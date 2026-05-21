@@ -62,4 +62,3 @@ Result: `item_count=158`; `duplicate_cluster_count=0`; `effective_duplicate_clus
 - S2-4: persist/verify merge provenance in repaired package output.
 - S2-5: run repair on a new candidate package and confirm strict audit remains zero.
 - Golden refresh/versioning remains separate because Sprint 1 verified rows are conservative snapshot labels, not human labels.
-

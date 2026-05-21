@@ -15,4 +15,3 @@ Generated: 2026-05-21
 ## Boundary
 
 Local code/docs only. No CloudRun deploy, mini-program upload, WeChat review submission, LLM/OCR/Dajiala run, Neo4j/Qdrant/production SQLite write.
-
