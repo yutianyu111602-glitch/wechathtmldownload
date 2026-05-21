@@ -1,0 +1,137 @@
+{
+    "ok":  true,
+    "repoPath":  "C:\\code\\githubstar\\wechathtmldownload",
+    "publicApiBase":  "https://weekly-api-255880-4-1371956557.sh.run.tcloudbase.com",
+    "dailyQueueDir":  "D:\\downstream_results\\stage7_rewrite\\longrun\\LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE",
+    "currentReleaseDir":  "C:\\code\\githubstar\\wechathtmldownload\\services\\weekly_activity_cloudrun\\data\\current_release",
+    "expectedMinItems":  80,
+    "remoteTotal":  158,
+    "firstId":  "nuts:8e60bf5acefe8588",
+    "checks":  [
+                   {
+                       "name":  "repo_exists",
+                       "ok":  true,
+                       "detail":  "C:\\code\\githubstar\\wechathtmldownload"
+                   },
+                   {
+                       "name":  "mini_program_dir_exists",
+                       "ok":  true,
+                       "detail":  "C:\\code\\githubstar\\wechathtmldownload\\apps\\weekly_activity_miniprogram"
+                   },
+                   {
+                       "name":  "release_dir_exists",
+                       "ok":  true,
+                       "detail":  "C:\\code\\githubstar\\wechathtmldownload\\services\\weekly_activity_cloudrun\\data\\current_release"
+                   },
+                   {
+                       "name":  "release_current_json_exists",
+                       "ok":  true,
+                       "detail":  "C:\\code\\githubstar\\wechathtmldownload\\services\\weekly_activity_cloudrun\\data\\current_release\\current.json"
+                   },
+                   {
+                       "name":  "release_source_map_exists",
+                       "ok":  true,
+                       "detail":  "C:\\code\\githubstar\\wechathtmldownload\\services\\weekly_activity_cloudrun\\data\\source_actions\\source_url_map.json"
+                   },
+                   {
+                       "name":  "daily_queue_exists",
+                       "ok":  true,
+                       "detail":  "D:\\downstream_results\\stage7_rewrite\\longrun\\LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE\\latest_queue.jsonl"
+                   },
+                   {
+                       "name":  "daily_queue_nonempty",
+                       "ok":  true,
+                       "detail":  "bytes=10304631"
+                   },
+                   {
+                       "name":  "daily_queue_recent",
+                       "ok":  true,
+                       "detail":  "age_hours=0.37 max=72"
+                   },
+                   {
+                       "name":  "daily_queue_summary_rows",
+                       "ok":  true,
+                       "detail":  "rows_written=2354"
+                   },
+                   {
+                       "name":  "daily_queue_exporter_refresh_recorded",
+                       "ok":  true,
+                       "detail":  "exporter_refresh_requested=True"
+                   },
+                   {
+                       "name":  "cloudbase_init_env",
+                       "ok":  true,
+                       "detail":  "app.js"
+                   },
+                   {
+                       "name":  "public_api_base_configured",
+                       "ok":  true,
+                       "detail":  "https://weekly-api-255880-4-1371956557.sh.run.tcloudbase.com"
+                   },
+                   {
+                       "name":  "call_container_path",
+                       "ok":  true,
+                       "detail":  "utils/api.js"
+                   },
+                   {
+                       "name":  "public_api_fallback_path",
+                       "ok":  true,
+                       "detail":  "utils/api.js"
+                   },
+                   {
+                       "name":  "static_batch_fallback",
+                       "ok":  true,
+                       "detail":  "utils/api.js"
+                   },
+                   {
+                       "name":  "visible_url_filter_present",
+                       "ok":  true,
+                       "detail":  "utils/format.js"
+                   },
+                   {
+                       "name":  "poster_pool_wiring",
+                       "ok":  true,
+                       "detail":  "pages/index/index.js"
+                   },
+                   {
+                       "name":  "poster_pool_default_size",
+                       "ok":  true,
+                       "detail":  "defaultPosterPool=48"
+                   },
+                   {
+                       "name":  "poster_pool_narrow_size",
+                       "ok":  true,
+                       "detail":  "narrowPosterPool=48"
+                   },
+                   {
+                       "name":  "backend_raw_hits_zero",
+                       "ok":  true,
+                       "detail":  "backendRawHits=0"
+                   },
+                   {
+                       "name":  "visible_compact_url_hits_zero",
+                       "ok":  true,
+                       "detail":  "visibleHits=0; backendRawHits=0"
+                   },
+                   {
+                       "name":  "published_items_have_source_urls",
+                       "ok":  true,
+                       "detail":  "missingSourceHash=0; missingSourceMapUrl=0"
+                   },
+                   {
+                       "name":  "frontend_real_data_probe",
+                       "ok":  true,
+                       "detail":  "items=158"
+                   },
+                   {
+                       "name":  "mini_program_tests",
+                       "ok":  true,
+                       "detail":  "ℹ tests 29\nℹ suites 0\nℹ pass 29\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 229.0159"
+                   },
+                   {
+                       "name":  "public_api_current_probe",
+                       "ok":  true,
+                       "detail":  "total=158 url=https://weekly-api-255880-4-1371956557.sh.run.tcloudbase.com/api/v1/weekly/current?limit=1"
+                   }
+               ]
+}

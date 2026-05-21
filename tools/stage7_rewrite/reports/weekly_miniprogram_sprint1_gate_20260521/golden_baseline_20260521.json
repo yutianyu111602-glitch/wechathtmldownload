@@ -1,0 +1,345 @@
+{
+  "generated_at": "2026-05-21T03:43:58+00:00",
+  "current_path": "C:\\code\\githubstar\\wechathtmldownload\\services\\weekly_activity_cloudrun\\data\\current_release\\current.json",
+  "golden_path": "C:\\code\\githubstar\\wechathtmldownload\\tools\\stage7_rewrite\\golden\\golden_set_v1.jsonl",
+  "release_metrics": {
+    "published_items": 158,
+    "lineup_nonempty": 100,
+    "lineup_nonempty_rate": 0.6329,
+    "missing_lineup_count": 58,
+    "backend_url_line_hits": 0,
+    "backend_url_event_count": 0,
+    "backend_url_event_rate": 0.0,
+    "city_count": 24
+  },
+  "golden_metrics": {
+    "golden_total": 88,
+    "status_counts": {
+      "verified": 20,
+      "pending": 68
+    },
+    "stratum_counts": {
+      "lineup_present": 22,
+      "missing_lineup": 48,
+      "url_backend": 18
+    },
+    "scored": {
+      "verified_count": 20,
+      "pending_count": 68,
+      "lineup_precision_mean": 1.0,
+      "lineup_recall_mean": 1.0,
+      "hard_error_count": 0,
+      "hard_error_rate": 0.0,
+      "per_row": [
+        {
+          "event_id": "flat_club:5b2a6b0aa1ee33b1",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 1,
+            "shown": 1,
+            "gold": 1
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "hum_club:23192b9b4f146b0e",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 1,
+            "shown": 1,
+            "gold": 1
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "agg-child-1add69b036fff9b0",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 1,
+            "shown": 1,
+            "gold": 1
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "gong:543c03d45272f30e",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 1,
+            "shown": 1,
+            "gold": 1
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "404:44a6669a38e65460",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 1,
+            "shown": 1,
+            "gold": 1
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "agg-child-e5cdb702a3d115ba",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 4,
+            "shown": 4,
+            "gold": 4
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "dada_bar_beijing:ba52c99bb21a08f8",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 3,
+            "shown": 3,
+            "gold": 3
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "nuts:20c4e474aee9dfe8",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 1,
+            "shown": 1,
+            "gold": 1
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "alkaline:0bb7b99a4b1a3b2a",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 3,
+            "shown": 3,
+            "gold": 3
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "reactor_shanghai:0aab4b5337998118",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 1,
+            "shown": 1,
+            "gold": 1
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "agg-child-7c82002192ecf723",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 4,
+            "shown": 4,
+            "gold": 4
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "oil:84f4a07cf5cec63e",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 1,
+            "shown": 1,
+            "gold": 1
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "agg-child-86e0b924a36835ee",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 4,
+            "shown": 4,
+            "gold": 4
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "agg-child-7960a35eb69f7d4b",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 3,
+            "shown": 3,
+            "gold": 3
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "zhaodai:4de0ef529f71260a",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 3,
+            "shown": 3,
+            "gold": 3
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "exit_shanghai:369ef80068badd45",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 1,
+            "shown": 1,
+            "gold": 1
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "youchang:9b499c6a7176c1f8",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 3,
+            "shown": 3,
+            "gold": 3
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "enlightening:503469be8accacbe",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 1,
+            "shown": 1,
+            "gold": 1
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "agg-child-cf34d077e0169925",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 6,
+            "shown": 6,
+            "gold": 6
+          },
+          "hard_error": false
+        },
+        {
+          "event_id": "agg-child-39d5d405fc919723",
+          "lineup_metrics": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "intersection": 1,
+            "shown": 1,
+            "gold": 1
+          },
+          "hard_error": false
+        }
+      ]
+    },
+    "snapshot_drift": [
+      {
+        "event_id": "flat_club:5b2a6b0aa1ee33b1",
+        "issue": "missing_in_current"
+      },
+      {
+        "event_id": "hum_club:23192b9b4f146b0e",
+        "issue": "lineup_snapshot_drift"
+      },
+      {
+        "event_id": "agg-child-1add69b036fff9b0",
+        "issue": "missing_in_current"
+      },
+      {
+        "event_id": "gong:543c03d45272f30e",
+        "issue": "missing_in_current"
+      },
+      {
+        "event_id": "agg-child-e5cdb702a3d115ba",
+        "issue": "missing_in_current"
+      },
+      {
+        "event_id": "agg-child-7c82002192ecf723",
+        "issue": "missing_in_current"
+      },
+      {
+        "event_id": "agg-child-86e0b924a36835ee",
+        "issue": "missing_in_current"
+      },
+      {
+        "event_id": "agg-child-7960a35eb69f7d4b",
+        "issue": "missing_in_current"
+      },
+      {
+        "event_id": "zhaodai:4de0ef529f71260a",
+        "issue": "lineup_snapshot_drift"
+      },
+      {
+        "event_id": "agg-child-cf34d077e0169925",
+        "issue": "missing_in_current"
+      },
+      {
+        "event_id": "agg-child-39d5d405fc919723",
+        "issue": "missing_in_current"
+      },
+      {
+        "event_id": "chengdu:bf96e957cb25b4a2",
+        "issue": "missing_in_current"
+      },
+      {
+        "event_id": "pools:df8e6aa6fd8e5e41",
+        "issue": "lineup_snapshot_drift"
+      },
+      {
+        "event_id": "404:1cd0577fec81768e",
+        "issue": "missing_in_current"
+      },
+      {
+        "event_id": "wigwam:bc529198ac4ba3ed",
+        "issue": "lineup_snapshot_drift"
+      },
+      {
+        "event_id": "aurora_bj:865d4d95f3e3f40b",
+        "issue": "lineup_snapshot_drift"
+      },
+      {
+        "event_id": "exit_shanghai:3082bf6846c3bd22",
+        "issue": "lineup_snapshot_drift"
+      },
+      {
+        "event_id": "oil:6dbb6e9c270cee3f",
+        "issue": "lineup_snapshot_drift"
+      },
+      {
+        "event_id": "yuanhe:174f3d2ce8b6261b",
+        "issue": "lineup_snapshot_drift"
+      },
+      {
+        "event_id": "agg-child-34a7b75b6f755c1c",
+        "issue": "missing_in_current"
+      }
+    ],
+    "snapshot_drift_count": 43
+  },
+  "p0_targets": {
+    "lineup_precision": 0.92,
+    "lineup_recall": 0.75,
+    "backend_url_line_hits": 0
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "total": 88,
+  "verified_before": 0,
+  "verified_after": 20,
+  "newly_verified": 20,
+  "newly_verified_ids": [
+    "golden_v1_flat_club_5b2a6b0aa1ee33b1",
+    "golden_v1_hum_club_23192b9b4f146b0e",
+    "golden_v1_agg-child-1add69b036fff9b0",
+    "golden_v1_gong_543c03d45272f30e",
+    "golden_v1_404_44a6669a38e65460",
+    "golden_v1_agg-child-e5cdb702a3d115ba",
+    "golden_v1_dada_bar_beijing_ba52c99bb21a08f8",
+    "golden_v1_nuts_20c4e474aee9dfe8",
+    "golden_v1_alkaline_0bb7b99a4b1a3b2a",
+    "golden_v1_reactor_shanghai_0aab4b5337998118",
+    "golden_v1_agg-child-7c82002192ecf723",
+    "golden_v1_oil_84f4a07cf5cec63e",
+    "golden_v1_agg-child-86e0b924a36835ee",
+    "golden_v1_agg-child-7960a35eb69f7d4b",
+    "golden_v1_zhaodai_4de0ef529f71260a",
+    "golden_v1_exit_shanghai_369ef80068badd45",
+    "golden_v1_youchang_9b499c6a7176c1f8",
+    "golden_v1_enlightening_503469be8accacbe",
+    "golden_v1_agg-child-cf34d077e0169925",
+    "golden_v1_agg-child-39d5d405fc919723"
+  ],
+  "safe_pending_after": 2,
+  "min_verified": 20,
+  "ok": true
+}
