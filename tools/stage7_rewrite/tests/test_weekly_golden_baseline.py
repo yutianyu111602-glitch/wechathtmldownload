@@ -122,6 +122,7 @@ class WeeklyGoldenBaselineTests(unittest.TestCase):
                     str(out_json),
                     "--out-md",
                     str(out_md),
+                    "--no-handoff-write",
                 ]
             )
             self.assertEqual(code2, 0)

@@ -4,7 +4,7 @@
 
 ## 一句话
 
-当前远端周活为 `weekly-api-039` / 158 条；Sprint 1 gate 已闭环：guardian 全绿、backendRawHits=0、strict duplicate/conflict=0、Golden 88 条中 20 verified。未执行 CloudRun 新部署、小程序新上传或微信提审。
+当前远端周活为 `weekly-api-039` / 158 条；Sprint 1 gate 已闭环：guardian 全绿、backendRawHits=0、strict duplicate/conflict=0、Golden 88 条中 20 条为 conservative snapshot verified。未执行 CloudRun 新部署、小程序新上传或微信提审。
 
 ## 权威数字（勿混旧数据）
 
@@ -16,7 +16,7 @@
 | guardian | ok=true；visibleHits=0；backendRawHits=0 |
 | strict 去重 | duplicate=0；effective_duplicate=0；conflict=0 |
 | lineup | 100/158；missing_lineup 58；hard_fail_count=0 |
-| Golden | 88 条，20 verified，68 pending |
+| Golden | 88 条，20 conservative snapshot verified，68 pending |
 | baseline drift | `snapshot_drift_count=43`（5/19 seed 对 5/21 current 的自然漂移） |
 | atlas snapshot | 209 lineup rows；alias_exact=63；fuzzy_multiple=90；no_match=56 |
 
@@ -42,7 +42,7 @@ tools/stage7_rewrite/
 ## 下一 agent 三件事
 
 1. 进入 Sprint 2：`weekly_dedup_spec.v1.json` + Python/JS parity，确保 frontend_extra_merge=0
-2. 处理 baseline drift：决定是否基于当前 158 包刷新/版本化 Golden
+2. 处理 baseline drift：决定是否基于当前 158 包刷新/版本化 Golden；20 verified 不是人工/inter-annotator 金标
 3. 继续保持上传/提审分离：提审必须单独用户批准
 
 ## 边界

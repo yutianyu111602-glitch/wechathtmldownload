@@ -28,7 +28,7 @@ Not performed: CloudRun deploy, mini-program upload, WeChat review submission, N
 | Lineup audit | `item_count=158`; `missing_lineup=58`; `hard_fail_count=0` |
 | Python targeted tests | `47` tests passed |
 | Mini-program Node tests | `29` tests passed |
-| Golden | `88` total; `20` verified; `68` pending |
+| Golden | `88` total; `20` conservative snapshot verified; `68` pending |
 | Baseline | regenerated from current 158 package; backend URL line hits `0`; lineup precision/recall on verified rows `1.0/1.0` |
 
 ## Evidence Files
@@ -49,13 +49,15 @@ Not performed: CloudRun deploy, mini-program upload, WeChat review submission, N
 - `snapshot_drift_count=43`
 - drift types include `missing_in_current` and `lineup_snapshot_drift`
 
-This does not block Sprint 1 gate closure because the verified S1 rows are conservative snapshot-based checks, but Sprint 2 should treat this as a reason to refresh or version Golden against the active package before widening parity metrics.
+This does not block Sprint 1 gate closure because the verified S1 rows are conservative snapshot-based checks. They are not human/inter-annotator Golden labels and must not be used as proof of broad P/R quality. Sprint 2 should refresh or version Golden against the active package before widening parity metrics.
 
 ## Changed Files
 
 - Restored `tools/stage7_rewrite/golden/golden_set_v1.jsonl` to the intended 88-row seed.
+- Added `--no-handoff-write` to `tools/stage7_rewrite/scripts/evaluate_weekly_golden_baseline.py` so unit tests cannot overwrite the maintained handoff baseline.
 - Added `tools/stage7_rewrite/scripts/verify_weekly_golden_s1.py`.
 - Added `tools/stage7_rewrite/tests/test_verify_weekly_golden_s1.py`.
+- Updated `tools/stage7_rewrite/tests/test_weekly_golden_baseline.py` to use `--no-handoff-write`.
 - Regenerated `docs/weekly-miniprogram-handoff-20260519/P0_BASELINE_REPORT_20260519.md`.
 - Wrote Sprint 1 gate evidence under `tools/stage7_rewrite/reports/weekly_miniprogram_sprint1_gate_20260521/`.
 
