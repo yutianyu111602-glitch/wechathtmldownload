@@ -4,7 +4,7 @@
 
 ## 一句话
 
-既有线上记录为 `weekly-api-039` / 158 条；本线程本地已闭环 Sprint 1–3 的可执行切片：backendRawHits=0、strict duplicate/conflict=0、dedupe parity PASS、重复推文 `merge_provenance` + source map redirect、详情/俱乐部页来源推文去重展示、`organizer_key/club_profile` API 契约、city switchTab、venue/artist 分页、saved lang。2026-05-21 本次 guardian 复验整体为 `ok=false`，原因是公网 API probe 超时与 daily queue exporter refresh 无有效账号，不代表本地 158 包重复/URL 门禁失败。未执行 CloudRun 新部署、小程序新上传或微信提审。
+既有线上记录为 `weekly-api-039` / 158 条；本线程本地已闭环 Sprint 1–3 的可执行切片：backendRawHits=0、strict duplicate/conflict=0、dedupe parity PASS、重复推文 `merge_provenance` + source map redirect、详情/俱乐部页来源推文去重展示、`organizer_key/club_profile` API 契约、city switchTab、venue/artist 分页、saved lang。2026-05-21 复核后公网 API 已恢复，当前包门禁 `GateMode=current-package` 为 `ok=true`、remoteTotal=158；默认 release 门禁仍为 `ok=false`，原因是 daily queue exporter refresh 无有效账号（`ret=200003 invalid session`），这会阻断下一次 rebuild/deploy/upload。未执行 CloudRun 新部署、小程序新上传或微信提审。
 
 ## 权威数字（勿混旧数据）
 
@@ -14,7 +14,8 @@
 | 条数 / 窗口 | 158 / `2026-05-20..2026-06-03` |
 | 小程序版 | `2026.05.21.1`（既有开发版；本线程未新上传；未提审） |
 | guardian 本地检查 | visibleHits=0；backendRawHits=0；frontend real data=158；mini_program_tests=35 pass |
-| guardian 整体复验 | ok=false；public_api_current_probe timeout；daily_queue_exporter_refresh_effective=false |
+| guardian current-package | ok=true；remoteTotal=158；firstId=`nuts:8e60bf5acefe8588` |
+| guardian release | ok=false；daily_queue_exporter_refresh_effective=false；exporter `invalid session` |
 | strict 去重 | duplicate=0；effective_duplicate=0；conflict=0 |
 | lineup | 100/158；missing_lineup 58；hard_fail_count=0 |
 | Golden | 88 条，20 conservative snapshot verified，68 pending |
@@ -87,11 +88,11 @@ apps/weekly_activity_miniprogram/tests/page-source-routing.test.cjs
 apps/weekly_activity_miniprogram/tests/format-quality.test.cjs
 ```
 
-验证：CloudRun API tests **30/30 pass**；CloudRun full tests **39/39 pass**；mini-program non-DevTools CJS/static tests pass；`stage7_safe_handoff_verify.ps1` **PASS**（Python targeted **354 passed**，CloudRun Stage7 **39 pass**）；当前 158 包 strict duplicate/effective/conflict **0/0/0**。DevTools 真机/上传未执行。
+验证：CloudRun API tests **30/30 pass**；CloudRun full tests **39/39 pass**；mini-program non-DevTools CJS/static tests pass；`stage7_safe_handoff_verify.ps1` **PASS**（Python targeted **354 passed**，CloudRun Stage7 **39 pass**）；当前 158 包 strict duplicate/effective/conflict **0/0/0**；Release Guardian `GateMode=current-package` **ok=true**，默认 `GateMode=release` 因 exporter session invalid 保持阻断。DevTools 真机/上传未执行。
 
 ## 下一 agent 三件事
 
-1. 修复/等待公网 API probe 与 daily queue exporter refresh，再复跑 guardian；不要把本次 `ok=false` 误判为本地 158 包去重失败
+1. 修复/重新授权 daily queue exporter session，再复跑默认 release guardian；不要把 `GateMode=release ok=false` 误判为本地 158 包去重失败
 2. 等待/生成下一次 OpenClaw 新包后，复跑 repair + strict audit，确认 source provenance 不丢、去重不新增重复卡
 3. 处理 baseline drift：决定是否基于当前 158 包刷新/版本化 Golden；20 verified 不是人工/inter-annotator 金标
 4. Sprint 4 需要 G0 alias export/new snapshot/dev upload；上传/提审必须单独用户批准

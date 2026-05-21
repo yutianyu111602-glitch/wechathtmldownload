@@ -39,14 +39,14 @@ No CloudRun deployment, mini-program upload, WeChat review, Neo4j/Qdrant write, 
 
 ## Guardian Note
 
-`check_weekly_release_guard.ps1` was rerun against the local current release directory. Local release checks passed for `backendRawHits=0`, `visibleHits=0`, source map presence, frontend real-data probe `items=158`, and mini-program tests `35 pass`.
+`check_weekly_release_guard.ps1` was rerun against the local current release directory. Local release checks passed for `backendRawHits=0`, `visibleHits=0`, source map presence, frontend real-data probe `items=158`, mini-program tests `35 pass`, and public API current probe `remoteTotal=158`.
 
-The guardian overall result is currently `ok=false` because:
+The guard now has two explicit modes:
 
-- `daily_queue_exporter_refresh_effective=false` with `exporter_accounts_ok=0`, `exporter_accounts_failed=122`, `exporter_article_rows=0`
-- `public_api_current_probe` timed out
+- `GateMode=current-package`: `ok=true`; use this to verify the already-built 158 package and remote-effective read path.
+- `GateMode=release`: `ok=false`; use this before rebuild/deploy/upload. It is correctly blocked by `daily_queue_exporter_refresh_effective=false` with `exporter_accounts_ok=0`, `exporter_accounts_failed=122`, `exporter_article_rows=0`.
 
-Do not treat this as a local dedupe/source regression. It is an external queue/remote-probe blocker to clear before deployment or upload.
+Dedicated diagnostics confirm `ret=200003`, `err_msg=invalid session`, and `article_count=0` from the local exporter. Do not treat this as a local dedupe/source regression. It is an exporter session blocker to clear before deployment or upload.
 
 ## Remaining
 

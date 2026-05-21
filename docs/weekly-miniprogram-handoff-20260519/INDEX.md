@@ -46,7 +46,7 @@ Scope: **仅周活小程序线**（不含电子音乐图鉴主线实现，但计
 | 小程序开发版 | `2026.05.21.1`（既有开发版；本线程未新上传；未提审） |
 | API 包 | `D:\downstream_results\stage7_rewrite\longrun\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260520` |
 | OpenClaw 入口 | `tools\stage7_rewrite\run_openclaw_weekly_daily_publish.ps1` |
-| 本次 guardian 复验 | 本地 URL/source/158/mini tests 过；整体 `ok=false`，公网 API probe 超时且 daily queue exporter refresh 无有效行 |
+| 本次 guardian 复验 | `GateMode=current-package` ok=true / remoteTotal=158；默认 `GateMode=release` 因 exporter `invalid session` 正确阻断 |
 
 
 
@@ -157,7 +157,7 @@ Scope: **仅周活小程序线**（不含电子音乐图鉴主线实现，但计
 
 | `../../reports/ATLAS_WEEKLY_ALL_DO_CLOSEOUT_20260521.md` | **2026-05-21 全做收口**：本地 Atlas 只读联动、review 包、Golden 包、observations ingest dry-run、release dry-run 与门禁证据 |
 
-| `../../reports/WEEKLY_EXPORTER_REFRESH_GATE_HARDENING_20260521.md` | **2026-05-21 续跑硬化**：Release Guardian 改为 exporter refresh effective 门禁；当前因 `0/122` 成功账号、`ret=200003 invalid session` 而正确阻断 |
+| `../../reports/WEEKLY_EXPORTER_REFRESH_GATE_HARDENING_20260521.md` | **2026-05-21 续跑硬化**：Release Guardian 改为 exporter refresh effective 门禁；默认 release 模式因 `0/122` 成功账号、`ret=200003 invalid session` 而正确阻断；current-package 模式可验证既有 158 包 |
 
 
 ---

@@ -1,0 +1,17 @@
+{
+  "schema_version": "weekly_daily_queue_refresh_validation.v1",
+  "decision": "daily_queue_refresh_blocked",
+  "ok": false,
+  "generated_at": "2026-05-21T15:32:43",
+  "summary_path": "D:\\downstream_results\\stage7_rewrite\\longrun\\LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE\\summary.json",
+  "rows_written": 2354,
+  "exporter_refresh_requested": true,
+  "exporter_accounts_ok": 0,
+  "exporter_accounts_failed": 122,
+  "exporter_article_rows": 0,
+  "checks": {
+    "daily_queue_summary_rows": true,
+    "daily_queue_exporter_refresh_recorded": true,
+    "daily_queue_exporter_refresh_effective": false
+  }
+}

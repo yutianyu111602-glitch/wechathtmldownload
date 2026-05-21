@@ -1,0 +1,15 @@
+{
+  "schema_version": "weekly_exporter_session_diagnostic.v1",
+  "generated_at": "2026-05-21T15:32:43",
+  "endpoint": "http://127.0.0.1:17300",
+  "registry": "tools\\stage7_rewrite\\registries\\weekly_accounts_seed.json",
+  "auth_env_present": true,
+  "auth_env_name": "MPTEXT_AUTH_KEY",
+  "probe_fakeid_hash": "fbd46eae4b9b",
+  "decision": "exporter_session_invalid",
+  "session_ok": false,
+  "ret": 200003,
+  "err_msg": "invalid session",
+  "article_count": 0,
+  "error": ""
+}

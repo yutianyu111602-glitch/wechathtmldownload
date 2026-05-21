@@ -128,7 +128,7 @@ ul { padding-left: 24px; }
         <div class="title">HUAIDJ Weekly Index</div>
         <div class="grid">
           <div><strong>Source</strong><br>C:\code\githubstar\wechathtmldownload\docs\weekly-miniprogram-handoff-20260519\INDEX.md</div>
-          <div><strong>Generated</strong><br>2026-05-21 15:23 +0800</div>
+          <div><strong>Generated</strong><br>2026-05-21 15:34 +0800</div>
         </div>
       </section>
       <section class="banner">
@@ -147,7 +147,7 @@ ul { padding-left: 24px; }
 <h2 id="权威事实-当前">权威事实（当前）</h2>
 <p>| 项 | 值 |</p>
 <p>|----|-----|</p>
-<p>| CloudRun | <code>weekly-api-039</code>（以 <code>apps\weekly_activity_miniprogram\OPENCLAW_AUTOMATION.md</code> 顶部为准） | | 发布条数 | 158 | | 窗口 | <code>2026-05-20..2026-06-03</code> | | 小程序开发版 | <code>2026.05.21.1</code>（既有开发版；本线程未新上传；未提审） | | API 包 | <code>D:\downstream_results\stage7_rewrite\longrun\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260520</code> | | OpenClaw 入口 | <code>tools\stage7_rewrite\run_openclaw_weekly_daily_publish.ps1</code> | | 本次 guardian 复验 | 本地 URL/source/158/mini tests 过；整体 <code>ok=false</code>，公网 API probe 超时且 daily queue exporter refresh 无有效行 |</p>
+<p>| CloudRun | <code>weekly-api-039</code>（以 <code>apps\weekly_activity_miniprogram\OPENCLAW_AUTOMATION.md</code> 顶部为准） | | 发布条数 | 158 | | 窗口 | <code>2026-05-20..2026-06-03</code> | | 小程序开发版 | <code>2026.05.21.1</code>（既有开发版；本线程未新上传；未提审） | | API 包 | <code>D:\downstream_results\stage7_rewrite\longrun\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260520</code> | | OpenClaw 入口 | <code>tools\stage7_rewrite\run_openclaw_weekly_daily_publish.ps1</code> | | 本次 guardian 复验 | <code>GateMode=current-package</code> ok=true / remoteTotal=158；默认 <code>GateMode=release</code> 因 exporter <code>invalid session</code> 正确阻断 |</p>
 <p>| 本地全做收口 | <code>reports\ATLAS_WEEKLY_ALL_DO_CLOSEOUT_20260521.md</code>；含 Atlas 只读 detail 接口、本地 review/Golden/ingest/release dry-run 包 |</p>
 <p>历史数量 <code>28/51/57/74/100/103/104/107/151/167/173</code> 等 <strong>不得</strong> 当作当前线上事实。</p>
 <p>---</p>
@@ -192,7 +192,7 @@ ul { padding-left: 24px; }
 <p>| <a href="./html/MASTER_DASHBOARD.html">html/MASTER_DASHBOARD.html</a> | 可视化总览 |</p>
 <p>| <a href="./html/">html/</a> | Markdown HTML 伴生页 |</p>
 <p>| <code>../../reports/ATLAS_WEEKLY_ALL_DO_CLOSEOUT_20260521.md</code> | <strong>2026-05-21 全做收口</strong>：本地 Atlas 只读联动、review 包、Golden 包、observations ingest dry-run、release dry-run 与门禁证据 |</p>
-<p>| <code>../../reports/WEEKLY_EXPORTER_REFRESH_GATE_HARDENING_20260521.md</code> | <strong>2026-05-21 续跑硬化</strong>：Release Guardian 改为 exporter refresh effective 门禁；当前因 <code>0/122</code> 成功账号、<code>ret=200003 invalid session</code> 而正确阻断 |</p>
+<p>| <code>../../reports/WEEKLY_EXPORTER_REFRESH_GATE_HARDENING_20260521.md</code> | <strong>2026-05-21 续跑硬化</strong>：Release Guardian 改为 exporter refresh effective 门禁；默认 release 模式因 <code>0/122</code> 成功账号、<code>ret=200003 invalid session</code> 而正确阻断；current-package 模式可验证既有 158 包 |</p>
 <p>---</p>
 <h2 id="外部权威-仓库内">外部权威（仓库内）</h2>
 <ul>

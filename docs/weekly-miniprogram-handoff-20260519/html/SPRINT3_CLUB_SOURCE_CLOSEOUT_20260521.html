@@ -123,7 +123,7 @@ ul { padding-left: 24px; }
         <div class="title">Sprint 3 Club Source Closeout</div>
         <div class="grid">
           <div><strong>Source</strong><br>C:\code\githubstar\wechathtmldownload\docs\weekly-miniprogram-handoff-20260519\SPRINT3_CLUB_SOURCE_CLOSEOUT_20260521.md</div>
-          <div><strong>Generated</strong><br>2026-05-21 15:23 +0800</div>
+          <div><strong>Generated</strong><br>2026-05-21 15:34 +0800</div>
         </div>
       </section>
       <section class="banner">
@@ -140,13 +140,13 @@ ul { padding-left: 24px; }
 <h2 id="verification">Verification</h2>
 <p>| Check | Result | |-------|--------| | <code>node apps\weekly_activity_miniprogram\tests\format-quality.test.cjs</code> | PASS | | <code>node apps\weekly_activity_miniprogram\tests\page-source-routing.test.cjs</code> | 3 pass | | <code>node apps\weekly_activity_miniprogram\tests\source-articles.test.cjs</code> | 4 pass | | <code>node apps\weekly_activity_miniprogram\tests\dedup-parity.test.cjs</code> | PASS | | other non-DevTools mini-program CJS tests | PASS | | <code>node services\weekly_activity_cloudrun\tests\weeklyApi.test.mjs</code> | 30 pass | | all CloudRun test files | 39 pass | | Python repair + dedup parity | 10 OK | | Golden baseline focused tests | 5 OK | | strict 158-package audit | duplicate/effective/conflict = 0/0/0 | | <code>stage7_safe_handoff_verify.ps1</code> | PASS; Python targeted 354 passed; CloudRun Stage7 39 pass |</p>
 <h2 id="guardian-note">Guardian Note</h2>
-<p><code>check_weekly_release_guard.ps1</code> was rerun against the local current release directory. Local release checks passed for <code>backendRawHits=0</code>, <code>visibleHits=0</code>, source map presence, frontend real-data probe <code>items=158</code>, and mini-program tests <code>35 pass</code>.</p>
-<p>The guardian overall result is currently <code>ok=false</code> because:</p>
+<p><code>check_weekly_release_guard.ps1</code> was rerun against the local current release directory. Local release checks passed for <code>backendRawHits=0</code>, <code>visibleHits=0</code>, source map presence, frontend real-data probe <code>items=158</code>, mini-program tests <code>35 pass</code>, and public API current probe <code>remoteTotal=158</code>.</p>
+<p>The guard now has two explicit modes:</p>
 <ul>
-<li><code>daily_queue_exporter_refresh_effective=false</code> with <code>exporter_accounts_ok=0</code>, <code>exporter_accounts_failed=122</code>, <code>exporter_article_rows=0</code></li>
-<li><code>public_api_current_probe</code> timed out</li>
+<li><code>GateMode=current-package</code>: <code>ok=true</code>; use this to verify the already-built 158 package and remote-effective read path.</li>
+<li><code>GateMode=release</code>: <code>ok=false</code>; use this before rebuild/deploy/upload. It is correctly blocked by <code>daily_queue_exporter_refresh_effective=false</code> with <code>exporter_accounts_ok=0</code>, <code>exporter_accounts_failed=122</code>, <code>exporter_article_rows=0</code>.</li>
 </ul>
-<p>Do not treat this as a local dedupe/source regression. It is an external queue/remote-probe blocker to clear before deployment or upload.</p>
+<p>Dedicated diagnostics confirm <code>ret=200003</code>, <code>err_msg=invalid session</code>, and <code>article_count=0</code> from the local exporter. Do not treat this as a local dedupe/source regression. It is an exporter session blocker to clear before deployment or upload.</p>
 <h2 id="remaining">Remaining</h2>
 <p>| Item | Status | |------|--------| | Week/month schedule badges | UI polish / DevTools review pending | | G0 alias export and new snapshot | External Atlas input pending | | DevTools 10/10 visual pass | Requires user-approved/available WeChat DevTools automation | | Upload new dev version | Requires explicit user approval | | WeChat review submission | Requires explicit user approval |</p>
       </article>

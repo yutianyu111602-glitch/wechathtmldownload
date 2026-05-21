@@ -25,7 +25,8 @@ Read in this order:
 | API | `weekly-api-039` |
 | Published window | 158 items, `2026-05-20..2026-06-03` |
 | Guardian local checks | `backendRawHits=0`, `visibleHits=0`, frontend real-data probe 158, mini-program tests 35 pass |
-| Guardian overall rerun | `ok=false` because public API probe timed out and daily queue exporter refresh had no effective account/article rows |
+| Guardian current-package rerun | `ok=true`, remoteTotal=158, public API probe recovered |
+| Guardian release rerun | `ok=false` because daily queue exporter refresh had no effective account/article rows; diagnostic says `ret=200003 invalid session` |
 | Strict dedupe | duplicate=0, effective_duplicate=0, conflict=0 |
 | Golden | 88 total, 20 conservative snapshot verified, 68 pending |
 | Atlas boundary | read-only enrichment only; no production graph/vector write from this thread |
@@ -57,6 +58,8 @@ Read in this order:
 | CloudRun dedup parity | PASS |
 | CloudRun full tests | 39 pass |
 | Stage7 safe handoff verify | PASS; Python targeted 354 passed; CloudRun Stage7 39 pass |
+| Current-package guardian | PASS; `GateMode=current-package` |
+| Release guardian | BLOCKED as designed; exporter session invalid |
 | Current 158 package strict audit | duplicate/effective/conflict = 0/0/0 |
 
 ## Document Lifecycle Inventory
@@ -107,4 +110,4 @@ Read in this order:
 - Older historical HTML companions may still contain old facts by design; route through `INDEX.html` / `MASTER_DASHBOARD.html` first.
 - Write a new long-form full handoff only if the user asks for a fresh long-form artifact.
 - Golden should be refreshed/versioned against the active 158 package before broader P/R claims.
-- Guardian must be rerun after the public API timeout and daily queue exporter refresh blocker are cleared.
+- Guardian default release mode must be rerun after the daily queue exporter session is repaired/re-authorized. `GateMode=current-package` is only for validating the existing 158 package/read path.
