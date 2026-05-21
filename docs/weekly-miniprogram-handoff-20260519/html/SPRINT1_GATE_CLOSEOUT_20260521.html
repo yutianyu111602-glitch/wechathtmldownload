@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HUAIDJ Weekly Miniprogram Sprint 1 Gate Closeout 2026-05-21</title>
+  <style>
+:root {
+  --bg: #f6f7f9;
+  --paper: #ffffff;
+  --ink: #16181d;
+  --muted: #5c6470;
+  --line: #d8dde6;
+  --accent: #2457d6;
+  --accent-soft: #e8eefc;
+  --warn: #8a4b00;
+  --code: #10141f;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+}
+.shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  min-height: 100vh;
+}
+aside {
+  border-right: 1px solid var(--line);
+  background: #f0f3f8;
+  padding: 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+}
+main {
+  max-width: 1120px;
+  width: 100%;
+  padding: 32px;
+}
+.meta, .banner, .content {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.meta { padding: 20px 24px; margin-bottom: 16px; }
+.banner {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  color: var(--warn);
+  background: #fff8e8;
+}
+.content { padding: 24px 32px; }
+h1, h2, h3 { line-height: 1.25; margin: 28px 0 12px; }
+h1 { font-size: 32px; margin-top: 0; }
+h2 { font-size: 22px; border-top: 1px solid var(--line); padding-top: 24px; }
+h3 { font-size: 17px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+nav a {
+  display: block;
+  padding: 6px 0;
+  color: var(--muted);
+}
+nav a.level-1 { color: var(--ink); font-weight: 700; }
+nav a.level-3, nav a.level-4, nav a.level-5, nav a.level-6 { padding-left: 12px; }
+code {
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: "Cascadia Mono", Consolas, monospace;
+}
+pre {
+  background: var(--code);
+  color: #e7edf7;
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+}
+pre code { background: transparent; padding: 0; color: inherit; }
+ul { padding-left: 24px; }
+.kicker {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.title { font-size: 28px; font-weight: 750; margin: 4px 0 8px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  color: var(--muted);
+}
+@media (max-width: 860px) {
+  .shell { display: block; }
+  aside { position: static; height: auto; }
+  main { padding: 20px; }
+  .content { padding: 20px; }
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="kicker">HTML handoff</div>
+      <h1>HUAIDJ Weekly Miniprogram Sprint 1 Gate Closeout 2026-05-21</h1>
+      <nav><a class="level-1" href="#huaidj-weekly-miniprogram-sprint-1-gate-closeout-2026-05-21">HUAIDJ Weekly Miniprogram Sprint 1 Gate Closeout 2026-05-21</a>
+<a class="level-2" href="#scope">Scope</a>
+<a class="level-2" href="#current-runtime-truth">Current Runtime Truth</a>
+<a class="level-2" href="#gate-results">Gate Results</a>
+<a class="level-2" href="#evidence-files">Evidence Files</a>
+<a class="level-2" href="#important-drift-note">Important Drift Note</a>
+<a class="level-2" href="#changed-files">Changed Files</a>
+<a class="level-2" href="#remaining-work">Remaining Work</a></nav>
+    </aside>
+    <main>
+      <section class="meta">
+        <div class="kicker">handoff</div>
+        <div class="title">HUAIDJ Weekly Miniprogram Sprint 1 Gate Closeout 2026-05-21</div>
+        <div class="grid">
+          <div><strong>Source</strong><br>C:\code\githubstar\wechathtmldownload\docs\weekly-miniprogram-handoff-20260519\SPRINT1_GATE_CLOSEOUT_20260521.md</div>
+          <div><strong>Generated</strong><br>2026-05-21 14:52 +0800</div>
+        </div>
+      </section>
+      <section class="banner">
+        Static derived artifact. Keep the source Markdown or structured notes as the source of truth. Do not add secrets to this HTML.
+      </section>
+      <article class="content">
+<h1 id="huaidj-weekly-miniprogram-sprint-1-gate-closeout-2026-05-21">HUAIDJ Weekly Miniprogram Sprint 1 Gate Closeout 2026-05-21</h1>
+<h2 id="scope">Scope</h2>
+<p>Closed the Phase II Sprint 1 gate loop from <code>PLAN_WEEKLY_MINIPROGRAM_UNIFIED.md</code>.</p>
+<p>Not performed: CloudRun deploy, mini-program upload, WeChat review submission, Neo4j/Qdrant production write, SQLite production mutation, new LLM/OCR/Dajiala run, or Atlas production graph acceptance.</p>
+<h2 id="current-runtime-truth">Current Runtime Truth</h2>
+<p>| State | Value | |------|-------| | CloudRun remote-effective | <code>weekly-api-039</code> | | Public API total | <code>158</code> | | Window | <code>2026-05-20..2026-06-03</code> | | Local current package | <code>services/weekly_activity_cloudrun/data/current_release</code> | | Source API package | <code>D:\downstream_results\stage7_rewrite\longrun\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260520</code> | | Mini-program uploaded dev version | <code>2026.05.21.1</code> | | WeChat review | not submitted |</p>
+<h2 id="gate-results">Gate Results</h2>
+<p>| Gate | Result | |------|--------| | Public API smoke | current total <code>158</code>; manifest item_count <code>158</code>; health ok <code>true</code> | | Guardian | <code>ok=true</code>; <code>remoteTotal=158</code>; <code>backendRawHits=0</code>; <code>visibleHits=0</code>; mini-program tests <code>29 pass</code> | | Strict duplicate/conflict audit | <code>duplicate_cluster_count=0</code>; <code>effective_duplicate_cluster_count=0</code>; <code>conflict_cluster_count=0</code> | | Lineup audit | <code>item_count=158</code>; <code>missing_lineup=58</code>; <code>hard_fail_count=0</code> | | Python targeted tests | <code>47</code> tests passed | | Mini-program Node tests | <code>29</code> tests passed | | Golden | <code>88</code> total; <code>20</code> conservative snapshot verified; <code>68</code> pending | | Baseline | regenerated from current 158 package; backend URL line hits <code>0</code>; lineup precision/recall on verified rows <code>1.0/1.0</code> |</p>
+<h2 id="evidence-files">Evidence Files</h2>
+<ul>
+<li><code>tools/stage7_rewrite/reports/weekly_miniprogram_sprint1_gate_20260521/current_state_probe.json</code></li>
+<li><code>tools/stage7_rewrite/reports/weekly_miniprogram_sprint1_gate_20260521/guardian.json</code></li>
+<li><code>tools/stage7_rewrite/reports/weekly_miniprogram_sprint1_gate_20260521/strict_conflicts.json</code></li>
+<li><code>tools/stage7_rewrite/reports/weekly_miniprogram_sprint1_gate_20260521/lineup_audit.json</code></li>
+<li><code>tools/stage7_rewrite/reports/weekly_miniprogram_sprint1_gate_20260521/golden_s1_verify_summary.json</code></li>
+<li><code>tools/stage7_rewrite/reports/weekly_miniprogram_sprint1_gate_20260521/golden_baseline_20260521.json</code></li>
+<li><code>tools/stage7_rewrite/reports/weekly_miniprogram_sprint1_gate_20260521/golden_baseline_20260521.md</code></li>
+<li><code>docs/weekly-miniprogram-handoff-20260519/P0_BASELINE_REPORT_20260519.md</code></li>
+</ul>
+<h2 id="important-drift-note">Important Drift Note</h2>
+<p><code>golden_set_v1.jsonl</code> was restored from the 2026-05-19 archived 88-row seed. The current 2026-05-20 package has 158 items, so baseline drift is expected and visible:</p>
+<ul>
+<li><code>snapshot_drift_count=43</code></li>
+<li>drift types include <code>missing_in_current</code> and <code>lineup_snapshot_drift</code></li>
+</ul>
+<p>This does not block Sprint 1 gate closure because the verified S1 rows are conservative snapshot-based checks. They are not human/inter-annotator Golden labels and must not be used as proof of broad P/R quality. Sprint 2 should refresh or version Golden against the active package before widening parity metrics.</p>
+<h2 id="changed-files">Changed Files</h2>
+<ul>
+<li>Restored <code>tools/stage7_rewrite/golden/golden_set_v1.jsonl</code> to the intended 88-row seed.</li>
+<li>Added <code>--no-handoff-write</code> to <code>tools/stage7_rewrite/scripts/evaluate_weekly_golden_baseline.py</code> so unit tests cannot overwrite the maintained handoff baseline.</li>
+<li>Added <code>tools/stage7_rewrite/scripts/verify_weekly_golden_s1.py</code>.</li>
+<li>Added <code>tools/stage7_rewrite/tests/test_verify_weekly_golden_s1.py</code>.</li>
+<li>Updated <code>tools/stage7_rewrite/tests/test_weekly_golden_baseline.py</code> to use <code>--no-handoff-write</code>.</li>
+<li>Regenerated <code>docs/weekly-miniprogram-handoff-20260519/P0_BASELINE_REPORT_20260519.md</code>.</li>
+<li>Wrote Sprint 1 gate evidence under <code>tools/stage7_rewrite/reports/weekly_miniprogram_sprint1_gate_20260521/</code>.</li>
+</ul>
+<h2 id="remaining-work">Remaining Work</h2>
+<ul>
+<li>Sprint 2: dedupe parity and merge provenance.</li>
+<li>Sprint 3: Club Profile and organizer key.</li>
+<li>Sprint 4: Atlas snapshot build integration and upload preparation.</li>
+</ul>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

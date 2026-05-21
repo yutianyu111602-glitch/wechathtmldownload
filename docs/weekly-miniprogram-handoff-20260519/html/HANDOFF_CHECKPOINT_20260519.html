@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>接手检查点 — 2026-05-19（2026-05-21 Sprint 1 + Sprint 2 source integration + docs sync 更新）</title>
+  <style>
+:root {
+  --bg: #f6f7f9;
+  --paper: #ffffff;
+  --ink: #16181d;
+  --muted: #5c6470;
+  --line: #d8dde6;
+  --accent: #2457d6;
+  --accent-soft: #e8eefc;
+  --warn: #8a4b00;
+  --code: #10141f;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+}
+.shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  min-height: 100vh;
+}
+aside {
+  border-right: 1px solid var(--line);
+  background: #f0f3f8;
+  padding: 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+}
+main {
+  max-width: 1120px;
+  width: 100%;
+  padding: 32px;
+}
+.meta, .banner, .content {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.meta { padding: 20px 24px; margin-bottom: 16px; }
+.banner {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  color: var(--warn);
+  background: #fff8e8;
+}
+.content { padding: 24px 32px; }
+h1, h2, h3 { line-height: 1.25; margin: 28px 0 12px; }
+h1 { font-size: 32px; margin-top: 0; }
+h2 { font-size: 22px; border-top: 1px solid var(--line); padding-top: 24px; }
+h3 { font-size: 17px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+nav a {
+  display: block;
+  padding: 6px 0;
+  color: var(--muted);
+}
+nav a.level-1 { color: var(--ink); font-weight: 700; }
+nav a.level-3, nav a.level-4, nav a.level-5, nav a.level-6 { padding-left: 12px; }
+code {
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: "Cascadia Mono", Consolas, monospace;
+}
+pre {
+  background: var(--code);
+  color: #e7edf7;
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+}
+pre code { background: transparent; padding: 0; color: inherit; }
+ul { padding-left: 24px; }
+.kicker {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.title { font-size: 28px; font-weight: 750; margin: 4px 0 8px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  color: var(--muted);
+}
+@media (max-width: 860px) {
+  .shell { display: block; }
+  aside { position: static; height: auto; }
+  main { padding: 20px; }
+  .content { padding: 20px; }
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="kicker">HTML handoff</div>
+      <h1>接手检查点 — 2026-05-19（2026-05-21 Sprint 1 + Sprint 2 source integration + docs sync 更新）</h1>
+      <nav><a class="level-1" href="#接手检查点-2026-05-19-2026-05-21-sprint-1-sprint-2-source-integration-docs-sync-更新">接手检查点 — 2026-05-19（2026-05-21 Sprint 1 + Sprint 2 source integration + docs sync 更新）</a>
+<a class="level-2" href="#一句话">一句话</a>
+<a class="level-2" href="#权威数字-勿混旧数据">权威数字（勿混旧数据）</a>
+<a class="level-2" href="#sprint-1-新增-修正代码-已验证">Sprint 1 新增/修正代码（已验证）</a>
+<a class="level-2" href="#sprint-2-parity-新增-修正代码-已验证">Sprint 2 parity 新增/修正代码（已验证）</a>
+<a class="level-2" href="#sprint-2-推文整合新增-修正代码-已验证">Sprint 2 推文整合新增/修正代码（已验证）</a>
+<a class="level-2" href="#下一-agent-三件事">下一 agent 三件事</a>
+<a class="level-2" href="#边界">边界</a></nav>
+    </aside>
+    <main>
+      <section class="meta">
+        <div class="kicker">handoff</div>
+        <div class="title">接手检查点 — 2026-05-19（2026-05-21 Sprint 1 + Sprint 2 source integration + docs sync 更新）</div>
+        <div class="grid">
+          <div><strong>Source</strong><br>C:\code\githubstar\wechathtmldownload\docs\weekly-miniprogram-handoff-20260519\HANDOFF_CHECKPOINT_20260519.md</div>
+          <div><strong>Generated</strong><br>2026-05-21 15:01 +0800</div>
+        </div>
+      </section>
+      <section class="banner">
+        Static derived artifact. Keep the source Markdown or structured notes as the source of truth. Do not add secrets to this HTML.
+      </section>
+      <article class="content">
+<h1 id="接手检查点-2026-05-19-2026-05-21-sprint-1-sprint-2-source-integration-docs-sync-更新">接手检查点 — 2026-05-19（2026-05-21 Sprint 1 + Sprint 2 source integration + docs sync 更新）</h1>
+<p>&gt; 精简续跑入口。执行计划见 <strong><a href="./PLAN_WEEKLY_MINIPROGRAM_UNIFIED.md">PLAN_WEEKLY_MINIPROGRAM_UNIFIED.md</a></strong>；Sprint 1 closeout 见 <a href="./SPRINT1_GATE_CLOSEOUT_20260521.md">SPRINT1_GATE_CLOSEOUT_20260521.md</a>；Sprint 2 parity closeout 见 <a href="./SPRINT2_DEDUP_PARITY_CLOSEOUT_20260521.md">SPRINT2_DEDUP_PARITY_CLOSEOUT_20260521.md</a>；去重与推文整合逻辑见 <a href="./DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.md">DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.md</a>；文档/代码/计划生命周期审计见 <a href="./DOC_CODE_PLAN_SYNC_AUDIT_20260521.md">DOC_CODE_PLAN_SYNC_AUDIT_20260521.md</a>。<a href="./NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.md">NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.md</a> 是 2026-05-19 长版历史接手证据，不再作为当前数字入口。</p>
+<h2 id="一句话">一句话</h2>
+<p>当前远端周活为 <code>weekly-api-039</code> / 158 条；Sprint 1 gate 已闭环：guardian 全绿、backendRawHits=0、strict duplicate/conflict=0、Golden 88 条中 20 条为 conservative snapshot verified。Sprint 2 已完成 <code>weekly_dedup_spec.v1.json</code> + Python/JS/CloudRun parity，<code>frontend_extra_merge=0</code>；并补齐重复推文合并的 <code>merge_provenance</code> 与 source map redirect，确保同一事件不重复发卡且不丢来源推文。未执行 CloudRun 新部署、小程序新上传或微信提审。</p>
+<h2 id="权威数字-勿混旧数据">权威数字（勿混旧数据）</h2>
+<p>| 项 | 值 | |----|-----| | API | <code>weekly-api-039</code> | | 条数 / 窗口 | 158 / <code>2026-05-20..2026-06-03</code> | | 小程序版 | <code>2026.05.21.1</code>（既有开发版；本线程未新上传；未提审） | | guardian | ok=true；visibleHits=0；backendRawHits=0 | | strict 去重 | duplicate=0；effective_duplicate=0；conflict=0 | | lineup | 100/158；missing_lineup 58；hard_fail_count=0 | | Golden | 88 条，20 conservative snapshot verified，68 pending | | baseline drift | <code>snapshot_drift_count=43</code>（5/19 seed 对 5/21 current 的自然漂移） | | atlas snapshot | 209 lineup rows；alias_exact=63；fuzzy_multiple=90；no_match=56 | | Sprint 2 parity | <code>weekly_dedup_spec.v1.json</code>；Python/mini-program/CloudRun parity PASS；frontend_extra_merge=0 | | Sprint 2 source integration | duplicate source map redirect；retained event <code>merge_provenance</code>；temp current repair hard_fail=0 |</p>
+<h2 id="sprint-1-新增-修正代码-已验证">Sprint 1 新增/修正代码（已验证）</h2>
+<pre><code>
+tools/stage7_rewrite/
+  scripts/weekly_golden_lib.py
+  scripts/bootstrap_weekly_golden_set.py
+  scripts/evaluate_weekly_golden_baseline.py
+  scripts/verify_weekly_golden_s1.py
+  scripts/build_weekly_atlas_snapshot.py
+  scripts/export_weekly_entity_observations.py
+  weekly_atlas_bridge/          # resolver + snapshot + observations
+  golden/golden_set_v1.jsonl
+  tests/test_weekly_golden_baseline.py
+  tests/test_verify_weekly_golden_s1.py
+  weekly_atlas_bridge/tests/test_resolver.py
+</code></pre>
+<p>验证：guardian ok=true；strict duplicate/conflict 0/0/0；Python targeted <strong>47/47 OK</strong>；小程序 Node <strong>29/29 OK</strong>。</p>
+<h2 id="sprint-2-parity-新增-修正代码-已验证">Sprint 2 parity 新增/修正代码（已验证）</h2>
+<pre><code>
+tools/stage7_rewrite/fixtures/weekly_dedup_spec.v1.json
+tools/stage7_rewrite/tests/test_weekly_dedup_spec_parity.py
+apps/weekly_activity_miniprogram/tests/dedup-parity.test.cjs
+apps/weekly_activity_miniprogram/utils/format.js
+services/weekly_activity_cloudrun/tests/dedupParity.test.mjs
+services/weekly_activity_cloudrun/src/dataStore.mjs
+</code></pre>
+<p>验证：Python L2 parity + repair conflict <strong>10/10 OK</strong>；小程序 Node <strong>30/30 pass</strong>；CloudRun Node <strong>38/38 pass</strong>；当前 158 包 strict duplicate/conflict <strong>0/0/0</strong>。</p>
+<h2 id="sprint-2-推文整合新增-修正代码-已验证">Sprint 2 推文整合新增/修正代码（已验证）</h2>
+<pre><code>
+tools/stage7_rewrite/scripts/repair_weekly_release_conflicts.py
+tools/stage7_rewrite/tests/test_repair_weekly_release_conflicts.py
+docs/weekly-miniprogram-handoff-20260519/DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.md
+docs/weekly-miniprogram-handoff-20260519/SPRINT2_SOURCE_INTEGRATION_CLOSEOUT_20260521.md
+</code></pre>
+<p>验证：重复合并会在 retained event 写 <code>merge_provenance</code>；被合并 source map 条目 redirect 到 retained event；当前 158 包临时 repair 后 <code>missing_lineup=58</code>、<code>hard_fail=0</code>。</p>
+<h2 id="下一-agent-三件事">下一 agent 三件事</h2>
+<p>1. 等待/生成下一次 OpenClaw 新包后，复跑 repair + strict audit，确认 source provenance 不丢、去重不新增重复卡 2. 处理 baseline drift：决定是否基于当前 158 包刷新/版本化 Golden；20 verified 不是人工/inter-annotator 金标 3. 进入 Sprint 3 前设计“来源推文在详情/俱乐部页可见但不重复展示”的 UI/API 小切片；上传/提审必须单独用户批准</p>
+<h2 id="边界">边界</h2>
+<p>小程序 ≠ 图谱；向量不进展示；不写 Neo4j/Qdrant production；未执行 CloudRun 新部署、小程序新上传、微信提审。</p>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,6 +1,6 @@
-# 接手检查点 — 2026-05-19（2026-05-21 Sprint 1 + Sprint 2 parity 更新）
+# 接手检查点 — 2026-05-19（2026-05-21 Sprint 1 + Sprint 2 source integration + docs sync 更新）
 
-> 精简续跑入口。执行计划见 **[PLAN_WEEKLY_MINIPROGRAM_UNIFIED.md](./PLAN_WEEKLY_MINIPROGRAM_UNIFIED.md)**；Sprint 1 closeout 见 [SPRINT1_GATE_CLOSEOUT_20260521.md](./SPRINT1_GATE_CLOSEOUT_20260521.md)；Sprint 2 parity closeout 见 [SPRINT2_DEDUP_PARITY_CLOSEOUT_20260521.md](./SPRINT2_DEDUP_PARITY_CLOSEOUT_20260521.md)；去重与推文整合逻辑见 [DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.md](./DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.md)；完整版见 [NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.md](./NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.md)
+> 精简续跑入口。执行计划见 **[PLAN_WEEKLY_MINIPROGRAM_UNIFIED.md](./PLAN_WEEKLY_MINIPROGRAM_UNIFIED.md)**；Sprint 1 closeout 见 [SPRINT1_GATE_CLOSEOUT_20260521.md](./SPRINT1_GATE_CLOSEOUT_20260521.md)；Sprint 2 parity closeout 见 [SPRINT2_DEDUP_PARITY_CLOSEOUT_20260521.md](./SPRINT2_DEDUP_PARITY_CLOSEOUT_20260521.md)；去重与推文整合逻辑见 [DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.md](./DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.md)；文档/代码/计划生命周期审计见 [DOC_CODE_PLAN_SYNC_AUDIT_20260521.md](./DOC_CODE_PLAN_SYNC_AUDIT_20260521.md)。[NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.md](./NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.md) 是 2026-05-19 长版历史接手证据，不再作为当前数字入口。
 
 ## 一句话
 
@@ -12,7 +12,7 @@
 |----|-----|
 | API | `weekly-api-039` |
 | 条数 / 窗口 | 158 / `2026-05-20..2026-06-03` |
-| 小程序版 | `2026.05.21.1`（未提审） |
+| 小程序版 | `2026.05.21.1`（既有开发版；本线程未新上传；未提审） |
 | guardian | ok=true；visibleHits=0；backendRawHits=0 |
 | strict 去重 | duplicate=0；effective_duplicate=0；conflict=0 |
 | lineup | 100/158；missing_lineup 58；hard_fail_count=0 |
@@ -67,9 +67,9 @@ docs/weekly-miniprogram-handoff-20260519/SPRINT2_SOURCE_INTEGRATION_CLOSEOUT_202
 
 ## 下一 agent 三件事
 
-1. 继续 Sprint 2：repair soft scoring impact review，确认 missing_lineup 下降不引入 hard_fail
+1. 等待/生成下一次 OpenClaw 新包后，复跑 repair + strict audit，确认 source provenance 不丢、去重不新增重复卡
 2. 处理 baseline drift：决定是否基于当前 158 包刷新/版本化 Golden；20 verified 不是人工/inter-annotator 金标
-3. 做 merge provenance 写入/抽样，然后再跑 repair 新包 + strict audit；上传/提审必须单独用户批准
+3. 进入 Sprint 3 前设计“来源推文在详情/俱乐部页可见但不重复展示”的 UI/API 小切片；上传/提审必须单独用户批准
 
 ## 边界
 

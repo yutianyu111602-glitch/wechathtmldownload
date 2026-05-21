@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>去重算法与推文来源整合逻辑 — 2026-05-21</title>
+  <style>
+:root {
+  --bg: #f6f7f9;
+  --paper: #ffffff;
+  --ink: #16181d;
+  --muted: #5c6470;
+  --line: #d8dde6;
+  --accent: #2457d6;
+  --accent-soft: #e8eefc;
+  --warn: #8a4b00;
+  --code: #10141f;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+}
+.shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  min-height: 100vh;
+}
+aside {
+  border-right: 1px solid var(--line);
+  background: #f0f3f8;
+  padding: 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+}
+main {
+  max-width: 1120px;
+  width: 100%;
+  padding: 32px;
+}
+.meta, .banner, .content {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.meta { padding: 20px 24px; margin-bottom: 16px; }
+.banner {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  color: var(--warn);
+  background: #fff8e8;
+}
+.content { padding: 24px 32px; }
+h1, h2, h3 { line-height: 1.25; margin: 28px 0 12px; }
+h1 { font-size: 32px; margin-top: 0; }
+h2 { font-size: 22px; border-top: 1px solid var(--line); padding-top: 24px; }
+h3 { font-size: 17px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+nav a {
+  display: block;
+  padding: 6px 0;
+  color: var(--muted);
+}
+nav a.level-1 { color: var(--ink); font-weight: 700; }
+nav a.level-3, nav a.level-4, nav a.level-5, nav a.level-6 { padding-left: 12px; }
+code {
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: "Cascadia Mono", Consolas, monospace;
+}
+pre {
+  background: var(--code);
+  color: #e7edf7;
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+}
+pre code { background: transparent; padding: 0; color: inherit; }
+ul { padding-left: 24px; }
+.kicker {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.title { font-size: 28px; font-weight: 750; margin: 4px 0 8px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  color: var(--muted);
+}
+@media (max-width: 860px) {
+  .shell { display: block; }
+  aside { position: static; height: auto; }
+  main { padding: 20px; }
+  .content { padding: 20px; }
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="kicker">HTML handoff</div>
+      <h1>去重算法与推文来源整合逻辑 — 2026-05-21</h1>
+      <nav><a class="level-1" href="#去重算法与推文来源整合逻辑-2026-05-21">去重算法与推文来源整合逻辑 — 2026-05-21</a>
+<a class="level-2" href="#goal">Goal</a>
+<a class="level-2" href="#layering">Layering</a>
+<a class="level-2" href="#event-dedup-decision">Event Dedup Decision</a>
+<a class="level-2" href="#source-article-integration">Source Article Integration</a>
+<a class="level-2" href="#current-package-impact">Current Package Impact</a>
+<a class="level-2" href="#tests-covering-the-contract">Tests Covering The Contract</a></nav>
+    </aside>
+    <main>
+      <section class="meta">
+        <div class="kicker">handoff</div>
+        <div class="title">去重算法与推文来源整合逻辑 — 2026-05-21</div>
+        <div class="grid">
+          <div><strong>Source</strong><br>C:\code\githubstar\wechathtmldownload\docs\weekly-miniprogram-handoff-20260519\DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.md</div>
+          <div><strong>Generated</strong><br>2026-05-21 14:52 +0800</div>
+        </div>
+      </section>
+      <section class="banner">
+        Static derived artifact. Keep the source Markdown or structured notes as the source of truth. Do not add secrets to this HTML.
+      </section>
+      <article class="content">
+<h1 id="去重算法与推文来源整合逻辑-2026-05-21">去重算法与推文来源整合逻辑 — 2026-05-21</h1>
+<p>Scope: HUAIDJ weekly mini-program + Atlas read-only cross-reference boundary.</p>
+<p>This thread owns the mini-program event feed and its Atlas read-only enrichment surface. It does not take over the Atlas graph mainline.</p>
+<h2 id="goal">Goal</h2>
+<p>When AI整理活动推文信息:</p>
+<ul>
+<li>do not publish duplicate event cards</li>
+<li>do not lose source article information when several posts point to one event</li>
+<li>do not merge conflicts just because titles look similar</li>
+<li>keep deploy, mini-program upload, and WeChat review as explicit separate states</li>
+</ul>
+<h2 id="layering">Layering</h2>
+<p>| Layer | Responsibility | |------|----------------| | L2 Python release repair | SSOT dedupe/conflict decision | | L2 source-map repair | Preserve/remap merged source articles | | L3 CloudRun dataStore | Runtime idempotent dedupe with L2-compatible rules | | L3 mini-program <code>format.js</code> | Display fallback dedupe, must not be wider than L2 | | Atlas bridge | Read-only artist/entity enrichment only; no vector/graph write from this thread |</p>
+<h2 id="event-dedup-decision">Event Dedup Decision</h2>
+<p>The current SSOT is <code>audit_weekly_cross_source_conflicts.are_likely_duplicates</code>.</p>
+<p>Decision order:</p>
+<p>1. Same <code>event_date_start</code> / <code>event_date_iso_guess</code>. 2. Same city. 3. Venue scope must match:</p>
+<ul>
+<li>exact venue label, or</li>
+<li>same address, or</li>
+<li>short/long venue alias with same owner.</li>
+<p>4. Title date conflict veto:</p>
+<li>if title tokens mention different month/day, do not merge.</li>
+<p>5. Strong duplicate evidence:</p>
+<li>same cover with title similarity &gt;= 0.5</li>
+<li>same source hash with title similarity &gt;= 0.5</li>
+<li>exact dedupe key</li>
+<li>title similarity &gt;= 0.86</li>
+<p>6. Weak evidence only merges when supported by trusted time, address, owner, or shared title anchors.</p>
+</ul>
+<p>Conflict rule:</p>
+<ul>
+<li>same date/city/title-ish but different venue/address is conflict or separate event, not duplicate.</li>
+</ul>
+<h2 id="source-article-integration">Source Article Integration</h2>
+<p>Before this slice, duplicate repair removed duplicate rows and filtered out source map entries for removed event IDs. That kept the list clean but could drop information about uploaded/collected posts.</p>
+<p>Now duplicate repair keeps one event card and preserves source provenance:</p>
+<pre><code class="language-json">
+&quot;merge_provenance&quot;: {
+  &quot;schema_version&quot;: &quot;weekly_merge_provenance.v1&quot;,
+  &quot;reason&quot;: &quot;duplicate_cluster&quot;,
+  &quot;retained_id&quot;: &quot;event:id&quot;,
+  &quot;retained_source_hash&quot;: &quot;hash&quot;,
+  &quot;merged_from&quot;: [&quot;old:event&quot;, &quot;event:id&quot;],
+  &quot;merged_source_hashes&quot;: [&quot;oldhash&quot;, &quot;hash&quot;],
+  &quot;source_count&quot;: 2,
+  &quot;sources&quot;: []
+}
+</code></pre>
+<p>Source map repair now redirects duplicate source entries to the retained event:</p>
+<ul>
+<li><code>event_id</code> becomes the retained event id</li>
+<li><code>merged_into_event_id</code> records the retained event id</li>
+<li><code>merged_into_source_hash</code> records the retained source hash</li>
+<li><code>merge_reason=duplicate_cluster</code></li>
+</ul>
+<p>Conflict-quarantined source entries are still removed; they are not folded into a retained event because the event identity is unsafe.</p>
+<h2 id="current-package-impact">Current Package Impact</h2>
+<p>Dry-run/write against a temporary copy of current 158-item package:</p>
+<p>| Metric | Result | |------|------| | raw_item_count | 158 | | repaired_item_count | 158 | | removed_duplicate_count | 0 | | quarantined_conflict_item_count | 0 | | missing_lineup_after | 58 | | hard_fail_after | 0 | | soft lineup retained actions | 0 | | lineup cleared actions | 0 |</p>
+<p>Interpretation: current package already has duplicate/conflict gates clean. The new source integration mainly protects future packages where repeated uploaded posts or aggregate/direct pairs collapse into one event.</p>
+<h2 id="tests-covering-the-contract">Tests Covering The Contract</h2>
+<ul>
+<li><code>tools/stage7_rewrite/tests/test_weekly_dedup_spec_parity.py</code></li>
+<li><code>apps/weekly_activity_miniprogram/tests/dedup-parity.test.cjs</code></li>
+<li><code>services/weekly_activity_cloudrun/tests/dedupParity.test.mjs</code></li>
+<li><code>tools/stage7_rewrite/tests/test_repair_weekly_release_conflicts.py</code></li>
+</ul>
+<p>Key assertions:</p>
+<ul>
+<li><code>frontend_extra_merge=0</code></li>
+<li>Python/JS/CloudRun all obey <code>weekly_dedup_spec.v1.json</code></li>
+<li>duplicate source-map entries are redirected to retained event instead of being dropped</li>
+<li>retained event receives <code>merge_provenance</code></li>
+</ul>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

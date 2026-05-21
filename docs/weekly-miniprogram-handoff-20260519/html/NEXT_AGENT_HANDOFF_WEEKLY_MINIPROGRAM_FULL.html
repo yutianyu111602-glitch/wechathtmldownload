@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NEXT AGENT HANDOFF — HUAIDJ 周活小程序（完整接手）</title>
+  <style>
+:root {
+  --bg: #f6f7f9;
+  --paper: #ffffff;
+  --ink: #16181d;
+  --muted: #5c6470;
+  --line: #d8dde6;
+  --accent: #2457d6;
+  --accent-soft: #e8eefc;
+  --warn: #8a4b00;
+  --code: #10141f;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+}
+.shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  min-height: 100vh;
+}
+aside {
+  border-right: 1px solid var(--line);
+  background: #f0f3f8;
+  padding: 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+}
+main {
+  max-width: 1120px;
+  width: 100%;
+  padding: 32px;
+}
+.meta, .banner, .content {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.meta { padding: 20px 24px; margin-bottom: 16px; }
+.banner {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  color: var(--warn);
+  background: #fff8e8;
+}
+.content { padding: 24px 32px; }
+h1, h2, h3 { line-height: 1.25; margin: 28px 0 12px; }
+h1 { font-size: 32px; margin-top: 0; }
+h2 { font-size: 22px; border-top: 1px solid var(--line); padding-top: 24px; }
+h3 { font-size: 17px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+nav a {
+  display: block;
+  padding: 6px 0;
+  color: var(--muted);
+}
+nav a.level-1 { color: var(--ink); font-weight: 700; }
+nav a.level-3, nav a.level-4, nav a.level-5, nav a.level-6 { padding-left: 12px; }
+code {
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: "Cascadia Mono", Consolas, monospace;
+}
+pre {
+  background: var(--code);
+  color: #e7edf7;
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+}
+pre code { background: transparent; padding: 0; color: inherit; }
+ul { padding-left: 24px; }
+.kicker {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.title { font-size: 28px; font-weight: 750; margin: 4px 0 8px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  color: var(--muted);
+}
+@media (max-width: 860px) {
+  .shell { display: block; }
+  aside { position: static; height: auto; }
+  main { padding: 20px; }
+  .content { padding: 20px; }
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="kicker">HTML handoff</div>
+      <h1>NEXT AGENT HANDOFF — HUAIDJ 周活小程序（完整接手）</h1>
+      <nav><a class="level-1" href="#next-agent-handoff-huaidj-周活小程序-完整接手">NEXT AGENT HANDOFF — HUAIDJ 周活小程序（完整接手）</a>
+<a class="level-2" href="#1-main-problem">1. Main Problem</a>
+<a class="level-2" href="#2-scope">2. Scope</a>
+<a class="level-3" href="#in-scope">In scope</a>
+<a class="level-3" href="#out-of-scope-除非用户明确要求">Out of scope（除非用户明确要求）</a>
+<a class="level-2" href="#3-thread-boundary-用户明确要求">3. Thread Boundary（用户明确要求）</a>
+<a class="level-2" href="#4-current-reality">4. Current Reality</a>
+<a class="level-3" href="#confirmed-2026-05-19">Confirmed（2026-05-19）</a>
+<a class="level-3" href="#hypotheses">Hypotheses</a>
+<a class="level-3" href="#unverified">Unverified</a>
+<a class="level-2" href="#5-work-performed-截至本接手">5. Work Performed（截至本接手）</a>
+<a class="level-2" href="#6-verification-status">6. Verification Status</a>
+<a class="level-2" href="#7-current-blockers">7. Current Blockers</a>
+<a class="level-2" href="#8-next-best-entry">8. Next Best Entry</a>
+<a class="level-3" href="#第一步-只读-5-分钟">第一步（只读，5 分钟）</a>
+<a class="level-3" href="#第二步-按优先级">第二步（按优先级）</a>
+<a class="level-3" href="#计划二-cli-已可用">计划二 CLI（已可用）</a>
+<a class="level-2" href="#9-key-code-map">9. Key Code Map</a>
+<a class="level-2" href="#10-warnings-pitfalls">10. Warnings / Pitfalls</a>
+<a class="level-2" href="#11-related-artifacts">11. Related Artifacts</a>
+<a class="level-2" href="#12-html-companion">12. HTML Companion</a>
+<a class="level-2" href="#13-openhuman-import">13. OpenHuman Import</a></nav>
+    </aside>
+    <main>
+      <section class="meta">
+        <div class="kicker">handoff</div>
+        <div class="title">NEXT AGENT HANDOFF — HUAIDJ 周活小程序（完整接手）</div>
+        <div class="grid">
+          <div><strong>Source</strong><br>C:\code\githubstar\wechathtmldownload\docs\weekly-miniprogram-handoff-20260519\NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.md</div>
+          <div><strong>Generated</strong><br>2026-05-21 15:01 +0800</div>
+        </div>
+      </section>
+      <section class="banner">
+        Static derived artifact. Keep the source Markdown or structured notes as the source of truth. Do not add secrets to this HTML.
+      </section>
+      <article class="content">
+<h1 id="next-agent-handoff-huaidj-周活小程序-完整接手">NEXT AGENT HANDOFF — HUAIDJ 周活小程序（完整接手）</h1>
+<p>&gt; Lifecycle: HISTORICAL_EVIDENCE. This is the 2026-05-19 long-form handoff. Current execution truth is <code>HANDOFF_CHECKPOINT_20260519.md</code> + <code>PLAN_WEEKLY_MINIPROGRAM_UNIFIED.md</code> + <code>DOC_CODE_PLAN_SYNC_AUDIT_20260521.md</code>. Do not use the 103-item / backendRawHits=51 values below as current runtime facts.</p>
+<p>Generated: 2026-05-19（续跑版，含 P0 度量 + 向量图谱桥接 L1） Agent session: 周活专项 + 计划一 P0 + 计划二 L1 Repo path: <code>C:\code\githubstar\wechathtmldownload</code>（<strong>非 Git 根</strong>）</p>
+<h2 id="1-main-problem">1. Main Problem</h2>
+<p>周活已稳定发布（<code>weekly-api-033</code> / 103 条），但 <strong>识别准确率</strong>（空 lineup、保守 repair）与 <strong>后端 51 处 URL 行</strong> 仍待改进；<strong>实体联动</strong>已具备只读桥接（<code>weekly_atlas_bridge</code>），但图谱 alias 导出未接入，当前匹配几乎全为 <code>no_match</code>。下一 agent 应在 <strong>0 hard_fail 发布门</strong> 下推进人工 Golden 标注、P1 URL 清洗（需批准）、计划二 L2 snapshot 挂载。</p>
+<h2 id="2-scope">2. Scope</h2>
+<h3 id="in-scope">In scope</h3>
+<ul>
+<li><code>apps\weekly_activity_miniprogram\</code></li>
+<li><code>services\weekly_activity_cloudrun\</code> → <code>/api/v1/weekly/*</code></li>
+<li><code>tools\stage7_rewrite\</code> 周活管线 + <strong>P0 Golden</strong> + <strong><code>weekly_atlas_bridge</code></strong></li>
+<li>OpenClaw <code>run_openclaw_weekly_daily_publish.ps1</code> + release guardian</li>
+<li>接手包 <code>docs\weekly-miniprogram-handoff-20260519\</code></li>
+</ul>
+<h3 id="out-of-scope-除非用户明确要求">Out of scope（除非用户明确要求）</h3>
+<ul>
+<li>电子音乐图鉴 93k/47k、Neo4j/Qdrant <strong>生产写入</strong>、Next1000</li>
+<li>微信提审</li>
+<li>无界 <code>D:\</code> 扫描、读取 secret</li>
+</ul>
+<h2 id="3-thread-boundary-用户明确要求">3. Thread Boundary（用户明确要求）</h2>
+<p><strong>小程序是小程序，图谱是图谱。</strong> 本线程只改周活侧；图谱仅通过 <strong>只读 snapshot / observation 上行</strong> 联动。向量命中 <strong>不得</strong> 自动进小程序 lineup 展示。</p>
+<h2 id="4-current-reality">4. Current Reality</h2>
+<h3 id="confirmed-2026-05-19">Confirmed（2026-05-19）</h3>
+<p>| 层 | 状态 | |----|------| | 远端后端 | <code>weekly-api-033</code>，103 条，reconcile 103/103 | | 发布窗口 | <code>2026-05-19..2026-06-02</code> | | 本地 API 包 | <code>D:\downstream_results\stage7_rewrite\longrun\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260519</code> | | 小程序开发版 | <code>2026.05.19.8</code>（已上传，<strong>未提审</strong>） | | release guardian | ok=true；visibleHits=0；<strong>backendRawHits=51</strong> | | lineup 覆盖 | ~40/103 有 lineup；audit missing_lineup <strong>63/103</strong> | | 小程序单测 | <strong>24/24</strong> pass | | P0 Golden 种子 | <strong>88</strong> 条，<code>annotation_status: pending</code>（0 verified） | | P0 脚本 + 单测 | bootstrap / evaluate / <code>weekly_golden_lib</code>；<strong>4/4</strong> pass | | 计划二 L0 契约 | <code>WeeklyAtlasEntityContract.md</code> | | 计划二 L1 bridge | <code>tools/stage7_rewrite/weekly_atlas_bridge/</code>；resolver 单测 <strong>4/4</strong> pass | | snapshot dry-run | <code>weekly_entity_snapshot.json</code>（89 lineup 行，全 <code>no_match</code> — seed 过小） | | observation dry-run | <code>weekly_entity_observations.jsonl</code>（103 行） | | LDR 深度研究 | 已落盘 <code>archive/</code>（候选，<strong>HOLD</strong>，非已实施） |</p>
+<h3 id="hypotheses">Hypotheses</h3>
+<ul>
+<li>lineup 空 = 保守 repair + OCR 覆盖 + 日期窗漏斗，不单是 LLM</li>
+<li><code>no_match</code> 89/89 主因：<strong>registry seed 仅少量艺人</strong>，待图谱 <code>atlas_alias_export.jsonl</code>（G0）</li>
+<li>Linux cron 可能仍跑旧脚本，未必已切 Windows OpenClaw wrapper</li>
+</ul>
+<h3 id="unverified">Unverified</h3>
+<ul>
+<li>真机全面 smoke</li>
+<li>微信审核状态</li>
+<li>OpenClaw <strong>定时首跑</strong>观测</li>
+<li>Qdrant <code>person_current</code> 向量 review（需本机 6333 + <code>--enable-vector-review</code>）</li>
+</ul>
+<h2 id="5-work-performed-截至本接手">5. Work Performed（截至本接手）</h2>
+<p>| 类别 | 内容 | |------|------| | 文档 | 计划一/二 v1+v2、LDR 档案、<code>PLAN_ROADMAP</code>、<code>PLAN_B_VECTOR_ATLAS_EXECUTION</code> | | P0 代码 | <code>bootstrap_weekly_golden_set.py</code>、<code>evaluate_weekly_golden_baseline.py</code>、<code>weekly_golden_lib.py</code> | | P0 数据 | <code>golden_set_v1.jsonl</code>（88）、<code>golden_baseline_20260519</code> 报告 | | 计划二 L1 | <code>weekly_atlas_bridge</code>（resolver/indexes/snapshot/observations）+ CLI 脚本 | | 产物 | 当前包下 <code>weekly_entity_snapshot.json</code>、<code>weekly_entity_observations.jsonl</code> | | 业务代码 | <strong>未改</strong> build/repair/CloudRun/小程序发布逻辑 |</p>
+<h2 id="6-verification-status">6. Verification Status</h2>
+<p>| 检查 | 结果 | |------|------| | release guardian @ 20260519 | ok | | node --test 小程序 | 24 pass | | unittest golden baseline | 4 pass | | unittest atlas bridge | 4 pass | | snapshot/observation 生成 | 成功（见上表） | | 人工 Golden verified | <strong>未做</strong> 0/88 | | P1 build URL 清洗 | <strong>未实施</strong>（需用户批准） | | DevTools E2E | 未跑 |</p>
+<h2 id="7-current-blockers">7. Current Blockers</h2>
+<p>| ID | 阻塞 | 解阻条件 | |----|------|----------| | B1 | Golden 全 pending | 人工标注 ≥20 条 <code>verified</code> 后重跑 baseline | | B2 | 实体匹配无召回 | 图谱侧 G0 导出 <code>atlas_alias_export.jsonl</code> 或扩充 registry | | B3 | backendRawHits=51 | P1 改 <code>build_weekly_activity_miniprogram_api.py</code> + 用户批准 | | B4 | OpenClaw cron | 首跑日志/观测清单 |</p>
+<h2 id="8-next-best-entry">8. Next Best Entry</h2>
+<h3 id="第一步-只读-5-分钟">第一步（只读，5 分钟）</h3>
+<p>1. 读 <code>docs\weekly-miniprogram-handoff-20260519\INDEX.md</code> 2. 读 <code>PLAN_ROADMAP_20260519.md</code> 3. 跑 guardian：</p>
+<pre><code class="language-powershell">
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\pc\.codex\skills\huaidj-weekly-release-guardian\scripts\check_weekly_release_guard.ps1 -CurrentReleaseDir D:\downstream_results\stage7_rewrite\longrun\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260519
+</code></pre>
+<h3 id="第二步-按优先级">第二步（按优先级）</h3>
+<p>| 优先级 | 动作 | 参考 | |--------|------|------| | P0 | 人工标注 Golden → <code>verified</code> → <code>evaluate_weekly_golden_baseline.py</code> | <code>P0_BASELINE_REPORT_20260519.md</code> | | P0 | OpenClaw 首跑观测 | <code>DELIVERABLE_OPENCLAW_OBSERVATION_CHECKLIST.md</code> | | P1 | URL 清洗（<strong>先获用户批准</strong>） | <code>DELIVERABLE_URL_TRACE_51.md</code> | | L2 | build 前挂载 snapshot；传入 <code>--alias-export</code> | <code>PLAN_B_VECTOR_ATLAS_EXECUTION_20260519.md</code> | | L2+ | Qdrant 向量 review（只读，不进展示） | <code>--enable-vector-review</code> |</p>
+<h3 id="计划二-cli-已可用">计划二 CLI（已可用）</h3>
+<pre><code class="language-powershell">
+cd C:\code\githubstar\wechathtmldownload
+
+python tools\stage7_rewrite\scripts\build_weekly_atlas_snapshot.py `
+  --current D:\downstream_results\stage7_rewrite\longrun\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260519\current.json `
+  --out D:\downstream_results\stage7_rewrite\longrun\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260519\weekly_entity_snapshot.json `
+  --publish-package WEEKLY_ACTIVITY_MINIPROGRAM_API_20260519
+
+python tools\stage7_rewrite\scripts\export_weekly_entity_observations.py `
+  --current D:\downstream_results\stage7_rewrite\longrun\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260519\current.json `
+  --out D:\downstream_results\stage7_rewrite\longrun\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260519\weekly_entity_observations.jsonl `
+  --window-start 2026-05-19 --window-end 2026-06-02
+</code></pre>
+<h2 id="9-key-code-map">9. Key Code Map</h2>
+<p>| 路径 | 职责 | |------|------| | <code>apps\weekly_activity_miniprogram\utils\format.js</code> | 展示契约、URL 过滤 | | <code>scripts\archive_old\build_weekly_activity_miniprogram_api.py</code> | 物化 current（<strong>dj_bio_lines 恒 []</strong>） | | <code>scripts\bootstrap_weekly_golden_set.py</code> | Golden 种子 | | <code>scripts\evaluate_weekly_golden_baseline.py</code> | P0 baseline | | <code>weekly_atlas_bridge\resolver.py</code> | 实体五级匹配 | | <code>scripts\build_weekly_atlas_snapshot.py</code> | snapshot 导出 | | <code>registries\weekly_artists_seed.json</code> | 艺人 registry seed |</p>
+<h2 id="10-warnings-pitfalls">10. Warnings / Pitfalls</h2>
+<ul>
+<li>勿把图鉴 47k/Neo4j 进度当作周活条数</li>
+<li>勿用历史条数 28/51/57/74/100/104/107 当线上事实</li>
+<li><code>missing_lineup</code> 不是 hard_fail；提召回需 Golden，不能单放宽 audit</li>
+<li><code>vector_candidate</code> <strong>禁止</strong> <code>display_tier=show</code></li>
+<li>snapshot 当前全 <code>no_match</code> <strong>不是</strong> resolver 坏了，是 <strong>alias 数据未接入</strong></li>
+<li>未获批准勿改 build/repair/deploy</li>
+</ul>
+<h2 id="11-related-artifacts">11. Related Artifacts</h2>
+<p>| 路径 | 说明 | |------|------| | <code>docs\weekly-miniprogram-handoff-20260519\INDEX.md</code> | 文档索引 | | <code>PLAN_A_DEEPRESEARCH_v2.md</code> / <code>PLAN_B_DEEPRESEARCH_v2.md</code> | 深度研究强化稿 | | <code>PLAN_B_VECTOR_ATLAS_EXECUTION_20260519.md</code> | 向量×图谱可执行计划 | | <code>P0_EXECUTION_STATUS_20260519.md</code> | P0 状态 | | <code>archive\ARCHIVE_INDEX_20260519.md</code> | LDR/DeepSeek/P0 档案 | | <code>...\weekly_entity_snapshot.json</code> | 实体 snapshot（dry-run） | | <code>...\weekly_entity_observations.jsonl</code> | 图谱上行 observation | | <code>D:\downstream_results\golden\golden_set_v1.jsonl</code> | Golden 主本 |</p>
+<h2 id="12-html-companion">12. HTML Companion</h2>
+<ul>
+<li>路径：<code>docs\weekly-miniprogram-handoff-20260519\html\NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.html</code></li>
+<li>生成：见 <code>INDEX.md</code> § HTML 生成</li>
+</ul>
+<h2 id="13-openhuman-import">13. OpenHuman Import</h2>
+<ul>
+<li>imported: <strong>no</strong>（本会话未执行 OpenHuman）</li>
+<li>原因：环境未配置或未请求导入</li>
+</ul>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

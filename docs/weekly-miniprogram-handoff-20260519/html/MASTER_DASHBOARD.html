@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HUAIDJ 周活小程序 — 接手总览</title>
+  <style>
+    :root { --bg:#0d1117; --card:#161b22; --border:#30363d; --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --ok:#3fb950; --warn:#d29922; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: "Segoe UI", system-ui, sans-serif; background:var(--bg); color:var(--text); line-height:1.5; }
+    header { padding:24px 32px; border-bottom:1px solid var(--border); background:var(--card); }
+    h1 { margin:0 0 8px; font-size:1.4rem; }
+    .meta { color:var(--muted); font-size:0.9rem; }
+    .status { display:flex; flex-wrap:wrap; gap:12px; margin-top:16px; }
+    .pill { padding:6px 12px; border-radius:6px; background:#21262d; border:1px solid var(--border); font-size:0.85rem; }
+    .pill.ok { border-color:var(--ok); color:var(--ok); }
+    .pill.warn { border-color:var(--warn); color:var(--warn); }
+    main { padding:24px 32px; max-width:1100px; }
+    h2 { font-size:1.1rem; margin:24px 0 12px; color:var(--accent); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
+    a.card { display:block; padding:16px; background:var(--card); border:1px solid var(--border); border-radius:8px; color:var(--text); text-decoration:none; }
+    a.card:hover { border-color:var(--accent); }
+    a.card strong { display:block; margin-bottom:6px; }
+    a.card span { color:var(--muted); font-size:0.85rem; }
+    code { font-family: Consolas, monospace; font-size:0.85rem; background:#21262d; padding:2px 6px; border-radius:4px; }
+    footer { padding:24px 32px; color:var(--muted); font-size:0.8rem; border-top:1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>HUAIDJ 周活小程序 — 接手与计划总览</h1>
+    <p class="meta">Updated 2026-05-21 · Scope: weekly mini-program + Atlas read-only cross-reference · Markdown 为权威源</p>
+    <div class="status">
+      <span class="pill ok">weekly-api-039 · 158 items</span>
+      <span class="pill ok">backendRawHits 0</span>
+      <span class="pill ok">dedupe/conflict 0/0/0</span>
+      <span class="pill warn">missing_lineup 58/158</span>
+    </div>
+  </header>
+  <main>
+    <h2>下一动作</h2>
+    <p>阅读 <a href="INDEX.html">INDEX</a> → <a href="HANDOFF_CHECKPOINT_20260519.html">CHECKPOINT</a> → <a href="PLAN_WEEKLY_MINIPROGRAM_UNIFIED.html">UNIFIED</a> → <a href="DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.html">去重来源逻辑</a>。旧 5/19 长交接只作历史证据。</p>
+
+    <h2>当前权威入口</h2>
+    <div class="grid">
+      <a class="card" href="PLAN_WEEKLY_MINIPROGRAM_UNIFIED.html">
+        <strong>统一主计划</strong>
+        <span>Phase II Sprint、RA/Atlas/去重/IA/UI、门禁、DoD</span>
+      </a>
+      <a class="card" href="INDEX.html">
+        <strong>文档索引</strong>
+        <span>Markdown/HTML 清单与阅读顺序</span>
+      </a>
+      <a class="card" href="HANDOFF_CHECKPOINT_20260519.html">
+        <strong>当前检查点</strong>
+        <span>weekly-api-039、158 条、guardian、Golden、下一步</span>
+      </a>
+      <a class="card" href="DOC_CODE_PLAN_SYNC_AUDIT_20260521.html">
+        <strong>文档生命周期审计</strong>
+        <span>当前权威、活跃证据、历史证据、归档计划</span>
+      </a>
+    </div>
+
+    <h2>去重与推文来源</h2>
+    <div class="grid">
+      <a class="card" href="DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.html">
+        <strong>去重来源整合 SSOT</strong>
+        <span>L2 为准；不重复发卡；retained event 保留 merge_provenance</span>
+      </a>
+      <a class="card" href="SPRINT2_DEDUP_PARITY_CLOSEOUT_20260521.html">
+        <strong>Sprint 2 parity closeout</strong>
+        <span>Python / mini-program / CloudRun 去重一致性</span>
+      </a>
+      <a class="card" href="SPRINT2_SOURCE_INTEGRATION_CLOSEOUT_20260521.html">
+        <strong>Sprint 2 source closeout</strong>
+        <span>source map redirect 与来源不丢失验证</span>
+      </a>
+    </div>
+
+    <h2>历史证据</h2>
+    <div class="grid">
+      <a class="card" href="NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.html">
+        <strong>2026-05-19 长版接手</strong>
+        <span>历史证据；103/backendRawHits=51 等数字已被当前 CHECKPOINT 取代</span>
+      </a>
+      <a class="card" href="PLAN_A_DEEPRESEARCH_v2.html">
+        <strong>计划一 LDR 原文</strong>
+        <span>参考材料；不作执行入口</span>
+      </a>
+      <a class="card" href="PLAN_B_DEEPRESEARCH_v2.html">
+        <strong>计划二 LDR 原文</strong>
+        <span>参考材料；Atlas 主线不由本线程接手</span>
+      </a>
+    </div>
+
+    <h2>数据附件</h2>
+    <p><code>../url-hits-20260519.json</code> — 旧 URL 行级明细；当前 backendRawHits=0，以 CHECKPOINT 为准。</p>
+
+    <h2>仓库内上游 handoff</h2>
+    <p><code>C:\code\githubstar\wechathtmldownload\NEXT_AGENT_HANDOFF_20260519_OPENCLAW_DAILY_RELEASE.md</code></p>
+  </main>
+  <footer>
+    Thread rule: 小程序是小程序，图谱是图谱。本线程只管周活小程序与 Atlas 只读交叉引用。
+  </footer>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sprint 2 Dedup Parity Closeout — 2026-05-21</title>
+  <style>
+:root {
+  --bg: #f6f7f9;
+  --paper: #ffffff;
+  --ink: #16181d;
+  --muted: #5c6470;
+  --line: #d8dde6;
+  --accent: #2457d6;
+  --accent-soft: #e8eefc;
+  --warn: #8a4b00;
+  --code: #10141f;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+}
+.shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  min-height: 100vh;
+}
+aside {
+  border-right: 1px solid var(--line);
+  background: #f0f3f8;
+  padding: 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+}
+main {
+  max-width: 1120px;
+  width: 100%;
+  padding: 32px;
+}
+.meta, .banner, .content {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.meta { padding: 20px 24px; margin-bottom: 16px; }
+.banner {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  color: var(--warn);
+  background: #fff8e8;
+}
+.content { padding: 24px 32px; }
+h1, h2, h3 { line-height: 1.25; margin: 28px 0 12px; }
+h1 { font-size: 32px; margin-top: 0; }
+h2 { font-size: 22px; border-top: 1px solid var(--line); padding-top: 24px; }
+h3 { font-size: 17px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+nav a {
+  display: block;
+  padding: 6px 0;
+  color: var(--muted);
+}
+nav a.level-1 { color: var(--ink); font-weight: 700; }
+nav a.level-3, nav a.level-4, nav a.level-5, nav a.level-6 { padding-left: 12px; }
+code {
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: "Cascadia Mono", Consolas, monospace;
+}
+pre {
+  background: var(--code);
+  color: #e7edf7;
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+}
+pre code { background: transparent; padding: 0; color: inherit; }
+ul { padding-left: 24px; }
+.kicker {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.title { font-size: 28px; font-weight: 750; margin: 4px 0 8px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  color: var(--muted);
+}
+@media (max-width: 860px) {
+  .shell { display: block; }
+  aside { position: static; height: auto; }
+  main { padding: 20px; }
+  .content { padding: 20px; }
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="kicker">HTML handoff</div>
+      <h1>Sprint 2 Dedup Parity Closeout — 2026-05-21</h1>
+      <nav><a class="level-1" href="#sprint-2-dedup-parity-closeout-2026-05-21">Sprint 2 Dedup Parity Closeout — 2026-05-21</a>
+<a class="level-2" href="#status">Status</a>
+<a class="level-2" href="#what-changed">What Changed</a>
+<a class="level-2" href="#parity-contract">Parity Contract</a>
+<a class="level-2" href="#verification">Verification</a>
+<a class="level-2" href="#remaining-sprint-2-work">Remaining Sprint 2 Work</a></nav>
+    </aside>
+    <main>
+      <section class="meta">
+        <div class="kicker">handoff</div>
+        <div class="title">Sprint 2 Dedup Parity Closeout — 2026-05-21</div>
+        <div class="grid">
+          <div><strong>Source</strong><br>C:\code\githubstar\wechathtmldownload\docs\weekly-miniprogram-handoff-20260519\SPRINT2_DEDUP_PARITY_CLOSEOUT_20260521.md</div>
+          <div><strong>Generated</strong><br>2026-05-21 14:52 +0800</div>
+        </div>
+      </section>
+      <section class="banner">
+        Static derived artifact. Keep the source Markdown or structured notes as the source of truth. Do not add secrets to this HTML.
+      </section>
+      <article class="content">
+<h1 id="sprint-2-dedup-parity-closeout-2026-05-21">Sprint 2 Dedup Parity Closeout — 2026-05-21</h1>
+<p>Scope: Sprint 2 first slice, release-layer and UI dedupe parity.</p>
+<h2 id="status">Status</h2>
+<p>Completed as a bounded local slice. No deploy, no mini-program upload, no WeChat review submission, no production DB/vector/graph writes.</p>
+<h2 id="what-changed">What Changed</h2>
+<ul>
+<li>Added <code>tools/stage7_rewrite/fixtures/weekly_dedup_spec.v1.json</code>.</li>
+<li>Added Python L2 parity test: <code>tools/stage7_rewrite/tests/test_weekly_dedup_spec_parity.py</code>.</li>
+<li>Added mini-program JS parity test: <code>apps/weekly_activity_miniprogram/tests/dedup-parity.test.cjs</code>.</li>
+<li>Added CloudRun data-store parity test: <code>services/weekly_activity_cloudrun/tests/dedupParity.test.mjs</code>.</li>
+<li>Aligned <code>apps/weekly_activity_miniprogram/utils/format.js</code> with L2 veto and venue-scope rules.</li>
+<li>Aligned <code>services/weekly_activity_cloudrun/src/dataStore.mjs</code> with the same L2-shaped rules.</li>
+</ul>
+<h2 id="parity-contract">Parity Contract</h2>
+<p>Python L2 remains the SSOT via <code>audit_weekly_cross_source_conflicts.are_likely_duplicates</code>.</p>
+<p>The shared fixture covers:</p>
+<ul>
+<li>same date/city/venue duplicate</li>
+<li>same title/source/venue with conflicting title dates veto</li>
+<li>same address venue alias duplicate</li>
+<li>same owner short/long venue alias duplicate</li>
+<li>same date/city/title but different venue/address conflict</li>
+<li>generic same-venue non-duplicate</li>
+</ul>
+<p>The JS mini-program test asserts <code>frontend_extra_merge=0</code>.</p>
+<h2 id="verification">Verification</h2>
+<pre><code class="language-powershell">
+python -m unittest tools.stage7_rewrite.tests.test_weekly_dedup_spec_parity tools.stage7_rewrite.tests.test_repair_weekly_release_conflicts -v
+</code></pre>
+<p>Result: 10 tests OK.</p>
+<pre><code class="language-powershell">
+node --test apps\weekly_activity_miniprogram\tests\*.test.cjs
+</code></pre>
+<p>Result: 30 pass, 0 fail.</p>
+<pre><code class="language-powershell">
+node --test services\weekly_activity_cloudrun\tests\*.test.mjs
+</code></pre>
+<p>Result: 38 pass, 0 fail.</p>
+<pre><code class="language-powershell">
+python tools\stage7_rewrite\scripts\audit_weekly_cross_source_conflicts.py --input services\weekly_activity_cloudrun\data\current_release\current.json --strict --fail-on-raw-duplicates
+</code></pre>
+<p>Result: <code>item_count=158</code>; <code>duplicate_cluster_count=0</code>; <code>effective_duplicate_cluster_count=0</code>; <code>conflict_cluster_count=0</code>.</p>
+<h2 id="remaining-sprint-2-work">Remaining Sprint 2 Work</h2>
+<ul>
+<li>S2-1: repair soft scoring impact review against current package.</li>
+<li>S2-4: persist/verify merge provenance in repaired package output.</li>
+<li>S2-5: run repair on a new candidate package and confirm strict audit remains zero.</li>
+<li>Golden refresh/versioning remains separate because Sprint 1 verified rows are conservative snapshot labels, not human labels.</li>
+</ul>
+      </article>
+    </main>
+  </div>
+</body>
+</html>
