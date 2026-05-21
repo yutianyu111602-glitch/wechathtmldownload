@@ -1,10 +1,10 @@
-# 接手检查点 — 2026-05-19（2026-05-21 Sprint 1 更新）
+# 接手检查点 — 2026-05-19（2026-05-21 Sprint 1 + Sprint 2 parity 更新）
 
-> 精简续跑入口。执行计划见 **[PLAN_WEEKLY_MINIPROGRAM_UNIFIED.md](./PLAN_WEEKLY_MINIPROGRAM_UNIFIED.md)**；Sprint 1 closeout 见 [SPRINT1_GATE_CLOSEOUT_20260521.md](./SPRINT1_GATE_CLOSEOUT_20260521.md)；完整版见 [NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.md](./NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.md)
+> 精简续跑入口。执行计划见 **[PLAN_WEEKLY_MINIPROGRAM_UNIFIED.md](./PLAN_WEEKLY_MINIPROGRAM_UNIFIED.md)**；Sprint 1 closeout 见 [SPRINT1_GATE_CLOSEOUT_20260521.md](./SPRINT1_GATE_CLOSEOUT_20260521.md)；Sprint 2 parity closeout 见 [SPRINT2_DEDUP_PARITY_CLOSEOUT_20260521.md](./SPRINT2_DEDUP_PARITY_CLOSEOUT_20260521.md)；完整版见 [NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.md](./NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.md)
 
 ## 一句话
 
-当前远端周活为 `weekly-api-039` / 158 条；Sprint 1 gate 已闭环：guardian 全绿、backendRawHits=0、strict duplicate/conflict=0、Golden 88 条中 20 条为 conservative snapshot verified。未执行 CloudRun 新部署、小程序新上传或微信提审。
+当前远端周活为 `weekly-api-039` / 158 条；Sprint 1 gate 已闭环：guardian 全绿、backendRawHits=0、strict duplicate/conflict=0、Golden 88 条中 20 条为 conservative snapshot verified。Sprint 2 首切片已完成 `weekly_dedup_spec.v1.json` + Python/JS/CloudRun parity，`frontend_extra_merge=0`。未执行 CloudRun 新部署、小程序新上传或微信提审。
 
 ## 权威数字（勿混旧数据）
 
@@ -19,6 +19,7 @@
 | Golden | 88 条，20 conservative snapshot verified，68 pending |
 | baseline drift | `snapshot_drift_count=43`（5/19 seed 对 5/21 current 的自然漂移） |
 | atlas snapshot | 209 lineup rows；alias_exact=63；fuzzy_multiple=90；no_match=56 |
+| Sprint 2 parity | `weekly_dedup_spec.v1.json`；Python/mini-program/CloudRun parity PASS；frontend_extra_merge=0 |
 
 ## Sprint 1 新增/修正代码（已验证）
 
@@ -39,11 +40,24 @@ tools/stage7_rewrite/
 
 验证：guardian ok=true；strict duplicate/conflict 0/0/0；Python targeted **47/47 OK**；小程序 Node **29/29 OK**。
 
+## Sprint 2 parity 新增/修正代码（已验证）
+
+```
+tools/stage7_rewrite/fixtures/weekly_dedup_spec.v1.json
+tools/stage7_rewrite/tests/test_weekly_dedup_spec_parity.py
+apps/weekly_activity_miniprogram/tests/dedup-parity.test.cjs
+apps/weekly_activity_miniprogram/utils/format.js
+services/weekly_activity_cloudrun/tests/dedupParity.test.mjs
+services/weekly_activity_cloudrun/src/dataStore.mjs
+```
+
+验证：Python L2 parity + repair conflict **10/10 OK**；小程序 Node **30/30 pass**；CloudRun Node **38/38 pass**；当前 158 包 strict duplicate/conflict **0/0/0**。
+
 ## 下一 agent 三件事
 
-1. 进入 Sprint 2：`weekly_dedup_spec.v1.json` + Python/JS parity，确保 frontend_extra_merge=0
+1. 继续 Sprint 2：repair soft scoring impact review，确认 missing_lineup 下降不引入 hard_fail
 2. 处理 baseline drift：决定是否基于当前 158 包刷新/版本化 Golden；20 verified 不是人工/inter-annotator 金标
-3. 继续保持上传/提审分离：提审必须单独用户批准
+3. 做 merge provenance 写入/抽样，然后再跑 repair 新包 + strict audit；上传/提审必须单独用户批准
 
 ## 边界
 
