@@ -436,13 +436,15 @@ python tools\stage7_rewrite\scripts\export_weekly_entity_observations.py `
 
 | ID | 任务 | 验收 |
 |----|------|------|
-| S3-1 | `club_profile.v1` + organizer_key | schema 草案 |
-| S3-2 | API clubs 或 items 嵌 key | smoke |
-| S3-3 | venue→Club Profile + SCHEDULE 徽章 | UI 可见 |
-| S3-4 | key 匹配替代模糊 | 金标馆回归 |
-| S3-5 | city switchTab | 真机无报错 |
-| S3-6 | venue/artist cursor 分页 | >100 不丢 |
-| S3-7 | detail 合并来源；saved lang | UI review |
+| S3-1 | `club_profile.v1` + organizer_key | ✅ schema v1 shell |
+| S3-2 | API clubs 或 items 嵌 key | ✅ current/detail/batch 输出 `organizer_key` + `club_profile` |
+| S3-3 | venue→Club Profile + SCHEDULE 徽章 | ✅ Club source/profile base；周/月徽章待 DevTools polish |
+| S3-4 | key 匹配替代模糊 | ✅ detail→venue 带 key；venue 优先 organizerKey |
+| S3-5 | city switchTab | ✅ pending city storage + switchTab |
+| S3-6 | venue/artist cursor 分页 | ✅ limit=100 cursor loop，避免 >100 首屏截断 |
+| S3-7 | detail 合并来源；saved lang | ✅ detail/venue source articles；saved detail lang |
+
+**2026-05-21 本地闭环：** Sprint 3 可本地执行部分已完成，closeout 见 `SPRINT3_CLUB_SOURCE_CLOSEOUT_20260521.md`。本次未执行 DevTools 真机 10/10、CloudRun 新部署、小程序新上传或微信提审。
 
 ### 9.5 Sprint 4（4–6 周）— Atlas + 上线准备
 
@@ -455,6 +457,8 @@ python tools\stage7_rewrite\scripts\export_weekly_entity_observations.py `
 | S4-5 | observation 进 OpenClaw SOP | checklist |
 | S4-6 | DevTools 10/10 + 单测 | artifact |
 | S4-7 | upload dev 新号 | 用户批准上传 |
+
+**2026-05-21 状态：** `stage7_safe_handoff_verify.ps1` 离线安全验证 PASS；S4 的 G0 alias/new snapshot/dev upload 仍受外部输入和用户批准约束。
 
 ---
 
@@ -571,8 +575,8 @@ node --test tests/*.test.mjs
 - [ ] guardian 连续 2 次 weekly 全绿
 - [ ] lineup ≥55%
 - [ ] Golden ≥40 verified + baseline
-- [ ] Club Profile v1 上 dev
-- [ ] dedupe parity 进 checklist/CI
+- [x] Club Profile v1 本地 API/UI 契约完成
+- [x] dedupe parity 进 checklist/CI
 - [ ] snapshot 有 ID 率 ≥40% 或记录原因
 - [ ] observation SOP 执行 1 次有日志
 

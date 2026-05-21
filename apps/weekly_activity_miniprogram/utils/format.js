@@ -171,6 +171,14 @@ function venueKey(item) {
   );
 }
 
+function organizerKeyForItem(item) {
+  return (
+    normalizeDedupePart(item.organizerKey || item.organizer_key || item.club_profile?.organizer_key) ||
+    venueKey(item) ||
+    normalizeDedupePart(item.promoter || item.account || item.source_account_name)
+  );
+}
+
 function sourceHash(item) {
   return String(item.sourceHash || item.source_action?.url_hash || item.source_article?.url_hash || "").trim();
 }
@@ -692,6 +700,8 @@ function compactItem(item) {
   const metaParts = [cityLabel, dateLabel].filter(Boolean);
   const coverUrl = posterUrl(item);
   const sourceHash = item.source_action?.url_hash || item.source_article?.url_hash || "";
+  const organizerKey = organizerKeyForItem({ ...item, venueLabel });
+  const upstreamClubProfile = item.clubProfile || item.club_profile || {};
   const interestSeed = `${item.id || item.article_id || item.title || ""}`.split("").reduce((sum, char) => sum + char.charCodeAt(0), 0);
   const descriptionLines = cleanDescriptionLines(item, bioLines);
   const atlasArtists = atlasArtistItems(item);
@@ -711,6 +721,14 @@ function compactItem(item) {
     hasTime: Boolean(timeLabel),
     hasTrustedTime: Boolean(timeLabel),
     venueLabel,
+    organizerKey,
+    clubProfile: {
+      schemaVersion: "weekly_club_profile.v1",
+      organizerKey,
+      displayName: upstreamClubProfile.displayName || upstreamClubProfile.display_name || venueLabel || item.promoter || item.account || "",
+      cityLabel,
+      addressLabel: upstreamClubProfile.addressLabel || upstreamClubProfile.address || addressLabel,
+    },
     addressLabel,
     placeLabel,
     hasPlace: Boolean(placeLabel),

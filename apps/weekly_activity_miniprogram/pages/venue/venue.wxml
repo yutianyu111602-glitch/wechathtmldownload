@@ -1,0 +1,46 @@
+<view class="page sub-page">
+  <view class="sub-nav">
+    <button bindtap="goBack">BACK</button>
+  </view>
+  <view wx:if="{{loading}}" class="state">加载中</view>
+  <view wx:elif="{{error}}" class="state error">{{error}}</view>
+  <view wx:else>
+    <view class="sub-head">
+      <view class="sub-label">VENUE</view>
+      <view class="sub-title">{{name}}</view>
+      <view wx:if="{{address}}" class="sub-address" bindtap="copyAddress">{{address}}</view>
+      <view class="sub-count">{{events.length}} upcoming</view>
+    </view>
+    <view class="section" wx:if="{{events.length}}">
+      <view wx:if="{{sourceArticles.length}}" class="source-article-list">
+        <view class="sub-heading">SOURCE ARTICLES</view>
+        <view
+          wx:for="{{sourceArticles}}"
+          wx:key="id"
+          class="source-article-row"
+          data-hash="{{item.hash}}"
+          data-id="{{item.fallbackDetailId}}"
+          bindtap="openSourceArticle"
+        >
+          <view>
+            <view class="source-article-title">{{item.title}}</view>
+            <view class="source-article-meta">{{item.subtitle}}</view>
+          </view>
+          <text class="chevron">›</text>
+        </view>
+      </view>
+      <view class="sub-heading">UPCOMING EVENTS</view>
+      <view wx:for="{{events}}" wx:key="id" class="event-row" data-id="{{item.id}}" bindtap="openDetail">
+        <view>
+          <view class="event-title">{{item.displayTitle}}</view>
+          <view class="event-meta">{{item.dateLabel}} · {{item.lineupLabel}}</view>
+        </view>
+        <text class="chevron">›</text>
+      </view>
+    </view>
+    <view class="section" wx:if="{{aboutLines.length}}">
+      <view class="sub-heading">ABOUT</view>
+      <view wx:for="{{aboutLines}}" wx:key="*this" class="body-line">{{item}}</view>
+    </view>
+  </view>
+</view>

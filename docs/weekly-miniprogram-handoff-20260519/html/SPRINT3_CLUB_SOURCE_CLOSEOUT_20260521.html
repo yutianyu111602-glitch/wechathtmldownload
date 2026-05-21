@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sprint 3 Club Source Closeout</title>
+  <style>
+:root {
+  --bg: #f6f7f9;
+  --paper: #ffffff;
+  --ink: #16181d;
+  --muted: #5c6470;
+  --line: #d8dde6;
+  --accent: #2457d6;
+  --accent-soft: #e8eefc;
+  --warn: #8a4b00;
+  --code: #10141f;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+}
+.shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  min-height: 100vh;
+}
+aside {
+  border-right: 1px solid var(--line);
+  background: #f0f3f8;
+  padding: 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+}
+main {
+  max-width: 1120px;
+  width: 100%;
+  padding: 32px;
+}
+.meta, .banner, .content {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.meta { padding: 20px 24px; margin-bottom: 16px; }
+.banner {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  color: var(--warn);
+  background: #fff8e8;
+}
+.content { padding: 24px 32px; }
+h1, h2, h3 { line-height: 1.25; margin: 28px 0 12px; }
+h1 { font-size: 32px; margin-top: 0; }
+h2 { font-size: 22px; border-top: 1px solid var(--line); padding-top: 24px; }
+h3 { font-size: 17px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+nav a {
+  display: block;
+  padding: 6px 0;
+  color: var(--muted);
+}
+nav a.level-1 { color: var(--ink); font-weight: 700; }
+nav a.level-3, nav a.level-4, nav a.level-5, nav a.level-6 { padding-left: 12px; }
+code {
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: "Cascadia Mono", Consolas, monospace;
+}
+pre {
+  background: var(--code);
+  color: #e7edf7;
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+}
+pre code { background: transparent; padding: 0; color: inherit; }
+ul { padding-left: 24px; }
+.kicker {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.title { font-size: 28px; font-weight: 750; margin: 4px 0 8px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  color: var(--muted);
+}
+@media (max-width: 860px) {
+  .shell { display: block; }
+  aside { position: static; height: auto; }
+  main { padding: 20px; }
+  .content { padding: 20px; }
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="kicker">HTML handoff</div>
+      <h1>Sprint 3 Club Source Closeout</h1>
+      <nav><a class="level-1" href="#sprint-3-club-source-closeout-2026-05-21">Sprint 3 Club / Source Closeout — 2026-05-21</a>
+<a class="level-2" href="#summary">Summary</a>
+<a class="level-2" href="#implemented">Implemented</a>
+<a class="level-2" href="#verification">Verification</a>
+<a class="level-2" href="#guardian-note">Guardian Note</a>
+<a class="level-2" href="#remaining">Remaining</a></nav>
+    </aside>
+    <main>
+      <section class="meta">
+        <div class="kicker">evidence</div>
+        <div class="title">Sprint 3 Club Source Closeout</div>
+        <div class="grid">
+          <div><strong>Source</strong><br>C:\code\githubstar\wechathtmldownload\docs\weekly-miniprogram-handoff-20260519\SPRINT3_CLUB_SOURCE_CLOSEOUT_20260521.md</div>
+          <div><strong>Generated</strong><br>2026-05-21 15:23 +0800</div>
+        </div>
+      </section>
+      <section class="banner">
+        Static derived artifact. Keep the source Markdown or structured notes as the source of truth. Do not add secrets to this HTML.
+      </section>
+      <article class="content">
+<h1 id="sprint-3-club-source-closeout-2026-05-21">Sprint 3 Club / Source Closeout — 2026-05-21</h1>
+<p>Scope: HUAIDJ weekly mini-program + Atlas read-only cross-reference + source-article dedupe integration.</p>
+<h2 id="summary">Summary</h2>
+<p>Sprint 3 local slice is complete for the parts that can be executed without deployment approval: source articles are visible without duplicating event cards, merged promotional posts remain traceable, Club Profile v1 has a stable organizer key, and city/venue/detail routing no longer relies on lossy navigation.</p>
+<p>No CloudRun deployment, mini-program upload, WeChat review, Neo4j/Qdrant write, or Atlas production write was executed.</p>
+<h2 id="implemented">Implemented</h2>
+<p>| Area | Result | |------|--------| | Detail source articles | <code>buildDetailSourceArticles</code> exposes merged source refs once and keeps the retained source primary | | Venue source articles | Club page <code>SOURCE ARTICLES</code> includes aggregate parents and merged provenance, grouped by source hash | | Club Profile contract | CloudRun current/detail/batch items now expose <code>organizer_key</code> and <code>club_profile.schema_version=weekly_club_profile.v1</code> | | Frontend contract | <code>compactItem</code> preserves backend <code>organizer_key/club_profile</code> and falls back to venue/account-derived keys | | Venue routing | Detail page passes <code>key=</code> to venue page; venue page matches <code>organizerKey</code> before fuzzy name matching | | City routing | City selector writes <code>weeklyActivityPendingCity</code> and uses <code>wx.switchTab(&quot;/pages/index/index&quot;)</code> | | Pagination | Venue and artist pages page through <code>/api/v1/weekly/current</code> with <code>limit=100</code> so local filters do not truncate at the first page | | Saved language | Saved page opens detail with <code>weeklyActivityLang</code> preserved |</p>
+<h2 id="verification">Verification</h2>
+<p>| Check | Result | |-------|--------| | <code>node apps\weekly_activity_miniprogram\tests\format-quality.test.cjs</code> | PASS | | <code>node apps\weekly_activity_miniprogram\tests\page-source-routing.test.cjs</code> | 3 pass | | <code>node apps\weekly_activity_miniprogram\tests\source-articles.test.cjs</code> | 4 pass | | <code>node apps\weekly_activity_miniprogram\tests\dedup-parity.test.cjs</code> | PASS | | other non-DevTools mini-program CJS tests | PASS | | <code>node services\weekly_activity_cloudrun\tests\weeklyApi.test.mjs</code> | 30 pass | | all CloudRun test files | 39 pass | | Python repair + dedup parity | 10 OK | | Golden baseline focused tests | 5 OK | | strict 158-package audit | duplicate/effective/conflict = 0/0/0 | | <code>stage7_safe_handoff_verify.ps1</code> | PASS; Python targeted 354 passed; CloudRun Stage7 39 pass |</p>
+<h2 id="guardian-note">Guardian Note</h2>
+<p><code>check_weekly_release_guard.ps1</code> was rerun against the local current release directory. Local release checks passed for <code>backendRawHits=0</code>, <code>visibleHits=0</code>, source map presence, frontend real-data probe <code>items=158</code>, and mini-program tests <code>35 pass</code>.</p>
+<p>The guardian overall result is currently <code>ok=false</code> because:</p>
+<ul>
+<li><code>daily_queue_exporter_refresh_effective=false</code> with <code>exporter_accounts_ok=0</code>, <code>exporter_accounts_failed=122</code>, <code>exporter_article_rows=0</code></li>
+<li><code>public_api_current_probe</code> timed out</li>
+</ul>
+<p>Do not treat this as a local dedupe/source regression. It is an external queue/remote-probe blocker to clear before deployment or upload.</p>
+<h2 id="remaining">Remaining</h2>
+<p>| Item | Status | |------|--------| | Week/month schedule badges | UI polish / DevTools review pending | | G0 alias export and new snapshot | External Atlas input pending | | DevTools 10/10 visual pass | Requires user-approved/available WeChat DevTools automation | | Upload new dev version | Requires explicit user approval | | WeChat review submission | Requires explicit user approval |</p>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

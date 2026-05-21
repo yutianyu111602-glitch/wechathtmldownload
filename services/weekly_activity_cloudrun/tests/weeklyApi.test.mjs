@@ -1,0 +1,942 @@
+import assert from "node:assert/strict";
+import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { after, before, test } from "node:test";
+import { createServer } from "../src/server.mjs";
+import { WeeklyActivityDataStore } from "../src/dataStore.mjs";
+
+let server;
+let baseUrl;
+let testEnv;
+
+async function writeJson(filePath, value) {
+  await writeFile(filePath, JSON.stringify(value, null, 2), "utf8");
+}
+
+async function createFixture() {
+  const dir = await mkdtemp(path.join(os.tmpdir(), "weekly-api-"));
+  const sourceMapDir = path.join(dir, "..", "source_actions");
+  const stage7Dir = path.join(dir, "..", "stage7");
+  await mkdir(path.join(dir, "by-id"), { recursive: true });
+  await mkdir(path.join(dir, "llm", "enrichments"), { recursive: true });
+  await mkdir(sourceMapDir, { recursive: true });
+  await mkdir(stage7Dir, { recursive: true });
+  await writeJson(path.join(dir, "manifest.json"), {
+    schema_version: "weekly_activity_miniprogram_api.v1",
+    generated_at: "2026-05-07T09:48:35",
+    item_count: 3,
+  });
+  const items = [
+    {
+      id: "item-a",
+      title: "上海 Club A",
+      city_key: "shanghai",
+      city_keys: ["shanghai"],
+      city: ["上海"],
+      event_date_iso_guess: "2026-05-09",
+      event_date_iso_guesses: ["2026-05-09"],
+      quality_status: "READY",
+      promoter: "Club A",
+      cover_url: "https://mmbiz.qpic.cn/example/item-a.jpg",
+      cover_image_url: "https://mmbiz.qpic.cn/example/item-a.jpg",
+      source_article: {
+        url_hash: "aaaaaaaaaaaaaaaa",
+        account_name: "Club A",
+        published_at: "2026-05-07",
+      },
+      source_action: {
+        type: "wechat_article",
+        label: "公众号",
+        available: true,
+        url_hash: "aaaaaaaaaaaaaaaa",
+      },
+      lineup: ["Club A", "DJ A", "DADA北京"],
+      venue: ["Dada Bar Beijing"],
+      evidence: ["22:00 开始", "DJ A all night", "4x4 house and club trax"],
+    },
+    {
+      id: "item-a-duplicate",
+      title: "📌 上海 Club A",
+      city_key: "shanghai",
+      city_keys: ["shanghai"],
+      city: ["上海"],
+      event_date_iso_guess: "2026-05-09",
+      event_date_iso_guesses: ["2026-05-09"],
+      quality_status: "READY",
+      promoter: "Club A",
+      cover_url: "https://mmbiz.qpic.cn/example/item-a-duplicate.jpg",
+      cover_image_url: "https://mmbiz.qpic.cn/example/item-a-duplicate.jpg",
+      source_action: {
+        type: "wechat_article",
+        label: "公众号",
+        available: true,
+        url_hash: "bbbbbbbbbbbbbbbb",
+      },
+      lineup: ["Club A", "DJ A"],
+      venue: ["Dada Bar Beijing"],
+      evidence: ["22:00 开始", "DJ A all night"],
+    },
+    {
+      id: "item-b",
+      title: "AURORA @ 莫须有工厂",
+      city_key: "beijing",
+      city_keys: ["beijing"],
+      city: ["北京"],
+      event_date_iso_guess: "2026-05-10",
+      event_date_iso_guesses: ["2026-05-10"],
+      quality_status: "READY",
+      promoter: "AURORA BJ",
+      lineup: ["AURORA BJ", "AURORA"],
+      venue: [],
+      evidence: ["来源公众号: AURORA BJ", "NIGHT TOUR / 夜游", "Night Tour 夜游 05.09 @ 莫须有工厂"],
+    },
+    {
+      id: "club:abc123",
+      title: "Colon Id Event",
+      city_key: "shanghai",
+      city_keys: ["shanghai"],
+      city: ["上海"],
+      event_date_iso_guess: "2026-05-11",
+      event_date_iso_guesses: ["2026-05-11"],
+      quality_status: "READY",
+      promoter: "Club Colon",
+      lineup: ["DJ Colon"],
+      venue: ["Club Colon"],
+      evidence: ["22:00 Club Colon"],
+    },
+    {
+      id: "range-week",
+      title: "Range Week Event",
+      city_key: "beijing",
+      city_keys: ["beijing"],
+      city: ["北京"],
+      event_date_iso_guess: "2026-05-18",
+      event_date_iso_guesses: ["2026-05-18", "2026-05-24"],
+      event_date_start: "2026-05-18",
+      event_date_end: "2026-05-24",
+      quality_status: "READY",
+      promoter: "Range Club",
+      lineup: ["DJ Range"],
+      venue: ["Range Club"],
+      evidence: ["2026-05-18 - 2026-05-24"],
+    },
+    {
+      id: "item-review",
+      title: "Review Only",
+      city_key: "shanghai",
+      city_keys: ["shanghai"],
+      event_date_iso_guess: "2026-05-09",
+      event_date_iso_guesses: ["2026-05-09"],
+      quality_status: "REVIEW",
+    },
+  ];
+  await writeJson(path.join(dir, "current.json"), {
+    schema_version: "weekly_activity_miniprogram_current.v1",
+    generated_at: "2026-05-07T09:48:35",
+    item_count: items.length,
+    items,
+  });
+  await writeJson(path.join(dir, "by-id", "item-a.json"), {
+    schema_version: "weekly_activity_miniprogram_detail.v1",
+    item: items[0],
+  });
+  await writeJson(path.join(dir, "by-id", "clubu3aabc123.json"), {
+    schema_version: "weekly_activity_miniprogram_detail.v1",
+    item: items.find((item) => item.id === "club:abc123"),
+  });
+  await writeJson(path.join(sourceMapDir, "source_url_map.json"), {
+    schema_version: "weekly_activity_source_url_map.v1",
+    generated_at: "2026-05-07T09:48:35",
+    source_count: 1,
+    sources: {
+      aaaaaaaaaaaaaaaa: {
+        type: "wechat_article",
+        url: "https://mp.weixin.qq.com/s/item-a",
+        account_name: "Club A",
+        published_at: "2026-05-07",
+        event_id: "item-a",
+      },
+    },
+  });
+  await writeJson(path.join(dir, "weekly_entity_snapshot.json"), {
+    schema_version: "weekly_atlas_entity.v1",
+    generated_at: "2026-05-20T16:47:43Z",
+    publish_package: "TEST",
+    artist_profiles: [
+      {
+        artist_id: "atlas:entity:dj-a",
+        canonical_name: "DJ A",
+        verified: true,
+        source: "atlas_alias_export",
+      },
+    ],
+    lineup_resolved: [
+      {
+        event_id: "item-a",
+        raw: "DJ A",
+        artist_id: "atlas:entity:dj-a",
+        canonical_name: "DJ A",
+        match_method: "alias_exact",
+        match_score: 1,
+        verified: true,
+        display_tier: "show",
+      },
+      {
+        event_id: "item-a",
+        raw: "KeiKo",
+        artist_id: null,
+        canonical_name: null,
+        match_method: "fuzzy_multiple",
+        match_score: 1,
+        verified: false,
+        display_tier: "show_with_hint",
+        candidates: [
+          { artist_id: "atlas:entity:hidden-a", canonical_name: "KEIKO", score: 1 },
+          { artist_id: "atlas:entity:hidden-b", canonical_name: "KeiKo 惠子", score: 1 },
+        ],
+      },
+    ],
+  });
+  await writeJson(path.join(dir, "llm", "weekly_summary.json"), {
+    schemaVersion: "weekly_activity_api.materialized_summary.v1",
+    generatedAt: "2026-05-07T10:00:00",
+    provider: "deepseek",
+    model: "deepseek-v4-pro",
+    thinking: "disabled",
+    itemCount: 2,
+    summary: {
+      highlight_events: [{ title: "上海 Club A", reason_zh: "测试推荐", reason_en: "Fixture pick" }],
+      city_breakdown: { shanghai: 1, beijing: 1 },
+      trending_artists: ["DJ A"],
+      style_distribution: { house: 1 },
+      editor_note_zh: "本周测试摘要。",
+      editor_note_en: "Fixture weekly summary.",
+    },
+  });
+  await writeJson(path.join(dir, "llm", "enrichment_index.json"), {
+    schemaVersion: "weekly_activity_api.materialized_enrichment_index.v1",
+    generatedAt: "2026-05-07T10:00:00",
+    provider: "deepseek",
+    model: "deepseek-v4-pro",
+    thinking: "disabled",
+    itemCount: 3,
+    enrichments: [
+      { id: "item-a", sourceItemHash: "fixture", path: "llm/enrichments/item-a.json" },
+      { id: "club:abc123", sourceItemHash: "fixture-colon", path: "llm/enrichments/clubu3aabc123.json" },
+    ],
+  });
+  await writeJson(path.join(dir, "llm", "enrichments", "item-a.json"), {
+    schemaVersion: "weekly_activity_api.materialized_enrichment.v1",
+    generatedAt: "2026-05-07T10:00:00",
+    id: "item-a",
+    sourceItemHash: "fixture",
+    enriched: {
+      provider: "deepseek",
+      model: "deepseek-v4-pro",
+      enrichment: { schema_version: "weekly_activity_llm_enrichment.v1", title_display: "上海 Club A" },
+    },
+  });
+  await writeJson(path.join(dir, "llm", "enrichments", "clubu3aabc123.json"), {
+    schemaVersion: "weekly_activity_api.materialized_enrichment.v1",
+    generatedAt: "2026-05-07T10:00:00",
+    id: "club:abc123",
+    sourceItemHash: "fixture-colon",
+    enriched: {
+      provider: "deepseek",
+      model: "deepseek-v4-pro",
+      enrichment: { schema_version: "weekly_activity_llm_enrichment.v1", title_display: "Colon Id Event" },
+    },
+  });
+  await writeFile(
+    path.join(stage7Dir, "articles.jsonl"),
+    [
+      JSON.stringify({
+        article_id: "article-a",
+        article_uid: "DADA Beijing/article-a",
+        title: "DADA Beijing archives",
+        source_account: "DADA Beijing",
+        publish_time_status: "unknown",
+        entity_count: 2,
+        event_count: 1,
+        quality_grade: "ready",
+        vector_text: "DADA Beijing underground club night",
+      }),
+      JSON.stringify({
+        article_id: "article-b",
+        article_uid: "Other/article-b",
+        title: "Other story",
+        source_account: "Other",
+        publish_time_status: "unknown",
+        entity_count: 1,
+        event_count: 0,
+        quality_grade: "ready",
+        vector_text: "ambient record shop",
+      }),
+    ].join("\n") + "\n",
+    "utf8",
+  );
+  await writeFile(
+    path.join(stage7Dir, "entities.jsonl"),
+    [
+      JSON.stringify({
+        eid: "entity-a",
+        name: "DADA Beijing",
+        type: "venue",
+        city: "北京",
+        source_article_uid: "DADA Beijing/article-a",
+        vector_text: "实体:DADA Beijing 类型:venue 城市:北京",
+      }),
+    ].join("\n") + "\n",
+    "utf8",
+  );
+  await writeFile(
+    path.join(stage7Dir, "events.jsonl"),
+    [
+      JSON.stringify({
+        evid: "event-a",
+        name: "DADA all night",
+        place: "DADA Beijing",
+        time_text: "Friday 22:00",
+        participants: ["DJ A"],
+        source_article_uid: "DADA Beijing/article-a",
+        vector_text: "活动:DADA all night 地点:DADA Beijing",
+      }),
+    ].join("\n") + "\n",
+    "utf8",
+  );
+  await writeJson(path.join(stage7Dir, "release_pointer.staging.json"), {
+    schema_version: "stage7_consumer_release_pointer.v1",
+    channel: "staging",
+    release_ready: true,
+    decision: "staging_ready_with_unknown_publish_time",
+    generated_at: "2026-05-17T18:38:05",
+    counts: { articles: 2, entities: 1, events: 1, missing_publish_time_articles: 2 },
+    publish_time_policy: { allow_unknown_publish_time: true, status_field: "publish_time_status" },
+    files: {
+      articles: { path: path.join(stage7Dir, "articles.jsonl"), bytes: 1, sha256: "fixture" },
+      entities: { path: path.join(stage7Dir, "entities.jsonl"), bytes: 1, sha256: "fixture" },
+      events: { path: path.join(stage7Dir, "events.jsonl"), bytes: 1, sha256: "fixture" },
+      manifest: { path: path.join(stage7Dir, "manifest.json"), bytes: 1, sha256: "fixture" },
+    },
+  });
+  await writeJson(path.join(stage7Dir, "recommendations.json"), {
+    decision: "hybrid_recommendations_ready_without_mem0",
+    generated_at: "2026-05-17T18:45:09",
+    recommendation_count: 1,
+    diversity_ratio: 0.5,
+    safety: { model_call_executed: false, mem0_write_executed: false },
+    recommendations: [{ id: "graph:dada", type: "graph_neighbor", title: "DADA Beijing", score: 0.9 }],
+  });
+  await writeFile(
+    path.join(stage7Dir, "graph_rag_answers.jsonl"),
+    JSON.stringify({
+      id: "q1",
+      query: "DADA 有什么线索",
+      answer: "找到 DADA Beijing 线索。",
+      citations: [{ source_article_uid: "DADA Beijing/article-a" }],
+      citation_count: 1,
+      llm_call_executed: false,
+    }) + "\n",
+    "utf8",
+  );
+  await writeJson(path.join(stage7Dir, "vector_router_smoke.json"), {
+    schema_version: "stage7_vector_collection_router_smoke.v1",
+    generated_at: "2026-05-18T02:31:45",
+    ok: true,
+    decision: "vector_collection_router_smoke_ready",
+    sample_size_per_collection: 3,
+    top_k: 5,
+    collection_groups: {
+      qwen3_current: { article: "wechat_stage7_article_qwen3_embedding_4b_1024_current" },
+      snowflake_full_staging: { article: "wechat_stage7_article_snowflake_arctic_embed_l_v2_0_1024_20260518_full_staging" },
+      english_sidecar_full_staging: { poster: "wechat_stage7_poster_bge_large_en_v1_5_1024_20260518_en_sidecar" },
+    },
+    channel_probes: {
+      qwen3_current: [
+        {
+          kind: "article",
+          collection: "wechat_stage7_article_qwen3_embedding_4b_1024_current",
+          checked: 3,
+          matched: 3,
+          match_rate: 1.0,
+        },
+      ],
+    },
+    router_cases: [
+      { id: "zh_full_route", lang: "zh", routed_channels: ["qwen3_current", "snowflake_full_staging"], fused: [{ parent_id: "p1" }] },
+    ],
+    safety: {
+      model_loaded: false,
+      embedding_call_executed: false,
+      qdrant_write_executed: false,
+      qdrant_alias_change_executed: false,
+      production_publish_executed: false,
+    },
+  });
+  await writeJson(path.join(stage7Dir, "identity_review_workbench.json"), {
+    schemaVersion: "stage7_atlas_identity_review_workbench.v1",
+    generatedAt: "2026-05-19T10:40:33",
+    decision: "identity_review_workbench_ready_read_only",
+    summary: {
+      sourceReportCount: 3,
+      itemCount: 2,
+      acceptedForGraph: 0,
+      identityProofCount: 0,
+      graphWriteAllowedCount: 0,
+      needsReviewCount: 2,
+    },
+    sourceReports: [
+      { id: "initial_adjudication", decision: "external_identity_adjudication_ready_no_graph_acceptance", reviewRows: 1, acceptedForGraph: 0 },
+    ],
+    facets: {
+      queues: [{ label: "initial_adjudication", count: 1 }, { label: "future_direct_proof_review_gate", count: 1 }],
+      buckets: [{ label: "context_missing_subject", count: 1 }, { label: "needs_subject_context_before_identity_review", count: 1 }],
+      domains: [{ label: "ra.co", count: 1 }, { label: "soundcloud.com", count: 1 }],
+    },
+    items: [
+      {
+        id: "initial:1",
+        queue: "initial_adjudication",
+        bucket: "context_missing_subject",
+        status: "not_accepted_source_backed_review_required",
+        subjectName: "ra.co",
+        url: "https://ra.co/dj/test",
+        domain: "ra.co",
+        sourceAccount: "DADA",
+        sourceArticleUid: "DADA/article-a",
+        sourceTitle: "DADA profile mention",
+        reviewReason: "reachable URL is not identity proof",
+        acceptedForGraph: false,
+        identityProof: false,
+        graphWriteAllowed: false,
+      },
+      {
+        id: "followup:2",
+        queue: "future_direct_proof_review_gate",
+        bucket: "needs_subject_context_before_identity_review",
+        status: "profile_content_needs_manual_review",
+        subjectName: "soundcloud.com",
+        url: "https://soundcloud.com/test",
+        domain: "soundcloud.com",
+        sourceTitle: "SoundCloud mention",
+        acceptedForGraph: false,
+        identityProof: false,
+        graphWriteAllowed: false,
+      },
+    ],
+    safety: {
+      reportOnly: true,
+      networkCallExecuted: false,
+      modelCallExecuted: false,
+      graphWriteExecuted: false,
+      qdrantWriteExecuted: false,
+      sqliteWriteExecuted: false,
+      mem0WriteExecuted: false,
+      paidApiUsed: false,
+      cookieOrTokenExported: false,
+      dScanExecuted: false,
+    },
+  });
+  return {
+    baseDir: dir,
+    sourceMapDir,
+    stage7AtlasPointer: path.join(stage7Dir, "release_pointer.staging.json"),
+    stage7RecommendationsPath: path.join(stage7Dir, "recommendations.json"),
+    stage7GraphRagAnswersPath: path.join(stage7Dir, "graph_rag_answers.jsonl"),
+    stage7VectorRouterSmokePath: path.join(stage7Dir, "vector_router_smoke.json"),
+    stage7IdentityReviewPath: path.join(stage7Dir, "identity_review_workbench.json"),
+  };
+}
+
+before(async () => {
+  const {
+    baseDir,
+    sourceMapDir,
+    stage7AtlasPointer,
+    stage7RecommendationsPath,
+    stage7GraphRagAnswersPath,
+    stage7VectorRouterSmokePath,
+    stage7IdentityReviewPath,
+  } = await createFixture();
+  testEnv = {};
+  for (let port = 18787; port < 18850; port += 1) {
+    server = createServer({
+      baseDir,
+      sourceMapDir,
+      stage7AtlasPointer,
+      stage7RecommendationsPath,
+      stage7GraphRagAnswersPath,
+      stage7VectorRouterSmokePath,
+      stage7IdentityReviewPath,
+      env: testEnv,
+      llmClient: {
+        publicStatus: () => ({
+          provider: "deepseek",
+          configured: false,
+          baseUrl: "https://api.deepseek.com",
+          model: "deepseek-v4-pro",
+          timeoutMs: 120000,
+          thinking: "disabled",
+        }),
+      },
+    });
+    try {
+      await new Promise((resolve, reject) => {
+        server.once("error", reject);
+        server.listen(port, "127.0.0.1", resolve);
+      });
+      baseUrl = `http://127.0.0.1:${port}`;
+      return;
+    } catch (error) {
+      await new Promise((resolve) => server.close(resolve));
+      if (error?.code !== "EADDRINUSE") throw error;
+    }
+  }
+  throw new Error("No free local test port in 18787-18849.");
+});
+
+after(async () => {
+  await new Promise((resolve) => server.close(resolve));
+});
+
+test("returns manifest", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/weekly/manifest`);
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.schema_version, "weekly_activity_miniprogram_api.v1");
+});
+
+test("serves Stage7 atlas manifest and search from a release pointer", async () => {
+  const manifestRes = await fetch(`${baseUrl}/api/v1/stage7/manifest`);
+  assert.equal(manifestRes.status, 200);
+  const manifest = await manifestRes.json();
+  assert.equal(manifest.schemaVersion, "stage7_atlas_api.manifest.v1");
+  assert.equal(manifest.releaseReady, true);
+  assert.equal(manifest.counts.articles, 2);
+
+  const searchRes = await fetch(`${baseUrl}/api/v1/stage7/search?q=dada&limit=5`);
+  assert.equal(searchRes.status, 200);
+  const search = await searchRes.json();
+  assert.equal(search.schemaVersion, "stage7_atlas_api.search_response.v1");
+  assert.equal(search.retrieval.mode, "materialized_text_scan");
+  assert.equal(search.retrieval.liveVectorSearchEnabled, false);
+  assert.ok(search.resultCount >= 3);
+  assert.ok(search.results.some((item) => item.kind === "articles" && item.item.article_id === "article-a"));
+  assert.ok(search.results.some((item) => item.kind === "entities" && item.item.eid === "entity-a"));
+  assert.ok(search.results.some((item) => item.kind === "events" && item.item.evid === "event-a"));
+});
+
+test("serves Stage7 vector router status without connecting to Qdrant", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/stage7/vector-router/status`);
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.schemaVersion, "stage7_atlas_api.vector_router_status.v1");
+  assert.equal(body.ok, true);
+  assert.equal(body.decision, "vector_collection_router_smoke_ready");
+  assert.equal(body.channelProbeSummary.qwen3_current[0].matchRate, 1.0);
+  assert.equal(body.serviceIntegration.liveVectorSearchEnabled, false);
+  assert.equal(body.safety.qdrantWriteExecuted, false);
+  assert.equal(body.safety.qdrantAliasChangeExecuted, false);
+});
+
+test("serves Stage7 materialized recommendations and Graph RAG drafts without provider calls", async () => {
+  const recRes = await fetch(`${baseUrl}/api/v1/stage7/recommendations?limit=1`);
+  assert.equal(recRes.status, 200);
+  const rec = await recRes.json();
+  assert.equal(rec.schemaVersion, "stage7_atlas_api.recommendations_response.v1");
+  assert.equal(rec.safety.modelCallExecuted, false);
+  assert.equal(rec.recommendations[0].title, "DADA Beijing");
+
+  const ragRes = await fetch(`${baseUrl}/api/v1/stage7/graph-rag/answers?limit=1`);
+  assert.equal(ragRes.status, 200);
+  const rag = await ragRes.json();
+  assert.equal(rag.schemaVersion, "stage7_atlas_api.graph_rag_answers_response.v1");
+  assert.equal(rag.llmCallExecuted, false);
+  assert.equal(rag.answers[0].citation_count, 1);
+});
+
+test("serves Stage7 atlas overview and browser page", async () => {
+  const overviewRes = await fetch(`${baseUrl}/api/v1/stage7/overview?sampleLimit=10`);
+  assert.equal(overviewRes.status, 200);
+  const overview = await overviewRes.json();
+  assert.equal(overview.schemaVersion, "stage7_atlas_api.overview.v1");
+  assert.equal(overview.counts.articles, 2);
+  assert.equal(overview.serviceIntegration.liveVectorSearchEnabled, false);
+  assert.ok(overview.browsingSurfaces.some((item) => item.id === "map"));
+  assert.ok(overview.browsingSurfaces.some((item) => item.id === "scenes"));
+  assert.ok(overview.facets.mapPlaces.length >= 1);
+  assert.equal(overview.safety.llmCallExecuted, false);
+  assert.equal(overview.safety.qdrantWriteExecuted, false);
+
+  const pageRes = await fetch(`${baseUrl}/atlas`);
+  assert.equal(pageRes.status, 200);
+  assert.match(pageRes.headers.get("content-type"), /text\/html/);
+  const body = await pageRes.text();
+  assert.match(body, /中国地下电子音乐图鉴/);
+  assert.match(body, /\/api\/v1\/stage7\/overview/);
+  assert.match(body, />地图</);
+  assert.match(body, />人物</);
+  assert.match(body, />厂牌</);
+  assert.match(body, />场景</);
+  assert.match(body, /\/atlas\/identity/);
+  assert.match(body, /huaidj-logo-nav-512x128\.png/);
+});
+
+test("serves Stage7 identity review workbench without graph writes", async () => {
+  const apiRes = await fetch(`${baseUrl}/api/v1/stage7/identity-review?domain=ra.co&limit=10`);
+  assert.equal(apiRes.status, 200);
+  const api = await apiRes.json();
+  assert.equal(api.schemaVersion, "stage7_atlas_api.identity_review_response.v1");
+  assert.equal(api.decision, "identity_review_workbench_ready_read_only");
+  assert.equal(api.summary.acceptedForGraph, 0);
+  assert.equal(api.page.total, 1);
+  assert.equal(api.items[0].domain, "ra.co");
+  assert.equal(api.items[0].acceptedForGraph, false);
+  assert.equal(api.safety.graphWriteExecuted, false);
+  assert.equal(api.safety.networkCallExecuted, false);
+
+  const pageRes = await fetch(`${baseUrl}/atlas/identity`);
+  assert.equal(pageRes.status, 200);
+  assert.match(pageRes.headers.get("content-type"), /text\/html/);
+  const body = await pageRes.text();
+  assert.match(body, /图鉴身份审阅/);
+  assert.match(body, /\/api\/v1\/stage7\/identity-review/);
+  assert.match(body, /huaidj-logo-nav-512x128\.png/);
+});
+
+test("serves Stage7 atlas detail API and browser page with related evidence", async () => {
+  const entityRes = await fetch(`${baseUrl}/api/v1/stage7/entities/entity-a?relatedLimit=5`);
+  assert.equal(entityRes.status, 200);
+  const entity = await entityRes.json();
+  assert.equal(entity.schemaVersion, "stage7_atlas_api.detail_response.v1");
+  assert.equal(entity.kind, "entities");
+  assert.equal(entity.primaryId, "entity-a");
+  assert.equal(entity.matchedBy, "eid");
+  assert.equal(entity.item.name, "DADA Beijing");
+  assert.equal(entity.related.sourceArticle.article_uid, "DADA Beijing/article-a");
+  assert.equal(entity.related.events[0].evid, "event-a");
+  assert.match(entity.evidence.vectorTextPreview, /实体:DADA Beijing/);
+  assert.equal(entity.safety.qdrantWriteExecuted, false);
+  assert.equal(entity.safety.neo4jWriteExecuted, false);
+  assert.equal(entity.safety.mem0WriteExecuted, false);
+
+  const articleRes = await fetch(`${baseUrl}/api/v1/stage7/articles/${encodeURIComponent("DADA Beijing/article-a")}`);
+  assert.equal(articleRes.status, 200);
+  const article = await articleRes.json();
+  assert.equal(article.kind, "articles");
+  assert.equal(article.matchedBy, "article_uid");
+  assert.equal(article.related.entities[0].eid, "entity-a");
+  assert.equal(article.related.events[0].evid, "event-a");
+
+  const eventRes = await fetch(`${baseUrl}/api/v1/stage7/events/event-a?relatedLimit=5`);
+  assert.equal(eventRes.status, 200);
+  const event = await eventRes.json();
+  assert.equal(event.kind, "events");
+  assert.equal(event.primaryId, "event-a");
+  assert.equal(event.related.sourceArticle.article_id, "article-a");
+  assert.equal(event.related.entities[0].eid, "entity-a");
+
+  const missingRes = await fetch(`${baseUrl}/api/v1/stage7/entities/missing-entity`);
+  assert.equal(missingRes.status, 404);
+  const missing = await missingRes.json();
+  assert.equal(missing.error.code, "STAGE7_DETAIL_NOT_FOUND");
+
+  const pageRes = await fetch(`${baseUrl}/atlas/entities/entity-a`);
+  assert.equal(pageRes.status, 200);
+  assert.match(pageRes.headers.get("content-type"), /text\/html/);
+  const body = await pageRes.text();
+  assert.match(body, /图鉴详情/);
+  assert.match(body, /\/api\/v1\/stage7\//);
+  assert.match(body, /huaidj-logo-nav-512x128\.png/);
+
+  const atlasRes = await fetch(`${baseUrl}/atlas`);
+  const atlasBody = await atlasRes.text();
+  assert.match(atlasBody, /detailHref\("entities"/);
+  assert.match(atlasBody, /detailHref\("events"/);
+});
+
+test("default packaged data source is available for CloudBase Run", async () => {
+  const store = new WeeklyActivityDataStore();
+  const manifest = await store.getManifest();
+  assert.equal(manifest.schema_version, "weekly_activity_miniprogram_api.v1");
+  assert.ok(manifest.item_count > 0);
+});
+
+test("reports DeepSeek LLM provider status without secrets", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/weekly/llm/status`);
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.schemaVersion, "weekly_activity_api.llm_status.v1");
+  assert.equal(body.llm.provider, "deepseek");
+  assert.equal(body.llm.model, "deepseek-v4-pro");
+  assert.equal(body.llm.baseUrl, "https://api.deepseek.com");
+  assert.equal(body.llm.thinking, "disabled");
+  assert.equal(Object.hasOwn(body.llm, "apiKey"), false);
+});
+
+test("serves materialized LLM summary without triggering provider calls", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/weekly/llm/materialized-summary`);
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.schemaVersion, "weekly_activity_api.materialized_summary.v1");
+  assert.equal(body.provider, "deepseek");
+  assert.equal(body.thinking, "disabled");
+  assert.equal(body.summary.highlight_events[0].title, "上海 Club A");
+});
+
+test("serves materialized LLM enrichment index and detail", async () => {
+  const indexRes = await fetch(`${baseUrl}/api/v1/weekly/llm/materialized-enrichments`);
+  assert.equal(indexRes.status, 200);
+  const index = await indexRes.json();
+  assert.equal(index.schemaVersion, "weekly_activity_api.materialized_enrichment_index.v1");
+  assert.equal(index.enrichments[0].id, "item-a");
+
+  const detailRes = await fetch(`${baseUrl}/api/v1/weekly/llm/materialized-enrichments/item-a`);
+  assert.equal(detailRes.status, 200);
+  const detail = await detailRes.json();
+  assert.equal(detail.schemaVersion, "weekly_activity_api.materialized_enrichment.v1");
+  assert.equal(detail.enriched.enrichment.title_display, "上海 Club A");
+
+  const colonDetailRes = await fetch(`${baseUrl}/api/v1/weekly/llm/materialized-enrichments/${encodeURIComponent("club:abc123")}`);
+  assert.equal(colonDetailRes.status, 200);
+  const colonDetail = await colonDetailRes.json();
+  assert.equal(colonDetail.id, "club:abc123");
+  assert.equal(colonDetail.enriched.enrichment.title_display, "Colon Id Event");
+});
+
+test("serves a browser landing page", async () => {
+  const res = await fetch(`${baseUrl}/`);
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get("content-type"), /text\/html/);
+  const body = await res.text();
+  assert.match(body, /HUAIDJ Atlas \/ Weekly/);
+  assert.match(body, /\/atlas/);
+  assert.match(body, /\/atlas\/identity/);
+  assert.match(body, /\/preview/);
+});
+
+test("serves huaidj brand asset", async () => {
+  const res = await fetch(`${baseUrl}/assets/huaidj-logo-nav-512x128.png`);
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get("content-type"), /image\/png/);
+  assert.ok((await res.arrayBuffer()).byteLength > 1000);
+});
+
+test("serves a browser preview page backed by current data", async () => {
+  const res = await fetch(`${baseUrl}/preview?cityKey=shanghai`);
+  assert.equal(res.status, 200);
+  const body = await res.text();
+  assert.match(body, /上海 Club A/);
+  assert.doesNotMatch(body, /https:\/\/mp\.weixin\.qq\.com\/s\/item-a/);
+  assert.match(body, /huaidj-logo-nav-512x128\.png/);
+  assert.doesNotMatch(body, /WEEKLY CLUB GUIDE/);
+  assert.match(body, /class="event-date">22:00/);
+  assert.match(body, /class="event-lineup">DJ A/);
+  assert.match(body, /class="event-style">4x4 \/ house \/ club trax/);
+  assert.match(body, /<select class="filter-select" name="cityKey"/);
+  assert.doesNotMatch(body, /<select class="filter-select" name="date"/);
+  assert.match(body, /class="date-option is-active"/);
+  assert.match(body, /href="\/preview\?cityKey=shanghai&amp;date=2026-05-09"/);
+  assert.doesNotMatch(body, /href="\/preview\?cityKey=shanghai&amp;date=2026-05-10"/);
+  assert.doesNotMatch(body, /class="event-lineup">Club A/);
+  assert.doesNotMatch(body, /class="event-lineup">.*DADA北京/);
+  assert.doesNotMatch(body, /class="source-link"/);
+  assert.doesNotMatch(body, /打开原文/);
+  assert.doesNotMatch(body, /地点待确认/);
+  assert.doesNotMatch(body, /待确认/);
+  assert.doesNotMatch(body, /Review Only/);
+  assert.match(body, /HUAIDJ WEEKLY/);
+  assert.match(body, /src="\/api\/v1\/weekly\/poster\/item-a"/);
+  assert.doesNotMatch(body, /mmbiz\.qpic\.cn\/example\/item-a/);
+});
+
+test("serves browser preview with English UI labels", async () => {
+  const res = await fetch(`${baseUrl}/preview?cityKey=shanghai&lang=en`);
+  assert.equal(res.status, 200);
+  const body = await res.text();
+  assert.match(body, /<html lang="en">/);
+  assert.match(body, />City</);
+  assert.match(body, /All dates/);
+  assert.doesNotMatch(body, /<select class="filter-select" name="date"/);
+  assert.match(body, /class="date-strip"/);
+  assert.match(body, /This week/);
+  assert.match(body, /class="event-date">22:00/);
+  assert.match(body, /class="event-style">4x4 \/ house \/ club trax/);
+  assert.doesNotMatch(body, /Open original/);
+  assert.doesNotMatch(body, /class="source-link"/);
+  assert.match(body, /href="\/preview\?cityKey=shanghai"/);
+  assert.match(body, /href="\/preview\/items\/item-a\?lang=en"/);
+});
+
+test("serves item pages without visible source links or placeholder venues", async () => {
+  const res = await fetch(`${baseUrl}/preview/items/item-a`);
+  assert.equal(res.status, 200);
+  const body = await res.text();
+  assert.doesNotMatch(body, /https:\/\/mp\.weixin\.qq\.com\/s\/item-a/);
+  assert.match(body, /北京市朝阳区南营房胡同日坛国际贸易中心A座北门B1层/);
+  assert.match(body, /data-copy="北京市朝阳区南营房胡同日坛国际贸易中心A座北门B1层"/);
+  assert.match(body, /复制地址/);
+  assert.match(body, /DJ LINEUP<\/span>DJ A/);
+  assert.match(body, /时间<\/span>22:00/);
+  assert.match(body, /风格<\/span>4x4 \/ house \/ club trax/);
+  assert.doesNotMatch(body, /DJ LINEUP<\/span>Club A/);
+  assert.doesNotMatch(body, /DJ LINEUP<\/span>.*DADA北京/);
+  assert.doesNotMatch(body, /待确认/);
+  assert.doesNotMatch(body, /打开活动原文/);
+});
+
+test("infers verified detailed venue addresses and exposes copy action", async () => {
+  const res = await fetch(`${baseUrl}/preview/items/item-b`);
+  assert.equal(res.status, 200);
+  const body = await res.text();
+  assert.match(body, /AURORA @ 莫须有工厂/);
+  assert.match(body, /地址<\/span><div class="address-copy">/);
+  assert.match(body, /北京市朝阳区酒仙桥路2号798艺术区706路B06-2/);
+  assert.match(body, /data-copy="北京市朝阳区酒仙桥路2号798艺术区706路B06-2"/);
+  assert.match(body, /复制地址/);
+  assert.doesNotMatch(body, /DJ LINEUP<\/span>/);
+  assert.doesNotMatch(body, /DJ 简介/);
+  assert.doesNotMatch(body, /NIGHT TOUR \/ 夜游/);
+  assert.doesNotMatch(body, /待确认/);
+});
+
+test("serves item pages with English UI labels", async () => {
+  const res = await fetch(`${baseUrl}/preview/items/item-a?lang=en`);
+  assert.equal(res.status, 200);
+  const body = await res.text();
+  assert.match(body, /<html lang="en">/);
+  assert.match(body, /<span>Club<\/span>Club A/);
+  assert.match(body, /<span>Time<\/span>22:00/);
+  assert.match(body, /Copy address/);
+  assert.doesNotMatch(body, /Open original post/);
+  assert.match(body, /href="\/preview\?lang=en"/);
+});
+
+test("filters current items by city and excludes review candidates", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/weekly/current?cityKey=shanghai`);
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.page.total, 2);
+  assert.equal(body.items[0].id, "item-a");
+  assert.equal(body.items[0].organizer_key, "dadabarbeijing");
+  assert.deepEqual(body.items[0].club_profile, {
+    schema_version: "weekly_club_profile.v1",
+    organizer_key: "dadabarbeijing",
+    display_name: "Dada Bar Beijing",
+    city: "上海",
+    address: "",
+  });
+  assert.equal(body.items[1].id, "club:abc123");
+});
+
+test("filters multi-day events by inclusive date range", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/weekly/current?date=2026-05-20`);
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.page.total, 1);
+  assert.equal(body.items[0].id, "range-week");
+});
+
+test("supports cursor pagination", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/weekly/current?limit=1`);
+  const body = await res.json();
+  assert.equal(body.items.length, 1);
+  assert.equal(body.page.nextCursor, "1");
+});
+
+test("returns detail by id", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/weekly/items/item-a`);
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.title, "上海 Club A");
+  assert.equal(body.organizer_key, "dadabarbeijing");
+  assert.equal(body.club_profile.schema_version, "weekly_club_profile.v1");
+  assert.equal(body.club_profile.display_name, "Dada Bar Beijing");
+
+  const colonRes = await fetch(`${baseUrl}/api/v1/weekly/items/${encodeURIComponent("club:abc123")}`);
+  assert.equal(colonRes.status, 200);
+  const colonBody = await colonRes.json();
+  assert.equal(colonBody.title, "Colon Id Event");
+});
+
+test("returns club profile contract on batch detail items", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/weekly/items/batch?ids=item-a,${encodeURIComponent("club:abc123")}`);
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.items.length, 2);
+  assert.equal(body.items[0].organizer_key, "dadabarbeijing");
+  assert.equal(body.items[1].organizer_key, "clubcolon");
+});
+
+test("returns source action by hash without exposing it in current list", async () => {
+  const currentRes = await fetch(`${baseUrl}/api/v1/weekly/current?cityKey=shanghai`);
+  const current = await currentRes.json();
+  assert.equal(Object.hasOwn(current.items[0].source_action, "url"), false);
+
+  const res = await fetch(`${baseUrl}/api/v1/weekly/source/aaaaaaaaaaaaaaaa`);
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.schemaVersion, "weekly_activity_api.source_action.v1");
+  assert.equal(body.mode, "webview");
+  assert.equal(body.url, "https://mp.weixin.qq.com/s/item-a");
+});
+
+test("returns weekly atlas event snapshot without exposing fuzzy candidate ids", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/weekly/atlas-events/item-a`);
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.schemaVersion, "weekly_activity_api.atlas_event.v1");
+  assert.equal(body.eventId, "item-a");
+  assert.equal(body.lineupResolved.length, 2);
+  assert.equal(body.lineupResolved[0].artistId, "atlas:entity:dj-a");
+  assert.equal(body.lineupResolved[0].displayTier, "show");
+  assert.equal(body.lineupResolved[1].artistId, null);
+  assert.equal(body.lineupResolved[1].displayTier, "show_with_hint");
+  assert.equal(Object.hasOwn(body.lineupResolved[1].candidates[0], "artist_id"), false);
+  assert.equal(body.artistProfiles[0].canonicalName, "DJ A");
+  assert.equal(body.safety.fuzzyCandidateIdsExposed, false);
+});
+
+test("uses unified error shape", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/weekly/items/missing`);
+  assert.equal(res.status, 404);
+  const body = await res.json();
+  assert.equal(body.error.code, "ITEM_NOT_FOUND");
+});
+
+test("llm enrich disabled by default", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/weekly/llm/enrich?id=item-a`);
+  assert.equal(res.status, 403);
+  const body = await res.json();
+  assert.equal(body.error.code, "LLM_DISABLED");
+});
+
+test("llm enrich requires id parameter", async () => {
+  testEnv.DEEPSEEK_ENRICH_ENABLED = "true";
+  testEnv.DEEPSEEK_API_KEY = "sk-test";
+  const res = await fetch(`${baseUrl}/api/v1/weekly/llm/enrich`);
+  assert.equal(res.status, 400);
+  const body = await res.json();
+  assert.equal(body.error.code, "MISSING_ID");
+  delete testEnv.DEEPSEEK_ENRICH_ENABLED;
+  delete testEnv.DEEPSEEK_API_KEY;
+});
+
+test("llm enrich returns 404 for unknown id", async () => {
+  testEnv.DEEPSEEK_ENRICH_ENABLED = "true";
+  testEnv.DEEPSEEK_API_KEY = "sk-test";
+  const res = await fetch(`${baseUrl}/api/v1/weekly/llm/enrich?id=unknown-item`);
+  assert.equal(res.status, 404);
+  const body = await res.json();
+  assert.equal(body.error.code, "ITEM_NOT_FOUND");
+  delete testEnv.DEEPSEEK_ENRICH_ENABLED;
+  delete testEnv.DEEPSEEK_API_KEY;
+});
+
+test("llm weekly-summary disabled by default", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/weekly/llm/weekly-summary`);
+  assert.equal(res.status, 403);
+  const body = await res.json();
+  assert.equal(body.error.code, "LLM_DISABLED");
+});

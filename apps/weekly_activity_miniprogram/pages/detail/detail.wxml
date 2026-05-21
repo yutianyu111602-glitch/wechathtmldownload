@@ -1,0 +1,142 @@
+<view class="page detail-page">
+  <view wx:if="{{loading}}" class="state loading-state">
+    <view>{{loadingStep || t.loading}}</view>
+    <view class="state-progress">
+      <view class="state-progress-fill" style="width: {{loadingProgress}}%;"></view>
+    </view>
+  </view>
+  <view wx:elif="{{error}}" class="state error">{{error}}</view>
+  <view wx:elif="{{!item}}" class="state">{{t.notFound || '活动不存在'}}</view>
+  <view wx:else>
+    <view class="detail-nav">
+      <button class="back-button" bindtap="goBack">BACK</button>
+      <button class="share-button icon-button" open-type="share">
+        <image class="action-icon" src="/assets/icons/share.png" mode="aspectFit"></image>
+        <text>SHARE</text>
+      </button>
+    </view>
+
+    <view class="event-hero">
+      <image class="detail-logo" src="/assets/brand/huaidj-logo-nav-512x128.png" mode="aspectFit"></image>
+      <view class="detail-meta-line">{{item.detailMetaLine}}</view>
+      <view class="detail-title">{{item.displayTitle}}</view>
+      <view class="hero-actions">
+        <button class="hero-save icon-button" bindtap="saveItem">
+          <image class="action-icon" src="{{saved ? '/assets/icons/favorite-active.png' : '/assets/icons/favorite.png'}}" mode="aspectFit"></image>
+          <text>{{saved ? t.saved : t.save}}</text>
+        </button>
+        <view wx:if="{{item.hasStyle}}" class="hero-tag">{{item.styleLabel}}</view>
+        <view wx:if="{{priceLabel}}" class="hero-tag">{{priceLabel}}</view>
+      </view>
+    </view>
+
+    <view class="fact-strip">
+      <view class="fact-cell">
+        <view class="fact-kicker">{{t.date}}</view>
+        <view class="fact-main fact-date-main">{{item.weekdayLabel}} {{item.dateCompact}}</view>
+        <view wx:if="{{item.hasTime}}" class="fact-sub">{{item.timeLabel}}</view>
+      </view>
+      <view class="fact-cell" bindtap="openVenue">
+        <view class="fact-kicker">{{t.location}}</view>
+        <view class="fact-main">{{item.venueLabel || item.promoter || item.account}}</view>
+        <view wx:if="{{item.cityLabel}}" class="fact-sub">{{item.cityLabel}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{item.hasAddress}}" class="address-block" bindtap="copyAddress">
+      <view class="address-label">{{t.address}}</view>
+      <view class="address-value">{{item.addressLabel}}</view>
+      <view class="copy-hint">{{t.copyAddress}}</view>
+    </view>
+
+    <view wx:if="{{item.hasLineup || item.hasLineupHint || item.hasDescription || item.hasBio}}" class="summary-strip">
+      <view wx:if="{{item.hasLineup}}" class="summary-cell">
+        <view class="summary-kicker">{{t.lineup}}</view>
+        <view class="summary-value">{{item.lineupLabel}}</view>
+      </view>
+      <view wx:elif="{{item.hasLineupHint}}" class="summary-cell">
+        <view class="summary-kicker">{{t.lineup}}</view>
+        <view class="summary-value muted-line">{{t.lineupHint}}</view>
+      </view>
+      <view wx:elif="{{item.hasDescription || item.hasBio}}" class="summary-cell">
+        <view class="summary-kicker">{{t.description}}</view>
+        <view class="summary-value">{{item.descriptionLead || item.displayTitle}}</view>
+      </view>
+    </view>
+
+    <view class="poster-hero" bindtap="openPoster" hover-class="poster-hover">
+      <image wx:if="{{item.coverUrl}}" class="detail-poster" src="{{item.coverUrl}}" mode="widthFix"></image>
+      <view wx:else class="detail-poster-fallback">{{item.displayTitle}}</view>
+      <view class="tap-hint">{{sourceLoading ? t.sourcePreparing : t.viewSource}} ›</view>
+    </view>
+
+    <view wx:if="{{item.sourceArticles.length}}" class="detail-section">
+      <view class="detail-heading">SOURCE ARTICLES</view>
+      <view
+        wx:for="{{item.sourceArticles}}"
+        wx:key="id"
+        class="source-article-row"
+        data-hash="{{item.hash}}"
+        bindtap="openSourceArticle"
+      >
+        <view class="source-article-main">
+          <view class="source-article-title">{{item.title}}</view>
+          <view class="source-article-meta">{{item.subtitle}}</view>
+        </view>
+        <text wx:if="{{item.isPrimary}}" class="source-article-badge">PRIMARY</text>
+        <text wx:else class="chevron">›</text>
+      </view>
+    </view>
+
+    <view wx:if="{{item.hasLineup}}" class="detail-section">
+      <view class="detail-heading">{{t.lineup}}</view>
+      <view wx:for="{{item.lineupItems}}" wx:key="*this" class="lineup-line">{{item}}</view>
+    </view>
+    <view wx:elif="{{item.hasLineupHint}}" class="detail-section">
+      <view class="detail-heading">{{t.lineup}}</view>
+      <view class="description-line muted-line">{{t.lineupHint}}</view>
+    </view>
+
+    <view wx:if="{{item.hasLineup}}" class="detail-section">
+      <view class="detail-heading">{{t.artists}}</view>
+      <view wx:for="{{item.lineupItems}}" wx:key="*this" class="artist-row" data-name="{{item}}" bindtap="openArtist">
+        <text>{{item}}</text>
+        <text class="chevron">›</text>
+      </view>
+    </view>
+
+    <view wx:if="{{item.hasAtlasArtistItems}}" class="detail-section">
+      <view class="detail-heading">{{t.atlas}}</view>
+      <view wx:for="{{item.atlasArtistItems}}" wx:key="raw" class="atlas-row" data-name="{{item.name}}" bindtap="openArtist">
+        <view class="atlas-row-main">
+          <view class="atlas-name">{{item.name}}</view>
+          <view wx:if="{{item.raw && item.raw !== item.name}}" class="atlas-raw">{{item.raw}}</view>
+          <view wx:if="{{item.isHint && item.hintLabel}}" class="atlas-raw">{{item.hintLabel}}</view>
+        </view>
+        <view class="atlas-badge {{item.isVerified ? 'is-verified' : 'is-hint'}}">
+          {{item.isVerified ? t.atlasVerified : t.atlasHint}}
+        </view>
+      </view>
+    </view>
+
+    <view class="detail-section">
+      <view class="detail-heading">{{t.description}}</view>
+      <view wx:if="{{item.hasDescription}}">
+        <view wx:for="{{item.descriptionLines}}" wx:key="*this" class="description-line">{{item}}</view>
+      </view>
+      <view wx:elif="{{item.hasBio}}">
+        <view wx:for="{{item.bioLines}}" wx:key="*this" class="description-line">{{item}}</view>
+      </view>
+      <view wx:else class="description-line muted-line">
+        {{item.displayTitle}}
+      </view>
+    </view>
+
+    <view class="bottom-action">
+      <button class="icon-button" bindtap="saveItem">
+        <image class="action-icon" src="{{saved ? '/assets/icons/favorite-active.png' : '/assets/icons/favorite.png'}}" mode="aspectFit"></image>
+        <text>{{saved ? t.saved : t.save}}</text>
+      </button>
+    </view>
+  </view>
+</view>

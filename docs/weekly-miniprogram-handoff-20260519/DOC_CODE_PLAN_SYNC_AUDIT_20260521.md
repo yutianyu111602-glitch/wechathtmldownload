@@ -16,6 +16,7 @@ Read in this order:
    - `SPRINT1_GATE_CLOSEOUT_20260521.md`
    - `SPRINT2_DEDUP_PARITY_CLOSEOUT_20260521.md`
    - `SPRINT2_SOURCE_INTEGRATION_CLOSEOUT_20260521.md`
+   - `SPRINT3_CLUB_SOURCE_CLOSEOUT_20260521.md`
 
 ## Current Facts
 
@@ -23,11 +24,13 @@ Read in this order:
 |------|---------------|
 | API | `weekly-api-039` |
 | Published window | 158 items, `2026-05-20..2026-06-03` |
-| Guardian | `ok=true`, `backendRawHits=0`, `visibleHits=0` |
+| Guardian local checks | `backendRawHits=0`, `visibleHits=0`, frontend real-data probe 158, mini-program tests 35 pass |
+| Guardian overall rerun | `ok=false` because public API probe timed out and daily queue exporter refresh had no effective account/article rows |
 | Strict dedupe | duplicate=0, effective_duplicate=0, conflict=0 |
 | Golden | 88 total, 20 conservative snapshot verified, 68 pending |
 | Atlas boundary | read-only enrichment only; no production graph/vector write from this thread |
 | Source integration | retained event receives `merge_provenance`; duplicate source maps redirect to retained event |
+| Sprint 3 local UI/API | detail/venue source articles, `organizer_key/club_profile`, venue key match, city switchTab, venue/artist pagination, saved lang |
 | Release state | existing dev version noted separately; this thread did not run deploy/upload/review |
 
 ## Code Evidence Map
@@ -38,6 +41,9 @@ Read in this order:
 | `tools/stage7_rewrite/scripts/repair_weekly_release_conflicts.py` | duplicate repair, conflict quarantine, source map redirect, `merge_provenance` |
 | `tools/stage7_rewrite/fixtures/weekly_dedup_spec.v1.json` | shared Python/JS/CloudRun parity fixture |
 | `apps/weekly_activity_miniprogram/utils/format.js` | L3 display dedupe, must not be wider than L2 |
+| `apps/weekly_activity_miniprogram/utils/sourceArticles.js` | source article grouping by source hash for detail/venue pages |
+| `apps/weekly_activity_miniprogram/pages/detail/detail.*` | merged source article display and venue key handoff |
+| `apps/weekly_activity_miniprogram/pages/venue/venue.js` | organizerKey-first club matching plus paginated current feed scan |
 | `services/weekly_activity_cloudrun/src/dataStore.mjs` | runtime current feed dedupe, L2-compatible |
 | `tools/stage7_rewrite/scripts/build_weekly_atlas_snapshot.py` | read-only Atlas snapshot build |
 | `tools/stage7_rewrite/weekly_atlas_bridge/` | resolver/snapshot/observation bridge; this thread treats it as read-only boundary |
@@ -49,6 +55,8 @@ Read in this order:
 | Python repair + dedup parity tests | 10 OK |
 | Mini-program dedup parity | PASS |
 | CloudRun dedup parity | PASS |
+| CloudRun full tests | 39 pass |
+| Stage7 safe handoff verify | PASS; Python targeted 354 passed; CloudRun Stage7 39 pass |
 | Current 158 package strict audit | duplicate/effective/conflict = 0/0/0 |
 
 ## Document Lifecycle Inventory
@@ -62,6 +70,7 @@ Read in this order:
 | `SPRINT1_GATE_CLOSEOUT_20260521.md` | ACTIVE_EVIDENCE | Sprint 1 gate evidence |
 | `SPRINT2_DEDUP_PARITY_CLOSEOUT_20260521.md` | ACTIVE_EVIDENCE | Sprint 2 parity evidence |
 | `SPRINT2_SOURCE_INTEGRATION_CLOSEOUT_20260521.md` | ACTIVE_EVIDENCE | Sprint 2 source integration evidence |
+| `SPRINT3_CLUB_SOURCE_CLOSEOUT_20260521.md` | ACTIVE_EVIDENCE | Sprint 3 local UI/API/source closeout |
 | `P0_BASELINE_REPORT_20260519.md` | ACTIVE_EVIDENCE | Current baseline regenerated against 158 package |
 | `P0_EXECUTION_STATUS_20260519.md` | ACTIVE_EVIDENCE | Verify numbers against checkpoint before use |
 | `WeeklyAtlasEntityContract.md` | REFERENCE | Contract full text; UNIFIED is operational summary |
@@ -89,6 +98,7 @@ Read in this order:
 - Current operational facts are centralized in `HANDOFF_CHECKPOINT_20260519.md`.
 - `NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.md` is historical and should not steer new work without checkpoint verification.
 - Sprint 2 `merge_provenance` is no longer pending; it is implemented and tested.
+- Sprint 3 Club/source local slice is no longer pending; remaining pieces are DevTools polish, G0 alias/new snapshot, and upload/review approval.
 - Upload/review language now separates existing dev-version state from actions taken by this thread.
 
 ## Remaining Documentation Debt
@@ -97,3 +107,4 @@ Read in this order:
 - Older historical HTML companions may still contain old facts by design; route through `INDEX.html` / `MASTER_DASHBOARD.html` first.
 - Write a new long-form full handoff only if the user asks for a fresh long-form artifact.
 - Golden should be refreshed/versioned against the active 158 package before broader P/R claims.
+- Guardian must be rerun after the public API timeout and daily queue exporter refresh blocker are cleared.

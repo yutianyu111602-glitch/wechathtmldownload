@@ -20,6 +20,7 @@ Scope: **仅周活小程序线**（不含电子音乐图鉴主线实现，但计
 | **[HANDOFF_CHECKPOINT_20260519.md](./HANDOFF_CHECKPOINT_20260519.md)** | **当前事实快照**：数字、已完成 Sprint、下一步 |
 | **[DOC_CODE_PLAN_SYNC_AUDIT_20260521.md](./DOC_CODE_PLAN_SYNC_AUDIT_20260521.md)** | **文档生命周期/代码事实审计**：权威、历史、归档分层 |
 | **[DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.md](./DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.md)** | **去重算法与推文来源整合 SSOT**：不重复发卡、不丢来源 |
+| **[SPRINT3_CLUB_SOURCE_CLOSEOUT_20260521.md](./SPRINT3_CLUB_SOURCE_CLOSEOUT_20260521.md)** | **Sprint 3 本地闭环**：Club Profile、source articles、organizer_key、routing/pagination |
 
 
 
@@ -45,6 +46,7 @@ Scope: **仅周活小程序线**（不含电子音乐图鉴主线实现，但计
 | 小程序开发版 | `2026.05.21.1`（既有开发版；本线程未新上传；未提审） |
 | API 包 | `D:\downstream_results\stage7_rewrite\longrun\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260520` |
 | OpenClaw 入口 | `tools\stage7_rewrite\run_openclaw_weekly_daily_publish.ps1` |
+| 本次 guardian 复验 | 本地 URL/source/158/mini tests 过；整体 `ok=false`，公网 API probe 超时且 daily queue exporter refresh 无有效行 |
 
 
 
@@ -74,6 +76,8 @@ Scope: **仅周活小程序线**（不含电子音乐图鉴主线实现，但计
 | [DOC_CODE_PLAN_SYNC_AUDIT_20260521.md](./DOC_CODE_PLAN_SYNC_AUDIT_20260521.md) | **文档/代码/计划生命周期审计** |
 
 | [DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.md](./DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.md) | **当前去重与推文来源整合逻辑** |
+
+| [SPRINT3_CLUB_SOURCE_CLOSEOUT_20260521.md](./SPRINT3_CLUB_SOURCE_CLOSEOUT_20260521.md) | **Club/source local closeout** |
 
 | [NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.md](./NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.md) | 2026-05-19 长版接手；**历史证据，当前数字看 CHECKPOINT** |
 
@@ -192,9 +196,11 @@ Scope: **仅周活小程序线**（不含电子音乐图鉴主线实现，但计
 
 4. `DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.md`
 
-5. `OPENCLAW_AUTOMATION.md` 顶部
+5. `SPRINT3_CLUB_SOURCE_CLOSEOUT_20260521.md`
 
-6. 按需：`DELIVERABLE_*` · `PLAN_A/B_DEEPRESEARCH_v2` · `html/MASTER_DASHBOARD.html`
+6. `OPENCLAW_AUTOMATION.md` 顶部
+
+7. 按需：`DELIVERABLE_*` · `PLAN_A/B_DEEPRESEARCH_v2` · `html/MASTER_DASHBOARD.html`
 
 
 

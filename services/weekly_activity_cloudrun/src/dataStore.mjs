@@ -151,6 +151,41 @@ function venueKey(item) {
   return normalizeDedupePart(item.venue_name || first(item.venue, "") || item.promoter || item.account);
 }
 
+function organizerLabel(item) {
+  return String(
+    item.venue_name ||
+      first(item.venue, "") ||
+      item.promoter ||
+      item.account ||
+      item.source_account_name ||
+      item.source_article?.account_name ||
+      "",
+  ).trim();
+}
+
+function organizerKeyForItem(item) {
+  return normalizeDedupePart(item.organizer_key || item.organizerKey || organizerLabel(item));
+}
+
+function withClubProfile(item) {
+  if (!item || typeof item !== "object") return item;
+  const organizerKey = organizerKeyForItem(item);
+  const displayName = organizerLabel(item);
+  const cityLabel = first(item.city, item.city_key || first(item.city_keys, ""));
+  const addressLabel = item.address_full || item.address || "";
+  return {
+    ...item,
+    organizer_key: organizerKey,
+    club_profile: {
+      schema_version: "weekly_club_profile.v1",
+      organizer_key: organizerKey,
+      display_name: displayName,
+      city: cityLabel,
+      address: addressLabel,
+    },
+  };
+}
+
 function duplicateScopeKey(item) {
   return [dateKey(item), cityKey(item), venueKey(item)].join("|");
 }
@@ -449,7 +484,7 @@ export class WeeklyActivityDataStore {
       return item.quality_status === "READY";
     });
     const deduped = dedupeItems(filtered);
-    const items = deduped.slice(pageCursor, pageCursor + pageLimit);
+    const items = deduped.slice(pageCursor, pageCursor + pageLimit).map(withClubProfile);
     const nextOffset = pageCursor + items.length;
 
     return {
@@ -526,10 +561,11 @@ export class WeeklyActivityDataStore {
 
     try {
       const detail = await readJson(this.baseDir, `by-id/${safeId}.json`);
-      return detail.item || detail;
+      return withClubProfile(detail.item || detail);
     } catch {
       const current = await readJson(this.baseDir, "current.json");
-      return current.items.find((item) => item.id === rawId || storageSlug(item.id) === safeId) || null;
+      const item = current.items.find((entry) => entry.id === rawId || storageSlug(entry.id) === safeId) || null;
+      return item ? withClubProfile(item) : null;
     }
   }
 
@@ -545,7 +581,7 @@ export class WeeklyActivityDataStore {
     for (const entry of wanted) {
       try {
         const detail = await readJson(this.baseDir, `by-id/${entry.safe}.json`);
-        found.push(detail.item || detail);
+        found.push(withClubProfile(detail.item || detail));
       } catch {
         remaining.push(entry);
       }
@@ -555,7 +591,11 @@ export class WeeklyActivityDataStore {
       const current = await readJson(this.baseDir, "current.json");
       const rawIds = new Set(remaining.map((entry) => entry.raw));
       const safeIds = new Set(remaining.map((entry) => entry.safe));
-      found.push(...current.items.filter((item) => rawIds.has(item.id) || safeIds.has(storageSlug(item.id))));
+      found.push(
+        ...current.items
+          .filter((item) => rawIds.has(item.id) || safeIds.has(storageSlug(item.id)))
+          .map(withClubProfile),
+      );
     }
     return found;
   }

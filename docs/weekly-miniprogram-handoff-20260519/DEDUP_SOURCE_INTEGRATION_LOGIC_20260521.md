@@ -21,6 +21,8 @@ When AI整理活动推文信息:
 | L2 source-map repair | Preserve/remap merged source articles |
 | L3 CloudRun dataStore | Runtime idempotent dedupe with L2-compatible rules |
 | L3 mini-program `format.js` | Display fallback dedupe, must not be wider than L2 |
+| L3 mini-program `sourceArticles.js` | Display source refs by source hash; merged sources are links, not duplicate event cards |
+| L3 Club Profile | `organizer_key` / `club_profile` aligns weekly venue pages with Atlas read-only references |
 | Atlas bridge | Read-only artist/entity enrichment only; no vector/graph write from this thread |
 
 ## Event Dedup Decision
@@ -76,6 +78,18 @@ Source map repair now redirects duplicate source entries to the retained event:
 
 Conflict-quarantined source entries are still removed; they are not folded into a retained event because the event identity is unsafe.
 
+## Mini-program Display Rule
+
+The UI now separates event identity from source article identity:
+
+- City/home list shows one event card per retained event.
+- Detail page shows merged source refs in `SOURCE ARTICLES` only when one retained event has multiple source hashes.
+- Venue/club page groups source refs by `source_hash`, so one aggregate parent or repeated promotion article appears once.
+- Source rows use `fallbackDetailId` only as a fallback; the primary source identity is the URL hash.
+- Venue navigation uses `organizer_key` before fuzzy name matching.
+
+This means repeated uploaded posts should not create repeated event cards, but their source articles remain reachable for audit and user fallback.
+
 ## Current Package Impact
 
 Dry-run/write against a temporary copy of current 158-item package:
@@ -97,6 +111,8 @@ Interpretation: current package already has duplicate/conflict gates clean. The 
 
 - `tools/stage7_rewrite/tests/test_weekly_dedup_spec_parity.py`
 - `apps/weekly_activity_miniprogram/tests/dedup-parity.test.cjs`
+- `apps/weekly_activity_miniprogram/tests/source-articles.test.cjs`
+- `apps/weekly_activity_miniprogram/tests/page-source-routing.test.cjs`
 - `services/weekly_activity_cloudrun/tests/dedupParity.test.mjs`
 - `tools/stage7_rewrite/tests/test_repair_weekly_release_conflicts.py`
 
@@ -106,3 +122,5 @@ Key assertions:
 - Python/JS/CloudRun all obey `weekly_dedup_spec.v1.json`
 - duplicate source-map entries are redirected to retained event instead of being dropped
 - retained event receives `merge_provenance`
+- detail/venue source article rows expose merged sources once per source hash
+- `organizer_key` is present on API current/detail/batch items and preserved by mini-program formatting

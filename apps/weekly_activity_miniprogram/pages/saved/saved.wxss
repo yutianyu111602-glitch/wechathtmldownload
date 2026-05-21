@@ -1,0 +1,66 @@
+.saved-page {
+  padding-top: 46rpx;
+}
+
+.saved-head {
+  padding-bottom: 34rpx;
+  border-bottom: 1rpx solid rgba(255,255,255,0.04);
+}
+
+.brand-logo {
+  width: 118rpx;
+  height: 36rpx;
+  margin-bottom: 56rpx;
+  opacity: .86;
+}
+
+.empty {
+  margin-top: 42rpx;
+  color: rgba(255,255,255,0.58);
+  font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+  font-size: 26rpx;
+  line-height: 1.55;
+}
+
+.saved-list {
+  margin-top: 20rpx;
+}
+
+.saved-card {
+  display: grid;
+  grid-template-columns: 94rpx 1fr 48rpx;
+  gap: 20rpx;
+  padding: 28rpx 0;
+  border-bottom: 1rpx solid rgba(255,255,255,0.04);
+}
+
+.saved-date {
+  color: #7eb8da;
+  font-size: 24rpx;
+  line-height: 1.2;
+  letter-spacing: .04em;
+}
+
+.saved-title {
+  color: #e0e0e0;
+  font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+  font-size: 30rpx;
+  line-height: 1.2;
+  font-weight: 750;
+}
+
+.saved-meta {
+  margin-top: 10rpx;
+  color: rgba(255,255,255,0.58);
+  font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+  font-size: 24rpx;
+  line-height: 1.4;
+}
+
+.chevron {
+  display: flex;
+  align-items: center;
+  color: rgba(255,255,255,0.32);
+  font-size: 44rpx;
+  font-weight: 300;
+}

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>HUAIDJ 周活小程序 — 统一主计划（全文）</title>
+  <title>Weekly Miniprogram Unified Plan</title>
   <style>
 :root {
   --bg: #f6f7f9;
@@ -109,7 +109,7 @@ ul { padding-left: 24px; }
   <div class="shell">
     <aside>
       <div class="kicker">HTML handoff</div>
-      <h1>HUAIDJ 周活小程序 — 统一主计划（全文）</h1>
+      <h1>Weekly Miniprogram Unified Plan</h1>
       <nav><a class="level-1" href="#huaidj-周活小程序-统一主计划-全文">HUAIDJ 周活小程序 — 统一主计划（全文）</a>
 <a class="level-2" href="#目录">目录</a>
 <a class="level-2" href="#1-执行摘要">1. 执行摘要</a>
@@ -176,11 +176,11 @@ ul { padding-left: 24px; }
     </aside>
     <main>
       <section class="meta">
-        <div class="kicker">handoff</div>
-        <div class="title">HUAIDJ 周活小程序 — 统一主计划（全文）</div>
+        <div class="kicker">summary</div>
+        <div class="title">Weekly Miniprogram Unified Plan</div>
         <div class="grid">
           <div><strong>Source</strong><br>C:\code\githubstar\wechathtmldownload\docs\weekly-miniprogram-handoff-20260519\PLAN_WEEKLY_MINIPROGRAM_UNIFIED.md</div>
-          <div><strong>Generated</strong><br>2026-05-21 15:01 +0800</div>
+          <div><strong>Generated</strong><br>2026-05-21 15:23 +0800</div>
         </div>
       </section>
       <section class="banner">
@@ -382,9 +382,11 @@ python tools\stage7_rewrite\scripts\export_weekly_entity_observations.py `
 <h3 id="9-3-sprint-2-2-4-周-发布层-去重">9.3 Sprint 2（2–4 周）— 发布层 + 去重</h3>
 <p>| ID | 任务 | 验收 | |----|------|------| | S2-1 | repair 软评分合并复验 | missing_lineup ↓≥10 | | S2-2 | <code>weekly_dedup_spec.v1.json</code> + parity | ✅ PASS | | S2-3 | format.js 对齐 L2 或仅校验 | ✅ frontend_extra_merge=0 | | S2-4 | merge_provenance 写入 | ✅ retained event 有元数据；source map redirect | | S2-5 | audit + repair 新包 | 当前 158 包 strict 0/0/0；新包待下一次 OpenClaw 包 |</p>
 <h3 id="9-4-sprint-3-3-5-周-俱乐部-ra-ia">9.4 Sprint 3（3–5 周）— 俱乐部 + RA IA</h3>
-<p>| ID | 任务 | 验收 | |----|------|------| | S3-1 | <code>club_profile.v1</code> + organizer_key | schema 草案 | | S3-2 | API clubs 或 items 嵌 key | smoke | | S3-3 | venue→Club Profile + SCHEDULE 徽章 | UI 可见 | | S3-4 | key 匹配替代模糊 | 金标馆回归 | | S3-5 | city switchTab | 真机无报错 | | S3-6 | venue/artist cursor 分页 | &gt;100 不丢 | | S3-7 | detail 合并来源；saved lang | UI review |</p>
+<p>| ID | 任务 | 验收 | |----|------|------| | S3-1 | <code>club_profile.v1</code> + organizer_key | ✅ schema v1 shell | | S3-2 | API clubs 或 items 嵌 key | ✅ current/detail/batch 输出 <code>organizer_key</code> + <code>club_profile</code> | | S3-3 | venue→Club Profile + SCHEDULE 徽章 | ✅ Club source/profile base；周/月徽章待 DevTools polish | | S3-4 | key 匹配替代模糊 | ✅ detail→venue 带 key；venue 优先 organizerKey | | S3-5 | city switchTab | ✅ pending city storage + switchTab | | S3-6 | venue/artist cursor 分页 | ✅ limit=100 cursor loop，避免 &gt;100 首屏截断 | | S3-7 | detail 合并来源；saved lang | ✅ detail/venue source articles；saved detail lang |</p>
+<p><strong>2026-05-21 本地闭环：</strong> Sprint 3 可本地执行部分已完成，closeout 见 <code>SPRINT3_CLUB_SOURCE_CLOSEOUT_20260521.md</code>。本次未执行 DevTools 真机 10/10、CloudRun 新部署、小程序新上传或微信提审。</p>
 <h3 id="9-5-sprint-4-4-6-周-atlas-上线准备">9.5 Sprint 4（4–6 周）— Atlas + 上线准备</h3>
 <p>| ID | 任务 | 验收 | |----|------|------| | S4-1 | <code>atlas_alias_export.v1.jsonl</code> | 图谱 G0 | | S4-2 | 重跑 snapshot | no_match 下降 | | S4-3 | build 挂 snapshot | 仅 verified bio | | S4-4 | 无 vector+show | 0 违规 | | S4-5 | observation 进 OpenClaw SOP | checklist | | S4-6 | DevTools 10/10 + 单测 | artifact | | S4-7 | upload dev 新号 | 用户批准上传 |</p>
+<p><strong>2026-05-21 状态：</strong> <code>stage7_safe_handoff_verify.ps1</code> 离线安全验证 PASS；S4 的 G0 alias/new snapshot/dev upload 仍受外部输入和用户批准约束。</p>
 <p>---</p>
 <h2 id="10-管线工程与蜂群-task">10. 管线工程与蜂群 Task</h2>
 <h3 id="10-1-蜂群-task1-4-feature-weekly-integrated-bridge">10.1 蜂群 Task1–4（<code>feature/weekly-integrated-bridge</code>）</h3>
@@ -447,8 +449,8 @@ node --test tests/*.test.mjs
 <li>[ ] guardian 连续 2 次 weekly 全绿</li>
 <li>[ ] lineup ≥55%</li>
 <li>[ ] Golden ≥40 verified + baseline</li>
-<li>[ ] Club Profile v1 上 dev</li>
-<li>[ ] dedupe parity 进 checklist/CI</li>
+<li>[x] Club Profile v1 本地 API/UI 契约完成</li>
+<li>[x] dedupe parity 进 checklist/CI</li>
 <li>[ ] snapshot 有 ID 率 ≥40% 或记录原因</li>
 <li>[ ] observation SOP 执行 1 次有日志</li>
 </ul>

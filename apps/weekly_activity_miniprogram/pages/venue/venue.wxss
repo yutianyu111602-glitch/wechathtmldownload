@@ -1,0 +1,38 @@
+@import "../artist/artist.wxss";
+
+.sub-address {
+  margin-top: 18rpx;
+  color: rgba(255,255,255,.58);
+  font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+  font-size: 26rpx;
+  line-height: 1.45;
+}
+
+.source-article-list {
+  margin-bottom: 46rpx;
+}
+
+.source-article-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 104rpx;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid rgba(255,255,255,0.04);
+}
+
+.source-article-title {
+  color: #b8ff72;
+  font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+  font-size: 28rpx;
+  line-height: 1.24;
+  font-weight: 760;
+}
+
+.source-article-meta {
+  margin-top: 10rpx;
+  color: rgba(255,255,255,0.5);
+  font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+  font-size: 23rpx;
+  line-height: 1.38;
+}

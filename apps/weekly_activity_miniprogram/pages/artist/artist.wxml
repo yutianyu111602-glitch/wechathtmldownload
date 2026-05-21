@@ -1,0 +1,28 @@
+<view class="page sub-page">
+  <view class="sub-nav">
+    <button bindtap="goBack">BACK</button>
+  </view>
+  <view wx:if="{{loading}}" class="state">加载中</view>
+  <view wx:elif="{{error}}" class="state error">{{error}}</view>
+  <view wx:else>
+    <view class="sub-head">
+      <view class="sub-label">ARTIST</view>
+      <view class="sub-title">{{name}}</view>
+      <view class="sub-count">{{events.length}} upcoming</view>
+    </view>
+    <view class="section" wx:if="{{events.length}}">
+      <view class="sub-heading">UPCOMING EVENTS</view>
+      <view wx:for="{{events}}" wx:key="id" class="event-row" data-id="{{item.id}}" bindtap="openDetail">
+        <view>
+          <view class="event-title">{{item.displayTitle}}</view>
+          <view class="event-meta">{{item.dateLabel}} · {{item.cardLocationLabel}}</view>
+        </view>
+        <text class="chevron">›</text>
+      </view>
+    </view>
+    <view class="section" wx:if="{{bioLines.length}}">
+      <view class="sub-heading">DESCRIPTION</view>
+      <view wx:for="{{bioLines}}" wx:key="*this" class="body-line">{{item}}</view>
+    </view>
+  </view>
+</view>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>去重算法与推文来源整合逻辑 — 2026-05-21</title>
+  <title>Dedupe Source Integration Logic</title>
   <style>
 :root {
   --bg: #f6f7f9;
@@ -109,22 +109,23 @@ ul { padding-left: 24px; }
   <div class="shell">
     <aside>
       <div class="kicker">HTML handoff</div>
-      <h1>去重算法与推文来源整合逻辑 — 2026-05-21</h1>
+      <h1>Dedupe Source Integration Logic</h1>
       <nav><a class="level-1" href="#去重算法与推文来源整合逻辑-2026-05-21">去重算法与推文来源整合逻辑 — 2026-05-21</a>
 <a class="level-2" href="#goal">Goal</a>
 <a class="level-2" href="#layering">Layering</a>
 <a class="level-2" href="#event-dedup-decision">Event Dedup Decision</a>
 <a class="level-2" href="#source-article-integration">Source Article Integration</a>
+<a class="level-2" href="#mini-program-display-rule">Mini-program Display Rule</a>
 <a class="level-2" href="#current-package-impact">Current Package Impact</a>
 <a class="level-2" href="#tests-covering-the-contract">Tests Covering The Contract</a></nav>
     </aside>
     <main>
       <section class="meta">
-        <div class="kicker">handoff</div>
-        <div class="title">去重算法与推文来源整合逻辑 — 2026-05-21</div>
+        <div class="kicker">evidence</div>
+        <div class="title">Dedupe Source Integration Logic</div>
         <div class="grid">
           <div><strong>Source</strong><br>C:\code\githubstar\wechathtmldownload\docs\weekly-miniprogram-handoff-20260519\DEDUP_SOURCE_INTEGRATION_LOGIC_20260521.md</div>
-          <div><strong>Generated</strong><br>2026-05-21 14:52 +0800</div>
+          <div><strong>Generated</strong><br>2026-05-21 15:23 +0800</div>
         </div>
       </section>
       <section class="banner">
@@ -143,7 +144,7 @@ ul { padding-left: 24px; }
 <li>keep deploy, mini-program upload, and WeChat review as explicit separate states</li>
 </ul>
 <h2 id="layering">Layering</h2>
-<p>| Layer | Responsibility | |------|----------------| | L2 Python release repair | SSOT dedupe/conflict decision | | L2 source-map repair | Preserve/remap merged source articles | | L3 CloudRun dataStore | Runtime idempotent dedupe with L2-compatible rules | | L3 mini-program <code>format.js</code> | Display fallback dedupe, must not be wider than L2 | | Atlas bridge | Read-only artist/entity enrichment only; no vector/graph write from this thread |</p>
+<p>| Layer | Responsibility | |------|----------------| | L2 Python release repair | SSOT dedupe/conflict decision | | L2 source-map repair | Preserve/remap merged source articles | | L3 CloudRun dataStore | Runtime idempotent dedupe with L2-compatible rules | | L3 mini-program <code>format.js</code> | Display fallback dedupe, must not be wider than L2 | | L3 mini-program <code>sourceArticles.js</code> | Display source refs by source hash; merged sources are links, not duplicate event cards | | L3 Club Profile | <code>organizer_key</code> / <code>club_profile</code> aligns weekly venue pages with Atlas read-only references | | Atlas bridge | Read-only artist/entity enrichment only; no vector/graph write from this thread |</p>
 <h2 id="event-dedup-decision">Event Dedup Decision</h2>
 <p>The current SSOT is <code>audit_weekly_cross_source_conflicts.are_likely_duplicates</code>.</p>
 <p>Decision order:</p>
@@ -188,6 +189,16 @@ ul { padding-left: 24px; }
 <li><code>merge_reason=duplicate_cluster</code></li>
 </ul>
 <p>Conflict-quarantined source entries are still removed; they are not folded into a retained event because the event identity is unsafe.</p>
+<h2 id="mini-program-display-rule">Mini-program Display Rule</h2>
+<p>The UI now separates event identity from source article identity:</p>
+<ul>
+<li>City/home list shows one event card per retained event.</li>
+<li>Detail page shows merged source refs in <code>SOURCE ARTICLES</code> only when one retained event has multiple source hashes.</li>
+<li>Venue/club page groups source refs by <code>source_hash</code>, so one aggregate parent or repeated promotion article appears once.</li>
+<li>Source rows use <code>fallbackDetailId</code> only as a fallback; the primary source identity is the URL hash.</li>
+<li>Venue navigation uses <code>organizer_key</code> before fuzzy name matching.</li>
+</ul>
+<p>This means repeated uploaded posts should not create repeated event cards, but their source articles remain reachable for audit and user fallback.</p>
 <h2 id="current-package-impact">Current Package Impact</h2>
 <p>Dry-run/write against a temporary copy of current 158-item package:</p>
 <p>| Metric | Result | |------|------| | raw_item_count | 158 | | repaired_item_count | 158 | | removed_duplicate_count | 0 | | quarantined_conflict_item_count | 0 | | missing_lineup_after | 58 | | hard_fail_after | 0 | | soft lineup retained actions | 0 | | lineup cleared actions | 0 |</p>
@@ -196,6 +207,8 @@ ul { padding-left: 24px; }
 <ul>
 <li><code>tools/stage7_rewrite/tests/test_weekly_dedup_spec_parity.py</code></li>
 <li><code>apps/weekly_activity_miniprogram/tests/dedup-parity.test.cjs</code></li>
+<li><code>apps/weekly_activity_miniprogram/tests/source-articles.test.cjs</code></li>
+<li><code>apps/weekly_activity_miniprogram/tests/page-source-routing.test.cjs</code></li>
 <li><code>services/weekly_activity_cloudrun/tests/dedupParity.test.mjs</code></li>
 <li><code>tools/stage7_rewrite/tests/test_repair_weekly_release_conflicts.py</code></li>
 </ul>
@@ -205,6 +218,8 @@ ul { padding-left: 24px; }
 <li>Python/JS/CloudRun all obey <code>weekly_dedup_spec.v1.json</code></li>
 <li>duplicate source-map entries are redirected to retained event instead of being dropped</li>
 <li>retained event receives <code>merge_provenance</code></li>
+<li>detail/venue source article rows expose merged sources once per source hash</li>
+<li><code>organizer_key</code> is present on API current/detail/batch items and preserved by mini-program formatting</li>
 </ul>
       </article>
     </main>
