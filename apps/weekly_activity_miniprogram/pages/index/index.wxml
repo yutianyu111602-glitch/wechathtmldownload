@@ -1,8 +1,14 @@
 <view class="page home-page">
   <view class="home-hero">
     <view class="topbar">
-      <image class="brand-logo" src="/assets/brand/huaidj-logo-nav-512x128.png" mode="aspectFit"></image>
-      <button class="lang-toggle" bindtap="toggleLang">{{t.langToggle}}</button>
+      <image lazy-load class="brand-logo" src="/assets/brand/huaidj-logo-nav-512x128.png" mode="aspectFit" ></image>
+      <view class="topbar-actions">
+        <view class="map-entry" bindtap="openMap" hover-class="option-hover">
+          <text class="map-entry-icon">◉</text>
+          <text class="map-entry-label">MAP</text>
+        </view>
+        <button class="lang-toggle" bindtap="toggleLang">{{t.langToggle}}</button>
+      </view>
     </view>
 
     <view class="hero-copy">
@@ -12,14 +18,20 @@
     </view>
 
     <view class="filter-pills">
-      <button class="filter-pill" bindtap="openDateModal"><text>{{datePillLabel}}</text><text class="pill-arrow">›</text></button>
-      <button class="filter-pill" bindtap="openLocationModal"><text>{{cityPillLabel}}</text><text class="pill-arrow">›</text></button>
+      <view class="filter-pill" hover-class="option-hover" bindtap="openDateModal"><text>{{datePillLabel}}</text><text class="pill-arrow">›</text></view>
+      <view class="filter-pill" hover-class="option-hover" bindtap="openLocationModal"><text>{{cityPillLabel}}</text><text class="pill-arrow">›</text></view>
     </view>
 
     <view class="tabs">
       <view data-tab="all" bindtap="setTab" class="{{activeTab === 'all' ? 'tab-active' : ''}}">{{t.tabAll}}</view>
       <view data-tab="forYou" bindtap="setTab" class="{{activeTab === 'forYou' ? 'tab-active' : ''}}">{{t.tabForYou}}</view>
       <view data-tab="new" bindtap="setTab" class="{{activeTab === 'new' ? 'tab-active' : ''}}">{{t.tabNew}}</view>
+    </view>
+
+    <view class="preview-ranges">
+      <view data-range="week" bindtap="setPreviewRange" hover-class="option-hover" class="preview-range {{previewRange === 'week' ? 'preview-range-active' : ''}}">{{t.previewWeek}}</view>
+      <view data-range="month" bindtap="setPreviewRange" hover-class="option-hover" class="preview-range {{previewRange === 'month' ? 'preview-range-active' : ''}}">{{t.previewMonth}}</view>
+      <view data-range="all" bindtap="setPreviewRange" hover-class="option-hover" class="preview-range {{previewRange === 'all' ? 'preview-range-active' : ''}}">{{t.previewAll}}</view>
     </view>
   </view>
 
@@ -32,45 +44,52 @@
       <view class="loading-bar" style="width: {{loadingProgress}}%;"></view>
     </view>
     <view class="loading-step">{{loadingStep}}</view>
+    <view wx:if="{{loadingHint}}" class="loading-hint">{{loadingHint}}</view>
   </view>
   <view wx:elif="{{error}}" class="state error">
     <view>{{error}}</view>
+    <view wx:if="{{errorHint}}" class="state-hint">{{errorHint}}</view>
     <button class="retry-button" hover-class="option-hover" bindtap="retryLoadData">{{t.retry}}</button>
   </view>
-  <view wx:elif="{{items.length === 0}}" class="state">{{t.empty}}</view>
+  <view wx:elif="{{totalItems === 0 && !loading}}" class="state">{{t.empty}}</view>
 
-  <view wx:else class="home-content">
+  <view wx:else class="home-content" bindtouchstart="onFeedTouchStart" bindtouchmove="onFeedTouchMove">
+    <view wx:if="{{cacheNotice}}" class="cache-notice">{{cacheNotice}}</view>
     <view class="archive-heading">{{t.featured}}</view>
 
     <scroll-view class="poster-strip" scroll-x enable-flex bindscroll="onPosterStripScroll">
       <view wx:for="{{popularItems}}" wx:key="posterKey" class="poster-card" data-id="{{item.id}}" bindtap="openDetail" hover-class="poster-hover">
         <view class="poster-frame">
-          <image wx:if="{{item.coverUrl}}" class="event-poster" src="{{item.coverUrl}}" mode="aspectFill"></image>
-        <view wx:else class="poster-fallback">{{item.displayTitle}}</view>
+          <image wx:if="{{item.coverUrl && !item.posterLoadFailed}}" class="event-poster" src="{{item.coverUrl}}" mode="aspectFill" data-id="{{item.id}}" data-src="{{item.coverUrl}}" bindload="onPosterImageLoad" binderror="onPosterImageError" ></image>
+          <view wx:else class="poster-fallback">{{item.displayTitle}}</view>
         </view>
-        <view class="poster-date">{{item.weekdayLabel}}, {{item.dateCompact}}</view>
+        <view wx:if="{{!item.isSourceOverview}}" class="poster-date">
+          <text wx:if="{{item.isCalendarPreview}}" class="calendar-preview-tag">{{item.calendarPreviewLabel}}</text>
+          <text>{{item.weekdayLabel}}, {{item.dateRangeCompact || item.dateCompact}}</text>
+        </view>
         <view class="poster-title">{{item.displayTitle}}</view>
-        <view class="poster-meta">{{item.cardLocationLabel}}</view>
-        <view wx:if="{{item.hasStyle}}" class="poster-meta">{{item.styleLabel}}</view>
+        <view wx:if="{{!item.isSourceOverview && item.cardLocationLabel}}" class="poster-meta">{{item.cardLocationLabel}}</view>
+        <view wx:if="{{!item.isSourceOverview && item.hasStyle}}" class="poster-meta">{{item.styleLabel}}</view>
       </view>
     </scroll-view>
 
     <view class="archive-heading all-heading">{{t.allEvents}}</view>
     <view wx:for="{{groups}}" wx:key="key" class="day-group">
-      <view class="day-head">
+      <view wx:if="{{!item.isSourceOverviewGroup}}" class="day-head">
         <text>{{item.weekday}}</text>
         <text>{{item.date}}</text>
       </view>
       <view wx:for="{{item.items}}" wx:for-item="event" wx:key="id" class="event-row" data-id="{{event.id}}" bindtap="openDetail">
-        <view class="event-date">
+        <view wx:if="{{!event.isSourceOverview}}" class="event-date">
           <view class="event-weekday">{{event.weekdayLabel}}</view>
-          <view class="event-day">{{event.dateCompact}}</view>
+          <view class="event-day">{{event.dateRangeCompact || event.dateCompact}}</view>
         </view>
         <view class="event-main">
+          <view wx:if="{{!event.isSourceOverview && event.isCalendarPreview}}" class="event-tag">{{event.calendarPreviewLabel}}</view>
           <view class="event-title">{{event.displayTitle}}</view>
-          <view class="event-place">{{event.listLocationLabel}}</view>
-          <view wx:if="{{event.hasLineup}}" class="event-lineup">{{event.lineupLabel}}</view>
-          <view wx:elif="{{event.hasLineupHint}}" class="event-lineup event-lineup-hint">{{event.lineupHint}}</view>
+          <view wx:if="{{!event.isSourceOverview && event.listLocationLabel}}" class="event-place">{{event.listLocationLabel}}</view>
+          <view wx:if="{{!event.isSourceOverview && event.hasLineup}}" class="event-lineup">{{event.lineupLabel}}</view>
+          <view wx:elif="{{!event.isSourceOverview && event.hasLineupHint}}" class="event-lineup event-lineup-hint">{{event.lineupHint}}</view>
         </view>
       </view>
     </view>
@@ -111,7 +130,7 @@
         <view class="modal-title">{{t.locationTitle}}</view>
         <view bindtap="closeModal" class="modal-close">×</view>
       </view>
-      <view class="location-tree">
+      <scroll-view class="location-tree" scroll-y enhanced show-scrollbar="{{false}}">
         <view class="country-row">{{t.china}}<text class="chevron">›</text></view>
         <view
           wx:for="{{cityFilters}}"
@@ -124,7 +143,7 @@
           <text>{{item.label}}</text>
           <text wx:if="{{item.count}}" class="option-count">{{item.count}}</text>
         </view>
-      </view>
+      </scroll-view>
       <view class="modal-actions">
         <view class="reset-button wide" hover-class="option-hover" bindtap="resetLocation">{{t.resetLocation}}</view>
       </view>
