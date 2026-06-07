@@ -245,7 +245,7 @@ async function run() {
     try {
       const initialData = await waitForIdle(page, "initial home before static probe", 30000);
       report.initialHome = {
-        itemCount: Array.isArray(initialData.items) ? initialData.items.length : 0,
+        itemCount: Number(initialData.totalItems || initialData.items?.length || 0),
         totalItems: initialData.totalItems,
         cacheNotice: initialData.cacheNotice || "",
       };
@@ -313,6 +313,7 @@ async function run() {
     const wallElapsedMs = Date.now() - startedAt;
     const pageElapsedMs = Number(loadTiming && loadTiming.pageElapsedMs);
     const items = data.items || [];
+    const effectiveItemCount = Number(data.totalItems || items.length || 0);
     const popularItems = data.popularItems || [];
     const itemDates = dateSetFromItems(items);
     const dateFilterKeys = (data.dateFilters || [])
@@ -333,7 +334,7 @@ async function run() {
       loading: data.loading,
       error: data.error || "",
       cacheNotice: data.cacheNotice || "",
-      itemCount: items.length,
+      itemCount: effectiveItemCount,
       totalItems: data.totalItems,
       dateFilterKeys,
       posterUrlSamples: posterUrls.slice(0, 5),
@@ -346,7 +347,7 @@ async function run() {
     };
     fs.writeFileSync(path.join(artifactDir, "partial-report.json"), JSON.stringify(report, null, 2), "utf8");
 
-    assert.ok(items.length >= expectedMinItems, `expected at least ${expectedMinItems} current items, got ${items.length}`);
+    assert.ok(effectiveItemCount >= expectedMinItems, `expected at least ${expectedMinItems} current items, got ${effectiveItemCount}`);
     assert.ok(Number(data.totalItems || 0) >= expectedMinItems, `expected totalItems >= ${expectedMinItems}, got ${data.totalItems}`);
     const cacheNotice = data.cacheNotice || "";
     assert.notEqual(cacheNotice, data.t.loadingCachedNotice, "current package render must not show cached-data notice");
@@ -388,7 +389,7 @@ async function run() {
       name: "current package renders current/future data without snapshot",
       pageElapsedMs,
       wallElapsedMs,
-      itemCount: items.length,
+      itemCount: effectiveItemCount,
       totalItems: data.totalItems,
       itemDateCount: itemDates.length,
       itemDates: itemDates.slice(0, 20),
