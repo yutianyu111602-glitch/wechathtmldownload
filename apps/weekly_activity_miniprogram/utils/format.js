@@ -1,3 +1,7 @@
+const { VERIFIED_ADDRESS_BOOK } = require("./addressBook");
+const { VERIFIED_MAP_LOCATION_BOOK } = require("./mapLocationBook");
+const { STYLE_RULES, NON_ARTIST_LINEUP_NAMES, TRUSTED_TIME_SOURCES } = require("./styleRules");
+
 function first(value, fallback = "") {
   return Array.isArray(value) ? value[0] || fallback : value || fallback;
 }
@@ -272,10 +276,6 @@ function isCalendarPreviewItem(item = {}) {
     item.contentType === "calendar_preview"
   );
 }
-
-const { VERIFIED_ADDRESS_BOOK } = require("./addressBook");
-const { VERIFIED_MAP_LOCATION_BOOK } = require("./mapLocationBook");
-const { STYLE_RULES, NON_ARTIST_LINEUP_NAMES, TRUSTED_TIME_SOURCES } = require("./styleRules");
 
 function sourceOverviewTitleCandidates(item = {}) {
   const sourceArticle = item.source_article || item.sourceArticle || {};
