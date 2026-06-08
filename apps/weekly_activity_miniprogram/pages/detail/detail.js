@@ -1,77 +1,10 @@
 const { requestApi } = require("../../utils/api");
 const { compactItem, joinList } = require("../../utils/format");
+const { applyLanguageChrome, localizeItem, localizedSourceArticles, normalizeLang, text } = require("../../utils/i18n");
 const { buildSourcePageUrl, fetchSourceByHash, openSourceUrl } = require("../../utils/sourceAction");
 const { buildDetailSourceArticles } = require("../../utils/sourceArticles");
 const { buildDetailShare, buildDetailTimeline, enableShareMenu } = require("../../utils/share");
-
-const I18N = {
-  zh: {
-    lang: "zh",
-    langToggle: "EN",
-    loading: "加载中",
-    loadFailed: "加载失败",
-    promoter: "俱乐部",
-    date: "日期",
-    city: "城市",
-    venue: "场地",
-    address: "地址",
-    genre: "风格",
-    lineup: "LINEUP",
-    artists: "ARTISTS",
-    atlas: "ATLAS",
-    atlasVerified: "VERIFIED",
-    atlasHint: "HINT",
-    description: "简介",
-    runningHours: "时间",
-    location: "地点",
-    music: "音乐",
-    tickets: "票务",
-    price: "票价",
-    save: "收藏",
-    saved: "已收藏",
-    about: "About",
-    copyAddress: "复制地址",
-    addressCopied: "地址已复制",
-    lineupHint: "点击海报跳转公众号原文查看",
-    sourcePreparing: "原文准备中",
-    viewSource: "点击海报跳转公众号原文查看",
-  },
-  en: {
-    lang: "en",
-    langToggle: "中文",
-    loading: "Loading",
-    loadFailed: "Failed to load",
-    promoter: "Promoter",
-    date: "Date",
-    city: "City",
-    venue: "Venue",
-    address: "Address",
-    genre: "Genre",
-    lineup: "Lineup",
-    artists: "Artists",
-    atlas: "Atlas",
-    atlasVerified: "Verified",
-    atlasHint: "Hint",
-    description: "Description",
-    runningHours: "Running hours",
-    location: "Location",
-    music: "Music",
-    tickets: "Tickets",
-    price: "Cost",
-    save: "Save",
-    saved: "Saved",
-    about: "About",
-    copyAddress: "Copy address",
-    addressCopied: "Address copied",
-    lineupHint: "Tap poster to view source",
-    sourcePreparing: "Preparing source",
-    viewSource: "Tap poster to view source",
-  },
-};
-
-function normalizeLang(value) {
-  return value === "en" ? "en" : "zh";
-}
+const { posterFallbackState, posterImageErrorFallback, resolvePosterUrlForItem } = require("../../utils/cloudPosterUrls");
 
 function safeDecode(value) {
   try {
@@ -81,10 +14,43 @@ function safeDecode(value) {
   }
 }
 
+function mapDestination(location) {
+  if (!location) return null;
+  const latitude = Number(location.latitude);
+  const longitude = Number(location.longitude);
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+  if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) return null;
+  if (latitude === 0 && longitude === 0) return null;
+  return { latitude, longitude };
+}
+
+function safeHideLoading() {
+  if (typeof wx !== "undefined" && typeof wx.hideLoading === "function") wx.hideLoading();
+}
+
+function safeShowLoading(options) {
+  if (typeof wx !== "undefined" && typeof wx.showLoading === "function") wx.showLoading(options);
+}
+
+function safeVibrate(type = "light") {
+  if (typeof wx !== "undefined" && typeof wx.vibrateShort === "function") wx.vibrateShort({ type });
+}
+
+function preferredSourceHash(item) {
+  const direct = String(item?.sourceHash || "").trim();
+  if (direct) return direct;
+  const sourceArticles = Array.isArray(item?.sourceArticles) ? item.sourceArticles : [];
+  for (const article of sourceArticles) {
+    const hash = String(article?.hash || "").trim();
+    if (hash) return hash;
+  }
+  return "";
+}
+
 Page({
   data: {
     lang: "zh",
-    t: I18N.zh,
+    t: text("detail", "zh"),
     loading: true,
     loadingProgress: 0,
     loadingStep: "加载中",
@@ -94,6 +60,7 @@ Page({
     saved: false,
     sourceUrl: "",
     sourceLoading: false,
+    posterLoadFailed: false,
   },
 
   onLoad(query) {
@@ -101,7 +68,8 @@ Page({
     this.itemId = safeDecode(query.id);
     const lang = normalizeLang(query.lang || wx.getStorageSync("weeklyActivityLang"));
     wx.setStorageSync("weeklyActivityLang", lang);
-    this.setData({ lang, t: I18N[lang] });
+    applyLanguageChrome("detail", lang);
+    this.setData({ lang, t: text("detail", lang) });
     this.loadDetail();
   },
 
@@ -130,17 +98,26 @@ Page({
       } catch (atlasError) {
         console.warn("[detail] atlas snapshot unavailable", atlasError && (atlasError.errMsg || atlasError.message || atlasError));
       }
-      const item = compactItem({ ...raw, weeklyAtlas });
-      item.sourceArticles = buildDetailSourceArticles(item);
+      let compact;
+      try {
+        compact = compactItem({ ...raw, weeklyAtlas });
+      } catch (compactError) {
+        console.error("[detail] compactItem failed", compactError);
+        // 回退：跳过 compact 处理，直接使用 raw + weeklyAtlas 原始字段
+        compact = { ...raw, weeklyAtlas, id: raw.id || this.itemId };
+      }
+      const item = await resolvePosterUrlForItem(localizeItem(compact, this.data.lang));
+      item.sourceArticles = localizedSourceArticles(buildDetailSourceArticles(compact), this.data.lang);
       const savedIds = wx.getStorageSync("savedActivityIds") || [];
       this.setData({
         item,
         priceLabel: joinList(item.price),
         saved: savedIds.includes(item.id),
+        posterLoadFailed: false,
         loadingProgress: 100,
         loading: false,
       });
-      this.prefetchSource(item.sourceHash);
+      this.prefetchSource(preferredSourceHash(item));
     } catch (error) {
       console.error("[detail] loadDetail failed", error);
       this.setData({
@@ -164,7 +141,12 @@ Page({
   toggleLang() {
     const lang = this.data.lang === "en" ? "zh" : "en";
     wx.setStorageSync("weeklyActivityLang", lang);
-    this.setData({ lang, t: I18N[lang] });
+    applyLanguageChrome("detail", lang);
+    this.setData({
+      lang,
+      t: text("detail", lang),
+    });
+    if (this.itemId) this.loadDetail();
   },
 
   goBack() {
@@ -192,6 +174,7 @@ Page({
   },
 
   openArtist(event) {
+    safeVibrate("light");
     const name = event.currentTarget.dataset.name || "";
     if (!name) return;
     wx.navigateTo({
@@ -200,16 +183,20 @@ Page({
   },
 
   openVenue() {
+    safeVibrate("light");
     const name = this.data.item?.venueLabel || this.data.item?.promoter || this.data.item?.account || "";
     const key = this.data.item?.organizerKey || "";
     if (!name) return;
+    safeShowLoading({ title: this.data.t.clubSchedule || "加载排期…", mask: false });
     wx.navigateTo({
       url: `/pages/venue/venue?name=${encodeURIComponent(name)}&key=${encodeURIComponent(key)}&lang=${this.data.lang}`,
+      complete: () => safeHideLoading(),
     });
   },
 
   openSource() {
-    const hash = this.data.item?.sourceHash || "";
+    safeVibrate("light");
+    const hash = preferredSourceHash(this.data.item);
     if (!hash) return;
     if (this.data.sourceLoading && !this.data.sourceUrl) {
       wx.showToast({ title: this.data.t.sourcePreparing, icon: "none" });
@@ -223,9 +210,10 @@ Page({
   },
 
   openSourceArticle(event) {
+    safeVibrate("light");
     const hash = event.currentTarget.dataset.hash || "";
     if (!hash) return;
-    if (hash === this.data.item?.sourceHash && this.data.sourceUrl) {
+    if (hash === preferredSourceHash(this.data.item) && this.data.sourceUrl) {
       openSourceUrl(this.data.sourceUrl, this.data.lang, { fallbackHash: hash });
       return;
     }
@@ -233,20 +221,37 @@ Page({
   },
 
   openPoster() {
-    const hash = this.data.item?.sourceHash || "";
-    if (!hash) return;
-    if (this.data.sourceLoading && !this.data.sourceUrl) {
-      wx.showToast({ title: this.data.t.sourcePreparing, icon: "none" });
+    safeVibrate("light");
+    const coverUrl = this.data.item?.coverUrl;
+    if (coverUrl) {
+      wx.previewImage({ urls: [coverUrl], current: coverUrl });
       return;
     }
-    if (this.data.sourceUrl) {
-      openSourceUrl(this.data.sourceUrl, this.data.lang, { fallbackHash: hash });
+    wx.showToast({ title: this.data.t.posterUnavailable, icon: "none" });
+  },
+
+  onPosterImageLoad() {
+    if (this.data.posterLoadFailed) this.setData({ posterLoadFailed: false });
+  },
+
+  async onPosterImageError() {
+    const item = this.data.item || {};
+    const fallback = await posterImageErrorFallback(item, item.coverUrl || "");
+    if (fallback) {
+      this.setData({
+        item: {
+          ...item,
+          ...posterFallbackState(item, fallback),
+        },
+        posterLoadFailed: false,
+      });
       return;
     }
-    wx.navigateTo({ url: buildSourcePageUrl(hash, this.data.lang) });
+    this.setData({ posterLoadFailed: true });
   },
 
   saveItem() {
+    safeVibrate("medium");
     const savedIds = wx.getStorageSync("savedActivityIds") || [];
     const id = this.data.item.id;
     const next = savedIds.includes(id)
@@ -256,13 +261,49 @@ Page({
     this.setData({ saved: next.includes(id) });
   },
 
-  copyAddress() {
-    if (!this.data.item?.addressLabel) return;
+  handleAddressTap() {
+    safeVibrate("light");
+    this.openMapLocation();
+  },
+
+  openMapLocation() {
+    const location = this.data.item?.mapLocation;
+    const destination = mapDestination(location);
+    if (!destination) {
+      if (this.copyAddress({ silent: true })) {
+        wx.showToast({ title: this.data.t.openMapFallback, icon: "none" });
+      }
+      return;
+    }
+    if (typeof wx.openLocation !== "function") {
+      if (this.copyAddress({ silent: true })) {
+        wx.showToast({ title: this.data.t.openMapFailed, icon: "none" });
+      }
+      return;
+    }
+    wx.openLocation({
+      latitude: destination.latitude,
+      longitude: destination.longitude,
+      name: location.name || this.data.item?.venueLabel || this.data.item?.displayTitle || "",
+      address: location.address || this.data.item?.addressLabel || "",
+      scale: 16,
+      fail: () => {
+        this.copyAddress({ silent: true });
+        wx.showToast({ title: this.data.t.openMapFailed, icon: "none" });
+      },
+    });
+  },
+
+  copyAddress(options = {}) {
+    if (!this.data.item?.addressLabel) return false;
     wx.setClipboardData({
       data: this.data.item.addressLabel,
       success: () => {
-        wx.showToast({ title: this.data.t.addressCopied, icon: "none" });
+        if (!options.silent) {
+          wx.showToast({ title: this.data.t.addressCopied, icon: "none" });
+        }
       },
     });
+    return true;
   },
 });
