@@ -77,7 +77,7 @@
     <view class="section" wx:if="{{atlasVenues.length}}">
       <view class="sub-heading">经常演出的俱乐部</view>
       <view class="chip-row">
-        <view wx:for="{{atlasVenues}}" wx:key="venueId" class="chip venue-chip" data-venue="{{item.venueName}}" catchtap="openVenue">
+        <view wx:for="{{atlasVenues}}" wx:key="venueName" class="chip venue-chip" data-venue="{{item.venueName}}" catchtap="openVenue">
           <text class="chip-name">{{item.venueName}}</text>
           <text class="chip-count">{{item.eventCount}}场</text>
         </view>
