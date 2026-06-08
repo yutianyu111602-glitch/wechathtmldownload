@@ -1,9 +1,9 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
 
-const { buildDetailSourceArticles, buildVenueSourceArticles } = require("../utils/sourceArticles");
+const { buildDetailSourceArticles, buildVenueSourceArticles, sourceHashOf } = require("../utils/sourceArticles");
 
-test("venue home surfaces aggregate parent article once for several child events", () => {
+test("venue home does not surface aggregate parent overview articles for child events", () => {
   const articles = buildVenueSourceArticles([
     {
       id: "agg-child-a",
@@ -21,11 +21,7 @@ test("venue home surfaces aggregate parent article once for several child events
     },
   ]);
 
-  assert.equal(articles.length, 1);
-  assert.equal(articles[0].hash, "parent-hash");
-  assert.equal(articles[0].title, "loopy Club 排期原文");
-  assert.match(articles[0].subtitle, /发布 04\.29/);
-  assert.match(articles[0].subtitle, /2场/);
+  assert.deepEqual(articles, []);
 });
 
 test("single non-aggregate event does not create a venue source article block", () => {
@@ -106,4 +102,61 @@ test("venue source block includes merged source provenance even for one retained
   assert.deepEqual(articles.map((article) => article.hash), ["newhash", "oldhash"]);
   assert.ok(articles.every((article) => article.eventCount === 1));
   assert.ok(articles.every((article) => article.isMergedSource));
+});
+
+test("merged source provenance skips aggregate child parent overview refs", () => {
+  const articles = buildDetailSourceArticles({
+    id: "loopy:retained",
+    account: "loopy Club",
+    sourceHash: "detail-hash",
+    source_article: {
+      url_hash: "detail-hash",
+      account_name: "loopy Club",
+      published_at: "2026-06-02",
+    },
+    merge_provenance: {
+      schema_version: "weekly_merge_provenance.v1",
+      retained_source_hash: "detail-hash",
+      source_count: 2,
+      sources: [
+        {
+          event_id: "agg-child-loopy-overview",
+          source_hash: "overview-hash",
+          title: "本周活动一览",
+          account_name: "loopy Club",
+          published_at: "2026-06-01",
+        },
+        {
+          event_id: "loopy:retained",
+          source_hash: "detail-hash",
+          title: "具体活动原文",
+          account_name: "loopy Club",
+          published_at: "2026-06-02",
+        },
+      ],
+    },
+  });
+
+  assert.deepEqual(articles.map((article) => article.hash), []);
+});
+
+test("disabled aggregate child source action does not surface parent article links", () => {
+  const item = {
+    id: "agg-child-loopy-overview",
+    account: "loopy Club",
+    sourceHash: "parent-hash",
+    source_article: { url_hash: "parent-hash", title: "本周活动一览" },
+    source_action: { available: false, url_hash: "" },
+    merge_provenance: {
+      schema_version: "weekly_merge_provenance.v1",
+      retained_source_hash: "parent-hash",
+      sources: [
+        { source_hash: "parent-hash", title: "本周活动一览" },
+      ],
+    },
+  };
+
+  assert.equal(sourceHashOf(item), "");
+  assert.deepEqual(buildDetailSourceArticles(item), []);
+  assert.deepEqual(buildVenueSourceArticles([item], { includeSingles: true }), []);
 });

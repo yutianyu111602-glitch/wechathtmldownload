@@ -42,7 +42,7 @@ test("CloudRun current feed dedupe follows weekly_dedup_spec.v1", async () => {
       items: [ready(item.left), ready(item.right)],
     });
 
-    const store = new WeeklyActivityDataStore({ baseDir: dir });
+    const store = new WeeklyActivityDataStore({ baseDir: dir, today: item.left.event_date_start });
     const current = await store.getCurrent({ limit: 10 });
     assert.equal(
       current.page.total,

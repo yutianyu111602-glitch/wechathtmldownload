@@ -1,4 +1,5 @@
 import importlib.util
+import importlib.util
 import json
 import subprocess
 import sys
@@ -74,6 +75,14 @@ def event(
         "detail_path": detail_path,
         "detail_url": detail_path,
     }
+
+
+def set_city(item: dict, city_name: str, city_key: str) -> dict:
+    item["city"] = [city_name]
+    item["city_key"] = city_key
+    item["city_name"] = city_name
+    item["city_keys"] = [city_key]
+    return item
 
 
 class RepairWeeklyReleaseConflictsTests(unittest.TestCase):
@@ -171,6 +180,333 @@ class RepairWeeklyReleaseConflictsTests(unittest.TestCase):
             )
             self.assertEqual(audit.returncode, 0, audit.stderr + audit.stdout)
 
+    def test_canonicalizes_stale_current_source_map_event_id(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            api_dir = root / "api"
+            source_map = api_dir / "source_actions" / "source_url_map.json"
+            current = event(
+                "exit:current",
+                "6.6 Techno Worlds x VACUUM",
+                "currenthash",
+                published_at="2026-05-19",
+                event_date="2026-06-06",
+            )
+
+            write_json(
+                api_dir / "current.json",
+                {"schema_version": "weekly_activity_miniprogram_current.v1", "item_count": 1, "items": [current]},
+            )
+            write_json(api_dir / "manifest.json", {"schema_version": "weekly_activity_miniprogram_api.v1", "item_count": 1})
+            write_json(
+                source_map,
+                {
+                    "schema_version": "weekly_activity_source_url_map.v1",
+                    "source_count": 1,
+                    "sources": {
+                        "currenthash": {
+                            "url": "https://mp.weixin.qq.com/s/current",
+                            "event_id": "exit:old",
+                            "merged_into_event_id": "exit:old",
+                            "merged_into_source_hash": "oldhash",
+                            "merge_reason": "duplicate_cluster",
+                        },
+                    },
+                },
+            )
+
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT), "--api-dir", str(api_dir), "--write", "--quarantine-conflicts"],
+                check=False,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            repaired_source_map = json.loads(source_map.read_text(encoding="utf-8"))
+            repaired_entry = repaired_source_map["sources"]["currenthash"]
+            self.assertEqual(repaired_entry["event_id"], "exit:current")
+            self.assertNotIn("merged_into_event_id", repaired_entry)
+            self.assertNotIn("merged_into_source_hash", repaired_entry)
+            self.assertNotIn("merge_reason", repaired_entry)
+            self.assertEqual(repaired_source_map["repair_report"]["canonicalized_current_source_count"], 1)
+
+    def test_canonicalizes_self_redirect_current_source_map_metadata(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            api_dir = root / "api"
+            source_map = api_dir / "source_actions" / "source_url_map.json"
+            current = event(
+                "wigwam:current",
+                "06.05 Wigwam",
+                "currenthash",
+                venue="wigwam",
+                published_at="2026-06-02",
+                event_date="2026-06-05",
+            )
+
+            write_json(
+                api_dir / "current.json",
+                {"schema_version": "weekly_activity_miniprogram_current.v1", "item_count": 1, "items": [current]},
+            )
+            write_json(api_dir / "manifest.json", {"schema_version": "weekly_activity_miniprogram_api.v1", "item_count": 1})
+            write_json(
+                source_map,
+                {
+                    "schema_version": "weekly_activity_source_url_map.v1",
+                    "source_count": 1,
+                    "sources": {
+                        "currenthash": {
+                            "url": "https://mp.weixin.qq.com/s/current",
+                            "event_id": "wigwam:current",
+                            "merged_into_event_id": "wigwam:current",
+                            "merged_into_source_hash": "currenthash",
+                            "merge_reason": "duplicate_cluster",
+                        },
+                    },
+                },
+            )
+
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT), "--api-dir", str(api_dir), "--write"],
+                check=False,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            repaired_source_map = json.loads(source_map.read_text(encoding="utf-8"))
+            repaired_entry = repaired_source_map["sources"]["currenthash"]
+            self.assertEqual(repaired_entry["event_id"], "wigwam:current")
+            self.assertNotIn("merged_into_event_id", repaired_entry)
+            self.assertNotIn("merged_into_source_hash", repaired_entry)
+            self.assertNotIn("merge_reason", repaired_entry)
+            self.assertEqual(repaired_source_map["repair_report"]["canonicalized_current_source_count"], 1)
+
+    def test_disables_aggregate_child_parent_source_but_keeps_real_cloudbase_poster(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            api_dir = root / "api"
+            source_map = api_dir / "source_actions" / "source_url_map.json"
+            file_id = "cloud://huaidjweekly-d8g1go7-d0a07863e3e/weekly-posters/20260605/agg-child-loopy-a.jpg"
+            child = event(
+                "agg-child-loopy-a",
+                "DJ Love @ loopy",
+                "overviewhash",
+                venue="loopy",
+                address="上海市测试路1号",
+                published_at="2026-06-01",
+                event_date="2026-06-06",
+            )
+            child["aggregation_child"] = True
+            child["evidence"] = ["06.06 DJ Love @ loopy", "Dapi / vusu"]
+            child["poster_file_id"] = file_id
+            child["cover_image_url"] = "https://mmbiz.qpic.cn/sz_mmbiz_jpg/overview/0?wx_fmt=jpeg"
+            write_json(
+                api_dir / "current.json",
+                {"schema_version": "weekly_activity_miniprogram_current.v1", "item_count": 1, "items": [child]},
+            )
+            write_json(api_dir / "manifest.json", {"schema_version": "weekly_activity_miniprogram_api.v1", "item_count": 1})
+            write_json(
+                source_map,
+                {
+                    "schema_version": "weekly_activity_source_url_map.v1",
+                    "source_count": 1,
+                    "sources": {
+                        "overviewhash": {"url": "https://mp.weixin.qq.com/s/weekly-overview", "event_id": "agg-child-loopy-a"},
+                    },
+                },
+            )
+
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT), "--api-dir", str(api_dir), "--write", "--quarantine-conflicts"],
+                check=False,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            current = json.loads((api_dir / "current.json").read_text(encoding="utf-8"))
+            repaired = current["items"][0]
+            self.assertTrue(repaired["aggregation_child"])
+            self.assertFalse(repaired["source_action"]["available"])
+            self.assertEqual(repaired["source_action"]["url_hash"], "")
+            self.assertEqual(repaired["source_article"]["url_hash"], "")
+            self.assertFalse(repaired["poster_suppressed"])
+            self.assertEqual(repaired["poster_suppressed_reason"], "")
+            self.assertEqual(repaired.get("poster_file_id"), file_id)
+            self.assertEqual(repaired.get("posterFileId"), file_id)
+            self.assertEqual(repaired.get("cloudFileId"), file_id)
+            self.assertEqual(repaired.get("cover_image_url"), file_id)
+            self.assertEqual(repaired.get("coverUrl"), file_id)
+            self.assertEqual(repaired.get("poster_storage"), "cloudbase")
+            self.assertEqual(repaired.get("poster_source"), "cloudbase_storage")
+            report = json.loads((api_dir / "repair_report.json").read_text(encoding="utf-8"))
+            self.assertEqual(report["suppressed_aggregate_child_source_count"], 1)
+            self.assertTrue(report["aggregate_child_source_suppressed_items"][0]["kept_internal_activity_poster"])
+            self.assertEqual(report["aggregate_child_source_suppressed_items"][0]["cleared_poster_fields"], [])
+            self.assertEqual(report["removed_weak_aggregate_child_count"], 0)
+            repaired_source_map = json.loads(source_map.read_text(encoding="utf-8"))
+            self.assertEqual(repaired_source_map["source_count"], 0)
+            self.assertEqual(repaired_source_map["sources"], {})
+
+    def test_disables_aggregate_child_parent_source_and_clears_public_parent_poster(self):
+        child = event(
+            "agg-child-public-parent-cover",
+            "DJ Love @ loopy",
+            "overviewhash",
+            venue="loopy",
+            address="上海市测试路1号",
+            published_at="2026-06-01",
+            event_date="2026-06-06",
+        )
+        child["aggregation_child"] = True
+        child["evidence"] = ["06.06 DJ Love @ loopy", "Dapi / vusu"]
+        child["cover_image_url"] = "https://mmbiz.qpic.cn/sz_mmbiz_jpg/overview/0?wx_fmt=jpeg"
+        child["coverUrl"] = "https://mmbiz.qpic.cn/sz_mmbiz_jpg/overview/0?wx_fmt=jpeg"
+
+        repaired, report = repair.repair_items([child], quarantine_conflicts=True, window_start="2026-06-02", window_end="2026-06-16")
+
+        self.assertEqual(len(repaired), 1)
+        repaired_child = repaired[0]
+        self.assertFalse(repaired_child["source_action"]["available"])
+        self.assertEqual(repaired_child["source_action"]["url_hash"], "")
+        self.assertFalse(repaired_child["poster_suppressed"])
+        self.assertEqual(repaired_child["poster_suppressed_reason"], "")
+        self.assertEqual(repaired_child.get("poster_file_id"), "")
+        self.assertEqual(repaired_child.get("cover_image_url"), "")
+        self.assertEqual(repaired_child.get("coverUrl"), "")
+        self.assertEqual(repaired_child.get("poster_source"), "")
+        self.assertFalse(report["aggregate_child_source_suppressed_items"][0]["kept_internal_activity_poster"])
+        self.assertIn("cover_image_url", report["aggregate_child_source_suppressed_items"][0]["cleared_poster_fields"])
+
+    def test_quarantines_weak_aggregate_child_date_evidence(self):
+        weak = event(
+            "agg-child-dj-love",
+            "DJ Love",
+            "overviewhash",
+            venue="loopy",
+            address="浙江省杭州市西湖区天目山路398号天目里7号楼负一层",
+            published_at="2026-05-25",
+            event_date="2026-06-06",
+        )
+        weak["aggregation_child"] = True
+        weak["poster_suppressed"] = True
+        weak["source_action"]["available"] = False
+        weak["source_action"]["url_hash"] = ""
+        weak["source_article"]["url_hash"] = ""
+        weak["evidence"] = ["Sun", "30", "DJ Love", "Dapi/lj555998/vusu"]
+
+        repaired, report = repair.repair_items([weak], quarantine_conflicts=True, window_start="2026-06-02", window_end="2026-06-16")
+
+        self.assertEqual(repaired, [])
+        self.assertEqual(report["removed_weak_aggregate_child_count"], 1)
+        self.assertEqual(report["weak_aggregate_child_items"][0]["id"], "agg-child-dj-love")
+        self.assertEqual(report["removed_items"][0]["reason"], "aggregate_child_weak_date_evidence")
+
+    def test_normalizes_cloudbase_poster_fields_without_network_or_upload(self):
+        item = event("poster:cloud", "Cloud Poster Event", "hash-cloud", event_date="2026-06-05")
+        file_id = "cloud://huaidjweekly-d8g1go7-d0a07863e3e/weekly-posters/20260605/poster-cloud.jpg"
+        item["poster_file_id"] = file_id
+        item["cover_image_url"] = "https://mmbiz.qpic.cn/sz_mmbiz_jpg/stale/0?wx_fmt=jpeg"
+        item["coverUrl"] = "/api/v1/weekly/poster/poster-cloud"
+
+        repaired, report = repair.repair_items([item], quarantine_conflicts=True)
+
+        self.assertEqual(len(repaired), 1)
+        normalized = repaired[0]
+        self.assertEqual(normalized["poster_file_id"], file_id)
+        self.assertEqual(normalized["posterFileId"], file_id)
+        self.assertEqual(normalized["cloudFileId"], file_id)
+        self.assertEqual(normalized["poster_storage"], "cloudbase")
+        self.assertEqual(normalized["posterStorage"], "cloudbase")
+        self.assertEqual(normalized["cover_image_url"], file_id)
+        self.assertEqual(normalized["coverUrl"], file_id)
+        self.assertEqual(report["cloudbase_poster_normalized_count"], 1)
+
+    def test_prunes_aggregate_child_sources_from_retained_merge_provenance(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            api_dir = root / "api"
+            source_map = api_dir / "source_actions" / "source_url_map.json"
+            retained = event(
+                "loopy:retained",
+                "具体活动原文",
+                "detailhash",
+                venue="loopy",
+                address="上海市测试路1号",
+                event_date="2026-06-06",
+            )
+            retained["merge_provenance"] = {
+                "schema_version": "weekly_merge_provenance.v1",
+                "reason": "duplicate_cluster",
+                "retained_id": "loopy:retained",
+                "retained_source_hash": "detailhash",
+                "merged_from": ["agg-child-loopy-overview", "loopy:retained"],
+                "merged_source_hashes": ["detailhash", "overviewhash"],
+                "source_count": 2,
+                "sources": [
+                    {
+                        "event_id": "agg-child-loopy-overview",
+                        "source_hash": "overviewhash",
+                        "title": "本周活动一览",
+                        "published_at": "2026-06-01",
+                        "account_name": "loopy Club",
+                    },
+                    {
+                        "event_id": "loopy:retained",
+                        "source_hash": "detailhash",
+                        "title": "具体活动原文",
+                        "published_at": "2026-06-02",
+                        "account_name": "loopy Club",
+                    },
+                ],
+            }
+            write_json(
+                api_dir / "current.json",
+                {"schema_version": "weekly_activity_miniprogram_current.v1", "item_count": 1, "items": [retained]},
+            )
+            write_json(api_dir / "manifest.json", {"schema_version": "weekly_activity_miniprogram_api.v1", "item_count": 1})
+            write_json(
+                source_map,
+                {
+                    "schema_version": "weekly_activity_source_url_map.v1",
+                    "source_count": 2,
+                    "sources": {
+                        "detailhash": {"url": "https://mp.weixin.qq.com/s/detail", "event_id": "loopy:retained"},
+                        "overviewhash": {
+                            "url": "https://mp.weixin.qq.com/s/weekly-overview",
+                            "event_id": "loopy:retained",
+                            "merged_into_event_id": "loopy:retained",
+                            "merge_reason": "duplicate_cluster",
+                        },
+                    },
+                },
+            )
+
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT), "--api-dir", str(api_dir), "--write", "--quarantine-conflicts"],
+                check=False,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            current = json.loads((api_dir / "current.json").read_text(encoding="utf-8"))
+            provenance = current["items"][0]["merge_provenance"]
+            self.assertEqual(provenance["source_count"], 1)
+            self.assertEqual(provenance["merged_from"], ["loopy:retained"])
+            self.assertEqual(provenance["merged_source_hashes"], ["detailhash"])
+            self.assertEqual([row["source_hash"] for row in provenance["sources"]], ["detailhash"])
+            report = json.loads((api_dir / "repair_report.json").read_text(encoding="utf-8"))
+            self.assertEqual(report["pruned_aggregate_child_merge_source_count"], 1)
+            repaired_source_map = json.loads(source_map.read_text(encoding="utf-8"))
+            self.assertEqual(set(repaired_source_map["sources"].keys()), {"detailhash"})
+
     def test_quarantines_cross_source_conflicts_instead_of_guessing(self):
         conflict_a = event("a:one", "Same Party", "hash-a", venue="Venue A", address="上海市A路1号", time="22:00")
         conflict_b = event("b:one", "Same Party", "hash-b", venue="Venue B", address="上海市B路2号", time="23:00")
@@ -182,6 +518,54 @@ class RepairWeeklyReleaseConflictsTests(unittest.TestCase):
         self.assertEqual(report["conflict_cluster_count"], 1)
         self.assertEqual(report["quarantined_conflict_item_count"], 2)
         self.assertEqual(report["audit_after"]["conflict_cluster_count"], 0)
+
+    def test_explicit_source_maps_only_does_not_rewrite_parent_map(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            api_dir = root / "api"
+            explicit_source_map = api_dir / "source_actions" / "source_url_map.json"
+            parent_source_map = root / "source_actions" / "source_url_map.json"
+            old = event("exit:old", "5.14 周四 | JACK'N", "oldhash", title_display="JACK'N", published_at="2026-05-10")
+            new = event("exit:new", "今晚📌 JACK'N", "newhash", title_display="📌 JACK'N", published_at="2026-05-14")
+            items = [old, new]
+            source_payload = {
+                "schema_version": "weekly_activity_source_url_map.v1",
+                "source_count": 2,
+                "sources": {
+                    "oldhash": {"url": "https://mp.weixin.qq.com/s/old", "event_id": "exit:old"},
+                    "newhash": {"url": "https://mp.weixin.qq.com/s/new", "event_id": "exit:new"},
+                },
+            }
+
+            write_json(api_dir / "current.json", {"schema_version": "weekly_activity_miniprogram_current.v1", "item_count": 2, "items": items})
+            write_json(api_dir / "manifest.json", {"schema_version": "weekly_activity_miniprogram_api.v1", "item_count": 2})
+            write_json(explicit_source_map, source_payload)
+            write_json(parent_source_map, source_payload)
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPT),
+                    "--api-dir",
+                    str(api_dir),
+                    "--source-url-map",
+                    str(explicit_source_map),
+                    "--explicit-source-maps-only",
+                    "--write",
+                    "--quarantine-conflicts",
+                ],
+                check=False,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            explicit_payload = json.loads(explicit_source_map.read_text(encoding="utf-8"))
+            parent_payload = json.loads(parent_source_map.read_text(encoding="utf-8"))
+            self.assertIn("repair_report", explicit_payload)
+            self.assertNotIn("repair_report", parent_payload)
+            self.assertEqual(parent_payload["sources"]["oldhash"]["event_id"], "exit:old")
 
     def test_repairs_repeated_promotion_posts_for_same_event(self):
         early = event(
@@ -221,6 +605,151 @@ class RepairWeeklyReleaseConflictsTests(unittest.TestCase):
         self.assertEqual(report["removed_duplicate_count"], 1)
         self.assertEqual(report["duplicate_cluster_count"], 1)
         self.assertEqual(report["audit_after"]["effective_duplicate_cluster_count"], 0)
+
+    def test_audit_fallback_repairs_raw_duplicates_missed_by_strict_scope(self):
+        first = set_city(
+            event(
+                "nuts:preview",
+                "预告丨ROUND2两周年 @坚果NUTS&INWARD",
+                "previewhash",
+                venue="坚果NUTS",
+                address="重庆市沙坪坝区大学城北路1号",
+                event_date="2026-06-06",
+            ),
+            "重庆",
+            "chongqing",
+        )
+        second = set_city(
+            event(
+                "nuts:main",
+                "ROUND2两周年 | 坚果NUTS & INWARD",
+                "mainhash",
+                venue="坚果NUTS",
+                address="重庆市渝中区测试路2号",
+                event_date="2026-06-06",
+            ),
+            "重庆",
+            "chongqing",
+        )
+
+        repaired, report = repair.repair_items([first, second], quarantine_conflicts=True)
+
+        self.assertEqual(len(repaired), 1)
+        self.assertEqual(report["removed_audit_raw_duplicate_fallback_count"], 1)
+        self.assertEqual(report["audit_after"]["duplicate_cluster_count"], 0)
+        self.assertEqual(report["audit_after"]["effective_duplicate_cluster_count"], 0)
+
+    def test_fallback_repairs_same_scope_promotion_with_shared_anchor(self):
+        earlier = event(
+            "pillbox:earlier",
+            "Antigen 八周年｜东南亚亿万少女的梦！菲律宾总统都在摇的舞曲！",
+            "earlierhash",
+            venue="PILLBOX Beijing",
+            address="北京市朝阳区测试路1号",
+            time="",
+            published_at="2026-05-18",
+            event_date="2026-05-22",
+        )
+        reminder = event(
+            "pillbox:reminder",
+            "今晚｜Antigen八周年核爆级阵容袭京",
+            "reminderhash",
+            venue="PILLBOX Beijing",
+            address="北京市朝阳区测试路1号",
+            time="22:00-23:00",
+            published_at="2026-05-22",
+            event_date="2026-05-22",
+        )
+        other = event(
+            "pillbox:other",
+            "另一场凌晨实验音乐会",
+            "otherhash",
+            venue="PILLBOX Beijing",
+            address="北京市朝阳区测试路1号",
+            time="23:30-02:00",
+            published_at="2026-05-22",
+            event_date="2026-05-22",
+        )
+        for row in (earlier, reminder, other):
+            row["address"] = ""
+            row["address_full"] = ""
+            row["source_article"]["account_name"] = ""
+            row["source_account_name"] = ""
+
+        repaired, report = repair.repair_items([earlier, reminder, other], quarantine_conflicts=True)
+
+        self.assertEqual([item["id"] for item in repaired], ["pillbox:reminder", "pillbox:other"])
+        self.assertEqual(report["removed_duplicate_count"], 1)
+        self.assertEqual(repaired[0]["merge_provenance"]["retained_id"], "pillbox:reminder")
+
+    def test_does_not_merge_same_title_tour_across_cities_or_addresses(self):
+        beijing = set_city(
+            event(
+                "tour:beijing",
+                "ANTIGEN 8 Year Anniversary",
+                "bjhash",
+                venue="PILLBOX Beijing",
+                address="北京市朝阳区测试路1号",
+                time="22:00-23:00",
+                published_at="2026-05-22",
+                event_date="2026-05-22",
+            ),
+            "北京",
+            "beijing",
+        )
+        shanghai = set_city(
+            event(
+                "tour:shanghai",
+                "ANTIGEN 8 Year Anniversary",
+                "shhash",
+                venue="PILLBOX Shanghai",
+                address="上海市黄浦区测试路2号",
+                time="22:00-23:00",
+                published_at="2026-05-22",
+                event_date="2026-05-22",
+            ),
+            "上海",
+            "shanghai",
+        )
+        guangzhou = set_city(
+            event(
+                "tour:guangzhou-address",
+                "ANTIGEN 8 Year Anniversary",
+                "gzhash",
+                venue="PILLBOX Guangzhou",
+                address="广州市越秀区测试路3号",
+                time="22:00-23:00",
+                published_at="2026-05-22",
+                event_date="2026-05-22",
+            ),
+            "广州",
+            "guangzhou",
+        )
+
+        repaired, report = repair.repair_items([beijing, shanghai, guangzhou], quarantine_conflicts=True)
+
+        self.assertEqual([item["id"] for item in repaired], ["tour:beijing", "tour:shanghai", "tour:guangzhou-address"])
+        self.assertEqual(report["removed_duplicate_count"], 0)
+        self.assertEqual(report["removed_raw_duplicate_fallback_count"], 0)
+
+        same_city_other_address = set_city(
+            event(
+                "tour:beijing-other-address",
+                "ANTIGEN 8 Year Anniversary",
+                "bjhash2",
+                venue="PILLBOX Beijing",
+                address="北京市朝阳区另一条路2号",
+                time="22:00-23:00",
+                published_at="2026-05-22",
+                event_date="2026-05-22",
+            ),
+            "北京",
+            "beijing",
+        )
+        deduped, removed, groups = repair.duplicate_repair([beijing, same_city_other_address])
+        self.assertEqual([item["id"] for item in deduped], ["tour:beijing", "tour:beijing-other-address"])
+        self.assertEqual(removed, [])
+        self.assertEqual(groups, [])
 
     def test_repairs_aggregate_child_and_direct_promo_with_shared_artist_anchor(self):
         aggregate = event(
@@ -362,6 +891,150 @@ class RepairWeeklyReleaseConflictsTests(unittest.TestCase):
         self.assertEqual(repaired[0]["event_date_end"], "2026-05-24")
         self.assertEqual(repaired[0]["event_date_iso_guesses"], aggregate["event_date_iso_guesses"])
 
+    def test_duplicate_merge_keeps_direct_single_date_when_removed_direct_has_wide_range(self):
+        wide = event(
+            "nuts:wide",
+            "告别春末的暖阳，向5月的璀璨出发吧！Hello Franky",
+            "widehash",
+            venue="坚果NUTS",
+            address="重庆市测试路1号",
+            time="20:00",
+            published_at="2026-05-07",
+            event_date="2026-05-24",
+        )
+        wide["event_date_iso_guesses"] = [
+            "2026-05-15",
+            "2026-05-16",
+            "2026-05-17",
+            "2026-05-18",
+            "2026-05-19",
+            "2026-05-20",
+            "2026-05-21",
+            "2026-05-22",
+            "2026-05-23",
+            "2026-05-24",
+        ]
+        wide["event_date_text"] = list(wide["event_date_iso_guesses"])
+        precise = event(
+            "nuts:precise",
+            "旋律朋克乐队 Hello Franky 2026公路巡演｜5月24日@坚果NUTS",
+            "precisehash",
+            venue="坚果NUTS",
+            address="重庆市测试路1号",
+            time="20:00",
+            published_at="2026-04-28",
+            event_date="2026-05-24",
+        )
+
+        kept = dict(precise)
+
+        repair.merge_duplicate_date_fields(kept, [wide, precise])
+
+        self.assertEqual(kept["event_date_start"], "2026-05-24")
+        self.assertEqual(kept["event_date_end"], "2026-05-24")
+        self.assertEqual(kept["event_date_iso_guesses"], ["2026-05-24"])
+
+    def test_quarantines_calendar_preview_parent_rows_from_event_feed(self):
+        parent = event(
+            "loopy:monthly-preview",
+            "loopy 六月活动一览",
+            "previewhash",
+            venue="loopy Club",
+            address="杭州市测试路1号",
+            time="",
+            published_at="2026-06-01",
+            event_date="2026-06-04",
+        )
+        parent["content_type"] = "calendar_preview"
+        parent["is_calendar_preview"] = True
+        parent["quality_flags"] = ["calendar_preview", "missing_time"]
+        parent["event_date_iso_guesses"] = ["2026-06-04", "2026-06-05", "2026-06-06"]
+        parent["event_date_end"] = "2026-06-06"
+        child = event(
+            "agg-child:loopy-single",
+            "VACUUM pres. 逃逸速度",
+            "childhash",
+            venue="loopy Club",
+            address="杭州市测试路1号",
+            time="22:00",
+            published_at="2026-06-01",
+            event_date="2026-06-04",
+        )
+
+        repaired, report = repair.repair_items([parent, child], quarantine_conflicts=True)
+
+        self.assertEqual([item["id"] for item in repaired], ["agg-child:loopy-single"])
+        self.assertEqual(report["removed_calendar_parent_count"], 1)
+        self.assertEqual(report["removed_items"][0]["id"], "loopy:monthly-preview")
+        self.assertEqual(report["removed_items"][0]["reason"], "calendar_preview_parent")
+
+    def test_quarantines_keycap_digit_month_calendar_parent_rows(self):
+        parent = event(
+            "abyss:monthly-preview",
+            "阿比鼠🦠🦠6️⃣月",
+            "previewhash",
+            venue="ABYSS Shanghai",
+            address="上海市测试路1号",
+            time="",
+            published_at="2026-06-01",
+            event_date="2026-06-05",
+        )
+        parent["event_date_iso_guesses"] = ["2026-06-05", "2026-06-06", "2026-06-12", "2026-06-13"]
+        parent["event_date_end"] = "2026-06-13"
+        child = event(
+            "agg-child:abyss-single",
+            "ABYSS Friday",
+            "childhash",
+            venue="ABYSS Shanghai",
+            address="上海市测试路1号",
+            time="22:00",
+            published_at="2026-06-01",
+            event_date="2026-06-06",
+        )
+
+        repaired, report = repair.repair_items([parent, child], quarantine_conflicts=True)
+
+        self.assertEqual([item["id"] for item in repaired], ["agg-child:abyss-single"])
+        self.assertEqual(report["removed_calendar_parent_count"], 1)
+        self.assertEqual(report["removed_items"][0]["id"], "abyss:monthly-preview")
+        self.assertEqual(report["removed_items"][0]["reason"], "calendar_preview_parent")
+
+    def test_quarantines_calendar_preview_title_range_but_keeps_single_weekly_event(self):
+        parent = event(
+            "with:weekly-preview",
+            "WITH · Stop Motion DJs Weekly｜ 06.01-06.07",
+            "previewhash",
+            venue="WITH BAR",
+            address="上海市测试路1号",
+            time="",
+            published_at="2026-06-01",
+            event_date="2026-06-07",
+        )
+        parent["content_type"] = "calendar_preview"
+        parent["is_calendar_preview"] = True
+        parent["quality_flags"] = ["calendar_preview"]
+        parent["title_display"] = "WITH · Stop Motion DJs Weekly"
+        single = event(
+            "wigwam:weekly-listening",
+            "今晚 22:00- Late Weekly Listening w/ 新生",
+            "singlehash",
+            venue="wigwam",
+            address="上海市测试路2号",
+            time="22:00-Late",
+            published_at="2026-06-02",
+            event_date="2026-06-02",
+        )
+        single["content_type"] = "calendar_preview"
+        single["is_calendar_preview"] = True
+        single["quality_flags"] = ["calendar_preview"]
+
+        repaired, report = repair.repair_items([parent, single], quarantine_conflicts=True)
+
+        self.assertEqual([item["id"] for item in repaired], ["wigwam:weekly-listening"])
+        self.assertEqual(report["removed_calendar_parent_count"], 1)
+        self.assertEqual(report["removed_items"][0]["id"], "with:weekly-preview")
+        self.assertEqual(report["removed_items"][0]["reason"], "calendar_preview_parent")
+
     def test_repairs_chinese_event_name_anchor_without_guessing_distinct_same_day_events(self):
         aggregate = event(
             "nuts:agg",
@@ -426,6 +1099,89 @@ class RepairWeeklyReleaseConflictsTests(unittest.TestCase):
         self.assertEqual([item["id"] for item in repaired], ["tote:may03", "tote:may16"])
         self.assertEqual(report["removed_duplicate_count"], 0)
         self.assertEqual(report["audit_after"]["effective_duplicate_cluster_count"], 0)
+
+    def test_rebuild_city_routes_use_label_aligned_with_each_city_key(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            api_dir = root / "api"
+            multi_city = event(
+                "crazy_track:multi",
+                "Goa Trance Outdoor",
+                "multicityhash",
+                event_date="2026-06-06",
+            )
+            multi_city["city"] = ["上海", "郑州"]
+            multi_city["city_key"] = "shanghai"
+            multi_city["city_name"] = "上海"
+            multi_city["city_keys"] = ["shanghai", "zhengzhou"]
+
+            write_json(api_dir / "current.json", {"schema_version": "weekly_activity_miniprogram_current.v1", "item_count": 1, "items": [multi_city]})
+            write_json(api_dir / "manifest.json", {"schema_version": "weekly_activity_miniprogram_api.v1", "item_count": 1})
+
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT), "--api-dir", str(api_dir), "--write"],
+                check=False,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            zhengzhou = json.loads((api_dir / "by-city" / "zhengzhou.json").read_text(encoding="utf-8"))
+            city_index = json.loads((api_dir / "by-city" / "index.json").read_text(encoding="utf-8"))
+
+            self.assertEqual(zhengzhou["city_key"], "zhengzhou")
+            self.assertEqual(zhengzhou["city"], "郑州")
+            city_by_key = {row["city_key"]: row for row in city_index["cities"]}
+            self.assertEqual(city_by_key["zhengzhou"]["city"], "郑州")
+
+    def test_enforce_window_start_drops_rows_outside_manifest_window(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            api_dir = root / "api"
+            report_path = root / "repair.json"
+            inside = event("inside:one", "Inside Window", "insidehash", event_date="2026-06-04")
+            outside = event("outside:one", "Outside Window", "outsidehash", event_date="2026-06-18")
+
+            write_json(
+                api_dir / "current.json",
+                {"schema_version": "weekly_activity_miniprogram_current.v1", "item_count": 2, "items": [inside, outside]},
+            )
+            write_json(
+                api_dir / "manifest.json",
+                {
+                    "schema_version": "weekly_activity_miniprogram_api.v1",
+                    "item_count": 2,
+                    "window_start": "2026-06-02",
+                    "window_end": "2026-06-16",
+                },
+            )
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(SCRIPT),
+                    "--api-dir",
+                    str(api_dir),
+                    "--report",
+                    str(report_path),
+                    "--write",
+                    "--enforce-window-start",
+                ],
+                check=False,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            current = json.loads((api_dir / "current.json").read_text(encoding="utf-8"))
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+
+            self.assertEqual(current["item_count"], 1)
+            self.assertEqual(current["items"][0]["id"], "inside:one")
+            self.assertEqual(report["dropped_outside_window_start_count"], 1)
+            self.assertEqual(report["dropped_outside_window_start_items"][0]["id"], "outside:one")
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ import { WeeklyActivityDataStore } from "../src/dataStore.mjs";
 let server;
 let baseUrl;
 let testEnv;
+let fixturePaths;
 
 async function writeJson(filePath, value) {
   await writeFile(filePath, JSON.stringify(value, null, 2), "utf8");
@@ -26,6 +27,18 @@ async function createFixture() {
     schema_version: "weekly_activity_miniprogram_api.v1",
     generated_at: "2026-05-07T09:48:35",
     item_count: 3,
+    field_resource_repair: {
+      schema_version: "weekly_resource_field_repair.v1",
+      item_change_count: 2,
+    },
+    geocode_enrichment: {
+      schema_version: "weekly_geocode_enrichment.v1",
+      updated_item_count: 2,
+    },
+    id_consistency_repair: {
+      schema_version: "weekly_resource_id_consistency_repair.v1",
+      changed_item_count: 2,
+    },
   });
   const items = [
     {
@@ -44,16 +57,31 @@ async function createFixture() {
         url_hash: "aaaaaaaaaaaaaaaa",
         account_name: "Club A",
         published_at: "2026-05-07",
+        url: "https://mp.weixin.qq.com/s/item-a",
+        body: "x".repeat(2000),
       },
       source_action: {
         type: "wechat_article",
         label: "公众号",
         available: true,
         url_hash: "aaaaaaaaaaaaaaaa",
+        url: "https://mp.weixin.qq.com/s/item-a",
+        debug_trace: "x".repeat(2000),
       },
       lineup: ["Club A", "DJ A", "DADA北京"],
       venue: ["Dada Bar Beijing"],
       evidence: ["22:00 开始", "DJ A all night", "4x4 house and club trax"],
+      description_original_lines: [
+        "Line 1 from public source",
+        "Line 2 from public source",
+        "Line 3 from public source",
+        "Line 4 from public source",
+        "Line 5 from public source that should be reserved for detail only",
+      ],
+      merge_provenance: [{ source: "aggregate-child", note: "x".repeat(2000) }],
+      field_evidence_refs: { title: [{ ref: "ocr-span", text: "x".repeat(1000) }] },
+      address_verification: { provider: "fixture", trace: "x".repeat(1000) },
+      geo_reverse_address: "fixture reverse address",
     },
     {
       id: "item-a-duplicate",
@@ -459,7 +487,8 @@ before(async () => {
     stage7VectorRouterSmokePath,
     stage7IdentityReviewPath,
   } = await createFixture();
-  testEnv = {};
+  fixturePaths = { baseDir, sourceMapDir };
+  testEnv = { WEEKLY_ACTIVITY_TODAY: "2026-05-09" };
   for (let port = 18787; port < 18850; port += 1) {
     server = createServer({
       baseDir,
@@ -505,6 +534,9 @@ test("returns manifest", async () => {
   assert.equal(res.status, 200);
   const body = await res.json();
   assert.equal(body.schema_version, "weekly_activity_miniprogram_api.v1");
+  assert.equal(body.field_resource_repair.schema_version, "weekly_resource_field_repair.v1");
+  assert.equal(body.geocode_enrichment.schema_version, "weekly_geocode_enrichment.v1");
+  assert.equal(body.id_consistency_repair.schema_version, "weekly_resource_id_consistency_repair.v1");
 });
 
 test("serves Stage7 atlas manifest and search from a release pointer", async () => {
@@ -820,13 +852,16 @@ test("filters current items by city and excludes review candidates", async () =>
   assert.equal(body.page.total, 2);
   assert.equal(body.items[0].id, "item-a");
   assert.equal(body.items[0].organizer_key, "dadabarbeijing");
-  assert.deepEqual(body.items[0].club_profile, {
-    schema_version: "weekly_club_profile.v1",
-    organizer_key: "dadabarbeijing",
-    display_name: "Dada Bar Beijing",
-    city: "上海",
-    address: "",
-  });
+  assert.equal(body.items[0].club_profile, undefined);
+  assert.equal(body.items[0].source_action.url_hash, "aaaaaaaaaaaaaaaa");
+  assert.equal(body.items[0].source_action.url, undefined);
+  assert.equal(body.items[0].source_article.url_hash, "aaaaaaaaaaaaaaaa");
+  assert.equal(body.items[0].source_article.url, undefined);
+  assert.equal(body.items[0].description_original_lines.length, 2);
+  assert.equal("merge_provenance" in body.items[0], false);
+  assert.equal("field_evidence_refs" in body.items[0], false);
+  assert.equal("address_verification" in body.items[0], false);
+  assert.equal("geo_reverse_address" in body.items[0], false);
   assert.equal(body.items[1].id, "club:abc123");
 });
 
@@ -838,11 +873,250 @@ test("filters multi-day events by inclusive date range", async () => {
   assert.equal(body.items[0].id, "range-week");
 });
 
+test("explicit single-day current filters ignore extra non-primary parser guesses", async () => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), "weekly-single-date-guesses-"));
+  await writeJson(path.join(dir, "current.json"), {
+    schema_version: "weekly_activity_miniprogram_current.v1",
+    generated_at: "2026-06-04T00:00:00+08:00",
+    item_count: 1,
+    items: [
+      {
+        id: "single-from-calendar",
+        title: "Single event from a calendar article",
+        city_key: "shanghai",
+        city_keys: ["shanghai"],
+        city: ["上海"],
+        event_date_start: "2026-06-05",
+        event_date_end: "2026-06-05",
+        event_date_iso_guess: "2026-06-05",
+        event_date_iso_guesses: ["2026-06-05", "2026-06-12", "2026-06-13"],
+        quality_status: "READY",
+      },
+    ],
+  });
+  const store = new WeeklyActivityDataStore({ baseDir: dir, today: "2026-06-04" });
+
+  const realDate = await store.getCurrent({ date: "2026-06-05", limit: 10 });
+  const guessedDate = await store.getCurrent({ date: "2026-06-12", limit: 10 });
+
+  assert.deepEqual(Array.from(realDate.items, (item) => item.id), ["single-from-calendar"]);
+  assert.deepEqual(Array.from(guessedDate.items, (item) => item.id), []);
+});
+
+test("default current feed is strict while explicit lookback can include recent past events", async () => {
+  const store = new WeeklyActivityDataStore({
+    baseDir: fixturePaths.baseDir,
+    sourceMapDir: fixturePaths.sourceMapDir,
+    today: "2026-05-21",
+  });
+
+  const body = await store.getCurrent({ limit: 10 });
+  assert.equal(body.filters.lookbackDays, null);
+  assert.deepEqual(Array.from(body.items, (item) => item.id), ["range-week"]);
+
+  const lookbackCurrent = await store.getCurrent({ limit: 10, lookbackDays: 45 });
+  assert.equal(lookbackCurrent.filters.lookbackDays, 45);
+  assert.deepEqual(Array.from(lookbackCurrent.items, (item) => item.id), ["item-a", "item-b", "club:abc123", "range-week"]);
+
+  const explicitPast = await store.getCurrent({ date: "2026-05-09", limit: 10 });
+  assert.equal(explicitPast.items[0].id, "item-a");
+});
+
+test("default current feed returns up to 100 rows so manifest 73 is not truncated to 50", async () => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), "weekly-current-limit-"));
+  const items = Array.from({ length: 120 }, (_, index) => ({
+    id: `future-${index}`,
+    title: `Future ${index}`,
+    city_key: "shanghai",
+    city_keys: ["shanghai"],
+    city: ["上海"],
+    event_date_iso_guess: "2026-06-02",
+    event_date_iso_guesses: ["2026-06-02"],
+    quality_status: "READY",
+  }));
+  await writeJson(path.join(dir, "current.json"), {
+    schema_version: "weekly_activity_miniprogram_current.v1",
+    generated_at: "2026-06-01T00:00:00+08:00",
+    item_count: items.length,
+    items,
+  });
+  const store = new WeeklyActivityDataStore({ baseDir: dir, today: "2026-06-01" });
+
+  const body = await store.getCurrent();
+
+  assert.equal(body.page.limit, 100);
+  assert.equal(body.page.total, 120);
+  assert.equal(body.items.length, 100);
+  assert.equal(body.page.nextCursor, "100");
+});
+
+test("date index hides past date chips when today advances", async () => {
+  const store = new WeeklyActivityDataStore({
+    baseDir: fixturePaths.baseDir,
+    sourceMapDir: fixturePaths.sourceMapDir,
+    today: "2026-05-21",
+  });
+
+  const body = await store.getDates();
+  assert.deepEqual(Array.from(body.dates, (item) => item.date), [
+    "2026-05-21",
+    "2026-05-22",
+    "2026-05-23",
+    "2026-05-24",
+  ]);
+});
+
+test("default current feed keeps the previous event date before late-night cutoff", async () => {
+  const lateNightStore = new WeeklyActivityDataStore({
+    baseDir: fixturePaths.baseDir,
+    sourceMapDir: fixturePaths.sourceMapDir,
+    now: "2026-05-09T17:30:00.000Z",
+  });
+
+  const body = await lateNightStore.getCurrent({ cityKey: "shanghai", limit: 10 });
+  assert.deepEqual(Array.from(body.items, (item) => item.id), ["item-a", "club:abc123"]);
+
+  const dateIndex = await lateNightStore.getDates();
+  assert.equal(dateIndex.dates[0].date, "2026-05-09");
+});
+
+test("default current feed drops the previous event date after late-night cutoff", async () => {
+  const morningStore = new WeeklyActivityDataStore({
+    baseDir: fixturePaths.baseDir,
+    sourceMapDir: fixturePaths.sourceMapDir,
+    now: "2026-05-10T00:30:00.000Z",
+  });
+
+  const body = await morningStore.getCurrent({ cityKey: "shanghai", limit: 10, lookbackDays: 0 });
+  assert.deepEqual(Array.from(body.items, (item) => item.id), ["club:abc123"]);
+});
+
+test("current feed can include a bounded lookback window for venue source schedules", async () => {
+  const store = new WeeklyActivityDataStore({
+    baseDir: fixturePaths.baseDir,
+    sourceMapDir: fixturePaths.sourceMapDir,
+    today: "2026-05-10",
+  });
+
+  const body = await store.getCurrent({ cityKey: "shanghai", lookbackDays: 1, limit: 10 });
+  assert.deepEqual(Array.from(body.items, (item) => item.id), ["item-a", "club:abc123"]);
+});
+
+test("current feed dedupe preserves non-empty fields from lower-score duplicates", async () => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), "weekly-api-empty-merge-"));
+  await writeJson(path.join(dir, "manifest.json"), {
+    schema_version: "weekly_activity_miniprogram_api.v1",
+    generated_at: "2026-05-09T00:00:00",
+    item_count: 2,
+  });
+  await writeJson(path.join(dir, "current.json"), {
+    schema_version: "weekly_activity_miniprogram_current.v1",
+    generated_at: "2026-05-09T00:00:00",
+    items: [
+      {
+        id: "dedupe-a",
+        title: "Dedupe Night",
+        city_key: "shanghai",
+        city_keys: ["shanghai"],
+        city: ["上海"],
+        event_date_start: "2026-05-09",
+        event_date_iso_guess: "2026-05-09",
+        quality_status: "READY",
+        venue: ["Heim Shanghai"],
+        venue_name: "Heim Shanghai",
+        address: "上海市黄浦区长乐路462号M101",
+        poster_url: "https://example.test/main-poster.jpg",
+        source_action: { available: true, url_hash: "src:heim" },
+        source_article: { url_hash: "src:heim", title: "今晚|Heim Club Night", account_name: "Heim Shanghai" },
+      },
+      {
+        id: "dedupe-b",
+        title: "Dedupe Night",
+        city_key: "shanghai",
+        city_keys: ["shanghai"],
+        city: ["上海"],
+        event_date_start: "2026-05-09",
+        event_date_iso_guess: "2026-05-09",
+        quality_status: "READY",
+        venue: ["Heim Shanghai"],
+        venue_name: "Heim Shanghai",
+        address: "",
+        poster_url: "",
+        event_time_text: "22:00 - Late",
+        event_time_source: "source_text",
+        source_action: { available: true, url_hash: "" },
+        source_article: { url_hash: "", title: "" },
+      },
+    ],
+  });
+
+  const store = new WeeklyActivityDataStore({ baseDir: dir, today: "2026-05-09" });
+  const body = await store.getCurrent({ cityKey: "shanghai", limit: 10 });
+
+  assert.equal(body.page.total, 1);
+  assert.equal(body.items[0].id, "dedupe-b");
+  assert.equal(body.items[0].event_time_text, "22:00 - Late");
+  assert.equal(body.items[0].address, "上海市黄浦区长乐路462号M101");
+  assert.equal(body.items[0].poster_url, "https://example.test/main-poster.jpg");
+  assert.equal(body.items[0].source_action.url_hash, "src:heim");
+  assert.equal(body.items[0].source_article.title, "今晚|Heim Club Night");
+});
+
 test("supports cursor pagination", async () => {
   const res = await fetch(`${baseUrl}/api/v1/weekly/current?limit=1`);
   const body = await res.json();
   assert.equal(body.items.length, 1);
   assert.equal(body.page.nextCursor, "1");
+});
+
+test("caches repeated current list requests while ignoring cache-busting timestamps", async () => {
+  const firstRes = await fetch(`${baseUrl}/api/v1/weekly/current?limit=7&lookbackDays=12&_ts=first`);
+  assert.equal(firstRes.status, 200);
+  assert.equal(firstRes.headers.get("x-weekly-cache"), "MISS");
+  assert.match(firstRes.headers.get("cache-control") || "", /max-age=\d+/);
+  const first = await firstRes.json();
+
+  const secondRes = await fetch(`${baseUrl}/api/v1/weekly/current?limit=7&lookbackDays=12&_ts=second`);
+  assert.equal(secondRes.status, 200);
+  assert.equal(secondRes.headers.get("x-weekly-cache"), "HIT");
+  const second = await secondRes.json();
+
+  assert.deepEqual(
+    second.items.map((item) => item.id),
+    first.items.map((item) => item.id),
+  );
+  assert.equal(second.page.total, first.page.total);
+});
+
+test("uses normalized current-list query values for cache keys", async () => {
+  const firstRes = await fetch(`${baseUrl}/api/v1/weekly/current?limit=999&lookbackDays=999&_ts=normalized-a`);
+  assert.equal(firstRes.status, 200);
+  assert.equal(firstRes.headers.get("x-weekly-cache"), "MISS");
+  const first = await firstRes.json();
+  assert.equal(first.page.limit, 100);
+  assert.equal(first.filters.lookbackDays, 45);
+
+  const secondRes = await fetch(`${baseUrl}/api/v1/weekly/current?limit=100&lookbackDays=45&_ts=normalized-b`);
+  assert.equal(secondRes.status, 200);
+  assert.equal(secondRes.headers.get("x-weekly-cache"), "HIT");
+  const second = await secondRes.json();
+
+  assert.deepEqual(
+    second.items.map((item) => item.id),
+    first.items.map((item) => item.id),
+  );
+  assert.equal(second.page.total, first.page.total);
+});
+
+test("compresses public weekly JSON responses without changing the payload shape", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/weekly/current?limit=7&lookbackDays=13&_ts=gzip`, {
+    headers: { "Accept-Encoding": "gzip" },
+  });
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get("content-encoding"), "gzip");
+  const body = await res.json();
+  assert.equal(body.schemaVersion, "weekly_activity_api.current_response.v1");
+  assert.ok(Array.isArray(body.items));
 });
 
 test("returns detail by id", async () => {
@@ -853,6 +1127,11 @@ test("returns detail by id", async () => {
   assert.equal(body.organizer_key, "dadabarbeijing");
   assert.equal(body.club_profile.schema_version, "weekly_club_profile.v1");
   assert.equal(body.club_profile.display_name, "Dada Bar Beijing");
+  assert.equal(body.source_action.url, "https://mp.weixin.qq.com/s/item-a");
+  assert.equal(body.merge_provenance[0].source, "aggregate-child");
+  assert.equal(body.field_evidence_refs.title[0].ref, "ocr-span");
+  assert.equal(body.address_verification.provider, "fixture");
+  assert.equal(body.geo_reverse_address, "fixture reverse address");
 
   const colonRes = await fetch(`${baseUrl}/api/v1/weekly/items/${encodeURIComponent("club:abc123")}`);
   assert.equal(colonRes.status, 200);
@@ -939,4 +1218,17 @@ test("llm weekly-summary disabled by default", async () => {
   assert.equal(res.status, 403);
   const body = await res.json();
   assert.equal(body.error.code, "LLM_DISABLED");
+});
+
+test("llm weekly-summary falls back to materialized summary when live provider fails", async () => {
+  testEnv.DEEPSEEK_ENRICH_ENABLED = "true";
+  const res = await fetch(`${baseUrl}/api/v1/weekly/llm/weekly-summary`);
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.schemaVersion, "weekly_activity_api.llm_summary.v1");
+  assert.equal(body.source, "materialized-summary-fallback");
+  assert.equal(body.fallbackUsed, true);
+  assert.equal(body.summary.highlight_events[0].title, "上海 Club A");
+  assert.match(body.fallbackReason, /generateWeeklySummary/);
+  delete testEnv.DEEPSEEK_ENRICH_ENABLED;
 });
