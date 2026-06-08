@@ -9,6 +9,7 @@ from tools.stage7_rewrite.weekly_atlas_bridge.observations import (
     _sha256,
     build_observation_row,
     sanitize_openid,
+    source_url_hash_for_item,
 )
 
 
@@ -38,8 +39,10 @@ class ObservationTests(unittest.TestCase):
             "event_id": "test:123",
             "source_url": "https://mp.weixin.qq.com/s/some_untrusted_link_with_openid_12345",
             "url": "https://mp.weixin.qq.com/s/some_untrusted_link_with_openid_12345",
+            "cover_image_url": "https://mmbiz.qpic.cn/foo/0?wx_fmt=jpeg&openid=abc",
             "description_original_lines": [
                 "Tonight's party! Guest list openid=abc.",
+                "https://mmbiz.qpic.cn/foo/0?wx_fmt=jpeg",
                 "Scan to register, openid: xyz"
             ],
             "title": "OpenID special event",
@@ -51,6 +54,8 @@ class ObservationTests(unittest.TestCase):
         # 1. 验证整个序列化输出中不包含 "openid"（不区分大小写）
         serialized = json.dumps(row)
         self.assertNotIn("openid", serialized.lower())
+        self.assertNotIn("mmbiz.qpic.cn", serialized.lower())
+        self.assertNotIn("wx_fmt", serialized.lower())
         
         # 2. 验证 source_url_hash 正确生成并以 'sha256:' 开头
         self.assertTrue(row["source_url_hash"].startswith("sha256:"))
@@ -66,6 +71,31 @@ class ObservationTests(unittest.TestCase):
         
         # 5. 验证其他包含 openid 的字段（如 description_lines，title，venue）均已被安全洗涤
         self.assertIn("id_sanitized", serialized)
+
+    def test_source_url_hash_from_source_map(self) -> None:
+        item = {
+            "event_id": "test:source-map",
+            "source_action": {"url_hash": "abc123"},
+        }
+        source_map = {
+            "sources": {
+                "abc123": {"url": "https://mp.weixin.qq.com/s/source?openid=secret&x=1"}
+            }
+        }
+
+        expected_cleaned_url = sanitize_openid("https://mp.weixin.qq.com/s/source?openid=secret&x=1")
+        self.assertEqual(
+            source_url_hash_for_item(item, source_map),
+            f"sha256:{_sha256(expected_cleaned_url)}",
+        )
+
+    def test_source_url_hash_falls_back_to_existing_hash(self) -> None:
+        item = {
+            "event_id": "test:source-hash",
+            "source_article": {"url_hash": "deadbeef"},
+        }
+
+        self.assertEqual(source_url_hash_for_item(item), "urlhash:deadbeef")
 
 
 if __name__ == "__main__":
