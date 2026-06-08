@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 import unicodedata
@@ -30,12 +31,16 @@ LONGRUN_ROOT = Path(r"D:\downstream_results\stage7_rewrite\longrun")
 DEFAULT_REGISTRY_ROOT = Path(__file__).resolve().parents[1] / "registries"
 DEFAULT_PACK_DIR = LONGRUN_ROOT / "WEEKLY_ACTIVITY_RECOMMENDATION_PACK_20260507"
 DEFAULT_OUT_DIR = LONGRUN_ROOT / "WEEKLY_ACTIVITY_MINIPROGRAM_API_20260507"
+DEFAULT_SOURCE_QUEUE = Path(
+    os.environ.get("WEEKLY_SOURCE_QUEUE", r"D:\downstream_results\stage7_rewrite\longrun\LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE\latest_queue.jsonl")
+)
 DEFAULT_VENUE_REGISTRY = DEFAULT_REGISTRY_ROOT / "weekly_venues_seed.json"
 DEFAULT_ACCOUNT_REGISTRY = DEFAULT_REGISTRY_ROOT / "weekly_accounts_seed.json"
-DEFAULT_MAX_ITEMS = 100
+DEFAULT_MAX_ITEMS = 10000
 DEFAULT_EVIDENCE_LIMIT = 5
 DEFAULT_WINDOW_DAYS = 15
 SOURCE_EVIDENCE_DATE_READ_LIMIT = 30000
+SOURCE_QUEUE_TEXT_LIMIT = 30000
 CITY_DEFS = [
     ("beijing", "北京", ["北京", "beijing", "bj"]),
     ("shanghai", "上海", ["上海", "shanghai", "长宁区"]),
@@ -116,6 +121,16 @@ DATE_SOURCE_TEXT_RE = re.compile(
 )
 TOUR_ANNOUNCEMENT_RE = re.compile(r"巡演|tour", re.I)
 TICKET_ANNOUNCEMENT_RE = re.compile(r"开票|嘉宾|行程|站次|场次|全阵容|售票", re.I)
+CALENDAR_PREVIEW_RE = re.compile(
+    r"\bweekly\s+(?:preview|calendar|schedule|program|guide)\b|"
+    r"\bweekly\b[^\n\r]{0,80}\d{1,2}\s*[./-]\s*\d{1,2}\s*(?:-|–|—|~|to)\s*(?:\d{1,2}\s*[./-]\s*)?\d{1,2}|"
+    r"(?:本周|这周|本星期|这个星期)\s*(?:活动|派对|演出|预告|预览|安排|日程|指南|一览|汇总|合集)|"
+    r"(?:\d{1,2}|[一二三四五六七八九十]+)\s*月\s*(?:活动|派对|演出)?\s*"
+    r"(?:预告|一览|预览|安排|日程|指南|汇总|合集|calendar|schedule|program)|"
+    r"(?:活动|派对|演出)(?:预告|预览|一览|安排|日程|指南|汇总|合集)\s*[:：｜|\- ]*"
+    r"(?:\d{1,2}|[一二三四五六七八九十]+)\s*月",
+    re.I,
+)
 LINEUP_DESCRIPTOR_RE = re.compile(
     r"厂牌|主创|创始|主理|经纪|活动策划|舞蹈教练|dancer|创作爆发期|驾驭|号令舞池|"
     r"主办|承办|联合呈现|powered\s+by|presented\s+by|扫码|进群|失物招领|活动开始|"
@@ -287,6 +302,13 @@ def first_string(*values: Any) -> str:
     return ""
 
 
+def optional_published_string(*values: Any) -> str:
+    text = first_string(*values)
+    if text.casefold() in {"unknown"} or text in {"待确认"}:
+        return ""
+    return text
+
+
 def display_address(value: str) -> str:
     text = first_string(value)
     if not text:
@@ -367,6 +389,263 @@ def visible_strings(value: Any, limit: int | None = None) -> list[str]:
     return out
 
 
+TIME_CONDITIONAL_FREE_RE = re.compile(
+    r"(?:[0-2]?\d\s*(?:am|pm)|[0-2]?\d[:：][0-5]\d|凌晨\s*[0-9]{1,2}\s*点(?:半)?)"
+    r"\s*(?:后|之后|以后|前|之前|以前)\s*(?:免费入场|免票入场|免票|free\s*entry)",
+    re.I,
+)
+SUSPICIOUS_SINGLE_DIGIT_PRICE_RE = re.compile(
+    r"^(?:(?:¥|￥|RMB\s*|CNY\s*)\s*[0-9](?:\.0+)?|[0-9](?:\.0+)?\s*(?:元|¥|￥|rmb|RMB|CNY|cny))$",
+    re.I,
+)
+FREE_ENTRY_RE = re.compile(r"(?:免费入场|免票入场|免票|free\s*entry)", re.I)
+TICKETING_LABEL_RE = re.compile(
+    r"预售|早鸟|双人|单人|现场|门票|票价|学生|全价|入场|"
+    r"presale|pre-sale|advance|door|onsite|on\s*site|at\s*door|tickets?|enter",
+    re.I,
+)
+TICKETING_TIER_RE = re.compile(
+    r"(?:预售|早鸟|双人|单人|现场|门票|票价|学生|全价|入场|"
+    r"presale|pre-sale|advance|door|onsite|on\s*site|at\s*door|tickets?|enter)"
+    r"[ \t\u00a0\u3000]*[:：/]?[ \t\u00a0\u3000]*(?:¥|￥|RMB[ \t\u00a0\u3000]*|CNY[ \t\u00a0\u3000]*)?"
+    r"[ \t\u00a0\u3000]*\d+(?:\.\d+)?[ \t\u00a0\u3000]*(?:元|¥|￥|rmb|RMB|CNY|cny)?",
+    re.I,
+)
+VISIBLE_AMOUNT_RE = re.compile(r"(?:¥|￥|RMB\s*|CNY\s*)?\s*\d+(?:\.\d+)?\s*(?:元|¥|￥|rmb|RMB|CNY|cny)?", re.I)
+QR_ONLY_TICKETING_RE = re.compile(r"芋圆|yuyuan|小程序码|二维码|扫码|购票链接|点击购票|click\s+for\s+tickets?", re.I)
+DRINK_SPECIAL_RE = re.compile(r"金汤力|啤酒|酒水|特调|鸡尾酒|杯|shot|drink|drinks|bottle|套餐|放送", re.I)
+TICKETING_CURRENCY_RE = re.compile(r"¥|￥|元|\brmb\b|\bcny\b", re.I)
+
+
+def source_text_values(value: Any, *, limit: int = 40) -> list[str]:
+    values: list[str] = []
+    if isinstance(value, str):
+        cleaned = re.sub(r"\s+", " ", value).strip()
+        if cleaned:
+            values.append(cleaned)
+    elif isinstance(value, list):
+        for item in value:
+            values.extend(source_text_values(item, limit=limit))
+            if len(values) >= limit:
+                break
+    elif isinstance(value, dict):
+        for key in (
+            "quote",
+            "text",
+            "raw",
+            "value",
+            "ticketing_text",
+            "price_text",
+            "description",
+            "ocr_text",
+            "content",
+            "digest",
+            "summary_digest",
+            "body_text",
+            "body_text_excerpt",
+            "raw_digest",
+            "_source_queue_text",
+        ):
+            if key in value:
+                values.extend(source_text_values(value.get(key), limit=limit))
+            if len(values) >= limit:
+                break
+    return values[:limit]
+
+
+def row_ticketing_source_text(row: dict[str, Any]) -> str:
+    parts: list[str] = []
+    for key in (
+        "ticketing_text",
+        "ticketing",
+        "price_text",
+        "price",
+        "evidence",
+        "description_original_lines",
+        "source_evidence",
+        "source_evidence_text",
+        "digest",
+        "summary_digest",
+        "body_text",
+        "body_text_excerpt",
+        "raw_digest",
+        "_source_queue_text",
+    ):
+        parts.extend(source_text_values(row.get(key)))
+    return "\n".join(parts)
+
+
+def extract_time_conditional_free_rules(text: str) -> list[str]:
+    values: list[str] = []
+    seen: set[str] = set()
+    normalized_text = unicodedata.normalize("NFKC", text or "")
+    for match in TIME_CONDITIONAL_FREE_RE.finditer(normalized_text):
+        value = re.sub(r"\s+", " ", match.group(0)).strip()
+        key = value.lower()
+        if key and key not in seen:
+            seen.add(key)
+            values.append(value)
+    return values
+
+
+def normalize_ticketing_value(value: str) -> str:
+    cleaned = re.sub(r"\s+", " ", unicodedata.normalize("NFKC", value or "")).strip()
+    cleaned = re.sub(r"\s+(元|¥|rmb|RMB|cny|CNY)$", lambda m: m.group(1).replace("元", "¥").upper(), cleaned)
+    cleaned = cleaned.replace("￥", "¥")
+    cleaned = re.sub(r"\s*¥\b", "¥", cleaned)
+    return cleaned
+
+
+def nearby_source_line(text: str, start: int, end: int) -> str:
+    left_candidates = [text.rfind(token, 0, start) for token in ("\n", "。", "；", ";")]
+    left = max(left_candidates)
+    right_candidates = [text.find(token, end) for token in ("\n", "。", "；", ";")]
+    right_values = [value for value in right_candidates if value >= 0]
+    right = min(right_values) if right_values else len(text)
+    return text[left + 1 : right]
+
+
+def looks_like_drink_price(value: str, source_text: str) -> bool:
+    cleaned = normalize_ticketing_value(value)
+    amount_match = re.search(r"\d+(?:\.\d+)?", cleaned)
+    if not amount_match:
+        return False
+    normalized_source = unicodedata.normalize("NFKC", source_text or "")
+    amount = amount_match.group(0)
+    for match in re.finditer(re.escape(amount), normalized_source):
+        local = normalized_source[max(0, match.start() - 16) : min(len(normalized_source), match.end() + 24)]
+        if DRINK_SPECIAL_RE.search(local) and not TICKETING_LABEL_RE.search(local):
+            return True
+    return False
+
+
+def looks_like_year_as_ticket_price(value: str) -> bool:
+    cleaned = normalize_ticketing_value(value)
+    if TICKETING_CURRENCY_RE.search(cleaned):
+        return False
+    amount_match = re.search(r"\d+(?:\.\d+)?", cleaned)
+    if not amount_match:
+        return False
+    try:
+        amount = float(amount_match.group(0))
+    except ValueError:
+        return False
+    return amount.is_integer() and 1900 <= amount <= 2099
+
+
+def qr_only_ticketing_text(value: str) -> bool:
+    cleaned = normalize_ticketing_value(value)
+    return bool(QR_ONLY_TICKETING_RE.search(cleaned)) and not VISIBLE_AMOUNT_RE.search(cleaned) and not FREE_ENTRY_RE.search(cleaned)
+
+
+def source_ticketing_items(text: str) -> list[str]:
+    normalized_text = unicodedata.normalize("NFKC", text or "")
+    values: list[str] = []
+    seen: set[str] = set()
+
+    def add(value: str) -> None:
+        cleaned = normalize_ticketing_value(value)
+        key = cleaned.lower()
+        if key and key not in seen:
+            seen.add(key)
+            values.append(cleaned)
+
+    for match in TICKETING_TIER_RE.finditer(normalized_text):
+        value = match.group(0)
+        amount_match = re.search(r"\d+(?:\.\d+)?", value)
+        if amount_match and float(amount_match.group(0)) < 10:
+            continue
+        if looks_like_year_as_ticket_price(value):
+            continue
+        line = nearby_source_line(normalized_text, match.start(), match.end())
+        if looks_like_drink_price(value, line):
+            continue
+        add(value)
+
+    timed_free_rules = extract_time_conditional_free_rules(normalized_text)
+    for rule in timed_free_rules:
+        add(rule)
+
+    if not timed_free_rules:
+        without_timed_free = TIME_CONDITIONAL_FREE_RE.sub(" ", normalized_text)
+        for match in FREE_ENTRY_RE.finditer(without_timed_free):
+            add(match.group(0))
+            break
+    return values[:8]
+
+
+def clean_price_items(row: dict[str, Any]) -> list[str]:
+    raw_items = list_strings(row.get("price"))
+    source_text = row_ticketing_source_text(row)
+    source_items = source_ticketing_items(source_text)
+    if source_items:
+        return source_items[:8]
+    time_free_rules = extract_time_conditional_free_rules(source_text)
+    free_context = bool(FREE_ENTRY_RE.search(source_text)) or any(FREE_ENTRY_RE.search(item) for item in raw_items)
+    values: list[str] = []
+    seen: set[str] = set()
+
+    def add(value: str) -> None:
+        cleaned = normalize_ticketing_value(value)
+        key = cleaned.lower()
+        if key and key not in seen:
+            seen.add(key)
+            values.append(cleaned)
+
+    for item in raw_items:
+        cleaned = normalize_ticketing_value(item)
+        if not cleaned:
+            continue
+        if qr_only_ticketing_text(cleaned):
+            continue
+        if looks_like_year_as_ticket_price(cleaned):
+            continue
+        if looks_like_drink_price(cleaned, source_text):
+            continue
+        if SUSPICIOUS_SINGLE_DIGIT_PRICE_RE.match(cleaned) and free_context:
+            continue
+        if time_free_rules and FREE_ENTRY_RE.search(cleaned) and not re.search(r"\d", cleaned):
+            continue
+        add(cleaned)
+    for rule in time_free_rules:
+        add(rule)
+    return values[:8]
+
+
+def clean_ticketing_text(row: dict[str, Any], price_text: str) -> str:
+    raw = first_string(row.get("ticketing_text"), row.get("ticketing"))
+    if not raw:
+        return price_text
+    cleaned = normalize_ticketing_value(raw)
+    if not cleaned:
+        return price_text
+
+    source_text = row_ticketing_source_text(row)
+    if price_text and source_ticketing_items(source_text) and len(price_text) > len(cleaned):
+        return price_text
+    if qr_only_ticketing_text(cleaned):
+        return price_text
+    if price_text and DRINK_SPECIAL_RE.search(cleaned):
+        return price_text
+    free_context = bool(FREE_ENTRY_RE.search(source_text))
+    if not free_context:
+        return cleaned
+
+    parts = [
+        re.sub(r"\s+", " ", part).strip()
+        for part in re.split(r"\s*(?:/|／|,|，|;|；|\||\n)\s*", cleaned)
+        if part and part.strip()
+    ]
+    if not parts:
+        return price_text or cleaned
+    if any(SUSPICIOUS_SINGLE_DIGIT_PRICE_RE.match(part) for part in parts):
+        kept = [part for part in parts if not SUSPICIOUS_SINGLE_DIGIT_PRICE_RE.match(part)]
+        return price_text or " / ".join(kept)
+    if SUSPICIOUS_SINGLE_DIGIT_PRICE_RE.match(cleaned):
+        return price_text
+    return cleaned
+
+
 def load_venue_registry(path: Path | None) -> list[dict[str, Any]]:
     if not path or not path.exists():
         return []
@@ -421,13 +700,18 @@ def normalized_contains(value: str, candidate: str) -> bool:
     return left == right or left in right or right in left
 
 
+def contains_cjk(value: str) -> bool:
+    return bool(re.search(r"[\u4e00-\u9fff]", value))
+
+
 def specific_normalized_match(left: str, right: str) -> bool:
     if not left or not right:
         return False
     if left == right:
         return True
     shorter = left if len(left) <= len(right) else right
-    if shorter in GENERIC_MATCH_TOKENS or len(shorter) < 5:
+    cjk_specific = contains_cjk(shorter) and len(shorter) >= 2
+    if shorter in GENERIC_MATCH_TOKENS or (len(shorter) < 5 and not cjk_specific):
         return False
     for token in GENERIC_MATCH_TOKENS:
         if len(token) >= 3 and shorter.startswith(token) and len(shorter) <= len(token) + 2:
@@ -519,6 +803,246 @@ def inactive_reason(row: dict[str, Any], inactive_registry: dict[str, set[str]])
     return ""
 
 
+SOURCE_UNAVAILABLE_FALSE_KEYS = (
+    "source_available",
+    "article_available",
+    "original_available",
+)
+SOURCE_UNAVAILABLE_TRUE_KEYS = (
+    "source_deleted",
+    "article_deleted",
+    "original_deleted",
+    "is_deleted",
+    "deleted",
+)
+SOURCE_UNAVAILABLE_STATUS_KEYS = (
+    "source_status",
+    "article_status",
+    "content_status",
+    "source_action_status",
+    "original_status",
+    "fetch_status",
+    "archive_status",
+)
+SOURCE_UNAVAILABLE_CODE_KEYS = (
+    "status_code",
+    "http_status",
+    "http_status_code",
+    "source_status_code",
+    "article_status_code",
+    "fetch_status_code",
+)
+SOURCE_UNAVAILABLE_MESSAGE_KEYS = (
+    "err_msg",
+    "errmsg",
+    "error",
+    "message",
+    "fetch_error",
+    "article_error",
+    "source_error",
+    "reason",
+)
+SOURCE_UNAVAILABLE_STATUSES = {
+    "deleted",
+    "removed",
+    "unavailable",
+    "invalid",
+    "not_found",
+    "not found",
+    "404",
+    "410",
+    "gone",
+}
+SOURCE_UNAVAILABLE_MESSAGE_RE = re.compile(
+    r"(已被删除|内容已删除|链接已删除|原文已删除|发布者删除|内容不存在|链接不存在|页面不存在|已失效|"
+    r"not\s+found|deleted|removed|gone|unavailable|404|410)",
+    re.I,
+)
+SOURCE_REGISTRY_VALUE_KEYS = {
+    "source_url",
+    "url",
+    "original_url",
+    "link",
+    "source_hash",
+    "url_hash",
+    "hash",
+    "id",
+}
+SOURCE_HASH_VALUE_RE = re.compile(r"^[a-f0-9]{16,64}$", re.I)
+
+
+def boolish_true(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    text = str(value).strip().lower()
+    return text in {"1", "true", "yes", "y", "deleted", "removed"}
+
+
+def boolish_false(value: Any) -> bool:
+    if isinstance(value, bool):
+        return not value
+    text = str(value).strip().lower()
+    return text in {"0", "false", "no", "n"}
+
+
+def normalize_source_key(value: Any) -> str:
+    text = str(value or "").strip()
+    if not text:
+        return ""
+    return re.sub(r"\s+", "", text).lower()
+
+
+def source_keys_for_row(row: dict[str, Any]) -> set[str]:
+    keys: set[str] = set()
+    source_url = first_string(row.get("source_url"), row.get("url"), row.get("link"), row.get("original_url"))
+    url_hash = first_string(row.get("url_hash"), row.get("source_hash"), row.get("source_url_hash"))
+    if source_url:
+        keys.add(normalize_source_key(source_url))
+        keys.add(sha256_short(source_url))
+    if url_hash:
+        keys.add(normalize_source_key(url_hash))
+    return {key for key in keys if key}
+
+
+def source_queue_lookup_keys(row: dict[str, Any]) -> list[str]:
+    keys: list[str] = []
+    seen: set[str] = set()
+
+    def add(value: Any) -> None:
+        key = normalize_source_key(value)
+        if key and key not in seen:
+            seen.add(key)
+            keys.append(key)
+
+    source_url = first_string(row.get("source_url"), row.get("url"), row.get("link"), row.get("original_url"))
+    if source_url:
+        add(source_url)
+        add(sha256_short(source_url))
+    url_hash = first_string(row.get("url_hash"), row.get("source_hash"), row.get("source_url_hash"))
+    if url_hash:
+        add(url_hash)
+    for key in sorted(source_keys_for_row(row)):
+        add(key)
+    for field in ("queue_id", "token", "article_id", "id"):
+        add(first_string(row.get(field)))
+    title_key = normalize_subject(first_string(row.get("title")))
+    if title_key:
+        add(f"title:{title_key}")
+    return keys
+
+
+def source_queue_text(row: dict[str, Any]) -> str:
+    parts: list[str] = []
+    for key in (
+        "digest",
+        "summary_digest",
+        "body_text",
+        "body_text_excerpt",
+        "raw_digest",
+        "source_evidence_text",
+        "evidence",
+    ):
+        parts.extend(source_text_values(row.get(key), limit=80))
+    text = "\n".join(parts)
+    return text[:SOURCE_QUEUE_TEXT_LIMIT]
+
+
+def load_source_queue_lookup(path: Path | None) -> dict[str, dict[str, Any]]:
+    if not path or not path.exists():
+        return {}
+    lookup: dict[str, dict[str, Any]] = {}
+    for row in read_jsonl(path):
+        text = source_queue_text(row)
+        if not text:
+            continue
+        for key in source_queue_lookup_keys(row):
+            lookup.setdefault(key, row)
+    return lookup
+
+
+def merge_source_queue_fields(row: dict[str, Any], source_queue_lookup: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    if not source_queue_lookup:
+        return row
+    source_row: dict[str, Any] | None = None
+    for key in source_queue_lookup_keys(row):
+        if key in source_queue_lookup:
+            source_row = source_queue_lookup[key]
+            break
+    if not source_row:
+        return row
+    merged = dict(row)
+    text = source_queue_text(source_row)
+    if text:
+        merged["_source_queue_text"] = text
+    for key in ("poi_name", "poi_address", "poi_geo_lng", "poi_geo_lat", "article_dir"):
+        if not first_string(merged.get(key)) and first_string(source_row.get(key)):
+            merged[key] = source_row.get(key)
+    return merged
+
+
+def collect_deleted_source_registry_values(value: Any, out: set[str]) -> None:
+    if isinstance(value, dict):
+        for key, child in value.items():
+            key_text = normalize_source_key(key)
+            if key_text and ("mp.weixin.qq.com/" in key_text or SOURCE_HASH_VALUE_RE.match(key_text)):
+                out.add(key_text)
+            if str(key).strip().lower() in SOURCE_REGISTRY_VALUE_KEYS:
+                collect_deleted_source_registry_values(child, out)
+            elif isinstance(child, (dict, list)):
+                collect_deleted_source_registry_values(child, out)
+    elif isinstance(value, list):
+        for child in value:
+            collect_deleted_source_registry_values(child, out)
+    else:
+        text = normalize_source_key(value)
+        if text and ("mp.weixin.qq.com/" in text or SOURCE_HASH_VALUE_RE.match(text)):
+            out.add(text)
+
+
+def load_deleted_source_registry(path: Path | None) -> set[str]:
+    if not path or not path.exists():
+        return set()
+    values: set[str] = set()
+    if path.suffix.lower() == ".jsonl":
+        for row in read_jsonl(path):
+            collect_deleted_source_registry_values(row, values)
+    else:
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            payload = {}
+        collect_deleted_source_registry_values(payload, values)
+    expanded = set(values)
+    for value in values:
+        if value.startswith("http"):
+            expanded.add(sha256_short(value))
+    return {value for value in expanded if value}
+
+
+def source_unavailable_reason(row: dict[str, Any], deleted_source_registry: set[str]) -> str:
+    if source_keys_for_row(row) & deleted_source_registry:
+        return "source_unavailable"
+    for key in SOURCE_UNAVAILABLE_FALSE_KEYS:
+        if key in row and boolish_false(row.get(key)):
+            return "source_unavailable"
+    for key in SOURCE_UNAVAILABLE_TRUE_KEYS:
+        if boolish_true(row.get(key)):
+            return "source_unavailable"
+    for key in SOURCE_UNAVAILABLE_STATUS_KEYS:
+        status = str(row.get(key) or "").strip().lower()
+        if status in SOURCE_UNAVAILABLE_STATUSES:
+            return "source_unavailable"
+    for key in SOURCE_UNAVAILABLE_CODE_KEYS:
+        code = str(row.get(key) or "").strip().lower()
+        if code in {"404", "410"}:
+            return "source_unavailable"
+    for key in SOURCE_UNAVAILABLE_MESSAGE_KEYS:
+        message = str(row.get(key) or "")
+        if message and SOURCE_UNAVAILABLE_MESSAGE_RE.search(message):
+            return "source_unavailable"
+    return ""
+
+
 def parse_year(post_date: str) -> int:
     match = re.match(r"^(20\d{2})-\d{1,2}-\d{1,2}$", post_date or "")
     if match:
@@ -528,27 +1052,83 @@ def parse_year(post_date: str) -> int:
 
 def strip_leading_date_words(value: str) -> str:
     text = value.strip()
-    text = re.sub(r"^\s*[「【\[]?\s*(今晚|今夜|本周|周末)\s*[」】\]]?\s*", "", text, flags=re.I)
+    text = re.sub(
+        r"^\s*[「【\[]?\s*(今晚|今夜|本周|周末)(?=\s|[」】\]｜|·:：,，\-–—]|$)\s*[」】\]]?\s*",
+        "",
+        text,
+        flags=re.I,
+    )
     text = re.sub(r"^\s*(\d{1,2})[./-](\d{1,2})(\s*\([^)]+\))?\s*(周[一二三四五六日天]|星期[一二三四五六日天]|今晚|今夜)?\s*", "", text, flags=re.I)
     text = re.sub(r"^\s*(20\d{2})[./-](\d{1,2})[./-](\d{1,2})\s*", "", text)
     text = re.sub(r"^\s*[｜|·:：,，\-–—]+\s*", "", text)
     return text.strip()
 
 
+GENERIC_TITLE_PREFIX_RE = re.compile(
+    r"^\s*(预告|活动预告|本周预告|活动安排|活动日程)(?=\s|[｜|·:：,，\-–—]|$)\s*",
+    re.I,
+)
+TITLE_DATE_PREFIX_RE = re.compile(
+    r"^\s*(?:"
+    r"(?:\d{1,2})[./-](?:\d{1,2})(?:\s*[-–—~～至到]\s*(?:(?:\d{1,2})[./-])?(?:\d{1,2}))?"
+    r"|(?:\d{1,2})\s*月\s*(?:\d{1,2})(?:\s*[-–—~～至到]\s*(?:\d{1,2}))?\s*日?"
+    r"|(?:20\d{2})[./-](?:\d{1,2})[./-](?:\d{1,2})"
+    r")"
+    r"(?:\s*(?:周[一二三四五六日天]|星期[一二三四五六日天]|Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?))?\.?"
+    r"\s*",
+    re.I,
+)
+TITLE_TIME_PREFIX_RE = re.compile(
+    r"^\s*(?:[01]?\d|2[0-3])[:：][0-5]\d"
+    r"(?:\s*[-–—~～至到]\s*(?:late|[01]?\d[:：][0-5]\d|2[0-3][:：][0-5]\d))?"
+    r"\s*",
+    re.I,
+)
+
+
+def strip_title_segment_noise(value: str) -> str:
+    text = strip_leading_date_words(value)
+    text = GENERIC_TITLE_PREFIX_RE.sub("", text).strip()
+    text = TITLE_DATE_PREFIX_RE.sub("", text).strip()
+    text = TITLE_TIME_PREFIX_RE.sub("", text).strip()
+    text = re.sub(r"^\s*[｜|·:：,，\-–—]+\s*", "", text)
+    return text.strip()
+
+
+def weak_title_segment(value: str) -> bool:
+    normalized = normalize_subject(value)
+    if not normalized:
+        return True
+    return normalized in {"预告", "活动预告", "本周预告", "活动", "活动安排", "活动日程"}
+
+
 def display_title(row: dict[str, Any]) -> str:
     raw = first_string(row.get("title"))
-    title = strip_leading_date_words(raw)
-    title = re.sub(r"\s+\d{1,2}[./-]\d{1,2}.*$", "", title, flags=re.I).strip()
-    parts = [part.strip() for part in re.split(r"[｜|]", title) if part.strip()]
     candidates = [
         first_string(row.get("account_key"), row.get("account")),
         first_string(row.get("promoter")),
         *list_strings(row.get("venue")),
         *list_strings(row.get("city")),
     ]
-    if len(parts) >= 2 and any(normalized_contains(parts[0], candidate) for candidate in candidates if candidate):
-        title = " / ".join(parts[1:]).strip()
+    parts = [part.strip() for part in re.split(r"[｜|]", raw) if part.strip()]
+    if len(parts) >= 2:
+        usable_parts: list[str] = []
+        for index, part in enumerate(parts):
+            cleaned = strip_title_segment_noise(part)
+            if weak_title_segment(cleaned):
+                continue
+            if index == 0 and any(normalized_contains(cleaned or part, candidate) for candidate in candidates if candidate):
+                continue
+            usable_parts.append(cleaned)
+        if usable_parts:
+            return " | ".join(usable_parts).strip()
+
+    title = strip_title_segment_noise(raw)
     return title or raw or "活动"
+
+
+def visible_account_key(row: dict[str, Any]) -> str:
+    return first_string(row.get("account_key"), row.get("account"), row.get("promoter"))
 
 
 def normalize_style_signal(value: str) -> str:
@@ -732,21 +1312,22 @@ def venue_registry_match(
 
     def search(signals: list[str]) -> dict[str, Any] | None:
         normalized_signals = [normalize_subject(value) for value in signals if normalize_subject(value)]
-        for entry in venue_registry:
-            entry_city = first_string(entry.get("city_key"))
-            entry_keys = entry.get("normalized_keys", [])
-            account_can_override = bool(
-                entry.get("allow_city_override")
-                and any(
-                    specific_normalized_match(key, signal)
-                    for key in entry_keys
-                    for signal in override_signals
+        for signal in normalized_signals:
+            for entry in venue_registry:
+                entry_city = first_string(entry.get("city_key"))
+                entry_keys = entry.get("normalized_keys", [])
+                account_can_override = bool(
+                    entry.get("allow_city_override")
+                    and any(
+                        specific_normalized_match(key, override_signal)
+                        for key in entry_keys
+                        for override_signal in override_signals
+                    )
                 )
-            )
-            if city_key_set and entry_city and entry_city not in city_key_set and not account_can_override:
-                continue
-            if any(any(specific_normalized_match(key, signal) for signal in normalized_signals) for key in entry_keys):
-                return entry
+                if city_key_set and entry_city and entry_city not in city_key_set and not account_can_override:
+                    continue
+                if any(specific_normalized_match(key, signal) for key in entry_keys):
+                    return entry
         return None
 
     # Prefer explicit source POI/venue/account signals. Evidence often contains
@@ -836,10 +1417,81 @@ def review_child_can_enter_publish_gate(row: dict[str, Any]) -> bool:
     return True
 
 
+def calendar_preview_text(row: dict[str, Any]) -> str:
+    return " | ".join(
+        [
+            first_string(row.get("title")),
+            first_string(row.get("title_display")),
+            first_string(row.get("account_key"), row.get("account")),
+            first_string(row.get("account_nickname"), row.get("source_account_name")),
+            first_string(row.get("promoter")),
+            *list_strings(row.get("event_date_text")),
+            *list_strings(row.get("date_text")),
+            *list_strings(row.get("venue")),
+        ]
+    )
+
+
+def row_is_calendar_preview(row: dict[str, Any]) -> bool:
+    text = calendar_preview_text(row)
+    return bool(text and CALENDAR_PREVIEW_RE.search(text))
+
+
+def calendar_preview_can_enter_publish_gate(row: dict[str, Any]) -> bool:
+    if not row_is_calendar_preview(row):
+        return False
+    if not first_string(row.get("title")):
+        return False
+    if not first_string(row.get("source_url")):
+        return False
+    if not (list_strings(row.get("event_date_text")) or list_strings(row.get("date_text")) or infer_date_values(row)):
+        return False
+    evidence_values = list_strings(row.get("evidence")) or list_strings(row.get("description_original_lines"))
+    if not evidence_values:
+        return False
+    venue_values = list_strings(row.get("venue"))
+    venue_text = " | ".join(venue_values)
+    if venue_text and re.search(r"\b(?:tba|tbd)\b|待定|暂定|未知", venue_text, re.I):
+        return False
+    flags = {normalize_subject(value) for value in list_strings(row.get("review_flags"))}
+    hard_flags = {
+        "venue_tba",
+        "venuetba",
+        "venue_uncertain",
+        "uncertainvenue",
+        "source_unavailable",
+        "source_deleted",
+        "deleted_source",
+        "missing_source_url",
+    }
+    if flags & hard_flags:
+        return False
+    if not (
+        venue_values
+        or list_strings(row.get("city"))
+        or first_string(row.get("account_key"), row.get("account"), row.get("account_nickname"), row.get("promoter"))
+    ):
+        return False
+    return True
+
+
+def row_is_aggregate_child(row: dict[str, Any], item_id: str = "") -> bool:
+    candidate_id = first_string(item_id, row.get("queue_id"), row.get("article_id"))
+    return bool(
+        row.get("aggregation_child")
+        or row.get("aggregation_child_review")
+        or first_string(candidate_id).startswith("agg-child-")
+    )
+
+
 def row_is_publish_blocked(row: dict[str, Any]) -> bool:
-    if row.get("aggregation_parent"):
+    if row_is_calendar_preview(row):
         return True
+    if row.get("aggregation_parent"):
+        return not calendar_preview_can_enter_publish_gate(row)
     if row.get("publish_blocked") or row.get("aggregation_child_review"):
+        if calendar_preview_can_enter_publish_gate(row):
+            return False
         return not review_child_can_enter_publish_gate(row)
     return False
 
@@ -891,6 +1543,8 @@ def dj_bio_lines(row: dict[str, Any], lineup: list[str]) -> list[str]:
             continue
         if re.search(r"来源公众号|公众号[:：]|已关注|二维码|购票|点击|扫码|小程序", line):
             continue
+        if re.match(r"^\s*(?:line\s*up|lineup|阵容)\s*[:：-]", line, flags=re.I):
+            continue
         if not any(artist_key in normalized for artist_key in artist_keys):
             continue
         if not re.search(r"dj|producer|artist|厂牌|发行|主理|来自|现居|音乐|舞曲|电子|场景|club|house|techno|bass|trax|break", line, re.I):
@@ -899,6 +1553,112 @@ def dj_bio_lines(row: dict[str, Any], lineup: list[str]) -> list[str]:
         if len(lines) >= 4:
             break
     return lines
+
+
+def artist_profiles_from_row(row: dict[str, Any]) -> list[dict[str, Any]]:
+    enrichment = row.get("entity_enrichment")
+    if not isinstance(enrichment, dict):
+        return []
+    raw_artists = enrichment.get("artists")
+    if not isinstance(raw_artists, list):
+        return []
+    profiles: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for raw in raw_artists:
+        if not isinstance(raw, dict):
+            continue
+        matched_name = first_string(raw.get("matched_name"), raw.get("name"))
+        canonical_name = first_string(raw.get("name"), matched_name)
+        if not canonical_name:
+            continue
+        artist_id = first_string(raw.get("entity_id"))
+        if not artist_id:
+            artist_id = f"weekly_artist:{sha256_short(canonical_name)[:12]}"
+        key = artist_id.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        sources = list_strings(raw.get("sources"))
+        links = [
+            first_string(raw.get(field))
+            for field in (
+                "ig_url",
+                "soundcloud_url",
+                "spotify_url",
+                "resident_advisor_url",
+                "xiaohongshu_url",
+                "youtube_url",
+            )
+        ]
+        profiles.append(
+            {
+                "artist_id": artist_id,
+                "canonical_name": canonical_name,
+                "matched_name": matched_name or canonical_name,
+                "verified": True,
+                "source": "+".join(sources) if sources else "entity_enrichment",
+                "city": optional_published_string(raw.get("city")),
+                "genres": list_strings(raw.get("genres")),
+                "bio": first_string(raw.get("bio_manual"), raw.get("ig_bio")),
+                "links": [link for link in links if link],
+            }
+        )
+    return profiles
+
+
+def build_weekly_entity_snapshot(items: list[dict[str, Any]], generated_at: str, pack_dir: Path) -> dict[str, Any]:
+    profile_by_id: dict[str, dict[str, Any]] = {}
+    resolved_rows: list[dict[str, Any]] = []
+    for item in items:
+        profiles = item.get("artist_profiles") if isinstance(item.get("artist_profiles"), list) else []
+        by_name = {
+            normalize_subject(first_string(profile.get("matched_name"), profile.get("canonical_name"))): profile
+            for profile in profiles
+            if isinstance(profile, dict)
+        }
+        for profile in profiles:
+            if not isinstance(profile, dict):
+                continue
+            artist_id = first_string(profile.get("artist_id"))
+            if artist_id and artist_id not in profile_by_id:
+                profile_by_id[artist_id] = {
+                    "artist_id": artist_id,
+                    "canonical_name": first_string(profile.get("canonical_name")),
+                    "verified": bool(profile.get("verified")),
+                    "source": first_string(profile.get("source"), "entity_enrichment"),
+                    "city": optional_published_string(profile.get("city")),
+                    "genres": list_strings(profile.get("genres")),
+                    "bio": first_string(profile.get("bio")),
+                    "links": list_strings(profile.get("links")),
+                }
+        for raw_name in list_strings(item.get("lineup_artists")):
+            profile = by_name.get(normalize_subject(raw_name))
+            if not profile:
+                continue
+            resolved_rows.append(
+                {
+                    "event_id": first_string(item.get("event_id"), item.get("id")),
+                    "raw": raw_name,
+                    "artist_id": first_string(profile.get("artist_id")),
+                    "canonical_name": first_string(profile.get("canonical_name"), raw_name),
+                    "match_method": "alias_exact",
+                    "match_score": 1,
+                    "verified": True,
+                    "display_tier": "show",
+                    "source": first_string(profile.get("source"), "entity_enrichment"),
+                }
+            )
+    return {
+        "schema_version": "weekly_atlas_entity.v1",
+        "generated_at": generated_at,
+        "publish_package": pack_dir.name,
+        "artist_profiles": sorted(profile_by_id.values(), key=lambda profile: profile.get("artist_id", "")),
+        "lineup_resolved": resolved_rows,
+        "source": "weekly_activity_entity_enrichment",
+        "graph_write_executed": False,
+        "qdrant_write_executed": False,
+        "production_write_executed": False,
+    }
 
 
 def normalize_iso_date(year: int, month: int, day: int) -> str:
@@ -917,6 +1677,43 @@ def parse_iso_date(value: str) -> date | None:
         return None
 
 
+def dedupe_preserve(values: list[str]) -> list[str]:
+    out: list[str] = []
+    seen: set[str] = set()
+    for value in values:
+        if value and value not in seen:
+            seen.add(value)
+            out.append(value)
+    return out
+
+
+def date_snippets_from_text(text: str, *, limit: int = 16) -> list[str]:
+    out: list[str] = []
+    seen: set[str] = set()
+    for match in DATE_SOURCE_TEXT_RE.finditer(text):
+        start = max(0, match.start() - 80)
+        end = min(len(text), match.end() + 120)
+        while start > 0 and text[start - 1] not in "\n。；;○":
+            start -= 1
+        while end < len(text) and text[end : end + 1] not in "\n。；;○":
+            end += 1
+            if end - start >= 220:
+                break
+        value = re.sub(r"\s+", " ", text[start:end]).strip()
+        if not value:
+            continue
+        if len(value) > 220:
+            value = value[:220].rstrip()
+        normalized = normalize_subject(value)
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        out.append(value)
+        if len(out) >= limit:
+            break
+    return out
+
+
 def source_evidence_date_lines(row: dict[str, Any], *, limit: int = 16) -> list[str]:
     path_text = first_string(row.get("source_evidence_path"))
     if not path_text:
@@ -932,19 +1729,30 @@ def source_evidence_date_lines(row: dict[str, Any], *, limit: int = 16) -> list[
     seen: set[str] = set()
     for line in text.splitlines():
         value = line.strip()
-        if not value or len(value) > 220:
+        if not value:
             continue
         if value.startswith(("- image_", "- source:", "- url:", "- path:", "- width:", "- height:", "- confidence:")):
             continue
         if not DATE_SOURCE_TEXT_RE.search(value):
             continue
-        key = normalize_subject(value)
-        if key and key not in seen:
-            seen.add(key)
-            out.append(value)
-        if len(out) >= limit:
-            break
+        candidates = [value] if len(value) <= 220 else date_snippets_from_text(value, limit=limit - len(out))
+        for candidate in candidates:
+            key = normalize_subject(candidate)
+            if key and key not in seen:
+                seen.add(key)
+                out.append(candidate)
+            if len(out) >= limit:
+                break
     return out
+
+
+def source_queue_date_lines(row: dict[str, Any], *, limit: int = 16) -> list[str]:
+    if not row_is_calendar_preview(row):
+        return []
+    text = first_string(row.get("_source_queue_text"))
+    if not text:
+        return []
+    return date_snippets_from_text(text, limit=limit)
 
 
 def parse_window_start(value: str) -> date:
@@ -1075,6 +1883,31 @@ def infer_relative_dates_from_texts(texts: list[str], post_date: str) -> list[st
     return guesses
 
 
+DATE_TIME_CONTEXT_RE = re.compile(
+    r"\b(?:[01]?\d|2[0-3])[:：][0-5]\d\b|"
+    r"(?:凌晨|早上|上午|中午|下午|晚上|晚间|今晚|夜里)?\s*(?:[01]?\d|2[0-3])\s*点"
+)
+
+
+def leading_event_context_dates(row: dict[str, Any]) -> list[str]:
+    post_date = first_string(row.get("post_date"), row.get("publish_date"))
+    default_year = parse_year(post_date)
+    texts = [
+        *list_strings(row.get("description_original_lines"), limit=8),
+        *list_strings(row.get("evidence"), limit=8),
+    ]
+    for raw in texts:
+        text = first_string(raw)
+        if not text or len(text) > 240:
+            continue
+        dates = infer_dates_from_texts([text], default_year)
+        if len(dates) != 1:
+            continue
+        if DATE_TIME_CONTEXT_RE.search(text) or "@" in text or re.search(r"演出|活动|live|show", text, re.I):
+            return dates
+    return []
+
+
 def infer_date_values(row: dict[str, Any]) -> list[str]:
     post_date = first_string(row.get("post_date"), row.get("publish_date"))
     default_year = parse_year(post_date)
@@ -1084,11 +1917,33 @@ def infer_date_values(row: dict[str, Any]) -> list[str]:
     title_relative_dates = infer_relative_dates_from_texts([first_string(row.get("title"))], post_date)
     if title_relative_dates:
         return title_relative_dates
+    leading_context_dates = leading_event_context_dates(row)
+    if leading_context_dates:
+        explicit_dates = infer_dates_from_texts(
+            [*list_strings(row.get("event_date_text")), *list_strings(row.get("date_text"))],
+            default_year,
+        )
+        if len(explicit_dates) > len(leading_context_dates):
+            return leading_context_dates
     field_dates = infer_dates_from_texts(
         [*list_strings(row.get("event_date_text")), *list_strings(row.get("date_text"))],
         default_year,
     )
     if field_dates:
+        if row_is_calendar_preview(row):
+            supplemental_dates = infer_dates_from_texts(
+                [
+                    *list_strings(row.get("evidence"), limit=16),
+                    *list_strings(row.get("description_original_lines"), limit=8),
+                    first_string(row.get("poster_ocr_text")),
+                    *source_evidence_date_lines(row),
+                    *source_queue_date_lines(row),
+                ],
+                default_year,
+            )
+            expanded_dates = dedupe_preserve([*field_dates, *supplemental_dates])
+            if len(expanded_dates) > len(field_dates):
+                return expanded_dates
         return field_dates
     field_relative_dates = infer_relative_dates_from_texts(
         [*list_strings(row.get("event_date_text")), *list_strings(row.get("date_text"))],
@@ -1101,6 +1956,7 @@ def infer_date_values(row: dict[str, Any]) -> list[str]:
         *list_strings(row.get("description_original_lines"), limit=8),
         first_string(row.get("poster_ocr_text")),
         *source_evidence_date_lines(row),
+        *source_queue_date_lines(row),
     ]
     evidence_dates = infer_dates_from_texts(evidence_texts, default_year)
     if evidence_dates:
@@ -1111,6 +1967,11 @@ def infer_date_values(row: dict[str, Any]) -> list[str]:
 def source_date_text_values(row: dict[str, Any]) -> list[str]:
     explicit = list_strings(row.get("event_date_text")) or list_strings(row.get("date_text"))
     if explicit:
+        leading_context_dates = leading_event_context_dates(row)
+        if leading_context_dates:
+            explicit_dates = infer_dates_from_texts(explicit, parse_year(first_string(row.get("post_date"), row.get("publish_date"))))
+            if len(explicit_dates) > len(leading_context_dates):
+                return leading_context_dates
         return explicit
     out: list[str] = []
     seen: set[str] = set()
@@ -1122,6 +1983,7 @@ def source_date_text_values(row: dict[str, Any]) -> list[str]:
         *list_strings(row.get("description_original_lines"), limit=8),
         first_string(row.get("poster_ocr_text")),
         *source_evidence_date_lines(row),
+        *source_queue_date_lines(row),
     ]:
         text = value.strip()
         if not text or not DATE_SOURCE_TEXT_RE.search(text):
@@ -1383,7 +2245,10 @@ def build_item(
     title = first_string(row.get("title"))
     title_for_display = display_title(row)
     source_url = first_string(row.get("source_url"))
-    account_name = first_string((registry_account or {}).get("account_name"), row.get("account_nickname"), row.get("account_key"), row.get("account"))
+    is_aggregate_child = row_is_aggregate_child(row, item_id)
+    source_hash = "" if is_aggregate_child else sha256_short(source_url)
+    account_key = visible_account_key(row)
+    account_name = first_string((registry_account or {}).get("account_name"), row.get("account_nickname"), account_key)
     venue_names = list_strings(row.get("venue"))
     venue_name = (
         registry_venue["canonical_name"]
@@ -1392,19 +2257,28 @@ def build_item(
     )
     address_full, address_source = choose_address(first_string(row.get("address")), registry_venue)
     lineup_artists = clean_lineup_values(row, list_strings(row.get("lineup")))
+    source_grounded_bio_lines = dj_bio_lines(row, lineup_artists)
+    artist_profiles = artist_profiles_from_row(row)
     music_styles = infer_music_styles(row)
     event_time = extract_event_time(row)
     source_date_texts = source_date_text_values(row)
     time_source = "source_text" if event_time else ""
     time_start, time_end = split_event_time(event_time)
     quality_flags: list[str] = []
+    if row_is_calendar_preview(row):
+        quality_flags.append("calendar_preview")
     if not event_time:
         quality_flags.append("missing_time")
-    price_items = list_strings(row.get("price"))
+    price_items = clean_price_items(row)
     price_text = " / ".join(price_items)
+    poster_file_id = first_string(row.get("poster_file_id"))
+    has_internal_poster = bool(re.match(r"^cloud://[^/]+/weekly-posters/\d{8}/.+", poster_file_id, re.I))
     cover_url = first_string(row.get("cover_url"), row.get("cover"), row.get("article_cover_url"), row.get("poster_url"))
+    package_cover_url = poster_file_id if has_internal_poster else ("" if is_aggregate_child else cover_url)
     item = {
         "schema_version": "weekly_event_published.v1",
+        "content_type": "calendar_preview" if row_is_calendar_preview(row) else "event",
+        "is_calendar_preview": row_is_calendar_preview(row),
         "id": item_id,
         "event_id": item_id,
         "article_id": article_id,
@@ -1413,26 +2287,31 @@ def build_item(
         "title_original": title,
         "title_display": title_for_display,
         "account": account_name,
-        "promoter": first_string(row.get("account_key"), row.get("promoter"), row.get("account")),
+        "account_key": account_key,
+        "promoter": account_name,
         "source_article": {
-            "url_hash": sha256_short(source_url),
+            "url_hash": source_hash,
             "account_name": account_name,
             "published_at": first_string(row.get("post_date"), row.get("publish_date")),
         },
         "source_action": {
             "type": "wechat_article",
             "label": "公众号",
-            "available": bool(source_url),
-            "url_hash": sha256_short(source_url),
+            "available": bool(source_hash),
+            "url_hash": source_hash,
+            "disabled_reason": "aggregate_child_parent_article" if is_aggregate_child else "",
         },
+        "aggregation_child": is_aggregate_child,
         "_source_url": source_url,
         "post_date": first_string(row.get("post_date"), row.get("publish_date")),
         "source_account_name": account_name,
         "source_published_at": first_string(row.get("post_date"), row.get("publish_date")),
-        "cover_url": cover_url,
-        "cover_image_url": cover_url,
-        "poster_file_id": first_string(row.get("poster_file_id")),
-        "poster_source": "wechat_article" if cover_url else "",
+        "cover_url": package_cover_url,
+        "cover_image_url": package_cover_url,
+        "poster_file_id": poster_file_id,
+        "poster_source": "cloudbase_storage" if has_internal_poster else ("" if is_aggregate_child else ("wechat_article" if cover_url else "")),
+        "poster_suppressed": False,
+        "poster_suppressed_reason": "",
         "event_date_text": source_date_texts,
         "event_date_iso_guess": primary_date,
         "event_date_iso_guesses": date_guesses,
@@ -1454,19 +2333,19 @@ def build_item(
         "address": address_full,
         "address_full": address_full,
         "address_source": address_source,
-        "geo_lng": (registry_venue or {}).get("geo_lng"),
-        "geo_lat": (registry_venue or {}).get("geo_lat"),
+        "geo_lng": (registry_venue or {}).get("geo_lng") or row.get("poi_geo_lng"),
+        "geo_lat": (registry_venue or {}).get("geo_lat") or row.get("poi_geo_lat"),
         "lineup": lineup_artists,
         "lineup_artists": lineup_artists,
         "genres": list_strings(row.get("genres")),
         "music_styles": music_styles,
         "price": price_items,
         "price_text": price_text,
-        "ticketing_text": first_string(row.get("ticketing_text"), row.get("ticketing")) or price_text,
+        "ticketing_text": clean_ticketing_text(row, price_text),
         "evidence": visible_strings(row.get("evidence"), limit=evidence_limit),
         "description_original_lines": description_lines(row, title_for_display, address_full),
-        "dj_bio_lines": [],
-        "artist_profiles": [],
+        "dj_bio_lines": source_grounded_bio_lines,
+        "artist_profiles": artist_profiles,
         "_score_confidence": float(row.get("confidence") or 0),
         "quality_status": "READY",
         "quality_flags": quality_flags,
@@ -1511,6 +2390,8 @@ def build_static_api(
     window_start: date,
     window_days: int,
     inactive_registry_path: Path | None,
+    deleted_source_registry_path: Path | None,
+    source_queue_path: Path | None,
     venue_registry_path: Path | None,
     account_registry_path: Path | None,
 ) -> dict[str, Any]:
@@ -1518,7 +2399,12 @@ def build_static_api(
     review_candidates_path = pack_dir / "weekly_activity_recommendation_review_candidates.jsonl"
     source_summary = read_json(pack_dir / "summary.json")
     rows = [*read_jsonl(candidates_path), *read_jsonl(review_candidates_path)]
+    source_queue_lookup = load_source_queue_lookup(source_queue_path)
+    if source_queue_lookup:
+        rows = [merge_source_queue_fields(row, source_queue_lookup) for row in rows]
+    source_queue_match_count = sum(1 for row in rows if first_string(row.get("_source_queue_text")))
     inactive_registry = load_inactive_registry(inactive_registry_path)
+    deleted_source_registry = load_deleted_source_registry(deleted_source_registry_path)
     venue_registry = load_venue_registry(venue_registry_path)
     account_registry = load_account_registry(account_registry_path)
     window_end = window_start + timedelta(days=max(1, window_days) - 1)
@@ -1535,6 +2421,10 @@ def build_static_api(
         if reason:
             filtered_counts[reason] += 1
             continue
+        reason = source_unavailable_reason(row, deleted_source_registry)
+        if reason:
+            filtered_counts[reason] += 1
+            continue
         item = build_item(
             row,
             evidence_limit=evidence_limit,
@@ -1542,7 +2432,11 @@ def build_static_api(
             venue_registry=venue_registry,
             account_registry=account_registry,
         )
-        if not first_string(row.get("source_url")) or not first_string((item.get("source_action") or {}).get("url_hash")):
+        is_aggregate_child = row_is_aggregate_child(row, first_string(item.get("id")))
+        if not first_string(row.get("source_url")):
+            filtered_counts["missing_source_url"] += 1
+            continue
+        if not first_string((item.get("source_action") or {}).get("url_hash")) and not is_aggregate_child:
             filtered_counts["missing_source_url"] += 1
             continue
         if not item.get("event_date_text"):
@@ -1555,10 +2449,11 @@ def build_static_api(
         if not item.get("city_keys"):
             filtered_counts["missing_city"] += 1
             continue
+        is_calendar_preview = row_is_calendar_preview(row)
         item["event_date_iso_guess"] = in_window_dates[0]
-        item["event_date_iso_guesses"] = in_window_dates
+        item["event_date_iso_guesses"] = in_window_dates if is_calendar_preview else [in_window_dates[0]]
         item["event_date_start"] = in_window_dates[0]
-        item["event_date_end"] = in_window_dates[0]
+        item["event_date_end"] = in_window_dates[-1] if is_calendar_preview else in_window_dates[0]
         item["dedupe_key"] = published_dedupe_key(item)
         if not item.get("address_full"):
             announcement_reason = non_local_announcement_reason(row, item)
@@ -1569,7 +2464,17 @@ def build_static_api(
         if not item.get("running_hours_text"):
             filtered_counts["missing_time_warning"] += 1
         raw_items.append(item)
-    items = sort_items(dedupe_items(raw_items))[:max_items]
+    # Pre-dedupe by article_id: same article pushed multiple times = 1 event
+    seen_articles: set[str] = set()
+    article_deduped: list[dict[str, Any]] = []
+    for item in raw_items:
+        aid = first_string(item.get("article_id"))
+        if aid and aid in seen_articles:
+            continue
+        if aid:
+            seen_articles.add(aid)
+        article_deduped.append(item)
+    items = sort_items(dedupe_items(article_deduped))[:max_items]
     source_map: dict[str, dict[str, Any]] = {}
     for item in items:
         source_url = first_string(item.pop("_source_url", ""))
@@ -1622,6 +2527,8 @@ def build_static_api(
         "items": items,
     }
     write_json(out_dir / "current.json", current)
+    entity_snapshot = build_weekly_entity_snapshot(items, generated_at, pack_dir)
+    write_json(out_dir / "weekly_entity_snapshot.json", entity_snapshot)
 
     city_index_rows: list[dict[str, Any]] = []
     for city_key, city_items in sorted(cities.items(), key=lambda pair: pair[0]):
@@ -1713,6 +2620,10 @@ def build_static_api(
         "window_end": window_end.isoformat(),
         "item_count": len(items),
         "filtered_counts": dict(sorted(filtered_counts.items())),
+        "deleted_source_registry_path": str(deleted_source_registry_path) if deleted_source_registry_path else "",
+        "deleted_source_registry_count": len(deleted_source_registry),
+        "source_queue_path": str(source_queue_path) if source_queue_path else "",
+        "source_queue_match_count": source_queue_match_count,
         "venue_registry_path": str(venue_registry_path) if venue_registry_path else "",
         "venue_registry_count": len(venue_registry),
         "account_registry_path": str(account_registry_path) if account_registry_path else "",
@@ -1724,6 +2635,7 @@ def build_static_api(
             "manifest": route_url(base_url, "manifest.json"),
             "by_city_index": route_url(base_url, "by-city/index.json"),
             "by_date_index": route_url(base_url, "by-date/index.json"),
+            "weekly_entity_snapshot": route_url(base_url, "weekly_entity_snapshot.json"),
             "source_url_map": route_url(base_url, "source_actions/source_url_map.json"),
         },
         "source_summary": {
@@ -1760,6 +2672,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--window-start", default="today", help="ISO date or 'today'; default keeps tonight/current day onward")
     parser.add_argument("--window-days", type=int, default=DEFAULT_WINDOW_DAYS, help="Inclusive calendar-day count from window start")
     parser.add_argument("--inactive-registry", default="", help="Optional JSON file with closed/inactive accounts and venues")
+    parser.add_argument("--deleted-source-registry", default="", help="Optional JSON/JSONL file with deleted or unavailable source URLs/hashes")
+    parser.add_argument(
+        "--source-queue",
+        default=str(DEFAULT_SOURCE_QUEUE) if DEFAULT_SOURCE_QUEUE.exists() else "",
+        help="Optional latest downloaded article queue JSONL; used read-only to recover source-backed ticketing text",
+    )
     parser.add_argument(
         "--venue-registry",
         default=str(DEFAULT_VENUE_REGISTRY) if DEFAULT_VENUE_REGISTRY.exists() else "",
@@ -1781,6 +2699,8 @@ def main(argv: list[str] | None = None) -> int:
         window_start=parse_window_start(args.window_start),
         window_days=max(1, args.window_days),
         inactive_registry_path=Path(args.inactive_registry) if args.inactive_registry else None,
+        deleted_source_registry_path=Path(args.deleted_source_registry) if args.deleted_source_registry else None,
+        source_queue_path=Path(args.source_queue) if args.source_queue else None,
         venue_registry_path=Path(args.venue_registry) if args.venue_registry else None,
         account_registry_path=Path(args.account_registry) if args.account_registry else None,
     )

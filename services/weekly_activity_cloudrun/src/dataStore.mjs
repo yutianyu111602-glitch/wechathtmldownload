@@ -45,8 +45,8 @@ export function storageSlug(value) {
 }
 
 function normalizeLimit(value) {
-  const parsed = Number.parseInt(String(value ?? "20"), 10);
-  if (!Number.isFinite(parsed)) return 20;
+  const parsed = Number.parseInt(String(value ?? "100"), 10);
+  if (!Number.isFinite(parsed)) return 100;
   return Math.min(Math.max(parsed, 1), 100);
 }
 
@@ -77,18 +77,28 @@ function addDateRange(dates, start, end) {
   }
 }
 
+function directItemDateValues(item) {
+  return [
+    item.event_date_start,
+    item.event_date_end,
+    item.event_date_iso_guess,
+  ].map(isoDate).filter(Boolean);
+}
+
 function itemDateKeys(item) {
   const dates = new Set();
   for (const key of ["event_date_start", "event_date_end", "event_date_iso_guess"]) {
     const value = isoDate(item[key]);
     if (value) dates.add(value);
   }
-  for (const key of ["event_date_iso_guesses", "event_date_text"]) {
-    const raw = item[key];
-    const values = Array.isArray(raw) ? raw : [raw];
-    for (const value of values) {
-      const date = isoDate(value);
-      if (date) dates.add(date);
+  if (directItemDateValues(item).length === 0) {
+    for (const key of ["event_date_iso_guesses", "event_date_text"]) {
+      const raw = item[key];
+      const values = Array.isArray(raw) ? raw : [raw];
+      for (const value of values) {
+        const date = isoDate(value);
+        if (date) dates.add(date);
+      }
     }
   }
   addDateRange(dates, isoDate(item.event_date_start), isoDate(item.event_date_end));
@@ -105,9 +115,122 @@ function itemMatchesDate(item, date) {
   return Boolean(start && end && start <= target && target <= end);
 }
 
+function currentShanghaiDateParts(now = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(now);
+  const byType = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return {
+    date: `${byType.year}-${byType.month}-${byType.day}`,
+    hour: Number.parseInt(byType.hour || "0", 10),
+  };
+}
+
+function addDays(dateKey, days) {
+  const date = isoDate(dateKey);
+  if (!date) return "";
+  const [year, month, day] = date.split("-").map((part) => Number.parseInt(part, 10));
+  const value = new Date(Date.UTC(year, month - 1, day));
+  value.setUTCDate(value.getUTCDate() + days);
+  return value.toISOString().slice(0, 10);
+}
+
+function normalizeLateNightCutoffHour(value) {
+  const parsed = Number.parseInt(value ?? "6", 10);
+  if (!Number.isFinite(parsed)) return 6;
+  return Math.max(0, Math.min(12, parsed));
+}
+
+const DEFAULT_CURRENT_LOOKBACK_DAYS = 0;
+
+function normalizeLookbackDays(value, fallback = 0) {
+  const parsed = Number.parseInt(value ?? String(fallback), 10);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(0, Math.min(45, parsed));
+}
+
+function currentShanghaiBusinessDateKey(now = new Date(), cutoffHour = 6) {
+  const parts = currentShanghaiDateParts(now);
+  if (cutoffHour > 0 && Number.isFinite(parts.hour) && parts.hour < cutoffHour) {
+    return addDays(parts.date, -1);
+  }
+  return parts.date;
+}
+
+function nowFromOverride(value) {
+  if (!value) return new Date();
+  const date = value instanceof Date ? new Date(value.getTime()) : new Date(value);
+  return Number.isNaN(date.getTime()) ? new Date() : date;
+}
+
+function itemIsCurrentOrFuture(item, today) {
+  const target = isoDate(today);
+  if (!target) return true;
+  const dates = itemDateKeys(item);
+  const start = isoDate(item.event_date_start) || dates[0] || "";
+  const end = isoDate(item.event_date_end) || dates[dates.length - 1] || start;
+  if (!start && !end) return true;
+  return (end || start) >= target;
+}
+
 function hasValue(value) {
   if (Array.isArray(value)) return value.some((item) => String(item || "").trim());
   return Boolean(String(value || "").trim());
+}
+
+function isPlainObject(value) {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+}
+
+function isMeaningfulValue(value) {
+  if (value === null || value === undefined) return false;
+  if (typeof value === "string") return value.trim() !== "";
+  if (typeof value === "number") return Number.isFinite(value);
+  if (typeof value === "boolean") return true;
+  if (Array.isArray(value)) return value.some(isMeaningfulValue);
+  if (isPlainObject(value)) return Object.values(value).some(isMeaningfulValue);
+  return true;
+}
+
+function meaningfulArray(value) {
+  if (!isMeaningfulValue(value)) return [];
+  const raw = Array.isArray(value)
+    ? value
+    : (typeof value === "string" ? value.split(/[\/,，、|｜]/) : [value]);
+  return raw.map((item) => (typeof item === "string" ? item.trim() : item)).filter(isMeaningfulValue);
+}
+
+function firstMeaningful(...values) {
+  for (const value of values) {
+    if (!isMeaningfulValue(value)) continue;
+    if (Array.isArray(value)) return meaningfulArray(value);
+    return value;
+  }
+  return "";
+}
+
+function mergeNonEmpty(...sources) {
+  const output = {};
+  for (const source of sources) {
+    if (!isPlainObject(source)) continue;
+    for (const [key, value] of Object.entries(source)) {
+      if (!isMeaningfulValue(value)) continue;
+      if (isPlainObject(value) && isPlainObject(output[key])) {
+        output[key] = mergeNonEmpty(output[key], value);
+      } else if (Array.isArray(value)) {
+        const arrayValue = meaningfulArray(value);
+        if (arrayValue.length) output[key] = arrayValue;
+      } else {
+        output[key] = value;
+      }
+    }
+  }
+  return output;
 }
 
 function stripEmoji(value) {
@@ -172,9 +295,8 @@ function withClubProfile(item) {
   const organizerKey = organizerKeyForItem(item);
   const displayName = organizerLabel(item);
   const cityLabel = first(item.city, item.city_key || first(item.city_keys, ""));
-  const addressLabel = item.address_full || item.address || "";
-  return {
-    ...item,
+  const addressLabel = firstMeaningful(item.address, item.club_profile?.address, item.address_full);
+  return mergeNonEmpty(item, {
     organizer_key: organizerKey,
     club_profile: {
       schema_version: "weekly_club_profile.v1",
@@ -183,7 +305,151 @@ function withClubProfile(item) {
       city: cityLabel,
       address: addressLabel,
     },
-  };
+  });
+}
+
+function compactText(value, maxChars = 220) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  return text.length > maxChars ? `${text.slice(0, maxChars).trim()}...` : text;
+}
+
+function compactTextList(value, { limit = 6, maxChars = 220 } = {}) {
+  const values = Array.isArray(value) ? value : value ? [value] : [];
+  return values
+    .map((entry) => compactText(entry, maxChars))
+    .filter(Boolean)
+    .slice(0, limit);
+}
+
+function pickObjectFields(value, fields) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const output = {};
+  for (const field of fields) {
+    if (value[field] !== undefined && value[field] !== null && value[field] !== "") {
+      output[field] = value[field];
+    }
+  }
+  return Object.keys(output).length > 0 ? output : undefined;
+}
+
+const LIST_COMPAT_FIELDS = [
+  "id",
+  "title",
+  "title_display",
+  "display_title",
+  "title_original",
+  "city_key",
+  "city_keys",
+  "city",
+  "city_name",
+  "event_date_start",
+  "event_date_end",
+  "event_date_iso_guess",
+  "event_date_iso_guesses",
+  "event_date_text",
+  "event_time_text",
+  "event_time_source",
+  "running_hours_text",
+  "running_hours_source",
+  "time_start",
+  "time_end",
+  "post_date",
+  "source_published_at",
+  "quality_status",
+  "quality_flags",
+  "publish_status",
+  "promoter",
+  "account",
+  "account_key",
+  "source_account_name",
+  "venue",
+  "venue_name",
+  "venue_id",
+  "address",
+  "address_full",
+  "address_source",
+  "venue_lat",
+  "venue_lng",
+  "geo_lat",
+  "geo_lng",
+  "geo_coord_system",
+  "geo_coordinate_system",
+  "geo_gcj02_lat",
+  "geo_gcj02_lng",
+  "gcj02_lat",
+  "gcj02_lng",
+  "latitude",
+  "longitude",
+  "coordinate_system",
+  "coord_system",
+  "map_location",
+  "coordinates",
+  "tencent_location",
+  "cover_url",
+  "cover_image_url",
+  "coverUrl",
+  "poster_url",
+  "poster_file_id",
+  "poster_source",
+  "flyer_url",
+  "description_text",
+  "description_original_lines",
+  "lineup",
+  "lineup_artists",
+  "lineup_text",
+  "music_styles",
+  "style_tags",
+  "genres",
+  "price",
+  "price_text",
+  "ticketing",
+  "ticketing_text",
+  "ticket_price",
+  "ticketing_tiers",
+  "sourceHash",
+  "source_hash",
+  "sourceRefId",
+  "source_ref_id",
+  "sourceTitle",
+  "source_title",
+  "sourceAccountName",
+  "source_account_name",
+  "sourcePublishedAt",
+  "source_published_at",
+
+];
+
+function withListCompatItem(rawItem) {
+  const item = withClubProfile(rawItem);
+  if (!item || typeof item !== "object") return item;
+  const output = {};
+  for (const key of LIST_COMPAT_FIELDS) {
+    if (item[key] !== undefined && item[key] !== null && item[key] !== "") {
+      output[key] = item[key];
+    }
+  }
+  output.organizer_key = item.organizer_key;
+
+  const sourceAction = pickObjectFields(item.source_action, ["available", "url_hash"]);
+  if (sourceAction) output.source_action = sourceAction;
+  const sourceArticle = pickObjectFields(item.source_article, ["url_hash", "title", "account_name", "published_at"]);
+  if (sourceArticle) output.source_article = sourceArticle;
+
+  if (Array.isArray(item.evidence)) output.evidence = compactTextList(item.evidence, { limit: 3, maxChars: 160 });
+  if (Array.isArray(item.description_original_lines)) {
+    output.description_original_lines = compactTextList(item.description_original_lines, { limit: 2, maxChars: 160 });
+  }
+  if (Array.isArray(item.source_evidence)) {
+    output.source_evidence = compactTextList(item.source_evidence, { limit: 2, maxChars: 160 });
+  }
+  if (Array.isArray(item.sound_system_evidence)) {
+    output.sound_system_evidence = compactTextList(item.sound_system_evidence, { limit: 4, maxChars: 180 });
+  }
+  for (const key of ["description", "digest", "summary", "summary_digest", "source_evidence_text"]) {
+    if (typeof item[key] === "string") output[key] = compactText(item[key], 260);
+  }
+  return output;
 }
 
 function duplicateScopeKey(item) {
@@ -191,11 +457,18 @@ function duplicateScopeKey(item) {
 }
 
 function sourceHash(item) {
-  return String(item.source_action?.url_hash || item.source_article?.url_hash || "").trim();
+  return String(firstMeaningful(
+    item.sourceHash,
+    item.source_hash,
+    item.sourceRefId,
+    item.source_ref_id,
+    item.source_action?.url_hash,
+    item.source_article?.url_hash,
+  ) || "").trim();
 }
 
 function coverKey(item) {
-  return String(item.cover_image_url || item.cover_url || item.coverUrl || "")
+  return String(firstMeaningful(item.poster_file_id, item.posterFileId, item.cover_file_id, item.coverFileId, item.poster_url, item.flyer_url, item.cover_image_url, item.cover_url, item.coverUrl) || "")
     .trim()
     .toLowerCase()
     .replace(/\?.*$/, "");
@@ -423,57 +696,127 @@ function itemQualityScore(item) {
     (hasValue(item.source_action?.url_hash || item.source_article?.url_hash) ? 4 : 0) +
     (hasValue(item.lineup_artists || item.lineup) ? 3 : 0) +
     (hasValue(item.music_styles || item.style_tags || item.genres) ? 2 : 0) +
-    (hasValue(item.cover_image_url || item.cover_url || item.coverUrl) ? 1 : 0)
+    (hasValue(item.poster_file_id || item.posterFileId || item.cover_file_id || item.coverFileId || item.cover_image_url || item.cover_url || item.coverUrl) ? 1 : 0)
   );
 }
 
+function dedupeKey(item) {
+  return dedupeKeyForItem(item) || `${dateKey(item)}||${cityKey(item)}||${String(item.id || "").slice(0, 32)}`;
+}
+
+function findDuplicateKey(seenMap, item) {
+  for (const [key, existing] of seenMap) {
+    if (areLikelyDuplicateItems(existing, item)) return key;
+  }
+  return null;
+}
+
 function dedupeItems(items) {
-  const output = [];
+  const seen = new Map(); // key -> item
   for (const item of items || []) {
-    const duplicateIndex = output.findIndex((current) => areLikelyDuplicateItems(current, item));
-    if (duplicateIndex === -1) {
-      output.push(item);
+    const duplicateKey = findDuplicateKey(seen, item);
+    if (!duplicateKey) {
+      const key = dedupeKey(item);
+      seen.set(key, item);
       continue;
     }
-    if (itemQualityScore(item) > itemQualityScore(output[duplicateIndex])) {
-      output[duplicateIndex] = item;
+    if (itemQualityScore(item) > itemQualityScore(seen.get(duplicateKey))) {
+      seen.set(duplicateKey, mergeNonEmpty(seen.get(duplicateKey), item));
+    } else {
+      seen.set(duplicateKey, mergeNonEmpty(item, seen.get(duplicateKey)));
     }
   }
-  return output;
+  return Array.from(seen.values());
 }
 
 async function readJson(baseDir, relativePath) {
   const fullPath = path.resolve(baseDir, relativePath);
+  // Prevent path traversal: resolved path must stay within baseDir
+  const normalizedBase = path.resolve(baseDir);
+  if (!fullPath.startsWith(normalizedBase + path.sep) && fullPath !== normalizedBase) {
+    throw Object.assign(new Error(`Path traversal blocked: ${relativePath}`), { code: "PATH_TRAVERSAL" });
+  }
   const raw = await readFile(fullPath, "utf8");
   return JSON.parse(raw);
 }
 
 export class WeeklyActivityDataStore {
   constructor(options = {}) {
+    this.env = options.env || process.env;
     this.baseDir = options.baseDir || process.env.WEEKLY_ACTIVITY_API_DIR || DEFAULT_API_DIR;
     this.sourceMapDir =
       options.sourceMapDir ||
       process.env.WEEKLY_ACTIVITY_SOURCE_MAP_DIR ||
       path.resolve(this.baseDir, "../source_actions");
+    this.todayOverride = isoDate(options.today || this.env.WEEKLY_ACTIVITY_TODAY || "");
+    this.nowOverride = options.now || this.env.WEEKLY_ACTIVITY_NOW || "";
+    this.lateNightCutoffHour = normalizeLateNightCutoffHour(
+      options.lateNightCutoffHour ?? this.env.WEEKLY_ACTIVITY_LATE_NIGHT_CUTOFF_HOUR,
+    );
+  }
+
+  todayDateKey() {
+    return this.todayOverride || currentShanghaiBusinessDateKey(nowFromOverride(this.nowOverride), this.lateNightCutoffHour);
   }
 
   async getManifest() {
-    const raw = await readJson(this.baseDir, "manifest.json");
-    // Upstream Stage7 pipeline emits camelCase (`schemaVersion`, `generatedAt`, `items_total`)
-    // while the miniprogram API contract uses snake_case (`schema_version`, `generated_at`, `item_count`).
-    // Normalize here so consumers always see the contract shape regardless of upstream variant.
-    return {
-      schema_version: raw.schema_version || "weekly_activity_miniprogram_api.v1",
-      generated_at: raw.generated_at || raw.generatedAt || null,
-      item_count: raw.item_count ?? raw.items_total ?? 0,
-      pipeline: raw.pipeline,
-    };
+    try {
+      const raw = await readJson(this.baseDir, "manifest.json");
+      const expectedSchema = "weekly_activity_miniprogram_api.v1";
+      if (raw.schema_version && raw.schema_version !== expectedSchema) {
+        console.warn(
+          `[dataStore] manifest schema drift: got "${raw.schema_version}", expected "${expectedSchema}"`,
+        );
+      }
+      return {
+        schema_version: raw.schema_version || expectedSchema,
+        generated_at: raw.generated_at || raw.generatedAt || null,
+        item_count: raw.item_count ?? raw.items_total ?? 0,
+        pipeline: raw.pipeline,
+        field_resource_repair: raw.field_resource_repair || null,
+        geocode_enrichment: raw.geocode_enrichment || null,
+        id_consistency_repair: raw.id_consistency_repair || null,
+      };
+    } catch (err) {
+      console.error("[dataStore] getManifest failed:", err.message);
+      return {
+        schema_version: "weekly_activity_miniprogram_api.v1",
+        generated_at: null,
+        item_count: 0,
+      };
+    }
   }
 
-  async getCurrent({ cityKey, date, limit, cursor } = {}) {
-    const current = await readJson(this.baseDir, "current.json");
+  async getCurrent({ cityKey, date, limit, cursor, lookbackDays } = {}) {
+    let current;
+    try {
+      current = await readJson(this.baseDir, "current.json");
+      const expectedCurrentSchema = "weekly_activity_miniprogram_current.v1";
+      if (current.schema_version && current.schema_version !== expectedCurrentSchema) {
+        console.warn(
+          `[dataStore] current.json schema drift: got "${current.schema_version}", expected "${expectedCurrentSchema}"`,
+        );
+      }
+      if (Array.isArray(current.items) && Number.isFinite(current.item_count) && current.item_count !== current.items.length) {
+        console.warn(
+          `[dataStore] current.json count mismatch: item_count=${current.item_count} but items.length=${current.items.length}`,
+        );
+      }
+    } catch (err) {
+      console.error("[dataStore] getCurrent failed to read current.json:", err.message);
+      return {
+        schemaVersion: "weekly_activity_api.current_response.v1",
+        generatedAt: null,
+        filters: { cityKey: cityKey || null, date: date || null, lookbackDays: lookbackDays || null },
+        page: { limit: normalizeLimit(limit), cursor: "0", nextCursor: null, total: 0 },
+        items: [],
+      };
+    }
     const pageLimit = normalizeLimit(limit);
     const pageCursor = normalizeCursor(cursor);
+    const today = this.todayDateKey();
+    const lookback = normalizeLookbackDays(lookbackDays, DEFAULT_CURRENT_LOOKBACK_DAYS);
+    const currentThreshold = !date && lookback > 0 ? addDays(today, -lookback) : today;
     const filtered = current.items.filter((item) => {
       if (cityKey && item.city_key !== cityKey && !(item.city_keys || []).includes(cityKey)) {
         return false;
@@ -481,10 +824,13 @@ export class WeeklyActivityDataStore {
       if (date && !itemMatchesDate(item, date)) {
         return false;
       }
+      if (!date && !itemIsCurrentOrFuture(item, currentThreshold)) {
+        return false;
+      }
       return item.quality_status === "READY";
     });
     const deduped = dedupeItems(filtered);
-    const items = deduped.slice(pageCursor, pageCursor + pageLimit).map(withClubProfile);
+    const items = deduped.slice(pageCursor, pageCursor + pageLimit).map(withListCompatItem);
     const nextOffset = pageCursor + items.length;
 
     return {
@@ -493,6 +839,7 @@ export class WeeklyActivityDataStore {
       filters: {
         cityKey: cityKey || null,
         date: date || null,
+        lookbackDays: lookback || null,
       },
       page: {
         limit: pageLimit,
@@ -509,8 +856,11 @@ export class WeeklyActivityDataStore {
       return await readJson(this.baseDir, "by-city/index.json");
     } catch {
       const current = await readJson(this.baseDir, "current.json");
+      const today = this.todayDateKey();
       const cities = new Map();
       for (const item of current.items) {
+        if (!itemIsCurrentOrFuture(item, today)) continue;
+        if (item.quality_status !== "READY") continue;
         const key = item.city_key || "unknown";
         const label = (item.city || [])[0] || key;
         cities.set(key, {
@@ -531,13 +881,27 @@ export class WeeklyActivityDataStore {
 
   async getDates() {
     try {
-      return await readJson(this.baseDir, "by-date/index.json");
+      const today = this.todayDateKey();
+      const payload = await readJson(this.baseDir, "by-date/index.json");
+      const dates = (payload.dates || []).filter((entry) => {
+        const dateValue = isoDate(entry.date);
+        return !today || !dateValue || dateValue >= today;
+      });
+      return {
+        ...payload,
+        date_count: dates.length,
+        item_count: dates.length,
+        dates,
+      };
     } catch {
       const current = await readJson(this.baseDir, "current.json");
+      const today = this.todayDateKey();
       const dates = new Map();
       for (const item of current.items) {
         const itemDates = itemDateKeys(item);
         for (const date of itemDates.length ? itemDates : ["unknown"]) {
+          const dateValue = isoDate(date);
+          if (today && dateValue && dateValue < today) continue;
           dates.set(date, {
             date,
             item_count: (dates.get(date)?.item_count || 0) + 1,
@@ -576,14 +940,20 @@ export class WeeklyActivityDataStore {
       .filter((entry) => entry.raw && entry.safe);
     if (wanted.length === 0) return [];
 
+    const results = await Promise.allSettled(
+      wanted.map((entry) =>
+        readJson(this.baseDir, `by-id/${entry.safe}.json`).then(
+          (detail) => ({ ok: true, entry, detail }),
+        ),
+      ),
+    );
     const found = [];
     const remaining = [];
-    for (const entry of wanted) {
-      try {
-        const detail = await readJson(this.baseDir, `by-id/${entry.safe}.json`);
-        found.push(withClubProfile(detail.item || detail));
-      } catch {
-        remaining.push(entry);
+    for (const result of results) {
+      if (result.status === "fulfilled" && result.value?.ok) {
+        found.push(withClubProfile(result.value.detail.item || result.value.detail));
+      } else {
+        remaining.push(result.status === "fulfilled" ? result.value.entry : result.reason?.entry || wanted[results.indexOf(result)]);
       }
     }
 
@@ -694,7 +1064,8 @@ export class WeeklyActivityDataStore {
 
   async getPosterSource(id) {
     const item = await this.getItem(id);
-    const source = item?.cover_image_url || item?.cover_url || item?.coverUrl || "";
+    // 优先级: poster_url > flyer_url > cover_image_url > cover_url
+    const source = item?.poster_url || item?.flyer_url || item?.cover_image_url || item?.cover_url || item?.coverUrl || "";
     if (!source || !/^https?:\/\//i.test(source)) return null;
     return source;
   }

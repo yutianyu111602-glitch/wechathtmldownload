@@ -35,6 +35,7 @@ from audit_weekly_cross_source_conflicts import (  # noqa: E402
     first,
     norm,
     quality_score,
+    shared_title_anchor,
     source_hash_of,
     title_of,
     trusted_time_of,
@@ -45,6 +46,59 @@ from audit_weekly_cross_source_conflicts import (  # noqa: E402
 DEFAULT_API_DIR = Path("services/weekly_activity_cloudrun/data/current_release")
 JSON_INDENT = 2
 ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+INTERNAL_WEEKLY_POSTER_RE = re.compile(r"^cloud://[^/]+/weekly-posters/\d{8}/.+", re.I)
+POSTER_FILE_ID_FIELDS = ("poster_file_id", "posterFileId", "cloudFileId", "cover_file_id", "coverFileId")
+POSTER_URL_FIELDS = (
+    "poster",
+    "poster_url",
+    "posterUrl",
+    "flyer_url",
+    "cover_image_url",
+    "cover_url",
+    "raw_cover_url",
+    "coverUrl",
+)
+POSTER_STORAGE_FIELDS = ("poster_storage", "posterStorage")
+CITY_LABEL_BY_KEY = {
+    "beijing": "北京",
+    "changchun": "长春",
+    "changsha": "长沙",
+    "chengdu": "成都",
+    "chongqing": "重庆",
+    "dali": "大理",
+    "dalian": "大连",
+    "daqing": "大庆",
+    "fuzhou": "福州",
+    "guangzhou": "广州",
+    "guiyang": "贵阳",
+    "haikou": "海口",
+    "hangzhou": "杭州",
+    "jinan": "济南",
+    "kunming": "昆明",
+    "lanzhou": "兰州",
+    "nanjing": "南京",
+    "nanning": "南宁",
+    "shanghai": "上海",
+    "shenyang": "沈阳",
+    "shenzhen": "深圳",
+    "suzhou": "苏州",
+    "tianjin": "天津",
+    "urumqi": "乌鲁木齐",
+    "xiamen": "厦门",
+    "xian": "西安",
+    "zhengzhou": "郑州",
+}
+AGGREGATE_CALENDAR_TITLE_RE = re.compile(
+    r"本周活动|活动一览|活动预览|活动预告|活动安排|活动日程|六月活动|月活动|"
+    r"(?:\d{1,2}|\d\ufe0f?\u20e3|[一二三四五六七八九十]+)\s*月\s*$|"
+    r"\bweekly\s+(?:preview|calendar|schedule|program|guide)\b|\bcalendar\b|\bschedule\b|\bjune\s+at\b",
+    re.I,
+)
+TITLE_DATE_RANGE_RE = re.compile(
+    r"(?<!\d)\d{1,2}[./·・•]\d{1,2}\s*[-–—~]\s*(?:\d{1,2}[./·・•])?\d{1,2}(?!\d)|"
+    r"(?<!\d)\d{1,2}\s*月\s*\d{1,2}\s*(?:日|号)?\s*[-–—~]\s*\d{1,2}\s*(?:日|号)?",
+    re.I,
+)
 
 
 def read_json(path: Path) -> Any:
@@ -108,7 +162,34 @@ def city_label_of(item: dict[str, Any]) -> str:
     return first(item.get("city_name") or item.get("city_key") or "unknown")
 
 
+def city_label_for_key(item: dict[str, Any], city_key: str) -> str:
+    key = first(city_key)
+    city_keys = item.get("city_keys") if isinstance(item.get("city_keys"), list) else []
+    city_labels = item.get("city") if isinstance(item.get("city"), list) else []
+    if key and city_keys and city_labels:
+        for index, candidate_key in enumerate(city_keys):
+            if first(candidate_key) == key and index < len(city_labels):
+                label = first(city_labels[index])
+                if label:
+                    return label
+    if key and first(item.get("city_key")) == key:
+        label = first(item.get("city_name"))
+        if label:
+            return label
+    return CITY_LABEL_BY_KEY.get(key) or city_label_of(item)
+
+
 def date_keys_of(item: dict[str, Any]) -> list[str]:
+    direct_dates = []
+    for key in ("event_date_start", "event_date_end", "event_date_iso_guess"):
+        value = first(item.get(key))
+        if ISO_DATE_RE.match(value) and value not in direct_dates:
+            direct_dates.append(value)
+    if direct_dates:
+        direct_dates = sorted(direct_dates)
+        expanded = expand_iso_date_range(direct_dates[0], direct_dates[-1])
+        return expanded or direct_dates
+
     raw = item.get("event_date_iso_guesses")
     if isinstance(raw, list):
         dates = [first(value) for value in raw if first(value)]
@@ -118,6 +199,28 @@ def date_keys_of(item: dict[str, Any]) -> list[str]:
     if primary and primary not in dates:
         dates.insert(0, primary)
     return dates
+
+
+def window_start_of(item: dict[str, Any]) -> str:
+    return first(item.get("event_date_start") or item.get("event_date_iso_guess"))
+
+
+def enforce_event_start_window(
+    items: list[dict[str, Any]],
+    window_start: str,
+    window_end: str,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    if not (ISO_DATE_RE.match(first(window_start)) and ISO_DATE_RE.match(first(window_end))):
+        return items, []
+    kept: list[dict[str, Any]] = []
+    dropped: list[dict[str, Any]] = []
+    for item in items:
+        start = window_start_of(item)
+        if start and ISO_DATE_RE.match(start) and not (window_start <= start <= window_end):
+            dropped.append(item)
+            continue
+        kept.append(item)
+    return kept, dropped
 
 
 def iso_dates_of(item: dict[str, Any]) -> list[str]:
@@ -152,7 +255,13 @@ def expand_iso_date_range(start: str, end: str) -> list[str]:
 
 
 def merge_duplicate_date_fields(kept: dict[str, Any], group_items: list[dict[str, Any]]) -> None:
-    dates = sorted({date for item in group_items for date in iso_dates_of(item)})
+    kept_dates = sorted(set(iso_dates_of(kept)))
+    aggregate_child_dates = sorted(
+        {date for item in group_items if is_aggregate_child_item(item) for date in iso_dates_of(item)}
+    )
+    dates = aggregate_child_dates if aggregate_child_dates and len(aggregate_child_dates) > len(kept_dates) else kept_dates
+    if not dates:
+        dates = sorted({date for item in group_items for date in iso_dates_of(item)})
     if not dates:
         return
     expanded = expand_iso_date_range(dates[0], dates[-1])
@@ -171,6 +280,78 @@ def source_date_value(item: dict[str, Any]) -> str:
 
 def is_aggregate_child_item(item: dict[str, Any]) -> bool:
     return bool(item.get("aggregation_child") or item_id(item).startswith("agg-child-"))
+
+
+def text_values(value: Any, *, limit: int = 24) -> list[str]:
+    out: list[str] = []
+    if isinstance(value, list):
+        for child in value:
+            out.extend(text_values(child, limit=limit))
+            if len(out) >= limit:
+                break
+    elif isinstance(value, dict):
+        for key in ("text", "ocr_text", "poster_text", "body_text", "summary", "digest"):
+            child = first(value.get(key))
+            if child:
+                out.append(child)
+            if len(out) >= limit:
+                break
+    else:
+        text = first(value)
+        if text:
+            out.append(text)
+    return out[:limit]
+
+
+def aggregate_child_date_evidence_texts(item: dict[str, Any]) -> list[str]:
+    texts: list[str] = []
+    for key in (
+        "title",
+        "title_original",
+        "title_display",
+        "display_title",
+        "evidence",
+        "description_original_lines",
+        "poster_ocr_text",
+        "posterOcrText",
+        "source_evidence_text",
+    ):
+        texts.extend(text_values(item.get(key)))
+    return [text for text in texts if text]
+
+
+def aggregate_child_has_strong_date_evidence(item: dict[str, Any]) -> bool:
+    event_date = date_of(item)
+    if not ISO_DATE_RE.match(event_date):
+        return False
+    try:
+        parsed = datetime.strptime(event_date, "%Y-%m-%d").date()
+    except ValueError:
+        return False
+    year = str(parsed.year)
+    month = parsed.month
+    day = parsed.day
+    month_0 = f"{month:02d}"
+    day_0 = f"{day:02d}"
+    explicit_patterns = [
+        re.compile(rf"\b{year}[-./]{month:02d}[-./]{day:02d}\b"),
+        re.compile(rf"\b{year}[-./]{month}[-./]{day}\b"),
+        re.compile(rf"(?<!\d){month_0}[./·・•-]{day_0}(?!\d)"),
+        re.compile(rf"(?<!\d){month}[./·・•-]{day}(?!\d)"),
+        re.compile(rf"(?<!\d){month_0}{day_0}(?!\d)"),
+        re.compile(rf"(?<!\d){month}\s*月\s*0?{day}\s*(?:日|号)?"),
+    ]
+    texts = aggregate_child_date_evidence_texts(item)
+    for text in texts:
+        if any(pattern.search(text) for pattern in explicit_patterns):
+            return True
+
+    post_date = source_date_value(item)
+    post_month_matches = ISO_DATE_RE.match(post_date[:10]) and post_date[:7] == event_date[:7]
+    if post_month_matches:
+        day_pattern = re.compile(rf"(?<!\d)0?{day}(?!\d)")
+        return any(day_pattern.search(text) for text in texts)
+    return False
 
 
 def source_detail_score(item: dict[str, Any]) -> int:
@@ -212,6 +393,38 @@ def raw_title_tokens(item: dict[str, Any]) -> set[str]:
     return {re.sub(r"\s+", " ", value).strip() for value in values if value}
 
 
+def explicit_address_mismatch(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    left_address = norm(address_of(left))
+    right_address = norm(address_of(right))
+    return bool(left_address and right_address and left_address != right_address)
+
+
+def same_release_identity_scope(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    left_date = date_of(left)
+    right_date = date_of(right)
+    if not left_date or left_date != right_date:
+        return False
+    left_city = norm(city_of(left))
+    right_city = norm(city_of(right))
+    if not left_city or left_city != right_city:
+        return False
+    return not explicit_address_mismatch(left, right)
+
+
+def can_merge_release_duplicates(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    return same_release_identity_scope(left, right) and are_likely_duplicates(left, right)
+
+
+def are_loose_same_event_promotions(left: dict[str, Any], right: dict[str, Any]) -> bool:
+    if not same_release_identity_scope(left, right):
+        return False
+    if are_likely_duplicates(left, right):
+        return True
+    if duplicate_scope_key(left) != duplicate_scope_key(right):
+        return False
+    return shared_title_anchor(left, right)
+
+
 def source_ref(item: dict[str, Any]) -> dict[str, Any]:
     source_article = item.get("source_article") if isinstance(item.get("source_article"), dict) else {}
     source_action = item.get("source_action") if isinstance(item.get("source_action"), dict) else {}
@@ -244,7 +457,7 @@ def duplicate_repair(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]],
     groups: list[list[tuple[int, dict[str, Any]]]] = []
     for index, item in enumerate(items):
         for group in groups:
-            if any(are_likely_duplicates(current, item) for _, current in group):
+            if any(can_merge_release_duplicates(current, item) for _, current in group):
                 group.append((index, item))
                 break
         else:
@@ -307,6 +520,154 @@ def duplicate_repair(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]],
     return repaired, removed, duplicate_groups
 
 
+def fallback_raw_duplicate_repair(
+    items: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    scoped: dict[tuple[str, str, str], list[tuple[int, dict[str, Any]]]] = defaultdict(list)
+    for index, item in enumerate(items):
+        scoped[duplicate_scope_key(item)].append((index, item))
+
+    repaired_records: list[tuple[int, dict[str, Any]]] = []
+    removed: list[dict[str, Any]] = []
+    duplicate_groups: list[dict[str, Any]] = []
+
+    for scope, pairs in scoped.items():
+        if len(pairs) <= 1:
+            index, item = pairs[0]
+            repaired_records.append((index, deepcopy(item)))
+            continue
+
+        buckets: list[list[tuple[int, dict[str, Any]]]] = []
+        for pair in pairs:
+            _, item = pair
+            for bucket in buckets:
+                if any(are_loose_same_event_promotions(existing, item) for _, existing in bucket):
+                    bucket.append(pair)
+                    break
+            else:
+                buckets.append([pair])
+
+        for bucket in buckets:
+            if len(bucket) <= 1:
+                index, item = bucket[0]
+                repaired_records.append((index, deepcopy(item)))
+                continue
+
+            keep_index, keep_item = max(bucket, key=lambda pair: rank_item(pair[1], pair[0]))
+            kept = deepcopy(keep_item)
+            group_items = [item for _, item in bucket]
+            merge_duplicate_date_fields(kept, group_items)
+            attach_merge_provenance(kept, group_items, keep_item)
+            kept["dedupe_key"] = release_dedupe_key(kept)
+            repaired_records.append((min(index for index, _ in bucket), kept))
+
+            removed_items: list[dict[str, Any]] = []
+            for index, item in bucket:
+                if index == keep_index:
+                    continue
+                removed_item = {
+                    "id": item_id(item),
+                    "title": title_of(item),
+                    "raw_titles": sorted(raw_title_tokens(item)),
+                    "venue": venue_of(item),
+                    "date": date_of(item),
+                    "city": city_of(item),
+                    "source_hash": source_hash_of(item),
+                    "reason": "raw_duplicate_anchor_fallback",
+                    "retained_id": item_id(keep_item),
+                    "retained_source_hash": source_hash_of(keep_item),
+                }
+                removed_items.append(removed_item)
+                removed.append(removed_item)
+
+            duplicate_groups.append(
+                {
+                    "key": "|".join(scope),
+                    "count": len(bucket),
+                    "retained": {
+                        "id": item_id(keep_item),
+                        "title": title_of(keep_item),
+                        "source_hash": source_hash_of(keep_item),
+                        "quality_score": quality_score(keep_item),
+                        "source_published_at": source_date_value(keep_item),
+                    },
+                    "removed": removed_items,
+                }
+            )
+
+    repaired_records.sort(key=lambda pair: pair[0])
+    return [item for _, item in repaired_records], removed, duplicate_groups
+
+
+def audit_raw_duplicate_repair(
+    items: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    groups: list[list[tuple[int, dict[str, Any]]]] = []
+    for index, item in enumerate(items):
+        for group in groups:
+            if any(are_likely_duplicates(current, item) for _, current in group):
+                group.append((index, item))
+                break
+        else:
+            groups.append([(index, item)])
+
+    repaired_records: list[tuple[int, dict[str, Any]]] = []
+    removed: list[dict[str, Any]] = []
+    duplicate_groups: list[dict[str, Any]] = []
+
+    for group in groups:
+        if len(group) <= 1:
+            index, item = group[0]
+            repaired_records.append((index, deepcopy(item)))
+            continue
+
+        keep_index, keep_item = max(group, key=lambda pair: rank_item(pair[1], pair[0]))
+        kept = deepcopy(keep_item)
+        group_items = [item for _, item in group]
+        merge_duplicate_date_fields(kept, group_items)
+        attach_merge_provenance(kept, group_items, keep_item)
+        kept["dedupe_key"] = release_dedupe_key(kept)
+        repaired_records.append((min(index for index, _ in group), kept))
+
+        removed_items: list[dict[str, Any]] = []
+        for index, item in group:
+            if index == keep_index:
+                continue
+            removed_item = {
+                "id": item_id(item),
+                "title": title_of(item),
+                "raw_titles": sorted(raw_title_tokens(item)),
+                "venue": venue_of(item),
+                "date": date_of(item),
+                "city": city_of(item),
+                "source_hash": source_hash_of(item),
+                "reason": "duplicate",
+                "repair_method": "audit_raw_duplicate_fallback",
+                "retained_id": item_id(keep_item),
+                "retained_source_hash": source_hash_of(keep_item),
+            }
+            removed_items.append(removed_item)
+            removed.append(removed_item)
+
+        duplicate_groups.append(
+            {
+                "key": "|".join(duplicate_scope_key(keep_item)),
+                "count": len(group),
+                "retained": {
+                    "id": item_id(keep_item),
+                    "title": title_of(keep_item),
+                    "source_hash": source_hash_of(keep_item),
+                    "quality_score": quality_score(keep_item),
+                    "source_published_at": source_date_value(keep_item),
+                },
+                "removed": removed_items,
+            }
+        )
+
+    repaired_records.sort(key=lambda pair: pair[0])
+    return [item for _, item in repaired_records], removed, duplicate_groups
+
+
 def conflict_groups_for(items: list[dict[str, Any]]) -> list[list[dict[str, Any]]]:
     loose: dict[tuple[str, str, str], list[dict[str, Any]]] = defaultdict(list)
     for item in items:
@@ -324,6 +685,287 @@ def conflict_groups_for(items: list[dict[str, Any]]) -> list[list[dict[str, Any]
         if len(venues) > 1 or len(addresses) > 1 or len(times) > 1:
             groups.append(group)
     return groups
+
+
+def quality_flags_of(item: dict[str, Any]) -> set[str]:
+    raw = item.get("quality_flags")
+    values = raw if isinstance(raw, list) else [raw]
+    return {first(value).lower() for value in values if first(value)}
+
+
+def is_calendar_preview_item(item: dict[str, Any]) -> bool:
+    return (
+        first(item.get("content_type")).lower() == "calendar_preview"
+        or item.get("is_calendar_preview") is True
+        or "calendar_preview" in quality_flags_of(item)
+    )
+
+
+def is_publishable_calendar_parent(item: dict[str, Any]) -> bool:
+    if is_aggregate_child_item(item):
+        return False
+    title = title_of(item)
+    has_calendar_title = bool(AGGREGATE_CALENDAR_TITLE_RE.search(title))
+    has_title_date_range = title_has_date_range(item)
+    return (is_calendar_preview_item(item) or has_calendar_title) and (
+        len(date_keys_of(item)) > 1 or has_calendar_title or has_title_date_range
+    )
+
+
+def title_has_date_range(item: dict[str, Any]) -> bool:
+    return any(TITLE_DATE_RANGE_RE.search(title) for title in raw_title_tokens(item) | {title_of(item)})
+
+
+def normalize_non_calendar_date_fields(
+    items: list[dict[str, Any]],
+    *,
+    window_start: str = "",
+    window_end: str = "",
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    use_window = bool(ISO_DATE_RE.match(first(window_start)) and ISO_DATE_RE.match(first(window_end)))
+    normalized: list[dict[str, Any]] = []
+    changed: list[dict[str, Any]] = []
+    for item in items:
+        next_item = deepcopy(item)
+        dates = sorted(set(iso_dates_of(next_item)))
+        if (
+            len(dates) > 1
+            and not is_calendar_preview_item(next_item)
+            and not is_aggregate_child_item(next_item)
+            and not title_has_date_range(next_item)
+        ):
+            selectable_dates = [date for date in dates if window_start <= date <= window_end] if use_window else dates
+            selected = (selectable_dates or dates)[-1]
+            next_item["event_date_start"] = selected
+            next_item["event_date_end"] = selected
+            next_item["event_date_iso_guess"] = selected
+            next_item["event_date_iso_guesses"] = [selected]
+            if isinstance(next_item.get("event_date_text"), list) and all(ISO_DATE_RE.match(first(value)) for value in next_item["event_date_text"]):
+                next_item["event_date_text"] = [selected]
+            changed.append(
+                {
+                    "id": item_id(next_item),
+                    "title": title_of(next_item),
+                    "reason": "non_calendar_multi_date_collapsed",
+                    "selected_date": selected,
+                    "previous_dates": dates,
+                }
+            )
+        normalized.append(next_item)
+    return normalized, changed
+
+
+def quarantine_calendar_parents(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    kept: list[dict[str, Any]] = []
+    removed: list[dict[str, Any]] = []
+    for item in items:
+        if is_publishable_calendar_parent(item):
+            removed.append(
+                {
+                    "id": item_id(item),
+                    "title": title_of(item),
+                    "raw_titles": sorted(raw_title_tokens(item)),
+                    "venue": venue_of(item),
+                    "date": date_of(item),
+                    "city": city_of(item),
+                    "source_hash": source_hash_of(item),
+                    "reason": "calendar_preview_parent",
+                    "note": "calendar/overview parent rows stay out of the event feed; keep split child events only",
+                }
+            )
+            continue
+        kept.append(item)
+    return kept, removed
+
+
+def quarantine_weak_aggregate_children(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    kept: list[dict[str, Any]] = []
+    removed: list[dict[str, Any]] = []
+    for item in items:
+        if is_aggregate_child_item(item) and not aggregate_child_has_strong_date_evidence(item):
+            removed.append(
+                {
+                    "id": item_id(item),
+                    "title": title_of(item),
+                    "raw_titles": sorted(raw_title_tokens(item)),
+                    "venue": venue_of(item),
+                    "date": date_of(item),
+                    "city": city_of(item),
+                    "source_published_at": source_date_value(item),
+                    "evidence": aggregate_child_date_evidence_texts(item)[:6],
+                    "reason": "aggregate_child_weak_date_evidence",
+                    "note": "aggregate child needs explicit source-backed month/day evidence; weekday or bare day-only evidence is not enough across month boundaries",
+                }
+            )
+            continue
+        kept.append(item)
+    return kept, removed
+
+
+def suppress_aggregate_child_source_and_poster(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    repaired: list[dict[str, Any]] = []
+    changed: list[dict[str, Any]] = []
+    for item in items:
+        next_item = deepcopy(item)
+        if is_aggregate_child_item(next_item):
+            before_hash = source_hash_of(next_item)
+            before_poster_fields = {
+                key: first(next_item.get(key))
+                for key in (*POSTER_FILE_ID_FIELDS, *POSTER_URL_FIELDS, *POSTER_STORAGE_FIELDS, "poster_source", "poster_cloud_path")
+                if first(next_item.get(key))
+            }
+            has_internal_activity_poster = any(
+                is_internal_weekly_poster_file_id(next_item.get(key))
+                for key in (*POSTER_FILE_ID_FIELDS, *POSTER_URL_FIELDS)
+            )
+            source_action = deepcopy(next_item.get("source_action") if isinstance(next_item.get("source_action"), dict) else {})
+            source_article = deepcopy(next_item.get("source_article") if isinstance(next_item.get("source_article"), dict) else {})
+            source_action["type"] = first(source_action.get("type") or "wechat_article")
+            source_action["label"] = first(source_action.get("label") or "公众号")
+            source_action["available"] = False
+            source_action["url_hash"] = ""
+            source_action["disabled_reason"] = "aggregate_child_parent_article"
+            source_article["url_hash"] = ""
+            for key in ("sourceHash", "source_hash", "sourceRefId", "source_ref_id"):
+                if key in next_item:
+                    next_item[key] = ""
+            next_item["source_action"] = source_action
+            next_item["source_article"] = source_article
+            next_item["aggregation_child"] = True
+            next_item["poster_suppressed"] = False
+            next_item["poster_suppressed_reason"] = ""
+            if not has_internal_activity_poster:
+                next_item["poster_source"] = ""
+                for field in (*POSTER_FILE_ID_FIELDS, *POSTER_URL_FIELDS, *POSTER_STORAGE_FIELDS, "poster_cloud_path"):
+                    next_item[field] = ""
+            if (
+                before_hash
+                or before_poster_fields
+                or item.get("poster_suppressed") is True
+                or (item.get("source_action") or {}).get("available") is not False
+            ):
+                changed.append(
+                    {
+                        "id": item_id(next_item),
+                        "title": title_of(next_item),
+                        "date": date_of(next_item),
+                        "city": city_of(next_item),
+                        "source_hash": before_hash,
+                        "cleared_poster_fields": [] if has_internal_activity_poster else sorted(before_poster_fields),
+                        "kept_internal_activity_poster": has_internal_activity_poster,
+                        "reason": "aggregate_child_parent_article_source_disabled",
+                    }
+                )
+        repaired.append(next_item)
+    return repaired, changed
+
+
+def prune_aggregate_child_merge_provenance(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    repaired: list[dict[str, Any]] = []
+    changed: list[dict[str, Any]] = []
+    for item in items:
+        next_item = deepcopy(item)
+        provenance = next_item.get("merge_provenance") if isinstance(next_item.get("merge_provenance"), dict) else None
+        sources = provenance.get("sources") if provenance and isinstance(provenance.get("sources"), list) else []
+        if provenance and sources:
+            kept_sources: list[dict[str, Any]] = []
+            removed_sources: list[dict[str, Any]] = []
+            for ref in sources:
+                ref_event_id = first((ref or {}).get("event_id") or (ref or {}).get("id") or (ref or {}).get("source_event_id"))
+                if ref_event_id.startswith("agg-child-") or (ref or {}).get("aggregation_child") is True:
+                    removed_sources.append(ref)
+                else:
+                    kept_sources.append(ref)
+            if removed_sources:
+                next_provenance = deepcopy(provenance)
+                removed_hashes = sorted({first((ref or {}).get("source_hash") or (ref or {}).get("hash") or (ref or {}).get("url_hash")) for ref in removed_sources if first((ref or {}).get("source_hash") or (ref or {}).get("hash") or (ref or {}).get("url_hash"))})
+                next_provenance["sources"] = kept_sources
+                next_provenance["source_count"] = len(kept_sources)
+                next_provenance["merged_from"] = [
+                    value for value in (next_provenance.get("merged_from") or []) if not first(value).startswith("agg-child-")
+                ]
+                next_provenance["merged_source_hashes"] = sorted(
+                    {
+                        first((ref or {}).get("source_hash") or (ref or {}).get("hash") or (ref or {}).get("url_hash"))
+                        for ref in kept_sources
+                        if first((ref or {}).get("source_hash") or (ref or {}).get("hash") or (ref or {}).get("url_hash"))
+                    }
+                )
+                next_item["merge_provenance"] = next_provenance
+                changed.append(
+                    {
+                        "id": item_id(next_item),
+                        "title": title_of(next_item),
+                        "date": date_of(next_item),
+                        "city": city_of(next_item),
+                        "removed_source_hashes": removed_hashes,
+                        "removed_source_count": len(removed_sources),
+                        "reason": "aggregate_child_merge_source",
+                    }
+                )
+        repaired.append(next_item)
+    return repaired, changed
+
+
+def is_internal_weekly_poster_file_id(value: Any) -> bool:
+    return bool(INTERNAL_WEEKLY_POSTER_RE.match(first(value)))
+
+
+def public_or_temp_poster_value(value: Any) -> bool:
+    text = first(value)
+    if not text:
+        return False
+    lower = text.lower()
+    if lower.startswith(("http://", "https://", "wxfile://", "blob:")):
+        return True
+    return "/api/v1/weekly/poster/" in lower
+
+
+def normalize_cloudbase_poster_fields(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    repaired: list[dict[str, Any]] = []
+    changed: list[dict[str, Any]] = []
+    for item in items:
+        next_item = deepcopy(item)
+        file_id = ""
+        for field in POSTER_FILE_ID_FIELDS + POSTER_URL_FIELDS:
+            value = first(next_item.get(field))
+            if is_internal_weekly_poster_file_id(value):
+                file_id = value
+                break
+        if file_id:
+            touched_fields: list[str] = []
+            for field in ("poster_file_id", "posterFileId", "cloudFileId"):
+                if next_item.get(field) != file_id:
+                    next_item[field] = file_id
+                    touched_fields.append(field)
+            for field in POSTER_STORAGE_FIELDS:
+                if next_item.get(field) != "cloudbase":
+                    next_item[field] = "cloudbase"
+                    touched_fields.append(field)
+            for field in POSTER_URL_FIELDS:
+                value = first(next_item.get(field))
+                if field in {"poster_file_id", "posterFileId", "cloudFileId"}:
+                    continue
+                if not value or public_or_temp_poster_value(value):
+                    if next_item.get(field) != file_id:
+                        next_item[field] = file_id
+                        touched_fields.append(field)
+            if first(next_item.get("poster_source")) in {"", "wechat_article", "aggregate_parent_cover"}:
+                next_item["poster_source"] = "cloudbase_storage"
+                touched_fields.append("poster_source")
+            if touched_fields:
+                changed.append(
+                    {
+                        "id": item_id(next_item),
+                        "title": title_of(next_item),
+                        "date": date_of(next_item),
+                        "city": city_of(next_item),
+                        "poster_file_id": file_id,
+                        "normalized_fields": sorted(set(touched_fields)),
+                    }
+                )
+        repaired.append(next_item)
+    return repaired, changed
 
 
 def summarize_conflict_group(group: list[dict[str, Any]]) -> dict[str, Any]:
@@ -352,6 +994,8 @@ def repair_items(
     items: list[dict[str, Any]],
     *,
     quarantine_conflicts: bool,
+    window_start: str = "",
+    window_end: str = "",
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     before = audit(items)
     deduped, duplicate_removed, duplicate_groups = duplicate_repair(items)
@@ -378,6 +1022,18 @@ def repair_items(
                 )
 
     repaired = [item for item in deduped if item_id(item) not in conflict_ids]
+    repaired, fallback_removed, fallback_groups = fallback_raw_duplicate_repair(repaired)
+    repaired, audit_fallback_removed, audit_fallback_groups = audit_raw_duplicate_repair(repaired)
+    repaired, date_normalized = normalize_non_calendar_date_fields(
+        repaired,
+        window_start=window_start,
+        window_end=window_end,
+    )
+    repaired, calendar_parent_removed = quarantine_calendar_parents(repaired)
+    repaired, weak_aggregate_removed = quarantine_weak_aggregate_children(repaired)
+    repaired, aggregate_source_suppressed = suppress_aggregate_child_source_and_poster(repaired)
+    repaired, aggregate_merge_pruned = prune_aggregate_child_merge_provenance(repaired)
+    repaired, cloudbase_poster_normalized = normalize_cloudbase_poster_fields(repaired)
     after = audit(repaired)
     report = {
         "schema_version": "weekly_activity_release_repair.v1",
@@ -386,15 +1042,40 @@ def repair_items(
         "deduped_item_count": len(deduped),
         "repaired_item_count": len(repaired),
         "removed_duplicate_count": len(duplicate_removed),
+        "removed_raw_duplicate_fallback_count": len(fallback_removed),
+        "removed_audit_raw_duplicate_fallback_count": len(audit_fallback_removed),
+        "normalized_non_calendar_multi_date_count": len(date_normalized),
+        "removed_calendar_parent_count": len(calendar_parent_removed),
+        "removed_weak_aggregate_child_count": len(weak_aggregate_removed),
+        "suppressed_aggregate_child_source_count": len(aggregate_source_suppressed),
+        "pruned_aggregate_child_merge_source_group_count": len(aggregate_merge_pruned),
+        "pruned_aggregate_child_merge_source_count": sum(row.get("removed_source_count", 0) for row in aggregate_merge_pruned),
+        "cloudbase_poster_normalized_count": len(cloudbase_poster_normalized),
         "quarantined_conflict_item_count": len(conflict_removed),
         "duplicate_cluster_count": len(duplicate_groups),
+        "raw_duplicate_fallback_cluster_count": len(fallback_groups),
+        "audit_raw_duplicate_fallback_cluster_count": len(audit_fallback_groups),
         "conflict_cluster_count": len(conflict_summaries),
         "quarantine_conflicts": quarantine_conflicts,
         "audit_before": before,
         "audit_after": after,
         "duplicate_groups": duplicate_groups,
+        "raw_duplicate_fallback_groups": fallback_groups,
+        "audit_raw_duplicate_fallback_groups": audit_fallback_groups,
         "conflict_groups": conflict_summaries,
-        "removed_items": [*duplicate_removed, *conflict_removed],
+        "date_normalized_items": date_normalized,
+        "weak_aggregate_child_items": weak_aggregate_removed,
+        "aggregate_child_source_suppressed_items": aggregate_source_suppressed,
+        "aggregate_child_merge_sources_pruned": aggregate_merge_pruned,
+        "cloudbase_poster_normalized_items": cloudbase_poster_normalized,
+        "removed_items": [
+            *duplicate_removed,
+            *fallback_removed,
+            *audit_fallback_removed,
+            *calendar_parent_removed,
+            *weak_aggregate_removed,
+            *conflict_removed,
+        ],
     }
     return repaired, report
 
@@ -437,7 +1118,7 @@ def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[di
             city_key = first(city_key)
             if city_key:
                 cities[city_key].append(item)
-                city_labels.setdefault(city_key, city_label_of(item))
+                city_labels.setdefault(city_key, city_label_for_key(item, city_key))
         for date_key in date_keys_of(item):
             dates[date_key].append(item)
 
@@ -546,15 +1227,22 @@ def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[di
     write_json(api_dir / "repair_report.json", report)
 
 
-def discover_source_maps(api_dir: Path, manifest: dict[str, Any], explicit: list[Path]) -> list[Path]:
+def discover_source_maps(
+    api_dir: Path,
+    manifest: dict[str, Any],
+    explicit: list[Path],
+    *,
+    explicit_only: bool = False,
+) -> list[Path]:
     candidates: list[Path] = []
     candidates.extend(explicit)
-    candidates.append(api_dir / "source_actions" / "source_url_map.json")
-    candidates.append(api_dir.parent / "source_actions" / "source_url_map.json")
-    for key in ("source_url_map_path", "static_source_url_map_path"):
-        value = first(manifest.get(key))
-        if value:
-            candidates.append(Path(value))
+    if not explicit_only:
+        candidates.append(api_dir / "source_actions" / "source_url_map.json")
+        candidates.append(api_dir.parent / "source_actions" / "source_url_map.json")
+        for key in ("source_url_map_path", "static_source_url_map_path"):
+            value = first(manifest.get(key))
+            if value:
+                candidates.append(Path(value))
 
     seen: set[Path] = set()
     out: list[Path] = []
@@ -569,7 +1257,26 @@ def discover_source_maps(api_dir: Path, manifest: dict[str, Any], explicit: list
 
 
 def repair_source_maps(paths: list[Path], items: list[dict[str, Any]], report: dict[str, Any]) -> list[str]:
-    kept_hashes = {source_hash_of(item) for item in items if source_hash_of(item)}
+    disabled_source_event_ids = {
+        item_id(item)
+        for item in items
+        if item_id(item) and isinstance(item.get("source_action"), dict) and item["source_action"].get("available") is False
+    }
+    disabled_source_hashes = {
+        first(row.get("source_hash"))
+        for row in report.get("aggregate_child_source_suppressed_items", [])
+        if first(row.get("source_hash"))
+    }
+    for row in report.get("aggregate_child_merge_sources_pruned", []):
+        for source_hash in row.get("removed_source_hashes", []) or []:
+            if first(source_hash):
+                disabled_source_hashes.add(first(source_hash))
+    source_items_by_hash: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for item in items:
+        source_hash = source_hash_of(item)
+        if source_hash and item_id(item) not in disabled_source_event_ids and source_hash not in disabled_source_hashes:
+            source_items_by_hash[source_hash].append(item)
+    kept_hashes = set(source_items_by_hash)
     kept_ids = {item_id(item) for item in items if item_id(item)}
     duplicate_source_redirects = {
         first(row.get("source_hash")): {
@@ -577,7 +1284,13 @@ def repair_source_maps(paths: list[Path], items: list[dict[str, Any]], report: d
             "retained_source_hash": first(row.get("retained_source_hash")),
         }
         for row in report.get("removed_items", [])
-        if row.get("reason") == "duplicate" and first(row.get("source_hash")) and first(row.get("retained_id"))
+        if (
+            row.get("reason") == "duplicate"
+            and first(row.get("source_hash"))
+            and first(row.get("source_hash")) not in disabled_source_hashes
+            and not first(row.get("id")).startswith("agg-child-")
+            and first(row.get("retained_id"))
+        )
     }
     touched: list[str] = []
 
@@ -588,8 +1301,11 @@ def repair_source_maps(paths: list[Path], items: list[dict[str, Any]], report: d
             continue
         filtered: dict[str, Any] = {}
         redirected = 0
+        canonicalized = 0
         for key, value in sources.items():
             entry = deepcopy(value) if isinstance(value, dict) else value
+            if first(key) in disabled_source_hashes:
+                continue
             redirect = duplicate_source_redirects.get(first(key))
             if redirect and isinstance(entry, dict):
                 entry["event_id"] = redirect["retained_id"]
@@ -599,7 +1315,25 @@ def repair_source_maps(paths: list[Path], items: list[dict[str, Any]], report: d
                 filtered[key] = entry
                 redirected += 1
                 continue
-            if key in kept_hashes or first((value or {}).get("event_id")) in kept_ids:
+            entry_event_id = first((value or {}).get("event_id"))
+            if entry_event_id in disabled_source_event_ids:
+                continue
+            if key in kept_hashes or entry_event_id in kept_ids:
+                current_source_items = source_items_by_hash.get(first(key), [])
+                if isinstance(entry, dict) and len(current_source_items) == 1:
+                    current_item = current_source_items[0]
+                    current_id = item_id(current_item)
+                    changed_current_entry = False
+                    if current_id and first(entry.get("event_id")) != current_id:
+                        entry["event_id"] = current_id
+                        changed_current_entry = True
+                    if any(field in entry for field in ("merged_into_event_id", "merged_into_source_hash", "merge_reason")):
+                        entry.pop("merged_into_event_id", None)
+                        entry.pop("merged_into_source_hash", None)
+                        entry.pop("merge_reason", None)
+                        changed_current_entry = True
+                    if changed_current_entry:
+                        canonicalized += 1
                 filtered[key] = entry
         payload["source_count"] = len(filtered)
         payload["sources"] = filtered
@@ -608,6 +1342,7 @@ def repair_source_maps(paths: list[Path], items: list[dict[str, Any]], report: d
             "kept_source_count": len(filtered),
             "removed_source_count": len(sources) - len(filtered),
             "redirected_duplicate_source_count": redirected,
+            "canonicalized_current_source_count": canonicalized,
         }
         write_json(path, payload)
         touched.append(str(path))
@@ -728,9 +1463,19 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--write", action="store_true", help="Rewrite release JSON. Without this flag, only prints a report.")
     parser.add_argument("--backup", action="store_true", help="Backup current/manifest/source maps before rewriting.")
     parser.add_argument(
+        "--explicit-source-maps-only",
+        action="store_true",
+        help="Repair only --source-url-map paths; skip package parent/global source map discovery.",
+    )
+    parser.add_argument(
         "--quarantine-conflicts",
         action="store_true",
         help="Remove cross-source conflict groups from publishable release instead of only reporting them.",
+    )
+    parser.add_argument(
+        "--enforce-window-start",
+        action="store_true",
+        help="Drop publishable rows whose event_date_start is outside manifest window_start/window_end.",
     )
     args = parser.parse_args(argv)
 
@@ -742,10 +1487,39 @@ def main(argv: list[str]) -> int:
     if not isinstance(items, list):
         raise SystemExit(f"current.json does not contain an item list: {current_path}")
 
-    repaired_items, report = repair_items(items, quarantine_conflicts=args.quarantine_conflicts)
     manifest_path = args.api_dir / "manifest.json"
     manifest = read_json(manifest_path) if manifest_path.exists() else {}
-    source_maps = discover_source_maps(args.api_dir, manifest, args.source_url_map)
+    window_start = first(manifest.get("window_start"))
+    window_end = first(manifest.get("window_end"))
+    repaired_items, report = repair_items(
+        items,
+        quarantine_conflicts=args.quarantine_conflicts,
+        window_start=window_start,
+        window_end=window_end,
+    )
+    if args.enforce_window_start:
+        repaired_items, dropped_window_items = enforce_event_start_window(repaired_items, window_start, window_end)
+        report["window_start"] = window_start
+        report["window_end"] = window_end
+        report["dropped_outside_window_start_count"] = len(dropped_window_items)
+        report["dropped_outside_window_start_items"] = [
+            {
+                "id": item_id(item),
+                "title": title_of(item),
+                "event_date_start": window_start_of(item),
+                "event_date_end": first(item.get("event_date_end")),
+                "city": city_label_of(item),
+                "venue": venue_of(item),
+            }
+            for item in dropped_window_items
+        ]
+        report["repaired_item_count"] = len(repaired_items)
+    source_maps = discover_source_maps(
+        args.api_dir,
+        manifest,
+        args.source_url_map,
+        explicit_only=args.explicit_source_maps_only,
+    )
 
     if args.write:
         if args.backup:

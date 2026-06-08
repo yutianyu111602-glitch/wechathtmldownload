@@ -34,11 +34,13 @@ from audit_weekly_lineup_address_time import (  # noqa: E402
     aggregate_title_text,
     current_address,
     current_lineup,
+    current_time,
     first,
     item_id,
     list_strings,
     load_enrichments,
     norm_name,
+    time_tokens,
     title_of,
 )
 from repair_weekly_release_conflicts import (  # noqa: E402
@@ -153,7 +155,11 @@ LINEUP_SENTENCE_RE = re.compile(
 )
 LINEUP_DATE_RE = re.compile(r"\b\d{1,2}[./-]\d{1,2}\b|^\d{1,2}[./-]\d{1,2}\s*[:：]", re.I)
 LINEUP_TIME_SUFFIX_RE = re.compile(
-    r"\s+\d{1,2}(?::\d{2})?\s*(?:am|pm)?\s*[-–—]\s*\d{1,2}(?::\d{2})?\s*(?:am|pm)?$",
+    r"\s+\d{1,2}(?::\d{2})?\s*(?:am|pm)?\s*[-–—~～至到]\s*\d{1,2}(?::\d{2})?\s*(?:am|pm)?$",
+    re.I,
+)
+LINEUP_TIME_ONLY_RE = re.compile(
+    r"^\s*\d{1,2}(?::\d{2})?\s*(?:am|pm)?\s*[-–—~～至到]\s*\d{1,2}(?::\d{2})?\s*(?:am|pm)?\s*$",
     re.I,
 )
 LINEUP_STRUCTURED_CUE_RE = re.compile(
@@ -186,6 +192,8 @@ SOURCE_ADDRESS_LINE_RE = re.compile(
 ADDRESS_NOISE_RE = re.compile(r"^\s*(?:地址|地点|场地)\s*[:：]\s*", re.I)
 POSTER_OCR_ADDRESS_PREFIX_RE = re.compile(r"^\s*(?:Poster\s+OCR\s+address|OCR\s+address)\s*[:：]\s*", re.I)
 ADDRESS_START_RE = re.compile(r"(?:[\u4e00-\u9fff]{2,}(?:省|市|自治区|特别行政区)|[A-Za-z .'-]+,\s*China)")
+DATE_IN_TIME_TEXT_RE = re.compile(r"\d{4}\s*[-/年]\s*\d{1,2}|(?:\d{1,2}\s*)?月\s*\d{1,2}\s*日")
+SIMPLE_LLM_TIME_RE = re.compile(r"^\s*\d{1,2}:\d{2}(?:\s*[-~～至]\s*(?:\d{1,2}:\d{2}|late|end))?\s*$", re.I)
 CITY_LABEL_RE = re.compile(
     r"北京|上海|广州|深圳|成都|杭州|南京|武汉|西安|长沙|重庆|天津|青岛|厦门|苏州|济南|昆明|贵阳|大理|"
     r"大连|沈阳|兰州|银川|太原|郑州|洛阳|石家庄|潍坊|淮安|泉州|福州|海口|南宁|珠海|拉萨|"
@@ -216,6 +224,15 @@ ADDRESS_OVERRIDES = {
         "address": "北京市朝阳区751园区火车街区3号车厢",
         "note": "source pack and external venue listings point to TRACK at 751D PARK train block carriage 3",
     },
+    "fouroneone_hangzhou:0e37d6f41aafb923": {
+        "match_id": "fouroneone_hangzhou:0e37d6f41aafb923",
+        "venue_id": "fouroneone_hangzhou",
+        "venue": ["肆幺幺杭州"],
+        "venue_name": "肆幺幺杭州",
+        "city": ["杭州"],
+        "address": "浙江省杭州市上城区中山南路411号",
+        "note": "event title is the Hangzhou tour stop at 肆幺幺; the previous address was polluted by later Shenzhen/Foshan tour-stop text",
+    },
 }
 
 ADDRESS_ADJUDICATIONS = {
@@ -241,6 +258,40 @@ TIME_ADJUDICATIONS = {
     "ours_pres:4099a58f1cbb5d5e": {
         "decision": "verified_registry_over_llm",
         "note": "17:30 is the arrival/card pickup deadline in source text; registry override keeps event window 15:00-21:00",
+    },
+    "exit_shanghai:3082bf6846c3bd22": {
+        "decision": "source_candidate_over_llm",
+        "value": "22:00-End",
+        "note": "source schedule runs from 22:00 through the 4:00-End B2B slot; the prior display kept only the first set window, while DeepSeek Pro extracted only the start time",
+    },
+    "cs_bar:c2309fb54ceb3c96": {
+        "decision": "source_candidate_over_llm",
+        "value": "19:30-Late",
+        "note": "source text explicitly says doors open 19:30-late; the prior 01:40-Late display was an OCR/extraction artefact",
+    },
+    "tagchengdu:8db5c367c73eb031": {
+        "decision": "source_candidate_over_llm",
+        "value": "21:30-04:00",
+        "note": "source lineup schedule covers 21:30-04:00; the prior display kept only the first set window",
+    },
+    "trust:efc8fee5b466a7c2": {
+        "decision": "source_candidate_over_llm",
+        "value": "18:00-03:00",
+        "note": "source text explicitly states 6:00 PM to 3:00 AM; the prior display stopped at the free-entry cutoff rather than the event end",
+    },
+    "jar:47476d2c96fa61a1:schedule:20260529:1": {
+        "decision": "source_candidate_over_llm",
+        "note": "source row contains multiple time cues; public release keeps the existing source-text display time rather than replacing it with an earlier ambiguous cue",
+    },
+    "exit_shanghai:c463790f486461f1": {
+        "decision": "source_candidate_over_llm",
+        "value": "22:00-05:30",
+        "note": "source evidence explicitly says 2026-06-06 22:00-5:30; the previous display kept only the trailing 05:30-Late fragment",
+    },
+    "flat_club:a2155eede469b668": {
+        "decision": "source_candidate_over_llm",
+        "value": "22:00-02:30",
+        "note": "source timetable lists 22:00-23:30, 23:30-01:00, and 01:00-02:30; public release shows the full event window",
     },
 }
 
@@ -344,6 +395,8 @@ def clean_lineup(values: list[str]) -> list[str]:
             if re.match(r"^[在他她它]\s+", artist):
                 continue
             if LINEUP_DATE_RE.search(artist):
+                continue
+            if LINEUP_TIME_ONLY_RE.search(artist):
                 continue
             if re.search(r"[。；：]", artist):
                 continue
@@ -457,6 +510,18 @@ def source_address_is_poster_ocr(candidate: str, source_row: dict[str, Any] | No
     return candidate_supported_by_text(candidate, haystack)
 
 
+def source_address_preferred_over_current_source(current: str, candidate: str) -> bool:
+    if not current or not candidate or address_compatible(current, candidate):
+        return False
+    cleaned_current = clean_source_address_line(current)
+    cleaned_candidate = clean_source_address_line(candidate)
+    if not SOURCE_ADDRESS_LINE_RE.search(cleaned_current) and SOURCE_ADDRESS_LINE_RE.search(cleaned_candidate):
+        return True
+    if re.search(r"[\u4e00-\u9fff].*(?:省|市|区|县).*(?:路|街|道|号|层|楼|广场|园区|大厦)", cleaned_candidate):
+        return not re.search(r"[\u4e00-\u9fff].*(?:省|市|区|县).*(?:路|街|道|号|层|楼|广场|园区|大厦)", cleaned_current)
+    return False
+
+
 def source_supports_current_venue(item: dict[str, Any], source_row: dict[str, Any] | None) -> bool:
     venue = first(item.get("venue_name") or item.get("venue"))
     if not venue:
@@ -473,7 +538,10 @@ def source_location_name_from_address(address: str) -> str:
     matches = [value for value in matches if len(norm_name(value)) >= 4]
     if not matches:
         return ""
-    return matches[-1]
+    candidate = matches[-1]
+    if re.search(r"(?:路|街|道|号|交叉|路口|往[东西南北]|约\d*米|[0-9０-９]+米)", candidate):
+        return ""
+    return candidate
 
 
 def candidate_supported_by_text(candidate: str, text: str) -> bool:
@@ -772,6 +840,25 @@ def apply_address_repair(item: dict[str, Any], source_row: dict[str, Any] | None
                     }
             return "source_address_replaced"
 
+    if current_source == "source_text" and current and source_candidates:
+        candidate = source_candidates[0]
+        if address_city_conflicts_item(candidate, item):
+            item["address_verification"] = {
+                "decision": "registry_over_source_poi",
+                "note": "explicit source address candidate mentions a different city than the event city; current source-text address is kept",
+                "rejected_source_address": candidate,
+            }
+            return "source_address_rejected_city_conflict"
+        if source_address_preferred_over_current_source(current, candidate):
+            item["address"] = candidate
+            item["address_full"] = candidate
+            item["address_source"] = "source_text_normalized"
+            item["address_verification"] = {
+                "decision": "source_candidate_over_source_text",
+                "note": "source evidence contains a structured address; current source-text address looked like event metadata or a less app-friendly alias",
+            }
+            return "source_address_normalized"
+
     if iid.startswith("oil:") and "OIL" in first(item.get("venue_name") or item.get("venue")):
         address = ADDRESS_OVERRIDES["oil"]["address"]
         if current_address(item) != address:
@@ -788,6 +875,8 @@ def apply_address_repair(item: dict[str, Any], source_row: dict[str, Any] | None
         item["venue_id"] = override["venue_id"]
         item["venue"] = override["venue"]
         item["venue_name"] = override["venue_name"]
+        if override.get("city"):
+            item["city"] = list(override["city"])
         item["address"] = override["address"]
         item["address_full"] = override["address"]
         item["address_source"] = "source_llm_web_crosscheck"
@@ -803,12 +892,52 @@ def apply_address_repair(item: dict[str, Any], source_row: dict[str, Any] | None
     return None
 
 
-def apply_time_repair(item: dict[str, Any]) -> str | None:
+def apply_time_repair(item: dict[str, Any], enriched: dict[str, Any] | None = None) -> str | None:
     adjudication = TIME_ADJUDICATIONS.get(item_id(item))
-    if not adjudication:
+    if adjudication:
+        value = first(adjudication.get("value"))
+        if value:
+            item["event_time_text"] = value
+            item["running_hours_text"] = value
+            start, end = time_tokens(value)
+            item["time_start"] = start or value
+            if end:
+                item["time_end"] = end
+            else:
+                item.pop("time_end", None)
+            item["event_time_source"] = first(item.get("event_time_source")) or "source_text"
+            item["running_hours_source"] = first(item.get("running_hours_source")) or item["event_time_source"]
+        item["time_verification"] = adjudication
+        return "time_overridden" if value else "time_adjudicated"
+
+    current = current_time(item)
+    pro_time = first((enriched or {}).get("event_time_text"))
+    if not current or not pro_time:
         return None
-    item["time_verification"] = adjudication
-    return "time_adjudicated"
+
+    if DATE_IN_TIME_TEXT_RE.search(current) and SIMPLE_LLM_TIME_RE.match(pro_time):
+        item["event_time_text"] = pro_time
+        item["running_hours_text"] = pro_time
+        item["time_start"] = time_tokens(pro_time)[0] or pro_time
+        item.pop("time_end", None)
+        item["event_time_source"] = first(item.get("event_time_source")) or "source_text"
+        item["running_hours_source"] = first(item.get("running_hours_source")) or item["event_time_source"]
+        item["time_verification"] = {
+            "decision": "source_candidate_over_llm",
+            "note": "materialized extraction normalized a date-prefixed source time into display time only; event date remains in event_date_start/end",
+        }
+        return "time_normalized_from_llm"
+
+    current_start, _current_end = time_tokens(current)
+    pro_start, _pro_end = time_tokens(pro_time)
+    if current_start and pro_start and current_start == pro_start:
+        item["time_verification"] = {
+            "decision": "source_candidate_over_llm",
+            "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time",
+        }
+        return "time_adjudicated"
+
+    return None
 
 
 def repair(current: dict[str, Any], api_dir: Path, *, quarantine_aggregates: bool) -> tuple[list[dict[str, Any]], dict[str, Any]]:
@@ -841,7 +970,7 @@ def repair(current: dict[str, Any], api_dir: Path, *, quarantine_aggregates: boo
             actions.append(address_action)
             bump(address_action)
 
-        time_action = apply_time_repair(next_item)
+        time_action = apply_time_repair(next_item, enrichments.get(iid, {}))
         if time_action:
             actions.append(time_action)
             bump(time_action)
