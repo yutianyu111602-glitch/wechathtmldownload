@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>图鉴知识图谱接手包 — 导航</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --border: #2d3a4f;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --ok: #3fb950;
+      --warn: #d29922;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      padding: 24px 16px 48px;
+    }
+    .wrap { max-width: 960px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin: 0 0 8px; }
+    .sub { color: var(--muted); margin-bottom: 24px; font-size: 0.95rem; }
+    .badge {
+      display: inline-block;
+      background: #238636;
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-right: 6px;
+    }
+    .badge-warn { background: #9e6a03; }
+    section { margin-bottom: 28px; }
+    h2 {
+      font-size: 1.1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      margin: 0 0 12px;
+      color: var(--accent);
+    }
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+    @media (min-width: 640px) {
+      .grid-2 { grid-template-columns: 1fr 1fr; }
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 1rem; }
+    .card p { margin: 0 0 10px; color: var(--muted); font-size: 0.88rem; }
+    .links a {
+      display: inline-block;
+      margin: 4px 8px 4px 0;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.88rem;
+    }
+    .links a:hover { text-decoration: underline; }
+    .cmd {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: Consolas, monospace;
+      font-size: 0.82rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th, td { border: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+    th { background: #161b22; color: var(--muted); }
+    .num { font-variant-numeric: tabular-nums; }
+    footer { margin-top: 32px; color: var(--muted); font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>中国地下电子音乐图鉴 — 知识图谱接手包</h1>
+    <p class="sub">
+      <span class="badge">图鉴主线</span>
+      <span class="badge badge-warn">非 weekly 小程序</span>
+      生成日期：2026-05-19 · Markdown 为 canonical SSOT，HTML 为人类可读 companion
+    </p>
+
+    <section>
+      <h2>第一步：主接手文档</h2>
+      <div class="card">
+        <h3>NEXT_AGENT_HANDOFF_ATLAS_GRAPH_20260519</h3>
+        <p>下一位 Agent 的强制入口：问题、范围、已确认事实、阻塞、下一步命令。</p>
+        <div class="links">
+          <a href="../../NEXT_AGENT_HANDOFF_ATLAS_GRAPH_20260519.html">打开 HTML</a>
+          <a href="../../NEXT_AGENT_HANDOFF_ATLAS_GRAPH_20260519.md">打开 Markdown</a>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>理解与计划（本线程核心产出）</h2>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>全量理解文档</h3>
+          <p>十阶段管线、47,470 基线、脚本地图、安全边界（无 weekly）。</p>
+          <div class="links">
+            <a href="../../reports/ATLAS_GRAPH_FULL_UNDERSTANDING_20260519.html">HTML</a>
+            <a href="../../reports/ATLAS_GRAPH_FULL_UNDERSTANDING_20260519.md">MD</a>
+          </div>
+        </div>
+        <div class="card">
+          <h3>知识图谱超级计划</h3>
+          <p>12 Epic、6 工作流、DB 审计、关系本体、关键路径。</p>
+          <div class="links">
+            <a href="../../reports/ATLAS_KNOWLEDGE_GRAPH_MEGA_PLAN_20260519.html">HTML</a>
+            <a href="../../reports/ATLAS_KNOWLEDGE_GRAPH_MEGA_PLAN_20260519.md">MD</a>
+          </div>
+        </div>
+        <div class="card">
+          <h3>深化研究计划（实施入口）</h3>
+          <p>DeepSeek v4-pro：Epic 验收、DAG、风险、Sprint、ceid / Graph RAG。</p>
+          <div class="links">
+            <a href="../../reports/ATLAS_KNOWLEDGE_GRAPH_DEEP_RESEARCH_PLAN_20260519.html">HTML</a>
+            <a href="../../reports/ATLAS_KNOWLEDGE_GRAPH_DEEP_RESEARCH_PLAN_20260519.md">MD</a>
+          </div>
+        </div>
+        <div class="card">
+          <h3>全项目理解（参考）</h3>
+          <p>含 weekly 侧线；图鉴线程请以 Atlas 文档为准。</p>
+          <div class="links">
+            <a href="../../reports/PROJECT_FULL_UNDERSTANDING_20260519.html">HTML</a>
+            <a href="../../reports/PROJECT_FULL_UNDERSTANDING_20260519.md">MD</a>
+          </div>
+        </div>
+        <div class="card">
+          <h3>本包索引</h3>
+          <p>文件清单、读序、线程边界。</p>
+          <div class="links">
+            <a href="MANIFEST.md">MANIFEST.md</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>权威 SSOT（仓库内，未改）</h2>
+      <div class="links">
+        <a href="../../docs/ELECTRONIC_MUSIC_GRAPH_CURRENT_AUTHORITY_20260518.md">图鉴根权威</a>
+        <a href="../../docs/ELECTRONIC_MUSIC_GRAPH_PIPELINE_STAGE_MAP_20260518.md">十阶段地图</a>
+        <a href="../../docs/ELECTRONIC_MUSIC_ATLAS_FINAL_COMPLETION_PLAN_20260519.md">收尾计划</a>
+        <a href="../../tools/stage7_rewrite/STAGE7_GRAPH_CURRENT_AUTHORITY_20260518.md">Stage7 图权威</a>
+        <a href="../../tools/stage7_rewrite/SSOT.md">Stage7/8/9 SSOT</a>
+      </div>
+    </section>
+
+    <section>
+      <h2>当前生产快照</h2>
+      <table>
+        <tr><th>指标</th><th>值</th></tr>
+        <tr><td>Stable articles（权威 2026-05-20）</td><td class="num">127,511</td></tr>
+        <tr><td>Graph entities / events（权威）</td><td class="num">875,368 / 150,752</td></tr>
+        <tr><td>Handoff 快照（2026-05-19）</td><td class="num">47,470 · 316,481 / 59,932</td></tr>
+        <tr><td>External identity 入图边</td><td class="num">0</td></tr>
+        <tr><td>Qdrant role aliases</td><td class="num">11（已 apply）</td></tr>
+        <tr><td>Pipeline readiness</td><td>full_pipeline_ready</td></tr>
+      </table>
+    </section>
+
+    <section>
+      <h2>推荐第一条命令</h2>
+      <div class="cmd">powershell -ExecutionPolicy Bypass -File C:\code\githubstar\wechathtmldownload\tools\stage7_rewrite\scripts\stage7_safe_handoff_verify.ps1</div>
+    </section>
+
+    <section>
+      <h2>推荐实现顺序</h2>
+      <p style="color:var(--muted);font-size:0.9rem;margin:0 0 12px;">
+        见 DEEP_RESEARCH_PLAN §5：Epic 0 → 1 → (2∥3) → 5 → 7；实施 AC 以深化研究计划为准
+      </p>
+    </section>
+
+    <footer>
+      Project: C:\code\githubstar\wechathtmldownload · 非 Git 仓库根 · 本页为导航 companion，事实以 Markdown handoff 为准。
+    </footer>
+  </div>
+</body>
+</html>

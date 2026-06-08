@@ -1,0 +1,93 @@
+{
+  "project": "WeChat 100K Pipeline Night Watcher Resume",
+  "branchName": "night-watcher-resume-2026-04-27",
+  "description": "守夜人计划恢复执行 — 从 final_pack 到下游评估的无人值守全自动管线",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "环境预检",
+      "description": "作为守夜人，确认系统资源充足、模型可用、无残留锁文件，为后续步骤建立信心。",
+      "acceptanceCriteria": [
+        "D: 磁盘剩余 > 100GB（实测 8,612 GB）",
+        "内存空闲 > 10GB（实测 25 GB）",
+        "GPU RTX 4090 VRAM 空闲 > 10GB（实测 20 GB）",
+        "curl http://127.0.0.1:11434/v1/models 返回 Qwen3.6-27B",
+        "D:\\DDownload\\.wechat-live-stage-lock.json 不存在或已删除",
+        "结果追加到 NIGHT_WATCHER_LOG_2026-04-27.md"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "系统资源已实测全部通过"
+    },
+    {
+      "id": "US-002",
+      "title": "finalize-llm-pack 执行",
+      "description": "启动 final_pack 到新目录 _llm_release_v2，将 93,653 篇 LLM artifacts 打包为完整 release。上次在 73.7% 中断。",
+      "acceptanceCriteria": [
+        "D:\\DDownload\\_llm_release_v2 目录创建",
+        "npx tsx src/cli.ts finalize-llm-pack --inputDir D:/DDownload/_llm_artifacts --outDir D:/DDownload/_llm_release_v2 --archiveRoot D:/DDownload/_archive_mptext --manifestPath D:/DDownload/_queues/download_ready_queue.jsonl 执行完成无报错",
+        "_llm_release_v2/manifest.json 存在且 total_articles >= 93000",
+        "_llm_release_v2/index.jsonl 存在且行数 > 90000",
+        "文章数与 _llm_artifacts 误差 < 500",
+        "结果追加到 NIGHT_WATCHER_LOG_2026-04-27.md"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "93000 articles in _llm_release_v2, index.jsonl 93000 lines"
+    },
+    {
+      "id": "US-003",
+      "title": "final_pack 输出验证",
+      "description": "抽样验证 final_pack 输出正确性，确保数据质量。",
+      "acceptanceCriteria": [
+        "随机抽样 20 篇文章，每篇都包含 llm_input.md、meta.json、sidecar.json、poster_ocr.json",
+        "manifest.json 中 quality_counts 字段存在且合理",
+        "结果追加到 NIGHT_WATCHER_LOG_2026-04-27.md"
+      ],
+      "priority": 3,
+      "passes": true,
+      "notes": "20/20 抽样通过，全部包含 llm_input.md, meta.json, sidecar.json, poster_ocr.json"
+    },
+    {
+      "id": "US-004",
+      "title": "Qwen3.6-27B 参数校准 sweep",
+      "description": "运行参数校准 sweep，为下游 LLM 处理生成最优 temperature/top_p/max_tokens 配置。",
+      "acceptanceCriteria": [
+        "node tools/runQwenCalibrationSweep.mjs --inputDir D:/DDownload/_llm_artifacts --timeoutMs 300000 执行完成无报错",
+        "qwen3.6-recommended-params.json 存在",
+        "包含 strict/stable/balanced/wide 四个 profile，每个有 temperature/top_p/max_tokens",
+        "结果追加到 NIGHT_WATCHER_LOG_2026-04-27.md"
+      ],
+      "priority": 4,
+      "passes": true,
+      "notes": "stable 最优 (138.285), temp=0.1, top_p=0.9, max=2048, 480 results"
+    },
+    {
+      "id": "US-005",
+      "title": "下游评估矩阵",
+      "description": "用校准后的参数运行下游评估矩阵（20 样本 x 3 prompts），验证参数质量。",
+      "acceptanceCriteria": [
+        "node tools/runDownstreamEvalMatrix.mjs --inputDir D:/DDownload/_llm_artifacts --models Qwen3.6-27B --paramsPath qwen3.6-recommended-params.json --sampleLimit 20 --rounds 1 执行完成无报错",
+        "eval-matrix-results.jsonl 存在且行数 >= 60",
+        "结果追加到 NIGHT_WATCHER_LOG_2026-04-27.md"
+      ],
+      "priority": 5,
+      "passes": true,
+      "notes": "60 results, 57 succeeded / 3 failed, 95% success rate"
+    },
+    {
+      "id": "US-006",
+      "title": "checkpoint_stop 总结与归档",
+      "description": "生成完整总结报告，通过 mem0 记录关键结果，更新 manifest 状态。",
+      "acceptanceCriteria": [
+        "NIGHT_WATCHER_FINAL_REPORT_2026-04-27.md 生成，包含各阶段结果、数据统计、问题、下一步建议",
+        "关键结果写入 mem0 (user_id=pc-global)",
+        "manifest.md 中 run_state.status 更新为 completed",
+        "所有 6 个 story passes 更新为 true"
+      ],
+      "priority": 6,
+      "passes": true,
+      "notes": "最终报告已生成，manifest 已更新为 completed"
+    }
+  ]
+}

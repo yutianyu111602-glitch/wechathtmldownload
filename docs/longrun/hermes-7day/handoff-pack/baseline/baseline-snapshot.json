@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-04-29T12:04:19.010491",
+  "outputBase": "/mnt/d/HTML/hermes-longrun-2026-04-28",
+  "files": {
+    "release_manifest": {
+      "exists": true,
+      "path": "/mnt/d/DDownload/_llm_release_v2/manifest.json"
+    },
+    "capture_manifest": {
+      "exists": false,
+      "path": "/mnt/d/HTML/hermes-longrun-2026-04-28/.hermes_wechat_history/manifest.jsonl"
+    },
+    "loopy_db": {
+      "exists": true,
+      "size_bytes": 546897920,
+      "path": "/mnt/d/HTML/.loopy_archiver/archiver.db"
+    }
+  },
+  "disk": {
+    "raw": "Filesystem      Size  Used Avail Use% Mounted on\nD:\\              15T  6.3T  8.4T  43% /mnt/d\n"
+  }
+}

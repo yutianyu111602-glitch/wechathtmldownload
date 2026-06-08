@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenClaw Docker Skill Handoff Round87</title>
+  <style>
+    :root {
+      --bg: #f6f7f8;
+      --panel: #ffffff;
+      --text: #1f2933;
+      --muted: #64707d;
+      --line: #d8dde3;
+      --ok: #147d64;
+      --warn: #a35f00;
+      --stop: #b42318;
+      --blue: #2368a2;
+      --code: #f0f3f6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.55 "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+    }
+    header {
+      background: #202832;
+      color: #fff;
+      padding: 22px 28px;
+      border-bottom: 1px solid #111820;
+    }
+    header h1 { margin: 0 0 6px; font-size: 22px; letter-spacing: 0; }
+    header p { margin: 0; color: #c6d0dc; }
+    main {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 18px auto 40px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
+    h2 { margin: 0 0 12px; font-size: 17px; }
+    h3 { margin: 16px 0 8px; font-size: 14px; color: #263341; }
+    p { margin: 8px 0; }
+    ul { margin: 8px 0 0 20px; padding: 0; }
+    li { margin: 4px 0; }
+    code {
+      background: var(--code);
+      padding: 1px 4px;
+      border-radius: 4px;
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 12px;
+    }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px;
+      background: #fbfcfd;
+    }
+    .metric strong { display: block; font-size: 18px; margin-bottom: 2px; }
+    .metric span { color: var(--muted); font-size: 12px; }
+    .badge {
+      display: inline-block;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      margin-right: 6px;
+    }
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .stop { color: var(--stop); }
+    .blue { color: var(--blue); }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+    th, td { border-bottom: 1px solid var(--line); padding: 8px; text-align: left; vertical-align: top; }
+    th { color: #334151; background: #f2f5f8; }
+    .paths td:first-child { width: 280px; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 860px) {
+      .grid, .split { grid-template-columns: 1fr; }
+      header { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>OpenClaw Docker Skill Handoff Round87</h1>
+    <p>2026-06-06 · canonical Markdown: docs/OPENCLAW_DOCKER_SKILL_HANDOFF_ROUND87_20260606.md</p>
+  </header>
+  <main>
+    <section>
+      <h2>主问题</h2>
+      <p>OpenClaw weekly Docker/skill lane 已接近可跑全量增量，但 Round87 尚未证明真实 full incremental candidate run。</p>
+      <p>
+        <span class="badge ok">当前包质量绿</span>
+        <span class="badge warn">全量增量未跑通</span>
+        <span class="badge blue">controller release 仅 report-only</span>
+      </p>
+    </section>
+
+    <section>
+      <h2>已确认</h2>
+      <div class="grid">
+        <div class="metric"><strong class="ok">check_only_ok</strong><span>最新 fallback 状态</span></div>
+        <div class="metric"><strong class="ok">155</strong><span>current_release item_count</span></div>
+        <div class="metric"><strong class="ok">0</strong><span>缺 CloudBase poster fileId</span></div>
+        <div class="metric"><strong class="ok">0</strong><span>公网/临时 poster URL</span></div>
+        <div class="metric"><strong class="warn">6</strong><span>missing_geo_count，非 hard fail</span></div>
+        <div class="metric"><strong class="ok">0</strong><span>Round87 controller-release leak count</span></div>
+      </div>
+      <h3>关键报告</h3>
+      <ul>
+        <li><code>tools/stage7_rewrite/reports/openclaw_weekly_daily_nonllm_20260606_151557/nonllm_fallback_summary.json</code></li>
+        <li><code>tools/stage7_rewrite/reports/openclaw_weekly_daily_nonllm_20260606_151557/current_release_quality_gate.json</code></li>
+        <li><code>tools/stage7_rewrite/reports/weekly_source_material_recovery_controller_release_round87_20260606/source_material_recovery_controller_release.json</code></li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Round87 做了什么</h2>
+      <ul>
+        <li>新增 <code>build_weekly_source_material_recovery_controller_release.py</code>，补齐 runtime preflight 之后的 controller-release 包。</li>
+        <li>新增对应 pytest，覆盖 ready、blocked、missing task、leak redaction、CLI report、markdown scorecard。</li>
+        <li>把 controller-release 包接入 <code>openclaw-weekly-daily-nonllm-fallback.ps1</code>。</li>
+        <li>修复 fallback summary 字段命名歧义：packet 与 release 分开记录。</li>
+        <li>把新状态接入 Darwin scorecard，明确 controller release 不等于 runtime executed。</li>
+        <li>验证最新小程序前端适配：CloudBase fileId 后端真值、temp URL 仅前端运行态。</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>未做 / 禁止误判</h2>
+      <div class="split">
+        <div>
+          <h3>Round87 未执行</h3>
+          <ul>
+            <li>Docker worker / source refresh / network fetch / OCR</li>
+            <li>StepFun / MiMo API</li>
+            <li>CloudBase Storage 或 DB 写入</li>
+            <li>DB2 / DB3 写入</li>
+            <li>CloudRun deploy / 小程序上传 / 微信审核 / 正式发布</li>
+          </ul>
+        </div>
+        <div>
+          <h3>容易误判的点</h3>
+          <ul>
+            <li>Round87 没有亲自修 11 个缺 poster fileId，只验证当前状态已绿。</li>
+            <li>Darwin 分数不是执行授权，执行权仍在 hard gate。</li>
+            <li>前端 temp URL 成功不代表后端包字段可写 temp URL。</li>
+            <li>不要清理 dirty repo；这里有大量既有 WIP 和生成产物。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>验证状态</h2>
+      <table>
+        <thead><tr><th>检查</th><th>结果</th></tr></thead>
+        <tbody>
+          <tr><td>Round87 focused Python regression</td><td><span class="ok">46 passed</span></td></tr>
+          <tr><td>PowerShell fallback parser</td><td><span class="ok">parse_ok</span></td></tr>
+          <tr><td>字段命名回归</td><td><span class="ok">25 passed</span></td></tr>
+          <tr><td>production-data-source.test.cjs</td><td><span class="ok">2 passed</span></td></tr>
+          <tr><td>cloud-poster-url.test.cjs</td><td><span class="ok">8 passed</span></td></tr>
+          <tr><td>Full incremental candidate run</td><td><span class="warn">未运行</span></td></tr>
+          <tr><td>DevTools 首屏渲染 proof</td><td><span class="warn">Round87 未重跑</span></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>下一步入口</h2>
+      <ol>
+        <li>先打开最新 fallback summary 和 current quality gate，确认当前质量仍绿。</li>
+        <li>基于当前绿状态重新生成 next-action、Darwin、full-incremental hard gate。</li>
+        <li>如果 hard gate 允许，运行 no-deploy/no-upload/no-release 的 full incremental candidate。</li>
+        <li>只有 candidate 质量和前端/后端 smoke 都绿，才进入 CloudBase/DB/发布写门。</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>OpenHuman / HTML 状态</h2>
+      <p>OpenHuman 导入：<span class="warn">未导入</span>，原因是 <code>C:\Users\pc\.openhuman\active_user.toml</code> 缺失，无法解析 active workspace。</p>
+      <p>HTML companion：当前文件，来源于 Markdown handoff，不是独立 SSOT。</p>
+    </section>
+
+    <section>
+      <h2>关键文件</h2>
+      <table class="paths">
+        <thead><tr><th>用途</th><th>路径</th></tr></thead>
+        <tbody>
+          <tr><td>交接 Markdown</td><td><code>C:\code\githubstar\wechathtmldownload\docs\OPENCLAW_DOCKER_SKILL_HANDOFF_ROUND87_20260606.md</code></td></tr>
+          <tr><td>controller-release 脚本</td><td><code>tools/stage7_rewrite/scripts/build_weekly_source_material_recovery_controller_release.py</code></td></tr>
+          <tr><td>fallback 集成</td><td><code>C:\Users\pc\.openclaw\bin\openclaw-weekly-daily-nonllm-fallback.ps1</code></td></tr>
+          <tr><td>Darwin 集成</td><td><code>tools/stage7_rewrite/scripts/build_openclaw_weekly_darwin_scorecard.py</code></td></tr>
+          <tr><td>Round87 报告</td><td><code>tools/stage7_rewrite/reports/weekly_source_material_recovery_controller_release_round87_20260606/source_material_recovery_controller_release.json</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>
+

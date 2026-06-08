@@ -1,0 +1,363 @@
+{
+  "id": "atlas-production-autofinish-20260519",
+  "title": "中国地下电子音乐图鉴生产长跑自动收尾",
+  "project_root": "C:\\code\\githubstar\\wechathtmldownload",
+  "updated": "2026-05-20T04:00:00+08:00",
+  "mainline": "中国地下电子音乐图鉴",
+  "scope": {
+    "include": [
+      "文档权威整合",
+      "127,511 图鉴基线",
+      "Stage7 图谱标记",
+      "1024-d role-isolated vectors",
+      "bounded no-login network/media/profile evidence",
+      "reviewed GraphCandidatePack",
+      "graph/vector/search/RAG smoke",
+      "final handoff and MkDocs evidence"
+    ],
+    "exclude_without_explicit_gate": [
+      "additional Qdrant alias mutation or rollback beyond the recorded all-DeepSeek alias apply",
+      "additional Neo4j production mutation beyond the verified 127,511 marker",
+      "SQLite write target if a future release path introduces SQLite",
+      "cloud mem0 or consumer personalization beyond the local canary",
+      "paid Dajiala rerun beyond the current queue-consumption audit",
+      "CloudRun publish",
+      "mini-program upload",
+      "9router"
+    ]
+  },
+  "current_truth": {
+    "stable_articles": 127511,
+    "graph_marker": "stage7_all_deepseek_127511_prod_20260520",
+    "graph_entities": 875368,
+    "graph_events": 150752,
+    "consumer_release_pack": "tools\\stage7_rewrite\\reports\\consumer_release_pack_all_deepseek_127511_20260520\\manifest.json",
+    "consumer_release_entities": 1456325,
+    "consumer_release_events": 589365,
+    "vector_router_smoke": "ready",
+    "qdrant_alias_gate": "ready_report_only",
+    "qdrant_role_alias_apply": "complete",
+    "qdrant_role_alias_apply_report": "tools\\stage7_rewrite\\reports\\qdrant_role_alias_apply_all_deepseek_127490_20260520\\qdrant_role_alias_apply_report.json",
+    "qdrant_role_alias_apply_action_count": 9,
+    "qdrant_role_alias_router_smoke": "ready",
+    "qdrant_role_alias_post_apply_gate_hard_gates": 0,
+    "neo4j_production_verify": "graph_production_promotion_verified",
+    "neo4j_production_verify_report": "tools\\stage7_rewrite\\reports\\graph_production_promotion_all_deepseek_127511_verify_20260520\\promotion_report.json",
+    "production_sqlite_surface_decision": "production_sqlite_not_applicable_to_current_selected_release_path",
+    "mem0_local_write_read_canary": "passed",
+    "mem0_local_rows_written": 3,
+    "mem0_write_gate_hard_gates": 0,
+    "external_identity_source_followup_rows": 100,
+    "external_identity_source_followup_accessible_rows": 79,
+    "external_identity_source_followup_manual_review_rows": 57,
+    "external_identity_review_gate_rejected_rows": 53,
+    "external_identity_review_gate_needs_more_source_rows": 47,
+    "graph_candidate_pack_base_ready": true,
+    "graph_candidate_pack_external_identity_edges": 0,
+    "source_context_recovery_input_rows": 47,
+    "source_context_recovery_rows_with_candidates": 39,
+    "source_context_decision_future_direct_proof_rows": 16,
+    "source_context_decision_review_only_rows": 16,
+    "source_context_decision_rejected_for_graph_now_rows": 7,
+    "future_direct_proof_followup_accessible_rows": 16,
+    "future_direct_proof_followup_manual_review_rows": 13,
+    "future_direct_proof_review_gate_needs_more_source_rows": 16,
+    "future_direct_proof_review_gate_candidate_direct_text_rows": 0,
+    "graph_candidate_pack_final_lock_external_identity_edges": 0,
+    "graph_rag_recommendation_current_smoke": "ready_report_only",
+    "external_identity_accepted_for_graph": 0,
+    "source_lineage_decision": "atlas_full_source_lineage_ready_report_only",
+    "source_lineage_script_files_scanned": 1501,
+    "source_lineage_references": 4416,
+    "source_lineage_d_paths_recorded_not_scanned": 246,
+    "full_v6_structured_rows_consumed_into_all_deepseek_layer": 81417,
+    "residual_p1_low_quality_ocr_text_rows": 99,
+    "residual_p1_ocr_empty_rows": 30,
+    "gap_backfill_decision": "atlas_gap_backfill_execution_packet_ready_report_only",
+    "gap_backfill_action_count": 11,
+    "gap_backfill_no_rerun_count": 3,
+    "gap_backfill_gate_required_count": 8,
+    "fullmap_old_route_initial_ocr_debt_rows": 3878,
+    "fullmap_old_route_dajiala130_promoted_rows": 130,
+    "fullmap_old_route_retry21_promoted_rows": 21,
+    "fullmap_old_route_retry_failures_or_unavailable_rows": 10,
+    "fullmap_old_route_deleted_or_unavailable_not_retried_rows": 4,
+    "fullmap_old_route_unsigned_source_repair_rows": 3338,
+    "dajiala_legacy_unfinished_audit_known_unconsumed_queue_rows": 0,
+    "dajiala_paid_queue_input_rows": 2556,
+    "dajiala_paid_queue_used_keys": 2556,
+    "dajiala_paid_queue_excluded_zero_yield_rows": 436,
+    "dajiala_current_unconsumed_candidate_rows_after_exclusions": 0,
+    "dajiala_paid_remaining_superlongrun_20260519_selected_rows": 0,
+    "dajiala_paid_remaining_superlongrun_20260519_estimated_cost": 0,
+    "final_full_pipeline_readiness": "full_pipeline_ready",
+    "superlongrun_production_state_20260519_backend_refresh": "superseded_stale_default_smoke_not_authority"
+  },
+  "stories": [
+    {
+      "id": "ATLAS-P0-S4",
+      "status": "complete",
+      "title": "script-derived full source lineage for 47k + 93k + gap",
+      "outputs": [
+        "tools\\stage7_rewrite\\reports\\atlas_full_source_lineage_47k_93k_gap_20260519\\atlas_full_source_lineage.md",
+        "tools\\stage7_rewrite\\reports\\atlas_full_source_lineage_47k_93k_gap_20260519\\atlas_full_source_lineage.json",
+        "tools\\stage7_rewrite\\reports\\atlas_full_source_lineage_47k_93k_gap_20260519\\production_source_decision_table.jsonl",
+        "tools\\stage7_rewrite\\reports\\atlas_full_source_lineage_47k_93k_gap_20260519\\script_path_references.jsonl"
+      ],
+      "acceptance": [
+        "derive source families from bounded script/report inspection",
+        "record D:/mnt/d references without scanning D:",
+        "separate current 127,511 production marker from historical 47k checkpoints and residual quality gaps",
+        "no graph/vector/database writes or paid API calls"
+      ]
+    },
+    {
+      "id": "ATLAS-P2-S2",
+      "status": "complete",
+      "title": "bounded no-login source/profile-content follow-up",
+      "inputs": [
+        "tools\\stage7_rewrite\\reports\\external_identity_adjudication_47k_delta375_20260519\\external_identity_source_followup_queue.jsonl"
+      ],
+      "outputs": [
+        "tools\\stage7_rewrite\\reports\\external_identity_source_followup_47k_delta375_20260519\\source_followup_summary.md",
+        "tools\\stage7_rewrite\\reports\\external_identity_source_followup_47k_delta375_20260519\\source_followup_review.jsonl",
+        "tools\\stage7_rewrite\\reports\\external_identity_source_followup_47k_delta375_20260519\\accepted_external_identity_edges_for_graph.jsonl",
+        "tools\\stage7_rewrite\\reports\\external_identity_source_followup_candidate_only_47k_delta375_20260519\\source_followup_summary.md",
+        "tools\\stage7_rewrite\\reports\\external_identity_source_followup_candidate_only_47k_delta375_20260519\\source_followup_review.jsonl",
+        "tools\\stage7_rewrite\\reports\\external_identity_source_followup_candidate_only_47k_delta375_20260519\\accepted_external_identity_edges_for_graph.jsonl"
+      ],
+      "acceptance": [
+        "no login/cookie/secret/browser-profile usage",
+        "bounded public fetch only",
+        "raw handle or reachability does not create graph edges",
+        "accepted_for_graph remains 0 unless direct source/profile content proves identity"
+      ]
+    },
+    {
+      "id": "ATLAS-P2-S3",
+      "status": "complete",
+      "title": "strict source-follow-up acceptance/rejection ledger",
+      "inputs": [
+        "tools\\stage7_rewrite\\reports\\external_identity_source_followup_47k_delta375_20260519\\source_followup_review.jsonl",
+        "tools\\stage7_rewrite\\reports\\external_identity_source_followup_candidate_only_47k_delta375_20260519\\source_followup_review.jsonl"
+      ],
+      "outputs": [
+        "tools\\stage7_rewrite\\reports\\external_identity_source_followup_review_gate_47k_delta375_20260519\\source_followup_review_gate_summary.md",
+        "tools\\stage7_rewrite\\reports\\external_identity_source_followup_review_gate_47k_delta375_20260519\\source_followup_review_gate.jsonl",
+        "tools\\stage7_rewrite\\reports\\external_identity_source_followup_review_gate_47k_delta375_20260519\\accepted_external_identity_edges_for_graph.jsonl"
+      ],
+      "acceptance": [
+        "reject generic platform/profile-index false positives",
+        "handle/reachability alone cannot pass",
+        "accepted rows require direct profile/source identity text",
+        "no graph/vector/database writes"
+      ]
+    },
+    {
+      "id": "ATLAS-P3-S1",
+      "status": "complete",
+      "title": "reviewed GraphCandidatePack build",
+      "acceptance": [
+        "external identity edge pack remains empty because accepted_for_graph is 0",
+        "readiness packet names the 47 needs-more-source rows",
+        "dry-run import/schema step does not invent profile edges"
+      ]
+    },
+    {
+      "id": "ATLAS-P3-S2",
+      "status": "complete",
+      "title": "source-context recovery for needs-more-source rows",
+      "inputs": [
+        "tools\\stage7_rewrite\\reports\\graph_candidate_pack_readiness_47k_delta375_20260519\\external_identity_needs_more_source_queue.jsonl"
+      ],
+      "outputs": [
+        "tools\\stage7_rewrite\\reports\\external_identity_source_context_recovery_47k_delta375_20260519\\source_context_recovery_summary.md",
+        "tools\\stage7_rewrite\\reports\\external_identity_source_context_recovery_47k_delta375_20260519\\source_context_recovery.jsonl"
+      ],
+      "acceptance": [
+        "local/source-backed context only",
+        "no graph/vector/database writes",
+        "do not accept identity from recovered context alone"
+      ]
+    },
+    {
+      "id": "ATLAS-P3-S3",
+      "status": "complete",
+      "title": "source-context decision for recovered candidates",
+      "inputs": [
+        "tools\\stage7_rewrite\\reports\\external_identity_source_context_recovery_47k_delta375_20260519\\source_context_recovery.jsonl"
+      ],
+      "outputs": [
+        "tools\\stage7_rewrite\\reports\\external_identity_source_context_decision_47k_delta375_20260519\\source_context_decision_summary.md",
+        "tools\\stage7_rewrite\\reports\\external_identity_source_context_decision_47k_delta375_20260519\\source_context_decision_summary.json",
+        "tools\\stage7_rewrite\\reports\\external_identity_source_context_decision_47k_delta375_20260519\\source_context_decision.jsonl",
+        "tools\\stage7_rewrite\\reports\\external_identity_source_context_decision_47k_delta375_20260519\\future_direct_proof_pass_queue.jsonl",
+        "tools\\stage7_rewrite\\reports\\external_identity_source_context_decision_47k_delta375_20260519\\review_only_context_queue.jsonl",
+        "tools\\stage7_rewrite\\reports\\external_identity_source_context_decision_47k_delta375_20260519\\rejected_source_context_only_for_graph.jsonl",
+        "tools\\stage7_rewrite\\reports\\external_identity_source_context_decision_47k_delta375_20260519\\accepted_external_identity_edges_for_graph.jsonl"
+      ],
+      "acceptance": [
+        "source-context-only evidence does not become profile identity proof",
+        "accepted_for_graph remains 0 unless direct profile/source proof exists",
+        "no graph/vector/database writes"
+      ]
+    },
+    {
+      "id": "ATLAS-P3-S4",
+      "status": "complete",
+      "title": "future direct-proof public follow-up",
+      "inputs": [
+        "tools\\stage7_rewrite\\reports\\external_identity_source_context_decision_47k_delta375_20260519\\future_direct_proof_pass_queue.jsonl"
+      ],
+      "outputs": [
+        "tools\\stage7_rewrite\\reports\\external_identity_future_direct_proof_followup_47k_delta375_20260519\\source_followup_summary.md",
+        "tools\\stage7_rewrite\\reports\\external_identity_future_direct_proof_followup_47k_delta375_20260519\\source_followup_summary.json",
+        "tools\\stage7_rewrite\\reports\\external_identity_future_direct_proof_followup_47k_delta375_20260519\\source_followup_review.jsonl",
+        "tools\\stage7_rewrite\\reports\\external_identity_future_direct_proof_followup_47k_delta375_20260519\\accepted_external_identity_edges_for_graph.jsonl"
+      ],
+      "acceptance": [
+        "bounded no-login public URL fetch only",
+        "raw page bodies are not persisted",
+        "accepted_for_graph remains 0",
+        "no graph/vector/database writes"
+      ]
+    },
+    {
+      "id": "ATLAS-P3-S5",
+      "status": "complete",
+      "title": "future direct-proof strict review gate",
+      "inputs": [
+        "tools\\stage7_rewrite\\reports\\external_identity_future_direct_proof_followup_47k_delta375_20260519\\source_followup_review.jsonl"
+      ],
+      "outputs": [
+        "tools\\stage7_rewrite\\reports\\external_identity_future_direct_proof_review_gate_47k_delta375_20260519\\source_followup_review_gate_summary.md",
+        "tools\\stage7_rewrite\\reports\\external_identity_future_direct_proof_review_gate_47k_delta375_20260519\\source_followup_review_gate_summary.json",
+        "tools\\stage7_rewrite\\reports\\external_identity_future_direct_proof_review_gate_47k_delta375_20260519\\source_followup_review_gate.jsonl",
+        "tools\\stage7_rewrite\\reports\\external_identity_future_direct_proof_review_gate_47k_delta375_20260519\\accepted_external_identity_edges_for_graph.jsonl"
+      ],
+      "acceptance": [
+        "strict gate keeps graph edge output empty without direct proof",
+        "needs-more-source rows remain queued",
+        "no graph/vector/database writes"
+      ]
+    },
+    {
+      "id": "ATLAS-P3-S6",
+      "status": "complete",
+      "title": "GraphCandidatePack final lock",
+      "inputs": [
+        "tools\\stage7_rewrite\\reports\\external_identity_future_direct_proof_review_gate_47k_delta375_20260519\\source_followup_review_gate_summary.json"
+      ],
+      "outputs": [
+        "tools\\stage7_rewrite\\reports\\graph_candidate_pack_final_lock_47k_delta375_20260519\\graph_candidate_pack_readiness.md",
+        "tools\\stage7_rewrite\\reports\\graph_candidate_pack_final_lock_47k_delta375_20260519\\graph_candidate_pack_readiness.json",
+        "tools\\stage7_rewrite\\reports\\graph_candidate_pack_final_lock_47k_delta375_20260519\\external_identity_edges_for_graphcandidatepack.jsonl",
+        "tools\\stage7_rewrite\\reports\\graph_candidate_pack_final_lock_47k_delta375_20260519\\external_identity_needs_more_source_queue.jsonl"
+      ],
+      "acceptance": [
+        "base graph ready is true",
+        "external identity edge pack remains empty",
+        "no graph/vector/database writes"
+      ]
+    },
+    {
+      "id": "ATLAS-P6-S1",
+      "status": "complete",
+      "title": "Graph/RAG/recommendation current smoke synthesis after final lock",
+      "outputs": [
+        "tools\\stage7_rewrite\\reports\\graph_rag_recommendation_current_smoke_47k_delta375_final_lock_20260519\\graph_rag_recommendation_current_smoke.md",
+        "tools\\stage7_rewrite\\reports\\graph_rag_recommendation_current_smoke_47k_delta375_final_lock_20260519\\graph_rag_recommendation_current_smoke.json"
+      ],
+      "acceptance": [
+        "report-only synthesis from current vector/router/RAG/recommendation evidence",
+        "no model call, Qdrant query/write, Neo4j query/write, or publish"
+      ]
+    },
+    {
+      "id": "ATLAS-P7-S1",
+      "status": "complete",
+      "title": "residual gap and backfill execution packet",
+      "inputs": [
+        "tools\\stage7_rewrite\\reports\\atlas_full_source_lineage_47k_93k_gap_20260519\\atlas_full_source_lineage.json",
+        "tools\\stage7_rewrite\\reports\\atlas_gap_ledger_refresh_20260519_0715\\gap_ledger.json"
+      ],
+      "outputs": [
+        "tools\\stage7_rewrite\\reports\\atlas_gap_backfill_execution_packet_20260519\\gap_backfill_execution_packet.md",
+        "tools\\stage7_rewrite\\reports\\atlas_gap_backfill_execution_packet_20260519\\gap_backfill_execution_packet.json",
+        "tools\\stage7_rewrite\\reports\\atlas_gap_backfill_execution_packet_20260519\\gap_backfill_actions.jsonl"
+      ],
+      "acceptance": [
+        "already-consumed artifacts are marked no-rerun",
+        "candidate-only 93k/FULL_MAP and full V6 rows are not promoted blindly",
+        "residual OCR and Dajiala queues require explicit source/ROI/no-duplicate gates",
+        "no D: scan, paid API, graph/vector/database write, or alias apply"
+      ]
+    },
+    {
+      "id": "ATLAS-P5-S1",
+      "status": "complete",
+      "title": "Qdrant role alias production apply",
+      "inputs": [
+        "tools\\stage7_rewrite\\reports\\qdrant_role_alias_gate_47k_delta375_20260519\\qdrant_role_alias_gate.json"
+      ],
+      "outputs": [
+        "tools\\stage7_rewrite\\reports\\qdrant_role_alias_apply_47k_delta375_20260519\\qdrant_role_alias_apply_report.md",
+        "tools\\stage7_rewrite\\reports\\qdrant_role_alias_apply_47k_delta375_20260519\\qdrant_role_alias_apply_report.json",
+        "tools\\stage7_rewrite\\reports\\qdrant_role_alias_apply_47k_delta375_20260519\\rollback_actions.json",
+        "tools\\stage7_rewrite\\reports\\qdrant_role_alias_router_smoke_47k_delta375_20260519\\qdrant_role_alias_router_smoke.md",
+        "tools\\stage7_rewrite\\reports\\vector_collection_router_smoke_47k_delta375_roles_post_alias_apply_20260519\\vector_collection_router_smoke.md",
+        "tools\\stage7_rewrite\\reports\\qdrant_role_alias_gate_post_apply_47k_delta375_20260519\\qdrant_role_alias_gate.md"
+      ],
+      "acceptance": [
+        "explicit confirm token is used",
+        "rollback packet is generated",
+        "post-apply alias-path router smoke passes",
+        "post-apply collection router smoke passes",
+        "post-apply gate has zero hard gates",
+        "only Qdrant alias metadata is mutated"
+      ]
+    },
+    {
+      "id": "ATLAS-P8-S1",
+      "status": "complete",
+      "title": "Neo4j/SQLite/mem0/Dajiala production backend refresh",
+      "outputs": [
+        "tools\\stage7_rewrite\\reports\\graph_production_promotion_47k_plus_v6_p1_repair_1397_plus_paid_wave09_21_delta375_verify_20260519\\promotion_report.md",
+        "tools\\stage7_rewrite\\reports\\production_sqlite_surface_decision_20260519\\production_sqlite_surface_decision.md",
+        "tools\\stage7_rewrite\\reports\\mem0_local_write_read_canary_20260519\\mem0_local_write_read_canary.md",
+        "tools\\stage7_rewrite\\reports\\mem0_write_gate_packet_20260519\\mem0_write_gate_packet.md",
+        "tools\\stage7_rewrite\\reports\\dajiala_paid_remaining_superlongrun_20260519\\dajiala_paid_remaining_superlongrun_status.md",
+        "tools\\stage7_rewrite\\reports\\dajiala_paid_queue_consumption_audit_20260519\\dajiala_paid_queue_consumption_audit.md",
+        "tools\\stage7_rewrite\\reports\\prd_longrun_status_20260519_post_mem0_dajiala\\prd_longrun_status.json"
+      ],
+      "acceptance": [
+        "Neo4j 47,340 production marker is verified with current counts",
+        "SQLite is classified as non-applicable because the selected CloudRun/miniprogram lane has no SQLite write target",
+        "local mem0 Postgres canary writes/upserts 3 rows and query self-hit passes",
+        "paid Dajiala formal longrun selects 0 rows after current de-duplication and exclusions, so no paid request is made",
+        "Dajiala queue audit shows input 2,556, used keys 2,556, excluded zero-yield rows 436, unconsumed candidates 0"
+      ]
+    },
+    {
+      "id": "ATLAS-P9-S1",
+      "status": "complete",
+      "title": "final readiness closure",
+      "outputs": [
+        "tools\\stage7_rewrite\\reports\\final_full_pipeline_readiness_20260519_backend_refresh\\final_full_pipeline_readiness.md"
+      ],
+      "acceptance": [
+        "final readiness decision is full_pipeline_ready",
+        "full pipeline run allowed is true",
+        "blocked PRD count is 0",
+        "the generated superlongrun production-state packet is not used as current authority because it used stale default CloudRun smoke inputs"
+      ]
+    }
+  ],
+  "verification": [
+    "python tools\\stage7_rewrite\\scripts\\audit_wechat_graph_pipeline_doc_truth_sync.py --out-dir reports\\<run-id>",
+    "python scripts\\audit_stage7_doc_truth_sync.py --out-dir reports\\<run-id>",
+    "powershell -NoProfile -ExecutionPolicy Bypass -File tools\\stage7_rewrite\\scripts\\stage7_safe_handoff_verify.ps1",
+    "powershell -NoProfile -ExecutionPolicy Bypass -File C:\\code\\scripts\\docs-build-active-projects.ps1",
+    "powershell -NoProfile -ExecutionPolicy Bypass -File C:\\code\\scripts\\docs-neat-closeout.ps1"
+  ]
+}

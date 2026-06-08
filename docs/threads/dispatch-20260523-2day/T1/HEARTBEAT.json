@@ -1,0 +1,26 @@
+{
+  "thread": "T1",
+  "updated_at": "2026-05-28T14:00:00+08:00",
+  "status": "diagnostic_complete_report_only",
+  "last_primary_queue": "Q2",
+  "last_result": "Fresh source-intake static diagnostic complete. Registry 129 (125 active), articles DB 139123 rows/117 accounts, 17 active account gaps, source URL recovery 100%, new-to-Atlas diff 1021 rows (2 accounts). Docker exporter session_ok=true but full-129-account queue is 5 days stale. T4 diff-ready=true; T2 package-ready=false.",
+  "last_evidence": [
+    "reports/atlas_t1_source_intake_20260528/summary.json",
+    "reports/atlas_t1_source_intake_20260528/diagnostic.md",
+    "reports/ATLAS_T1_EXPORTER_NO_SECRET_SESSION_GATE_20260525.md",
+    "tools/stage7_rewrite/reports/OPENCLAW_PACKAGE_AUDIT_20260527.md"
+  ],
+  "stop_reason": null,
+  "wait_reason": "t1_exporter_session_requires_auth_or_fresh_session for fresh full-129-account queue. 17 active registry accounts not yet ingested.",
+  "next_resume_pointer": "reports/atlas_t1_source_intake_20260528/summary.json",
+  "t2_handoff": {
+    "package_ready": false,
+    "available": "incremental 1021-row queue (fouroneone_hangzhou+stereo52, 2026-05-22), 196 activity events in candidate DB"
+  },
+  "t4_handoff": {
+    "diff_ready": true,
+    "new_urls": 1021,
+    "source_url_coverage_pct": 100.0,
+    "available": "new_to_atlas_urls.jsonl (1021), atlas_source_url_recovery.sqlite (139123), activity candidate DB (196 events/2181 evidence)"
+  }
+}

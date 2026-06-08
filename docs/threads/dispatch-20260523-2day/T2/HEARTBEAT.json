@@ -1,0 +1,15 @@
+{
+  "thread": "T2",
+  "updated_at": "2026-05-26T15:56:00+08:00",
+  "status": "assigned_weekly_package_root_drift_resolution",
+  "last_primary_queue": "Q3",
+  "last_result": "Full production dispatch assigns T2 to resolve weekly_default_vs_deploy_current_release_drift as an active production lane, then deploy backend/resource if release gates pass.",
+  "last_evidence": [
+    "reports/ATLAS_T0_FULL_PRODUCTION_THREAD_DISPATCH_20260526.md",
+    "reports/WEEKLY_T2_T3_RELEASE_READINESS_DRIFT_HOOK_20260526.md",
+    "tools/stage7_rewrite/reports/weekly_release_candidate_dry_run_with_drift_gate_20260526/weekly_release_candidate_dry_run.json"
+  ],
+  "stop_reason": "weekly_default_vs_deploy_current_release_drift_until_sync_or_redirect_packet_passes",
+  "wait_reason": "Need release-guardian sync/redirect evidence before backend/resource deploy.",
+  "next_resume_pointer": "tools/stage7_rewrite/reports/weekly_release_candidate_dry_run_with_drift_gate_20260526/weekly_release_candidate_dry_run.json"
+}

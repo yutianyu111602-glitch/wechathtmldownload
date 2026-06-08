@@ -1,0 +1,66 @@
+# Hermes 7-Day Longrun Configuration
+# Copy to: ~/.config/hermes/config.yaml or use with: hermes --config
+
+# Model Configuration
+model:
+  provider: deepseek
+  model: deepseek-v4-pro
+  api_key: "${DEEPSEEK_API_KEY}"
+  base_url: "https://api.deepseek.com/v1"
+  max_tokens: 4096
+  temperature: 0.1
+  top_p: 0.9
+
+# Tool Configuration
+tools:
+  enabled:
+    - file_operations
+    - code_execution
+    - web_tools
+    - memory_tool
+    - delegate_tool
+    - todo_tool
+    - session_search
+    - checkpoint_manager
+  disabled:
+    - browser_tool
+    - voice_mode
+    - tts_tool
+    - image_generation
+    - rl_training_tool
+
+# Memory Configuration
+memory:
+  provider: mem0
+  endpoint: "http://127.0.0.1:11434/v1"
+  agent_id: "hermes_wechat_pipeline"
+  run_id: "hermes-7day-2026-04-28"
+
+# Batch Configuration
+batch:
+  output_dir: "/mnt/d/HTML/hermes-longrun-2026-04-28"
+  checkpoint_interval: 50
+  checkpoint_time_min: 30
+  max_items_per_run: 100
+  resume: true
+
+# Cron Configuration
+cron:
+  enabled: true
+  jobs:
+    - name: "wechat_capture_monitor"
+      schedule: "*/30 * * * *"
+      command: "bash /mnt/c/code/githubstar/wechathtmldownload/docs/longrun/hermes-7day/handoff-pack/scripts/start-hermes-7day.sh monitor"
+    - name: "checkpoint_heartbeat"
+      schedule: "0 * * * *"
+      command: "bash /mnt/c/code/githubstar/wechathtmldownload/docs/longrun/hermes-7day/handoff-pack/scripts/start-hermes-7day.sh checkpoint auto GREEN"
+
+# Safety Configuration
+safety:
+  forbidden_paths:
+    - "/mnt/d/DDownload/_llm_release_v2"
+    - "/mnt/d/DDownload/_llm_release"
+    - "/mnt/d/aidata"
+  max_capture_items: 100
+  checkpoint_max_age_min: 60
+  disk_free_min_gb: 50

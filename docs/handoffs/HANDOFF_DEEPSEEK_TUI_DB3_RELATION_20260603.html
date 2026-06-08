@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>WSL2 DeepSeek TUI 接手报告 - DB3 关系身份门禁</title>
+  <style>
+    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65;margin:40px;max-width:1080px;color:#111827}
+    code{background:#f3f4f6;padding:2px 5px;border-radius:4px}
+    pre{background:#111827;color:#f9fafb;padding:16px;border-radius:8px;overflow:auto}
+    h1,h2{line-height:1.25}
+    .warn{border-left:4px solid #dc2626;padding:8px 14px;background:#fef2f2}
+    .ok{border-left:4px solid #2563eb;padding:8px 14px;background:#eff6ff}
+  </style>
+</head>
+<body>
+  <h1>WSL2 DeepSeek TUI 接手报告 - DB3 关系身份门禁</h1>
+  <p>主文档：<code>docs/handoffs/HANDOFF_DEEPSEEK_TUI_DB3_RELATION_20260603.md</code></p>
+  <p>WSL 主仓：<code>/mnt/c/code/githubstar/wechathtmldownload</code>；Explorer UNC：<code>\\wsl.localhost\Ubuntu\mnt\c\code\githubstar\wechathtmldownload</code>。</p>
+  <p>DeepSeek TUI 目录：<code>/home/pc/.deepseek</code>；历史草稿/mailroom：<code>/mnt/d/agent-comm/drafts</code>，使用前需确认。</p>
+  <div class="ok">本线程职责：只生成接手文档和交接边界；不写 DB，不启动 Docker，不联网抓取，不读凭据，不发布。后续 agent 应把本线程当作文档交接线程。</div>
+  <div class="warn">当前 DB3 blocker 是 <code>db3_same_normalized_name_multi_id=348</code>。DeepSeek TUI 只能做只读分析草稿，不能写 DB，不能进入 S232D-4。</div>
+  <h2>当前状态</h2>
+  <ul>
+    <li>S232D-3B7 repair rows：348</li>
+    <li>provider crosscheck：38</li>
+    <li>manual review：93</li>
+    <li>external evidence required：217</li>
+    <li>approved_for_s232d4：0</li>
+    <li>db_write_allowed_now：0</li>
+  </ul>
+  <h2>下一步</h2>
+  <p>先审 38 条 <code>provider_crosscheck_review</code>，输出 draft-only disposition：merge candidate / preserve separate / non-person or lineup / needs more evidence。</p>
+  <h2>禁止</h2>
+  <p>不写 DB，不联网，不读凭据，不把模型判断当 source-backed evidence，不解锁发布。</p>
+</body>
+</html>

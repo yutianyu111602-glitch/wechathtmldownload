@@ -1,0 +1,59 @@
+{
+  "error_types": [
+    {
+      "code": "TIMEOUT",
+      "description": "Model request exceeded timeout_ms",
+      "retryable": true,
+      "max_retries": 3
+    },
+    {
+      "code": "PARSE_ERROR",
+      "description": "Model response failed JSON parse",
+      "retryable": true,
+      "max_retries": 2
+    },
+    {
+      "code": "OOM",
+      "description": "GPU out of memory",
+      "retryable": false,
+      "action": "STOP_BATCH"
+    },
+    {
+      "code": "MODEL_DOWN",
+      "description": "Model service unavailable",
+      "retryable": true,
+      "max_retries": 3,
+      "action": "STOP_AFTER_RETRIES"
+    },
+    {
+      "code": "CONTEXT_OVERFLOW",
+      "description": "Article + prompt exceeds context limit",
+      "retryable": false,
+      "action": "MOVE_TO_LONG_CONTEXT_QUEUE"
+    },
+    {
+      "code": "MISSING_BODY",
+      "description": "Article body file not found",
+      "retryable": false,
+      "action": "MOVE_TO_BLOCKED_QUEUE"
+    },
+    {
+      "code": "DISK_FULL",
+      "description": "Output disk has < 50GB free",
+      "retryable": false,
+      "action": "STOP_BATCH"
+    },
+    {
+      "code": "CHECKPOINT_CORRUPT",
+      "description": "Checkpoint file unreadable",
+      "retryable": false,
+      "action": "HUMAN_AUDIT"
+    },
+    {
+      "code": "UNKNOWN",
+      "description": "Unclassified error",
+      "retryable": true,
+      "max_retries": 1
+    }
+  ]
+}

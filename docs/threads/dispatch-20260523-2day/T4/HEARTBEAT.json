@@ -1,0 +1,20 @@
+{
+  "thread": "T4",
+  "updated_at": "2026-05-28T04:00:00+08:00",
+  "status": "candidate_activity_preflight_verified_gap_detected_report_only",
+  "last_primary_queue": "Q4",
+  "last_result": "Candidate DB preflight passed (16/16 checks). Table counts match baseline exactly (activity 196/2181, performance_event 508049, dj_profile 53555, dj_event 1285827, dj_relation_rollup 701396, search_document 590927, graph_window_cache 53555, evidence_ref 130591). Activity data integrity: all 196 events have evidence, 100% DJ entity coverage (200/200 artists matched). Critical gap: only 1 account (cicipark) overlaps between Atlas activity sidecar (71 accounts, built May 22) and current weekly release (55 accounts, built May 28). 86 of 94 current weekly items are not in Atlas activity tables. Activity sidecar refresh from May 28 expanded pack (2,101 candidates, 892 high-confidence) is recommended before T5 promotion.",
+  "last_evidence": [
+    "reports/atlas_serving_time_city_year_span_final_candidate_preflight_20260527_2145/promotion_preflight.json",
+    "reports/atlas_serving_time_overlay_span_split_search_date_refresh_candidate_20260527_2018/atlas_serving.sqlite",
+    "reports/atlas_serving_participant_delta_current_20260526_0016/atlas_serving.sqlite",
+    "services/weekly_activity_cloudrun/data/current_release/current.json",
+    "services/weekly_activity_cloudrun/data/current_release/manifest.json",
+    "tools/stage7_rewrite/longrun/WEEKLY_ACTIVITY_EXPANDED_PACK_20260528/summary.json",
+    "tools/stage7_rewrite/longrun/WEEKLY_ACTIVITY_QUEUE_NIGHTLY_20260528/latest_queue.jsonl",
+    "reports/atlas_activity_source_sidecar_current_20260523_132244/summary.json"
+  ],
+  "stop_reason": "activity_sidecar_stale_weekly_refresh_recommended",
+  "wait_reason": "wait_for_t4_activity_sidecar_refresh_from_current_weekly_pack",
+  "next_resume_pointer": "tools/stage7_rewrite/longrun/WEEKLY_ACTIVITY_EXPANDED_PACK_20260528"
+}

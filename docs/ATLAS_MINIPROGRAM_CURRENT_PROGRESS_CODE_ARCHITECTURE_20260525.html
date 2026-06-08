@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Atlas 与微信小程序当前进度、代码架构、代码实际情况</title>
+  <style>
+    :root {
+      --bg: #f6f7f8;
+      --panel: #ffffff;
+      --text: #1f2933;
+      --muted: #5d6875;
+      --line: #d8dee6;
+      --accent: #146c94;
+      --ok: #0b7a53;
+      --warn: #9a5b00;
+      --block: #a43d3d;
+      --code: #eef2f5;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 28px 20px 56px;
+    }
+    header {
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 22px;
+      padding-bottom: 18px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 28px 0 12px;
+      font-size: 20px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 6px;
+    }
+    h3 {
+      margin: 20px 0 10px;
+      font-size: 16px;
+    }
+    p, li {
+      color: var(--text);
+    }
+    .meta, .muted {
+      color: var(--muted);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 14px;
+    }
+    .metric {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      margin: 10px 0 18px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #edf1f4;
+    }
+    code {
+      background: var(--code);
+      border-radius: 4px;
+      padding: 1px 4px;
+      font-family: "Cascadia Mono", Consolas, monospace;
+      font-size: 0.92em;
+    }
+    .tag {
+      display: inline-block;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 1px 6px;
+      background: #fff;
+      color: var(--muted);
+      margin-right: 6px;
+    }
+    .ok { color: var(--ok); font-weight: 650; }
+    .warn { color: var(--warn); font-weight: 650; }
+    .block { color: var(--block); font-weight: 650; }
+    .flow {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 14px;
+      overflow-x: auto;
+      white-space: pre;
+      font-family: "Cascadia Mono", Consolas, monospace;
+    }
+    @media (max-width: 820px) {
+      .grid { grid-template-columns: 1fr; }
+      main { padding: 18px 12px 40px; }
+      h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Atlas 与微信小程序当前进度、代码架构、代码实际情况</h1>
+    <div class="meta">Status: <code>CURRENT_AUTHORITY</code> · Updated: 2026-05-25 14:09 CST · Scope: <code>C:\code\githubstar\wechathtmldownload</code></div>
+  </header>
+
+  <section class="grid">
+    <div class="card"><div class="metric">744</div><div>Understand-Anything focused files</div></div>
+    <div class="card"><div class="metric">5569</div><div>Graph nodes, schema validation passed</div></div>
+    <div class="card"><div class="metric">4825</div><div>Graph edges across 4 architecture layers</div></div>
+    <div class="card"><div class="metric">431</div><div>CodeGraph JS/Python files</div></div>
+    <div class="card"><div class="metric">10465</div><div>CodeGraph symbol nodes</div></div>
+    <div class="card"><div class="metric">24031</div><div>CodeGraph relation edges</div></div>
+  </section>
+
+  <h2>当前结论</h2>
+  <table>
+    <tr><th>Lane</th><th>Current State</th><th>Not Claimed</th></tr>
+    <tr>
+      <td>Atlas</td>
+      <td>Local Neo4j production marker verified; local staging/product-truth evidence progressed; <code>Cod.Act</code> remains blocked; <code>YYYY</code> mutation blocked by missing canonical target id.</td>
+      <td class="block">No public pointer, no public-effective Atlas serving, no identity proof/avatar/public-field promotion.</td>
+    </tr>
+    <tr>
+      <td>Weekly Backend</td>
+      <td><code>weekly-api-066</code> is remote-effective after the backend-only cache-key deploy; post-write smoke ready; pressure <code>2101/0</code>.</td>
+      <td class="warn">No weekly resource package switch, mini-program upload/review, or Atlas pointer change.</td>
+    </tr>
+    <tr>
+      <td>Mini-Program</td>
+      <td>Developer version <code>2026.05.23.1</code> uploaded; frontend consumes <code>weekly-api</code> via CloudBase container plus fallbacks.</td>
+      <td class="block">No WeChat review submission by Codex; no formal user-visible claim.</td>
+    </tr>
+  </table>
+
+  <h2>Architecture Flow</h2>
+  <div class="flow">T1 Source Intake / Docker Exporter
+  -> T2 Weekly Backend / CloudRun weekly-api
+      -> T3 WeChat Mini-Program
+  -> T4 Atlas Activity Candidate
+      -> T5 Atlas DJ Serving Graph
+          -> /atlas + /api/v1/stage7/*
+T6 DeepSeekTUI / LDR Sidecar -> report-only evidence -> T5
+T7 Docs / SSOT keeps all lanes routed and separated</div>
+
+  <h2>Code Reality</h2>
+  <ul>
+    <li>Backend server: <code>services/weekly_activity_cloudrun/src/server.mjs</code> exposes weekly API, Atlas pages, Stage7 API, session gate, rate checks, and safety headers.</li>
+    <li>Atlas store: <code>services/weekly_activity_cloudrun/src/stage7AtlasSqliteStore.mjs</code> is the largest current serving read-model hotspot.</li>
+    <li>Weekly store: <code>services/weekly_activity_cloudrun/src/dataStore.mjs</code> owns current/city/date/item/source/Atlas event reads.</li>
+    <li>Mini-program API boundary: <code>apps/weekly_activity_miniprogram/utils/api.js</code> owns callContainer, public fallback, static fallback, mock fallback, dedupe, and read-only Atlas event enrichment.</li>
+    <li>Atlas bridge: <code>tools/stage7_rewrite/weekly_atlas_bridge</code> resolves weekly lineup strings through registry, aliases, fuzzy match, and optional Qdrant review.</li>
+    <li>Working tree is dirty and broad: branch <code>feature/weekly-integrated-bridge</code>, backup snapshot written before this report, current graph includes untracked current files by design.</li>
+  </ul>
+
+  <h2>Understand-Anything Evidence</h2>
+  <table>
+    <tr><th>Artifact</th><th>Path</th><th>Result</th></tr>
+    <tr><td>Knowledge graph</td><td><code>.understand-anything/knowledge-graph.json</code></td><td class="ok">Schema valid, issue count 0</td></tr>
+    <tr><td>Summary</td><td><code>.understand-anything/focused-atlas-miniapp-summary.json</code></td><td>Scope counts and structural hotspots</td></tr>
+    <tr><td>Builder</td><td><code>.understand-anything/tmp/build-focused-atlas-miniapp-graph.mjs</code></td><td>Focused deterministic scan for Atlas + mini-program</td></tr>
+  </table>
+
+  <h2>Understand-Anything + CodeGraph Pairing</h2>
+  <table>
+    <tr><th>Tool</th><th>Use First For</th><th>Do Not Use As</th></tr>
+    <tr>
+      <td>Understand-Anything</td>
+      <td>Thread/SSOT scope, docs, config, WXML/WXSS, JSON manifests, lane boundaries, cross-domain project map.</td>
+      <td>A precise JS/Python caller/callee or edit-impact engine.</td>
+    </tr>
+    <tr>
+      <td>CodeGraph</td>
+      <td>JS/Python symbols, imports, callers/callees, impact radius, targeted context before edits.</td>
+      <td>A replacement for current-state routers, Markdown docs, WXML/WXSS, or WeChat release-state evidence.</td>
+    </tr>
+  </table>
+  <ul>
+    <li>Safe pattern here: Understand-Anything selects the Atlas + mini-program universe, then CodeGraph indexes only the JS/Python subset in <code>.understand-anything/codegraph-atlas-miniapp-workspace</code>.</li>
+    <li>CodeGraph status: <code>431</code> files, <code>10465</code> nodes, <code>24031</code> edges, backend <code>node-sqlite</code>, journal <code>wal</code>, pending changes <code>0</code>.</li>
+    <li><code>codegraph query createServer</code> resolves <code>services/weekly_activity_cloudrun/src/server.mjs:448</code>; <code>codegraph callees createServer</code> shows Stage7 store, Atlas security, DeepSeek client, weekly store methods, and page rendering helpers.</li>
+    <li><code>codegraph query getAtlasEvent</code> resolves <code>services/weekly_activity_cloudrun/src/dataStore.mjs:854</code>; <code>codegraph callers getAtlasEvent</code> reports <code>createServer</code> as the direct caller.</li>
+    <li><code>codegraph query callContainer</code> has no local symbol hit because <code>wx.cloud.callContainer</code> is a platform API property call. Use source evidence for that literal, then CodeGraph around local wrappers such as <code>requestApi</code>.</li>
+  </ul>
+
+  <h2>Next Safe Gates</h2>
+  <ol>
+    <li>Keep <code>Cod.Act</code> blocked until exact Atlas source context or canonical DJ/entity id evidence exists.</li>
+    <li>Reopen <code>YYYY</code> product-truth mutation only after exact canonical target id evidence exists.</li>
+    <li>Keep weekly backend remote-effective, mini-program developer upload, WeChat review, and formal visibility as separate states.</li>
+    <li>Rerun public Atlas smoke only after public target identity/session ambiguity can be resolved without secrets.</li>
+  </ol>
+</main>
+</body>
+</html>

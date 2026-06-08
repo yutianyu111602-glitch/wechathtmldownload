@@ -1,0 +1,39 @@
+{
+  "thread": "T0_master",
+  "updated_at": "2026-05-27T21:56:00+08:00",
+  "run_window_start": "2026-05-23T14:26:00+08:00",
+  "run_window_end": "open",
+  "mode": "full-production-authorized Codex-coordinated longrun",
+  "status": "final_time_city_year_span_candidate_preflight_ready_public_upload_disabled",
+  "automation_id": "atlas-wechat-t1-t7-2day-coordinator",
+  "goal": "Continue Atlas DJ graph production with explicit target provenance, rollback/prewrite evidence, postwrite readback/public smoke, and SSOT closeout; do not repeat huaidj.club upload unless explicitly re-enabled.",
+  "last_primary_queue": "T5_final_time_city_year_span_candidate_preflight_and_T6_year_context_review",
+  "last_primary_result": "Final report-local serving candidate passed local promotion preflight against the selected baseline; T6 year-context review consumed 1366 blocker rows and released 0 deterministic ready rows, leaving source-artifact/manual review queues.",
+  "last_evidence": [
+    "reports/ATLAS_T5_T6_TIME_CITY_YEAR_SPAN_FINAL_CANDIDATE_PREFLIGHT_20260527.md",
+    "reports/atlas_serving_time_city_year_span_final_candidate_preflight_20260527_2145/promotion_preflight.json",
+    "reports/ATLAS_T6_TIME_TITLE_YEAR_CONTEXT_REVIEW_20260527.md",
+    "tools/stage7_rewrite/reports/atlas_t6_time_title_year_context_review_20260527/year_context_review_summary.json",
+    "NEXT_AGENT_HANDOFF_ATLAS_FULL_PRODUCTION_20260527.md",
+    "NEXT_AGENT_HANDOFF_ATLAS_FULL_PRODUCTION_20260527.html"
+  ],
+  "thread_assignments": {
+    "T1": "no-secret source/cache/artifact recovery for T4/T5/T6",
+    "T2": "resolve weekly package-root drift, then deploy backend/resource if gates pass",
+    "T3": "mini-program regression/upload readiness after T2 package authority resolution",
+    "T4": "source/raw provenance and schema adapters for Atlas DB merge lanes",
+    "T5": "own local serving/package/API contracts and later public-serving gates if upload is re-enabled",
+    "T6": "continue year-context source-artifact, weekday-year, relative-date source-context, source/OCR, avatar/media recovery queues",
+    "T7": "SSOT/MkDocs after every verified advance"
+  },
+  "next_primary_queue": "T6",
+  "stop_reason": "final_candidate_preflight_ready_public_upload_disabled",
+  "wait_reason": "huaidj.club upload remains disabled; continue local data-quality queues instead of public deploy.",
+  "next_resume_pointer": "reports/atlas_serving_time_city_year_span_final_candidate_preflight_20260527_2145/promotion_preflight.json",
+  "next_local_data_quality_pointers": [
+    "tools/stage7_rewrite/reports/atlas_t6_time_title_year_context_review_20260527/year_context_source_artifact_required_rows.jsonl",
+    "tools/stage7_rewrite/reports/atlas_t6_time_title_year_context_review_20260527/year_context_weekday_review_required_rows.jsonl",
+    "tools/stage7_rewrite/reports/atlas_t6_time_title_exact_date_recovery_20260527/relative_date_source_context_required_rows.jsonl",
+    "tools/stage7_rewrite/reports/atlas_t5_time_city_venue_gap_closure_20260527/source_ocr_gap_recovery_work_orders.jsonl"
+  ]
+}

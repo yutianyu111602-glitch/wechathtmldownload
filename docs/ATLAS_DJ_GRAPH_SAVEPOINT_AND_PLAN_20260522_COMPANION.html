@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Atlas DJ Graph Savepoint And Plan</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090c08;
+      --panel: #10170f;
+      --line: #283921;
+      --text: #e7efe1;
+      --muted: #a9b6a1;
+      --accent: #9cff5f;
+      --warn: #ffd166;
+      --bad: #ff6b6b;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+      line-height: 1.55;
+    }
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+    h1, h2, h3 {
+      letter-spacing: 0;
+      line-height: 1.2;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      color: var(--accent);
+    }
+    h2 {
+      margin-top: 34px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      font-size: 22px;
+    }
+    h3 {
+      margin-top: 24px;
+      font-size: 17px;
+      color: var(--accent);
+    }
+    .meta, .muted {
+      color: var(--muted);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .card {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .num {
+      display: block;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    code {
+      color: var(--accent);
+      background: #071006;
+      border: 1px solid #1d2d18;
+      border-radius: 4px;
+      padding: 1px 5px;
+    }
+    li {
+      margin: 6px 0;
+    }
+    .warn {
+      color: var(--warn);
+    }
+    .bad {
+      color: var(--bad);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Atlas DJ Graph Savepoint And Plan</h1>
+    <p class="meta">Updated: 2026-05-22 02:20 CST · Canonical Markdown: <code>docs\ATLAS_DJ_GRAPH_SAVEPOINT_AND_PLAN_20260522.md</code></p>
+
+    <h2>核心结论</h2>
+    <p>Atlas 是中国地下电子音乐 DJ 关系网 + 历史演出档案。DJ 是一级主体，活动是事实层，文章是证据层，场地/厂牌/电台/作品/公开账号是围绕 DJ 的上下文。</p>
+
+    <div class="grid">
+      <div class="card"><span class="num">138,102</span>文章</div>
+      <div class="card"><span class="num">1,510,787</span>实体行</div>
+      <div class="card"><span class="num">608,678</span>活动行</div>
+      <div class="card"><span class="num">405,342</span>ready-for-DJ-rollup overlay</div>
+      <div class="card"><span class="num">321,832</span>已归一化时间候选</div>
+      <div class="card"><span class="num">60,573</span>OIL canonical 事件计数</div>
+    </div>
+
+    <h2>必须先读的文档</h2>
+    <ol>
+      <li><code>docs\ATLAS_DJ_FIRST_FULL_DESIGN_AND_PLAN_20260522.md</code></li>
+      <li><code>docs\ATLAS_HIGH_PERFORMANCE_DATABASE_ARCHITECTURE_20260522.md</code></li>
+      <li><code>docs\ATLAS_MUSIC_GRAPH_RELATION_LOGIC_CHINESE_UI_20260521.md</code></li>
+      <li><code>docs\ATLAS_GRAPH_DB_SEARCH_TAXONOMY_ARCHITECTURE_20260521.md</code></li>
+      <li><code>docs\ATLAS_ANTI_SCRAPE_SECURITY_PLAN_20260521.md</code></li>
+      <li><code>reports\atlas_dj_low_cost_repair_sidecar_20260522\summary.md</code></li>
+      <li><code>reports\atlas_source_url_recovery_20260522\summary.md</code></li>
+      <li><code>reports\atlas_event_time_normalized_sidecar_20260522\summary.md</code></li>
+    </ol>
+
+    <h2>重要发现</h2>
+    <ul>
+      <li>全量 LLM 产物是宽泛文章图谱，不是 DJ-first 历史关系网。</li>
+      <li>旧 UI 的 <code>OIL</code> 档案是 exact-name full，不是 canonical full。</li>
+      <li>修复后 <code>OIL</code> 合并 <code>OIL油 / OIL Club / OIL CLUB / 深圳OIL</code> 等别名，达到 <code>17,848</code> 实体行、<code>9,924</code> 来源文章、<code>60,573</code> 活动。</li>
+      <li>源 URL 已在私有 sidecar 层恢复到 <code>138,102 / 138,102</code>，但不能公开暴露。</li>
+      <li>SHCR、BYYB、baihui、CDCR 是电台/媒体平台，不应作为噪音删掉。</li>
+    </ul>
+
+    <h2>坑点</h2>
+    <ul>
+      <li class="bad">不能把 150 万实体和 60 万活动直接塞进浏览器。</li>
+      <li class="bad">不能把同文章共现当强 DJ 关系；强关系必须优先来自同活动/同厂牌/多次同台。</li>
+      <li class="bad">不能公开 raw source_url、raw HTML path、source DB path、bulk export。</li>
+      <li class="bad">不能继续盲目花钱跑 full LLM；先吃掉 deterministic repair sidecar。</li>
+      <li class="bad">不能把 <code>Boiler Room</code> 这种 substring 命中卷进 <code>OIL</code> profile。</li>
+      <li class="bad">不能把 <code>深圳</code> 这种 city-only place 当场地节点。</li>
+    </ul>
+
+    <h2>下一步</h2>
+    <ol>
+      <li>构建 report-only <code>atlas_serving.sqlite</code> materializer。</li>
+      <li>物化 <code>canonical_dj</code>、<code>performance_event</code>、<code>dj_event_edge</code>、<code>dj_dj_relation_rollup</code>、<code>search_document</code>、<code>graph_window_cache</code>。</li>
+      <li>先接受 auto_candidate，review_candidate 留在私有审核台。</li>
+      <li>用 <code>atlas:graph:selftest</code> 和真实 DJ/场地样本验搜索、profile、graph-window。</li>
+      <li>通过反爬/暗数据库 gate 后再部署 <code>atlas.huaidj.club</code>。</li>
+    </ol>
+
+    <h2>验证</h2>
+    <p>2026-05-22 验证通过：<code>node --test services\weekly_activity_cloudrun\tests\stage7SqliteLocal.test.mjs</code> 12/12；<code>npm run atlas:graph:selftest</code> 12/12。raw-profile p95 仍为 <code>3508ms</code>，所以性能上线前必须预物化。</p>
+  </main>
+</body>
+</html>

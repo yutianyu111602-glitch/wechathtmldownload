@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-05-19T22:05:23+00:00",
+  "schema_version": "weekly_golden_set.v1",
+  "source_current": "D:\\downstream_results\\stage7_rewrite\\longrun\\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260519\\current.json",
+  "source_audit": "D:\\downstream_results\\stage7_rewrite\\longrun\\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260519\\lineup_address_time_audit.json",
+  "item_count_source": 103,
+  "golden_count": 88,
+  "stratum_counts": {
+    "lineup_present": 22,
+    "missing_lineup": 48,
+    "url_backend": 18
+  },
+  "annotation_pending": 88,
+  "annotation_verified": 0,
+  "out_path": "D:\\downstream_results\\golden\\golden_set_v1.jsonl",
+  "repo_copy": "C:\\code\\githubstar\\wechathtmldownload\\tools\\stage7_rewrite\\golden\\golden_set_v1.jsonl"
+}

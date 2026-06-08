@@ -1,6 +1,6 @@
 # HUAIDJ 周活小程序 — 统一主计划（全文）
 
-Updated: 2026-05-21
+Updated: 2026-05-22 01:25 CST
 Status: **ACTIVE — 唯一执行 SSOT**
 Scope: 小程序产品 + Stage7 发布管线 + Atlas 只读交叉（不含图谱 production 写入）
 
@@ -45,8 +45,10 @@ Atlas → 周活：只读 alias / verified profile / venue_id（weekly_entity_sn
 周活 → Atlas：weekly_entity_observations.jsonl（observation，不直写 production）
 向量：match_method=vector_candidate → display_tier=hide，永不自动 show
 去重：L2 发布修复 + audit 为 SSOT；前端 format.js 不得宽于 Python
+票价：OCR/LLM 中的 3am/3 AM/凌晨3点是时间条件，禁止抽成 3元/￥3
 排期文（周/月计划）：俱乐部主页；城市页不堆全文
 列表：只展示单场 Event（含 agg-child）；父 aggregate publish_blocked
+服务器边界：新加坡服务器 / Singapore VPS 是炒股 beta 线，禁止当作周活小程序、Atlas 只读联动、Docker exporter、CloudRun weekly-api 或小程序上传资源
 ```
 
 ### 1.3 Phase II 一句话
@@ -54,6 +56,24 @@ Atlas → 周活：只读 alias / verified profile / venue_id（weekly_entity_sn
 **6 周内：** 发布门禁全绿 → lineup ~55% → Golden ≥40 verified → Club Profile v1 + dedupe parity → Atlas alias 挂载 snapshot → 新 dev 包（提审单独批准）。
 
 **2026-05-21 线程更新：** Sprint 1 gate 已闭环；Sprint 2 已完成 dedupe parity、`merge_provenance`、duplicate source-map redirect。当前线程专管周活小程序与 Atlas 只读交叉引用，以及活动推文整理时“不重复发卡、不丢来源”。Atlas 主线接手不属于本文线程。
+
+**2026-05-21 服务器边界更新：** 新加坡服务器 / Singapore VPS 是炒股 beta 线，和周活小程序无关。后续不要用它排查小程序、不要从那里取 weekly API、不要部署或修改那边脚本来修小程序；小程序链路只认本机/Windows、Docker exporter、OpenClaw 周活 wrapper、CloudRun `weekly-api` 和微信开发者工具/上传链。
+
+**2026-05-21 票价/OCR 更新：** `3am 后免费入场` 不得显示为 `3元/￥3`；票价防线已覆盖 exporter pack、recommendation pack、static API、DeepSeek/CloudRun prompt 和小程序 `format.js`。新公众号 `Ping常` 已解析 fakeid/city 并进入 active staging；杭州 BAC 场馆信息已写入 venue registry。
+
+**2026-05-21 Ping常 双路线更新：** 用户重新登录 Docker exporter 后，脚本已改为自动发现最新 `.mptext-data\kv\cookie` key，避免 stale `MPTEXT_AUTH_KEY` 卡住。`Ping常` 历史 URL 已拉取 79 条；老路线完成 archive/process/assets/OCR staging（20 valid、59 partial retry，未写 Atlas production）；新规则路线从多日排期推文拆出 2 条本周活动 staging，strict duplicate/conflict 与 source audit 通过。命令与证据见 [PINGCHANG_TWO_ROUTE_HANDOFF_20260521.md](./PINGCHANG_TWO_ROUTE_HANDOFF_20260521.md)。
+
+**2026-05-21 原文可用性 / 默认日期更新：** 原文链接已删或不可用的行现在是 static API 发布门禁，计为 `source_unavailable`，不会更新活动卡或 source map；默认 `current`/date chips 只显示今天及以后或仍在进行的多日活动，显式 date 回查保留。这解决了 5.21 默认页仍出现 5.20 单日活动的问题。
+
+**2026-05-21 20:32 CloudRun + 本地 LLM + 开发版上传历史检查点：** source/date hotfix 当时部署到 `weekly-api-043`。远端 manifest 为 158 条，默认 current 因日期门禁为 136 条；materialized summary/enrichment 由本地 `materialize_llm_outputs.mjs` 调 DeepSeek Pro 生成，`provider=deepseek`、`model=deepseek-v4-pro`、`timeoutMs=null`、`136/136`。CloudRun 只读缓存，不在请求时调用 LLM。小程序开发版已上传 `2026.05.21.2`，描述 `weekly-api-043-localLLM136-current136-resource-sync`；微信未提审。该前端开发版仍是最新上传包，但当前后端资源包已被 21:40 的 `weekly-api-044` 覆盖。提审自动化需另建 guarded 微信审核 API executor，当前 `miniprogram-ci@2.1.31` 仅证明 upload/preview 能力。
+
+**2026-05-21 日常发布策略更新：** 后续 OpenClaw 定时任务默认只更新后端/资源包：Docker exporter → 本地 OCR → 本地 LLM 物化 → 严格门禁 → CloudRun deploy/smoke/guardian。只要前端代码、权限、路由和接口兼容层没变，不上传小程序前端、不触发微信审核；需要新开发版时必须显式 `-UploadFrontend`，提审仍是单独 guarded 步骤。
+
+**2026-05-21 21:40 OCR/LLM/Atlas 策略审计更新：** 计划中的 OCR-first、source gate、本地 LLM 物化、去重/source provenance、Atlas 只读 enrich 已在 `weekly-api-044` 后端资源包中验证生效。修复点包括：EXIT `3am 后免费入场` 误判 `￥3`、LLM cache digest 未包含票价/source 字段、duplicate repair 日期范围误扩、source compare false negative、Atlas snapshot/observations 未打入 deploy context、CloudRun smoke 只比第一页导致 LLM superset 误报。证据见 `reports\WEEKLY_OCR_LLM_ATLAS_STRATEGY_AUDIT_20260521.md`。本轮只部署后端/资源包，未重新上传小程序前端，未提审。
+
+**2026-05-22 01:25 信息榨干 / DeepSeek 策略评测更新：** 本地脚本完成 `600/600` DeepSeek 矩阵调用，最佳生产物化组合是 `yellowpage_gate_v3 + deepseek-v4-flash + thinking disabled + temperature 0.0/0.1`；重型 `keyword_squeeze_v4` 不适合作生产 schema，轻量 `keyword_gate_v5` 只能作为 checklist/审计辅助。票务 10-case 交叉验证显示 current 包 exact `3/10`，确定性 `source_regex_conservative` exact `10/10`，DeepSeek strict tiers `16/20`；因此票价发布权威是 source regex，本地 LLM 只做候选/复核。API 构建器新增只读 `--source-queue` 补源，能从下载队列 digest 恢复 EXIT `预售/双人/现场/3am 后免费入场`，但本轮只生成本地 probe 包，未部署。证据见 `reports\WEEKLY_INFO_SQUEEZE_STRATEGY_EVAL_20260521.md`。
+
+**2026-05-22 03:21 MoXu/Ping 后端资源同步更新：** 当前远端 CloudRun 已是 `weekly-api-047`，manifest/current `177`，窗口 `2026-05-22..2026-06-05`，本地 DeepSeek materialized LLM `177/177` 已随资源包发布。`Ping常` 发布 2 条本周活动，`莫须有公社` 发布 4 条本周活动；`account_f07ee3e4a5` 仅保留为内部 id 前缀，不得作为公开显示名。票价规则新增“票价标签不得跨段落吞日期”和“裸 19xx/20xx 年份不是票价”，远端 EXIT 5.22 详情为 `预售 70¥ / 双人 128¥ / 现场 100¥ / 3am 后免费入场`。本轮只部署后端/资源包，未上传小程序前端，未提审。证据见 `reports\WEEKLY_MOXU_PING_BACKEND_SYNC_20260522.md`。
 
 ---
 
@@ -67,20 +87,22 @@ Atlas → 周活：只读 alias / verified profile / venue_id（weekly_entity_sn
 | `OPENCLAW_AUTOMATION.md` 顶部 | 线上 CloudRun / 条数 |
 | `check_weekly_release_guard.ps1` | 当前包硬门禁 |
 
-**当前执行底准（2026-05-21，以 CHECKPOINT + OPENCLAW 顶部为准）：**
+**当前执行底准（2026-05-22，以 CHECKPOINT + OPENCLAW 顶部为准）：**
 
 | 项 | 值 |
 |----|-----|
-| CloudRun | `weekly-api-039` |
-| 发布条数 / 窗口 | 158 / `2026-05-20..2026-06-03` |
-| 小程序 dev | `2026.05.21.1`（既有开发版；本线程未新上传；未提审） |
-| guardian | ok=true；visibleHits=0；backendRawHits=0 |
+| CloudRun | `weekly-api-047` |
+| 发布条数 / 窗口 | manifest/current 177 / `2026-05-22..2026-06-05`；Ping常=2；莫须有公社=4 |
+| 小程序 dev | `2026.05.21.2`（仍为最新开发版；047 未重新上传前端；未提审） |
+| guardian | release ok=true；remoteTotal=177；visibleHits=0；backendRawHits=0；display placeholder=0；year-like ticket=0 |
 | strict 去重 | duplicate=0；effective_duplicate=0；conflict=0 |
-| lineup | 100/158；missing_lineup 58；hard_fail_count=0 |
+| lineup | 87/177（49.2%）；missing_lineup 90；hard_fail_count=0 |
 | Golden | 88 条；20 conservative snapshot verified；68 pending |
-| atlas snapshot | 209 lineup rows；alias_exact=63；fuzzy_multiple=90；no_match=56 |
+| atlas snapshot | 28,685 artist_profiles；209 lineup rows；alias_exact=63；fuzzy_multiple=90；no_match=56；exact-ID events 39/100（39%） |
+| CloudRun smoke | `cloudrun_weekly_production_smoke_ready`；active `weekly-api-047`；blockers=[]；materialized local DeepSeek 177/177；current LLM missing=0 |
+| 日常发布 | backend/resource-only by default；frontend upload requires explicit `-UploadFrontend` and real code/schema reason；review separate |
 
-**勿混：** Atlas **138,102** 文章 ≠ 周活 **~100–160** 条/包；历史 28/51/74/107 等不得当线上事实。
+**勿混：** Atlas **138,102** 文章 ≠ 周活 **~100–180** 条/包；新加坡服务器属于炒股 beta 线 ≠ 周活小程序运行/部署线；历史 28/51/74/107/127/136/158 等不得当线上事实。
 
 ### 2.2 阶段划分
 
@@ -444,7 +466,7 @@ python tools\stage7_rewrite\scripts\export_weekly_entity_observations.py `
 | S3-6 | venue/artist cursor 分页 | ✅ limit=100 cursor loop，避免 >100 首屏截断 |
 | S3-7 | detail 合并来源；saved lang | ✅ detail/venue source articles；saved detail lang |
 
-**2026-05-21 本地闭环：** Sprint 3 可本地执行部分已完成，closeout 见 `SPRINT3_CLUB_SOURCE_CLOSEOUT_20260521.md`。本次未执行 DevTools 真机 10/10、CloudRun 新部署、小程序新上传或微信提审。
+**2026-05-21 本地闭环：** Sprint 3 可本地执行部分已完成，closeout 见 `SPRINT3_CLUB_SOURCE_CLOSEOUT_20260521.md`。该本地切片当时未执行 DevTools 真机 10/10、CloudRun 新部署、小程序新上传或微信提审；后续 `20:32` 已完成本地 DeepSeek LLM 物化、CloudRun `weekly-api-043` 部署与开发版 `2026.05.21.2` 上传，但仍未微信提审。
 
 ### 9.5 Sprint 4（4–6 周）— Atlas + 上线准备
 
@@ -456,9 +478,9 @@ python tools\stage7_rewrite\scripts\export_weekly_entity_observations.py `
 | S4-4 | 无 vector+show | 0 违规 |
 | S4-5 | observation 进 OpenClaw SOP | checklist |
 | S4-6 | DevTools 10/10 + 单测 | artifact |
-| S4-7 | upload dev 新号 | 用户批准上传 |
+| S4-7 | upload dev 新号 | ✅ `2026.05.21.2` 已上传；提审另管 |
 
-**2026-05-21 状态：** `stage7_safe_handoff_verify.ps1` 离线安全验证 PASS；S4 的 G0 alias/new snapshot/dev upload 仍受外部输入和用户批准约束。
+**2026-05-21 状态：** `stage7_safe_handoff_verify.ps1` 离线安全验证 PASS；S4 的 G0 alias/new snapshot 仍受外部输入约束；开发版已上传 `2026.05.21.2`，微信提审未执行。
 
 ---
 
@@ -477,7 +499,7 @@ python tools\stage7_rewrite\scripts\export_weekly_entity_observations.py `
 
 **2026-05-21 本地执行状态：** T1-T4 已在 `feature/weekly-integrated-bridge` 本地验证闭环完成，并补齐 `atlas_alias_export.v1.jsonl` 只读导出、20260520 snapshot 与 observations 双份物化。基础验证报告见 `../../reports/ATLAS_WEEKLY_FULL_PLAN_EXECUTION_CLOSEOUT_20260521.md`。
 
-**2026-05-21 全做收口：** 已完成剩余安全本地计划：Atlas fuzzy/no-match review 包、observations ingest dry-run、Golden 标注候选包、release candidate dry-run、backend `/api/v1/weekly/atlas-events/:id` 只读接口、小程序 detail 只读 Atlas 展示与静态 fallback。全做报告见 `../../reports/ATLAS_WEEKLY_ALL_DO_CLOSEOUT_20260521.md`。未执行 CloudRun 部署、小程序上传、微信提审或 Atlas 生产写入。
+**2026-05-21 全做收口：** 已完成剩余安全本地计划：Atlas fuzzy/no-match review 包、observations ingest dry-run、Golden 标注候选包、release candidate dry-run、backend `/api/v1/weekly/atlas-events/:id` 只读接口、小程序 detail 只读 Atlas 展示与静态 fallback。全做报告见 `../../reports/ATLAS_WEEKLY_ALL_DO_CLOSEOUT_20260521.md`。该本地收口切片当时未执行 CloudRun 部署、小程序上传、微信提审或 Atlas 生产写入；后续 `20:32` 已完成本地 DeepSeek LLM 物化、CloudRun `weekly-api-043` 部署与开发版 `2026.05.21.2` 上传，仍未微信提审。
 
 | Gate | 2026-05-21 status |
 |------|-------------------|
@@ -490,7 +512,7 @@ python tools\stage7_rewrite\scripts\export_weekly_entity_observations.py `
 | Backend Atlas event API | 本地实现并通过 37/37 backend tests；fuzzy 多候选不暴露内部 candidate id |
 | Golden annotation pack | 120 pending candidates |
 | Release candidate dry-run | 硬化后 `release_candidate_local_gates_blocked`；阻断点 `daily_queue_refresh_effective=false` |
-| Release Guardian | 硬化后 `ok=false`；`remoteTotal=158`、`backendRawHits=0`、`visibleHits=0`、小程序 29/29 仍通过；阻断点 `exporter_accounts_ok=0 / failed=122 / article_rows=0` |
+| Release Guardian | `current-package ok=true`；`remoteTotal=136`、`backendRawHits=0`、`visibleHits=0`、小程序 37/37 通过；默认 release 的 exporter refresh-effective 仍是 advisory/blocker，需下一次 exporter 成功刷新后再发新包 |
 
 ### 10.2 关键代码路径
 

@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Atlas 与微信小程序说人话版总结</title>
+  <style>
+    :root {
+      --bg: #f5f6f8;
+      --surface: #ffffff;
+      --surface-2: #eef2f7;
+      --ink: #1b1f27;
+      --muted: #667085;
+      --line: #d8dee8;
+      --accent: #2357c6;
+      --ok: #0f7b54;
+      --warn: #9a5b00;
+      --block: #b14242;
+      --code: #edf2ff;
+      --shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 14px/1.62 -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+      letter-spacing: 0;
+    }
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 252px minmax(0, 1fr);
+    }
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      border-right: 1px solid var(--line);
+      background: #f0f3f7;
+      padding: 18px 16px;
+      overflow: auto;
+    }
+    .brand {
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+    .subtle { color: var(--muted); }
+    nav {
+      margin-top: 18px;
+      display: grid;
+      gap: 4px;
+    }
+    nav a {
+      color: #344054;
+      text-decoration: none;
+      padding: 7px 8px;
+      border-radius: 5px;
+    }
+    nav a:hover, nav a:focus {
+      background: #e4e9f1;
+      outline: none;
+    }
+    main {
+      min-width: 0;
+      padding: 22px 28px 42px;
+    }
+    .topbar {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 24px 0 10px;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+    h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+    p { margin: 8px 0; }
+    code {
+      background: var(--code);
+      border: 1px solid #dbe6ff;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: "Cascadia Mono", Consolas, monospace;
+      font-size: 0.92em;
+    }
+    .statusbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .chip {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 9px;
+      background: var(--surface);
+      color: #344054;
+      white-space: nowrap;
+    }
+    .chip.ok { color: var(--ok); border-color: #b7dfcf; background: #edf9f4; }
+    .chip.warn { color: var(--warn); border-color: #f1d8a7; background: #fff7e8; }
+    .chip.block { color: var(--block); border-color: #efc2c2; background: #fff0f0; }
+    .summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+    }
+    .lead {
+      font-size: 18px;
+      line-height: 1.5;
+      margin: 0;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .metric {
+      font-size: 22px;
+      line-height: 1.2;
+      font-weight: 750;
+      color: var(--accent);
+    }
+    .label {
+      color: var(--muted);
+      margin-top: 3px;
+    }
+    .lane-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .lane {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 13px;
+    }
+    .lane ul, .panel ul, .panel ol {
+      margin: 8px 0 0;
+      padding-left: 19px;
+    }
+    li { margin: 5px 0; }
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+    .state-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: var(--surface-2);
+      color: #344054;
+      font-weight: 650;
+    }
+    tr:last-child td { border-bottom: 0; }
+    .footer {
+      margin-top: 20px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+    }
+    @media (max-width: 1020px) {
+      .app { grid-template-columns: 1fr; }
+      aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+      nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      main { padding: 18px 14px 34px; }
+      .summary, .lane-grid, .split, .grid { grid-template-columns: 1fr; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .statusbar { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand">Atlas / 微信小程序</div>
+      <div class="subtle">说人话版总结</div>
+      <nav aria-label="页面导航">
+        <a href="#one-line">一句话</a>
+        <a href="#current">现在到哪了</a>
+        <a href="#do-not-mix">别混淆</a>
+        <a href="#graphs">双图谱怎么用</a>
+        <a href="#next">下一步</a>
+        <a href="#files">主要文件</a>
+      </nav>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <h1>Atlas 与微信小程序现在到底到哪了</h1>
+          <div class="subtle">更新时间：2026-05-25 14:09 CST · 作用范围：<code>C:\code\githubstar\wechathtmldownload</code></div>
+        </div>
+        <div class="statusbar">
+          <span class="chip ok">weekly-api-066 远端有效</span>
+          <span class="chip warn">小程序开发版已上传</span>
+          <span class="chip block">Atlas 公网未生效</span>
+        </div>
+      </header>
+
+      <section id="one-line" class="summary">
+        <div class="panel">
+          <h2>一句话</h2>
+          <p class="lead">现在真正已经远端有效的是周活后端。微信小程序有开发版上传，但还没有通过 Codex 提交微信审核；Atlas 本地证据和图谱推进了，但公网 Atlas 入口还不能说已经正式生效。</p>
+        </div>
+        <div class="panel">
+          <h2>这页回答什么</h2>
+          <ul>
+            <li>现在到底哪些东西可用。</li>
+            <li>哪些只是本地推进，不能算上线。</li>
+            <li>Understand-Anything 和 CodeGraph 怎么配合。</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="grid" aria-label="图谱指标">
+        <div class="panel">
+          <div class="metric">744</div>
+          <div class="label">Understand-Anything 聚焦文件</div>
+        </div>
+        <div class="panel">
+          <div class="metric">431</div>
+          <div class="label">CodeGraph JS/Python 文件</div>
+        </div>
+        <div class="panel">
+          <div class="metric">24,031</div>
+          <div class="label">CodeGraph 关系边</div>
+        </div>
+      </section>
+
+      <h2 id="current">现在到哪了</h2>
+      <section class="lane-grid">
+        <article class="lane">
+          <h3>周活后端</h3>
+          <span class="chip ok">当前最稳</span>
+          <ul>
+            <li><code>weekly-api-066</code> 是远端有效状态。</li>
+            <li>Q3 backend deploy 已完成，post-write smoke 通过。</li>
+            <li>压力探针：<code>2101</code> 请求，<code>0</code> 失败。</li>
+            <li>本轮没有切换 weekly resource package。</li>
+          </ul>
+        </article>
+        <article class="lane">
+          <h3>微信小程序</h3>
+          <span class="chip warn">开发版，不是正式版</span>
+          <ul>
+            <li>appid：<code>wx0bc0a1d9d892af2d</code>。</li>
+            <li>当前名字：<code>坏DJclub</code>。</li>
+            <li>通过 <code>wx.cloud.callContainer</code> 调 <code>weekly-api</code>。</li>
+            <li>开发版 <code>2026.05.23.1</code> 已上传；Codex 没有提交微信审核。</li>
+          </ul>
+        </article>
+        <article class="lane">
+          <h3>Atlas</h3>
+          <span class="chip block">本地推进，公网未成</span>
+          <ul>
+            <li>本地 Neo4j marker 已验证。</li>
+            <li><code>YYYY</code> mutation 被 <code>atlas_dj_id_missing</code> 卡住。</li>
+            <li><code>Cod.Act</code> 仍缺本地 Atlas source context。</li>
+            <li><code>https://atlas.huaidj.club</code> 不能说 public-effective。</li>
+          </ul>
+        </article>
+      </section>
+
+      <h2 id="do-not-mix">别混淆这些状态</h2>
+      <table class="state-table">
+        <thead>
+          <tr><th>容易说错的话</th><th>应该怎么说</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Atlas 已上线</td><td>Atlas 本地推进了，但公网入口还没证明生效。</td></tr>
+          <tr><td>小程序已经发布</td><td>小程序开发版已上传；微信审核和正式用户可见还没证明。</td></tr>
+          <tr><td>weekly 通过就等于 Atlas 通过</td><td>weekly 后端和 Atlas 公网是不同门禁，不能互相代替。</td></tr>
+          <tr><td>T6 sidecar 可以直接写生产</td><td>T6 是研究证据，不是生产控制器。</td></tr>
+        </tbody>
+      </table>
+
+      <h2 id="graphs">Understand-Anything 和 CodeGraph 怎么配</h2>
+      <section class="split">
+        <div class="panel">
+          <h3>Understand-Anything 先用</h3>
+          <p>它负责看“大图”：项目分几条线、当前事实入口在哪、哪些文档是 SSOT、哪些文件属于 Atlas/weekly/小程序。</p>
+          <ul>
+            <li><code>744</code> files</li>
+            <li><code>5569</code> nodes</li>
+            <li><code>4825</code> edges</li>
+            <li>适合 docs、配置、WXML/WXSS、JSON、线程边界。</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3>CodeGraph 后用</h3>
+          <p>它负责查“代码调用”：函数在哪、谁调它、它调谁、改它会影响哪些 JS/Python。</p>
+          <ul>
+            <li><code>431</code> JS/Python files</li>
+            <li><code>10465</code> nodes</li>
+            <li><code>24031</code> edges</li>
+            <li><code>getAtlasEvent</code> 的 direct caller 是 <code>createServer</code>。</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>实际用法</h3>
+        <ol>
+          <li>先读 <code>docs/threads/THREADS_INDEX_20260522.md</code> 和 <code>docs/current-runtime.md</code>。</li>
+          <li>用 Understand-Anything 确认 Atlas + 小程序的文件范围。</li>
+          <li>只把 JS/Python 子集放进 <code>.understand-anything/codegraph-atlas-miniapp-workspace</code> 给 CodeGraph 索引。</li>
+          <li>改代码前用 CodeGraph 查 <code>query</code>、<code>callers</code>、<code>callees</code>、<code>impact</code>。</li>
+          <li>写结论时回到 SSOT，分开写本地、上传、审核、远端生效、正式可见。</li>
+        </ol>
+      </section>
+
+      <h2 id="next">下一步最安全的事</h2>
+      <section class="panel">
+        <ol>
+          <li><code>Cod.Act</code> 继续 blocked，直到有精确 Atlas source context 或 canonical id。</li>
+          <li><code>YYYY</code> product-truth mutation 继续 blocked，直到补齐 canonical target id。</li>
+          <li>小程序继续把开发版、微信审核、正式用户可见分开记录。</li>
+          <li>Atlas public serving 只有在 smoke、session/identity、pointer/readback 都清楚后再推进。</li>
+          <li>任何 deploy、审核、生产写入前，都先写 gate packet，并保留 rollback/readback 证据。</li>
+        </ol>
+      </section>
+
+      <h2 id="files">主要文件</h2>
+      <table class="state-table">
+        <tbody>
+          <tr><th>技术核对报告</th><td><code>docs/ATLAS_MINIPROGRAM_CURRENT_PROGRESS_CODE_ARCHITECTURE_20260525.md</code></td></tr>
+          <tr><th>说人话 Markdown</th><td><code>docs/ATLAS_MINIPROGRAM_HUMAN_SUMMARY_20260525.md</code></td></tr>
+          <tr><th>说人话 HTML</th><td><code>docs/ATLAS_MINIPROGRAM_HUMAN_SUMMARY_20260525_STANDALONE.html</code></td></tr>
+          <tr><th>当前运行状态</th><td><code>docs/current-runtime.md</code></td></tr>
+          <tr><th>七线程路由</th><td><code>docs/threads/THREADS_INDEX_20260522.md</code></td></tr>
+          <tr><th>Understand-Anything 图谱</th><td><code>.understand-anything/knowledge-graph.json</code></td></tr>
+          <tr><th>CodeGraph 状态</th><td><code>.understand-anything/codegraph-atlas-miniapp-status.json</code></td></tr>
+        </tbody>
+      </table>
+
+      <div class="footer">
+        HTML 是派生展示页；事实源仍以 Markdown 技术报告、current-runtime 和七线程路由为准。没有小程序提审、没有 Atlas 公网生效、没有生产图谱/向量/SQLite 写入。
+      </div>
+    </main>
+  </div>
+</body>
+</html>

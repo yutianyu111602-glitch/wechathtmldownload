@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>OpenClaw / Docker 武器库接手报告</title>
+  <style>
+    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.65;margin:40px;max-width:1080px;color:#111827}
+    code{background:#f3f4f6;padding:2px 5px;border-radius:4px}
+    table{border-collapse:collapse;width:100%}
+    th,td{border:1px solid #d1d5db;padding:8px;text-align:left}
+    .warn{border-left:4px solid #dc2626;padding:8px 14px;background:#fef2f2}
+  </style>
+</head>
+<body>
+  <h1>OpenClaw / Docker 武器库接手报告</h1>
+  <p>主文档：<code>docs/handoffs/HANDOFF_OPENCLAW_DOCKER_WEAPONS_20260603.md</code></p>
+  <p>WSL 主仓：<code>/mnt/c/code/githubstar/wechathtmldownload</code>；DB2/OpenClaw worktree：<code>/mnt/c/code/.worktrees/wechathtmldownload/20260601-db2-weapons-containers</code>。</p>
+  <div class="warn">本线程职责：只生成接手文档和交接边界；不写 DB，不启动 Docker runtime，不联网抓取，不读凭据，不发布。后续 agent 应把本线程当作文档交接线程。</div>
+  <div class="warn">L1-L6 Docker dry-run 已通过，但只是 report-local 证明，不等于抓取、DB2 投影、DB3 写门或小程序发布授权。</div>
+  <h2>L1-L6 状态</h2>
+  <ul>
+    <li>decision：<code>openclaw_l1_l6_container_dry_run_runtime_passed_report_local_no_execution</code></li>
+    <li>network/deepseek/db/projection/package/deploy/upload/release：全部 false</li>
+    <li>raw/private/secret leak：0</li>
+  </ul>
+  <h2>分层</h2>
+  <table>
+    <tr><th>层</th><th>profile</th><th>作用</th></tr>
+    <tr><td>L1</td><td>openclaw-source-exporter</td><td>源导出</td></tr>
+    <tr><td>L2</td><td>openclaw-source-queue-cache</td><td>队列/缓存/有界 fetch</td></tr>
+    <tr><td>L3</td><td>openclaw-ocr</td><td>OCR / poster / lineup</td></tr>
+    <tr><td>L4</td><td>openclaw-llm-extraction</td><td>DeepSeek 结构化</td></tr>
+    <tr><td>L5</td><td>openclaw-map-verify</td><td>地址/地图验证</td></tr>
+    <tr><td>L6</td><td>openclaw-package-merge</td><td>增量包 merge</td></tr>
+  </table>
+</body>
+</html>

@@ -1,0 +1,99 @@
+{
+  "project": "WeChat 100K Pipeline Night Watcher (OpenClaw Edition)",
+  "branchName": "openclaw-night-watcher",
+  "description": "守夜人计划 — OpenClaw 无人值守执行版，从final_pack到downstream评估全流程自动执行、监控、通知",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "环境检查与锁清理",
+      "description": "作为守夜人，执行环境预检：磁盘>100GB、内存>10GB、GPU显存>10GB、Qwen3.6-27B可访问、stage锁清理",
+      "acceptanceCriteria": [
+        "✅ 磁盘 D: 剩余 >100GB",
+        "✅ 内存 >10GB 空闲",
+        "✅ GPU RTX 4090 >10GB 显存空闲",
+        "✅ curl http://127.0.0.1:11434/v1/models 返回包含 Qwen3.6-27B",
+        "✅ D:\\DDownload\\.wechat-live-stage-lock.json 删除（确认无 pipeline 进程）",
+        "✅ 结果追加到 NIGHT_WATCHER_LOG_2026-04-26.md"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "执行命令：openclaw agent --local --message \"执行守夜人 US-001：检查磁盘、内存、GPU、模型，删除stage锁\" --deliver"
+    },
+    {
+      "id": "US-002",
+      "title": "finalize-llm-pack 执行",
+      "description": "启动final_pack到新目录_llm_release_v2，监控执行进度，完成后验证输出",
+      "acceptanceCriteria": [
+        "✅ D:\\DDownload\\_llm_release_v2 目录创建",
+        "✅ npx tsx src/cli.ts finalize-llm-pack 命令执行完成无报错",
+        "✅ _llm_release_v2/manifest.json 存在且可解析",
+        "✅ _llm_release_v2/index.jsonl 存在且行数>90,000",
+        "✅ _llm_release_v2/checksums.sha256 存在",
+        "✅ 文章数与_llm_artifacts匹配（误差<500）",
+        "✅ 结果追加到 NIGHT_WATCHER_LOG，Telegram 通知完成"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "执行命令：openclaw agent --local --timeout 10800 --message \"执行守夜人 US-002：在C:/code/githubstar/wechathtmldownload目录运行finalize-llm-pack到_llm_release_v2，监控进度，完成后验证输出文件\" --deliver"
+    },
+    {
+      "id": "US-003",
+      "title": "final_pack 输出验证",
+      "description": "验证final_pack输出正确性，抽样检查文章完整性",
+      "acceptanceCriteria": [
+        "✅ 随机抽样20篇文章，每篇包含llm_input.md、meta.json、sidecar.json、poster_ocr.json",
+        "✅ 10篇文章poster_ocr.json内容和图片匹配",
+        "✅ manifest.json中quality_counts正常",
+        "✅ 文件完整性校验通过",
+        "✅ 结果追加到 NIGHT_WATCHER_LOG"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "执行命令：openclaw agent --local --message \"执行守夜人 US-003：抽样20篇final_pack输出，验证文件完整性和正确性\""
+    },
+    {
+      "id": "US-004",
+      "title": "Qwen3.6-27B 参数校准 sweep",
+      "description": "运行参数校准，生成最优配置文件",
+      "acceptanceCriteria": [
+        "✅ node tools/runQwenCalibrationSweep.mjs 执行完成无报错",
+        "✅ qwen3.6-calibration-manifest.json 存在",
+        "✅ qwen3.6-calibration-results.jsonl 存在",
+        "✅ qwen3.6-recommended-params.json 存在，包含strict/stable/balanced/wide四个profile，每个profile有temperature、top_p、max_tokens",
+        "✅ 结果追加到 NIGHT_WATCHER_LOG，Telegram 通知完成"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "执行命令：openclaw agent --local --timeout 10800 --message \"执行守夜人 US-004：运行Qwen校准sweep，验证生成的参数文件\" --deliver"
+    },
+    {
+      "id": "US-005",
+      "title": "下游评估矩阵",
+      "description": "运行下游评估，生成评估结果文件",
+      "acceptanceCriteria": [
+        "✅ node tools/runDownstreamEvalMatrix.mjs 执行完成无报错",
+        "✅ eval-matrix-manifest.json 存在",
+        "✅ eval-matrix-results.jsonl 存在且行数>=60（20样本*3prompts）",
+        "✅ 结果追加到 NIGHT_WATCHER_LOG，Telegram 通知完成"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "执行命令：openclaw agent --local --timeout 21600 --message \"执行守夜人 US-005：运行下游评估矩阵，验证输出结果文件\" --deliver"
+    },
+    {
+      "id": "US-006",
+      "title": "checkpoint_stop 总结与通知",
+      "description": "生成完整总结报告，通知人工完成",
+      "acceptanceCriteria": [
+        "✅ NIGHT_WATCHER_FINAL_REPORT_2026-04-26.md 生成，包含各阶段结果、数据统计、问题、下一步建议",
+        "✅ 最终结果通过Telegram发送通知",
+        "✅ 所有log归档到D:/DDownload/_queues/logs/",
+        "✅ 标记所有story passes: true",
+        "✅ 停止所有cron任务"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": "执行命令：openclaw agent --local --message \"执行守夜人 US-006：生成最终报告，发送Telegram通知，归档日志\" --deliver"
+    }
+  ]
+}

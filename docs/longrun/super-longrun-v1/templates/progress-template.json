@@ -1,0 +1,39 @@
+{
+  "run_state": {
+    "mode": "unattended",
+    "status": "ready",
+    "current_phase": "Phase 0",
+    "current_story_id": "US-000",
+    "iteration": 0,
+    "max_iterations": 24,
+    "failure_budget": 3,
+    "last_heartbeat_at": "",
+    "last_verified_at": "",
+    "next_resume_cursor": "US-000",
+    "stop_reason": ""
+  },
+  "stories": {
+    "US-000": { "status": "queued", "started_at": "", "completed_at": "", "failure_count": 0, "notes": "" },
+    "US-001": { "status": "queued", "started_at": "", "completed_at": "", "failure_count": 0, "notes": "" },
+    "US-001B": { "status": "queued", "started_at": "", "completed_at": "", "failure_count": 0, "notes": "" },
+    "US-002": { "status": "queued", "started_at": "", "completed_at": "", "failure_count": 0, "notes": "" },
+    "US-003": { "status": "queued", "started_at": "", "completed_at": "", "failure_count": 0, "notes": "" },
+    "US-004": { "status": "queued", "started_at": "", "completed_at": "", "failure_count": 0, "notes": "" },
+    "US-005": { "status": "queued", "started_at": "", "completed_at": "", "failure_count": 0, "notes": "" },
+    "US-006": { "status": "queued", "started_at": "", "completed_at": "", "failure_count": 0, "notes": "" },
+    "US-007": { "status": "queued", "started_at": "", "completed_at": "", "failure_count": 0, "notes": "" },
+    "US-008": { "status": "queued", "started_at": "", "completed_at": "", "failure_count": 0, "notes": "" },
+    "US-009": { "status": "queued", "started_at": "", "completed_at": "", "failure_count": 0, "notes": "" },
+    "US-010": { "status": "queued", "started_at": "", "completed_at": "", "failure_count": 0, "notes": "" },
+    "US-011": { "status": "queued", "started_at": "", "completed_at": "", "failure_count": 0, "notes": "" },
+    "US-012": { "status": "queued", "started_at": "", "completed_at": "", "failure_count": 0, "notes": "" }
+  },
+  "artifacts": {
+    "prd": "docs/longrun/super-longrun-v1/01-PRD.md",
+    "execution_plan": "docs/longrun/super-longrun-v1/02-execution-plan.md",
+    "operations_manual": "docs/longrun/super-longrun-v1/03-operations-manual.md",
+    "ga_monitor_spec": "docs/longrun/super-longrun-v1/04-ga-monitor-spec.md",
+    "safety_policy": "docs/longrun/super-longrun-v1/05-safety-policy.md",
+    "context_gate_policy": "docs/longrun/super-longrun-v1/06-context-gate-policy.md"
+  }
+}

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claude Handoff - Weekly Mini-Program + Atlas Crosscheck</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --ink: #18202a;
+      --muted: #667485;
+      --line: #d8dee8;
+      --accent: #0f6cbd;
+      --warn: #8a4b00;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+    }
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+      padding: 24px 32px;
+    }
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px 24px 48px;
+    }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    h2 { margin: 28px 0 12px; font-size: 20px; }
+    h3 { margin: 18px 0 8px; font-size: 16px; }
+    p { margin: 8px 0; }
+    code {
+      font-family: Consolas, "Cascadia Mono", monospace;
+      background: #eef2f7;
+      border: 1px solid #dbe2eb;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .muted { color: var(--muted); }
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      margin: 2px 4px 2px 0;
+      font-size: 12px;
+    }
+    .warn {
+      border-color: #f0c36d;
+      background: #fff7e6;
+      color: var(--warn);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+    th, td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #eef2f7; }
+    ul { margin: 8px 0 0 20px; padding: 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Claude Handoff: 周活小程序 LLM/OCR + Atlas 交叉比对</h1>
+    <p class="muted">Generated: 2026-05-21 21:30 CST. Markdown is canonical.</p>
+    <p><code>C:\code\githubstar\wechathtmldownload\docs\CLAUDE_WEEKLY_MINIPROGRAM_ATLAS_CROSSCHECK_HANDOFF_20260521.md</code></p>
+  </header>
+  <main>
+    <section class="panel warn">
+      <h2>边界</h2>
+      <p>这是给 Claude 做升级方案的接手包，不是生产执行授权。</p>
+      <p>不要部署 CloudRun、不要上传或提审小程序、不要写 Neo4j/Qdrant/production SQLite、不要杀 PID <code>108336</code>、不要对 raw <code>246,024</code> Atlas telemetry 直接跑 OpenCLI/Maigret/Camofox/Scrapling。</p>
+    </section>
+
+    <h2>两个项目域</h2>
+    <div class="grid">
+      <section class="panel">
+        <h3>周活小程序</h3>
+        <p>公众号推文/排期原文、OCR、本地 DeepSeek LLM 物化、CloudRun <code>weekly-api</code>、微信小程序展示。</p>
+        <p><span class="pill">weekly-api-043</span><span class="pill">manifest 158</span><span class="pill">default current 136</span><span class="pill">dev upload 2026.05.21.2</span><span class="pill">未提审</span></p>
+      </section>
+      <section class="panel">
+        <h3>Atlas 图谱</h3>
+        <p>138,102 文章基线、实体/事件图谱、本地 SQLite、社交主页/外链证据、review-only graph candidate flow。</p>
+        <p><span class="pill">138,102 articles</span><span class="pill">1,510,787 entities</span><span class="pill">608,678 events</span><span class="pill">accepted edges 0</span></p>
+      </section>
+    </div>
+
+    <h2>最新关键状态</h2>
+    <table>
+      <thead><tr><th>项</th><th>事实</th></tr></thead>
+      <tbody>
+        <tr><td>CloudRun</td><td><code>weekly-api-043</code>, smoke ready, blockers empty.</td></tr>
+        <tr><td>小程序</td><td>开发版 <code>2026.05.21.2</code> 已上传，微信审核未提交。</td></tr>
+        <tr><td>周活数据包</td><td><code>current_release</code> manifest <code>158</code>，默认 current <code>136</code>。</td></tr>
+        <tr><td>LLM 物化</td><td>runtime 报 <code>136/136</code>；本地探测发现 <code>llm/enrichments</code> 125 个 JSON 且缺 <code>enrichment_index.json</code>，需要 Claude 优先核对。</td></tr>
+        <tr><td>Atlas public-search</td><td><code>RUNNING</code>, PID <code>108336</code>, <code>184,552 / 246,024</code>, <code>75.0138%</code> at <code>2026-05-21T21:24:17+08:00</code>。</td></tr>
+        <tr><td>Weekly Atlas snapshot</td><td><code>209</code> lineup rows: alias_exact <code>63</code>, fuzzy_multiple <code>90</code>, no_match <code>56</code>。</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Claude 任务</h2>
+    <div class="panel">
+      <ul>
+        <li>设计字段级 evidence refs 和 confidence contract。</li>
+        <li>把 source article、OCR、LLM 物化、current package、Atlas snapshot、observations 做可交叉比对。</li>
+        <li>给 bio、实体、活动介绍、lineup、票价、地址、时间制定保守显示/隐藏/复核策略。</li>
+        <li>输出实现计划、文件清单、Golden/测试/发布门禁。</li>
+      </ul>
+    </div>
+
+    <h2>必读文件</h2>
+    <div class="panel">
+      <p><code>docs\current-runtime.md</code></p>
+      <p><code>docs\weekly-miniprogram-handoff-20260519\PLAN_WEEKLY_MINIPROGRAM_UNIFIED.md</code></p>
+      <p><code>docs\ATLAS_SOCIAL_SEARCH_RULES_SSOT_20260521.md</code></p>
+      <p><code>docs\ELECTRONIC_MUSIC_GRAPH_CURRENT_AUTHORITY_20260518.md</code></p>
+      <p><code>docs\CLAUDE_WEEKLY_MINIPROGRAM_ATLAS_CROSSCHECK_HANDOFF_20260521.md</code></p>
+    </div>
+  </main>
+</body>
+</html>

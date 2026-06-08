@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>============ 版本化策略 ============</title>
+  <style>
+:root {
+  --bg: #f6f7f9;
+  --paper: #ffffff;
+  --ink: #16181d;
+  --muted: #5c6470;
+  --line: #d8dde6;
+  --accent: #2457d6;
+  --accent-soft: #e8eefc;
+  --warn: #8a4b00;
+  --code: #10141f;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+}
+.shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  min-height: 100vh;
+}
+aside {
+  border-right: 1px solid var(--line);
+  background: #f0f3f8;
+  padding: 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+}
+main {
+  max-width: 1120px;
+  width: 100%;
+  padding: 32px;
+}
+.meta, .banner, .content {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.meta { padding: 20px 24px; margin-bottom: 16px; }
+.banner {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  color: var(--warn);
+  background: #fff8e8;
+}
+.content { padding: 24px 32px; }
+h1, h2, h3 { line-height: 1.25; margin: 28px 0 12px; }
+h1 { font-size: 32px; margin-top: 0; }
+h2 { font-size: 22px; border-top: 1px solid var(--line); padding-top: 24px; }
+h3 { font-size: 17px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+nav a {
+  display: block;
+  padding: 6px 0;
+  color: var(--muted);
+}
+nav a.level-1 { color: var(--ink); font-weight: 700; }
+nav a.level-3, nav a.level-4, nav a.level-5, nav a.level-6 { padding-left: 12px; }
+code {
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: "Cascadia Mono", Consolas, monospace;
+}
+pre {
+  background: var(--code);
+  color: #e7edf7;
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+}
+pre code { background: transparent; padding: 0; color: inherit; }
+ul { padding-left: 24px; }
+.kicker {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.title { font-size: 28px; font-weight: 750; margin: 4px 0 8px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  color: var(--muted);
+}
+@media (max-width: 860px) {
+  .shell { display: block; }
+  aside { position: static; height: auto; }
+  main { padding: 20px; }
+  .content { padding: 20px; }
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="kicker">HTML handoff</div>
+      <h1>============ 版本化策略 ============</h1>
+      <nav><a class="level-2" href="#ldr-在线推理证据">LDR 在线推理证据</a>
+<a class="level-2" href="#1-执行摘要">1. 执行摘要</a>
+<a class="level-2" href="#2-分工与哲学">2. 分工与哲学</a>
+<a class="level-3" href="#2-1-边界定义">2.1 边界定义</a>
+<a class="level-3" href="#2-2-联动原则">2.2 联动原则</a>
+<a class="level-3" href="#2-3-信息来源限制">2.3 信息来源限制</a>
+<a class="level-2" href="#3-架构图">3. 架构图</a>
+<a class="level-3" href="#3-1-整体数据流">3.1 整体数据流</a>
+<a class="level-3" href="#3-2-resolver-决策流">3.2 Resolver 决策流</a>
+<a class="level-2" href="#4-契约全文草案">4. 契约全文草案</a>
+<a class="level-3" href="#4-1-weeklyatlasentitycontract-v1-0">4.1 WeeklyAtlasEntityContract v1.0</a>
+<a class="level-3" href="#4-2-breaking-change-策略">4.2 Breaking Change 策略</a>
+<a class="level-2" href="#5-entity-resolver-算法规格">5. Entity Resolver 算法规格</a>
+<a class="level-3" href="#5-1-五级匹配阶梯-含阈值来源">5.1 五级匹配阶梯（含阈值来源）</a>
+<a class="level-3" href="#5-2-伪代码">5.2 伪代码</a>
+<a class="level-3" href="#5-3-冲突处理策略">5.3 冲突处理策略</a>
+<a class="level-3" href="#5-4-多候选-ui-策略">5.4 多候选 UI 策略</a>
+<a class="level-2" href="#6-上下行数据格式示例">6. 上下行数据格式示例</a>
+<a class="level-3" href="#6-1-snapshot-物化示例-下行">6.1 Snapshot 物化示例 (下行)</a>
+<a class="level-3" href="#6-2-observation-jsonl-示例-上行">6.2 Observation JSONL 示例 (上行)</a>
+<a class="level-3" href="#6-3-展示层控制">6.3 展示层控制</a>
+<a class="level-2" href="#7-分阶段-okr-与计划一协同矩阵">7. 分阶段 OKR + 与计划一协同矩阵</a>
+<a class="level-3" href="#7-1-路线图">7.1 路线图</a>
+<a class="level-3" href="#7-2-与计划一协同矩阵">7.2 与计划一协同矩阵</a>
+<a class="level-2" href="#8-模块-文件落地建议">8. 模块/文件落地建议</a>
+<a class="level-3" href="#8-1-目录结构">8.1 目录结构</a>
+<a class="level-3" href="#8-2-api-调用方式">8.2 API 调用方式</a>
+<a class="level-3" href="#8-3-与现有管线的集成点">8.3 与现有管线的集成点</a>
+<a class="level-2" href="#9-评测与观测指标">9. 评测与观测指标</a>
+<a class="level-3" href="#9-1-评测方案">9.1 评测方案</a>
+<a class="level-3" href="#9-2-观测指标">9.2 观测指标</a>
+<a class="level-2" href="#10-待拍板决策">10. 待拍板决策</a></nav>
+    </aside>
+    <main>
+      <section class="meta">
+        <div class="kicker">handoff</div>
+        <div class="title">============ 版本化策略 ============</div>
+        <div class="grid">
+          <div><strong>Source</strong><br>C:\code\githubstar\wechathtmldownload\docs\weekly-miniprogram-handoff-20260519\PLAN_B_DEEPRESEARCH_v2.md</div>
+          <div><strong>Generated</strong><br>2026-05-19 20:57 +0800</div>
+        </div>
+      </section>
+      <section class="banner">
+        Static derived artifact. Keep the source Markdown or structured notes as the source of truth. Do not add secrets to this HTML.
+      </section>
+      <article class="content">
+<p>﻿# 计划二强化版 v2：周活 × 电子音乐图谱实体联动</p>
+<p>Updated: 2026-05-19 Status: <strong>候选研究稿</strong>（HOLD_FOR_HERMES_DECISION，未实施） Supersedes: <code>PLAN_B_WEEKLY_ATLAS_ENTITY_LINKAGE.md</code>（保留 v1 作概要）</p>
+<h2 id="ldr-在线推理证据">LDR 在线推理证据</h2>
+<p>| 项 | 值 | |----|-----| | 引擎 | local-deep-research-wechat <code>run-artifact-research.py</code> | | 模型 | <code>deepseek-v4-pro</code> | | 端点 | <code>https://api.deepseek.com</code> | | 生成时间 | 2026-05-19（Plan B 跑完略晚于 Plan A） | | 源包 | <code>source_pack/weekly_plan_deepresearch_20260519</code> | | 原始报告 | <code>C:\code\local-deep-research-wechat\data\research_outputs\weekly_plan_b_deepseek_v4_pro_20260519.md</code> |</p>
+<p>--- <strong>状态</strong>: CANDIDATE RESEARCH — HOLD_FOR_HERMES_DECISION <strong>角色</strong>: 知识图谱工程师 + 实体解析架构师 + 周活小程序数据契约设计师 <strong>日期</strong>: 2026-05-19</p>
+<p>---</p>
+<h2 id="1-执行摘要">1. 执行摘要</h2>
+<p>本计划在现有 <code>PLAN_B_WEEKLY_ATLAS_ENTITY_LINKAGE.md</code> [1][2] 基础上，产出强化版 v2 设计。核心交付包括：</p>
+<ul>
+<li><strong>WeeklyAtlasEntityContract</strong> 草案：定义周活与图谱之间的数据契约、字段 schema、版本化策略与兼容性规则</li>
+<li><strong>Entity Resolver 规格</strong>：五级匹配阶梯的精确阈值、冲突处理算法、多候选 UI 策略</li>
+<li><strong>Snapshot 物化格式</strong>：<code>artist_profiles[]</code>、<code>lineup_resolved[]</code>、<code>venue_resolved</code> 的完整 JSON 示例</li>
+<li><strong>上行 observation jsonl</strong>：每周 publish 后的字段定义、隐私/合规边界、图谱 ingest 约束</li>
+<li><strong>分阶段 OKR (L0–L4)</strong>：与计划一 P0–P3 [5][6] 的时间对齐表</li>
+<li><strong>模块边界</strong>：建议 <code>weekly_atlas_bridge</code> 目录结构与 API 调用方式</li>
+<li><strong>评测方案</strong>：利用计划一 golden 集的 <code>artist_id</code> 字段评估 resolver</li>
+<li><strong>风险决策表</strong>：≤5 项待拍板决策，给出推荐与备选</li>
+</ul>
+<p><strong>关键原则</strong>：图谱管「是谁」，周活管「这一场」；向量匹配不得自动进入小程序展示 [1][2][3][4]。</p>
+<p>---</p>
+<h2 id="2-分工与哲学">2. 分工与哲学</h2>
+<h3 id="2-1-边界定义">2.1 边界定义</h3>
+<p>| 维度 | 周活小程序 | 电子音乐图谱 | |------|-----------|--------------| | 时间跨度 | 未来 15 天 | 4.7 万+ 历史记录 [1][2] | | 产品定位 | 大众查活动 | 图谱 / RAG / 研究 | | 实体粒度 | 活动级快照 | canonical 艺人 / 场地 / 关系 | | 准确率要求 | 展示极严（宁可空不可错）[5][6] | candidate + review 分层 | | 数据方向 | <strong>消费</strong>图谱标准化输出 | <strong>提供</strong>实体解析能力 |</p>
+<h3 id="2-2-联动原则">2.2 联动原则</h3>
+<p>1. <strong>图谱负责「是谁」</strong>：提供 canonical ID、别名、verified bio、资产（头像/海报带 source <code>image_id</code>） 2. <strong>周活负责「这一场」</strong>：日期、本场 lineup 证据（OCR + LLM），不做 full 图谱抽取 3. <strong>向量匹配不自动展示</strong>：向量匹配结果仅进入 review 队列，不直接进入小程序的 <code>show</code> 或 <code>show_with_hint</code> tier [1][2] 4. <strong>bio/头像仅 verified</strong>：只有图谱 verified 或 registry <code>bio_manual</code> 的 bio 和头像才可进入小程序展示 [5][6] 5. <strong>不增加无证据 lineup</strong>：Resolver 只能标准化已有 lineup，不得通过图谱关系推断和添加新的人名 [1]</p>
+<h3 id="2-3-信息来源限制">2.3 信息来源限制</h3>
+<p>根据 hard constraint #1 [3][4]，本计划<strong>仅基于 source_pack 内的文件</strong>进行设计。以下内容不在本计划范围内：</p>
+<ul>
+<li>93k/47k 图鉴管线的具体实现 (G0–G4 各阶段工作属于图谱线程) [1]</li>
+<li>Neo4j/Qdrant 的实际写入操作或 production 图写入状态 [3][4]</li>
+<li>图谱 production 环境的具体配置</li>
+</ul>
+<p>---</p>
+<h2 id="3-架构图">3. 架构图</h2>
+<h3 id="3-1-整体数据流">3.1 整体数据流</h3>
+<pre><code>
+┌──────────────────────────────────────────────────────────────┐
+│                        周活管线 (Weekly Pipeline)               │
+│                                                              │
+│  Queue → OCR → DeepSeek → Build API → Repair → Audit         │
+│     ↑                                  ↓                     │
+│     │                    WEEKLY_ACTIVITY_MINIPROGRAM_API      │
+│     │                                  ↓                     │
+│     │                    ┌──────────────────────┐            │
+│     │                    │  weekly_atlas_bridge │            │
+│     │                    │     (本计划范围)      │            │
+│     │                    └──────────┬───────────┘            │
+│     │                               │                        │
+│     │                    ┌──────────▼───────────┐            │
+│     │                    │   Entity Resolver     │            │
+│     │                    │   五级匹配阶梯         │            │
+│     │                    └──────────┬───────────┘            │
+│     │                               │                        │
+│     │                    ┌──────────▼───────────┐            │
+│     │                    │  Weekly Atlas Snapshot│            │
+│     │                    │  (只读物化下行)        │            │
+│     │                    └──────────┬───────────┘            │
+│     │                               │                        │
+│     │                    ┌──────────▼───────────┐            │
+│     │                    │  小程序 enriched 展示  │            │
+│     │                    │  artist_id + verified │            │
+│     └────────────────────┤  bio/图 (仅verified)  │            │
+│                          └──────────────────────┘            │
+│                                                              │
+│  每周 publish 后:                                             │
+│  weekly_entity_observations.jsonl ─────────────────────────► │
+│                                                              │
+└──────────────────────────────────────────────────────────────┘
+                                    │
+                                    │ observation (上行, 低频)
+                                    ▼
+┌──────────────────────────────────────────────────────────────┐
+│                      电子音乐图谱 (图谱线程)                     │
+│                                                              │
+│  G0: 统一 schema + 别名导出                                   │
+│  G1: 47k batch → candidate 表                                │
+│  G2: 500 高频 DJ verified                                    │
+│  G3: verified 关系边                                         │
+│  G4: 实体 API                                                │
+│                                                              │
+│  Observation ingest → 图谱生长 (不直写 production)              │
+└──────────────────────────────────────────────────────────────┘
+</code></pre>
+<h3 id="3-2-resolver-决策流">3.2 Resolver 决策流</h3>
+<pre><code class="language-mermaid">
+flowchart TD
+    A[周活 raw lineup 字符串] --&gt; B{阶1: registry seed exact?}
+    B --&gt;|命中| Z1[自动采纳, score=1.0, method=registry_exact]
+    B --&gt;|未命中| C{阶2: 图谱 alias exact ≥ 0.98?}
+    C --&gt;|命中| Z2[自动采纳, method=alias_exact]
+    C --&gt;|未命中| D{阶3: fuzzy 唯一候选 ≥ 0.92?}
+    D --&gt;|命中, 唯一| Z3[自动采纳, method=fuzzy_unique]
+    D --&gt;|多候选| M[多候选 → HINT 模式]
+    D --&gt;|未命中| E{阶4: 向量 top-1?}
+    E --&gt;|有候选| R[仅 review, 不自动展示]
+    E --&gt;|无候选| F[阶5: 保留 raw, artist_id=null]
+    M --&gt; H[展示 canonical_name hint, 不展示 ID]
+    R --&gt; O[写入 observation, 等待图谱 verified]
+    F --&gt; O
+</code></pre>
+<p>---</p>
+<h2 id="4-契约全文草案">4. 契约全文草案</h2>
+<h3 id="4-1-weeklyatlasentitycontract-v1-0">4.1 WeeklyAtlasEntityContract v1.0</h3>
+<pre><code class="language-yaml">
+contract: WeeklyAtlasEntityContract
+version: &quot;1.0.0&quot;
+status: DRAFT
+effective_date: null  # HOLD_FOR_HERMES_DECISION
+
+# ============ 版本化策略 ============
+versioning:
+  strategy: semver
+  major_breaking:
+    - 字段移除或重命名
+    - 必填字段新增
+    - artist_id 格式变更 (如 atlas:entity: → atlas:artist:)
+  minor_additive:
+    - 新增可选字段
+    - 新增 match_method 枚举值
+  patch:
+    - 阈值调整
+    - 文档修正
+
+# ============ 下行: 图谱 → 周活 ============
+downstream_snapshot:
+  description: &quot;周活侧物化的只读 snapshot，由 Resolver 写入&quot;
+
+  artist_profiles:
+    type: array
+    description: &quot;仅含 verified 或 registry bio_manual 的艺人画像&quot;
+    items:
+      artist_id:
+        type: string
+        pattern: &quot;^atlas:entity:[a-zA-Z0-9_-]+$&quot;
+        description: &quot;图谱 canonical ID&quot;
+      canonical_name:
+        type: string
+        description: &quot;图谱标准名&quot;
+      aliases:
+        type: array
+        items: string
+      verified:
+        type: boolean
+        description: &quot;图谱 G2+ verified&quot;
+      bio:
+        type: string | null
+        description: &quot;仅 verified 或 registry bio_manual 时有值 [5]&quot;
+        nullable: true
+      avatar:
+        type: object | null
+        properties:
+          url: string
+          source_image_id: string
+        nullable: true
+      genres:
+        type: array
+        items: string
+        description: &quot;图谱 style/标签&quot;
+      source:
+        type: string
+        enum: [atlas_verified, registry_bio_manual]
+
+  lineup_resolved:
+    type: array
+    description: &quot;本场 lineup 的实体链接结果&quot;
+    items:
+      raw:
+        type: string
+        description: &quot;周活 OCR/LLM 原始 lineup 字符串&quot;
+      artist_id:
+        type: string | null
+        pattern: &quot;^atlas:entity:[a-zA-Z0-9_-]+$&quot;
+        nullable: true
+      match_score:
+        type: number
+        minimum: 0
+        maximum: 1
+      match_method:
+        type: string
+        enum:
+          - registry_exact
+          - alias_exact
+          - fuzzy_unique
+          - vector_candidate
+          - no_match
+      verified:
+        type: boolean
+      candidates:
+        type: array | null
+        description: &quot;多候选时提供 (最多 5), 仅含 canonical_name, 不含 ID&quot;
+        items:
+          canonical_name: string
+          score: number
+        nullable: true
+
+  venue_resolved:
+    type: object | null
+    nullable: true
+    properties:
+      raw_name: string
+      venue_id:
+        type: string | null
+        pattern: &quot;^atlas:venue:[a-zA-Z0-9_-]+$&quot;
+        nullable: true
+      canonical_name: string | null
+      address: string | null
+      match_score: number
+      match_method: string
+
+# ============ 上行: 周活 → 图谱 ============
+upstream_observation:
+  description: &quot;每周 publish 后导出，图谱 ingest 为 observation&quot;
+
+  file_format: jsonl
+  frequency: weekly_after_publish
+
+  record_schema:
+    observation_id:
+      type: string
+      description: &quot;uuid, 幂等键&quot;
+    observation_type:
+      type: string
+      enum:
+        - lineup_match
+        - lineup_no_match
+        - venue_match
+        - venue_no_match
+        - artist_new_raw
+    event_ref:
+      type: string
+      description: &quot;周活 event_id, 用于溯源&quot;
+    raw_text:
+      type: string
+    evidence_refs:
+      type: array
+      items:
+        type: string
+        enum: [ocr, body, title]
+    matched_atlas_id:
+      type: string | null
+    match_method_used:
+      type: string | null
+    match_score:
+      type: number | null
+    url_hash:
+      type: string | null
+      description: &quot;source URL hash, 去重用&quot;
+    generated_at:
+      type: string
+      format: date-time
+
+  privacy_compliance:
+    - &quot;不含用户个人信息&quot;
+    - &quot;不含微信 OpenID / UnionID&quot;
+    - &quot;仅含公众号公开内容 + OCR 提取文本&quot;
+    - &quot;url_hash 为单向 SHA256, 不存原始 URL&quot;
+
+  ingest_boundary:
+    - &quot;图谱 ingest 为 observation 层, 不直接写入 production graph&quot;
+    - &quot;observation 经图谱审核流程后, 方可提升为 canonical entity 或 alias&quot;
+    - &quot;同一 url_hash 的 observation 幂等去重&quot;
+</code></pre>
+<h3 id="4-2-breaking-change-策略">4.2 Breaking Change 策略</h3>
+<p>| 变更类型 | 版本号影响 | 迁移策略 | |----------|-----------|----------| | 新增可选字段 | MINOR ++ | 旧 reader 忽略未知字段 | | 新增 match_method 枚举值 | MINOR ++ | 旧 reader 将未知值视为 <code>unknown</code> | | 阈值调整 (0.92 → 0.90) | PATCH | 重新生成 snapshot 即可 | | 字段重命名 | MAJOR ++ | 双写过渡期 ≥ 2 周, 旧字段标记 deprecated | | artist_id 格式变更 | MAJOR ++ | 图谱侧 alias, 周活侧批量更新 | | 移除字段 | MAJOR ++ | 提前 2 版本声明 deprecated |</p>
+<p>---</p>
+<h2 id="5-entity-resolver-算法规格">5. Entity Resolver 算法规格</h2>
+<h3 id="5-1-五级匹配阶梯-含阈值来源">5.1 五级匹配阶梯（含阈值来源）</h3>
+<p>根据 source [1][2] 定义的匹配阶梯，正式规格化如下：</p>
+<p>| 阶 | 方法 | 阈值 | 自动采纳 | 多候选处理 | |----|------|------|----------|------------| | 1 | registry seed exact | 字符完全匹配 | 是 | 不适用 (seed 唯一) | | 2 | 图谱 alias exact | ≥ 0.98 | 是 | 取最高分 (预期 alias 归一) | | 3 | fuzzy 唯一候选 | ≥ 0.92 | 是 | 仅当候选数 = 1 | | 4 | fuzzy 多候选 | ≥ 0.92 | <strong>否</strong> | UI hint, 不展示 ID | | 5 | 向量 top-1 | 任意 | <strong>否</strong> | 仅 review | | 6 | 无匹配 | — | — | 保留 raw, <code>artist_id=null</code> |</p>
+<p><strong>说明</strong>：</p>
+<ul>
+<li>阶 3 与阶 4 使用同一 fuzzy 阈值 0.92，区别在于候选数量：唯一候选自动采纳，多候选进入 HINT 模式 [1][2]</li>
+<li>向量匹配 (阶 5) <strong>在任何情况下都不自动进入小程序展示</strong>，仅写入 observation 上行供图谱 review [3][4]</li>
+</ul>
+<h3 id="5-2-伪代码">5.2 伪代码</h3>
+<pre><code class="language-python">
+def resolve_lineup(raw_names: list[str], 
+                   registry_seeds: dict, 
+                   atlas_alias_index: dict,
+                   fuzzy_index,
+                   vector_index) -&gt; list[dict]:
+    &quot;&quot;&quot;
+    raw_names: 周活 OCR/LLM 产出的 lineup 字符串列表
+    registry_seeds: {name: artist_id} mapping
+    atlas_alias_index: {alias: [(artist_id, canonical_name, verified)]}
+    &quot;&quot;&quot;
+    results = []
+    
+    for raw in raw_names:
+        # ---- 阶 1: registry seed exact ----
+        if raw in registry_seeds:
+            results.append({
+                &quot;raw&quot;: raw,
+                &quot;artist_id&quot;: registry_seeds[raw],
+                &quot;match_score&quot;: 1.0,
+                &quot;match_method&quot;: &quot;registry_exact&quot;,
+                &quot;verified&quot;: check_verified(registry_seeds[raw]),
+                &quot;candidates&quot;: None
+            })
+            continue
+        
+        # ---- 阶 2: 图谱 alias exact ----
+        if raw in atlas_alias_index:
+            candidates = atlas_alias_index[raw]
+            # 预期 alias 已归一，取第一个或最高 verified 优先
+            best = max(candidates, key=lambda x: (x.verified, x.score))
+            if best.score &gt;= 0.98:
+                results.append({
+                    &quot;raw&quot;: raw,
+                    &quot;artist_id&quot;: best.artist_id,
+                    &quot;match_score&quot;: best.score,
+                    &quot;match_method&quot;: &quot;alias_exact&quot;,
+                    &quot;verified&quot;: best.verified,
+                    &quot;candidates&quot;: None
+                })
+                continue
+        
+        # ---- 阶 3/4: fuzzy ----
+        fuzzy_candidates = fuzzy_index.search(raw, threshold=0.92)
+        if len(fuzzy_candidates) == 1:
+            c = fuzzy_candidates[0]
+            results.append({
+                &quot;raw&quot;: raw,
+                &quot;artist_id&quot;: c.artist_id,
+                &quot;match_score&quot;: c.score,
+                &quot;match_method&quot;: &quot;fuzzy_unique&quot;,
+                &quot;verified&quot;: c.verified,
+                &quot;candidates&quot;: None
+            })
+        elif len(fuzzy_candidates) &gt; 1:
+            # 多候选 → HINT 模式, artist_id = null
+            results.append({
+                &quot;raw&quot;: raw,
+                &quot;artist_id&quot;: None,
+                &quot;match_score&quot;: max(c.score for c in fuzzy_candidates),
+                &quot;match_method&quot;: &quot;fuzzy_multiple&quot;,
+                &quot;verified&quot;: False,
+                &quot;candidates&quot;: [
+                    {&quot;canonical_name&quot;: c.canonical_name, &quot;score&quot;: c.score}
+                    for c in fuzzy_candidates[:5]
+                ]
+            })
+            continue
+        else:
+            # ---- 阶 5: 向量 ----
+            vec_candidate = vector_index.search(raw, top_k=1)
+            if vec_candidate:
+                results.append({
+                    &quot;raw&quot;: raw,
+                    &quot;artist_id&quot;: None,          # 不自动采纳
+                    &quot;match_score&quot;: vec_candidate.score,
+                    &quot;match_method&quot;: &quot;vector_candidate&quot;,
+                    &quot;verified&quot;: False,
+                    &quot;candidates&quot;: [
+                        {&quot;canonical_name&quot;: vec_candidate.canonical_name, 
+                         &quot;score&quot;: vec_candidate.score}
+                    ]
+                })
+                continue
+        
+        # ---- 阶 6: 无匹配 ----
+        results.append({
+            &quot;raw&quot;: raw,
+            &quot;artist_id&quot;: None,
+            &quot;match_score&quot;: 0.0,
+            &quot;match_method&quot;: &quot;no_match&quot;,
+            &quot;verified&quot;: False,
+            &quot;candidates&quot;: None
+        })
+    
+    return results
+</code></pre>
+<h3 id="5-3-冲突处理策略">5.3 冲突处理策略</h3>
+<p>| 冲突场景 | 处理 | |----------|------| | 同一 raw 在 alias 和 registry 都命中但 ID 不同 | registry 优先 (阶 1 &gt; 阶 2) | | fuzzy 单候选但 verified=False | 仍自动采纳 (可信度来自匹配分数, 非 verified 状态) | | 同一艺人本场多次出现 (raw 变体) | 保留每次的 raw 原文, 可指向同一 artist_id | | Resolver 产出 artist_id 与计划一 golden 不一致 | 写入评测日志, 不回退 resolver |</p>
+<h3 id="5-4-多候选-ui-策略">5.4 多候选 UI 策略</h3>
+<p>根据 source [1][2] 要求, 多候选场景下：</p>
+<ul>
+<li><strong>不</strong>展示 <code>artist_id</code> 到前端</li>
+<li><strong>可</strong>展示 <code>canonical_name</code> 作为 hint (例如 &quot;可能是: A, B, C&quot;)</li>
+<li>前端 tier 控制: 阶 4/5 产出使用 <code>show_with_hint</code> 或 <code>hide</code>, 绝不能 <code>show</code></li>
+<li>用户不可见的内部字段（如 <code>artist_id</code>）必须在前端 <code>compactItem</code> 中过滤 [7][8]</li>
+</ul>
+<p>---</p>
+<h2 id="6-上下行数据格式示例">6. 上下行数据格式示例</h2>
+<h3 id="6-1-snapshot-物化示例-下行">6.1 Snapshot 物化示例 (下行)</h3>
+<pre><code class="language-json">
+{
+  &quot;snapshot_version&quot;: &quot;1.0.0&quot;,
+  &quot;snapshot_id&quot;: &quot;snap_20260519_001&quot;,
+  &quot;generated_at&quot;: &quot;2026-05-19T12:00:00Z&quot;,
+  &quot;event_id&quot;: &quot;tangtangtang:5e86d5854dc6bcf9&quot;,
+  
+  &quot;artist_profiles&quot;: [
+    {
+      &quot;artist_id&quot;: &quot;atlas:entity:doon_kanda&quot;,
+      &quot;canonical_name&quot;: &quot;Doon Kanda&quot;,
+      &quot;aliases&quot;: [&quot;Doon Kanda&quot;, &quot;Jesse Kanda&quot;],
+      &quot;verified&quot;: true,
+      &quot;bio&quot;: &quot;Visual artist and musician, known for collaborations with Arca and experimental electronic works.&quot;,
+      &quot;avatar&quot;: {
+        &quot;url&quot;: &quot;https://cdn.example.com/artists/doon_kanda.jpg&quot;,
+        &quot;source_image_id&quot;: &quot;img_dk_001&quot;
+      },
+      &quot;genres&quot;: [&quot;experimental&quot;, &quot;electronic&quot;, &quot;deconstructed club&quot;],
+      &quot;source&quot;: &quot;atlas_verified&quot;
+    }
+  ],
+  
+  &quot;lineup_resolved&quot;: [
+    {
+      &quot;raw&quot;: &quot;Doon Kanda&quot;,
+      &quot;artist_id&quot;: &quot;atlas:entity:doon_kanda&quot;,
+      &quot;match_score&quot;: 0.98,
+      &quot;match_method&quot;: &quot;alias_exact&quot;,
+      &quot;verified&quot;: true,
+      &quot;candidates&quot;: null
+    },
+    {
+      &quot;raw&quot;: &quot;Doon Kanda (Live)&quot;,
+      &quot;artist_id&quot;: &quot;atlas:entity:doon_kanda&quot;,
+      &quot;match_score&quot;: 0.94,
+      &quot;match_method&quot;: &quot;fuzzy_unique&quot;,
+      &quot;verified&quot;: true,
+      &quot;candidates&quot;: null
+    },
+    {
+      &quot;raw&quot;: &quot;Unknown DJ X&quot;,
+      &quot;artist_id&quot;: null,
+      &quot;match_score&quot;: 0.0,
+      &quot;match_method&quot;: &quot;no_match&quot;,
+      &quot;verified&quot;: false,
+      &quot;candidates&quot;: null
+    },
+    {
+      &quot;raw&quot;: &quot;Slikbak&quot;,
+      &quot;artist_id&quot;: null,
+      &quot;match_score&quot;: 0.89,
+      &quot;match_method&quot;: &quot;fuzzy_multiple&quot;,
+      &quot;verified&quot;: false,
+      &quot;candidates&quot;: [
+        {&quot;canonical_name&quot;: &quot;Slikback&quot;, &quot;score&quot;: 0.89},
+        {&quot;canonical_name&quot;: &quot;Slikback (KE)&quot;, &quot;score&quot;: 0.87}
+      ]
+    }
+  ],
+  
+  &quot;venue_resolved&quot;: {
+    &quot;raw_name&quot;: &quot;Tango Club&quot;,
+    &quot;venue_id&quot;: &quot;atlas:venue:tango_beijing&quot;,
+    &quot;canonical_name&quot;: &quot;Tango 俱乐部 (北京)&quot;,
+    &quot;address&quot;: &quot;北京市朝阳区工体北路&quot;,
+    &quot;match_score&quot;: 0.97,
+    &quot;match_method&quot;: &quot;alias_exact&quot;
+  }
+}
+</code></pre>
+<h3 id="6-2-observation-jsonl-示例-上行">6.2 Observation JSONL 示例 (上行)</h3>
+<pre><code class="language-jsonl">
+{&quot;observation_id&quot;:&quot;obs_20260519_001&quot;,&quot;observation_type&quot;:&quot;lineup_match&quot;,&quot;event_ref&quot;:&quot;tangtangtang:5e86d5854dc6bcf9&quot;,&quot;raw_text&quot;:&quot;Doon Kanda&quot;,&quot;evidence_refs&quot;:[&quot;ocr&quot;],&quot;matched_atlas_id&quot;:&quot;atlas:entity:doon_kanda&quot;,&quot;match_method_used&quot;:&quot;alias_exact&quot;,&quot;match_score&quot;:0.98,&quot;url_hash&quot;:&quot;sha256:a1b2c3...&quot;,&quot;generated_at&quot;:&quot;2026-05-19T12:00:00Z&quot;}
+{&quot;observation_id&quot;:&quot;obs_20260519_002&quot;,&quot;observation_type&quot;:&quot;lineup_no_match&quot;,&quot;event_ref&quot;:&quot;dirty_house:ce92df09b77cbf74&quot;,&quot;raw_text&quot;:&quot;Unknown DJ X&quot;,&quot;evidence_refs&quot;:[&quot;body&quot;],&quot;matched_atlas_id&quot;:null,&quot;match_method_used&quot;:&quot;no_match&quot;,&quot;match_score&quot;:0.0,&quot;url_hash&quot;:&quot;sha256:d4e5f6...&quot;,&quot;generated_at&quot;:&quot;2026-05-19T12:00:00Z&quot;}
+{&quot;observation_id&quot;:&quot;obs_20260519_003&quot;,&quot;observation_type&quot;:&quot;lineup_match&quot;,&quot;event_ref&quot;:&quot;potent:32fabb508702db79&quot;,&quot;raw_text&quot;:&quot;Slikbak&quot;,&quot;evidence_refs&quot;:[&quot;ocr&quot;],&quot;matched_atlas_id&quot;:null,&quot;match_method_used&quot;:&quot;fuzzy_multiple&quot;,&quot;match_score&quot;:0.89,&quot;url_hash&quot;:&quot;sha256:g7h8i9...&quot;,&quot;generated_at&quot;:&quot;2026-05-19T12:00:00Z&quot;}
+{&quot;observation_id&quot;:&quot;obs_20260519_004&quot;,&quot;observation_type&quot;:&quot;venue_match&quot;,&quot;event_ref&quot;:&quot;tangtangtang:5e86d5854dc6bcf9&quot;,&quot;raw_text&quot;:&quot;Tango Club&quot;,&quot;evidence_refs&quot;:[&quot;body&quot;],&quot;matched_atlas_id&quot;:&quot;atlas:venue:tango_beijing&quot;,&quot;match_method_used&quot;:&quot;alias_exact&quot;,&quot;match_score&quot;:0.97,&quot;url_hash&quot;:&quot;sha256:j0k1l2...&quot;,&quot;generated_at&quot;:&quot;2026-05-19T12:00:00Z&quot;}
+</code></pre>
+<h3 id="6-3-展示层控制">6.3 展示层控制</h3>
+<p>根据 source [6] 置信分层和 [9][10] 中 <code>format.js</code> 展示契约：</p>
+<pre><code class="language-javascript">
+// 在 compactItem 中：
+function applyTier(resolved) {
+  if (!resolved.artist_id) return &#x27;hide&#x27;;
+  if (resolved.match_method === &#x27;vector_candidate&#x27;) return &#x27;hide&#x27;;        // 向量不进展示
+  if (resolved.match_method === &#x27;fuzzy_multiple&#x27;) return &#x27;show_with_hint&#x27;; // hint 仅展示候选名
+  if (resolved.match_score &gt;= 0.92) return &#x27;show&#x27;;
+  return &#x27;show_with_hint&#x27;;
+}
+</code></pre>
+<p>---</p>
+<h2 id="7-分阶段-okr-与计划一协同矩阵">7. 分阶段 OKR + 与计划一协同矩阵</h2>
+<h3 id="7-1-路线图">7.1 路线图</h3>
+<p>根据 source [1][2] 路线图阶段定义：</p>
+<p>| 阶段 | 周期 | 交付 | 关键依赖 | |------|------|------|----------| | <strong>L0 契约</strong> | 2 周 | <code>WeeklyAtlasEntityContract.md</code> (本文档) | 计划一 P0 可并行 | | <strong>L1 Resolver v0</strong> | 4 周 | exact + fuzzy snapshot 产出 | 图谱 G0 (alias 导出) | | <strong>L2 小程序读 snapshot</strong> | 3 周 | 艺人页 artist_id 展示 | L1 完成; 计划一 P3 | | <strong>L3 Observation 上行</strong> | 4 周 | 每周 observation 导出管线 | L2 稳定运行 ≥ 2 周 | | <strong>L4 向量候选 review</strong> | 6 周 | 人工 review 工具, 不进自动展示 | 图谱 G1-G2 |</p>
+<h3 id="7-2-与计划一协同矩阵">7.2 与计划一协同矩阵</h3>
+<p>| 计划二阶段 | 计划一阶段 | 协同关系 | |-----------|-----------|----------| | L0 契约 | P0 度量 | 并行: L0 定义 schema, P0 标注 golden 集 [5] | | L1 Resolver | P1 证据 + P2 候选 | <strong>L1 依赖</strong>: P0 golden 提供评测数据; <strong>P1 受益</strong>: L1 snapshot 为 evidence 增加实体锚点 | | L2 小程序集成 | P3 展示 | <strong>强耦合</strong>: L2 产出 snapshot 供 P3 tier UI 消费; P3 verified bio 依赖 L1 的 <code>artist_profiles[]</code> [6] | | L3 Observation | P4 闭环 | <strong>互相增强</strong>: L3 输出未经匹配的 raw 名称 → 图谱审核 → 反向提升 L1 recall | | L4 向量 review | P4 闭环 | L4 工具化人工复核, 与 P4 registry 更新形成闭环 |</p>
+<p><strong>时间对齐表</strong>:</p>
+<pre><code>
+Week:  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16
+计划一: [P0===][P1======][P2========][P3======][P4============]
+计划二: [L0===][L1============][L2======][L3========][L4============]
+                           ↑ L2 需 L1 snapshot 就绪
+                                    ↑ P3 verified bio 依赖 artist_profiles
+</code></pre>
+<p>---</p>
+<h2 id="8-模块-文件落地建议">8. 模块/文件落地建议</h2>
+<h3 id="8-1-目录结构">8.1 目录结构</h3>
+<p>根据 source [1] &quot;代码边界: 独立 <code>weekly_atlas_bridge</code> 模块&quot; 和 source [7] repo 结构:</p>
+<pre><code>
+tools/stage7_rewrite/
+├── weekly_atlas_bridge/          # 新建: 不侵入现有周活管道
+│   ├── __init__.py
+│   ├── contract.py               # WeeklyAtlasEntityContract schema 定义
+│   ├── resolver.py               # Entity Resolver 实现 (5 级阶梯)
+│   ├── snapshot_builder.py       # 物化 artist_profiles + lineup_resolved
+│   ├── observation_exporter.py   # 上行 jsonl 导出
+│   ├── enrich_weekly_from_atlas.py  # 主入口: 读 pack → resolve → 写 snapshot
+│   ├── thresholds.py             # 阈值常量与配置
+│   └── tests/
+│       ├── test_resolver.py
+│       ├── test_snapshot.py
+│       └── test_observation.py
+└── runbooks/
+    └── atlas_resolver_weekly.md  # 周度运行手册
+</code></pre>
+<h3 id="8-2-api-调用方式">8.2 API 调用方式</h3>
+<p>根据 source [1] 图谱能力提供方式，resolver 采用<strong>离线批量物化</strong>模式，而非实时 API 调用：</p>
+<pre><code class="language-python">
+# enrich_weekly_from_atlas.py 概念脚本
+
+def main(api_dir: str, atlas_alias_dump: str, registry_seeds: str):
+    &quot;&quot;&quot;
+    1. 读取 WEEKLY_ACTIVITY_MINIPROGRAM_API_YYYYMMDD/current.json
+    2. 加载图谱 alias 导出 (G0 产物)
+    3. 加载周活 registry seeds
+    4. 对每条活动的 lineup/venue 执行 resolve
+    5. 写入 snapshot 到同一 API 目录
+    &quot;&quot;&quot;
+    events = load_json(f&quot;{api_dir}/current.json&quot;)
+    alias_index = load_alias_index(atlas_alias_dump)
+    seeds = load_registry_seeds(registry_seeds)
+    
+    snapshot = {
+        &quot;snapshot_version&quot;: &quot;1.0.0&quot;,
+        &quot;events&quot;: []
+    }
+    
+    for event in events:
+        resolved = resolve_event(event, seeds, alias_index)
+        snapshot[&quot;events&quot;].append(resolved)
+    
+    write_json(f&quot;{api_dir}/atlas_snapshot.json&quot;, snapshot)
+    # 作为 CloudRun 静态文件暴露: /api/v1/weekly/atlas/snapshot
+</code></pre>
+<p><strong>只读原则</strong>: snapshot 为纯物化 JSON，CloudRun 以静态文件形式分发，不引入图谱数据库直连。</p>
+<h3 id="8-3-与现有管线的集成点">8.3 与现有管线的集成点</h3>
+<p>根据 source [1][7] 管线架构：</p>
+<pre><code>
+现有管线: ... → repair → audit → build_API → deploy
+                                         ↑
+                            enrich_weekly_from_atlas.py
+                            (在 build_API 之后、deploy 之前)
+</code></pre>
+<ul>
+<li><strong>时机</strong>: <code>build_weekly_activity_miniprogram_api.py</code> 执行后</li>
+<li><strong>输入</strong>: API 目录中的 <code>current.json</code></li>
+<li><strong>输出</strong>: 同一目录下的 <code>atlas_snapshot.json</code></li>
+<li><strong>隔离</strong>: Resolver 失败不阻塞 deploy; snapshot 缺失时小程序降级为无实体模式</li>
+</ul>
+<p>---</p>
+<h2 id="9-评测与观测指标">9. 评测与观测指标</h2>
+<h3 id="9-1-评测方案">9.1 评测方案</h3>
+<p>根据 source [5][6] 计划一 P0 golden 集定义，利用其 <code>artist_id</code> 字段评测 resolver：</p>
+<p><strong>评测数据</strong>:</p>
+<ul>
+<li>计划一 P0 产出的 golden 集包含人工标注的 <code>artist_id</code> (80 条) [5]</li>
+<li>计划二 L1 产出 lineup_resolved 的 <code>artist_id</code> 预测</li>
+</ul>
+<p><strong>指标定义</strong>:</p>
+<pre><code>
+Precision = |{ resolved.artist_id == golden.artist_id } ∩ resolved.artist_id != null |
+            / |{ resolved.artist_id != null }|
+
+Recall    = |{ resolved.artist_id == golden.artist_id }|
+            / |{ golden.artist_id != null }|
+
+F1        = 2 * P * R / (P + R)
+</code></pre>
+<p><strong>评测分层</strong>:</p>
+<p>| 评测子集 | 范围 | 目标 | |----------|------|------| | registry exact 子集 | 阶1 命中 | P=1.0 (确定性) | | alias exact 子集 | 阶2 命中 | P ≥ 0.98 | | fuzzy 子集 | 阶3-4 命中 | P ≥ 0.90, 多候选归入 FP | | 全量 | 所有 golden 有 ID 的样本 | P ≥ 0.92, R ≥ 0.75 (对齐计划一目标 [5]) |</p>
+<p><strong>评测脚本位置</strong>: <code>tools/stage7_rewrite/weekly_atlas_bridge/tests/test_resolver_eval.py</code></p>
+<h3 id="9-2-观测指标">9.2 观测指标</h3>
+<p>| 指标 | 描述 | 监控方式 | |------|------|----------| | <code>resolver_coverage</code> | 有 artist_id 的 lineup 比例 | 每周 snapshot 统计 | | <code>match_method_distribution</code> | 各阶梯命中占比 | histogram, 周度趋势 | | <code>vector_candidate_count</code> | 进入 review 的向量候选数 | 上限告警 | | <code>no_match_rate</code> | 完全无匹配比例 | 目标逐月下降 | | <code>snapshot_generation_latency</code> | Resolver 全量耗时 | ≤ 60s | | <code>observation_export_count</code> | 每周 observation 条数 | 幂等检查 |</p>
+<p>---</p>
+<h2 id="10-待拍板决策">10. 待拍板决策</h2>
+<p>仅含 ≤5 项，根据 source [1][2] 风险决策表扩展：</p>
+<p>| # | 决策 | 推荐 | 备选 | 理由 | |---|------|------|------|------| | <strong>D1</strong> | <strong>bio 展示范围</strong> | 仅 verified + registry <code>bio_manual</code> [5][6] | 开放 LLM 生成 bio | LLM 自由 bio 有幻觉风险 [6]；计划一明确 &quot;LLM 自由 bio 不做&quot; [5] | | <strong>D2</strong> | <strong>向量自动匹配</strong> | <strong>不用</strong>，向量仅进 review [1] | 向量 top-1 自动进 show_with_hint | 向量无 evidence grounding，违反 &quot;可证明才展示&quot; 原则 [5]；分子结构与艺人名的语义距离不可靠 | | <strong>D3</strong> | <strong>OCR 成本策略</strong> | 风险行优先, 渐进全量 [1] | 全量 OCR 铺开 | 当前 OCR 覆盖仅 94 fetched / 1631 skipped [17]；全量成本不可控 | | <strong>D4</strong> | <strong>代码边界</strong> | 独立 <code>weekly_atlas_bridge</code> 模块 [1] | 嵌入现有 <code>enrich_</code> 脚本 | 隔离 resolver 故障域；contract 版本可独立演进 | | <strong>D5</strong> | <strong>artist_id 在 snapshot 的多候选字段</strong> | <code>candidates</code> 仅含 <code>canonical_name</code>, 不含 <code>artist_id</code> [1] | <code>candidates</code> 含完整 <code>artist_id</code> | 前端 hint 不应暴露内部 ID, 避免用户困惑；且符合 &quot;不展示 ID&quot; 的产品约束 |</p>
+<p>---</p>
+<p><strong>状态</strong>: 以上全部内容为 CANDIDATE RESEARCH, 等待 Hermes 决策后进入实施。根据 hard constraint #5 [3][4]，本计划不包含图谱生产写入的具体实现指令。</p>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

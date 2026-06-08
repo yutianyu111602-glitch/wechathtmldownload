@@ -1,0 +1,69 @@
+{
+  "schema_version": "mailroom.message.v2",
+  "type": "TASK_STATUS_UPDATE",
+  "message_id": "codex_atlas_full_run_repair_20260522T031800_pc_deepseek_tui",
+  "sender": "codex",
+  "receiver": "pc_deepseek_tui",
+  "created_at": "2026-05-22T03:18:00+08:00",
+  "priority": "high",
+  "risk_level": "low",
+  "requires_ack": false,
+  "requires_result": false,
+  "intent": "notify_atlas_full_run_repair_and_handoff",
+  "parts": [
+    {
+      "kind": "TextPart",
+      "text": "Codex completed an Atlas DJ-first full-run repair slice. Strict public serving DB is built and validated; aggressive-private repair DB has more coverage but must not be deployed directly. Read the handoff packet before advising on next steps."
+    },
+    {
+      "kind": "DataPart",
+      "data": {
+        "project": "C:\\code\\githubstar\\wechathtmldownload",
+        "wsl_project": "/mnt/c/code/githubstar/wechathtmldownload",
+        "handoff": "C:\\code\\githubstar\\wechathtmldownload\\docs\\atlas-deepseektui-handoff-20260522\\ATLAS_FULL_RUN_REPAIR_TO_DEEPSEEK_20260522.md",
+        "wsl_handoff": "/mnt/c/code/githubstar/wechathtmldownload/docs/atlas-deepseektui-handoff-20260522/ATLAS_FULL_RUN_REPAIR_TO_DEEPSEEK_20260522.md",
+        "wsl_home_copy": "/home/pc/codex-handoffs/ATLAS_FULL_RUN_REPAIR_TO_DEEPSEEK_20260522.md",
+        "prompt": "C:\\code\\githubstar\\wechathtmldownload\\docs\\atlas-deepseektui-handoff-20260522\\DEEPSEEKTUI_PROMPT.md",
+        "manifest": "C:\\code\\githubstar\\wechathtmldownload\\docs\\atlas-deepseektui-handoff-20260522\\MANIFEST.md",
+        "strict_public_db": "C:\\code\\githubstar\\wechathtmldownload\\reports\\atlas_serving_read_model_20260522\\atlas_serving.sqlite",
+        "private_repair_db": "C:\\code\\githubstar\\wechathtmldownload\\reports\\atlas_serving_repair_full_private_20260522\\atlas_serving.sqlite",
+        "strict_public_counts": {
+          "raw_events": 608678,
+          "performance_events": 467769,
+          "dj_profiles": 51593,
+          "dj_event_edges": 1104301,
+          "directed_dj_relation_edges": 611140,
+          "search_docs": 547374,
+          "graph_windows": 51593,
+          "wine_search_hits": 0
+        },
+        "private_repair_counts": {
+          "performance_events": 538034,
+          "dj_profiles": 55791,
+          "dj_event_edges": 1415016,
+          "directed_dj_relation_edges": 772998,
+          "search_docs": 623336,
+          "graph_windows": 55791
+        },
+        "verification": [
+          "py_compile build_atlas_serving_read_model.py passed",
+          "pytest test_build_atlas_serving_read_model.py passed",
+          "strict public full build completed",
+          "private aggressive repair build completed",
+          "forbidden public schema/raw path checks passed",
+          "MaFoL strict/public and private repair spot checks recorded"
+        ],
+        "policy": "draft-only notice for pc_deepseek_tui; no production controller authority granted; no secrets or raw source URLs included",
+        "do_not": [
+          "do not deploy private repair DB",
+          "do not expose raw URLs/raw HTML/raw JSON/article UID",
+          "do not remove SHCR/BYYB/BAIHUI/CDCR as noise",
+          "do not use expensive LLM for deterministic cleanup by default"
+        ]
+      }
+    }
+  ],
+  "business_action_executed": false,
+  "runner_started": false,
+  "db_or_memory_written": false
+}

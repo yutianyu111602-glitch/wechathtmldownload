@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Atlas DeepSeekTUI Handoff 20260522</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070907;
+      --panel: #11170f;
+      --line: #2b3a22;
+      --text: #e8eee2;
+      --muted: #aeb8a7;
+      --accent: #8be05f;
+      --warn: #f0c36a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 15px/1.58 "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: radial-gradient(circle at 20% 0%, rgba(91, 141, 56, .22), transparent 32%), var(--bg);
+      color: var(--text);
+    }
+    main { max-width: 1080px; margin: 0 auto; padding: 36px 24px 48px; }
+    header { border-bottom: 1px solid var(--line); padding-bottom: 18px; margin-bottom: 22px; }
+    h1 { margin: 0 0 8px; font-size: 30px; letter-spacing: 0; }
+    h2 { margin: 26px 0 12px; font-size: 18px; color: var(--accent); letter-spacing: .08em; text-transform: uppercase; }
+    p, li { color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .metric, .panel {
+      background: rgba(17, 23, 15, .86);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px 16px;
+    }
+    .metric strong { display: block; color: var(--text); font-size: 24px; line-height: 1.2; }
+    code, pre {
+      font-family: "Cascadia Mono", "JetBrains Mono", Consolas, monospace;
+      color: var(--text);
+      background: #0b0f0a;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+    }
+    code { padding: 1px 5px; }
+    pre { padding: 12px; overflow: auto; }
+    .warn { color: var(--warn); font-weight: 700; }
+    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } main { padding: 24px 16px; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Atlas 全量修复交接给 DeepSeekTUI</h1>
+    <p>Codex -> WSL2 DeepSeekTUI / pc_deepseek_tui, 2026-05-22 03:18 +08:00</p>
+  </header>
+
+  <section class="grid">
+    <div class="metric"><strong>467,769</strong><span>严格公开 performance events</span></div>
+    <div class="metric"><strong>51,593</strong><span>DJ profiles</span></div>
+    <div class="metric"><strong>1,104,301</strong><span>DJ-event edges</span></div>
+    <div class="metric"><strong>611,140</strong><span>directed DJ relation edges</span></div>
+    <div class="metric"><strong>547,374</strong><span>search docs</span></div>
+    <div class="metric"><strong>0</strong><span>wine/product search hits</span></div>
+  </section>
+
+  <h2>核心判断</h2>
+  <div class="panel">
+    <p>Atlas 的价值在 DJ-first 中国地下电子音乐关系网：历史演出、经常同台、常见场地、厂牌/crew、公开账号和证据链。</p>
+    <p class="warn">可部署候选只有 strict public DB；aggressive-private repair DB 只能做补全研究和规则提升，不能直接上线。</p>
+  </div>
+
+  <h2>先读文件</h2>
+  <pre>/mnt/c/code/githubstar/wechathtmldownload/docs/atlas-deepseektui-handoff-20260522/ATLAS_FULL_RUN_REPAIR_TO_DEEPSEEK_20260522.md
+/mnt/c/code/githubstar/wechathtmldownload/docs/ATLAS_FULL_RUN_AND_REPAIR_WORKLOG_20260522.md
+/mnt/c/code/githubstar/wechathtmldownload/docs/ATLAS_SERVING_READ_MODEL_PRODUCTION_RUN_20260522.md
+/mnt/c/code/githubstar/wechathtmldownload/docs/ATLAS_FULL_REPAIR_PRIVATE_CANDIDATE_20260522.md</pre>
+
+  <h2>下一步</h2>
+  <ol>
+    <li>比较 strict public 与 aggressive-private 的 private-only 增量。</li>
+    <li>抽检新增 DJ/event/venue 边，找低噪音 deterministic promotion 规则。</li>
+    <li>写测试，提升规则，重建 strict public DB。</li>
+    <li>再次验证 forbidden raw 字段、酒水噪音和 MaFoL 等高准实体。</li>
+  </ol>
+
+  <h2>禁止事项</h2>
+  <ul>
+    <li>不要部署 private repair DB。</li>
+    <li>不要暴露 raw URL、raw HTML path、raw JSON、article UID。</li>
+    <li>不要删除 SHCR / BYYB / BAIHUI / CDCR 这类电台/媒体实体。</li>
+    <li>不要默认用昂贵 LLM 重跑全量。</li>
+  </ul>
+</main>
+</body>
+</html>
+

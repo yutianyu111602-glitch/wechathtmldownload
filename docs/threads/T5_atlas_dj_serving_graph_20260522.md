@@ -1,0 +1,1254 @@
+# T5 Atlas DJ Serving Graph Thread
+
+Status: `CURRENT_AUTHORITY`
+Updated: 2026-05-27 21:56 CST
+Thread owner: DJ-first serving read model, participant graph delta, search/3D graph validation, public-safe promotion gate.
+
+## Purpose
+
+Own the product-facing Atlas graph/read-model layer. Atlas is a China underground electronic music DJ relationship and historical performance system, not a generic article graph. This thread converts private/candidate evidence into public-safe serving candidates.
+
+## Current State
+
+- 2026-05-27 Atlas final time/city/year-span local candidate preflight is ready:
+  - report `reports\ATLAS_T5_T6_TIME_CITY_YEAR_SPAN_FINAL_CANDIDATE_PREFLIGHT_20260527.md`
+  - preflight `reports\atlas_serving_time_city_year_span_final_candidate_preflight_20260527_2145\promotion_preflight.json`
+  - candidate DB `reports\atlas_serving_time_overlay_span_split_search_date_refresh_candidate_20260527_2018\atlas_serving.sqlite`
+  - comparison DB `reports\atlas_serving_participant_delta_current_20260526_0016\atlas_serving.sqlite`
+  - result: decision `promotion_preflight_passed_local_only`; candidate and comparison counts match for performance_event `508049`, dj_profile `53555`, dj_event `1285827`, dj_relation_rollup `701396`, search_document `590927`, graph_window_cache `53555`, evidence_ref `130591`, activity tables `196/2181`; graph-window gap `0`; duplicate normalized profile groups `0`; forbidden schema/value and hard-noise hits `0`
+  - T5 interpretation: this is the clean local final candidate for a future explicit publish/predeploy gate, not a selected-serving overwrite and not a public upload
+  - validation: final preflight parsed and passed; combined focused T6/T5 pytest `16 passed`
+  - production action state: no source/raw DB open/write in this slice, no selected serving mutation/rebuild, graph/vector/public pointer, huaidj.club upload, CloudRun/VPS deploy, mini-program upload/review, memory, credential, network/OCR/model, 9router, destructive Git, or D-root action
+  - `STOP_REASON`: `final_candidate_preflight_ready_public_upload_disabled`
+  - `WAIT_REASON`: public upload remains disabled; keep candidate ready and route local data quality to T6
+  - next resume pointer: `reports\atlas_serving_time_city_year_span_final_candidate_preflight_20260527_2145\promotion_preflight.json`
+- 2026-05-27 Atlas span/split time recovery local API/package preflight is ready:
+  - report `reports\ATLAS_T5_SERVING_TIME_OVERLAY_SPAN_SPLIT_LOCAL_API_PACKAGE_PREFLIGHT_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t5_serving_time_overlay_span_split_local_api_package_preflight_20260527\serving_time_overlay_local_api_package_preflight_summary.json`
+  - package context `reports\atlas_serving_time_span_split_overlay_cloudrun_context_20260527_2018\atlas_serving_sqlite_cloudrun_context.json`
+  - candidate DB `reports\atlas_serving_time_overlay_span_split_search_date_refresh_candidate_20260527_2018\atlas_serving.sqlite`
+  - result: decision `atlas_t5_serving_time_overlay_year_span_local_api_package_preflight_ready_report_only`; failed checks `[]`; T6 span/split review `16/16/14/2`; selected-serving readback `14/14`; source/raw committed `events.time_iso` rows `51` with postwrite `51/51`; report-local serving changed rows `395` split performance_event/dj_event `47/348`; starts_at gaps improved performance_event `154,030->153,983` and dj_event `429,924->429,576`; search refresh rows `47`; API/browser checks `25/25` and `5/5`; package context ready `1`; sidecars copied `2`; table-count drift `0`; leak hits `0/0/0`
+  - LLM audit: the remaining span/split queue was higher value than another public package repeat. The builder fixed an English month/day parse regression and keeps multi-event guide/news rows blocked instead of collapsing every span into one event date.
+  - validation: `py_compile` passed; focused span/split pytest `3 passed`; combined time-overlay pytest `19 passed`; `node --check` passed; local API/browser smoke `ok=true`; JSON parse `11` files OK; structured leak scan zero and raw URL/secret/absolute-path grep passed
+  - production action state: source/raw DB mutated only for `events.time_iso` `51` rows; selected serving SQLite was not mutated; report-local candidate copies were mutated only for `starts_at`, event search text, and FTS; no graph/vector/public pointer, huaidj.club upload, CloudRun/VPS deploy, mini-program, memory, network/OCR/model, credential, 9router, destructive Git, or D-root action
+  - `STOP_REASON`: `serving_time_overlay_span_split_package_preflight_ready_public_upload_disabled`
+  - `WAIT_REASON`: public upload remains disabled; continue remaining year-context / relative-date source-context / source-OCR recovery queues
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t5_serving_time_overlay_span_split_local_api_package_preflight_20260527\serving_time_overlay_local_api_package_preflight_summary.json`
+- 2026-05-27 Atlas time year/span local API/package preflight is ready:
+  - report `reports\ATLAS_T5_SERVING_TIME_OVERLAY_YEAR_SPAN_LOCAL_API_PACKAGE_PREFLIGHT_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t5_serving_time_overlay_year_span_local_api_package_preflight_20260527\serving_time_overlay_local_api_package_preflight_summary.json`
+  - contract `tools\stage7_rewrite\reports\atlas_t5_serving_time_overlay_year_span_local_api_package_preflight_20260527\serving_time_overlay_local_api_package_contract.json`
+  - package context `reports\atlas_serving_time_year_span_overlay_cloudrun_context_20260527_1815\atlas_serving_sqlite_cloudrun_context.json`
+  - candidate DB `reports\atlas_serving_time_overlay_year_span_search_date_refresh_candidate_20260527_1804\atlas_serving.sqlite`
+  - result: decision `atlas_t5_serving_time_overlay_year_span_local_api_package_preflight_ready_report_only`; failed checks `[]`; API/browser checks `24/24` and `5/5`; search-document update rows `380`; postwrite search text/FTS date matches `380/380`; input changed rows `2703`; candidate DB alignment rows `1`; package context ready rows `1`; sidecars copied `2`; table-count drift `0`; leak hits `0/0/0`
+  - LLM audit: after the source/raw time write and report-local search refresh, SQL/readback evidence was no longer sufficient; the refreshed cumulative candidate is now bound to local HTTP, browser, search-date refresh, and CloudRun context sidecar-copy evidence while public upload remains disabled
+  - validation: `py_compile` passed; focused package preflight pytest `3 passed`; combined time-overlay/package pytest `11 passed` with `PYTHONPATH=.`; `node --check` passed; JSON parse `3` files OK; strict leak grep returned no hits
+  - production action state: local package/API contract only; no source/raw DB open in this slice, selected serving mutation/rebuild, graph/vector/public pointer, huaidj.club upload, CloudRun/VPS deploy, mini-program upload/review, memory, network/OCR/model, credential, 9router, destructive Git, or D-root action
+  - `STOP_REASON`: `serving_time_overlay_year_span_package_preflight_ready_public_upload_disabled`
+  - `WAIT_REASON`: public upload remains disabled; continue remaining T6 span/year/source-context/source-OCR recovery queues
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t5_serving_time_overlay_year_span_local_api_package_preflight_20260527\serving_time_overlay_local_api_package_preflight_summary.json`
+- 2026-05-27 Atlas time-title year/span source/raw write and cumulative serving overlay candidate are ready:
+  - recovery/readback reports `reports\ATLAS_T6_TIME_TITLE_YEAR_SPAN_RECOVERY_20260527.md` and `reports\ATLAS_T6_TIME_TITLE_YEAR_SPAN_READBACK_GATE_20260527.md`
+  - T5 reports `reports\ATLAS_T5_TIME_ISO_YEAR_SPAN_WRITE_PREFLIGHT_PACKET_20260527.md`, `reports\ATLAS_T5_TIME_ISO_YEAR_SPAN_WRITE_EXECUTION_GATE_20260527.md`, `reports\ATLAS_T5_SERVING_TIME_OVERLAY_YEAR_SPAN_CANDIDATE_20260527.md`, `reports\ATLAS_T5_SERVING_TIME_OVERLAY_YEAR_SPAN_SEARCH_GRAPH_SMOKE_20260527.md`, and `reports\ATLAS_T5_SERVING_TIME_OVERLAY_YEAR_SPAN_SEARCH_DATE_REFRESH_GATE_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t5_serving_time_overlay_year_span_search_date_refresh_gate_20260527\serving_time_overlay_search_date_refresh_summary.json`
+  - candidate DB `reports\atlas_serving_time_overlay_year_span_search_date_refresh_candidate_20260527_1804\atlas_serving.sqlite`
+  - local smoke `reports\atlas_serving_time_overlay_year_span_search_date_refresh_local_smoke_20260527_1804\api_smoke.json` and `browser_smoke.json`
+  - result: T6 released `64` conservative year/span candidates, readback ready `64/64`, T5 mapped `54` readback groups into `242` raw `events.time_iso` update rows, committed `242` rows with postwrite match `242/242`, built a cumulative report-local serving candidate with `2703` changed `starts_at` rows split `performance_event=380` / `dj_event=2323`, refreshed `380` event search docs/FTS rows with postwrite date matches `380/380`, and local API/browser smoke returned `ok=true`
+  - LLM audit: the highest-value lane was the unconsumed month/day-year and span-start evidence, not another public/package deploy. The writer stayed scoped to source/raw `events.time_iso`, and serving changes were applied only to a report-local candidate copied from the latest `15:18` candidate baseline.
+  - validation: `py_compile` passed; focused T6/T5 pytest `23 passed`; `node --check` passed; summary JSON parse passed; strict raw URL/key/path leak grep returned no hits; local API/browser smoke exited `0`
+  - production action state: source/raw DB mutated only for `events.time_iso`; selected serving SQLite was not mutated; graph/vector/public pointer, huaidj.club upload, CloudRun/VPS deploy, mini-program upload/review, memory, network/OCR/model, 9router, destructive Git, and D-root action did not occur
+  - `STOP_REASON`: `serving_time_overlay_year_span_search_date_refresh_candidate_ready_public_upload_disabled`
+  - `WAIT_REASON`: public upload remains disabled; continue local package/API preflight for the refreshed cumulative candidate or remaining split/source-context/source-OCR recovery queues
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t5_serving_time_overlay_year_span_search_date_refresh_gate_20260527\serving_time_overlay_search_date_refresh_summary.json`
+- 2026-05-27 Atlas entity-merge second-pass local API/package preflight is ready:
+  - report `reports\ATLAS_ENTITY_MERGE_SECONDPASS_LOCAL_API_PACKAGE_PREFLIGHT_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_entity_merge_secondpass_local_api_package_preflight_20260527\entity_merge_secondpass_local_api_package_preflight_summary.json`
+  - contract `tools\stage7_rewrite\reports\atlas_entity_merge_secondpass_local_api_package_preflight_20260527\entity_merge_secondpass_local_api_package_contract.json`
+  - inputs `reports\atlas_entity_merge_validation_secondpass_current\entity_merge_validation_summary.json`, `reports\atlas_entity_merge_secondpass_local_smoke_current\api_smoke.json`, `browser_smoke.json`, and `reports\atlas_serving_sqlite_cloudrun_context_entity_merge_secondpass_20260527_1625\atlas_serving_sqlite_cloudrun_context.json`
+  - result: decision `atlas_entity_merge_secondpass_local_api_package_preflight_ready_report_only`; failed checks `[]`; API/browser checks `24/24` and `5/5`; mobile entity checks `6/6`; known cases `3/3`; queue/latest decisions `28,853/28,853`; missing decisions `0`; final merge groups / merged subjects `7,094/24,609`; package sidecars copied `2/2`; leak hits `0/0/0`
+  - T5 interpretation: DeepSeek Pro second-pass merge is now bound to the local service/mobile/browser/package path, but public deploy remains a separate gate and huaidj.club upload remains disabled
+  - validation: `py_compile` passed; focused package/context/entity-merge pytest `10 passed`; strict URL/key/path/source grep returned no hits
+  - production action state: local API/browser/package contract only; no source/raw DB open/write, selected serving mutation/rebuild, graph/vector/public pointer, huaidj.club upload, CloudRun/VPS deploy, mini-program, memory, network/OCR/model, 9router, or D-root action
+  - `STOP_REASON`: `entity_merge_secondpass_package_preflight_ready_public_upload_disabled`
+  - `WAIT_REASON`: public upload disabled; continue local data-quality lanes such as T6 span/year/source-OCR recovery, avatar storage provenance, or graph/search/read-model consistency
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_entity_merge_secondpass_local_api_package_preflight_20260527\entity_merge_secondpass_local_api_package_preflight_summary.json`
+- 2026-05-27 T5 serving time overlay search-date refresh candidate is ready:
+  - report `reports\ATLAS_T5_SERVING_TIME_OVERLAY_SEARCH_DATE_REFRESH_GATE_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t5_serving_time_overlay_search_date_refresh_gate_20260527\serving_time_overlay_search_date_refresh_summary.json`
+  - candidate DB `reports\atlas_serving_time_overlay_search_date_refresh_candidate_20260527_1518\atlas_serving.sqlite`
+  - local smoke `reports\atlas_serving_time_overlay_search_date_refresh_local_smoke_20260527_1518\api_smoke.json` and `browser_smoke.json`
+  - result: decision `atlas_t5_serving_time_overlay_search_date_refresh_candidate_ready_report_local`; failed checks `[]`; refresh target rows `394`; search document update rows `394`; search text changed rows `394`; postwrite search text/FTS date matches `394/394`; rollback/postwrite contracts `394/394`; table-count drift `0`; local API/browser smoke `ok=true`
+  - T5 interpretation: the time overlay candidate now has date-search text and FTS refreshed in a report-local candidate copy; a future public-serving gate can package this candidate if public upload is re-enabled, otherwise continue local gap closure
+  - validation: `py_compile` passed; focused pytest `2 passed`; combined time-overlay pytest `13 passed`; local Stage7 API/browser smoke exited `0`
+  - production action state: report-local candidate DB copy mutated only; no source/raw DB open/write, selected serving mutation, graph/vector/public pointer, huaidj.club upload, CloudRun/VPS deploy, mini-program, memory, network/OCR/model, 9router, or D-root action
+  - `STOP_REASON`: `serving_time_overlay_search_date_refresh_candidate_ready_public_upload_disabled`
+  - `WAIT_REASON`: public upload remains disabled; run refreshed candidate package/API contract or continue remaining source/OCR/time recovery
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t5_serving_time_overlay_search_date_refresh_gate_20260527\serving_time_overlay_search_date_refresh_summary.json`
+- 2026-05-27 T5 serving time overlay search/graph smoke is ready and requires a bounded search-date refresh gate before public packaging:
+  - report `reports\ATLAS_T5_SERVING_TIME_OVERLAY_SEARCH_GRAPH_SMOKE_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t5_serving_time_overlay_search_graph_smoke_20260527\serving_time_overlay_search_graph_smoke_summary.json`
+  - API contract `tools\stage7_rewrite\reports\atlas_t5_serving_time_overlay_search_graph_smoke_20260527\serving_time_overlay_api_contract.json`
+  - result: decision `atlas_t5_serving_time_overlay_search_graph_smoke_ready_search_date_refresh_required_report_only`; failed checks `[]`; performance_event starts_at readback `394/394`; dj_event starts_at readback `2939/2939`; event search docs present/missing `394/0`; event search text missing date rows `349`; graph window seeds/missing seeds `292/0`; metric drift rows `0`; local API/browser smoke `ok=true`; leak hits `0/0/0`
+  - T5 interpretation: the report-local serving time overlay candidate is graph/readback correct, but `394` event search rows still need a bounded search-date refresh or package gate before any public promotion
+  - validation: `py_compile` passed; focused pytest `2 passed`; combined time-overlay pytest `11 passed`; targeted URL/path/secret grep returned no hits
+  - production action state: candidate serving DB opened read-only only; no source/raw DB open/write, selected serving mutation, graph/vector/public pointer, huaidj.club upload, CloudRun/VPS deploy, mini-program, memory, network/OCR/model, 9router, or D-root action
+  - `STOP_REASON`: `serving_time_overlay_search_graph_smoke_ready_search_date_refresh_required`
+  - `WAIT_REASON`: build the bounded search-date refresh/package gate for `394` deferred event search rows; public upload remains disabled
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t5_serving_time_overlay_search_graph_smoke_20260527\serving_time_overlay_search_graph_smoke_summary.json`
+- 2026-05-27 T5 time ISO source/raw write and report-local serving time overlay candidate are ready:
+  - preflight report `reports\ATLAS_T5_TIME_ISO_WRITE_PREFLIGHT_PACKET_20260527.md`
+  - execution report `reports\ATLAS_T5_TIME_ISO_WRITE_EXECUTION_GATE_20260527.md`
+  - serving overlay report `reports\ATLAS_T5_SERVING_TIME_OVERLAY_CANDIDATE_20260527.md`
+  - execution summary `tools\stage7_rewrite\reports\atlas_t5_time_iso_write_execution_gate_20260527\time_iso_write_execution_summary.json`
+  - serving overlay summary `tools\stage7_rewrite\reports\atlas_t5_serving_time_overlay_candidate_20260527\serving_time_overlay_summary.json`
+  - candidate DB `reports\atlas_serving_time_overlay_candidate_20260527_0925\atlas_serving.sqlite`
+  - local smoke `reports\atlas_serving_time_overlay_local_smoke_20260527_0929\api_smoke.json` and `browser_smoke.json`
+  - result: source/raw execution decision `atlas_t5_time_iso_write_execution_gate_source_raw_time_iso_write_verified`; failed checks `[]`; committed `events.time_iso` rows `690`; postwrite matches `690/690`; serving overlay decision `atlas_t5_serving_time_overlay_candidate_ready_report_local`; changed `3333` report-local `starts_at` rows split `performance_event=394` / `dj_event=2939`; blocked rows `0`; table-count drift `0`; local API/browser smoke `ok=true`
+  - LLM audit: raw target field is `events.time_iso`, not `starts_at`; the preflight fixed a date-matching hang and rejects conflicting year/month-day evidence
+  - production action state: source/raw DB mutated only for `events.time_iso`; selected serving SQLite not mutated; report-local serving candidate written; no graph/vector/public pointer, huaidj.club upload, CloudRun/VPS deploy, mini-program, memory, network/OCR/model, 9router, or D-root action
+  - `STOP_REASON`: `serving_time_overlay_candidate_ready_public_upload_disabled`
+  - `WAIT_REASON`: public upload remains disabled; run local search/graph/API drilldown or package preflight for time overlay, then continue remaining source/OCR/time recovery
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t5_serving_time_overlay_candidate_20260527\serving_time_overlay_summary.json`
+- 2026-05-27 T6 time-title exact-date readback gate ready for a future T5/source-raw `starts_at` write-preflight:
+  - readback report `reports\ATLAS_T6_TIME_TITLE_READBACK_GATE_20260527.md`
+  - recovery report `reports\ATLAS_T6_TIME_TITLE_EXACT_DATE_RECOVERY_20260527.md`
+  - readback summary `tools\stage7_rewrite\reports\atlas_t6_time_title_readback_gate_20260527\time_title_readback_summary.json`
+  - ready rows `tools\stage7_rewrite\reports\atlas_t6_time_title_readback_gate_20260527\time_title_readback_ready_report_only.jsonl`
+  - new scripts/tests `tools\stage7_rewrite\scripts\build_atlas_t6_time_title_exact_date_recovery_packet.py`, `tools\stage7_rewrite\scripts\build_atlas_t6_time_title_readback_gate.py`, `tools\stage7_rewrite\tests\test_build_atlas_t6_time_title_exact_date_recovery_packet.py`, and `tools\stage7_rewrite\tests\test_build_atlas_t6_time_title_readback_gate.py`
+  - result: recovery candidate-ready rows `78` from `2000` time-title work orders; readback decision `atlas_t6_time_title_readback_gate_ready_report_only`; failed checks `[]`; input/readback/ready/blocked rows `78/78/78/0`; performance-event missing `starts_at` rows covered `412`; DJ-event missing `starts_at` rows covered `3036`; unique event IDs `412`; unique DJ IDs `314`; duplicate selector drift groups `0`; leak hits `0/0/0`
+  - T5 interpretation: this is exact-date evidence and selected-serving readback only. A future write gate must bind these rows to an explicit source/raw target DB, capture prewrite row hashes, apply only `starts_at` fields in a bounded transaction, produce inverse rollback, run postwrite source/raw readback, then rebuild/overlay serving without regressing current time/participant coverage.
+  - validation: `py_compile` passed; focused recovery pytest `4 passed`; focused readback pytest `3 passed`; combined T6/T5 focused pytest `9 passed`; strict URL/key/path grep returned no hits
+  - production action state: selected serving SQLite read-only only; source/raw DB, selected serving SQLite, graph/vector stores, public pointer, huaidj.club upload, CloudRun/VPS, mini-program, memory, network/OCR/model, 9router, and D roots remain unchanged
+  - `STOP_REASON`: `time_title_readback_gate_ready_source_raw_starts_at_write_preflight_required`
+  - `WAIT_REASON`: build source/raw target-provenance and starts_at write-preflight with rollback/postwrite evidence, or continue split span/year/source-OCR recovery if closed
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_time_title_readback_gate_20260527\time_title_readback_ready_report_only.jsonl`
+- 2026-05-27 T5 serving city overlay local API/package preflight ready:
+  - report `reports\ATLAS_T5_SERVING_CITY_OVERLAY_LOCAL_API_PACKAGE_PREFLIGHT_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t5_serving_city_overlay_local_api_package_preflight_20260527\serving_city_overlay_local_api_package_preflight_summary.json`
+  - contract `tools\stage7_rewrite\reports\atlas_t5_serving_city_overlay_local_api_package_preflight_20260527\serving_city_overlay_local_api_package_contract.json`
+  - local smoke `reports\atlas_serving_city_overlay_local_api_smoke_20260527_0813\api_smoke.json`, `browser_smoke.json`, `atlas_browser_smoke.png`
+  - package context `reports\atlas_serving_city_overlay_cloudrun_context_20260527_0816\atlas_serving_sqlite_cloudrun_context.json`
+  - code changed `services\weekly_activity_cloudrun\scripts\atlasServingLocalSmoke.mjs`; new builder/test `tools\stage7_rewrite\scripts\build_atlas_t5_serving_city_overlay_local_api_package_preflight.py` and `tools\stage7_rewrite\tests\test_build_atlas_t5_serving_city_overlay_local_api_package_preflight.py`
+  - decision `atlas_t5_serving_city_overlay_local_api_package_preflight_ready_report_only`; failed checks `[]`; leak hits `0/0/0`
+  - counts: API checks `16/16`; browser checks `5/5`; city event searches `5`; exact city event result/match rows `40/40`; short-city fallback match rows `12284`; package context ready rows `1`; package sidecars copied `2`; CloudRun/huaidj/public/graph-vector/source-raw/memory write rows all `0`
+  - T5 interpretation: the city overlay is now proven through the local HTTP service and browser surface, not just SQL readback. The first real smoke caught an event-kind assertion bug (`kind=events`), which is fixed and covered by rerun evidence.
+  - validation: `node --check` passed; weekly CloudRun service test `63 passed`; first local API smoke failed only on the smoke assertion; fixed rerun exited `0`; CloudRun context preparation exited `0`; py_compile passed; focused preflight pytest `2 passed`; combined city overlay pytest `8 passed`; strict URL/key/path grep returned no hits
+  - production action state: report-local candidate opened read-only through local service/API/browser only; CloudRun context prepared locally only; selected serving SQLite, source/raw DB, graph/vector stores, public pointer, huaidj.club upload, CloudRun/VPS deploy, mini-program, memory, network/OCR/model, 9router, and D roots remain unchanged
+  - `STOP_REASON`: `serving_city_overlay_local_api_package_preflight_ready_public_upload_disabled`
+  - `WAIT_REASON`: huaidj.club upload remains disabled; continue local data-quality production through exact-date/source-OCR recovery or another bounded gap lane
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t5_serving_city_overlay_local_api_package_preflight_20260527\serving_city_overlay_local_api_package_preflight_summary.json`
+- 2026-05-27 T5 serving city overlay short-city search gate ready:
+  - report `reports\ATLAS_T5_SERVING_CITY_OVERLAY_SHORT_CITY_SEARCH_GATE_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t5_serving_city_overlay_short_city_search_gate_20260527\serving_city_overlay_short_city_search_gate_summary.json`
+  - contract `tools\stage7_rewrite\reports\atlas_t5_serving_city_overlay_short_city_search_gate_20260527\serving_city_overlay_short_city_search_contract.json`
+  - service fix/test `services\weekly_activity_cloudrun\src\stage7AtlasSqliteStore.mjs` and `services\weekly_activity_cloudrun\tests\stage7SqliteLocal.test.mjs`
+  - new script/test `tools\stage7_rewrite\scripts\build_atlas_t5_serving_city_overlay_short_city_search_gate.py` and `tools\stage7_rewrite\tests\test_build_atlas_t5_serving_city_overlay_short_city_search_gate.py`
+  - decision `atlas_t5_serving_city_overlay_short_city_search_gate_ready_report_only`; failed checks `[]`; leak hits `0/0/0`
+  - counts: overlay event search rows `12284`; unique city terms `24`; short CJK city terms `24`; direct city fallback match rows `12284`; direct missing/mismatch/text-missing `0/0/0`; FTS city-term match rows `0`; FTS short-city refresh-insufficient rows `12284`; broad LIKE city-term rows `400130`; service fallback markers `6/6`
+  - T5 interpretation: the 07:24 deferred FTS assumption was too coarse. FTS5 trigram will not match 1-2 character CJK city terms, so public city search must use exact `city_text` evidence after empty FTS results rather than a blind FTS rebuild or broad LIKE.
+  - validation: py_compile passed; focused short-city gate pytest `2 passed`; `node --check` passed; focused Stage7 SQLite Node test `14 passed`; combined city overlay pytest `6 passed`; full weekly CloudRun service test `63 passed`; strict URL/key/path grep returned no hits; JSON parsed
+  - production action state: report-local candidate DB read-only only; selected serving SQLite, source/raw DB, graph/vector stores, public pointer, huaidj.club upload, CloudRun/VPS deploy, mini-program, memory, network/OCR/model, 9router, and D roots remain unchanged
+  - `STOP_REASON`: `serving_city_overlay_short_city_search_gate_ready_local_service_fallback_required`
+  - `WAIT_REASON`: run local API/package promotion preflight for the overlay candidate with the service fallback; huaidj.club upload remains disabled
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t5_serving_city_overlay_short_city_search_gate_20260527\serving_city_overlay_short_city_search_gate_summary.json`
+- 2026-05-27 T5 serving city overlay search/graph smoke ready, with FTS refresh still required:
+  - report `reports\ATLAS_T5_SERVING_CITY_OVERLAY_SEARCH_GRAPH_SMOKE_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t5_serving_city_overlay_search_graph_smoke_20260527\serving_city_overlay_search_graph_smoke_summary.json`
+  - API contract `tools\stage7_rewrite\reports\atlas_t5_serving_city_overlay_search_graph_smoke_20260527\serving_city_overlay_api_contract.json`
+  - new script/test `tools\stage7_rewrite\scripts\build_atlas_t5_serving_city_overlay_search_graph_smoke.py` and `tools\stage7_rewrite\tests\test_build_atlas_t5_serving_city_overlay_search_graph_smoke.py`
+  - decision `atlas_t5_serving_city_overlay_search_graph_smoke_ready_fts_refresh_required_report_only`; failed checks `[]`; leak hits `0/0/0`
+  - direct search readback: overlay event search rows checked `12284`; direct city matches `12284`; missing/mismatch/text-missing rows `0/0/0`
+  - graph readback: event rows checked `12284`; DJ-event edges `38103`; unique DJs `5094`; graph window seed rows `5094`; missing graph seeds `0`; metric drift rows `0`
+  - FTS status: refresh required rows `12284`; city terms requiring refresh `24`; no FTS errors
+  - T5 interpretation: the overlay candidate is coherent for direct API/search/graph consumers, but it is not public-deployable until a bounded FTS delta/rebuild gate refreshes the deferred event search rows
+  - validation: py_compile passed; focused smoke pytest `2 passed`; combined city smoke/overlay/preflight/write pytest `11 passed`; strict URL/key/path grep over new report/output returned no hits; summary JSON parsed
+  - production action state: candidate serving DB read-only only; selected serving, source/raw DB, graph/vector, public pointer, huaidj.club, CloudRun/VPS, mini-program, memory, network/OCR/model, 9router, and D roots remain unchanged
+  - `STOP_REASON`: `serving_city_overlay_search_graph_smoke_ready_fts_refresh_required`
+  - `WAIT_REASON`: build bounded FTS delta/rebuild gate for the `12284` deferred event search rows before public serving promotion
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t5_serving_city_overlay_search_graph_smoke_20260527\serving_city_overlay_search_graph_smoke_summary.json`
+- 2026-05-27 T5 city write execution + serving overlay candidate ready:
+  - source/raw write report `reports\ATLAS_T5_CITY_WRITE_EXECUTION_GATE_20260527.md`
+  - source/raw write summary `tools\stage7_rewrite\reports\atlas_t5_city_write_execution_gate_20260527\city_write_execution_summary.json`
+  - serving overlay report `reports\ATLAS_T5_SERVING_CITY_OVERLAY_CANDIDATE_20260527.md`
+  - serving overlay summary `tools\stage7_rewrite\reports\atlas_t5_serving_city_overlay_candidate_20260527\serving_city_overlay_summary.json`
+  - candidate DB `reports\atlas_serving_city_overlay_candidate_20260527_0535\atlas_serving.sqlite`
+  - new scripts/tests `tools\stage7_rewrite\scripts\run_atlas_t5_city_write_execution_gate.py`, `tools\stage7_rewrite\scripts\build_atlas_t5_serving_city_overlay_candidate.py`, `tools\stage7_rewrite\tests\test_run_atlas_t5_city_write_execution_gate.py`, and `tools\stage7_rewrite\tests\test_build_atlas_t5_serving_city_overlay_candidate.py`
+  - source/raw decision `atlas_t5_city_write_execution_gate_source_raw_city_write_verified`; failed checks `[]`; committed `events.city` rows `15954`; postwrite readback/city-match `15954/15954`; rollback contracts `15954`; leak hits `0/0/0`
+  - overlay decision `atlas_t5_serving_city_overlay_candidate_ready_report_local`; failed checks `[]`; mapped serving rows `50387`; blocked `0`; city updates `performance_event=12284`, `dj_event=38103`, `search_document=12284`; gaps improved `performance_event 132423->120139`, `dj_event 349045->310942`; table counts and `starts_at` gaps preserved; FTS refresh deferred `12284`; deployable public `false`; leak hits `0/0/0`
+  - T5 interpretation: the source/raw city repair has landed. A full source/raw serving rebuild was rejected because it regressed the selected serving candidate's time/participant coverage; the correct next artifact is the overlay candidate that preserves current selected serving coverage.
+  - validation: py_compile passed for both new scripts; focused overlay pytest `2 passed`; combined city write/preflight/time-city-overlay pytest `11 passed`; SQL readback confirmed sample event `event:05cb0202201a81f5` has candidate city `深圳`; targeted URL/path/secret grep returned no hits
+  - production action state: selected serving DB, Neo4j/Qdrant, production SQLite, public pointer, huaidj.club, CloudRun/VPS, mini-program, memory, network/OCR/model, 9router, and D roots remain unchanged
+  - `STOP_REASON`: `serving_city_overlay_candidate_ready_fts_refresh_deferred`
+  - `WAIT_REASON`: run local API/search/graph smoke over the overlay candidate or build a fast explicit FTS refresh gate for the `12284` deferred event search rows; huaidj.club upload remains disabled
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t5_serving_city_overlay_candidate_20260527\serving_city_overlay_summary.json`
+- 2026-05-27 T5 city write preflight packet partial-ready:
+  - report `reports\ATLAS_T5_CITY_WRITE_PREFLIGHT_PACKET_20260527.md`
+  - summary/contract `tools\stage7_rewrite\reports\atlas_t5_city_write_preflight_20260527\city_write_preflight_summary.json` and `city_write_preflight_contract.json`
+  - ready rows / rollback / postwrite readback `city_write_preflight_ready_raw_event_rows.jsonl`, `city_write_preflight_rollback_contracts.jsonl`, and `city_write_preflight_postwrite_readback_contracts.jsonl`
+  - builder/test `tools\stage7_rewrite\scripts\build_atlas_t5_city_write_preflight_packet.py`; `tools\stage7_rewrite\tests\test_build_atlas_t5_city_write_preflight_packet.py`
+  - decision `atlas_t5_city_write_preflight_partial_ready_report_only`; failed checks `[]`; leak hits `0/0/0`
+  - counts: input serving city candidates `61266`; mapped serving candidates `50387`; blocked serving candidates `10879`; raw event city update targets `15954`; duplicate selector groups `15954`; conflict groups `0`; rollback/postwrite readback contracts `15954/15954`; source/raw target DB present/opened/provenance-ready `1/1/1`
+  - T5 interpretation: city repair now has source/raw row-level prewrite evidence for a bounded future `events.city` update. Direct serving IDs are not raw row IDs; safe binding is exact normalized title plus conservative venue-family matching with empty raw city.
+  - validation: py_compile passed; focused pytest `4 passed`; combined city preflight + time/city/venue pytest `6 passed`; summary JSON parsed; strict URL/key/path grep returned no hits
+  - boundary: source/raw SQLite read-only and report-only; no source/raw DB write, serving SQLite write/rebuild, graph/vector/public write, huaidj.club upload, CloudRun deploy, mini-program upload/review, memory, credential, network/OCR/model, 9router, destructive Git, or D: root scan
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t5_city_write_preflight_20260527\city_write_preflight_ready_raw_event_rows.jsonl`
+- 2026-05-27 T5 time/city/venue gap closure packet ready:
+  - report `reports\ATLAS_T5_TIME_CITY_VENUE_GAP_CLOSURE_PACKET_20260527.md`
+  - summary/contract `tools\stage7_rewrite\reports\atlas_t5_time_city_venue_gap_closure_20260527\time_city_venue_gap_closure_summary.json` and `time_city_venue_gap_closure_contract.json`
+  - output queues `venue_city_deterministic_candidates.jsonl`, `time_title_recovery_work_orders.jsonl`, and `source_ocr_gap_recovery_work_orders.jsonl`
+  - builder/test `tools\stage7_rewrite\scripts\build_atlas_t5_time_city_venue_gap_closure_packet.py`; `tools\stage7_rewrite\tests\test_build_atlas_t5_time_city_venue_gap_closure_packet.py`
+  - decision `atlas_t5_time_city_venue_gap_closure_packet_ready_report_only`; failed checks `[]`; leak hits `0/0/0`
+  - counts: performance_event rows / starts_at gaps / city gaps / venue gaps `508049/154804/132423/66616`; dj_event rows / starts_at gaps / city gaps / venue gaps `1285827/435186/349045/151231`; deterministic venue-to-city candidates `61266` split performance_event/dj_event `15390/45876`; time-title recovery work orders `2000`; source/OCR gap work orders `2000`; parser-precheck groups/events `5/252`
+  - T5 interpretation: city has a large deterministic repair lane through unique `dj_venue_rollup` city evidence by venue name. Missing `starts_at` must stay in source/title/OCR recovery because `time_text` alone is not exact-date evidence.
+  - validation: py_compile passed; focused pytest `2 passed`; combined time/city/venue + completion rollup pytest `5 passed`; summary JSON parsed; targeted URL/path/secret-value grep returned no hits
+  - boundary: selected serving SQLite read-only and report-only; no source/raw DB open/write, serving SQLite write/rebuild, graph/vector/public write, huaidj.club upload, CloudRun deploy, mini-program upload/review, memory, credential, network/OCR/model, 9router, destructive Git, or D: root scan
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t5_time_city_venue_gap_closure_20260527\venue_city_deterministic_candidates.jsonl`
+- 2026-05-27 T6 avatar binary storage provenance gate blocked:
+  - report `reports\ATLAS_T6_AVATAR_BINARY_STORAGE_PROVENANCE_GATE_20260527.md`
+  - summary/contract `tools\stage7_rewrite\reports\atlas_t6_avatar_binary_storage_provenance_gate_20260527\avatar_binary_storage_provenance_summary.json` and `avatar_binary_storage_provenance_contract.json`
+  - primary candidates / blocked rows / repair rows `avatar_primary_selection_candidates.jsonl`, `avatar_binary_storage_blocked_rows.jsonl`, and `avatar_binding_repair_work_orders.jsonl`
+  - builder/test `tools\stage7_rewrite\scripts\build_atlas_t6_avatar_binary_storage_provenance_gate.py`; `tools\stage7_rewrite\tests\test_build_atlas_t6_avatar_binary_storage_provenance_gate.py`
+  - decision `atlas_t6_avatar_binary_storage_provenance_gate_blocked_report_only`; failed checks `binding_repair_rows_present`, `binary_source_provenance_missing`, and `storage_target_provenance_missing`; leak hits `0/0/0`
+  - counts: bound input rows `24`; primary avatar candidates/superseded/unresolved `23/1/0`; duplicate primary groups input/resolved `1/1`; binary storage ready/blocked rows `0/23`; binding repair work-order rows `1`; binary-source/storage-target provenance-ready rows `0/0`; binary files scanned/hash rows `0/0`
+  - T5 interpretation: primary-avatar selection is no longer blocking. Avatar serving/public fields remain closed only because explicit binary source and storage target provenance are missing, plus one `DJ HEARTSTRING` binding repair remains.
+  - validation: py_compile passed; focused pytest `2 passed`; combined avatar binary/entity/storage/media/validation/rollup pytest `16 passed`; strict raw URL/path and secret grep returned no hits
+  - boundary: report-only provenance gate; no binary files opened in the default run, no avatar download/storage write, no source/raw DB open/write, no serving SQLite open/write/rebuild, no graph/vector/public write, no huaidj.club upload, no mini-program upload/review, no memory, no credential, no network/OCR/model, no 9router, no destructive Git, and no D: root scan
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_avatar_binary_storage_provenance_gate_20260527\avatar_binary_storage_blocked_rows.jsonl`
+- 2026-05-27 T6 avatar entity binding gate partial-ready:
+  - report `reports\ATLAS_T6_AVATAR_ENTITY_BINDING_GATE_20260527.md`
+  - summary/contract/ready rows `tools\stage7_rewrite\reports\atlas_t6_avatar_entity_binding_gate_20260527\avatar_entity_binding_summary.json`, `avatar_entity_binding_contract.json`, and `avatar_entity_binding_ready_report_only.jsonl`
+  - blocker/review rows `avatar_entity_binding_blocked_rows.jsonl` and `avatar_primary_selection_review_rows.jsonl`
+  - builder/test `tools\stage7_rewrite\scripts\build_atlas_t6_avatar_entity_binding_gate.py`; `tools\stage7_rewrite\tests\test_build_atlas_t6_avatar_entity_binding_gate.py`
+  - decision `atlas_t6_avatar_entity_binding_gate_partial_ready_storage_target_blocked_report_only`; failed checks `binding_blocked_rows_present`, `primary_avatar_selection_review_required`, `binary_source_provenance_missing`, and `storage_target_provenance_missing`; leak hits `0/0/0`
+  - counts: input storage-ready rows `68`; DJ-first input rows `25`; serving `dj_id` bound rows `24`; binding blocked rows `1`; unique bound serving DJ IDs `23`; serving search/graph readback rows `24/24`; duplicate serving-DJ avatar groups `1`; primary avatar selection review rows `2`; binary-source/storage-target provenance-ready rows `0/0`
+  - T5 interpretation: this is a strong selected-serving readback gate for DJ avatar identity, but still not a serving/public avatar field gate. T5 needs primary-avatar selection, explicit storage/binary target provenance, checksum readback, rollback, and local serving/public-safe avatar smoke before display fields open.
+  - validation: py_compile passed; focused pytest `2 passed`; combined avatar entity/storage/media/validation/rollup pytest `14 passed`; strict raw URL/path and secret grep returned no hits
+  - boundary: selected serving SQLite read-only entity binding only; no avatar binary download/storage write, source/raw DB open/write, serving SQLite write/rebuild, graph/vector/public write, huaidj.club upload, CloudRun deploy, mini-program upload/review, memory, credential, network/OCR/model, 9router, destructive Git, or D: root scan
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_avatar_entity_binding_gate_20260527\avatar_entity_binding_ready_report_only.jsonl`
+- 2026-05-27 T6 avatar storage contract gate ready:
+  - report `reports\ATLAS_T6_AVATAR_STORAGE_CONTRACT_GATE_20260527.md`
+  - summary/contract/ready rows `tools\stage7_rewrite\reports\atlas_t6_avatar_storage_contract_gate_20260527\avatar_storage_contract_summary.json`, `avatar_storage_contract.json`, and `avatar_storage_contract_ready_report_only.jsonl`
+  - builder/test `tools\stage7_rewrite\scripts\build_atlas_t6_avatar_storage_contract_gate.py`; `tools\stage7_rewrite\tests\test_build_atlas_t6_avatar_storage_contract_gate.py`
+  - decision `atlas_t6_avatar_storage_contract_gate_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - counts: input avatar rows `68`; storage-contract ready/blocked rows `68/0`; DJ-first/non-DJ ready rows `25/43`; entity-kind split `dj=25`, `venue=31`, `label=10`, `missing_rollup=2`; platform split `youtube=47`, `instagram=19`, `soundcloud=2`
+  - T5 interpretation: avatar storage/display contracts are deterministic, but not yet serving/public avatar fields. Next gate must bind DJ-first rows to Atlas `dj_id`, define explicit storage/binary target provenance, perform checksum readback, and run serving/public-safe avatar smoke before any product field opens.
+  - validation: py_compile passed; focused pytest `2 passed`; combined avatar storage/media/validation/rollup pytest `12 passed`; strict raw URL/path and secret grep returned no hits
+  - boundary: report-local contract only; no avatar binary download/storage write, source/raw DB open/write, serving SQLite open/write/rebuild, graph/vector/public write, huaidj.club upload, CloudRun deploy, mini-program upload/review, memory, credential, network/OCR/model, 9router, destructive Git, or D: root scan
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_avatar_storage_contract_gate_20260527\avatar_storage_contract_ready_report_only.jsonl`
+- 2026-05-27 T6 avatar/media recovery v4 ready:
+  - report `reports\ATLAS_T6_AVATAR_MEDIA_RECOVERY_PACKET_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t6_avatar_media_recovery_packet_20260527\avatar_media_recovery_summary.json`
+  - contract `tools\stage7_rewrite\reports\atlas_t6_avatar_media_recovery_packet_20260527\avatar_media_recovery_contract.json`
+  - work orders `tools\stage7_rewrite\reports\atlas_t6_avatar_media_recovery_packet_20260527\avatar_media_recovery_work_orders.jsonl`
+  - builder/test `tools\stage7_rewrite\scripts\build_atlas_t6_avatar_media_recovery_packet.py`; `tools\stage7_rewrite\tests\test_build_atlas_t6_avatar_media_recovery_packet.py`
+  - decision `atlas_t6_avatar_media_recovery_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - counts: avatar artifacts input/hash-addressable/DJ-first/non-DJ/missing-rollup `68/68/25/41/2`; media signal rollups total/DJ-first `74/25`; old validation avatar actual/hash-ready/blocked `2/0/2`; completion rollup DJ avatar/media missing `53,555/53,555`
+  - T5 interpretation: this is the first current packet that promotes v4 avatar evidence out of stale validation state. T5 public/serving avatar fields remain closed until a separate storage/readback/public-safe serving gate exists.
+  - validation: py_compile passed; focused pytest `3 passed`; combined avatar/media + validation + completion rollup pytest `10 passed`; strict URL/key/path grep returned no hits
+  - boundary: report-local hash/redacted planning only; no source/raw DB open/write, serving SQLite open/write/rebuild, graph/vector/public write, huaidj.club upload, CloudRun deploy, mini-program upload/review, memory, credential, network/model, 9router, destructive Git, or D: root scan
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_avatar_media_recovery_packet_20260527\avatar_media_recovery_work_orders.jsonl`
+- 2026-05-27 T5/T6 sidecar social read-model rendered UI smoke ready:
+  - report `reports\ATLAS_T5_T6_SIDECAR_SOCIAL_READ_MODEL_RENDERED_UI_SMOKE_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_rendered_ui_smoke_t5_t6_20260527\social_read_model_rendered_ui_smoke_summary.json`
+  - rendered contract `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_rendered_ui_smoke_t5_t6_20260527\social_read_model_rendered_ui_contract.json`
+  - fixture `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_rendered_ui_smoke_t5_t6_20260527\social_read_model_rendered_ui_fixture.html`
+  - builder/test `tools\stage7_rewrite\scripts\build_atlas_t6_sidecar_social_read_model_rendered_ui_smoke.py`; `tools\stage7_rewrite\tests\test_build_atlas_t6_sidecar_social_read_model_rendered_ui_smoke.py`
+  - decision `atlas_t6_sidecar_social_read_model_rendered_ui_smoke_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - counts: workbench sample/platform-filter/blank rows `12/12/0`; rendered route panels/sample cards `5/12`; preview graph elements/nodes/edges `75/38/37`; social/profile/outlink rows `18,710/15,715/2,995`
+  - LLM audit: fixed the 02:08 UI workbench sample bug that rendered `platform_filter` rows as blank DJ cards; regenerated workbench now has `blank_sample_cards=0`
+  - validation: py_compile passed; focused pytest `9 passed`; combined social read-model pytest `25 passed`; strict URL/key/path grep returned no hits
+  - boundary: report-local static UI fixture only; no source/raw DB open/write, serving SQLite open/write/rebuild, graph/vector/public write, huaidj.club upload, CloudRun deploy, mini-program upload/review, memory, credential, network/model, 9router, destructive Git, or D: root scan
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_rendered_ui_smoke_t5_t6_20260527\social_read_model_rendered_ui_contract.json`
+- 2026-05-27 T5/T6 sidecar social read-model UI integration review ready:
+  - report `reports\ATLAS_T5_T6_SIDECAR_SOCIAL_READ_MODEL_UI_INTEGRATION_REVIEW_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_ui_integration_review_t5_t6_20260527\social_read_model_ui_integration_review_summary.json`
+  - workbench contract `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_ui_integration_review_t5_t6_20260527\social_read_model_ui_workbench_contract.json`
+  - builder/test `tools\stage7_rewrite\scripts\build_atlas_t6_sidecar_social_read_model_ui_integration_review.py`; `tools\stage7_rewrite\tests\test_build_atlas_t6_sidecar_social_read_model_ui_integration_review.py`
+  - decision `atlas_t6_sidecar_social_read_model_ui_integration_review_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - counts: detail/search/graph rows `1,975/1,975/1,975`; platform facet rows `122`; consumer sample rows `24`; contract routes `5`; UI top platform/city rows `16/16`; distinct search platforms/cities `95/23`; social/profile/outlink rows `18,710/15,715/2,995`
+  - deployable_public `false`; blockers `huaidj_club_upload_disabled_until_explicit_gate` and `public_serving_field_allowed_rows_zero`
+  - T5 interpretation: the social/profile/outlink surface is now shaped as a local workbench contract for rendered graph UI/API fixture smoke. It is not public-serving approved and does not authorize source/raw, selected-serving, graph/vector, or public mutation.
+  - validation: py_compile passed; focused pytest `4 passed`; combined UI review/consumer/candidate/persistence pytest `20 passed`; strict URL/key/path grep returned no hits
+  - boundary: report-local UI workbench contract only; no source/raw DB open/write, serving SQLite open/write/rebuild, graph/vector/public write, huaidj.club upload, CloudRun deploy, mini-program upload/review, memory, credential, network/model, 9router, destructive Git, or D: root scan
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_ui_integration_review_t5_t6_20260527\social_read_model_ui_workbench_contract.json`
+- 2026-05-27 T5/T6 sidecar social read-model consumer smoke ready:
+  - report `reports\ATLAS_T5_T6_SIDECAR_SOCIAL_READ_MODEL_CONSUMER_SMOKE_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_consumer_smoke_t5_t6_20260527\social_read_model_consumer_smoke_summary.json`
+  - contract `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_consumer_smoke_t5_t6_20260527\social_read_model_consumer_contract.json`
+  - builder/test `tools\stage7_rewrite\scripts\build_atlas_t6_sidecar_social_read_model_consumer_smoke.py`; `tools\stage7_rewrite\tests\test_build_atlas_t6_sidecar_social_read_model_consumer_smoke.py`
+  - decision `atlas_t6_sidecar_social_read_model_consumer_smoke_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - counts: detail/search/graph rows `1,975/1,975/1,975`; platform facet rows `122`; consumer sample rows `24`; distinct search platforms/cities `95/23`; social/profile/outlink rows `18,710/15,715/2,995`
+  - T5 interpretation: the WSL2 social/profile/outlink overlay is now locally consumer-shaped for UI/API work. It can feed graph UI/API integration review; source/raw DB writes, selected-serving persistence, graph/vector writes, and public exposure still require separate gates.
+  - validation: py_compile passed; focused pytest `8 passed`; combined sidecar social-read-model consumer/candidate/persistence/attach/overlay/rollup pytest `32 passed`; strict URL/key/path grep returned no hits
+  - boundary: report-local consumer fixtures only; no source/raw DB open/write, serving SQLite open/write/rebuild, graph/vector/public write, huaidj.club upload, CloudRun deploy, mini-program upload/review, memory, credential, network/model, 9router, destructive Git, or D: root scan
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_consumer_smoke_t5_t6_20260527\social_read_model_consumer_contract.json`
+- 2026-05-27 T5/T6 sidecar social read-model candidate ready:
+  - report `reports\ATLAS_T5_T6_SIDECAR_SOCIAL_READ_MODEL_CANDIDATE_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_candidate_t5_t6_20260527\social_read_model_candidate_summary.json`
+  - manifest `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_candidate_t5_t6_20260527\social_read_model_candidate_manifest.json`
+  - builder/test `tools\stage7_rewrite\scripts\build_atlas_t6_sidecar_social_read_model_candidate.py`; `tools\stage7_rewrite\tests\test_build_atlas_t6_sidecar_social_read_model_candidate.py`
+  - decision `atlas_t6_sidecar_social_read_model_candidate_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - counts: detail/search/graph rows `1,975/1,975/1,975`; platform facet rows `122`; platform-host rows `2,024`; social/profile/outlink rows `18,710/15,715/2,995`
+  - persistence alignment: 2026-05-27 persistence contract matches overlay entity/link/profile/outlink counts; source/raw and selected serving native social tables remain `0/0`
+  - route smoke: `ok=true` for social overview, DJ social detail, social search, graph social overlay, and platform facet fixtures
+  - T5 interpretation: current product-safe social surface is a report-local attach-only read model/API fixture. It can feed local service/UI consumer smoke and a later public-serving-field approval gate, but not source/raw or selected-serving in-place mutation.
+  - validation: py_compile passed; focused pytest `5 passed`; combined sidecar social-read-model/persistence/attach/overlay/rollup pytest `19 passed`; strict URL/key/path grep returned no hits
+  - boundary: report-local fixtures only; no source/raw DB open/write, serving SQLite open/write/rebuild, graph/vector/public write, huaidj.club upload, CloudRun deploy, mini-program upload/review, memory, credential, 9router, destructive Git, or D: root scan
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_candidate_t5_t6_20260527\social_read_model_candidate_manifest.json`
+- 2026-05-27 T5/T6 social overlay persistence decision ready:
+  - report `reports\ATLAS_T5_T6_SIDECAR_OVERLAY_PERSISTENCE_DECISION_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_persistence_decision_t5_t6_20260527\social_overlay_persistence_summary.json`
+  - contract `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_persistence_decision_t5_t6_20260527\social_overlay_persistence_contract.json`
+  - builder/test `tools\stage7_rewrite\scripts\build_atlas_t6_sidecar_overlay_persistence_decision.py`; `tools\stage7_rewrite\tests\test_build_atlas_t6_sidecar_overlay_persistence_decision.py`
+  - decision `atlas_t6_sidecar_overlay_persistence_attach_only_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - counts: overlay entities/links/profile/outlink `1,975/18,710/15,715/2,995`; platform/host rows `122/1,961`; source/raw native social tables `0`; selected serving native social tables `0`
+  - joins: profile/search/graph/event/relation `1,975/1,975/1,975/1,975/1,946`; relation-only warning gap rows `29`
+  - T5 interpretation: current product-safe decision is attach-only read model. Do not mutate source/raw or selected serving in place because neither has native social tables; the next write-shaped work must be a separate derived serving/read-model candidate builder with base hash, rollback, postwrite readback, and FTS consistency if social text enters search.
+  - validation: py_compile passed; focused pytest `3 passed`; combined overlay persistence/attach/overlay DB/completion pytest `14 passed`; strict URL/key/path grep over the new report/output surface returned no hits
+  - boundary: report-only read-only decision packet; no source/raw DB open/write, selected serving DB mutation/rebuild, graph/vector/public write, huaidj.club upload, CloudRun deploy, mini-program upload/review, memory, credential, 9router, destructive Git, or D: root scan
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_persistence_decision_t5_t6_20260527\social_overlay_persistence_work_orders.jsonl`
+- 2026-05-27 HUAIDJ root Atlas graph home / Turnstile fix SSOT sync ready:
+  - report `reports\ATLAS_T7_HUAIDJ_ROOT_GRAPH_HOME_SSOT_SYNC_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t7_huaidj_root_graph_home_ssot_sync_20260527\root_graph_home_ssot_sync_summary.json`
+  - current runtime source `docs\current-runtime.md`, section `2026-05-27 00:48 Atlas Turnstile Failure Handling Fix`
+  - decision `atlas_t7_huaidj_root_graph_home_turnstile_ssot_sync_ready_report_only`, failed checks `[]`, SSOT drift resolved rows `1`, leak hits `0/0/0`
+  - T5 interpretation: the root graph lab surface and Turnstile failure-handling fix are already recorded as remote-effective upstream evidence, so T5 should not repeat upload. Next product-facing work is protected-session readability/coolness validation, local UI/API smoke, social overlay persistence or attach-only decision, avatar/media recovery, and time/city/venue gap closure.
+  - boundary: this T7 sync did not upload, mutate source/raw DB, write/rebuild serving SQLite, write Neo4j/Qdrant/production SQLite, deploy CloudRun, upload/review mini-program, write memory, read credentials, use 9router, or scan D: roots.
+  - next resume pointer: `https://huaidj.club/` for human Turnstile/readability checks; local data-quality work continues from `tools\stage7_rewrite\reports\atlas_dj_completion_overlay_rollup_t5_t6_20260527\dj_completion_next_work_orders.jsonl`.
+- 2026-05-27 T5/T6 DJ completion overlay rollup ready:
+  - report `reports\ATLAS_T5_T6_DJ_COMPLETION_OVERLAY_ROLLUP_20260527.md`
+  - summary `tools\stage7_rewrite\reports\atlas_dj_completion_overlay_rollup_t5_t6_20260527\dj_completion_overlay_rollup_summary.json`
+  - rollup `tools\stage7_rewrite\reports\atlas_dj_completion_overlay_rollup_t5_t6_20260527\dj_completion_overlay_rollup.json`
+  - work orders `tools\stage7_rewrite\reports\atlas_dj_completion_overlay_rollup_t5_t6_20260527\dj_completion_next_work_orders.jsonl`
+  - builder/test `tools\stage7_rewrite\scripts\build_atlas_dj_completion_overlay_rollup.py`; `tools\stage7_rewrite\tests\test_build_atlas_dj_completion_overlay_rollup.py`
+  - decision `atlas_dj_completion_overlay_rollup_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - counts: DJ profiles / historical performance events / DJ-event edges / directed DJ relations / search docs / graph windows `53,555/508,049/1,285,827/701,396/590,927/53,555`
+  - sidecar overlay: social-enriched DJs `1,975` (`3.69%`), social/profile/outlink rows `18,710/15,715/2,995`, serving event/relation joins `436,835/364,868`
+  - remaining data-quality gaps: DJ city/avatar/media missing `13,013/53,555/53,555`; performance-event starts_at/city/venue missing `154,804/132,423/66,616`; DJ-event starts_at/city/venue missing `435,186/349,045/151,231`
+  - graph/search posture: history/co-appearance/search/graph windows are strong; social overlay is validated but not yet a source/raw or serving in-place persistence decision
+  - LLM audit finding: current-runtime and Stage7 overlay SSOT record a guarded public graph UI upload at `00:10`, while thread/index/code-map surfaces needed sync; do not repeat public upload
+  - validation: py_compile passed; focused pytest `3 passed`; combined completion-overlay/completion-effect/sidecar-UI/sidecar-attach pytest `19 passed`; strict raw URL/local-path/credential grep returned no hits
+  - boundary: report-only rollup from existing artifacts; no source/raw DB open/write, serving DB open/write/rebuild, graph/vector write, public pointer mutation, remote upload, mini-program upload/review, or memory write
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_dj_completion_overlay_rollup_t5_t6_20260527\dj_completion_next_work_orders.jsonl`
+- 2026-05-26 T5/T6 sidecar overlay UI integration smoke ready:
+  - report `reports\ATLAS_T5_T6_SIDECAR_OVERLAY_UI_INTEGRATION_SMOKE_20260526.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_ui_integration_smoke_t5_t6_20260526\overlay_social_ui_integration_smoke_summary.json`
+  - integration contract `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_ui_integration_smoke_t5_t6_20260526\overlay_social_ui_integration_contract.json`
+  - Cytoscape elements `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_ui_integration_smoke_t5_t6_20260526\overlay_social_cytoscape_elements.json`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_t6_sidecar_overlay_ui_integration_smoke.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_t6_sidecar_overlay_ui_integration_smoke.py`
+  - decision `atlas_t6_sidecar_overlay_ui_integration_smoke_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - consumed report-local UI contract `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_local_api_consumer_smoke_t5_t6_20260526\overlay_social_ui_contract.json`; this builder did not open source/raw DB or serving DB
+  - outputs `overlay_social_ui_integration_contract.json`, `overlay_social_cytoscape_elements.json`, `overlay_social_ui_filter_state.json`, `overlay_social_ui_integration_samples.jsonl`, `overlay_social_ui_integration_smoke_summary.json`, and `overlay_social_ui_integration_smoke_summary.md`
+  - counts: attach-ready/blocked entities `1,975/0`; Cytoscape elements/nodes/edges `136/34/102`; DJ/platform/city nodes `8/20/6`; platform/city edges `94/8`; detail/graph/integration samples `8/8/8`; overlay link/profile/outlink rows `18,710/15,715/2,995`; serving event/relation edges `436,835/364,868`
+  - graph/search posture: the sidecar social overlay now has a local UI integration view model, but accepted-for-graph rows `0`, graph-write rows `0`, public-serving-field-allowed rows `0`, and memory-write rows `0`
+  - self-correction: detail-only platforms missing from top platform facets are now sample-only platforms, not blockers; unsafe URL-like platform labels still block
+  - validation: `py_compile` passed; focused pytest `8 passed`; combined sidecar UI-integration/consumer/candidate/attach/overlay/validation/redacted-manifest/completion pytest `41 passed`; strict raw URL/local-path/credential grep returned no hits
+  - `deployable_public=false`: huaidj.club upload is disabled until explicitly re-enabled
+  - boundary: report-local UI integration smoke only; no source/raw DB open/mutation, no serving DB open/write/rebuild, no Neo4j/Qdrant/production/public write, no huaidj.club upload, CloudRun/VPS deploy, mini-program upload/review, or memory write
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_ui_integration_smoke_t5_t6_20260526\overlay_social_ui_integration_contract.json`
+- 2026-05-26 T5/T6 sidecar overlay local API consumer smoke ready:
+  - report `reports\ATLAS_T5_T6_SIDECAR_OVERLAY_LOCAL_API_CONSUMER_SMOKE_20260526.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_local_api_consumer_smoke_t5_t6_20260526\overlay_social_local_api_consumer_smoke_summary.json`
+  - UI contract `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_local_api_consumer_smoke_t5_t6_20260526\overlay_social_ui_contract.json`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_t6_sidecar_overlay_local_api_consumer_smoke.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_t6_sidecar_overlay_local_api_consumer_smoke.py`
+  - decision `atlas_t6_sidecar_overlay_local_api_consumer_smoke_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - consumed report-local manifest `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_local_api_candidate_t5_t6_20260526\overlay_social_local_api_candidate_manifest.json`; this builder did not open source/raw DB or serving DB
+  - outputs `overlay_social_consumer_route_smoke.json`, `overlay_social_ui_contract.json`, `overlay_social_consumer_samples.jsonl`, `overlay_social_local_api_consumer_smoke_summary.json`, and `overlay_social_local_api_consumer_smoke_summary.md`
+  - counts: route contracts `5`; overview/detail/search/platform/graph rows `1/24/1/12/8`; search item rows `12`; graph sample DJ rows `8`; attach-ready/blocked entities `1,975/0`; platform-host rows `2,024`; distinct platforms/hosts `122/1,961`; overlay link/profile/outlink rows `18,710/15,715/2,995`; serving event/relation edges `436,835/364,868`
+  - graph/search posture: the sidecar social overlay now has a UI/API consumer contract and route smoke, but accepted-for-graph rows `0`, graph-write rows `0`, public-serving-field-allowed rows `0`, and memory-write rows `0`
+  - self-corrections: valid zero outlink totals now parse as `0` instead of missing; safe colon host tokens such as `facebook:http:` remain allowed while raw URL/path/credential shapes stay blocked
+  - validation: `py_compile` passed; focused pytest `8 passed`; combined sidecar consumer/candidate/attach/overlay/validation/redacted-manifest/completion pytest `33 passed`; strict raw URL/local-path/credential grep returned no hits
+  - `deployable_public=false`: huaidj.club upload is disabled until explicitly re-enabled
+  - boundary: report-local UI/API consumer contract smoke only; no source/raw DB open/mutation, no serving DB open/write/rebuild, no Neo4j/Qdrant/production/public write, no huaidj.club upload, CloudRun/VPS deploy, mini-program upload/review, or memory write
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_local_api_consumer_smoke_t5_t6_20260526\overlay_social_ui_contract.json`
+- 2026-05-26 T5/T6 sidecar overlay local API candidate ready:
+  - report `reports\ATLAS_T5_T6_SIDECAR_OVERLAY_LOCAL_API_CANDIDATE_20260526.md`
+  - manifest `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_local_api_candidate_t5_t6_20260526\overlay_social_local_api_candidate_manifest.json`
+  - summary `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_local_api_candidate_t5_t6_20260526\overlay_social_local_api_candidate_summary.json`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_t6_sidecar_overlay_local_api_candidate.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_t6_sidecar_overlay_local_api_candidate.py`
+  - decision `atlas_t6_sidecar_overlay_local_api_candidate_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - consumed report-local contract `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_serving_attach_smoke_t5_t6_20260526\overlay_social_api_contract.json`; this builder did not open source/raw DB or serving DB
+  - outputs `overlay_social_overview_response.json`, `overlay_social_detail_responses.jsonl`, `overlay_social_search_response.json`, `overlay_social_platform_responses.jsonl`, `overlay_social_graph_responses.jsonl`
+  - counts: route contracts `5`; overview/detail/search/platform/graph responses `1/24/1/12/8`; attach-ready/blocked entities `1,975/0`; platform-host rows `2,024`; distinct platforms/hosts `122/1,961`; overlay link/profile/outlink rows `18,710/15,715/2,995`; serving event/relation edges `436,835/364,868`
+  - graph/search posture: local API response fixtures are ready for UI/API wiring review, but accepted-for-graph rows `0`, graph-write rows `0`, public-serving-field-allowed rows `0`, and memory-write rows `0`
+  - `deployable_public=false`: huaidj.club upload is disabled until explicitly re-enabled
+  - boundary: report-local sanitized API fixtures only; no source/raw DB open/mutation, no serving DB open/write/rebuild, no Neo4j/Qdrant/production/public write, no huaidj.club upload, CloudRun/VPS deploy, mini-program upload/review, or memory write
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_local_api_candidate_t5_t6_20260526\overlay_social_local_api_candidate_manifest.json`
+- 2026-05-26 T5/T6 sidecar social read-model candidate ready:
+  - report `reports\ATLAS_T5_T6_SIDECAR_SOCIAL_READ_MODEL_CANDIDATE_20260526.md`
+  - manifest `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_candidate_t5_20260526\social_read_model_candidate_manifest.json`
+  - summary `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_candidate_t5_20260526\social_read_model_candidate_summary.json`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_t6_sidecar_social_read_model_candidate.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_t6_sidecar_social_read_model_candidate.py`
+  - decision `atlas_t6_sidecar_social_read_model_candidate_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - consumed report-local contract `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_serving_attach_smoke_t5_t6_20260526\overlay_social_api_contract.json`; no source/raw DB or serving DB open was needed in this builder
+  - outputs `social_overview_response.json`, `dj_social_detail_responses.jsonl`, `social_search_index.jsonl`, `graph_social_overlays.jsonl`, `social_platform_facet_responses.jsonl`, `social_read_model_route_smoke.json`
+  - counts: input entity rows `1,975`; detail/search/graph rows `1,975/1,975/1,975`; platform facet rows `122`; platform-host rows `2,024`; total social links `18,710`; profile/outlink rows `15,715/2,995`
+  - graph/search posture: local search/UI/graph fixtures are available, but accepted-for-graph rows `0`, graph-write rows `0`, and public-serving-field-allowed rows `0`
+  - route smoke passed for `/atlas/social/overview`, `/atlas/dj/{dj_id}/social`, `/atlas/search?has_social=true`, `/atlas/graph/{dj_id}?include=social`, and `/atlas/social/platforms/{platform}`
+  - `deployable_public=false`: blockers `public_serving_field_allowed_rows_zero` and `huaidj_club_upload_disabled_until_explicit_gate`
+  - boundary: report-local sanitized read-model fixtures only; no source/raw DB open/mutation, no serving DB in-place overwrite, no Neo4j/Qdrant/production/public write, no huaidj.club upload, CloudRun/VPS deploy, mini-program upload/review, or memory write
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_sidecar_social_read_model_candidate_t5_20260526\social_read_model_candidate_manifest.json`
+- 2026-05-26 local Qdrant full vector import verified:
+  - report `reports\ATLAS_T5_QDRANT_FULL_VECTOR_IMPORT_VERIFY_20260526.md`
+  - surface audit report `reports\ATLAS_T5_QDRANT_FULL_VECTOR_SURFACE_AUDIT_20260526.md`
+  - surface audit manifest `tools\stage7_rewrite\reports\qdrant_full_vector_surface_audit_t5_20260526\qdrant_vector_surface_manifest.json`
+  - current vector router smoke `tools\stage7_rewrite\reports\vector_collection_router_smoke_t5_full_vector_audit_20260526\vector_collection_router_smoke.json`
+  - fresh smoke `tools\stage7_rewrite\reports\qdrant_full_import_verify_47k_p1_repair1397_20260526\qdrant_full_staging_smoke.json`
+  - source vector artifact `tools\stage7_rewrite\reports\vector_full_qwen3_4b_1024_47k_plus_v6_p1_repair_1397_20260518`
+  - local Qdrant `local-qdrant` was started and recovered `83` collections before verification
+  - latest full Qwen3 1024 artifact is fully present in isolated full-staging collections: article/entity/event `46,965/518,144/220,834`, total `785,943`
+  - all current vector surfaces are present and searchable locally: Qwen3 `785,943`, multilingual baseline `1,626,556`, Snowflake canary `1,626,556`, English sidecar `1,260,981` including poster English `40`, poster OCR baseline `40`; current Stage7 alias gaps `[]`
+  - router smoke: multilingual/English/Snowflake/OCR baseline match rates `1.0`, route cases `zh_full_route`, `en_full_route`, `mixed_full_route`, `poster_ocr_route` returned fused results
+  - collection health all `green`, optimizer `ok`, equivalent self-query rate `1.0` over `15` checked rows
+  - boundary: no new embedding/model call, duplicate point upsert, alias promotion, production alias mutation, Neo4j write, raw/source Atlas DB mutation, serving rebuild/write, public pointer, CloudRun/VPS deploy, mini-program upload/review, memory write, credential read, paid/model API, 9router, D: root scan, or destructive Git
+- 2026-05-26 T5/T6 sidecar overlay serving attach smoke ready:
+  - report `reports\ATLAS_T5_T6_SIDECAR_OVERLAY_SERVING_ATTACH_SMOKE_20260526.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_serving_attach_smoke_t5_t6_20260526\overlay_serving_attach_smoke_summary.json`
+  - API contract `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_serving_attach_smoke_t5_t6_20260526\overlay_social_api_contract.json`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_t6_sidecar_overlay_serving_attach_smoke.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_t6_sidecar_overlay_serving_attach_smoke.py`
+  - decision `atlas_t6_sidecar_overlay_serving_attach_smoke_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - read-only inputs: selected serving DB `reports\atlas_serving_participant_delta_current_20260526_0016\atlas_serving.sqlite`; overlay DB `tools\stage7_rewrite\reports\atlas_t6_sidecar_new_db_overlay_t5_t6_20260526\atlas_t6_sidecar_social_overlay.sqlite`
+  - attach coverage: overlay link/rollup/entity rows `18,710/1,975/1,975`; profile/outlink rows `15,715/2,995`; distinct platforms/hosts `122/1,961`
+  - serving joins: `dj_profile/search_document/graph_window` matches `1,975/1,975/1,975`; serving event/relation edges for social entities `436,835/364,868`; attach-ready/blocked entity rows `1,975/0`; duplicate selector groups `0`
+  - T5 interpretation: local serving/search/graph/API behavior is now proven from the overlay, so the next lane is a public-safe local read-model/API candidate from the contract; source/raw social schema migration remains a separate gate
+  - boundary: report-only read-only attach; no source/raw DB open/mutation, serving rebuild/write, graph/vector/public mutation, huaidj.club upload, mini-program upload/review, or memory write
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_sidecar_overlay_serving_attach_smoke_t5_t6_20260526\overlay_social_api_contract.json`
+- 2026-05-26 T5/T6 sidecar new Atlas overlay DB built:
+  - report `reports\ATLAS_T5_T6_SIDECAR_NEW_DB_OVERLAY_20260526.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t6_sidecar_new_db_overlay_t5_t6_20260526\sidecar_new_db_overlay_summary.json`
+  - overlay DB `tools\stage7_rewrite\reports\atlas_t6_sidecar_new_db_overlay_t5_t6_20260526\atlas_t6_sidecar_social_overlay.sqlite`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_t6_sidecar_new_db_overlay.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_t6_sidecar_new_db_overlay.py`
+  - decision `atlas_t6_sidecar_new_atlas_overlay_db_built_local_only`, failed checks `[]`, leak hits `0/0/0`
+  - source/raw target DB opened read-only, quick_check `ok`, native social/outlink tables `0`, target DB size `3,996,237,824`
+  - overlay counts: link/rollup/entity rows `18,710/1,975/1,975`; profile/outlink rows `15,715/2,995`; duplicate selector rows `0`; write-guard-open rows `0`
+  - T5 interpretation: this is now the right attachment artifact for the new Atlas serving/read-model rebuild; do not mutate the 4GB source/raw DB in-place until a separate schema migration/write gate exists
+  - boundary: report-local overlay SQLite write only; no source/raw mutation, serving rebuild/write, graph/vector/public mutation, huaidj.club upload, mini-program upload/review, or memory write
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_sidecar_new_db_overlay_t5_t6_20260526\atlas_t6_sidecar_social_overlay.sqlite`
+- 2026-05-26 T5/T6 sidecar manifest validation gate ready:
+  - report `reports\ATLAS_T5_T6_SIDECAR_MANIFEST_VALIDATION_GATE_20260526.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t6_sidecar_manifest_validation_gate_t5_t6_20260526\sidecar_manifest_validation_summary.json`
+  - merge contract `tools\stage7_rewrite\reports\atlas_t6_sidecar_manifest_validation_gate_t5_t6_20260526\merge_contract.json`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_t6_sidecar_manifest_validation_gate.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_t6_sidecar_manifest_validation_gate.py`
+  - decision `atlas_t6_sidecar_manifest_validation_gate_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - counts candidates / entity rollups / avatar rows / upstream blocked rows `18,741/1,986/2/12,260`; selected serving DJ profiles `53,555`; unique candidate entity IDs `1,986`
+  - merge scope: profile/outlink merge-precheck-ready rows `18,710`; identity review-required rows `31`; validation-blocked candidate rows `0`; duplicate candidate/url-key groups `0/0`; missing serving entity refs `0`; entity-rollup validation blockers `0`
+  - avatar scope: hash-ready/blocked rows `0/2`; avatar rows remain closed until content hash and storage contract are available
+  - T5 interpretation: profile/outlink sidecar rows are structurally ready for a separate source/raw/new-Atlas-DB merge gate; identity candidates and avatars are not write-ready; do not merge directly from WSL scratch or the raw T6 manifest
+  - boundary: report-only validation; no source/raw DB write, serving rebuild/write, graph/vector/public mutation, huaidj.club upload, mini-program upload/review, or memory write
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_sidecar_manifest_validation_gate_t5_t6_20260526\merge_contract.json`
+- 2026-05-26 T6 sidecar hash/redacted manifest ready for T5 validation:
+  - report `reports\ATLAS_T6_SIDECAR_REDACTED_MANIFEST_20260526.md`
+  - summary `tools\stage7_rewrite\reports\atlas_t6_sidecar_redacted_manifest_20260526\sidecar_redacted_manifest_summary.json`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_t6_sidecar_redacted_manifest.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_t6_sidecar_redacted_manifest.py`
+  - decision `atlas_t6_sidecar_redacted_manifest_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - input scratch counts `dj_social_profiles=24,184`, `dj_outlinks=8,300`, `dj_identity_candidates=184`, `dj_avatars=2`
+  - output counts joined candidates / entity rollups / avatar artifacts / blockers `18,741/1,986/2/12,260`
+  - emitted outputs `manifest.json`, `entity_rollups.jsonl`, `candidate_evidence.jsonl`, `avatar_artifacts_manifest.jsonl`, `blocked_rows.jsonl`, `leak_scan.json`, and `provenance_summary.json`
+  - T5 interpretation: this satisfies the first T6 contract step by removing raw URLs/local paths from the WSL sidecar surface, but it is still candidate evidence. The next T5 step is schema/count/entity-join/avatar blocker validation, then a separate source/raw/new-Atlas-DB merge gate with prewrite/rollback/postwrite evidence.
+  - boundary: report-only; no source/raw DB write, serving rebuild/write, graph/vector/public mutation, huaidj.club upload, mini-program upload/review, or memory write
+  - next resume pointer: `tools\stage7_rewrite\reports\atlas_t6_sidecar_redacted_manifest_20260526\manifest.json`
+- 2026-05-26 T5/T6 DJ completion-effect audit and sidecar merge contract:
+  - report `reports\ATLAS_T5_T6_DJ_COMPLETION_EFFECT_AND_SIDECAR_CONTRACT_20260526.md`
+  - summary `tools\stage7_rewrite\reports\atlas_dj_completion_effect_audit_t5_t6_20260526\dj_completion_effect_audit_summary.json`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_dj_completion_effect_audit.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_dj_completion_effect_audit.py`
+  - decision `atlas_dj_completion_effect_audit_ready_report_only`, failed checks `[]`, leak hits `0/0/0`
+  - selected serving candidate counts `53,555` DJ profiles / `508,049` performance events / `1,285,827` DJ-event edges / `701,396` directed relations / `590,927` search docs / `53,555` graph windows; deltas vs base `+96/+28/+399/+1,596/+124/+96`
+  - open completion gaps for the new Atlas DB include `dj_profile.avatar_asset_id=0/53,555`, `dj_profile.media_count_gt0=0/53,555`, `performance_event.starts_at=353,245/508,049`, `performance_event.city=375,626/508,049`, `performance_event.venue_name=441,433/508,049`, `dj_event.starts_at=850,641/1,285,827`, `dj_event.city=936,782/1,285,827`, and `dj_event.venue_name=1,134,596/1,285,827`
+  - WSL sidecar scratch DB shape `dj_social_profiles=24,184`, `dj_outlinks=8,300`, `dj_identity_candidates=184`, `dj_avatars=2`; raw URL/path columns are present, so T6 output cannot be merged until it emits the new hashed/redacted manifest contract
+  - next local work: `tools\stage7_rewrite\reports\atlas_dj_completion_effect_audit_t5_t6_20260526\dj_completion_gap_register.jsonl`, then T6 hashed manifest generation and T5 source/raw real snapshot + merge gate for the new Atlas DB
+  - boundary: report-only; no source/raw write, serving rebuild/write, graph/vector/public mutation, huaidj.club upload, mini-program upload/review, or memory write
+- 2026-05-26 Q6/T5 source/raw mapping and mapped acceptance gates:
+  - mapping report `reports\ATLAS_T6_MANUAL_PARTICIPANT_SOURCE_RAW_MAPPING_PROBE_20260526.md`
+  - mapped gate reports `reports\ATLAS_T6_MANUAL_PARTICIPANT_SOURCE_DATE_ACCEPTANCE_WRITE_GATE_MAPPED_20260526.md`, `reports\ATLAS_T6_MANUAL_PARTICIPANT_OVERNIGHT_MIDNIGHT_ACCEPTANCE_WRITE_GATE_MAPPED_20260526.md`, and `reports\ATLAS_T6_MANUAL_PARTICIPANT_REMAINING_IDENTITY_ACCEPTANCE_WRITE_GATE_MAPPED_20260526.md`
+  - mapping decision `atlas_social_manual_participant_source_raw_mapping_probe_ready_report_only`, failed checks `[]`, input target rows `8`, direct existing explicit source/raw target DB paths `1`, mapping ready/blocked rows `8/0`
+  - mapped gates are all ready report-only; source/raw provenance ready/blocked rows are `3/0`, `1/0`, and `4/0`; write execution allowed rows remain `0`
+  - T5 interpretation: proceed next to read-only real snapshot and rollback/postwrite verification; do not write source/raw DB, rebuild serving, promote graph/vector/public state, or update public pointers from report-only readiness alone
+  - next local work: `tools\stage7_rewrite\reports\atlas_social_manual_participant_source_raw_mapping_probe_q6_20260526\source_raw_mapping_ready_report_only.jsonl`
+- 2026-05-26 Q6/T5 manual participant remaining-identity readback gate:
+  - upstream T6/T5 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_REMAINING_IDENTITY_READBACK_GATE_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_event_identity_readback_gate.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_event_identity_readback_gate.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_remaining_identity_readback_gate_q6_20260526\event_identity_readback_gate_summary.json`
+  - decision `atlas_social_manual_participant_event_identity_readback_gate_ready_report_only`, failed checks `[]`
+  - counts input/readback/ready/blocked rows `4/4/4/0`; date/venue split `2/2`; unique selected event ids `11`; duplicate selector drift groups `0`; min participant evidence `1`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: the remaining-identity blockers now have four selected-serving readback-ready candidates, but they are still not source/raw DB writes, serving rebuild inputs, graph fact acceptance, public pointer, graph/vector/DB production writes, or memory.
+  - validation: py_compile passed; focused pytest `12 passed`; combined remaining-identity/readback/midnight/blocked-identity pytest `29 passed`; strict URL/key/path grep returned no hits
+  - next local work: process `tools\stage7_rewrite\reports\atlas_social_manual_participant_remaining_identity_readback_gate_q6_20260526\event_identity_readback_ready_report_only.jsonl` only through a separate source/raw DB provenance/write gate; keep all source/raw DB, serving, graph/public, and memory writes closed unless that later gate passes with rollback/postwrite evidence.
+- 2026-05-26 Q6/T5 manual participant remaining-identity recovery gate:
+  - upstream T6/T5 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_REMAINING_IDENTITY_RECOVERY_GATE_20260526.md`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_remaining_identity_recovery_q6_20260526\remaining_identity_recovery_summary.json`
+  - status: consumed by the 15:43 readback gate; produced input/candidate/blocked rows `9/4/5`, same-date/venue candidates `2/2`, source-account batches `4`, unique selected event ids `11`, leak hits `0/0/0`, and all write/promotion rows `0`.
+- 2026-05-26 Q6/T5 manual participant overnight-midnight acceptance write-gate:
+  - upstream T6/T5 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_OVERNIGHT_MIDNIGHT_ACCEPTANCE_WRITE_GATE_20260526.md`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_overnight_midnight_acceptance_write_gate_q6_20260526\overnight_midnight_acceptance_write_gate_summary.json`
+  - decision `atlas_social_manual_participant_overnight_midnight_acceptance_write_gate_blocked_report_only`, failed checks `["source_raw_target_db_provenance_missing"]`; input/write/manual-ready `1/1/1`; source/raw target DB ready/blocked `0/1`; write execution allowed `0`; leak hits `0/0/0`; all write/promotion rows `0`
+  - status: the 15:10 midnight readback is now upstream evidence; no source/raw DB or serving/graph/public mutation is authorized.
+- 2026-05-26 Q6/T5 manual participant overnight-midnight readback gate:
+  - upstream T6/T5 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_OVERNIGHT_MIDNIGHT_READBACK_GATE_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_overnight_midnight_readback_gate.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_overnight_midnight_readback_gate.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_overnight_midnight_readback_gate_q6_20260526\overnight_midnight_readback_gate_summary.json`
+  - decision `atlas_social_manual_participant_overnight_midnight_readback_gate_ready_report_only`, failed checks `[]`
+  - counts input/readback/ready/blocked rows `1/1/1/0`; boundary segment readback rows `2`; unique selected event ids `5`; unique boundary dates `2`; boundary-start/midnight-date event rows `2/3`; min participant evidence `1`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: OIL `Countdown to 2020` readback verifies the single overnight midnight boundary against selected serving events/source refs/participant evidence. The 14:42 correction and previous span packet remain upstream evidence; this is not serving rebuild or graph/public promotion authorization.
+  - validation: py_compile passed; focused pytest `7 passed`; combined midnight-readback/correction/span/source-date-readback pytest `22 passed`; strict URL/key/path grep returned no hits
+  - next local work: process `tools\stage7_rewrite\reports\atlas_social_manual_participant_overnight_midnight_readback_gate_q6_20260526\overnight_midnight_readback_ready_report_only.jsonl` only through a manual midnight-boundary acceptance/source-raw DB provenance write gate; keep all source/raw DB, serving, graph/public, and memory writes closed unless that later gate passes with rollback/postwrite evidence.
+- 2026-05-26 Q6/T5 manual participant overnight-midnight correction:
+  - upstream T6/T5 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_OVERNIGHT_MIDNIGHT_CORRECTION_20260526.md`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_overnight_midnight_correction_q6_20260526\overnight_midnight_correction_summary.json`
+  - status: consumed by the 15:10 midnight-boundary readback gate; it remains upstream correction evidence for the single-boundary model and no longer owns the active resume pointer.
+- 2026-05-26 Q6/T5 manual participant source-date acceptance write-gate:
+  - upstream T6/T5 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_SOURCE_DATE_ACCEPTANCE_WRITE_GATE_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_source_date_acceptance_write_gate.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_source_date_acceptance_write_gate.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_source_date_acceptance_write_gate_q6_20260526\source_date_acceptance_write_gate_summary.json`
+  - decision `atlas_social_manual_participant_source_date_acceptance_write_gate_blocked_report_only`, failed checks `["source_raw_target_db_provenance_missing"]`
+  - counts input ready/write-gate/manual-ready rows `3/3/3`; source/raw target DB provenance ready rows `0`; source/raw target DB blocked rows `3`; row blockers `0`; source-account batches `2`; unique selected event ids/dates `6/3`; prewrite/rollback/postwrite required rows `3/3/3`; write execution allowed rows `0`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: the three source-date rows are manual acceptance-precheck ready at report-only contract level, but source/raw target DB provenance is missing. This blocks source/raw DB writes, serving rebuild, graph fact acceptance, public pointer, graph/vector/DB production writes, and memory.
+  - validation: py_compile passed; focused pytest `6 passed`; combined source-date acceptance/source-date readback/target-DB provenance pytest `17 passed`; strict URL/key/path grep returned no hits
+  - next local work: process `tools\stage7_rewrite\reports\atlas_social_manual_participant_source_date_acceptance_write_gate_q6_20260526\source_raw_target_db_blocked_rows.jsonl`; only write if a later explicit source/raw target DB real snapshot/write gate passes with rollback and postwrite evidence.
+
+- 2026-05-26 Q6/T5 manual participant source-date readback gate (direct upstream, consumed by 14:07 gate):
+  - upstream T6/T5 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_SOURCE_DATE_READBACK_GATE_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_source_date_readback_gate.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_source_date_readback_gate.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_source_date_readback_gate_q6_20260526\source_date_readback_gate_summary.json`
+  - decision `atlas_social_manual_participant_source_date_readback_gate_ready_report_only`, failed checks `[]`
+  - counts input/readback/ready/blocked rows `3/3/3/0`; source-account batches `2`; unique selected event ids/dates `6/3`; min participant evidence per ready event `1`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this verifies source-date candidates against the selected local serving read model, but it still does not authorize source/raw DB writes, serving rebuild, graph fact acceptance, OCR execution, public pointer, graph/vector/DB production writes, or memory.
+  - validation: py_compile passed; focused pytest `7 passed`; combined source-date-readback/source-date-context/event-identity-readback pytest `20 passed`; strict URL/key/path grep returned no hits
+  - upstream status: `tools\stage7_rewrite\reports\atlas_social_manual_participant_source_date_readback_gate_q6_20260526\source_date_readback_ready_report_only.jsonl` was consumed by the 14:07 source-date acceptance write-gate; keep span rows and all public/write gates closed.
+
+- 2026-05-26 Q6/T5 manual participant source-date-context recovery packet:
+  - upstream T6/T5 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_SOURCE_DATE_CONTEXT_RECOVERY_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_source_date_context_recovery.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_source_date_context_recovery.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_source_date_context_recovery_q6_20260526\source_date_context_recovery_summary.json`
+  - decision `atlas_social_manual_participant_source_date_context_recovery_ready_report_only`, failed checks `[]`
+  - counts input work orders `4`; review rows `4`; source-account batches `2`; candidate-ready rows `3`; source-artifact required rows `0`; overnight/span review rows `1`; ambiguous tiebreak rows `0`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this advances source-date-context blockers into report-only readback candidates, but it still does not authorize source/raw DB writes, serving rebuild, graph fact acceptance, OCR execution, public pointer, graph/vector/DB production writes, or memory.
+  - validation: py_compile passed; focused pytest `6 passed`; combined source-date-context/blocked-identity/event-identity pytest `15 passed`; strict URL/key/path grep returned no hits
+  - upstream status: `date_context_candidate_ready_report_only.jsonl` was consumed by the 13:10 source-date readback gate; keep the overnight/span row and all writes closed.
+
+- 2026-05-26 Q6/T5 manual participant blocked identity review packet:
+  - upstream T6/T5 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_BLOCKED_IDENTITY_REVIEW_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_blocked_identity_review.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_blocked_identity_review.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_blocked_identity_review_q6_20260526\manual_participant_blocked_identity_review_summary.json`
+  - decision `atlas_social_manual_participant_blocked_identity_review_ready_report_only`, failed checks `[]`
+  - counts input still-blocked rows `13`; review work-order rows `13`; source-account batches `4`; lane split source-date-context `4`, event-date/source-year `1`, same-date cluster tiebreak `2`, venue-alias lineage `4`, multi-venue split `1`, low-title manual review `1`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this advances the blocked manual identity lane into precise recovery queues. It still does not authorize source/raw DB writes, serving rebuild, graph fact acceptance, public pointer, graph/vector/DB production writes, OCR execution, or memory.
+  - validation: py_compile passed; focused pytest `4 passed`; combined blocked-identity/event-identity/blocker-recovery pytest `13 passed`; strict URL/key/path grep returned no hits
+  - next local work: process `tools\stage7_rewrite\reports\atlas_social_manual_participant_blocked_identity_review_q6_20260526\source_date_context_recovery_work_orders.jsonl` first, then the event-date/source-year, same-date tiebreak, venue-alias lineage, multi-venue, and low-title queues only through separate report-only recovery/readback gates.
+
+- 2026-05-26 Q6/T5 manual participant visual API response smoke packet:
+  - upstream T6/T5 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_VISUAL_API_RESPONSE_SMOKE_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_visual_api_response_smoke.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_visual_api_response_smoke.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_visual_api_response_smoke_q6_20260526\manual_participant_visual_api_response_smoke_summary.json`
+  - decision `atlas_social_manual_participant_visual_api_response_smoke_ready_report_only`, failed checks `[]`
+  - counts route contracts `5`; response fixtures overview/detail/neighbor/search/cluster `1/12/12/8/8`; detail-neighbor mismatch rows `0`; query-facet mismatch rows `0`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this proves the 10:40 local API drilldown can produce stable consumer response fixtures. It still does not authorize source/raw DB writes, serving rebuild, graph fact acceptance, public pointer, graph/vector/DB production writes, or memory.
+  - validation: py_compile passed; focused pytest `6 passed`; combined visual-response/API-drilldown/smoke/export/graph-search pytest `27 passed`; strict URL/key/path grep returned no hits
+  - next local work: treat `tools\stage7_rewrite\reports\atlas_social_manual_participant_visual_api_response_smoke_q6_20260526\manual_participant_visual_api_response_manifest.json` as local API response evidence only; continue source/OCR/manual blocker recovery unless a direct source/raw target DB provenance artifact appears.
+
+- 2026-05-26 Q6/T5 manual participant visual API drilldown packet:
+  - upstream T6/T5 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_VISUAL_API_DRILLDOWN_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_visual_api_drilldown.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_visual_api_drilldown.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_visual_api_drilldown_q6_20260526\manual_participant_visual_api_drilldown_summary.json`
+  - decision `atlas_social_manual_participant_visual_api_drilldown_ready_report_only`, failed checks `[]`
+  - counts input elements/nodes/edges `381/132/249`; DJ/event/venue nodes `70/51/11`; DJ-event/event-venue edges `198/51`; route/detail/neighbor/search samples `5/12/12/8`; cluster filters/samples `16/8`; dangling/duplicate/zero-degree/window-parse `0/0/0/0`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this proves the 10:11 UI contract can be consumed through report-only route/detail/search/neighbor drilldown. It still does not authorize source/raw DB writes, serving rebuild, graph fact acceptance, public pointer, graph/vector/DB production writes, or memory.
+  - validation: py_compile passed; focused pytest `6 passed`; combined visual-api/visual-smoke/visual-export/graph-search pytest `21 passed`; strict URL/key/path grep returned no hits
+  - next local work: treat `tools\stage7_rewrite\reports\atlas_social_manual_participant_visual_api_drilldown_q6_20260526\manual_participant_visual_api_contract.json` as local API drilldown evidence only; continue source/OCR/manual blocker recovery unless a direct source/raw target DB provenance artifact appears.
+
+- 2026-05-26 Q6/T5 manual participant visual UI/API smoke packet:
+  - upstream T6/T5 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_VISUAL_SMOKE_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_visual_smoke.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_visual_smoke.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_visual_smoke_q6_20260526\manual_participant_visual_smoke_summary.json`
+  - decision `atlas_social_manual_participant_visual_smoke_ready_report_only`, failed checks `[]`
+  - counts input nodes/edges `132/249`; Cytoscape elements `381`; DJ/event/venue nodes `70/51/11`; DJ-event/event-venue edges `198/51`; cluster/search/window rows `16/121/70`; missing search subjects/window seeds/dangling/duplicates/not-ready `0/0/0/0/0`; graph-window parse failures `0`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this proves the 09:54 local visual graph can be consumed by a UI/API contract. It still does not authorize source/raw DB writes, serving rebuild, graph fact acceptance, public pointer, graph/vector/DB production writes, or memory.
+  - validation: py_compile passed; focused pytest `5 passed`; combined visual-smoke/visual-export/graph-search pytest `15 passed`; strict URL/key/path grep returned no hits
+  - next local work: treat `tools\stage7_rewrite\reports\atlas_social_manual_participant_visual_smoke_q6_20260526\manual_participant_visual_ui_contract.json` as local UI/API evidence only; continue source/OCR/manual blocker recovery unless a direct source/raw target DB provenance artifact appears.
+
+- 2026-05-26 Q6/T5 manual participant visual export packet:
+  - upstream T6/T5 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_VISUAL_EXPORT_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_visual_export.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_visual_export.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_visual_export_q6_20260526\manual_participant_visual_export_summary.json`
+  - decision `atlas_social_manual_participant_visual_export_ready_report_only`, failed checks `[]`
+  - counts input/cluster rows `16/16`; selected event ids `51`; visual event/DJ/venue nodes `51/70/11`; visual edges `249` split DJ-event/event-venue `198/51`; search drilldown rows `121`; graph-window rows `70`; parsed graph-window nodes/edges `4,380/5,554`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this turns the 09:39 consistency-ready rows into local display/search JSON evidence. It still does not authorize source/raw DB writes, serving rebuild, graph fact acceptance, public pointer, graph/vector/DB production writes, or memory.
+  - validation: py_compile passed; focused pytest `5 passed`; combined visual/graph/readback pytest `17 passed`; strict URL/key/path grep returned no hits
+  - next local work: treat `tools\stage7_rewrite\reports\atlas_social_manual_participant_visual_export_q6_20260526\manual_participant_visual_graph.json` as local visualization/search evidence only; continue source/OCR/manual blocker recovery unless a direct source/raw target DB provenance artifact appears.
+
+- 2026-05-26 Q6 manual participant graph/search consistency packet:
+  - upstream T6/T5 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_GRAPH_SEARCH_CONSISTENCY_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_graph_search_consistency.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_graph_search_consistency.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_graph_search_consistency_q6_20260526\graph_search_consistency_summary.json`
+  - decision `atlas_social_manual_participant_graph_search_consistency_ready_report_only`, failed checks `[]`
+  - counts input/consistency/ready/blocked rows `16/16/16/0`; unique selected event ids `51`; serving performance events `51`; serving DJ-event edges `198`; unique serving DJ ids `70`; search event/DJ docs `51/70`; graph-window DJ seeds `70`; bundle event nodes/DJ nodes/DJ-event relations/event-venue relations `51/70/198/51`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this validates local display/search/read-model coverage for the 09:06 readback-ready rows against selected serving SQLite and the full relation bundle. It still does not authorize source/raw DB writes, serving rebuild, graph fact acceptance, public pointer, graph/vector/DB production writes, or memory.
+  - validation: py_compile passed; focused pytest `5 passed`; combined graph/readback/bundle pytest `15 passed`; strict URL/key/path grep returned no hits
+  - next local work: keep `tools\stage7_rewrite\reports\atlas_social_manual_participant_graph_search_consistency_q6_20260526\graph_search_consistency_ready_report_only.jsonl` as local visualization/search evidence only; continue source/OCR/manual blocker recovery unless a direct source/raw target DB provenance artifact appears.
+
+- 2026-05-26 Q6 manual participant event-identity readback gate:
+  - upstream T6 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_EVENT_IDENTITY_READBACK_GATE_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_event_identity_readback_gate.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_event_identity_readback_gate.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_event_identity_readback_gate_q6_20260526\event_identity_readback_gate_summary.json`
+  - decision `atlas_social_manual_participant_event_identity_readback_gate_ready_report_only`, failed checks `[]`
+  - counts input/readback/ready/blocked rows `16/16/16/0`; date-resolved ready `10`; venue-alias ready `6`; unique selected event ids `51`; duplicate selector drift groups `0`; min participant evidence count per ready event `1`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this verifies the 08:43 deduped event-identity candidates against the selected local serving read model in read-only mode. It still does not authorize source/raw DB writes, serving rebuild, graph fact acceptance, public pointer, graph/vector/DB production writes, or memory.
+  - LLM self-correction: first real run over-blocked `5` rows on venue aliases; `OIL CLUB`, `OIL Mainroom`, and `Dada Kunming & 桠雀` now normalize correctly and have focused regression coverage.
+  - validation: py_compile passed; focused pytest `7 passed`; combined Q6 focused pytest `49 passed`; row-count check `16/16/16/0/10/6/51`; strict URL/key grep returned no hits
+  - next local work: process `tools\stage7_rewrite\reports\atlas_social_manual_participant_event_identity_readback_gate_q6_20260526\event_identity_readback_ready_report_only.jsonl` only through a separate explicit write/provenance gate; if no source/raw target DB is explicitly proven, keep write gates closed and pivot to another bounded safe lane.
+
+- 2026-05-26 Q6 manual participant event-identity resolution packet:
+  - upstream T6 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_EVENT_IDENTITY_RESOLUTION_PACKET_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_event_identity_resolution_packet.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_event_identity_resolution_packet.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_event_identity_resolution_q6_20260526\manual_event_identity_resolution_summary.json`
+  - decision `atlas_social_manual_participant_event_identity_resolution_candidates_ready_report_only`, failed checks `[]`
+  - counts input manual event-identity rows `31`; resolution candidates `18`; deduped candidates `16`; date-resolved candidates `12`; venue-alias-resolved candidates `6`; still blocked rows `13`; duplicate selector groups `2`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this turns some manual event-identity blockers into safe readback candidates after the source/OCR lane remained blocked. It still does not authorize source/raw DB writes, serving rebuild, graph fact acceptance, public pointer, graph/vector/DB production writes, or memory.
+  - validation: py_compile passed; focused pytest `5 passed`; combined Q6 focused pytest `42 passed`; row-count check `31/18/16/12/6/13/2`; strict URL/key grep returned no hits
+  - next local work: process `tools\stage7_rewrite\reports\atlas_social_manual_participant_event_identity_resolution_q6_20260526\manual_event_identity_resolution_candidates_deduped.jsonl` through a DB-backed consolidation/readback gate before any graph fact acceptance or serving rebuild.
+
+- 2026-05-26 Q6 manual participant blocker recovery packet:
+  - upstream T6 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_BLOCKER_RECOVERY_PACKET_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_blocker_recovery_packet.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_blocker_recovery_packet.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_blocker_recovery_q6_20260526\manual_participant_blocker_recovery_summary.json`
+  - decision `atlas_social_manual_participant_blocker_recovery_ready_report_only`, failed checks `[]`
+  - counts input source-context/source-OCR/acceptance/manual-event-identity rows `5/1/2/31`; recovery work orders `38`; lane split source/OCR `1`, manual event-match `4`, event-evidence repair `2`, manual event-identity `31`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this advances the blocked rows into safe recovery queues after the target-DB lane blocked. It still does not authorize source/raw DB writes, serving rebuild, graph fact acceptance, public pointer, graph/vector/DB production writes, or memory.
+  - validation: py_compile passed; focused pytest `4 passed`; combined Q6 focused pytest `45 passed`; row-count check `38/31/4/2/1`; strict URL/key grep returned no hits
+  - next local work: process `tools\stage7_rewrite\reports\atlas_social_manual_participant_blocker_recovery_q6_20260526\source_ocr_recovery_work_orders.jsonl` if source artifacts can be localized safely; otherwise process `manual_event_identity_review_work_orders.jsonl` by source account.
+
+- 2026-05-26 Q6 manual participant target DB provenance blocker:
+  - upstream T6 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_TARGET_DB_PROVENANCE_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_target_db_provenance_packet.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_target_db_provenance_packet.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_target_db_provenance_q6_20260526\target_db_provenance_summary.json`
+  - decision `atlas_social_manual_participant_target_db_provenance_blocked_report_only`, failed checks `["target_db_provenance_blocked"]`
+  - counts input real-snapshot blocked/prewrite rows `46/46`; candidate refs `35`; unique paths `35`; direct existing explicit source/raw target DB paths `0`; serving read-model rejected paths `20`; source DB references not bound to Q6 gate `3`; ready/blocked rows `0/46`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this confirms the graph/serving write path remains blocked by missing source/raw target DB provenance. Serving SQLite remains read-model evidence only and must not be substituted as the mutation target.
+  - validation: py_compile passed; focused pytest `4 passed`; combined Q6 focused pytest `26 passed`; report/output leak grep returned no hits
+  - boundary: report-only blocker; no SQLite open, source/raw Atlas DB open/mutation, serving SQLite write/rebuild, public pointer, deploy, graph/vector/DB production write, upload/review, memory, credential, network/model/paid API, 9router, or D: root action occurred
+  - next local work: only rerun the real snapshot gate if a direct upstream artifact names an existing explicit source/raw `--target-db`; otherwise pivot to another bounded safe lane.
+
+- 2026-05-26 Q6 manual participant DB real snapshot gate:
+  - upstream T6 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_DB_REAL_SNAPSHOT_GATE_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_db_real_snapshot_gate.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_db_real_snapshot_gate.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_db_real_snapshot_gate_q6_20260526\manual_participant_db_real_snapshot_gate_summary.json`
+  - decision `atlas_social_manual_participant_db_real_snapshot_gate_blocked_report_only`, failed checks `["blocked_rows_present"]`
+  - counts input prewrite rows `46`; candidate rows after contract checks `46`; real snapshot rows `0`; blocked rows `46`; explicit target DB present/opened read-only `0/0`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this correctly blocks graph fact acceptance and serving rebuild because the source/raw target DB has not been named. The selected serving DB must not be substituted as the source/raw target.
+  - validation: py_compile passed; focused pytest `4 passed`; combined Q6 focused pytest `22 passed`; summary JSON parsed; blocked rows sampled
+  - boundary: report-only blocker; no source/raw Atlas DB open/mutation, serving SQLite write/rebuild, public pointer, deploy, graph/vector/DB production write, upload/review, memory, credential, network/model/paid API, 9router, or D: root action occurred
+  - next local work: resolve `tools\stage7_rewrite\reports\atlas_social_manual_participant_db_real_snapshot_gate_q6_20260526\manual_participant_db_real_snapshot_blocked_rows.jsonl` by providing an explicit source/raw `--target-db`, then rerun read-only snapshot capture.
+
+- 2026-05-26 Q6 manual participant DB prewrite snapshot packet:
+  - upstream T6 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_DB_PREWRITE_SNAPSHOT_PACKET_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_db_prewrite_snapshot_packet.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_db_prewrite_snapshot_packet.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_db_prewrite_snapshot_q6_20260526\manual_participant_db_prewrite_snapshot_summary.json`
+  - decision `atlas_social_manual_participant_db_prewrite_snapshot_ready_report_only`, failed checks `[]`
+  - counts input target rows `46`; prewrite snapshot rows `46`; blocked rows `0`; event-id/semantic split `27/19`; unique event_ids `199`; planned identity-lineage edges report-only `161`; participant evidence total `730`; contract row hashes `46`; duplicate hashes `0`; all accepted/write/promotion rows `0`; leak hits `0/0/0`; source DB opened/written `false/false`
+  - T5 interpretation: this is useful contract-snapshot evidence for a later confirmed writer, but it still is not source/raw DB write authorization, not serving rebuild authorization, and not graph/public promotion authorization.
+  - validation: py_compile passed; focused pytest `4 passed`; combined Q6 focused pytest `18 passed`; summary JSON parsed
+  - boundary: report-only prewrite snapshot; no source/raw Atlas DB open/mutation, serving SQLite write/rebuild, public pointer, deploy, graph/vector/DB production write, upload/review, memory, credential, network/model/paid API, 9router, or D: root action occurred
+  - next local work: use only `tools\stage7_rewrite\reports\atlas_social_manual_participant_db_prewrite_snapshot_q6_20260526\manual_participant_db_prewrite_snapshot_rows.jsonl` for a future confirmed writer that first opens the explicit target DB read-only, captures real row snapshots, and then requires separate write confirmation.
+
+- 2026-05-26 Q6 manual participant DB write-gate contract:
+  - upstream T6 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_DB_WRITE_GATE_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_db_write_gate_packet.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_db_write_gate_packet.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_db_write_gate_q6_20260526\manual_participant_db_write_gate_summary.json`
+  - decision `atlas_social_manual_participant_db_write_gate_ready_report_only`, failed checks `[]`
+  - counts input ready rows `46`; write-gate target rows `46`; blocked rows `0`; event-id/semantic split `27/19`; unique event_ids `199`; planned identity-lineage edges report-only `161`; participant evidence total `730`; duplicate selector evidence input/matched/blocked `5/5/0`; prewrite snapshot/rollback/postwrite readback required rows `46/46/46`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this is useful write-contract evidence for a later source/raw DB writer, but it is still report-only. It is not source/raw DB write authorization, not serving rebuild authorization, and not graph/public promotion authorization.
+  - validation: py_compile passed; focused pytest `5 passed`; combined Q6 focused pytest `14 passed`; summary JSON parsed; row-count check `46/46/46/46/0/5/0`; internal leak scan `0/0/0`
+  - boundary: report-only write-gate contract; no source/raw Atlas DB mutation, serving SQLite write/rebuild, public pointer, deploy, graph/vector/DB production write, upload/review, memory, credential, network/model/paid API, 9router, or D: root action occurred
+  - next local work: use only `tools\stage7_rewrite\reports\atlas_social_manual_participant_db_write_gate_q6_20260526\manual_participant_db_write_gate_targets.jsonl` for a future confirmed writer dry-run/prewrite snapshot packet before any graph fact acceptance or serving rebuild.
+- 2026-05-26 Q6 manual participant DB readback/write-preflight:
+  - upstream T6 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_READBACK_PREFLIGHT_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_readback_preflight_packet.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_readback_preflight_packet.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_readback_preflight_q6_20260526\manual_participant_readback_preflight_summary.json`
+  - decision `atlas_social_manual_participant_readback_preflight_ready_report_only`, failed checks `[]`
+  - counts input event-id/semantic rows `27/19`; readback preflight rows `46`; write-preflight ready report-only rows `46`; blocked readback rows `0`; unique candidate event_ids `199`; duplicate selector evidence rows `5`; min participant evidence count per event `1`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this verifies local serving read-model identity/evidence consistency only. It is not source/raw DB write authorization and not serving rebuild authorization.
+  - validation: py_compile passed; focused pytest `4 passed`; combined Q6 focused pytest `9 passed`; summary/schema JSON parsed; row-count check `46/46/27/19/0/5`; internal leak scan `0/0/0`
+  - boundary: report-only readback/write-preflight using selected serving SQLite read-only; no source/raw Atlas DB mutation, serving SQLite write/rebuild, public pointer, deploy, graph/vector/DB production write, upload/review, memory, credential, network/model/paid API, 9router, or D: root action occurred
+  - next local work: use only `tools\stage7_rewrite\reports\atlas_social_manual_participant_readback_preflight_q6_20260526\write_preflight_ready_report_only.jsonl` to build a separate explicit source/raw DB write gate with prewrite snapshots, inverse mapping, rollback, and postwrite readback before any graph fact acceptance or serving rebuild.
+- 2026-05-26 Q6 manual participant consolidation gate packet:
+  - upstream T6 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_CONSOLIDATION_GATE_PACKET_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_consolidation_gate_packet.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_consolidation_gate_packet.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_consolidation_gate_q6_20260526\manual_participant_consolidation_gate_summary.json`
+  - decision `atlas_social_manual_participant_consolidation_gate_packet_ready_report_only`, failed checks `[]`
+  - counts event-id candidates `29`; semantic cluster candidates `22`; gate targets `51`; ready before selector dedupe `51`; deduped manual DB readback rows `46`; event-id/semantic split `27/19`; duplicate selector groups/collapsed rows `5/5`; blocked rows `0`; all accepted/write/promotion rows `0`; leak hits `0/0/0`
+  - T5 interpretation: this is useful upstream event-normalization gate evidence, not serving rebuild authorization. A later DB-backed readback/write packet with rollback remains required before source/serving/graph mutation.
+  - validation: py_compile passed; focused pytest `5 passed`; combined Q6 focused pytest `26 passed`; summary JSON parsed; data-row URL/local-path grep returned no hits
+  - boundary: report-only gate packet over existing redacted JSONL; no source/raw Atlas DB mutation, serving SQLite read/write/rebuild, public pointer, deploy, graph/vector/DB production write, upload/review, memory, credential, network/model/paid API, 9router, or D: root action occurred
+  - next local work: process `tools\stage7_rewrite\reports\atlas_social_manual_participant_consolidation_gate_q6_20260526\event_id_ready_for_manual_db_readback.jsonl` first, then `semantic_cluster_ready_for_manual_db_readback.jsonl`, before any graph fact acceptance or serving rebuild.
+- 2026-05-26 Q6 manual participant event-cluster review:
+  - upstream T6 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_EVENT_CLUSTER_REVIEW_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_event_cluster_review.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_event_cluster_review.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_event_cluster_review_q6_20260526\manual_participant_event_cluster_review_summary.json`
+  - decision `atlas_social_manual_participant_event_cluster_review_candidates_ready_report_only`, failed checks `[]`
+  - counts input event-id dedupe rows `29`; input ambiguous-cluster rows `53`; event-id consolidation candidates `29`; semantic cluster consolidation candidates `22`; manual event identity blocked rows `31`; accepted_for_graph/source_sqlite_write/serving_rebuild/graph_write/public_serving_field/memory rows all `0`; leak hits `0/0/0`
+  - T5 interpretation: this is useful event-normalization upstream evidence, not serving rebuild authorization. It defines future consolidation gate inputs but does not accept graph facts.
+  - validation: py_compile passed; focused pytest `5 passed`; combined Q6 focused pytest `21 passed`; summary JSON parsed; data-row leak grep `NO_DATA_ROW_LEAK_HITS`
+  - boundary: report-only review over existing redacted JSONL; no source/raw Atlas DB mutation, serving SQLite read/write/rebuild, public pointer, deploy, graph/vector/DB production write, upload/review, memory, credential, network/model/paid API, 9router, or D: root action occurred
+  - next local work: process `tools\stage7_rewrite\reports\atlas_social_manual_participant_event_cluster_review_q6_20260526\event_id_consolidation_candidates.jsonl` before any graph fact acceptance or serving rebuild.
+- 2026-05-26 Q6 manual participant acceptance precheck:
+  - upstream T6 report `reports\ATLAS_T6_MANUAL_PARTICIPANT_ACCEPTANCE_PRECHECK_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_social_manual_participant_acceptance_precheck.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_social_manual_participant_acceptance_precheck.py`
+  - summary `tools\stage7_rewrite\reports\atlas_social_manual_participant_acceptance_precheck_q6_20260526\manual_participant_acceptance_precheck_summary.json`
+  - decision `atlas_social_manual_participant_acceptance_precheck_review_ready_report_only`, failed checks `[]`
+  - counts input candidate rows `89`; strict manual acceptance review-ready rows `5`; semantic duplicate event-id dedupe rows `29`; ambiguous event-cluster review rows `53`; blocked event-evidence rows `2`; accepted_for_graph/source_sqlite_write/serving_rebuild/graph_write/public_serving_field/memory rows all `0`; leak hits `0/0/0`
+  - LLM critique: the 05:36 source-context review was consistent, but most rows map to duplicate or ambiguous local event IDs, so this does not justify serving rebuild or graph/public write
+  - validation: py_compile passed; focused pytest `6 passed`; combined Q6 focused pytest `16 passed`; summary JSON parsed; data-row leak grep `NO_DATA_ROW_LEAK_HITS`
+  - boundary: report-only deterministic precheck over existing JSONL; no source/raw Atlas DB mutation, serving SQLite read/write/rebuild, public pointer, deploy, graph/vector/DB production write, upload/review, memory, credential, network/model/paid API, 9router, or D: root action occurred
+  - next local work: process `tools\stage7_rewrite\reports\atlas_social_manual_participant_acceptance_precheck_q6_20260526\event_id_dedupe_review_rows.jsonl` and `ambiguous_event_cluster_review_rows.jsonl` first; only strict-ready rows may feed a later manual acceptance gate.
+- 2026-05-26 source acquisition bounded fetch:
+  - report `reports\ATLAS_T5_SOURCE_ACQUISITION_BOUNDED_FETCH_20260526.md`
+  - runner `tools\stage7_rewrite\scripts\run_atlas_source_acquisition_bounded_fetch.py`
+  - regression `tools\stage7_rewrite\tests\test_run_atlas_source_acquisition_bounded_fetch.py`
+  - summary `tools\stage7_rewrite\reports\atlas_source_acquisition_bounded_fetch_t5_20260526\source_acquisition_bounded_fetch_summary.json`
+  - decision `atlas_source_acquisition_bounded_fetch_blocked_report_only`, failed checks `[]`
+  - counts input work orders `5`; source URL hash verified rows `5`; network fetch executed rows `5`; response artifact written rows `5`; article artifact ready rows `0`; blocked/not-ready rows `5`; status `200` rows `5`; OCR generation allowed now `0`; acceptance precheck allowed now `0`; leak hits `0/0/0`
+  - LLM critique/self-correction: first-pass classification would have treated broad WeChat markers as article-ready; the fixed runner requires article-content markers and classifies the real fetched pages as verification shells (`js_content_text_len=0`, title prefix absent, article marker absent, weak/block marker present)
+  - validation: py_compile passed; focused runner pytest `5 passed`; combined focused source/OCR pytest `23 passed`; real fetch generated summary/report/JSONL; leak grep returned `NO_LEAK_HITS`
+  - boundary: bounded public fetch and report-local response artifact creation only; no OCR execution, source/OCR acceptance, graph fact acceptance, source/raw Atlas DB mutation, serving SQLite rebuild/write, public pointer, deploy, production DB/vector write, upload/review, memory, credential/browser-profile read, model/paid API, 9router, or D: root action occurred
+  - next local work: process `tools\stage7_rewrite\reports\atlas_source_acquisition_bounded_fetch_t5_20260526\fetch_blocked_rows.jsonl` through browser-safe/manual artifact acquisition or local original artifact recovery; OCR generation and source/OCR acceptance stay closed.
+- 2026-05-26 source acquisition preflight work orders:
+  - report `reports\ATLAS_T5_SOURCE_ACQUISITION_PREFLIGHT_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_source_acquisition_preflight_work_order.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_source_acquisition_preflight_work_order.py`
+  - summary `tools\stage7_rewrite\reports\atlas_source_acquisition_preflight_t5_20260526\source_acquisition_preflight_summary.json`
+  - decision `atlas_source_acquisition_preflight_ready_report_only`, failed checks `[]`
+  - counts input rows `5`; sidecar source URL found rows `5`; source URL hash match rows `5`; hash mismatch rows `0`; fetch preflight-ready rows `5`; localize-without-fetch ready rows `0`; blocked rows `0`; OCR generation allowed now `0`; acceptance precheck allowed now `0`; leak hits `0/0/0`
+  - validation: py_compile passed; focused pytest `4 passed`; combined focused source/OCR pytest `18 passed`; real preflight generated summary/report/JSONL; leak grep returned `NO_LEAK_HITS`
+  - boundary: report-only source acquisition preflight/work-order generation; no source URL fetch, OCR execution, graph fact acceptance, source/raw Atlas DB mutation, serving SQLite rebuild/write, public pointer, deploy, production DB/vector write, upload/review, memory, credential, 9router, or D: root action occurred
+  - next local work: execute bounded report-local acquisition only against `tools\stage7_rewrite\reports\atlas_source_acquisition_preflight_t5_20260526\fetch_preflight_ready_work_orders.jsonl`; OCR generation and source/OCR acceptance stay closed until fetched/localized artifacts pass content and leak checks.
+- 2026-05-26 source artifact acquisition plan:
+  - report `reports\ATLAS_T5_SOURCE_ARTIFACT_ACQUISITION_PLAN_20260526.md`
+  - planner `tools\stage7_rewrite\scripts\build_atlas_source_artifact_acquisition_plan.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_source_artifact_acquisition_plan.py`
+  - summary `tools\stage7_rewrite\reports\atlas_source_artifact_acquisition_plan_t5_20260526\source_artifact_acquisition_plan_summary.json`
+  - decision `atlas_source_artifact_acquisition_plan_external_acquisition_required_report_only`, failed checks `[]`
+  - counts target rows `5`; source URL present rows `5`; local image count total `100`; host source-dir present rows `0`; sidecar local artifact ref rows `0`; local source artifact-ready rows `0`; external source acquisition candidate rows `5`; OCR generation allowed rows `0`; leak hits `0/0/0`
+  - validation: py_compile passed; focused pytest `4 passed`; combined focused source/OCR pytest `14 passed`; real planner generated summary/report/JSONL; leak grep returned `NO_LEAK_HITS`
+  - boundary: report-only acquisition planning; no source URL fetch, OCR execution, graph fact acceptance, source/raw Atlas DB mutation, serving SQLite rebuild/write, public pointer, deploy, production DB/vector write, upload/review, memory, credential, 9router, or D: root action occurred
+  - next local work: run bounded source acquisition preflight over `tools\stage7_rewrite\reports\atlas_source_artifact_acquisition_plan_t5_20260526\external_source_acquisition_candidates.jsonl`; OCR generation and source/OCR acceptance stay closed until report-local article/image artifacts exist.
+- 2026-05-26 source/OCR exact-date review packet:
+  - report `reports\ATLAS_T5_SOURCE_OCR_EXACT_DATE_REVIEW_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_source_ocr_exact_date_review_packet.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_source_ocr_exact_date_review_packet.py`
+  - summary `tools\stage7_rewrite\reports\atlas_source_ocr_exact_date_review_t5_20260526\source_ocr_exact_date_review_summary.json`
+  - decision `atlas_source_ocr_exact_date_review_blocked_report_only`, failed checks `[]`
+  - counts input rows `2`; article rows found `2`; entity evidence rows scanned `29`; image OCR rows scanned `4`; full exact-date candidate rows `0`; review-only date candidate rows `0`; still blocked rows `2`; acceptance-precheck allowed rows `0`; leak hits `0/0/0`
+  - validation: py_compile passed; focused pytest `4 passed`; combined focused source/OCR pytest `10 passed`; real packet generated summary/report/JSONL; leak grep returned `NO_LEAK_HITS`
+  - boundary: report-only exact-date review; no OCR execution, graph fact acceptance, source/raw Atlas DB mutation, serving SQLite rebuild/write, public pointer, deploy, production DB/vector write, upload/review, memory, credential, 9router, or D: root action occurred
+  - next local work: do not rerun source/OCR acceptance for these two rows; continue source artifact acquisition.
+- 2026-05-26 source/OCR artifact recovery execution gate:
+  - report `reports\ATLAS_T5_SOURCE_OCR_ARTIFACT_RECOVERY_EXECUTION_GATE_20260526.md`
+  - gate `tools\stage7_rewrite\scripts\build_atlas_source_ocr_artifact_recovery_execution_gate.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_source_ocr_artifact_recovery_execution_gate.py`
+  - summary `tools\stage7_rewrite\reports\atlas_source_ocr_artifact_recovery_execution_gate_t5_20260526\source_ocr_artifact_recovery_execution_gate_summary.json`
+  - inputs `tools\stage7_rewrite\reports\atlas_source_ocr_artifact_localization_probe_t5_20260526\ocr_candidate_present_date_blocked.jsonl`, `tools\stage7_rewrite\reports\atlas_source_ocr_artifact_localization_probe_t5_20260526\ocr_markdown_missing_generation_queue.jsonl`, bounded source-url JSONL, and bounded host artifact root inspection
+  - outputs `exact_date_review_queue.jsonl`, `ocr_markdown_generation_ready_queue.jsonl`, `source_artifact_acquisition_queue.jsonl`, `acceptance_hold_rows.jsonl`, `source_rollup.jsonl`
+  - decision `atlas_source_ocr_artifact_recovery_execution_gate_blocked_report_only`, failed checks `[]`
+  - target rows `7`; exact-date review rows `2`; OCR/Markdown missing rows `5`; local OCR/Markdown generation-ready rows `0`; source artifact acquisition required rows `5`; acceptance-precheck allowed rows `0`; host source-dir-present rows `0`; source-url post-date/time rows `0/0`
+  - LLM critique: the two `club between` rows need exact-date review from existing OCR/article text; the five OCR/Markdown-missing rows first require source artifact acquisition, not blind OCR retry
+  - validation: py_compile passed; focused pytest `3 passed`; combined focused source/OCR pytest `11 passed`; real gate generated summary/report/JSONL; targeted leak grep returned `NO_LEAK_HITS`; `C:\code\scripts\docs-build.ps1 -SkipRefresh` exited `0`
+  - boundary: report-only execution gate. No OCR execution, LLM/model call, graph fact acceptance, source/raw Atlas DB mutation, serving SQLite rebuild/write, public pointer, deploy, production DB/vector write, upload/review, memory, credential, 9router, or D: root action occurred.
+  - next local work: process `tools\stage7_rewrite\reports\atlas_source_ocr_artifact_recovery_execution_gate_t5_20260526\exact_date_review_queue.jsonl`, then `source_artifact_acquisition_queue.jsonl`; rerun OCR generation or source/OCR acceptance only after recovered exact-date and OCR/Markdown evidence exists.
+- 2026-05-26 source/OCR artifact localization probe:
+  - report `reports\ATLAS_T5_SOURCE_OCR_ARTIFACT_LOCALIZATION_PROBE_20260526.md`
+  - probe `tools\stage7_rewrite\scripts\probe_atlas_source_ocr_artifact_localization.py`
+  - regression `tools\stage7_rewrite\tests\test_probe_atlas_source_ocr_artifact_localization.py`
+  - summary `tools\stage7_rewrite\reports\atlas_source_ocr_artifact_localization_probe_t5_20260526\source_ocr_artifact_localization_probe_summary.json`
+  - inputs `tools\stage7_rewrite\reports\atlas_source_ocr_artifact_recovery_packet_t5_20260526\source_ocr_artifact_recovery_work_orders.jsonl`, first-batch evidence rows, Atlas local candidate DB, source-url sidecar DB, and bounded host-html artifact root inspection
+  - decision `atlas_source_ocr_artifact_localization_probe_blocked_report_only`, failed checks `[]`
+  - target rows `7`; fast-date rows `2`; event OCR/date rows `5`; source DB article rows found `7`; source URL rows found `7`; existing OCR/Markdown candidate rows `2`; missing OCR/Markdown rows `5`; exact date candidate rows `0`; acceptance-ready rows `0`; still blocked rows `7`; host artifact source-dir-present rows `0`
+  - LLM critique: the two `club between` fast-date rows have existing OCR candidate evidence but still lack exact dates; the five event OCR/date rows still lack both exact date and OCR/Markdown evidence, so acceptance precheck remains closed
+  - validation: py_compile passed; focused pytest `3 passed`; combined focused source/OCR pytest `8 passed`; real probe generated refreshed queues; leak grep returned `NO_LEAK_HITS`
+  - boundary: report-only localization probe. No OCR execution, LLM/model call, graph fact acceptance, source/raw Atlas DB mutation, serving SQLite rebuild/write, public pointer, deploy, production DB/vector write, upload/review, memory, credential, 9router, or D: root action occurred.
+  - next local work: process `tools\stage7_rewrite\reports\atlas_source_ocr_artifact_localization_probe_t5_20260526\ocr_candidate_present_date_blocked.jsonl` and `ocr_markdown_missing_generation_queue.jsonl`; rerun source/OCR acceptance precheck only after recovered exact date and OCR/Markdown evidence exists.
+- 2026-05-26 source/OCR artifact recovery packet:
+  - report `reports\ATLAS_T5_SOURCE_OCR_ARTIFACT_RECOVERY_PACKET_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_source_ocr_artifact_recovery_packet.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_source_ocr_artifact_recovery_packet.py`
+  - summary `tools\stage7_rewrite\reports\atlas_source_ocr_artifact_recovery_packet_t5_20260526\source_ocr_artifact_recovery_summary.json`
+  - inputs `tools\stage7_rewrite\reports\atlas_source_ocr_fast_date_repair_attempt_t5_20260526\date_blocked_rows.jsonl`, `tools\stage7_rewrite\reports\atlas_source_ocr_first_batch_repair_targets_t5_20260526\event_like_repair_targets.jsonl`, and `tools\stage7_rewrite\reports\atlas_source_ocr_first_batch_repair_targets_t5_20260526\ocr_markdown_repair_targets.jsonl`
+  - decision `atlas_source_ocr_artifact_recovery_packet_ready_report_only`, failed checks `[]`
+  - input fast-date blocked/event-like/OCR rows `2/7/18`; unique work orders `20`; fast-date artifact recovery rows `2`; event OCR+date repair rows `5`; OCR/Markdown localization rows `13`; acceptance hold rows `20`; ready for acceptance now `0`; source-account rollup rows `9`
+  - LLM audit finding: upstream `source_url_match_basis` text could contain sensitive-key words such as `token`; builder now scrubs those words and regression covers the redaction path
+  - public leak scan `0/0/0`; raw source URLs/local paths are not emitted
+  - validation: py_compile passed; focused pytest `2 passed`; combined focused source/OCR pytest `7 passed`; real run generated refreshed queues with leak scan `0/0/0`
+  - boundary: report-only recovery packet. No OCR execution, graph fact acceptance, source/raw Atlas DB mutation, serving SQLite write/rebuild, public pointer, deploy, production DB/vector write, upload/review, memory, credential, 9router, or D: root action occurred.
+  - next local work: process `tools\stage7_rewrite\reports\atlas_source_ocr_artifact_recovery_packet_t5_20260526\fast_date_artifact_recovery_queue.jsonl` and `event_ocr_markdown_and_date_repair_queue.jsonl`, then rerun source/OCR acceptance precheck only after local evidence is recovered.
+- 2026-05-26 source/OCR fast-date repair attempt:
+  - report `reports\ATLAS_T5_SOURCE_OCR_FAST_DATE_REPAIR_ATTEMPT_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_source_ocr_fast_date_repair_attempt.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_source_ocr_fast_date_repair_attempt.py`
+  - summary `tools\stage7_rewrite\reports\atlas_source_ocr_fast_date_repair_attempt_t5_20260526\source_ocr_fast_date_repair_attempt_summary.json`
+  - input `tools\stage7_rewrite\reports\atlas_source_ocr_first_batch_repair_targets_t5_20260526\fast_date_repair_targets.jsonl`
+  - decision `atlas_source_ocr_fast_date_repair_attempt_blocked_report_only`, failed checks `[]`
+  - input fast-date rows `2`; date candidate rows `0`; date accepted rows `0`; date blocked rows `2`
+  - next cursor `tools\stage7_rewrite\reports\atlas_source_ocr_fast_date_repair_attempt_t5_20260526\date_blocked_rows.jsonl` -> source/OCR artifact recovery, then `event_ocr_markdown_and_date_repair`
+  - public leak scan `0/0/0`; raw source URLs/local paths are not emitted
+  - validation: py_compile passed; focused pytest `3 passed`; combined focused Atlas source/OCR/full-relation pytest `13 passed`
+  - boundary: report-only fast-date attempt. No OCR execution, graph fact acceptance, source/raw Atlas DB mutation, serving SQLite write/rebuild, public pointer, deploy, production DB/vector write, upload/review, memory, credential, 9router, or D: root action occurred.
+- 2026-05-26 source/OCR first-batch repair targets:
+  - report `reports\ATLAS_T5_SOURCE_OCR_FIRST_BATCH_REPAIR_TARGETS_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_source_ocr_first_batch_repair_targets.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_source_ocr_first_batch_repair_targets.py`
+  - summary `tools\stage7_rewrite\reports\atlas_source_ocr_first_batch_repair_targets_t5_20260526\source_ocr_first_batch_repair_targets_summary.json`
+  - input `tools\stage7_rewrite\reports\atlas_source_ocr_first_batch_evidence_probe_t5_20260526\first_batch_evidence_probe_rows.jsonl`
+  - decision `atlas_source_ocr_first_batch_repair_targets_ready_report_only`, failed checks `[]`
+  - repair target rows `20`; event-like `7`; fast date lane `2`; date repair `19`; OCR/Markdown repair `18`; entity/review `13`; lane split `2/5/9/4`
+  - first execution cursor `tools\stage7_rewrite\reports\atlas_source_ocr_first_batch_repair_targets_t5_20260526\fast_date_repair_targets.jsonl`
+  - public leak scan `0/0/0`; raw source URLs remain stripped
+  - validation: py_compile passed; focused pytest `2 passed`; combined focused Atlas source/OCR/full-relation pytest `10 passed`
+  - boundary: report-only target queue. No OCR execution, graph fact acceptance, source/raw Atlas DB mutation, serving SQLite write/rebuild, public pointer, deploy, production DB/vector write, upload/review, memory, credential, 9router, or D: root action occurred.
+- 2026-05-26 source/OCR first-batch evidence probe:
+  - report `reports\ATLAS_T5_SOURCE_OCR_FIRST_BATCH_EVIDENCE_PROBE_20260526.md`
+  - probe `tools\stage7_rewrite\scripts\probe_atlas_source_ocr_first_batch_evidence.py`
+  - regression `tools\stage7_rewrite\tests\test_probe_atlas_source_ocr_first_batch_evidence.py`
+  - summary `tools\stage7_rewrite\reports\atlas_source_ocr_first_batch_evidence_probe_t5_20260526\source_ocr_first_batch_evidence_probe_summary.json`
+  - input `tools\stage7_rewrite\reports\atlas_source_ocr_repair_batch_plan_t5_20260526\first_active_batch.jsonl`
+  - Atlas DB read-only `reports\atlas_incremental_wechat_refresh_20260522_1438\atlas_local_sqlite_db_139123_activity_candidate_current_20260525_1435\atlas.sqlite`
+  - source-url DB read-only `reports\atlas_incremental_wechat_refresh_20260522_1438\atlas_source_url_recovery_139123_candidate\atlas_source_url_recovery.sqlite`
+  - decision `atlas_source_ocr_first_batch_evidence_probe_ready_report_only`, failed checks `[]`
+  - counts: input rows `20`; source DB article rows found `20`; source URL sidecar rows found `20`; source-context candidate rows `20`; source entity rows found `306`; source event rows found `0`
+  - classification: event-like candidates `7`; editorial/profile candidates `4`; image-rich entity-relation candidates `7`; entity-relation candidates `2`
+  - candidate field coverage: date candidate rows `1`; venue candidate rows `20`; lineup candidate rows `20`; OCR/Markdown candidate rows `2`; acceptance-ready rows `0`; still-blocked rows `20`
+  - public leak scan hits `0/0/0`; raw source URLs are not emitted, only source ref / presence / match basis / SHA256
+  - validation: probe py_compile passed; focused pytest `3 passed`; real probe generated refreshed outputs after fixing temp-path summary rendering and false date candidates such as `4/4 DJ B2B` / `80/90后`
+  - interpretation: first active source/OCR batch is now triaged into candidate fields and still-missing evidence; no row is accepted for graph or serving rebuild yet
+  - boundary: report-only local evidence probe; no OCR execution, LLM/model call, source/raw Atlas DB write, serving SQLite write/rebuild, graph fact acceptance, public pointer, CloudRun/VPS, Neo4j/Qdrant/SQLite production write, mini-program upload/review, memory, credential, network/model/paid API, destructive Git, 9router, or D: root action occurred
+  - next local work: repair/localize missing date and OCR/Markdown evidence for `event_like_candidate_rows.jsonl` and `still_blocked_rows.jsonl`, then rerun the source/OCR acceptance precheck
+
+- 2026-05-26 full relation bundle:
+  - report `reports\ATLAS_T5_FULL_RELATION_BUNDLE_20260526.md`
+  - exporter `tools\stage7_rewrite\scripts\export_atlas_full_relation_bundle.py`
+  - regression `tools\stage7_rewrite\tests\test_export_atlas_full_relation_bundle.py`
+  - summary `tools\stage7_rewrite\reports\atlas_full_relation_bundle_t5_20260526\atlas_full_relation_bundle_summary.json`
+  - source DB read-only `reports\atlas_serving_participant_delta_current_20260526_0016\atlas_serving.sqlite`, SHA256 `3a65aad6771945fc4f2ccad6f58a44eacfc28cd886536ae7ba327426ab79f577`
+  - decision `atlas_full_relation_bundle_ready_local_only`, failed checks `[]`
+  - exported nodes `673,805`: canonical subjects `82,878`, DJ profiles `53,555`, performance events `508,049`, venues `5,767`, organizations `23,556`
+  - exported relations `2,871,166`: DJ-DJ `701,396`, DJ-event `1,285,827`, DJ-org `323,335`, DJ-venue `137,101`, event-venue `423,507`
+  - public leak scan hits `0/0/0`
+  - validation: exporter py_compile passed; focused pytest `3 passed`; real full export generated gzip JSONL outputs and final summary passed after fixing false-positive leak scan rules for public artist/title names
+  - interpretation: current local all-entity/all-relation export bundle for graph visualization/search work; selected serving DB remains unchanged and public target remains blocked
+  - boundary: read-only local serving SQLite export; no source/raw Atlas DB mutation, serving SQLite write/rebuild, public pointer, CloudRun/VPS, Neo4j/Qdrant/SQLite production write, mini-program upload/review, memory, credential, network/model/paid API, destructive Git, 9router, or D: root action occurred
+
+- 2026-05-26 source/OCR repair batch plan:
+  - report `reports\ATLAS_T5_SOURCE_OCR_REPAIR_BATCH_PLAN_20260526.md`
+  - builder `tools\stage7_rewrite\scripts\build_atlas_source_ocr_repair_batch_plan.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_source_ocr_repair_batch_plan.py`
+  - summary `tools\stage7_rewrite\reports\atlas_source_ocr_repair_batch_plan_t5_20260526\source_ocr_repair_batch_plan_summary.json`
+  - first active batch `tools\stage7_rewrite\reports\atlas_source_ocr_repair_batch_plan_t5_20260526\first_active_batch.jsonl`
+  - decision `atlas_source_ocr_repair_batch_plan_ready_report_only`, failed checks `[]`
+  - counts: execution-order rows `54`; manual deferred rows `6`; planned rows `60`; first active rows `20`
+  - batch split: source+OCR `42`; source-context `11`; OCR/Markdown `1`; manual editorial deferred `6`
+  - public leak scan hits `0/0/0`
+  - validation: py_compile passed; focused pytest `2 passed`; real summary JSON parsed
+  - interpretation: the 01:30 precheck remains blocked, but next longrun cursor is now a concrete first active repair batch rather than a vague gate
+  - boundary: report-only queue planning; no OCR execution, LLM call, graph fact acceptance, source/raw Atlas DB mutation, serving SQLite write/rebuild, graph/vector/DB write, public pointer, CloudRun/VPS, Neo4j/Qdrant/SQLite production write, mini-program upload/review, memory, credential, network/model/paid API, destructive Git, 9router, or D: root action occurred
+  - next local work: repair `first_active_batch.jsonl`, then rerun the source/OCR acceptance precheck
+
+- 2026-05-26 source/OCR acceptance precheck:
+  - report `reports\ATLAS_T5_SOURCE_OCR_ACCEPTANCE_PRECHECK_20260526.md`
+  - script `tools\stage7_rewrite\scripts\build_atlas_source_ocr_acceptance_precheck.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_source_ocr_acceptance_precheck.py`
+  - summary `tools\stage7_rewrite\reports\atlas_source_ocr_acceptance_precheck_t5_20260526\source_ocr_acceptance_precheck_summary.json`
+  - input `tools\stage7_rewrite\reports\atlas_source_ocr_repair_packet_t5_20260526\source_ocr_repair_packet_rows.jsonl`
+  - decision `atlas_source_ocr_acceptance_precheck_blocked_report_only`, failed checks `[]`
+  - counts: input/precheck rows `60/60`; ready for acceptance gate `0`; blocked rows `60`; manual editorial filter rows `6`; execution-order rows `54`
+  - blockers: missing date `60`, missing venue `60`, missing lineup `60`, missing source-context verification `53`, missing OCR/Markdown verification `43`, manual editorial filter required `6`
+  - public leak scan hits `0/0/0`
+  - interpretation: latest local completion cursor; no repair row can enter deterministic graph acceptance yet; selected serving candidate remains the participant-delta DB below
+  - boundary: report-only precheck; no OCR execution, LLM call, graph fact acceptance, source/raw Atlas DB mutation, serving SQLite write/rebuild, graph/vector/DB write, public pointer, CloudRun/VPS, Neo4j/Qdrant/SQLite production write, mini-program upload/review, memory, credential, network/model/paid API, destructive Git, 9router, or D: root action occurred
+  - next local work: bounded evidence repair over `tools\stage7_rewrite\reports\atlas_source_ocr_acceptance_precheck_t5_20260526\source_ocr_repair_execution_order.jsonl`, then rerun this precheck
+
+- 2026-05-26 source/OCR repair packet:
+  - report `reports\ATLAS_T5_SOURCE_OCR_REPAIR_PACKET_20260526.md`
+  - script `tools\stage7_rewrite\scripts\build_atlas_source_ocr_repair_packet.py`
+  - regression `tools\stage7_rewrite\tests\test_build_atlas_source_ocr_repair_packet.py`
+  - summary `tools\stage7_rewrite\reports\atlas_source_ocr_repair_packet_t5_20260526\source_ocr_repair_packet_summary.json`
+  - input `tools\stage7_rewrite\reports\atlas_source_context_increment_audit_t5_20260526\high_yield_event_candidates.jsonl`
+  - decision `atlas_source_ocr_repair_packet_ready_report_only`, failed checks `[]`
+  - counts: high-yield input rows `60`; repair rows `60`; source+OCR overlap rows `42`; source-context reextract rows `11`; OCR/Markdown repair rows `1`; manual editorial filter rows `6`; source rollup rows `18`
+  - output queues under `tools\stage7_rewrite\reports\atlas_source_ocr_repair_packet_t5_20260526`: `source_plus_ocr_repair_queue.jsonl`, `source_context_reextract_queue.jsonl`, `ocr_markdown_repair_queue.jsonl`, `manual_editorial_filter_queue.jsonl`, `source_ocr_repair_source_rollup.jsonl`
+  - public leak scan hits `0/0/0`
+  - interpretation: upstream repair-lane packet now checked by the 01:30 acceptance precheck above; selected serving candidate remains the participant-delta DB below
+  - boundary: report-only local queue materialization; no OCR execution, source/raw Atlas DB mutation, serving SQLite write/rebuild, graph/vector/DB write, public pointer, CloudRun/VPS, Neo4j/Qdrant/SQLite production write, mini-program upload/review, memory, credential, network/model/paid API, destructive Git, 9router, or D: root action occurred
+  - next local work: superseded by the 01:30 acceptance precheck; continue from its execution-order queue
+
+- 2026-05-26 source-context increment audit:
+  - report `reports\ATLAS_T5_SOURCE_CONTEXT_INCREMENT_AUDIT_20260526.md`
+  - script `tools\stage7_rewrite\scripts\build_atlas_source_context_increment_audit.py`
+  - summary `tools\stage7_rewrite\reports\atlas_source_context_increment_audit_t5_20260526\source_context_increment_audit_summary.json`
+  - input `tools\stage7_rewrite\reports\atlas_social_broader_source_context_recovery_q6_20260526\source_context_reextract_review_slice.jsonl`
+  - selected serving DB read-only `reports\atlas_serving_participant_delta_current_20260526_0016\atlas_serving.sqlite`
+  - decision `atlas_source_context_increment_audit_ready_report_only`
+  - counts: audited rows `120`; high-yield event candidates `60`; source-context event candidates `28`; OCR-first event candidates `32`; duplicate-context rows `39`; context/noise rows `11`; manual-review rows `10`; source-account rollup rows `28`
+  - top routing: `OIL油` `24` rows / `13` OCR-first rows, `Dada Shanghai` `17` rows / `7` high-yield rows, `club between` `7` rows / `6` OCR-first rows, `44KW` `6` OCR-first rows, `All俱乐部` `14` rows / `2` high-yield rows
+  - public leak scan hits `0/0/0`
+  - interpretation: upstream routing evidence now refined by the 01:20 source/OCR repair packet above; selected serving candidate remains the participant-delta DB below; no graph facts accepted and no serving rebuild triggered
+  - boundary: report-only local prioritization; no source/raw Atlas DB mutation, serving SQLite write/rebuild, public pointer, CloudRun/VPS, Neo4j/Qdrant/SQLite production write, mini-program upload/review, memory, credential, network/model/paid API, destructive Git, 9router, or D: root action occurred
+  - next local work: completed by the 01:20 source/OCR repair packet; continue from its emitted queues
+
+- 2026-05-26 participant-delta production-ready candidate:
+  - report `reports\ATLAS_T5_SERVING_PARTICIPANT_DELTA_PRODUCTION_CANDIDATE_20260526.md`
+  - candidate `reports\atlas_serving_participant_delta_current_20260526_0016\atlas_serving.sqlite`
+  - base DB `reports\atlas_serving_activity_current_time_dedupe_strict_20260525-1625\atlas_serving.sqlite`
+  - candidate SHA256 `3a65aad6771945fc4f2ccad6f58a44eacfc28cd886536ae7ba327426ab79f577`; size `2,178,207,744` bytes
+  - participant supplement `reports\atlas_participant_public_supplement_current_20260526_0007\summary.json`, participant rows `114,676`, raw URL/path hits `0`
+  - graph delta `reports\atlas_participant_graph_delta_current_20260526_0008\summary.json`, new candidates `96` DJ profiles / `28` events / `399` DJ-event rows / `1,596` directed relations
+  - candidate counts `508,049` performance events, `53,555` DJ profiles, `1,285,827` DJ-event edges, `701,396` directed relations, `590,927` search docs, `53,555` graph windows, activity detail/evidence `196/2,181`
+  - delta over time-dedupe base: `+28` performance events, `+96` DJ profiles, `+399` DJ-event edges, `+1,596` directed relations, `+124` search docs, `+96` graph windows
+  - preflight `reports\atlas_serving_participant_delta_current_20260526_0016\preflight_vs_time_dedupe\promotion_preflight.json`, decision `promotion_preflight_passed_local_only`, failed checks `[]`
+  - health summary `tools\stage7_rewrite\reports\atlas_serving_participant_delta_health_refresh_t5_20260526_0016\atlas_serving_search_graph_health_refresh_summary.json`, decision `atlas_serving_search_graph_health_refresh_ready_report_only`, blockers `[]`, graph-window gap `0`
+  - API smoke `reports\atlas_serving_participant_delta_current_20260526_0016\api_smoke\api_smoke.json`, `ok=true`
+  - browser smoke `reports\atlas_serving_participant_delta_current_20260526_0016\api_smoke\browser_smoke.json`, `ok=true`, screenshot `reports\atlas_serving_participant_delta_current_20260526_0016\api_smoke\atlas_browser_smoke.png`
+  - DJ-first self-test `reports\atlas_serving_participant_delta_current_20260526_0016\api_smoke\atlas_graph_search_selftest_20260525T162504Z\atlas_graph_search_selftest.json`, decision `PASS`, `6/6` seeds passed
+  - production packet `reports\atlas_serving_participant_delta_production_execution_packet_20260526_0026\atlas_serving_production_execution_packet.json`, decision `atlas_serving_production_execution_packet_ready_report_only`, failed gates `[]`
+  - public target resmoke `tools\stage7_rewrite\reports\cloudrun_stage7_participant_delta_public_target_resmoke_q5_20260526_0027\cloudrun_stage7_production_smoke.json`, decision `cloudrun_stage7_production_smoke_blocked`
+  - interpretation: newest selected local production-ready candidate; not public-effective because the no-secret public smoke remains blocked
+  - supersedes selected-current role of `reports\ATLAS_T5_SERVING_TIME_DEDUPE_PRODUCTION_CANDIDATE_20260525.md`, which now remains base/rollback comparison evidence
+  - boundary: no raw/source Atlas DB mutation, public pointer, CloudRun/VPS, Neo4j/Qdrant/SQLite production write, mini-program upload/review, memory, credential, external network/model/paid API, destructive Git, 9router, or D: root scan occurred
+
+- 2026-05-25 venue acceptance gate:
+  - report `reports\ATLAS_T5_VENUE_ACCEPTANCE_GATE_20260525.md`
+  - summary `reports\atlas_dj_venue_acceptance_gate_activity_current_20260525_1809\summary.json`
+  - decision `atlas_dj_venue_acceptance_no_patch_candidates_report_only`
+  - input rows `932`; patch candidates `0`; blocked rows `304`; already matching rows `628`; existing venue-id conflicts `259`; serving-event-not-found rows `45`
+  - no serving rebuild/write, public pointer, CloudRun/VPS deploy, Neo4j/Qdrant/SQLite production write, mini-program upload/review, memory, network/model/paid API, credential read, 9router use, or D: root scan
+  - next local work: build a conflict-review packet over `reports\atlas_dj_venue_acceptance_gate_activity_current_20260525_1809\venue_acceptance_blocked.jsonl`, or continue participant/source-context/OCR repair queues
+
+- 2026-05-25 serving time-dedupe production-ready candidate:
+  - report `reports\ATLAS_T5_SERVING_TIME_DEDUPE_PRODUCTION_CANDIDATE_20260525.md`
+  - strict rebuild report `reports\ATLAS_T5_SERVING_TIME_DEDUPE_STRICT_20260525.md`
+  - candidate `reports\atlas_serving_activity_current_time_dedupe_strict_20260525-1625\atlas_serving.sqlite`
+  - candidate SHA256 `67f9949a4e34650bee810ef153aceee5b870820fe37e6a1e703c71c66c04e527`
+  - preflight `reports\atlas_serving_activity_current_time_dedupe_strict_20260525-1625\preflight_vs_fullcomplete\promotion_preflight.json`, decision `promotion_preflight_passed_local_only`, failed checks `[]`
+  - health summary `tools\stage7_rewrite\reports\atlas_serving_time_dedupe_health_refresh_t5_20260525\atlas_serving_search_graph_health_refresh_summary.json`, decision `atlas_serving_search_graph_health_refresh_ready_report_only`, blockers `[]`
+  - API smoke `reports\atlas_serving_activity_current_time_dedupe_strict_20260525-1625\api_smoke\api_smoke.json`, `ok=true`, failed checks `[]`
+  - browser smoke `reports\atlas_serving_activity_current_time_dedupe_strict_20260525-1625\api_smoke\browser_smoke.json`, `ok=true`, screenshot `reports\atlas_serving_activity_current_time_dedupe_strict_20260525-1625\api_smoke\atlas_browser_smoke.png`
+  - DJ-first self-test `reports\atlas_serving_activity_current_time_dedupe_strict_20260525-1625\api_smoke\atlas_graph_search_selftest_20260525T084805Z\atlas_graph_search_selftest.json`, decision `PASS`
+  - production packet `reports\atlas_serving_activity_current_time_dedupe_production_execution_packet_20260525_1648\atlas_serving_production_execution_packet.json`, decision `atlas_serving_production_execution_packet_ready_report_only`, failed gates `[]`
+  - public target resmoke `tools\stage7_rewrite\reports\cloudrun_stage7_time_dedupe_public_target_resmoke_q5_20260525_1650\cloudrun_stage7_production_smoke.json`, decision `cloudrun_stage7_production_smoke_blocked`
+  - logic fix: deterministic duplicate time-sidecar row ranking in `build_atlas_serving_read_model.py`; selected sidecar `time_text` is preserved; preflight comparison no longer fails equal modern activity candidates
+  - counts stable: performance events `508,021`, DJ profiles `53,459`, DJ-event edges `1,285,428`, directed relations `699,800`, search docs `590,803`, graph windows `53,459`, activity detail/evidence `196/2,181`
+  - completeness improved: performance `starts_at` blanks `-35,472`, DJ-event `starts_at` blanks `-90,775`, performance `time_text` blanks `-4,189`, DJ-event `time_text` blanks `-10,485`
+  - interpretation: newest selected local production-ready candidate; not public-effective because the no-secret public smoke remains blocked
+  - boundary: no raw/source Atlas DB mutation, public pointer, CloudRun/VPS, Neo4j/Qdrant/SQLite production write, mini-program upload/review, memory, credential, external network/model/paid API, destructive Git, 9router, or D: root scan occurred
+- 2026-05-25 time acceptance gate:
+  - report `reports\ATLAS_T5_TIME_ACCEPTANCE_GATE_20260525.md`
+  - summary `reports\atlas_dj_time_acceptance_gate_activity_current_20260525_1559\summary.json`
+  - source auto candidates `reports\atlas_dj_time_work_order_sidecar_activity_current_20260525_1545\time_auto_candidates.jsonl`
+  - result: `atlas_dj_time_acceptance_patch_ready_report_only`
+  - counts: input rows `915`, already matching rows `803`, patch candidates `1`, blocked rows `111`, existing-starts-at conflicts `26`, serving-event-not-found rows `85`, DJ-event blank rows impacted `1`
+  - interpretation: one patch candidate is ready for a separate report-only serving patch candidate; serving DB remains unchanged
+  - boundary: no raw/source Atlas DB mutation, serving DB overwrite/rebuild, public pointer, CloudRun/VPS deploy, Neo4j/Qdrant/SQLite production write, mini-program upload/review, memory write, credential read, network/model/paid API, destructive Git, 9router, or D: root scan occurred
+- 2026-05-25 time work-order sidecar:
+  - report `reports\ATLAS_T5_TIME_WORK_ORDER_SIDECAR_20260525.md`
+  - summary `reports\atlas_dj_time_work_order_sidecar_activity_current_20260525_1545\summary.json`
+  - source work order `reports\atlas_dj_repair_queue_review_packet_activity_current_20260525_1537\time_normalization_work_order.jsonl`
+  - result: `atlas_dj_time_work_order_sidecar_materialized_report_only`
+  - counts: input rows `920`, post dates found `662`, normalized rows `919`, auto candidates `915`, review candidates `4`, unresolved rows `1`
+  - parse statuses: full date `159`, partial-date-year-inferred `726`, relative today `6`, relative weekday `28`, time-only `1`
+  - interpretation: deterministic time candidates are ready for a report-only acceptance/rebuild gate, but serving DB remains unchanged
+  - boundary: no raw/source Atlas DB mutation, serving DB overwrite/rebuild, public pointer, CloudRun/VPS deploy, Neo4j/Qdrant/SQLite production write, mini-program upload/review, memory write, credential read, network/model/paid API, destructive Git, 9router, or D: root scan occurred
+- 2026-05-25 DJ repair queue review packet:
+  - report `reports\ATLAS_T5_DJ_REPAIR_QUEUE_REVIEW_PACKET_20260525.md`
+  - review summary `reports\atlas_dj_repair_queue_review_packet_activity_current_20260525_1537\summary.json`
+  - source queue `reports\atlas_dj_repair_priority_queue_activity_current_20260525_1526\repair_priority_queue.jsonl`
+  - result: `atlas_dj_repair_queue_review_packet_materialized_no_serving_rebuild`
+  - counts: input rows `6,000`, unique work items `5,820`, duplicates removed `180`, serving-rebuild eligible items `0`
+  - work orders: source-context `1,000`, OCR/Markdown `1,000`, participant review `968`, venue review `932`, time normalization `920`, noise quarantine `1,000`
+  - public leak scan: local path `0`, secret-word `0`, URL/archive `0`
+  - interpretation: current serving candidate stays selected; no immediate rebuild until accepted review/source-context decisions or new T1/T4 intake creates deterministic graph facts
+  - boundary: no raw/source Atlas DB mutation, serving DB overwrite, public pointer, CloudRun/VPS deploy, Neo4j/Qdrant/SQLite production write, mini-program upload/review, memory write, credential read, network/model/paid API, destructive Git, 9router, or D: root scan occurred
+- 2026-05-25 local graph full advance:
+  - report `reports\ATLAS_T5_LOCAL_GRAPH_FULL_ADVANCE_20260525.md`
+  - information-gap packet `reports\atlas_serving_information_gap_closure_activity_current_20260525_1522\information_gap_closure.json`
+  - field-repair sidecar `reports\atlas_field_repair_promotion_sidecar_activity_current_20260525_1523\summary.json`
+  - DJ repair priority queue `reports\atlas_dj_repair_priority_queue_activity_current_20260525_1526\summary.json`
+  - result: `atlas_t5_local_graph_full_advance_current_gap_queues_materialized`
+  - current residuals: field-missing event rows `242,904`, grouped field gaps `76,219`, participant-delta blocked events `59`, missing blocked-event edges `196`, missing profile edges `0`
+  - field-repair result: auto event candidates `0`, auto rule additions `0`, review event candidates `15,939`, source-account groups `53`, time public-visible rows `286,075`
+  - repair queue: `6,000` rows, `1,000` each for DJ entity/no-event articles, image/poster no-event articles, participant-empty music events, missing-place-with-participants, time ISO normalization, and noise quarantine
+  - interpretation: current local public-safe serving read model is healthy; next local work is bounded source-context/review/OCR queue processing, not immediate full rebuild with unchanged deterministic inputs
+  - boundary: no raw/source Atlas DB mutation, serving DB overwrite, public pointer, CloudRun/VPS deploy, Neo4j/Qdrant/SQLite production write, mini-program upload/review, memory write, credential read, paid/model API, destructive Git, 9router, or D: root scan occurred
+- 2026-05-25 activity-current production candidate packet ready:
+  - report `reports\ATLAS_T5_ACTIVITY_CURRENT_SERVING_PRODUCTION_CANDIDATE_20260525.md`
+  - serving candidate `reports\atlas_serving_activity_current_fullcomplete_strict_20260525-1442\atlas_serving.sqlite`
+  - production execution packet `reports\atlas_serving_activity_current_production_execution_packet_20260525_1515\atlas_serving_production_execution_packet.json`
+  - candidate SHA256 `cb7c01548013f5a7cc77fe0422393ac5074ee1361a73eb402d580823d0267673`
+  - local gates: API smoke `ok=true`, browser smoke `ok=true`, DJ-first self-test `PASS`, packet failed gates `[]`
+  - counts: performance events `508,021`, DJ profiles `53,459`, DJ-event edges `1,285,428`, directed relations `699,800`, search docs `590,803`, graph windows `53,459`, activity detail/evidence `196/2,181`
+  - public target resmoke `tools\stage7_rewrite\reports\cloudrun_stage7_activity_current_public_target_resmoke_q5_20260525_1510\cloudrun_stage7_production_smoke.json` remains blocked by `403`/session-gated Stage7 API behavior at `https://atlas.huaidj.club`
+  - production SQLite surface decision `tools\stage7_rewrite\reports\production_sqlite_surface_decision_q5_activity_current_public_pointer_20260525_1510\production_sqlite_surface_decision.json` is `production_sqlite_not_applicable_to_current_selected_release_path`
+  - no serving/public pointer update, CloudRun/VPS deploy, Neo4j/Qdrant/SQLite production write, mini-program upload/review, memory write, credential read, paid/model API call, destructive Git, 9router, or D: root scan occurred
+- Current Atlas savepoint: `docs\ATLAS_DJ_GRAPH_SAVEPOINT_AND_PLAN_20260522.md`.
+- Strict public serving candidate exists:
+  - `reports\atlas_serving_read_model_20260522\atlas_serving.sqlite`
+  - deployable public candidate, not yet public deployment.
+- Private repair candidate exists:
+  - `reports\atlas_serving_repair_full_private_20260522\atlas_serving.sqlite`
+  - marked `deployable_public=0`; do not deploy directly.
+- Field-repair strict candidate exists:
+  - `reports\atlas_serving_field_repair_strict_sourcevenue_20260522-0438\atlas_serving.sqlite`
+  - `deployable_public=1`
+- Participant graph delta complete:
+  - final supplement `114,851` participant rows
+  - graph delta `29,734` event candidates
+  - DJ-event rows `114,851`
+  - directed relation rows `113,286`
+  - raw URL/path leak hits `0`
+- Activity-aware participant-delta serving gate complete:
+  - `reports\atlas_serving_activity_participant_candidate_139123_publicsafe_v3_20260522-2250\atlas_serving.sqlite`
+  - `deployable_public=true`, leak hits `0`, strong product/admin noise hits `0`
+  - performance events `507,927`, DJ profiles `53,462`, DJ-event edges `1,285,033`, directed relation edges `699,504`, search docs `590,695`, graph windows `53,462`
+  - local candidate only; no raw Atlas/base serving/production pointer/Neo4j/Qdrant/CloudRun/mini-program mutation
+- Current DJ-complete activity-aware participant-delta serving candidate:
+  - `reports\atlas_serving_activity_participant_candidate_139123_publicsafe_djcomplete_v2_20260522-2335\atlas_serving.sqlite`
+  - report `reports\ATLAS_DJ_GRAPH_COMPLETION_CANDIDATE_20260522.md`
+  - `deployable_public=true`, participant acceptance `strict`, raw URL/path/openid/fakeid leak hits `0`
+  - performance events `508,020`, DJ profiles `53,462`, DJ-event edges `1,285,415`, directed relation edges `699,816`, search docs `590,788`, graph windows `53,462`
+  - recovered `+93` event rows, `+382` DJ-event edges, and `+312` directed relations over the 22:50 candidate by narrowing the participant-delta event noise gate for real DJ/performance rows
+  - remaining participant-delta event gap `68`; keep as bounded review queue, not blanket merge
+- 2026-05-23 read-only T5 public gate complete:
+  - report `reports\ATLAS_DJ_SERVING_GRAPH_T5_PUBLIC_GATE_20260523.md`
+  - candidate remains `reports\atlas_serving_activity_participant_candidate_139123_publicsafe_djcomplete_v2_20260522-2335\atlas_serving.sqlite`
+  - manifest and SQLite counts matched; `deployable_public=true`, build metadata `deployable_public=1`
+  - raw URL/path/openid/fakeid leak hits `0`; forbidden public schema columns `0`; `public_url_allowed != 0` rows `0`
+  - search smoke `40/40` LIKE and `40/40` FTS5; `Stage7AtlasSqliteStore` MaFoL search/profile/graph smoke passed
+  - graph windows `53,462/53,462` DJ profiles; MaFoL window `71` nodes / `88` edges
+  - local HTTP API smoke passed through the real `services\weekly_activity_cloudrun\src\server.mjs` entrypoint with `forbiddenHits=[]`
+  - `/atlas/graph` browser visual smoke passed through Canvas fallback: MaFoL query, `73` nodes / `88` relations, session gate inactive, screenshot `reports\atlas_dj_serving_graph_t5_visual_smoke_20260523\atlas_graph_mafol_smoke.png`
+  - broad ASCII `yoga` token has reviewable music/name-context hits and is not a hard private-leak failure; stricter workshop filtering remains a policy follow-up, not a blanket merge reason
+- 2026-05-23 promotion-readiness packet complete:
+  - report `reports\ATLAS_DJ_SERVING_PROMOTION_READINESS_PACKET_20260523.md`
+  - comparison source `reports\atlas_serving_participant_delta_public_candidate_publicsafe_v3_20260522\atlas_serving.sqlite`
+  - decision: keep DJ-complete activity-aware v2 as selected local promotion source
+  - rationale: participant-only v3 is larger but lacks activity-rich evidence tables, has duplicate normalized-name inflation, and has hard noise hits; selected candidate has activity evidence, name-remap quality, stricter filtering, and passed extended smoke
+  - extended API smoke covered `MaFoL`, `DaRou`, `OIL`, `SHCR`, activity detail evidence, graph windows, and `forbiddenHits=[]`
+  - browser smoke artifacts in `reports\atlas_dj_serving_promotion_review_20260523`
+  - status `promotion_source_selected_local_only`; production pointer, CloudRun/VPS deploy, Neo4j/Qdrant, and mini-program publication remain separate explicit gates
+- 2026-05-23 report-only deployment preflight made repeatable:
+  - script `tools\stage7_rewrite\scripts\validate_atlas_serving_promotion_preflight.py`
+  - tests `tools\stage7_rewrite\tests\test_validate_atlas_serving_promotion_preflight.py`
+  - output `reports\atlas_serving_promotion_preflight_20260523\promotion_preflight.md`
+  - machine output `reports\atlas_serving_promotion_preflight_20260523\promotion_preflight.json`
+  - decision `promotion_preflight_passed_local_only`
+  - confirmed required public tables, deployable metadata, strict participant acceptance, forbidden schema/value hits `0`, hard noise hits `0`, activity evidence `196/196`, duplicate normalized profile groups `0`, graph window gap `0`, and `public_url_allowed` nonzero rows `0`
+  - comparison again records participant-only v3 as larger but missing activity tables and containing duplicate profile/noise issues
+  - no production write/deploy action executed
+- 2026-05-23 information-gap closure packet complete:
+  - report `reports\ATLAS_SERVING_INFORMATION_GAP_CLOSURE_20260523.md`
+  - script `tools\stage7_rewrite\scripts\build_atlas_serving_information_gap_closure_packet.py`
+  - generated packet `reports\atlas_serving_information_gap_closure_20260523\information_gap_closure.md` / `.json`
+  - review sidecar `reports\atlas_serving_information_gap_closure_20260523\information_gap_review_sidecar.sqlite`
+  - decision `information_gap_queues_materialized_local_only`
+  - Route B serving read-model consumption is closed: `activity_event_detail=196`, `activity_evidence_ref=2171`, evidence `196/196`
+  - OCRSpanRegistry remains `0` and is explicitly recorded as `upstream_contract_gap_not_fabricated`
+  - participant-delta gap is now materialized as `68` blocked/review events and `216` true missing edges caused by those blocked events
+  - earlier `546` missing DJ-event-row statement is reconciled: `216` true blocked-event edges plus `330` legacy simple-normalized profile rows resolved by canonical normalization
+  - field gaps are materialized as `274649` `performance_event` row entries and `82339` grouped gap rows
+  - raw leak hits across emitted queues `0`; no source/serving DB mutation or production action executed
+- 2026-05-23 field-repair fullcomplete promotion-readiness complete:
+  - report `reports\ATLAS_FIELD_REPAIR_PROMOTION_READINESS_20260523.md`
+  - selected candidate `reports\atlas_serving_field_repair_fullcomplete_strict_20260523-1658\atlas_serving.sqlite`
+  - this supersedes both `reports\atlas_serving_activity_participant_candidate_139123_publicsafe_fullcomplete_20260523-1518\atlas_serving.sqlite` and `reports\atlas_serving_field_repair_activity_participant_strict_20260523-1535\atlas_serving.sqlite`
+  - reason: combines field-repair venue/time sidecar with the `9` accepted blocked-event rows
+  - counts: performance events `508,021`, DJ profiles `53,459`, DJ-event edges `1,285,428`, directed relations `699,800`, search docs `590,803`, graph windows `53,459`, evidence refs `130,591`, activity detail/evidence `196/2,171`
+  - accepted participant-delta events `9`; remaining blocked participant-delta rows `59`
+  - field gap improvements versus DJ-complete v2: `performance_event.venue_name 107090 -> 66604`, `performance_event.city 132551 -> 132395`, `dj_event.venue_name 241365 -> 151069`
+  - preflight against participant-only v3 passed with failed checks `[]`; forbidden schema/value hits `0`; hard noise hits `0`; duplicate normalized profile groups `0`; graph window gap `0`
+  - local API smoke and browser smoke passed in `reports\atlas_serving_field_repair_fullcomplete_strict_20260523-1658\api_smoke`
+  - verification: `py_compile` passed, focused pytest `7 passed`, CloudRun service tests `59 passed`
+  - no production pointer/CloudRun/VPS/Neo4j/Qdrant/mini-program mutation executed
+- 2026-05-25 serving/search/graph health refresh complete:
+  - report `reports\ATLAS_T5_SERVING_SEARCH_GRAPH_HEALTH_REFRESH_20260525.md`
+  - script `tools\stage7_rewrite\scripts\build_atlas_serving_search_graph_health_refresh.py`
+  - focused test `tools\stage7_rewrite\tests\test_build_atlas_serving_search_graph_health_refresh.py`
+  - machine summary `tools\stage7_rewrite\reports\atlas_serving_search_graph_health_refresh_t5_20260525\atlas_serving_search_graph_health_refresh_summary.json`
+  - decision `atlas_serving_search_graph_health_refresh_ready_report_only`; blockers `[]`
+  - old DJ-first relationship-network plan evidence exists in `docs\ATLAS_DJ_GRAPH_SAVEPOINT_AND_PLAN_20260522.md`, `docs\ATLAS_DJ_FIRST_FULL_DESIGN_AND_PLAN_20260522.md`, `docs\ATLAS_HIGH_PERFORMANCE_DATABASE_ARCHITECTURE_20260522.md`, `docs\ATLAS_SERVING_READ_MODEL_PRODUCTION_RUN_20260522.md`, `docs\ATLAS_GRAPH_DB_SEARCH_TAXONOMY_ARCHITECTURE_20260521.md`, and `reports\atlas_dj_first_canary_20260522\summary.md`
+  - counts reconfirmed for selected candidate: performance events `508,021`, DJ profiles `53,459`, DJ-event edges `1,285,428`, directed relations `699,800`, search docs/FTS `590,803/590,803`, graph windows `53,459`, activity detail/evidence `196/2,171`
+  - search seed smoke over `MaFoL`, `DaRou`, `OIL`, `SHCR`, `BYYB`, `DADA`, `DADA昆明`: LIKE missing `0`, FTS missing `0`, FTS errors `0`
+  - graph window gap `0`; public-safety leak/schema/public-url checks `0`; review noise signals `202` remain review signals, not hard blockers
+  - validation: `py_compile` passed, focused pytest `2 passed`, selected-DB refresh completed
+  - no serving pointer, public pointer, CloudRun/VPS, Neo4j, Qdrant, source/serving SQLite production write, mini-program upload/review, memory write, credential read, destructive Git, 9router, paid API, or D: root scan occurred
+- 2026-05-23 production execution packet ready report-only:
+  - script `tools\stage7_rewrite\scripts\build_atlas_serving_production_execution_packet.py`
+  - test `tools\stage7_rewrite\tests\test_build_atlas_serving_production_execution_packet.py`
+  - output `reports\atlas_serving_production_execution_packet_20260523_2119\atlas_serving_production_execution_packet.md`
+  - machine output `reports\atlas_serving_production_execution_packet_20260523_2119\atlas_serving_production_execution_packet.json`
+  - decision `atlas_serving_production_execution_packet_ready_report_only`
+  - failed gates `[]`
+  - candidate SHA256 `4d61539c24c77c7ad38c2fe561f303b587dba78b9cab958f653f4ce3b2c51974`
+  - gates passed: candidate exists, manifest public-safe/public-rollup-only, preflight passed local-only, API smoke `ok=true`, browser smoke `ok=true`
+  - rollout, rollback, and post-write remote-effective checks are now recorded; this packet did not copy the DB, update the public pointer, deploy CloudRun/VPS, write Neo4j/Qdrant/SQLite production state, upload/review mini-program, read secrets, or use paid APIs
+- 2026-05-24 local Neo4j graph production marker verified:
+  - report `reports\ATLAS_Q5_GRAPH_PRODUCTION_MARKER_VERIFY_20260524.md`
+  - promotion id `stage7_all_full_llm_138102_prod_q6_social_20260524`
+  - decision `graph_production_promotion_verified`; blockers `[]`
+  - verified counts: articles `138102`, entities `913082`, events `158490`
+  - consumer smoke `tools\stage7_rewrite\reports\consumer_query_smoke_q6_social_production_labels_20260524\consumer_query_smoke.json` returned `ok=true`, Qdrant equivalent rate `1.0`, Neo4j label mode `production`, row count `5`
+  - boundary: this is local Neo4j marker truth only; public pointer, Qdrant alias/write, SQLite serving pointer, CloudRun/VPS, mini-program, and memory states are not claimed effective
+- 2026-05-24 public serving/pointer verification packet is ready but target identity is blocked:
+  - report `reports\ATLAS_Q5_PUBLIC_SERVING_POINTER_VERIFICATION_PACKET_20260524.md`
+  - serving packet `reports\atlas_serving_public_pointer_verification_packet_20260524_1841\atlas_serving_production_execution_packet.json`
+  - public target smoke `tools\stage7_rewrite\reports\cloudrun_stage7_public_target_resmoke_q5_20260524_1841\cloudrun_stage7_production_smoke.json`
+  - SQLite surface decision `tools\stage7_rewrite\reports\production_sqlite_surface_decision_q5_public_pointer_20260524_1841\production_sqlite_surface_decision.json`
+  - result: serving packet failed gates `[]`, public target smoke decision `cloudrun_stage7_production_smoke_blocked`, production SQLite decision `production_sqlite_not_applicable_to_current_selected_release_path`, current SQLite write candidates `0`
+  - boundary: no serving pointer update, CloudRun/VPS deploy, SQLite production write, Qdrant write/alias mutation, new Neo4j write, mini-program upload/review, memory write, credential read, destructive Git, paid API call, 9router use, or D: root scan occurred
+- 2026-05-24 product-truth promotion review packet is ready report-only:
+  - report `reports\ATLAS_Q5_Q6_PRODUCT_TRUTH_PROMOTION_REVIEW_PACKET_20260524.md`
+  - summary `tools\stage7_rewrite\reports\atlas_social_product_truth_promotion_review_q5_q6_20260524\atlas_social_product_truth_promotion_review_summary.json`
+  - ready rows `tools\stage7_rewrite\reports\atlas_social_product_truth_promotion_review_q5_q6_20260524\atlas_social_product_truth_promotion_ready.jsonl`
+  - result: decision `atlas_social_product_truth_promotion_review_ready_report_only`, input edges `3`, promotion-review-ready rows `3`, blocked rows `0`, accepted subjects Gekko, FullHouse, and 4Tael
+  - boundary: this is a later mutation-packet design gate only; product truth, identity proof, avatar display, public serving fields, production graph labels, Qdrant, SQLite serving pointer, public pointer, CloudRun/VPS, mini-program upload/review, and memory writes remain closed
+- 2026-05-25 product-truth mutation packet is ready report-only:
+  - report `reports\ATLAS_Q5_Q6_PRODUCT_TRUTH_MUTATION_PACKET_20260525.md`
+  - summary `tools\stage7_rewrite\reports\atlas_social_product_truth_mutation_packet_q5_q6_20260525\atlas_social_product_truth_mutation_packet_summary.json`
+  - targets `tools\stage7_rewrite\reports\atlas_social_product_truth_mutation_packet_q5_q6_20260525\atlas_social_product_truth_mutation_targets.jsonl`
+  - result: decision `atlas_social_product_truth_mutation_packet_ready_report_only`, input rows `3`, mutation targets `3`, blocked rows `0`, target namespace `local_neo4j_stage7_staging_social_profile_edge`
+  - boundary: target Cypher/readback/rollback is now specified, but no Neo4j write, production label, identity proof, avatar display, public serving field, Qdrant, SQLite, public pointer, deploy/upload/review, or memory write occurred
+- 2026-05-23 blocked participant-delta event review packet complete:
+  - script `tools\stage7_rewrite\scripts\build_atlas_participant_blocked_event_review_packet.py`
+  - test `tools\stage7_rewrite\tests\test_build_atlas_participant_blocked_event_review_packet.py`
+  - output `reports\atlas_participant_blocked_event_review_packet_20260523\blocked_event_review_packet.md`
+  - decisions `reports\atlas_participant_blocked_event_review_packet_20260523\blocked_event_review_decisions.jsonl`
+  - decision `blocked_event_review_packet_ready_report_only`
+  - input rows `68`, raw leak hits `0`
+  - review actions: `manual_review_candidate=9`, `hold_review_only=52`, `reject_hard_noise=7`
+  - no source/serving DB mutation, LLM/network call, production pointer, Neo4j/Qdrant, CloudRun, or mini-program action executed
+- 2026-05-23 blocked-event source-review detail complete:
+  - report `reports\ATLAS_PARTICIPANT_BLOCKED_EVENT_SOURCE_REVIEW_20260523.md`
+  - joined the `9` `manual_review_candidate` rows to public-safe source titles and missing participant names
+  - auto-promoted rows `0`
+  - stronger source-title matches include `爵对律动 Jazz Groove Vol.10`, `PSY:PULSE`, `06/16 Psy Chill`, and `喝酒蹦迪周末永恒快乐主题派对`
+  - rows without public source title remain hold/review until more public-safe evidence is attached
+  - no raw URL read, source/serving DB mutation, LLM/network call, production pointer, Neo4j/Qdrant, CloudRun, or mini-program action executed
+- 2026-05-23 fullcomplete public-safe candidate complete:
+  - report `reports\ATLAS_DJ_GRAPH_FULLCOMPLETE_CANDIDATE_20260523.md`
+  - candidate `reports\atlas_serving_activity_participant_candidate_139123_publicsafe_fullcomplete_20260523-1518\atlas_serving.sqlite`
+  - accepted-event input `reports\atlas_participant_blocked_event_acceptance_20260523\accepted_events.jsonl`
+  - builder supports `--participant-delta-accepted-events` with explicit `accepted_for_public_candidate=true`
+  - only the `9` source-reviewed blocked-event rows were accepted; the remaining `59` stay hold/reject and were not blanket-merged
+  - counts: performance events `508,029`, DJ profiles `53,462`, DJ-event edges `1,285,435`, directed relation edges `699,828`, search docs `590,797`, graph windows `53,462`, evidence refs `130,596`
+  - delta over DJ-complete v2: `+9` events, `+20` DJ-event edges, `+12` directed relations, `+9` search docs, `+4` evidence refs
+  - participant-delta event coverage `29,734 / 29,675 / 59`; accepted rows present with `20` DJ-event edges
+  - raw URL/path/openid/fakeid/unionid/local archive leak hits `0`; `public_url_allowed != 0` rows `0`; duplicate normalized profile groups `0`; graph-window gap `0`
+  - DB search smoke over top `40` participant-delta DJ names: LIKE missing `0/40`, FTS missing `0/40`, FTS errors `0`
+  - `Stage7AtlasSqliteStore` read-only smoke passed for MaFoL search/profile/graph plus accepted `Jam Sounds vol.9` detail lookup; write flags all `false`
+  - focused verification `py_compile` passed and pytest `5 passed in 0.73s`
+  - this supersedes DJ-complete v2 as the current local public-safe T5 candidate, but production pointer/deploy/Neo4j/Qdrant/mini-program publication remain separate explicit gates
+- 2026-05-23 fullcomplete promotion preflight complete:
+  - report `reports\atlas_serving_promotion_preflight_fullcomplete_vs_v3_20260523\promotion_preflight.md`
+  - machine output `reports\atlas_serving_promotion_preflight_fullcomplete_vs_v3_20260523\promotion_preflight.json`
+  - decision `promotion_preflight_passed_local_only`; failed checks `[]`
+  - comparison source `reports\atlas_serving_participant_delta_public_candidate_publicsafe_v3_20260522\atlas_serving.sqlite`
+  - confirmed report-only boundary: no production/public pointer update, CloudRun/VPS deploy, Neo4j/Qdrant write, mini-program upload, network call, LLM call, mem0 write, or agentmemory write
+
+## Owns
+
+- DJ-first serving read model.
+- Public/private repair candidate boundary.
+- Participant graph delta candidate build and validation.
+- Search, profile, history rollup, graph-window and 3D graph validation.
+- Public-safe promotion candidate build.
+
+## Does Not Own
+
+- Weekly backend package publication.
+- Docker exporter source intake.
+- DeepSeekTUI sidecar authority.
+- Raw Atlas DB mutation.
+- Neo4j/Qdrant production writes unless a separate explicit production gate authorizes them.
+
+## Source Documents
+
+- `docs\ATLAS_DJ_GRAPH_SAVEPOINT_AND_PLAN_20260522.md`
+- `docs\ATLAS_FULL_RUN_AND_REPAIR_WORKLOG_20260522.md`
+- `docs\ATLAS_FULL_REPAIR_PRIVATE_CANDIDATE_20260522.md`
+- `docs\ATLAS_FIELD_REPAIR_LONGRUN_20260522.md`
+- `NEXT_AGENT_HANDOFF_ATLAS_PARTICIPANT_LLM_20260522.md`
+- `reports\ATLAS_RELATION_GRAPH_PARTICIPANT_DELTA_20260522.md`
+- `docs\atlas-deepseektui-handoff-20260522\ATLAS_FULL_RUN_REPAIR_TO_DEEPSEEK_20260522.md` for sidecar handoff only.
+
+## Key Scripts
+
+- `tools\stage7_rewrite\scripts\build_atlas_serving_read_model.py`
+- `tools\stage7_rewrite\scripts\build_atlas_participant_llm_adjudication_queue.py`
+- `tools\stage7_rewrite\scripts\run_atlas_participant_llm_adjudication.py`
+- `tools\stage7_rewrite\scripts\monitor_atlas_participant_llm_adjudication.py`
+- `tools\stage7_rewrite\scripts\build_atlas_participant_public_supplement.py`
+- `tools\stage7_rewrite\scripts\build_atlas_participant_graph_delta.py`
+- `tools\stage7_rewrite\scripts\build_atlas_serving_participant_delta_candidate.py`
+- `services\weekly_activity_cloudrun\src\stage7AtlasSqliteStore.mjs`
+- `services\weekly_activity_cloudrun\src\atlasGraphPage.mjs`
+
+## Output Contract
+
+A T5 run should leave:
+
+- dated public-safe serving candidate DB;
+- manifest and summary;
+- leakage/noise validation;
+- search/profile/graph smoke reports;
+- clear deployability flag;
+- promotion decision separate from production deployment.
+
+## Gates
+
+- Never deploy `aggressive-private` DB directly.
+- Never mutate raw Atlas SQLite or current serving DB in place.
+- Public serving output must not expose raw source URLs, local archive paths, raw HTML, raw JSON, or article UIDs.
+- Wine/menu/product/pseudo-event noise must remain blocked.
+
+## Next Bounded Tasks
+
+1. Treat `reports\atlas_serving_participant_delta_current_20260526_0016\atlas_serving.sqlite` as the selected current local T5 serving candidate. The repeatable local promotion preflight has passed in `reports\atlas_serving_participant_delta_current_20260526_0016\preflight_vs_time_dedupe\promotion_preflight.json`, and the final DJ-first self-test PASS is `reports\atlas_serving_participant_delta_current_20260526_0016\api_smoke\atlas_graph_search_selftest_20260525T162504Z\atlas_graph_search_selftest.json`.
+2. Do not execute public serving exposure while `https://atlas.huaidj.club` Stage7 target identity remains blocked by 403/session-gated public API behavior. Rerun public Stage7 smoke only after target identity changes or can be verified without secrets.
+3. Run the product-truth mutation only through a future confirm-token writer using `reports\ATLAS_Q5_Q6_PRODUCT_TRUTH_MUTATION_PACKET_20260525.md`; it is report-only and not execution authorization.
+4. Treat `reports\ATLAS_T5_SERVING_TIME_DEDUPE_PRODUCTION_CANDIDATE_20260525.md` as base/rollback comparison evidence, not the latest selected local candidate.
+5. Local Neo4j marker truth for `stage7_all_full_llm_138102_prod_q6_social_20260524` is verified; do not treat that as Qdrant, SQLite serving pointer, CloudRun/VPS, Atlas public pointer, mini-program, or public remote-effective promotion.
+
+## Thread Prompt
+
+```text
+你是 T5 Atlas DJ Serving Graph 线程。只负责 DJ-first public-safe serving read model、participant graph delta、搜索/3D 图谱和 promotion candidate。
+先读 docs/threads/THREADS_INDEX_20260522.md、docs/ATLAS_DJ_GRAPH_SAVEPOINT_AND_PLAN_20260522.md、reports/ATLAS_RELATION_GRAPH_PARTICIPANT_DELTA_20260522.md。
+输出 dated serving candidate、manifest、leak/noise/search/graph 验证，并明确 deployable_public。
+禁止：raw atlas.sqlite mutation、current serving DB 原地覆盖、直接部署 private aggressive DB、Neo4j/Qdrant production 写入、CloudRun deploy unless explicitly gated。
+```
+

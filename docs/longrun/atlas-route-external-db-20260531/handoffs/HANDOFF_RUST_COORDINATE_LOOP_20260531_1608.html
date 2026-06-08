@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rust Club Coordinate Handoff</title>
+  <style>
+    body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; background: #f6f7f9; color: #1f2933; }
+    main { max-width: 1100px; margin: 0 auto; padding: 28px; }
+    h1 { font-size: 28px; margin: 0 0 8px; }
+    h2 { font-size: 18px; margin: 24px 0 10px; border-bottom: 1px solid #d8dee7; padding-bottom: 6px; }
+    p, li { line-height: 1.55; }
+    code, pre { font-family: Consolas, "SFMono-Regular", monospace; }
+    pre { background: #111827; color: #e5e7eb; padding: 14px; overflow: auto; border-radius: 6px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .card { background: #fff; border: 1px solid #d8dee7; border-radius: 6px; padding: 14px; }
+    .label { color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+    .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+    .warn { border-left: 4px solid #b45309; background: #fff7ed; padding: 10px 12px; }
+    .ok { border-left: 4px solid #15803d; background: #f0fdf4; padding: 10px 12px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Rust Club Coordinate Loop Handoff</h1>
+  <p>Updated: 2026-05-31 16:08 CST. Markdown file is canonical.</p>
+
+  <div class="grid">
+    <div class="card"><div class="label">Release Geo</div><div class="value">207 / 208</div></div>
+    <div class="card"><div class="label">Registry Active Geo</div><div class="value">77 / 77</div></div>
+    <div class="card"><div class="label">Known Missing</div><div class="value">Rust Club</div></div>
+    <div class="card"><div class="label">Latest Tencent Probe</div><div class="value">111</div></div>
+  </div>
+
+  <h2>Main Problem</h2>
+  <div class="warn">Rust Club has a user-supplied poster address candidate, but no provider-accepted taxi-grade coordinate yet. Do not write production coordinates until geocode and reverse confirmation pass.</div>
+
+  <h2>Candidate Address</h2>
+  <p><code>大庆市龙凤区东风新村学伟大街 大庆市黎明湖酒吧一条街三号集装箱</code></p>
+  <p>Poster phone field exists but is intentionally excluded from reports and registry.</p>
+
+  <h2>Confirmed</h2>
+  <ul>
+    <li>Current release has one missing coordinate: <code>rust_club:74c857fda5f80128</code>.</li>
+    <li>Four trusted current venues were solidified into <code>weekly_venues_seed.json</code>: ABYSS, Bar.SOS, CCR Chengdu, GUM Guangzhou.</li>
+    <li>Tencent probe over the candidate address returned status <code>111</code> twice, accepted geocodes <code>0</code>.</li>
+    <li>Mini-program map action now requires taxi-grade evidence and no longer requests user location before opening the destination.</li>
+  </ul>
+
+  <h2>Next Command</h2>
+  <pre>python tools\stage7_rewrite\scripts\geocode_weekly_activity_places.py --current-json tools\stage7_rewrite\reports\rust_club_user_address_candidate_s45_20260531\rust_club_candidate_current.json --provider amap --limit 1 --sleep-ms 0 --out-dir tools\stage7_rewrite\reports\rust_club_user_address_amap_probe_s46_20260531</pre>
+
+  <h2>Do Not Do</h2>
+  <ul>
+    <li>Do not reuse old Beijing/将台路 coordinate.</li>
+    <li>Do not print secrets.</li>
+    <li>Do not claim all addresses are latest; freshness audit is still false.</li>
+    <li>Do not deploy/upload/review from this coordinate lane.</li>
+  </ul>
+
+  <h2>Canonical Markdown</h2>
+  <p><code>C:\code\githubstar\wechathtmldownload\docs\longrun\atlas-route-external-db-20260531\handoffs\HANDOFF_RUST_COORDINATE_LOOP_20260531_1608.md</code></p>
+</main>
+</body>
+</html>

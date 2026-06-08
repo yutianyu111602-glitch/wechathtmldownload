@@ -1,0 +1,174 @@
+{
+  "project": "WeChat Article Pipeline Super Long Run v1",
+  "branchName": "ralph/super-longrun-v1",
+  "description": "统一口径版超级长跑计划 — 93K 下游抽取、质量报告、图谱候选、临时文件清理、文档整合、代码质量基线",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Baseline Freeze",
+      "description": "冻结当前产物状态, 创建可验证快照",
+      "acceptanceCriteria": [
+        "生成 baseline-snapshot.json (文件数/大小/哈希)",
+        "快照与实际一致, 可重复验证",
+        "D 盘剩余空间 ≥ 100GB",
+        "无意外写入"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Downstream Dry-run 100",
+      "description": "从 93K release pack 中抽取 100 篇跑结构化下游抽取, 验证 pipeline 通畅",
+      "acceptanceCriteria": [
+        "100 条完整 JSONL 记录",
+        "JSON valid rate ≥ 90%",
+        "无 OOM/超时",
+        "输出文件: dry-run-100.jsonl"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Downstream Smoke 1000",
+      "description": "跑 1000 篇, 验证 resume、checkpoint、吞吐、错误类型分布",
+      "acceptanceCriteria": [
+        "1000 条完整 JSONL 记录",
+        "resume 可用 (中断后可继续)",
+        "错误分类完整",
+        "吞吐 ≥ 50 篇/小时",
+        "输出文件: smoke-1000.jsonl + smoke-checkpoints/"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Full 93K Downstream Batch",
+      "description": "对 93,000 篇做全量结构化抽取",
+      "acceptanceCriteria": [
+        "覆盖率 ≥ 98%",
+        "失败率 < 5%",
+        "可 resume",
+        "checkpoint 完整",
+        "输出文件: full-downstream-93k.jsonl + full-checkpoints/"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Quality Report",
+      "description": "统计 JSON parse rate、实体/事件质量、失败分布",
+      "acceptanceCriteria": [
+        "统计完整",
+        "图表可生成",
+        "失败原因分类清晰",
+        "无数据遗漏",
+        "输出文件: quality-report.json + quality-charts/"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Graph Candidate Pack",
+      "description": "生成 entities/events/venues/djs/edges/evidence 候选包",
+      "acceptanceCriteria": [
+        "实体去重合理",
+        "关系可追溯",
+        "冲突 < 10%",
+        "不写生产库",
+        "输出文件: graph-candidate-pack/ (JSON/JSONL)"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Temp Files Cleanup",
+      "description": "清理 27 个 tmp-* 目录和根目录临时文件",
+      "acceptanceCriteria": [
+        "27 个 tmp-* 目录已删除",
+        "根目录 tmp-*.png/txt/json/ps1/bat/mjs/js/html 已删除",
+        "Mac 脚本已删除 (mac_port_scan.py, mac_smoke_test.py)",
+        "DOUBAO 模板已删除 (4 个)",
+        "gpt-image-2 产物已删除 (tmp-pcui-images/)",
+        "NIGHT_WATCHER 日志/zip 已删除",
+        "MEM0 上传文件已删除",
+        "不影响任何功能"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Documentation Consolidation",
+      "description": "归档过期文档, 统一文档口径",
+      "acceptanceCriteria": [
+        "过期 HANDOFF 文件归档到 docs/handoff-archive/",
+        "废弃 docs/superpowers 文档移到 historical/",
+        "重复文档合并或删除",
+        "建立全局数据清单 (GLOBAL_DATA_INVENTORY.md)",
+        "所有 prd.json 统一位置",
+        "manifest.md 为每个计划唯一入口"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Code Quality Baseline",
+      "description": "建立代码质量基线, 记录技术债",
+      "acceptanceCriteria": [
+        "生成 TECH_DEBT.md",
+        "记录 cli.ts 拆分需求",
+        "记录类型重复问题",
+        "记录硬编码路径清单",
+        "记录错误处理不一致问题",
+        "不修改代码"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-010",
+      "title": "GA Monitor Integration",
+      "description": "集成 GA 只读监控, 输出定期摘要",
+      "acceptanceCriteria": [
+        "9 项检查完整",
+        "格式正确",
+        "告警准确",
+        "无越权操作",
+        "输出文件: GA_MONITOR_SUMMARY_*.md (每 10 分钟)"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-011",
+      "title": "Final Report and Handoff",
+      "description": "生成最终报告、handoff、下一阶段计划",
+      "acceptanceCriteria": [
+        "所有指标可追溯",
+        "计划清晰",
+        "mem0 记录完整",
+        "输出文件: FINAL_HANDOFF_*.md + NEXT_PHASE_PLAN.md"
+      ],
+      "priority": 11,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}

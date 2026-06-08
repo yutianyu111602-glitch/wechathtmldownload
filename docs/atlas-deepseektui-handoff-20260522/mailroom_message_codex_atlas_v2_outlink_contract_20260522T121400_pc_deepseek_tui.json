@@ -1,0 +1,80 @@
+{
+  "schema_version": "mailroom.message.v2",
+  "type": "TASK_STATUS_UPDATE",
+  "message_id": "codex_atlas_v2_outlink_contract_20260522T121400_pc_deepseek_tui",
+  "sender": "codex",
+  "receiver": "pc_deepseek_tui",
+  "created_at": "2026-05-22T12:14:00+08:00",
+  "priority": "high",
+  "risk_level": "low",
+  "requires_ack": false,
+  "requires_result": false,
+  "intent": "notify_atlas_public_graph_recovery_v2_and_outlink_avatar_field_contract",
+  "parts": [
+    {
+      "kind": "TextPart",
+      "text": "Codex completed deterministic Atlas public graph recovery v2. Venue/city gaps were greatly reduced without paid APIs or LLM calls. DeepSeekTUI should keep avatar/outlink work as a report-only identity evidence sidecar and follow the field contract."
+    },
+    {
+      "kind": "DataPart",
+      "data": {
+        "project": "C:\\code\\githubstar\\wechathtmldownload",
+        "wsl_project": "/mnt/c/code/githubstar/wechathtmldownload",
+        "report": "C:\\code\\githubstar\\wechathtmldownload\\reports\\ATLAS_PUBLIC_GRAPH_RECOVERY_V2_20260522.md",
+        "wsl_report": "/mnt/c/code/githubstar/wechathtmldownload/reports/ATLAS_PUBLIC_GRAPH_RECOVERY_V2_20260522.md",
+        "field_contract": "C:\\code\\githubstar\\wechathtmldownload\\docs\\atlas-deepseektui-handoff-20260522\\OUTLINK_AVATAR_FIELD_CONTRACT_20260522.md",
+        "wsl_field_contract": "/mnt/c/code/githubstar/wechathtmldownload/docs/atlas-deepseektui-handoff-20260522/OUTLINK_AVATAR_FIELD_CONTRACT_20260522.md",
+        "strict_public_db_v2": "C:\\code\\githubstar\\wechathtmldownload\\reports\\atlas_serving_recovered_public_v2_20260522\\atlas_serving.sqlite",
+        "strict_public_counts_v2": {
+          "raw_events": 608678,
+          "performance_events": 482108,
+          "dj_profiles": 52503,
+          "dj_event_edges": 1179965,
+          "directed_dj_relation_edges": 659940,
+          "search_docs": 564000,
+          "graph_windows": 52503,
+          "missing_venue_name": 95724,
+          "missing_city": 103313,
+          "missing_starts_at": 163096,
+          "wine_search_hits": 0,
+          "leak_hits": 0
+        },
+        "deepseek_output_contract": {
+          "required_fields": [
+            "subject_id",
+            "display_name",
+            "normalized_name",
+            "alias_used",
+            "platform",
+            "handle",
+            "url_normalized",
+            "avatar_url",
+            "avatar_source_url",
+            "bio_snippet",
+            "evidence_source_url",
+            "evidence_source_title",
+            "evidence_text",
+            "match_type",
+            "confidence",
+            "identity_proof",
+            "accepted_for_graph",
+            "review_status",
+            "risk_flags",
+            "fetched_at"
+          ],
+          "accepted_for_graph_default": false,
+          "identity_proof_rule": "direct official proof or two independent public sources; search snippets alone are candidates only"
+        },
+        "do_not": [
+          "do not write production graph rows directly",
+          "do not export cookies/tokens/private pages/raw HTML/follower lists",
+          "do not expose raw source URLs or archive paths in public serving DB",
+          "do not accept short ambiguous names without extra proof"
+        ]
+      }
+    }
+  ],
+  "business_action_executed": false,
+  "runner_started": false,
+  "db_or_memory_written": false
+}

@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-05-19T22:05:23+00:00",
+  "current_path": "D:\\downstream_results\\stage7_rewrite\\longrun\\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260519\\current.json",
+  "golden_path": "D:\\downstream_results\\golden\\golden_set_v1.jsonl",
+  "release_metrics": {
+    "published_items": 103,
+    "lineup_nonempty": 40,
+    "lineup_nonempty_rate": 0.3883,
+    "missing_lineup_count": 63,
+    "backend_url_line_hits": 51,
+    "backend_url_event_count": 23,
+    "backend_url_event_rate": 0.2233,
+    "city_count": 21
+  },
+  "golden_metrics": {
+    "golden_total": 88,
+    "status_counts": {
+      "pending": 88
+    },
+    "stratum_counts": {
+      "lineup_present": 22,
+      "missing_lineup": 48,
+      "url_backend": 18
+    },
+    "scored": {
+      "verified_count": 0,
+      "pending_count": 88,
+      "lineup_precision_mean": null,
+      "lineup_recall_mean": null,
+      "hard_error_count": 0,
+      "hard_error_rate": null,
+      "per_row": []
+    },
+    "snapshot_drift": [],
+    "snapshot_drift_count": 0
+  },
+  "p0_targets": {
+    "lineup_precision": 0.92,
+    "lineup_recall": 0.75,
+    "backend_url_line_hits": 0
+  }
+}

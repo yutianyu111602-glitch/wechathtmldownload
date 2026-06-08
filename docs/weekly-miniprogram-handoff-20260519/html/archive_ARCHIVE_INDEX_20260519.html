@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>研究档案总索引 — 2026-05-19</title>
+  <style>
+:root {
+  --bg: #f6f7f9;
+  --paper: #ffffff;
+  --ink: #16181d;
+  --muted: #5c6470;
+  --line: #d8dde6;
+  --accent: #2457d6;
+  --accent-soft: #e8eefc;
+  --warn: #8a4b00;
+  --code: #10141f;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+}
+.shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  min-height: 100vh;
+}
+aside {
+  border-right: 1px solid var(--line);
+  background: #f0f3f8;
+  padding: 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+}
+main {
+  max-width: 1120px;
+  width: 100%;
+  padding: 32px;
+}
+.meta, .banner, .content {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.meta { padding: 20px 24px; margin-bottom: 16px; }
+.banner {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  color: var(--warn);
+  background: #fff8e8;
+}
+.content { padding: 24px 32px; }
+h1, h2, h3 { line-height: 1.25; margin: 28px 0 12px; }
+h1 { font-size: 32px; margin-top: 0; }
+h2 { font-size: 22px; border-top: 1px solid var(--line); padding-top: 24px; }
+h3 { font-size: 17px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+nav a {
+  display: block;
+  padding: 6px 0;
+  color: var(--muted);
+}
+nav a.level-1 { color: var(--ink); font-weight: 700; }
+nav a.level-3, nav a.level-4, nav a.level-5, nav a.level-6 { padding-left: 12px; }
+code {
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: "Cascadia Mono", Consolas, monospace;
+}
+pre {
+  background: var(--code);
+  color: #e7edf7;
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+}
+pre code { background: transparent; padding: 0; color: inherit; }
+ul { padding-left: 24px; }
+.kicker {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.title { font-size: 28px; font-weight: 750; margin: 4px 0 8px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  color: var(--muted);
+}
+@media (max-width: 860px) {
+  .shell { display: block; }
+  aside { position: static; height: auto; }
+  main { padding: 20px; }
+  .content { padding: 20px; }
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="kicker">HTML handoff</div>
+      <h1>研究档案总索引 — 2026-05-19</h1>
+      <nav><a class="level-1" href="#研究档案总索引-2026-05-19">研究档案总索引 — 2026-05-19</a>
+<a class="level-2" href="#两轮研究关系-勿混淆">两轮研究关系（勿混淆）</a>
+<a class="level-2" href="#目录清单">目录清单</a>
+<a class="level-3" href="#ldr-raw-20260519-ldr-原始报告-含-json-推理元数据">`ldr_raw_20260519/` — LDR 原始报告（含 JSON 推理元数据）</a>
+<a class="level-3" href="#ldr-source-pack-20260519-ldr-任务提示词">`ldr_source_pack_20260519/` — LDR 任务提示词</a>
+<a class="level-3" href="#deepseek-prompt-matrix-20260518-r1-矩阵结论">`deepseek_prompt_matrix_20260518/` — R1 矩阵结论</a>
+<a class="level-3" href="#p0-golden-20260519-p0-执行档案">`p0_golden_20260519/` — P0 执行档案</a>
+<a class="level-2" href="#接手包内精炼稿-非-archive-为-ssot-阅读入口">接手包内精炼稿（非 archive，为 SSOT 阅读入口）</a>
+<a class="level-2" href="#状态门">状态门</a>
+<a class="level-2" href="#复现-ldr-r2">复现 LDR R2</a></nav>
+    </aside>
+    <main>
+      <section class="meta">
+        <div class="kicker">handoff</div>
+        <div class="title">研究档案总索引 — 2026-05-19</div>
+        <div class="grid">
+          <div><strong>Source</strong><br>C:\code\githubstar\wechathtmldownload\docs\weekly-miniprogram-handoff-20260519\archive\ARCHIVE_INDEX_20260519.md</div>
+          <div><strong>Generated</strong><br>2026-05-20 06:07 +0800</div>
+        </div>
+      </section>
+      <section class="banner">
+        Static derived artifact. Keep the source Markdown or structured notes as the source of truth. Do not add secrets to this HTML.
+      </section>
+      <article class="content">
+<h1 id="研究档案总索引-2026-05-19">研究档案总索引 — 2026-05-19</h1>
+<p>本目录为 <strong>周活小程序接手包</strong> 的只读档案库，汇总两轮深度研究 + P0 执行产物。 权威编辑稿在上一级 <code>docs/weekly-miniprogram-handoff-20260519/*.md</code>；此处保留 <strong>原始推理输出</strong> 便于审计复现。</p>
+<h2 id="两轮研究关系-勿混淆">两轮研究关系（勿混淆）</h2>
+<p>| 轮次 | 名称 | 引擎 | 产出 | 用途 | |------|------|------|------|------| | <strong>R1</strong> | DeepSeek Prompt Matrix | <code>deepseek-v4-flash</code> / <code>pro</code> 在线 API + 评测脚本 | <code>deepseek_prompt_matrix_20260518/</code> | 生产模型策略：Flash 全量 + Pro 风险行；<code>yellowpage_gate_v3</code> | | <strong>R2a</strong> | LDR 深度研究 · 计划一 | LDR + <code>deepseek-v4-pro</code> @ api.deepseek.com | <code>ldr_raw_20260519/weekly_plan_a_*</code> | 强化 → <a href="../PLAN_A_DEEPRESEARCH_v2.md">PLAN_A_DEEPRESEARCH_v2.md</a> | | <strong>R2b</strong> | LDR 深度研究 · 计划二 | 同上 | <code>ldr_raw_20260519/weekly_plan_b_*</code> | 强化 → <a href="../PLAN_B_DEEPRESEARCH_v2.md">PLAN_B_DEEPRESEARCH_v2.md</a> |</p>
+<p>R2 运行记录：<a href="../DEEPRESEARCH_RUN_20260519.md">DEEPRESEARCH_RUN_20260519.md</a></p>
+<h2 id="目录清单">目录清单</h2>
+<h3 id="ldr-raw-20260519-ldr-原始报告-含-json-推理元数据"><code>ldr_raw_20260519/</code> — LDR 原始报告（含 JSON 推理元数据）</h3>
+<p>| 文件 | 说明 | |------|------| | <code>weekly_plan_a_deepseek_v4_pro_20260519.md</code> | 计划一候选全文；<code>model=deepseek-v4-pro</code>，<code>endpoint=https://api.deepseek.com</code> | | <code>weekly_plan_b_deepseek_v4_pro_20260519.md</code> | 计划二候选全文 |</p>
+<p>主副本仍保留：<code>C:\code\local-deep-research-wechat\data\research_outputs\</code>（本 archive 为接手包内镜像）。</p>
+<h3 id="ldr-source-pack-20260519-ldr-任务提示词"><code>ldr_source_pack_20260519/</code> — LDR 任务提示词</h3>
+<p>| 文件 | 说明 | |------|------| | <code>research_query_plan_a.md</code> | 发给 LDR 的计划一研究任务 | | <code>research_query_plan_b.md</code> | 发给 LDR 的计划二研究任务 |</p>
+<p>完整源包（10 份 MD）：<code>C:\code\local-deep-research-wechat\source_pack\weekly_plan_deepresearch_20260519\</code></p>
+<h3 id="deepseek-prompt-matrix-20260518-r1-矩阵结论"><code>deepseek_prompt_matrix_20260518/</code> — R1 矩阵结论</h3>
+<p>| 文件 | 说明 | |------|------| | <code>weekly_deepseek_prompt_matrix_20260518_FINDINGS.md</code> | Flash/Pro × thinking × prompt 评测结论 |</p>
+<h3 id="p0-golden-20260519-p0-执行档案"><code>p0_golden_20260519/</code> — P0 执行档案</h3>
+<p>| 文件 | 说明 | |------|------| | <code>golden_set_v1.jsonl</code> | 88 条金标种子（<code>annotation_status: pending</code>） | | <code>golden_set_v1.manifest.json</code> | 引导 manifest | | <code>golden_baseline_20260519.json</code> | 机器可读 baseline | | <code>golden_baseline_20260519.md</code> | 人类可读 baseline（与 <a href="../P0_BASELINE_REPORT_20260519.md">P0_BASELINE_REPORT</a> 同内容） |</p>
+<p>工作副本：<code>D:\downstream_results\golden\</code>（与 archive 内 jsonl 同步于 2026-05-19 引导时）。</p>
+<h2 id="接手包内精炼稿-非-archive-为-ssot-阅读入口">接手包内精炼稿（非 archive，为 SSOT 阅读入口）</h2>
+<p>| 层级 | 文件 | |------|------| | v1 概要 | <code>PLAN_A_WEEKLY_*.md</code>, <code>PLAN_B_WEEKLY_*.md</code> | | <strong>v2 实施稿</strong> | <code>PLAN_A_DEEPRESEARCH_v2.md</code>, <code>PLAN_B_DEEPRESEARCH_v2.md</code> | | L0 契约 | <code>WeeklyAtlasEntityContract.md</code> | | P0 状态 | <code>P0_EXECUTION_STATUS_20260519.md</code>, <code>P0_BASELINE_REPORT_20260519.md</code> | | 主接手 | <code>NEXT_AGENT_HANDOFF_WEEKLY_MINIPROGRAM_FULL.md</code> |</p>
+<h2 id="状态门">状态门</h2>
+<p>| 档案类型 | <code>confirmed_truth</code> | 下一门 | |----------|-------------------|--------| | LDR R2 原始报告 | <strong>false</strong>（候选研究） | HOLD_FOR_HERMES_DECISION | | v2 精炼稿 | <strong>false</strong>（设计稿） | 用户批准 → P0/P1 实施 | | P0 golden/baseline | <strong>事实快照</strong>（可复现） | 待人工 verified |</p>
+<h2 id="复现-ldr-r2">复现 LDR R2</h2>
+<p>见 <a href="../DEEPRESEARCH_RUN_20260519.md">DEEPRESEARCH_RUN_20260519.md</a> 内 <code>docker exec ldr-wechat-research ...</code> 命令。</p>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

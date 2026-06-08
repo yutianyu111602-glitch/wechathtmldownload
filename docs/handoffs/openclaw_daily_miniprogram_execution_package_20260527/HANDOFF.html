@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenClaw Daily Mini-Program Execution Handoff</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; margin: 32px; line-height: 1.55; color: #172033; background: #f7f8fb; }
+    main { max-width: 980px; margin: 0 auto; background: #fff; border: 1px solid #d9deea; border-radius: 8px; padding: 28px 34px; }
+    h1 { font-size: 28px; margin: 0 0 8px; }
+    h2 { font-size: 18px; margin-top: 28px; border-bottom: 1px solid #e5e8f0; padding-bottom: 6px; }
+    h3 { font-size: 15px; margin-top: 18px; }
+    code { background: #eef2f8; padding: 1px 4px; border-radius: 4px; }
+    ul { padding-left: 22px; }
+    .meta { color: #59667a; margin-bottom: 22px; }
+    .warn { background: #fff7e6; border: 1px solid #f2cf89; padding: 12px 14px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>OpenClaw Daily Mini-Program Execution Handoff</h1>
+  <div class="meta">Updated: 2026-05-27 22:10 CST</div>
+
+  <h2>Main Problem</h2>
+  <p>Daily WeChat mini-program source/update work needs to move from ad hoc Codex operation to a repeatable OpenClaw-run workflow with clear auth, source, release, frontend, and SSOT boundaries.</p>
+
+  <h2>Scope</h2>
+  <ul>
+    <li>Repo: <code>C:\code\githubstar\wechathtmldownload</code></li>
+    <li>Branch observed before package write: <code>feature/weekly-integrated-bridge</code></li>
+    <li>In scope: T1 source intake, T2 backend/resource gates, T3 frontend boundary, T7 docs closeout, and conversation-derived operating knowledge.</li>
+    <li>Out of scope: WeChat review, public release claims, Atlas mutation, Windows OpenClaw/Hermes, Telegram, old mailroom, 9router, Ollama chat.</li>
+  </ul>
+
+  <h2>Confirmed Current Reality</h2>
+  <ul>
+    <li>Latest T3 developer upload: <code>2026.05.27.7</code>; not public/reviewed.</li>
+    <li>Operator-recorded online mini-program version: <code>2026.05.26.1</code>.</li>
+    <li>T2/T3 drift gate currently blocks release claims.</li>
+    <li>OpenClaw default model route should be direct DeepSeek API model <code>deepseek/deepseek-v4-pro</code>.</li>
+    <li>Dirty repo state was backed up to <code>C:\code\.git-workspace-backups\wechathtmldownload\20260527-221022</code>.</li>
+  </ul>
+
+  <h2>Next Best Entry</h2>
+  <p>Open <code>OPENCLAW_EXECUTION_PROMPT.md</code>, paste it to OpenClaw, then read <code>OPENCLAW_OPERATING_KNOWLEDGE.md</code> and run <code>DAILY_RUNBOOK.md</code> step 1 to prove exporter/session state before any queue/package/deploy work.</p>
+
+  <h2>Warnings</h2>
+  <div class="warn">
+    Do not collapse developer upload, WeChat review, and public visibility. Do not claim auth refresh if the wrapper returns <code>login_qr_upstream_unavailable</code>. Do not overwrite <code>current_release</code> to bypass drift. Do not read secrets or scan D-root paths.
+  </div>
+
+  <h2>OpenHuman / HTML Status</h2>
+  <ul>
+    <li>OpenHuman import: no; <code>C:\Users\pc\.openhuman\active_user.toml</code> is missing.</li>
+    <li>Canonical artifact: <code>HANDOFF.md</code>.</li>
+    <li>HTML companion: this file.</li>
+  </ul>
+</main>
+</body>
+</html>

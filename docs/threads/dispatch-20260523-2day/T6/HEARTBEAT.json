@@ -1,0 +1,23 @@
+{
+  "thread": "T6",
+  "updated_at": "2026-05-27T21:56:00+08:00",
+  "status": "year_context_review_blocked_source_artifact_recovery_pending",
+  "last_primary_queue": "T6_time_title_year_context_review",
+  "last_result": "Consumed 1366 year-context review rows and released 0 deterministic ready rows. Blocked split: source-artifact required 443, weekday-year review 647, conflict/ambiguous 276, multi-event guide/news 41; leak hits 0/0/0.",
+  "last_evidence": [
+    "reports/ATLAS_T6_TIME_TITLE_YEAR_CONTEXT_REVIEW_20260527.md",
+    "tools/stage7_rewrite/reports/atlas_t6_time_title_year_context_review_20260527/year_context_review_summary.json",
+    "tools/stage7_rewrite/reports/atlas_t6_time_title_year_context_review_20260527/year_context_source_artifact_required_rows.jsonl",
+    "tools/stage7_rewrite/reports/atlas_t6_time_title_year_context_review_20260527/year_context_weekday_review_required_rows.jsonl"
+  ],
+  "stop_reason": "year_context_rows_blocked_no_safe_deterministic_ready_rows",
+  "wait_reason": "Continue source-artifact and weekday-year review lanes; do not promote title-only year context into T5 write gates.",
+  "next_resume_pointer": "tools/stage7_rewrite/reports/atlas_t6_time_title_year_context_review_20260527/year_context_source_artifact_required_rows.jsonl",
+  "next_recovery_pointers": [
+    "tools/stage7_rewrite/reports/atlas_t6_time_title_year_context_review_20260527/year_context_source_artifact_required_rows.jsonl",
+    "tools/stage7_rewrite/reports/atlas_t6_time_title_year_context_review_20260527/year_context_weekday_review_required_rows.jsonl",
+    "tools/stage7_rewrite/reports/atlas_t6_time_title_exact_date_recovery_20260527/relative_date_source_context_required_rows.jsonl",
+    "tools/stage7_rewrite/reports/atlas_t5_time_city_venue_gap_closure_20260527/source_ocr_gap_recovery_work_orders.jsonl",
+    "tools/stage7_rewrite/reports/atlas_t6_avatar_binary_storage_provenance_gate_20260527/avatar_binary_storage_blocked_rows.jsonl"
+  ]
+}

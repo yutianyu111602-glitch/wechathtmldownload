@@ -1,0 +1,166 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="HUAIDJ Architecture">
+    <mxGraphModel dx="1434" dy="844" grid="1" gridSize="10">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- DATA SOURCES -->
+        <mxCell id="src-label" value="DATA SOURCES" style="text;fontSize=14;fontStyle=1;align=center;fillColor=#fff2cc" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="200" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="wechat" value="WeChat 公众号文章" style="rounded=1;fillColor=#dae8fc" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="200" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="atlas" value="Atlas 数据源 (RA/SC/web)" style="rounded=1;fillColor=#dae8fc" vertex="1" parent="1">
+          <mxGeometry x="40" y="110" width="200" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- ARROWS: sources -> pipeline -->
+        <mxCell id="a1" style="edgeStyle=orthogonalEdgeStyle;endArrow=classic" edge="1" parent="1" source="wechat">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="300" y="80" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- PIPELINE -->
+        <mxCell id="pipe-label" value="STAGE7 PIPELINE (Python)" style="text;fontSize=14;fontStyle=1;align=center;fillColor=#fff2cc" vertex="1" parent="1">
+          <mxGeometry x="300" y="20" width="240" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="ocr" value="OCR / Markdown" style="rounded=1;fillColor=#e1d5e7" vertex="1" parent="1">
+          <mxGeometry x="300" y="60" width="110" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="llm" value="DeepSeek LLM 提取" style="rounded=1;fillColor=#e1d5e7" vertex="1" parent="1">
+          <mxGeometry x="430" y="60" width="110" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="pack" value="build API pack" style="rounded=1;fillColor=#e1d5e7" vertex="1" parent="1">
+          <mxGeometry x="300" y="110" width="110" height="40" as="geometry"/>
+        </mxCell>
+        <mxCell id="merge" value="Entity Merge Pipeline" style="rounded=1;fillColor=#e1d5e7" vertex="1" parent="1">
+          <mxGeometry x="430" y="110" width="110" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- ARROWS pipeline -> API -->
+        <mxCell id="a2" style="edgeStyle=orthogonalEdgeStyle;endArrow=classic" edge="1" parent="1" source="pack">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="600" y="130" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- CloudRun -->
+        <mxCell id="cr-label" value="CloudRun API" style="text;fontSize=14;fontStyle=1;align=center;fillColor=#fff2cc" vertex="1" parent="1">
+          <mxGeometry x="600" y="20" width="200" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="server" value="server.mjs (Node 20)" style="rounded=1;fillColor=#d5e8d4" vertex="1" parent="1">
+          <mxGeometry x="600" y="60" width="200" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="store" value="dataStore.mjs (JSON)" style="rounded=1;fillColor=#d5e8d4" vertex="1" parent="1">
+          <mxGeometry x="600" y="100" width="200" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="atlas-sql" value="Atlas SQLite (2.2GB)" style="rounded=1;fillColor=#d5e8d4" vertex="1" parent="1">
+          <mxGeometry x="600" y="140" width="200" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="merge-map" value="merge_map.json" style="rounded=1;fillColor=#d5e8d4" vertex="1" parent="1">
+          <mxGeometry x="600" y="180" width="200" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="deepseek" value="DeepSeek API (LLM)" style="rounded=1;fillColor=#f8cecc" vertex="1" parent="1">
+          <mxGeometry x="600" y="220" width="200" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- ARROW API -> mini program -->
+        <mxCell id="a3" style="edgeStyle=orthogonalEdgeStyle;endArrow=classic" edge="1" parent="1" source="server">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="880" y="80" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- CloudBase -->
+        <mxCell id="cb-label" value="CloudBase" style="text;fontSize=12;fontStyle=1;align=center;fillColor=#fff2cc" vertex="1" parent="1">
+          <mxGeometry x="880" y="20" width="160" height="25" as="geometry"/>
+        </mxCell>
+        <mxCell id="storage" value="CloudBase Storage (海报)" style="rounded=1;fillColor=#ffe6cc" vertex="1" parent="1">
+          <mxGeometry x="880" y="55" width="160" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="hotdb" value="CloudBase DB (weeklyDataSync)" style="rounded=1;fillColor=#ffe6cc" vertex="1" parent="1">
+          <mxGeometry x="880" y="95" width="160" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="aifunc" value="weeklyAiProxy (Hunyuan)" style="rounded=1;fillColor=#ffe6cc" vertex="1" parent="1">
+          <mxGeometry x="880" y="135" width="160" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- CDN -->
+        <mxCell id="cdn" value="CDN (entity-posterocr6)" style="rounded=1;fillColor=#ffe6cc" vertex="1" parent="1">
+          <mxGeometry x="880" y="175" width="160" height="30" as="geometry"/>
+        </mxCell>
+
+        <!-- ARROW CloudBase -> mini program -->
+        <mxCell id="a4" style="edgeStyle=orthogonalEdgeStyle;endArrow=classic" edge="1" parent="1" source="hotdb">
+          <mxGeometry relative="1" as="geometry"><mxPoint x="1120" y="110" as="targetPoint"/></mxGeometry>
+        </mxCell>
+
+        <!-- Mini Program -->
+        <mxCell id="mp-label" value="微信小程序" style="text;fontSize=14;fontStyle=1;align=center;fillColor=#fff2cc" vertex="1" parent="1">
+          <mxGeometry x="1120" y="20" width="240" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="pages" value="12 Pages (index/detail/map...)" style="rounded=1;fillColor=#d5e8d4" vertex="1" parent="1">
+          <mxGeometry x="1120" y="60" width="240" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="utils" value="utils/ (api/format/poster/source...)" style="rounded=1;fillColor=#d5e8d4" vertex="1" parent="1">
+          <mxGeometry x="1120" y="100" width="240" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="fallback" value="4级降级: DB→API→Cache→Snapshot" style="rounded=1;fillColor=#d5e8d4" vertex="1" parent="1">
+          <mxGeometry x="1120" y="140" width="240" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="poster-cl" value="海报: cloud://→tempURL→download" style="rounded=1;fillColor=#d5e8d4" vertex="1" parent="1">
+          <mxGeometry x="1120" y="180" width="240" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="setdata" value="v1.3.0: setData 减荷 (_fullItems)" style="rounded=1;fillColor=#d5e8d4" vertex="1" parent="1">
+          <mxGeometry x="1120" y="220" width="240" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="version" value="v1.4.0 (166条, CDN fallback)" style="text;fontSize=11;align=center;fillColor=#f8cecc" vertex="1" parent="1">
+          <mxGeometry x="1120" y="260" width="240" height="25" as="geometry"/>
+        </mxCell>
+
+        <!-- STATS -->
+        <mxCell id="stats-label" value="ATLAS 图谱 Stats" style="text;fontSize=14;fontStyle=1;align=center;fillColor=#fff2cc" vertex="1" parent="1">
+          <mxGeometry x="40" y="180" width="500" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="s1" value="DJs: 45,215 (from 53,555)" style="rounded=1;fillColor=#f5f5f5" vertex="1" parent="1">
+          <mxGeometry x="40" y="220" width="240" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="s2" value="Venues: 3,275 (from 5,767)" style="rounded=1;fillColor=#f5f5f5" vertex="1" parent="1">
+          <mxGeometry x="300" y="220" width="240" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="s3" value="Events: 508,049 (1.2M DJ edges)" style="rounded=1;fillColor=#f5f5f5" vertex="1" parent="1">
+          <mxGeometry x="40" y="265" width="240" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="s4" value="Merge: 11,369 decisions ($15 v4-flash)" style="rounded=1;fillColor=#f5f5f5" vertex="1" parent="1">
+          <mxGeometry x="300" y="265" width="240" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="s5" value="Weekly: 166 items, 06-02~06-16" style="rounded=1;fillColor=#f5f5f5" vertex="1" parent="1">
+          <mxGeometry x="40" y="310" width="240" height="35" as="geometry"/>
+        </mxCell>
+        <mxCell id="s6" value="Geo: 0 missing, Posters: cloud://" style="rounded=1;fillColor=#f5f5f5" vertex="1" parent="1">
+          <mxGeometry x="300" y="310" width="240" height="35" as="geometry"/>
+        </mxCell>
+
+        <!-- PROVIDER STATUS -->
+        <mxCell id="prov-label" value="Provider Status (2026-06-08)" style="text;fontSize=14;fontStyle=1;align=center;fillColor=#fff2cc" vertex="1" parent="1">
+          <mxGeometry x="40" y="380" width="500" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="p1" value="DeepSeek v4-pro/flash: OK 直连" style="rounded=1;fillColor=#d5e8d4" vertex="1" parent="1">
+          <mxGeometry x="40" y="420" width="240" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2" value="Zhipu GLM-5.1: OK 直连" style="rounded=1;fillColor=#d5e8d4" vertex="1" parent="1">
+          <mxGeometry x="300" y="420" width="240" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3" value="Kimi Moonshot: OK 直连" style="rounded=1;fillColor=#d5e8d4" vertex="1" parent="1">
+          <mxGeometry x="40" y="460" width="240" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="p4" value="MiMo: 9Router (fake-ip blocked)" style="rounded=1;fillColor=#ffe6cc" vertex="1" parent="1">
+          <mxGeometry x="300" y="460" width="240" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="p5" value="Ollama bge-m3 (1024d): 本地" style="rounded=1;fillColor=#e1d5e7" vertex="1" parent="1">
+          <mxGeometry x="40" y="500" width="240" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="p6" value="StepFun 3.7 Flash: OK 直连" style="rounded=1;fillColor=#d5e8d4" vertex="1" parent="1">
+          <mxGeometry x="300" y="500" width="240" height="30" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

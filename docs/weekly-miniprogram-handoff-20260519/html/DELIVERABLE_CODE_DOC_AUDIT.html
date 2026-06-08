@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>交付物：周活小程序代码与文档只读审计</title>
+  <style>
+:root {
+  --bg: #f6f7f9;
+  --paper: #ffffff;
+  --ink: #16181d;
+  --muted: #5c6470;
+  --line: #d8dde6;
+  --accent: #2457d6;
+  --accent-soft: #e8eefc;
+  --warn: #8a4b00;
+  --code: #10141f;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+}
+.shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  min-height: 100vh;
+}
+aside {
+  border-right: 1px solid var(--line);
+  background: #f0f3f8;
+  padding: 24px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+}
+main {
+  max-width: 1120px;
+  width: 100%;
+  padding: 32px;
+}
+.meta, .banner, .content {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.meta { padding: 20px 24px; margin-bottom: 16px; }
+.banner {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  color: var(--warn);
+  background: #fff8e8;
+}
+.content { padding: 24px 32px; }
+h1, h2, h3 { line-height: 1.25; margin: 28px 0 12px; }
+h1 { font-size: 32px; margin-top: 0; }
+h2 { font-size: 22px; border-top: 1px solid var(--line); padding-top: 24px; }
+h3 { font-size: 17px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+nav a {
+  display: block;
+  padding: 6px 0;
+  color: var(--muted);
+}
+nav a.level-1 { color: var(--ink); font-weight: 700; }
+nav a.level-3, nav a.level-4, nav a.level-5, nav a.level-6 { padding-left: 12px; }
+code {
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: "Cascadia Mono", Consolas, monospace;
+}
+pre {
+  background: var(--code);
+  color: #e7edf7;
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+}
+pre code { background: transparent; padding: 0; color: inherit; }
+ul { padding-left: 24px; }
+.kicker {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.title { font-size: 28px; font-weight: 750; margin: 4px 0 8px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  color: var(--muted);
+}
+@media (max-width: 860px) {
+  .shell { display: block; }
+  aside { position: static; height: auto; }
+  main { padding: 20px; }
+  .content { padding: 20px; }
+  .grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="kicker">HTML handoff</div>
+      <h1>交付物：周活小程序代码与文档只读审计</h1>
+      <nav><a class="level-1" href="#交付物-周活小程序代码与文档只读审计">交付物：周活小程序代码与文档只读审计</a>
+<a class="level-2" href="#1-现场验证">1. 现场验证</a>
+<a class="level-2" href="#2-代码地图-4500-行应用代码">2. 代码地图（~4500 行应用代码）</a>
+<a class="level-2" href="#3-cloudrun-weekly-api">3. CloudRun weekly API</a>
+<a class="level-2" href="#4-缺陷清单">4. 缺陷清单</a>
+<a class="level-2" href="#5-文档审计">5. 文档审计</a>
+<a class="level-3" href="#权威">权威</a>
+<a class="level-3" href="#漂移">漂移</a>
+<a class="level-2" href="#6-管线契约">6. 管线契约</a>
+<a class="level-2" href="#7-lineup-审计数据点">7. lineup 审计数据点</a>
+<a class="level-2" href="#8-建议下一动作-只读优先">8. 建议下一动作（只读优先）</a></nav>
+    </aside>
+    <main>
+      <section class="meta">
+        <div class="kicker">handoff</div>
+        <div class="title">交付物：周活小程序代码与文档只读审计</div>
+        <div class="grid">
+          <div><strong>Source</strong><br>C:\code\githubstar\wechathtmldownload\docs\weekly-miniprogram-handoff-20260519\DELIVERABLE_CODE_DOC_AUDIT.md</div>
+          <div><strong>Generated</strong><br>2026-05-19 20:37 +0800</div>
+        </div>
+      </section>
+      <section class="banner">
+        Static derived artifact. Keep the source Markdown or structured notes as the source of truth. Do not add secrets to this HTML.
+      </section>
+      <article class="content">
+<h1 id="交付物-周活小程序代码与文档只读审计">交付物：周活小程序代码与文档只读审计</h1>
+<p>Audited: 2026-05-19 Scope: mini-program + weekly CloudRun API + weekly docs（不含图鉴实现）</p>
+<h2 id="1-现场验证">1. 现场验证</h2>
+<p>| 项 | 结果 | |----|------| | release guardian @ 20260519 包 | ok=true | | backendRawHits / visibleHits | 51 / 0 | | 远端 current + enrichment | 103 / 103 | | 小程序单测 | 24/24 pass | | DevTools E2E | 本机 cliPath 失败（非阻塞） |</p>
+<h2 id="2-代码地图-4500-行应用代码">2. 代码地图（~4500 行应用代码）</h2>
+<p>| 文件 | 行数 | 结论 | |------|------|------| | utils/api.js | 453 | 四级 fallback，强 | | utils/format.js | 542 | 展示契约，掩盖 51 URL | | pages/index/index.js | 462 | 全量分页；onLoad 无 query | | pages/venue/venue.js | 64 | limit=100，注释未实现分页 | | utils/posterPool.js | 109 | 48/24 海报池，有测 | | tests/*.cjs | ~1500 | 24 pass |</p>
+<p>无自定义组件；8 页面。</p>
+<h2 id="3-cloudrun-weekly-api">3. CloudRun weekly API</h2>
+<ul>
+<li>只读文件 API；<code>dataStore.dedupeItems</code> 服务端去重</li>
+<li>小程序用：current, items/:id, batch, source/:hash, poster/:id, cities, dates</li>
+<li>Stage7 路由同服但小程序未调用</li>
+</ul>
+<h2 id="4-缺陷清单">4. 缺陷清单</h2>
+<p>| ID | 严重度 | 问题 | |----|--------|------| | MP-1 | P0 | 51 URL 在 description_original_lines | | MP-2 | P1 | 63/103 missing_lineup | | MP-3 | P1 | venue/artist 仅 100 条 | | MP-4 | P2 | city→index 深链断裂 | | MP-5 | P2 | 三处去重可能漂移 | | MP-6 | P3 | miniprogram-ci 未入 package.json | | MP-7 | P3 | DevTools E2E 环境未就绪 |</p>
+<h2 id="5-文档审计">5. 文档审计</h2>
+<h3 id="权威">权威</h3>
+<ul>
+<li>NEXT_AGENT_HANDOFF_20260519_OPENCLAW_DAILY_RELEASE.md</li>
+<li>OPENCLAW_WEEKLY_DAILY_UPDATE_RUNBOOK.md</li>
+<li>OPENCLAW_AUTOMATION.md（顶部口径）</li>
+<li>SSOT.md weekly 专节</li>
+<li>WEEKLY_ACTIVITY_PUBLISHED_SCHEMA_V1</li>
+</ul>
+<h3 id="漂移">漂移</h3>
+<p>| 文档 | 应为 | |------|------| | DOCUMENTATION_INDEX.md | api-033 / 103 | | current-runtime.md weekly 段 | 同上 | | weekly_miniprogram_final_project_summary | 103 非 107 |</p>
+<h2 id="6-管线契约">6. 管线契约</h2>
+<p>| 门 | 构建 | 小程序 | 一致 | |----|------|--------|------| | 无 source URL | filter | READY only | ok | | needs_ocr_review | filter | 不展示 | ok | | URL in UI | 未清 build | format 滤 | <strong>分裂</strong> | | dj_bio | 恒 [] | 不展示 | 设计 |</p>
+<h2 id="7-lineup-审计数据点">7. lineup 审计数据点</h2>
+<ul>
+<li>repair 20260519：<code>lineup_cleared</code> 34</li>
+<li>audit materialized：<code>missing_lineup</code> 63</li>
+<li>biofix2 历史：100 条中 16 有 lineup，hard_fail 0</li>
+</ul>
+<h2 id="8-建议下一动作-只读优先">8. 建议下一动作（只读优先）</h2>
+<p>1. guardian + 远端 reconcile（每日） 2. 确认 cron 脚本与 wrapper 一致性 3. 用户批准后：P0 golden（计划一）+ URL 清洗（本交付物）</p>
+      </article>
+    </main>
+  </div>
+</body>
+</html>

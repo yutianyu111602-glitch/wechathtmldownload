@@ -1,0 +1,21 @@
+{
+  "thread": "T5",
+  "updated_at": "2026-05-27T21:56:00+08:00",
+  "status": "final_time_city_year_span_candidate_preflight_ready_public_upload_disabled",
+  "last_primary_queue": "T5_final_serving_candidate_promotion_preflight",
+  "last_result": "Validated the cumulative time/city/year-span report-local serving candidate against the selected baseline. Counts matched, graph-window gap was 0, duplicate normalized profile groups were 0, and forbidden schema/value plus hard-noise hits were empty. Decision promotion_preflight_passed_local_only.",
+  "last_evidence": [
+    "reports/ATLAS_T5_T6_TIME_CITY_YEAR_SPAN_FINAL_CANDIDATE_PREFLIGHT_20260527.md",
+    "reports/atlas_serving_time_city_year_span_final_candidate_preflight_20260527_2145/promotion_preflight.json",
+    "reports/atlas_serving_time_overlay_span_split_search_date_refresh_candidate_20260527_2018/atlas_serving.sqlite",
+    "reports/atlas_serving_participant_delta_current_20260526_0016/atlas_serving.sqlite"
+  ],
+  "stop_reason": "final_candidate_preflight_ready_public_upload_disabled",
+  "wait_reason": "Public upload disabled. Keep this local candidate ready for a later explicit publish gate and route local data-quality work to T6.",
+  "next_resume_pointer": "reports/atlas_serving_time_city_year_span_final_candidate_preflight_20260527_2145/promotion_preflight.json",
+  "next_fallback_pointers": [
+    "tools/stage7_rewrite/reports/atlas_t6_time_title_year_context_review_20260527/year_context_source_artifact_required_rows.jsonl",
+    "tools/stage7_rewrite/reports/atlas_t6_time_title_exact_date_recovery_20260527/relative_date_source_context_required_rows.jsonl",
+    "tools/stage7_rewrite/reports/atlas_t5_time_city_venue_gap_closure_20260527/source_ocr_gap_recovery_work_orders.jsonl"
+  ]
+}

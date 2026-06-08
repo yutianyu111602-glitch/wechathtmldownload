@@ -1,0 +1,514 @@
+{
+  "project": "Hermes 7-Day WSL2 Super Longrun",
+  "branchName": "ralph/hermes-7day-wsl2",
+  "description": "WSL2 Hermes Agent orchestrates 7-day continuous WeChat article capture pipeline with deepseek-v4-pro planning and Qwen3.6-27B local extraction",
+  "version": "1.0",
+  "generatedAt": "2026-04-28T00:00:00+08:00",
+  "timezone": "Asia/Singapore",
+  "primaryGoal": "Safe 7-day Hermes WSL2 execution of WeChat capture + downstream processing without modifying release data",
+  "sourceFacts": {
+    "hermesRepo": "C:/code/Hermes",
+    "workspace": "C:/code/githubstar/wechathtmldownload",
+    "releaseRoot": "D:/DDownload/_llm_release_v2",
+    "captureOutput": "D:/HTML/hermes-longrun-2026-04-28",
+    "totalExistingArticles": 93000,
+    "modelProvider": "deepseek-v4-pro",
+    "localModel": "Qwen3.6-27B",
+    "localEndpoint": "http://127.0.0.1:11434",
+    "mem0Endpoint": "http://127.0.0.1:11434/v1",
+    "temperature": 0.1,
+    "topP": 0.9,
+    "maxTokens": 2048
+  },
+  "hardBans": [
+    "Do not modify D:/DDownload/_llm_release_v2",
+    "Do not recursive scan D:/DDownload or D:/aidata",
+    "Do not delete any data/log/lock/DB files",
+    "Do not start OpenClaw/AG as controller",
+    "Do not use OpenRouter fallback without approval",
+    "Do not auto-fix failed capture tasks",
+    "Do not run Windows UI automation without window verification",
+    "Do not commit/push to git automatically",
+    "Do not run wsl --shutdown during active capture",
+    "Do not store API keys in mem0"
+  ],
+  "userStories": [
+    {
+      "id": "US-000",
+      "title": "Hermes WSL2 Setup & Preflight",
+      "priority": 0,
+      "day": "Day 0",
+      "status": "ready",
+      "description": "Verify WSL2, Hermes, deepseek-v4-pro, Qwen3.6-27B, mem0, D drive, WeChat window all ready",
+      "inputs": [
+        "WSL2 Ubuntu environment",
+        "Hermes installed at C:/code/Hermes",
+        "deepseek-v4-pro API key"
+      ],
+      "outputs": [
+        "reports/preflight-*.md",
+        "state/run-state.json"
+      ],
+      "acceptanceCriteria": [
+        "WSL2 running and accessible",
+        "Hermes CLI available (hermes --version)",
+        "deepseek-v4-pro API responds",
+        "Qwen3.6-27B model responds at localhost:11434",
+        "mem0 service responds",
+        "D drive free space > 100GB",
+        "WeChat window accessible on Windows",
+        "No dangerous scan processes detected"
+      ],
+      "stopConditions": [
+        "WSL2 not running",
+        "Hermes not installed",
+        "API key missing",
+        "D drive < 50GB"
+      ],
+      "commands": [
+        "wsl --status",
+        "hermes --version",
+        "hermes doctor",
+        "bash scripts/start-hermes-7day.sh preflight"
+      ]
+    },
+    {
+      "id": "US-001",
+      "title": "deepseek-v4-pro Provider Config",
+      "priority": 1,
+      "day": "Day 0",
+      "status": "blocked_by_US-000",
+      "description": "Configure Hermes to use deepseek-v4-pro for planning and decision making",
+      "inputs": [
+        "US-000 preflight PASS",
+        "deepseek-v4-pro API key"
+      ],
+      "outputs": [
+        "config/hermes.config.yaml",
+        "reports/provider-config.md"
+      ],
+      "acceptanceCriteria": [
+        "hermes.config.yaml created with correct model/provider",
+        "hermes config get model returns deepseek-v4-pro",
+        "Test prompt succeeds with deepseek-v4-pro"
+      ],
+      "stopConditions": [
+        "API key invalid",
+        "Provider unreachable"
+      ],
+      "commands": [
+        "hermes model",
+        "hermes config set model deepseek-v4-pro"
+      ]
+    },
+    {
+      "id": "US-002",
+      "title": "Baseline Freeze",
+      "priority": 2,
+      "day": "Day 1",
+      "status": "blocked_by_US-001",
+      "description": "Read-only snapshot of existing data: release v2, capture history, loopy DB, model status",
+      "inputs": [
+        "D:/DDownload/_llm_release_v2/manifest.json",
+        "D:/HTML/.hermes_wechat_history/manifest.jsonl",
+        "D:/HTML/.loopy_archiver/archiver.db"
+      ],
+      "outputs": [
+        "baseline/baseline-snapshot.json",
+        "reports/baseline-*.md"
+      ],
+      "acceptanceCriteria": [
+        "Baseline snapshot includes file counts, sizes, hashes",
+        "No data mutation during baseline",
+        "Snapshot is verifiable against actual state"
+      ],
+      "stopConditions": [
+        "Baseline cannot be written",
+        "Release v2 path mismatch"
+      ],
+      "commands": [
+        "bash scripts/start-hermes-7day.sh baseline"
+      ]
+    },
+    {
+      "id": "US-003",
+      "title": "Context Gate & Queue Build",
+      "priority": 3,
+      "day": "Day 1",
+      "status": "blocked_by_US-002",
+      "description": "Analyze existing 93K articles, identify gaps, build capture queue for new articles",
+      "inputs": [
+        "D:/DDownload/_llm_release_v2/index.jsonl",
+        "Baseline snapshot"
+      ],
+      "outputs": [
+        "queues/capture_queue.jsonl",
+        "queues/existing_coverage.jsonl",
+        "reports/context-gate-report.md"
+      ],
+      "acceptanceCriteria": [
+        "Capture queue contains URLs not in existing release",
+        "Queue count reconciles with baseline",
+        "No recursive scan performed"
+      ],
+      "stopConditions": [
+        "Queue count mismatch > 5% unexplained",
+        "Index parse failure"
+      ],
+      "commands": [
+        "bash scripts/start-hermes-7day.sh context-gate"
+      ]
+    },
+    {
+      "id": "US-004",
+      "title": "WeChat Capture Dry-run 50",
+      "priority": 4,
+      "day": "Day 2",
+      "status": "blocked_by_US-003",
+      "description": "Capture 50 articles to verify pipeline: WeChat → PDF → manifest",
+      "inputs": [
+        "queues/capture_queue.jsonl",
+        "WeChat window accessible"
+      ],
+      "outputs": [
+        "output/capture-dryrun-50/manifest.jsonl",
+        "output/capture-dryrun-50/*.pdf",
+        "reports/dryrun-verification.md"
+      ],
+      "acceptanceCriteria": [
+        "50 manifest entries",
+        ">= 40 success (80%)",
+        "PDF files non-empty",
+        "manifest.jsonl parseable",
+        "No WeChat login interruption"
+      ],
+      "stopConditions": [
+        "Success rate < 70%",
+        "WeChat login required",
+        "Window lost"
+      ],
+      "commands": [
+        "python tools/windows_wechat_history.py --output-dir /mnt/d/HTML/hermes-longrun-2026-04-28 --max-items 50 --resume"
+      ]
+    },
+    {
+      "id": "US-005",
+      "title": "Capture Failure Analysis",
+      "priority": 5,
+      "day": "Day 2",
+      "status": "blocked_by_US-004",
+      "description": "Analyze dry-run failures, categorize reasons, propose fixes",
+      "inputs": [
+        "output/capture-dryrun-50/manifest.jsonl"
+      ],
+      "outputs": [
+        "reports/dryrun-failures.md",
+        "reports/dryrun-fixes.md"
+      ],
+      "acceptanceCriteria": [
+        "All failures categorized",
+        "Fix proposals documented",
+        "Smoke 500 go/no-go decision made"
+      ],
+      "stopConditions": [
+        "Failure rate > 30% (block smoke 500)"
+      ],
+      "commands": [
+        "bash scripts/start-hermes-7day.sh analyze-failures --input output/capture-dryrun-50/manifest.jsonl"
+      ]
+    },
+    {
+      "id": "US-006",
+      "title": "Capture Smoke 500 + Resume Test",
+      "priority": 6,
+      "day": "Day 3",
+      "status": "blocked_by_US-005",
+      "description": "Capture 500 articles, verify resume capability, measure throughput",
+      "inputs": [
+        "queues/capture_queue.jsonl",
+        "US-005 fixes applied"
+      ],
+      "outputs": [
+        "output/capture-smoke-500/manifest.jsonl",
+        "state/checkpoints/smoke-500-*.json",
+        "reports/resume-test.md",
+        "reports/throughput-estimate.md"
+      ],
+      "acceptanceCriteria": [
+        "500 manifest entries",
+        "Resume test passes (no duplicates, no gaps)",
+        "Throughput >= 30/hr",
+        "Failure rate < 15%"
+      ],
+      "stopConditions": [
+        "Resume fails",
+        "Throughput < 15/hr",
+        "Failure rate >= 15%"
+      ],
+      "commands": [
+        "python tools/windows_wechat_history.py --output-dir /mnt/d/HTML/hermes-longrun-2026-04-28 --max-items 500 --resume"
+      ]
+    },
+    {
+      "id": "US-007",
+      "title": "Throughput & Stability Test",
+      "priority": 7,
+      "day": "Day 3",
+      "status": "blocked_by_US-006",
+      "description": "Analyze smoke 500 results, confirm stability, decide full batch go/no-go",
+      "inputs": [
+        "output/capture-smoke-500/manifest.jsonl",
+        "Throughput data"
+      ],
+      "outputs": [
+        "reports/stability-test.md",
+        "reports/full-batch-decision.md"
+      ],
+      "acceptanceCriteria": [
+        "Stability confirmed (no crashes, no data loss)",
+        "Throughput estimate documented",
+        "Full batch go/no-go decision made"
+      ],
+      "stopConditions": [
+        "Stability issues found",
+        "Throughput too low for 7-day completion"
+      ],
+      "commands": [
+        "bash scripts/start-hermes-7day.sh analyze-throughput"
+      ]
+    },
+    {
+      "id": "US-008",
+      "title": "Full Capture Batch Start",
+      "priority": 8,
+      "day": "Day 4",
+      "status": "blocked_by_US-007",
+      "description": "Start continuous WeChat capture, checkpoint every 50 articles or 30 min",
+      "inputs": [
+        "queues/capture_queue.jsonl",
+        "US-007 go decision"
+      ],
+      "outputs": [
+        "output/capture-full/manifest.jsonl",
+        "state/checkpoints/ (every 50 items)",
+        "reports/full-batch-progress-day4.md"
+      ],
+      "acceptanceCriteria": [
+        "Capture running with checkpoints",
+        "Checkpoint every 50 items or 30 min",
+        "Monitor reports GREEN",
+        "4-hour progress report written"
+      ],
+      "stopConditions": [
+        "Failure rate > 20%",
+        "Checkpoint stale > 60 min",
+        "WeChat window lost"
+      ],
+      "commands": [
+        "python tools/windows_wechat_history.py --output-dir /mnt/d/HTML/hermes-longrun-2026-04-28 --max-items 1000 --resume"
+      ]
+    },
+    {
+      "id": "US-009",
+      "title": "Loopy-Archiver Integration",
+      "priority": 9,
+      "day": "Day 4-6",
+      "status": "blocked_by_US-008_progress",
+      "description": "Trigger loopy-archiver pipeline on new captures: archive → entities → relationships → graph",
+      "inputs": [
+        "output/capture-full/*.pdf",
+        "Loopy-archiver pipeline"
+      ],
+      "outputs": [
+        "D:/HTML/.loopy_archiver/archiver.db (updated)",
+        "reports/loopy-trigger.md",
+        "reports/loopy-progress.md"
+      ],
+      "acceptanceCriteria": [
+        "New captures processed by loopy",
+        "Entities extracted",
+        "Relationships extracted",
+        "Graph updated"
+      ],
+      "stopConditions": [
+        "Loopy pipeline stuck > 2 hours",
+        "DB corruption"
+      ],
+      "commands": [
+        "cd /mnt/c/code/loopy-archiver && python pipeline_keeper.py --mode batch_archive"
+      ]
+    },
+    {
+      "id": "US-010",
+      "title": "mem0 Learning Loop",
+      "priority": 10,
+      "day": "Day 4-6",
+      "status": "parallel_with_US-008",
+      "description": "Save capture learnings to mem0, retrieve before each new session",
+      "inputs": [
+        "Capture results",
+        "Failure analysis",
+        "Throughput data"
+      ],
+      "outputs": [
+        "mem0 memories (agent_id=hermes_wechat_pipeline)",
+        "reports/mem0-summary.md"
+      ],
+      "acceptanceCriteria": [
+        "Learnings saved to mem0",
+        "Memories retrievable in new session",
+        "At least 5 learning entries saved"
+      ],
+      "stopConditions": [
+        "mem0 unavailable (fallback to local file)"
+      ],
+      "commands": [
+        "curl -X POST http://127.0.0.1:11434/v1/memories -H 'Content-Type: application/json' -d '{...}'"
+      ]
+    },
+    {
+      "id": "US-011",
+      "title": "Qwen3.6 Downstream Extraction",
+      "priority": 11,
+      "day": "Day 5-6",
+      "status": "blocked_by_US-008_progress",
+      "description": "Run local Qwen3.6-27B structured extraction on captured articles",
+      "inputs": [
+        "output/capture-full/manifest.jsonl",
+        "Qwen3.6-27B at localhost:11434"
+      ],
+      "outputs": [
+        "output/downstream/results.jsonl",
+        "reports/downstream-quality.md"
+      ],
+      "acceptanceCriteria": [
+        "JSON valid rate >= 90%",
+        "Extraction covers key entities (events, venues, artists)",
+        "No VRAM exhaustion"
+      ],
+      "stopConditions": [
+        "Valid JSON < 80%",
+        "Model OOM"
+      ],
+      "commands": [
+        "cd /mnt/c/code/githubstar/wechathtmldownload && npm run run-downstream-llm-batch -- --inputDir /mnt/d/HTML/hermes-longrun-2026-04-28 --modelAlias Qwen3.6-27B"
+      ]
+    },
+    {
+      "id": "US-012",
+      "title": "Quality Report Generation",
+      "priority": 12,
+      "day": "Day 6",
+      "status": "blocked_by_US-011",
+      "description": "Aggregate capture + downstream results into quality report",
+      "inputs": [
+        "output/capture-full/manifest.jsonl",
+        "output/downstream/results.jsonl"
+      ],
+      "outputs": [
+        "reports/quality-report-final.md",
+        "reports/quality-report-final.json"
+      ],
+      "acceptanceCriteria": [
+        "Total capture count documented",
+        "Success/failure rates documented",
+        "Per-account stats included",
+        "Downstream coverage documented",
+        "Failure categories listed"
+      ],
+      "stopConditions": [
+        "Input data missing"
+      ],
+      "commands": [
+        "bash scripts/start-hermes-7day.sh quality-report"
+      ]
+    },
+    {
+      "id": "US-013",
+      "title": "Graph Candidate Dry-run",
+      "priority": 13,
+      "day": "Day 6-7",
+      "status": "blocked_by_US-012",
+      "description": "Generate graph candidate pack from downstream output, dry-run only",
+      "inputs": [
+        "output/downstream/results.jsonl",
+        "Loopy graph data"
+      ],
+      "outputs": [
+        "output/graph-candidate-pack/",
+        "reports/graph-dry-run.md"
+      ],
+      "acceptanceCriteria": [
+        "Dry-run flag present",
+        "No production DB write",
+        "Schema gaps listed",
+        "Candidate count documented"
+      ],
+      "stopConditions": [
+        "Production DB write attempted"
+      ],
+      "commands": [
+        "cd /mnt/c/code/loopy-archiver && python graph_builder.py --dry-run"
+      ]
+    },
+    {
+      "id": "US-014",
+      "title": "OBSIDIAN Knowledge Update",
+      "priority": 14,
+      "day": "Day 7",
+      "status": "blocked_by_US-012",
+      "description": "Update OBSIDIAN vault with 7-day run results and learnings",
+      "inputs": [
+        "Quality report",
+        "Graph candidate pack",
+        "mem0 memories"
+      ],
+      "outputs": [
+        "reports/obsidian-update.md",
+        "C:/code/githubstar/OBSIDIAN/MASHER/03 Projects/ (updated)"
+      ],
+      "acceptanceCriteria": [
+        "OBSIDIAN project page updated with run results",
+        "New learnings documented",
+        "Links to evidence packs included"
+      ],
+      "stopConditions": [
+        "OBSIDIAN vault not accessible"
+      ],
+      "commands": [
+        "Write markdown to C:/code/githubstar/OBSIDIAN/MASHER/03 Projects/wechathtmldownload.md"
+      ]
+    },
+    {
+      "id": "US-015",
+      "title": "Final Handoff & Cleanup Plan",
+      "priority": 15,
+      "day": "Day 7",
+      "status": "final",
+      "description": "Generate final handoff with all evidence, recovery commands, and cleanup dry-run plan",
+      "inputs": [
+        "All previous story outputs",
+        "Quality report",
+        "mem0 memories"
+      ],
+      "outputs": [
+        "FINAL_HANDOFF_2026-05-05.md",
+        "NEXT_PHASE_PLAN.md",
+        "reports/cleanup-dry-run-plan.md"
+      ],
+      "acceptanceCriteria": [
+        "Final state documented",
+        "Evidence paths included",
+        "Resume commands included",
+        "Unfinished work listed",
+        "Cleanup plan is dry-run only"
+      ],
+      "stopConditions": [
+        "None (must complete)"
+      ],
+      "commands": [
+        "bash scripts/start-hermes-7day.sh final-handoff"
+      ]
+    }
+  ]
+}

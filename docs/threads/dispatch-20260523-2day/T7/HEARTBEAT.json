@@ -1,0 +1,92 @@
+{
+  "thread": "T7",
+  "updated_at": "2026-05-28T02:45:00+08:00",
+  "status": "ssot_reconciliation_8_inconsistencies_found_2_critical",
+  "last_primary_queue": "T7_full_ssot_reconciliation_user_return",
+  "last_result": "Full cross-thread SSOT reconciliation completed. 8 inconsistencies found: 2 HIGH (dual pipeline without cross-reference in LONGRUN_STATE, LONGRUN_STATE checkpoint stale vs SWARM handoff), 3 MEDIUM (DB path mismatches), 2 LOW (thread doc staleness, HOME_RETURN stale paths), 1 INFO (SWARM handoff not cross-referenced). Canonical serving candidate confirmed: promotion_preflight_passed_local_only at 508K/53K/1.28M/701K/590K/53K counts.",
+  "last_evidence": [
+    "reports/atlas_serving_time_city_year_span_final_candidate_preflight_20260527_2145/promotion_preflight.json",
+    "tools/stage7_rewrite/reports/atlas_t6_time_title_year_context_review_20260527/year_context_review_summary.json",
+    "NEXT_AGENT_HANDOFF_ATLAS_FULL_PRODUCTION_20260527.md",
+    "NEXT_AGENT_HANDOFF_ATLAS_SWARM_20260527.md",
+    "LONGRUN_STATE.md",
+    "AGENTS.md",
+    "docs/current-runtime.md",
+    "docs/threads/THREADS_INDEX_20260522.md",
+    "docs/threads/T1_source_intake_docker_exporter_20260522.md",
+    "docs/threads/T5_atlas_dj_serving_graph_20260522.md",
+    "docs/threads/T6_deepseektui_ldr_sidecar_20260522.md",
+    "docs/threads/T7_docs_ssot_control_20260522.md",
+    "docs/threads/dispatch-20260523-2day/T0_master/STATUS.md",
+    "docs/threads/dispatch-20260523-2day/T0_master/UNIFIED_QUEUE.md",
+    "docs/threads/dispatch-20260523-2day/T0_master/HOME_RETURN_CONTINUATION_PLAN_20260525.md"
+  ],
+  "stop_reason": "ssot_reconciliation_complete_8_inconsistencies_documented",
+  "wait_reason": "T7 reconciliation is read-only; downstream agents should resolve HIGH inconsistencies before production writes.",
+  "next_resume_pointer": "reports/atlas_serving_time_city_year_span_final_candidate_preflight_20260527_2145/promotion_preflight.json",
+  "ssot_inconsistencies": [
+    {
+      "id": "INC-001",
+      "severity": "HIGH",
+      "title": "Two separate serving pipelines without cross-reference",
+      "detail": "LONGRUN_STATE.md describes batch agent pipeline at /tmp/atlas_merged.sqlite (609K events) and /tmp/atlas_serving_final_v4/. Thread index describes T5/T6 gate chain at reports/atlas_serving_time_overlay_span_split_search_date_refresh_candidate_20260527_2018/atlas_serving.sqlite (508K events). No cross-reference exists.",
+      "recommendation": "Cross-reference or declare one superseded in LONGRUN_STATE.md"
+    },
+    {
+      "id": "INC-002",
+      "severity": "HIGH",
+      "title": "LONGRUN_STATE.md checkpoint stale vs SWARM handoff",
+      "detail": "LONGRUN_STATE checkpoint 2026-05-28 02:45 does not reflect SWARM handoff finding: 99.3% articles missing publish_time.",
+      "recommendation": "Update LONGRUN_STATE.md to reflect article publish_time gap"
+    },
+    {
+      "id": "INC-003",
+      "severity": "MEDIUM",
+      "title": "Different source DB paths across SSOT surfaces",
+      "detail": "LONGRUN_STATE: /tmp/atlas_merged.sqlite. Thread index: reports/atlas_incremental_wechat_refresh_20260522_1438/.../atlas.sqlite.",
+      "recommendation": "Declare canonical source DB path"
+    },
+    {
+      "id": "INC-004",
+      "severity": "MEDIUM",
+      "title": "Three different serving DB paths",
+      "detail": "Thread index: ...span_split.../atlas_serving.sqlite. LONGRUN_STATE: /tmp/atlas_serving_final_v4/. AGENTS.md: ...participant_delta_current_20260526_0016/atlas_serving.sqlite.",
+      "recommendation": "Declare canonical serving candidate path"
+    },
+    {
+      "id": "INC-005",
+      "severity": "LOW",
+      "title": "AGENTS.md duplicates Atlas DJ state from thread index",
+      "detail": "AGENTS.md lines 5-58 duplicate thread index content with different ordering.",
+      "recommendation": "Consolidate or add cross-reference"
+    },
+    {
+      "id": "INC-006",
+      "severity": "LOW",
+      "title": "HOME_RETURN_CONTINUATION_PLAN has stale paths",
+      "detail": "References YYYY/Cod.Act work from 2026-05-25 not reflected in thread index or LONGRUN_STATE.",
+      "recommendation": "Update or mark as historical"
+    },
+    {
+      "id": "INC-007",
+      "severity": "LOW",
+      "title": "T1/T2/T3 thread docs not updated with latest sync",
+      "detail": "T1 last updated 14:45, T2/T3 not updated since 2026-05-26, but thread index has 2026-05-28 00:36 sync.",
+      "recommendation": "Update T1/T2/T3 thread docs"
+    },
+    {
+      "id": "INC-008",
+      "severity": "INFO",
+      "title": "SWARM handoff not cross-referenced",
+      "detail": "NEXT_AGENT_HANDOFF_ATLAS_SWARM_20260527.md (root cause analysis) not in thread index, LONGRUN_STATE, or AGENTS.md.",
+      "recommendation": "Add SWARM handoff to thread index and LONGRUN_STATE"
+    }
+  ],
+  "next_local_data_quality_pointers": [
+    "SWARM handoff Lane A: article publish_time backfill (unblocks T6 year-context)",
+    "tools/stage7_rewrite/reports/atlas_t5_time_city_venue_gap_closure_20260527/venue_city_deterministic_candidates.jsonl (61,266 rows)",
+    "tools/stage7_rewrite/reports/atlas_t5_time_city_venue_gap_closure_20260527/source_ocr_gap_recovery_work_orders.jsonl (2,000 rows)",
+    "tools/stage7_rewrite/reports/atlas_t6_time_title_year_context_review_20260527/year_context_source_artifact_required_rows.jsonl (443 rows)",
+    "tools/stage7_rewrite/reports/atlas_t6_avatar_binary_storage_provenance_gate_20260527/avatar_binary_storage_blocked_rows.jsonl (23 rows)"
+  ]
+}

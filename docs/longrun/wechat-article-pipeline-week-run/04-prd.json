@@ -1,0 +1,4 @@
+{
+  "canonical": ".omc/ralph/wechat-article-pipeline-week-run/prd.json",
+  "note": "Ralph canonical prd.json lives under .omc/ralph. This pointer exists to satisfy the longrun layout while avoiding two competing execution queues."
+}

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Atlas Outlink DeepSeekTUI Handoff</title>
+  <style>
+    body { margin: 0; background: #f6f7f9; color: #20242a; font: 14px/1.55 "Segoe UI", "Microsoft YaHei", Arial, sans-serif; }
+    header { background: #202a35; color: #fff; padding: 28px 32px; border-bottom: 4px solid #146c94; }
+    main { max-width: 1080px; margin: 24px auto 48px; padding: 0 20px; }
+    section { background: #fff; border: 1px solid #d9dee7; border-radius: 8px; padding: 18px 20px; margin: 14px 0; }
+    h1 { margin: 0 0 8px; font-size: 24px; }
+    h2 { margin: 0 0 12px; font-size: 18px; }
+    code, pre { background: #eef2f6; border-radius: 6px; font-family: Consolas, "Cascadia Mono", monospace; }
+    code { padding: 1px 4px; }
+    pre { padding: 12px; overflow: auto; border: 1px solid #d9dee7; }
+    ul { margin: 8px 0 0 20px; padding: 0; }
+    li { margin: 5px 0; }
+    .warn { color: #9a5b00; font-weight: 650; }
+    .ok { color: #136f3f; font-weight: 650; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Atlas Outlink Search DeepSeekTUI Handoff</h1>
+    <p>Scope: only Atlas external outlink / social second-hop evidence search.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Status</h2>
+      <p class="warn">Quality: WARN, can continue.</p>
+      <p>Latest checked snapshot: <span class="ok">RUNNING</span>, PID <code>108336</code>, <code>178,052 / 246,024</code>, <code>72.3718%</code>, stderr <code>0</code>.</p>
+    </section>
+    <section>
+      <h2>Open First</h2>
+      <ul>
+        <li><code>MANIFEST.md</code></li>
+        <li><code>FULL_ENTITY_OUTLINK_SEARCH_PLAN.md</code></li>
+        <li><code>DEEPSEEKTUI_PROMPT.md</code></li>
+        <li><code>RUNBOOK.md</code></li>
+        <li><code>LONGRUN_STABILITY_PLAN.md</code></li>
+        <li><code>QUALITY_GATE.md</code></li>
+      </ul>
+    </section>
+    <section>
+      <h2>Route</h2>
+      <pre>public-search COMPLETE
+  -> full Post-Filter
+  -> reduced profile URL / handle seed rows only
+  -> HTTP first
+  -> Scrapling for static difficult pages
+  -> OpenCLI browser-session public profile reads
+  -> Camofox fallback
+  -> social second-hop outlinks
+  -> strict review
+  -> no graph write</pre>
+    </section>
+    <section>
+      <h2>Red Lines</h2>
+      <ul>
+        <li>No raw 246k Maigret/OpenCLI/Camofox/outlink run.</li>
+        <li>No graph/vector/database/memory writes.</li>
+        <li>No cookie/token export or credential-store reads.</li>
+        <li>No CloudRun, mini-program, weekly, or other-project work.</li>
+      </ul>
+    </section>
+  </main>
+</body>
+</html>

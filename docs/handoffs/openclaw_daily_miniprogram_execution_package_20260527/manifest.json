@@ -1,0 +1,42 @@
+{
+  "package_name": "openclaw_daily_miniprogram_execution_package_20260527",
+  "generated_at": "2026-05-27T22:10:00+08:00",
+  "project_root": "C:\\code\\githubstar\\wechathtmldownload",
+  "package_dir": "C:\\code\\githubstar\\wechathtmldownload\\docs\\handoffs\\openclaw_daily_miniprogram_execution_package_20260527",
+  "intended_runner": "OpenClaw WSL2",
+  "default_model": "deepseek/deepseek-v4-pro",
+  "scope_threads": [
+    "T1_source_intake_docker_exporter_20260522",
+    "T2_weekly_backend_release_20260522",
+    "T3_mini_program_frontend_20260522",
+    "T7_docs_ssot_control_20260522"
+  ],
+  "package_files": [
+    "README.md",
+    "OPENCLAW_EXECUTION_PROMPT.md",
+    "OPENCLAW_OPERATING_KNOWLEDGE.md",
+    "THREAD_CHAT_RECORD_20260527.md",
+    "PC_PATHS_INDEX.md",
+    "DAILY_RUNBOOK.md",
+    "HANDOFF.md",
+    "HANDOFF.html",
+    "manifest.json"
+  ],
+  "current_baseline": {
+    "operator_recorded_online_miniprogram_version": "2026.05.26.1",
+    "latest_developer_upload": "2026.05.27.7",
+    "latest_developer_upload_desc": "atlas-beta-copy-full-access",
+    "wechat_review_submitted": false,
+    "public_user_visible_claimed": false,
+    "backend_reference": "weekly-api-066",
+    "release_claim_blocker": "T2/T3 current_release drift gate"
+  },
+  "hard_boundaries": [
+    "no raw secrets in docs/logs",
+    "no WeChat review submission by default",
+    "no public release claim without evidence",
+    "no D-root scan",
+    "no Telegram/old mailroom/9router/Ollama chat",
+    "direct DeepSeek API only"
+  ]
+}

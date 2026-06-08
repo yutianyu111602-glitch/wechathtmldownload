@@ -1,0 +1,179 @@
+{
+  "run_id": "hermes-7day-2026-04-28",
+  "status": "running",
+  "mode": "autonomous-7day-dual-loop",
+  "started": "2026-04-28T02:30:00+08:00",
+  "last_updated": "2026-05-04T12:02:41+08:00",
+  "current_phase": "P1 Day 6 ACTIVE_STAGE7_93K_COMMANDER_RELAUNCH_LOCKDOWN",
+  "current_story": "US-000 (completed), US-001 (completed), D0-MAINT (completed), US-002 Baseline Freeze (completed)",
+  "next_story": "US-003 remains gated by Stage7/93K commander/writer lockdown; no capture while WeChat RED",
+  "architecture": "DeepTutor dual-loop (Solve + Review)",
+  "zombie_cleanup": {
+    "timestamp": "2026-04-28T12:13:00+08:00",
+    "killed": [
+      32180,
+      47092,
+      15920
+    ],
+    "reason": "downstream batch orphan, 8h41m runtime, 0% success",
+    "downstream_batch_snapshot": {
+      "started": "2026-04-27T19:19:53Z",
+      "succeeded_count": 0,
+      "failed_count": 77781,
+      "queued_count": 15218,
+      "status_file_says": "running",
+      "actual_process": "DEAD (all zombies killed)"
+    }
+  },
+  "preflight": {
+    "wsl2": "GREEN",
+    "hermes": "GREEN (v0.11.0)",
+    "deepseek_v4_pro": "GREEN",
+    "llama_swap": "GREEN (Windows PS HTTP 200 models=14, qwen3.6_present=True)",
+    "wechat": "RED — process_count=0",
+    "mem0": "AMBER — live memory status Provider:  (none — built-in only)",
+    "d_disk": "GREEN (D:\\              15T  6.3T  8.4T  43% /mnt/d)",
+    "powershell": "GREEN (available via full path)",
+    "output_dir": "GREEN (D:\\HTML\\hermes-longrun-2026-04-28)"
+  },
+  "cron_jobs": {
+    "night_watcher_heartbeat": {
+      "id": "add1efe63339",
+      "schedule": "every 10m",
+      "repeat": "6/1008",
+      "status": "active",
+      "role": "GA pack 只读心跳"
+    },
+    "hermes_7day_watchdog": {
+      "id": "ed27b1cfb547",
+      "schedule": "every 30m",
+      "repeat": "1/336",
+      "status": "active",
+      "role": "Solve+Review 双层监控看门狗",
+      "skills": [
+        "wechat-100k-pipeline-night-watch"
+      ]
+    },
+    "hermes_7day_daily_executor": {
+      "id": "1509f1c94d40",
+      "schedule": "0 12 * * *",
+      "repeat": "1/7",
+      "status": "active",
+      "role": "每日 story 推进 + DeepTutor 反思循环",
+      "skills": [
+        "hermes-longrun-planner",
+        "wechat-100k-pipeline-night-watch"
+      ]
+    },
+    "prompt_review_loop": {
+      "id": "691cb6c6fd32",
+      "schedule": "every 6h",
+      "repeat": "1/28",
+      "status": "active",
+      "role": "DeepTutor 提示词优化循环（自我批判+补丁建议）",
+      "skills": [
+        "hermes-longrun-planner"
+      ]
+    },
+    "paused": {
+      "old_night_watcher": "11856200b44f — paused (Night Watcher completed)"
+    }
+  },
+  "completed_pipelines": {
+    "night_watcher_2026_04_27": {
+      "status": "COMPLETED",
+      "stories": "6/6 passed",
+      "artifacts": "93,000 articles in _llm_release_v2",
+      "calibration": "Qwen3.6-27B stable (temp=0.1, top_p=0.9, max_tokens=2048)",
+      "eval": "57/60 downstream (95%)",
+      "handoff": "HANDOFF_2026-04-27_NIGHT_WATCHER_COMPLETED.md"
+    },
+    "export_llm": {
+      "status": "completed",
+      "source": "D:\\DDownload\\_llm_artifacts\\export-llm-status.json"
+    }
+  },
+  "autonomous_plan": {
+    "strategy": "条件自适应：服务可用则执行，不可用则做分析/规划/质量工作",
+    "fallback_when_no_wechat": [
+      "baseline分析",
+      "coverage报告",
+      "队列构建",
+      "提示词优化"
+    ],
+    "fallback_when_no_llama_swap": [
+      "数据分析",
+      "质量审计",
+      "cleanup规划",
+      "文档整理"
+    ],
+    "priority": "先尝试恢复llama-swap → 若恢复则启动下游处理 → WeChat恢复则启动抓取 → 两者都down则做分析规划工作",
+    "current_effective_mode": "llama-swap GREEN, WeChat RED → 可执行：baseline分析、下游LLM处理、质量审计；跳过：capture相关"
+  },
+  "anti_blocking": {
+    "same_story_max_retries": 3,
+    "disk_min_threshold_gb": 100,
+    "amber_non_blocking": true,
+    "red_criteria": [
+      "disk<50GB",
+      "data corruption",
+      "same story fail 3x",
+      "model unreachable 3x consecutive",
+      "downstream batch 0% success > 3h with fix known but not applied"
+    ]
+  },
+  "prompt_patches_applied": {
+    "patch_3_batch_red_criteria": "INTEGRATED into red_criteria (2026-04-28T12:15:00+08:00)",
+    "patch_1_watchdog": "DEFERRED — watchdog cron prompt needs update via cronjob tool (not available in this context)",
+    "patch_2_daily_executor_step0": "EXECUTED — zombie cleanup + env verification completed this run",
+    "patch_13_live_root_scan_gate": "EXECUTED — daily executor Step0 scanned WSL process table before story work (2026-04-30T12:05+08)",
+    "patch_11_artifact_contract": "EXECUTED — daily-executor/evidence/checkpoint written early in this run",
+    "patch_10_recovery_mode": "EXECUTED — run-state refreshed from live checks instead of stale preflight",
+    "patch_23_consolidated_us003_recovery_gate": "INTEGRATED by daily-executor 2026-05-01T12:05:00+08:00; red6=2, post_nonred=1, current_danger=0",
+    "patch_31_recovery_amber": "SUPERSEDED by #32 (2026-05-03 daily executor)",
+    "patch_32_active_stage7_red_lockdown": "INTEGRATED by daily-executor 2026-05-03T12:03:28+08:00; decision=RED; writer_count=2; executor_artifact_gap_guard=start heartbeat written",
+    "patch_36_generalized_stage7_93k_commander_relaunch_lockdown": "INTEGRATED by daily-executor 2026-05-04T12:02:41+08:00; writer_count=1; commander_count=1; active_93k=1; decision=RED"
+  },
+  "hard_bans": [
+    "D:\\DDownload\\_llm_release_v2 — READ ONLY",
+    "D:\\DDownload recursive scan",
+    "D:\\aidata recursive scan",
+    "OpenClaw/AG auto-start",
+    "destructive file operations",
+    "auto-fix RED issues"
+  ],
+  "last_watchdog": {
+    "timestamp": "2026-04-30T04:50:00+08:00",
+    "decision": "AMBER",
+    "items": [
+      "llama-swap 14->1 regression ~42h+ (not self-healing)",
+      "run-state stale ~40.6h",
+      "daily-executor #3 completed but zero artifacts",
+      "OpenClaw WSL 3 procs persistent (ban violation, ~50 cycles)",
+      "llama-swap WSL unreachable (conn refused)",
+      "output dir 0 bytes, US-002 never started"
+    ]
+  },
+  "latest_daily_executor": {
+    "timestamp": "2026-05-04T12:02:41+08:00",
+    "story": "US-003 gated / no-capture context gate blocked by active Stage7/93K writer or commander",
+    "decision": "RED",
+    "classification": "STAGE7_93K_COMMANDER_RELAUNCH_LOCKDOWN_RED",
+    "start_heartbeat": "/mnt/c/code/githubstar/wechathtmldownload/docs/longrun/hermes-7day/reports/daily-executor-start-2026-05-04_120241.md",
+    "metrics": {
+      "llama_swap_ok": true,
+      "llama_swap_model_count": 14,
+      "qwen36_present": true,
+      "wechat_process_count": "0",
+      "d_disk": "D:\\              15T  6.3T  8.4T  43% /mnt/d",
+      "mem0_provider_line": "Provider:  (none — built-in only)",
+      "wsl_openclaw_related_processes": 5,
+      "openclaw_stage7_downstream_writer_count": 1,
+      "active_93k_runner_count": 1,
+      "active_commander_count": 1,
+      "next1000_control_or_runner_count": 0,
+      "latest_prompt_review": "/mnt/c/code/githubstar/wechathtmldownload/docs/longrun/hermes-7day/reports/prompt-review-2026-05-04_1051.md",
+      "latest_watchdog": "/mnt/c/code/githubstar/wechathtmldownload/docs/longrun/hermes-7day/reports/WATCHDOG_RED_2026-05-04_1155.md"
+    }
+  }
+}

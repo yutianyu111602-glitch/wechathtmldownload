@@ -1,0 +1,14 @@
+{
+  "thread": "T3",
+  "updated_at": "2026-05-26T15:56:00+08:00",
+  "status": "assigned_frontend_regression_upload_readiness_after_T2",
+  "last_primary_queue": "Q3",
+  "last_result": "Full production dispatch assigns T3 to run mini-program API/frontend compatibility regression after T2 package authority is resolved; upload/review only if evidence requires it.",
+  "last_evidence": [
+    "reports/ATLAS_T0_FULL_PRODUCTION_THREAD_DISPATCH_20260526.md",
+    "reports/WEEKLY_T2_T3_RELEASE_READINESS_DRIFT_HOOK_20260526.md"
+  ],
+  "stop_reason": "none_for_T3_until_T2_changes_API_or_resource_shape",
+  "wait_reason": "Wait for T2 package-root decision before upload/review.",
+  "next_resume_pointer": "reports/WEEKLY_T2_T3_RELEASE_READINESS_DRIFT_HOOK_20260526.md"
+}

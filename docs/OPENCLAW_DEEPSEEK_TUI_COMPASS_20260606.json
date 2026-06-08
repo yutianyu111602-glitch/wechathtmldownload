@@ -1,0 +1,128 @@
+{
+  "schema_version": "openclaw_deepseek_tui_compass.v1",
+  "generated_at": "2026-06-06T15:45:00+08:00",
+  "audience": "DeepSeek TUI in WSL2",
+  "primary_wsl_directory": "/home/pc/.deepseek/handoffs/openclaw-weekly-skill-round87",
+  "primary_windows_unc_directory": "\\\\wsl.localhost\\Ubuntu\\home\\pc\\.deepseek\\handoffs\\openclaw-weekly-skill-round87",
+  "repo": {
+    "windows": "C:\\code\\githubstar\\wechathtmldownload",
+    "wsl": "/mnt/c/code/githubstar/wechathtmldownload"
+  },
+  "current_acceptance": {
+    "fallback_summary": "tools/stage7_rewrite/reports/openclaw_weekly_daily_nonllm_20260606_151557/nonllm_fallback_summary.json",
+    "fallback_status": "check_only_ok",
+    "fallback_ok": true,
+    "current_release_quality_gate": "tools/stage7_rewrite/reports/openclaw_weekly_daily_nonllm_20260606_151557/current_release_quality_gate.json",
+    "current_release_quality_ok": true,
+    "item_count": 155,
+    "poster_blocker_counts_zero": true,
+    "missing_geo_count": 6,
+    "full_incremental_candidate_run_proven": false,
+    "devtools_rendered_proof_round87": false
+  },
+  "round87_controller_release": {
+    "report": "tools/stage7_rewrite/reports/weekly_source_material_recovery_controller_release_round87_20260606/source_material_recovery_controller_release.json",
+    "decision": "weekly_source_material_recovery_controller_release_ready_no_runtime_execution",
+    "release_id": "CTRL-WEEKLY-SOURCE-MATERIAL-RECOVERY-20260606-1540-codex-round87",
+    "selected_task_count": 5,
+    "selected_candidate_source_count": 19,
+    "source_material_runtime_allowed_by_this_packet": true,
+    "source_material_runtime_executed_by_this_packet": false,
+    "full_incremental_run_allowed_now": false,
+    "leak_count": 0
+  },
+  "new_or_updated_files": [
+    "tools/stage7_rewrite/scripts/build_weekly_source_material_recovery_controller_release.py",
+    "tools/stage7_rewrite/tests/test_build_weekly_source_material_recovery_controller_release.py",
+    "tools/stage7_rewrite/scripts/build_openclaw_weekly_darwin_scorecard.py",
+    "tools/stage7_rewrite/tests/test_openclaw_full_incremental_runner_gate.py",
+    "tools/stage7_rewrite/tests/test_weekly_pipeline_repair_flags.py",
+    "C:\\Users\\pc\\.openclaw\\bin\\openclaw-weekly-daily-nonllm-fallback.ps1",
+    "C:\\Users\\pc\\.openclaw\\skills\\openclaw-weekly-daily-run\\SKILL.md",
+    "C:\\Users\\pc\\.openclaw\\skills\\openclaw-docker-arsenal\\SKILL.md",
+    "docs/OPENCLAW_DOCKER_SKILL_HANDOFF_ROUND87_20260606.md",
+    "docs/OPENCLAW_DEEPSEEK_TUI_ACCEPTANCE_AND_RUNBOOK_20260606.md",
+    "docs/superpowers/specs/2026-06-06-openclaw-deepseek-tui-next-optimization-design.md",
+    "docs/superpowers/plans/2026-06-06-openclaw-deepseek-tui-next-optimization-plan.md"
+  ],
+  "superpowers_next_plan": {
+    "design_spec": "docs/superpowers/specs/2026-06-06-openclaw-deepseek-tui-next-optimization-design.md",
+    "implementation_plan": "docs/superpowers/plans/2026-06-06-openclaw-deepseek-tui-next-optimization-plan.md",
+    "recommended_execution_mode": "inline checkpoint or subagent-driven with max 3 read-only scouts",
+    "first_step": "baseline readback and current quality verification before any runtime action"
+  },
+  "skills_used": [
+    "handoff-writer",
+    "huaidj-weekly-release-guardian",
+    "darwin-skill",
+    "git-workspace-guardian",
+    "openclaw-weekly-daily-run",
+    "openclaw-docker-arsenal"
+  ],
+  "docker_profiles": [
+    {"layer": "L1", "profile": "openclaw-source-exporter", "service": "openclaw-source-exporter", "queue": "openclaw.source_exporter"},
+    {"layer": "L2", "profile": "openclaw-source-queue-cache", "service": "openclaw-source-queue-cache", "queue": "openclaw.source_queue_cache"},
+    {"layer": "L3", "profile": "openclaw-ocr", "service": "openclaw-ocr-worker", "queue": "openclaw.ocr"},
+    {"layer": "L3A", "profile": "openclaw-poster-ocr-recovery", "service": "openclaw-poster-ocr-recovery-worker", "queue": "openclaw.poster_ocr_recovery"},
+    {"layer": "L4", "profile": "openclaw-llm-extraction", "service": "openclaw-llm-extract-worker", "queue": "openclaw.llm_extraction"},
+    {"layer": "L5", "profile": "openclaw-map-verify", "service": "openclaw-map-verify-worker", "queue": "openclaw.map_verify"},
+    {"layer": "L6", "profile": "openclaw-package-merge", "service": "openclaw-package-merge-worker", "queue": "openclaw.package_merge"},
+    {"layer": "L7", "profile": "openclaw-deploy-upload-wrapper", "service": "openclaw-release-wrapper", "queue": "openclaw.deploy_upload_wrapper"}
+  ],
+  "verification_commands": {
+    "focused_pytest": "python -m pytest tools/stage7_rewrite/tests/test_build_weekly_source_material_recovery_controller_release.py tools/stage7_rewrite/tests/test_build_weekly_source_material_recovery_runtime_release_preflight.py tools/stage7_rewrite/tests/test_build_openclaw_weekly_next_action_packet.py tools/stage7_rewrite/tests/test_build_openclaw_weekly_darwin_scorecard.py tools/stage7_rewrite/tests/test_openclaw_full_incremental_runner_gate.py tools/stage7_rewrite/tests/test_weekly_pipeline_repair_flags.py -q",
+    "frontend_production_data_source": "node apps/weekly_activity_miniprogram/tests/production-data-source.test.cjs",
+    "frontend_cloud_poster_url": "node apps/weekly_activity_miniprogram/tests/cloud-poster-url.test.cjs",
+    "fallback_check_only": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File 'C:\\Users\\pc\\.openclaw\\bin\\openclaw-weekly-daily-nonllm-fallback.ps1' -CheckOnly",
+    "powershell_parse": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"$ErrorActionPreference='Stop'; $script = Get-Content -Raw -LiteralPath 'C:\\Users\\pc\\.openclaw\\bin\\openclaw-weekly-daily-nonllm-fallback.ps1'; $null = [scriptblock]::Create($script); 'parse_ok'\""
+  },
+  "forbidden_until_gate_allows": [
+    "source_refresh",
+    "docker_worker_execution",
+    "download",
+    "ocr",
+    "stepfun_api_call",
+    "mimo_api_call",
+    "cloudbase_storage_write",
+    "cloudbase_db_write",
+    "package_patch",
+    "db2_write",
+    "db3_write",
+    "cloudrun_deploy",
+    "miniprogram_upload",
+    "wechat_review",
+    "public_release",
+    "git_clean_or_reset"
+  ],
+  "next_optimization_queue": [
+    {
+      "priority": 1,
+      "task": "regenerate current next-action Darwin and full-incremental hard gate",
+      "why": "package quality changed from blocked to green after Round86 artifacts"
+    },
+    {
+      "priority": 2,
+      "task": "run no-deploy no-upload no-release full incremental candidate if hard gate allows",
+      "why": "full goal is not complete until candidate run is proven"
+    },
+    {
+      "priority": 3,
+      "task": "repair or explicitly track missing_geo_count=6 with source-backed map lane",
+      "why": "not a hard fail now but still user-visible quality debt"
+    },
+    {
+      "priority": 4,
+      "task": "run StepFun versus MiMo poster vision comparison only after source material and API boundaries are stable",
+      "why": "model output must not override package truth or source-backed validators"
+    },
+    {
+      "priority": 5,
+      "task": "rerun DevTools first-screen rendered proof for current package",
+      "why": "Node tests prove contract, DevTools proves live render behavior"
+    }
+  ],
+  "openhuman_import": {
+    "imported": false,
+    "reason": "C:\\Users\\pc\\.openhuman\\active_user.toml is missing"
+  }
+}

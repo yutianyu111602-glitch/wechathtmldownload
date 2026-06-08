@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Atlas / HUAIDJ S1-S115 接手文档</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --fg: #1f2933;
+      --muted: #667085;
+      --line: #d9dee7;
+      --panel: #ffffff;
+      --accent: #0f766e;
+      --danger: #b42318;
+      --code: #eef2f6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.55;
+    }
+    main {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 32px 24px 56px;
+    }
+    header {
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 18px;
+      margin-bottom: 24px;
+    }
+    h1 { font-size: 30px; margin: 0 0 8px; }
+    h2 { font-size: 20px; margin: 26px 0 10px; }
+    h3 { font-size: 16px; margin: 18px 0 8px; color: var(--accent); }
+    p, li { font-size: 14px; }
+    code {
+      background: var(--code);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: Consolas, "Cascadia Mono", monospace;
+      font-size: 12px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .metric { font-size: 24px; font-weight: 700; }
+    .muted { color: var(--muted); }
+    .danger { color: var(--danger); font-weight: 600; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      margin-top: 10px;
+    }
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 13px;
+    }
+    th { background: #eef2f6; }
+    tr:last-child td { border-bottom: 0; }
+    .phase td:first-child { width: 140px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Atlas / HUAIDJ S1-S115 接手文档</h1>
+      <p class="muted">Updated: 2026-06-01 13:55 CST · Canonical Markdown: <code>HANDOFF_S1_S115_ATLAS_HUAIDJ_20260601.md</code></p>
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        <div class="metric">S115</div>
+        <div class="muted">当前 story</div>
+      </div>
+      <div class="card">
+        <div class="metric danger">3</div>
+        <div class="muted">顶层 blocker</div>
+      </div>
+      <div class="card">
+        <div class="metric">2045</div>
+        <div class="muted">relation/identity blockers</div>
+      </div>
+      <div class="card">
+        <div class="metric">0</div>
+        <div class="muted">approved write-gate rows</div>
+      </div>
+      <div class="card">
+        <div class="metric">1 / 59</div>
+        <div class="muted">missing geo / stale registry rows</div>
+      </div>
+      <div class="card">
+        <div class="metric">27</div>
+        <div class="muted">S115 starter tasks</div>
+      </div>
+    </section>
+
+    <h2>当前结论</h2>
+    <p>系统已经从 S1 推进到 S115，但不能声明全量完成或部署完成。当前主线是 report-only 的 blocker 收敛：坐标、DB3 关系/身份写门、DevTools rendered coverage 仍未清。</p>
+
+    <h2>S1-S115 阶段概览</h2>
+    <table class="phase">
+      <tr><th>范围</th><th>做了什么</th><th>当前状态</th></tr>
+      <tr><td>S1-S10</td><td>接手 inventory、DB contract、地址队列、mixtape/outlink UX、部署边界、SSOT、减少重复构建。</td><td>基础边界完成。</td></tr>
+      <tr><td>S11-S20</td><td>DJ Interview backend、小程序 developer version、用户命令、腾讯/高德/Rust Club、DevTools protocol、版权 direct-media guard。</td><td>坐标和 DevTools 保持 blocked。</td></tr>
+      <tr><td>S21-S30</td><td>本周/本月预览、采访 review queue/workbench/intake、relation guard、original-link action、event-handler guard、完整静态 preflight。</td><td>小程序静态链路增强；rendered coverage 未完成。</td></tr>
+      <tr><td>S31-S40</td><td>命令总账、goal completion、DevTools/Rust Club audit、Tencent signature、taxi-grade 坐标质量审计。</td><td>开始形成可复跑证据链。</td></tr>
+      <tr><td>S42-S48</td><td>打车级坐标 gate、Rust Club 地址候选、OpenClaw/weekly freeze、字段统一、空字段覆盖 review。</td><td>S46 冻结仍有效。</td></tr>
+      <tr><td>S49-S61</td><td>goal audit 持续硬化、DevTools dirty/preflight/port guard、坐标 freshness gate、DB3 identity projection。</td><td>坐标和身份正式卡入 deploy gate。</td></tr>
+      <tr><td>S63-S72</td><td>OpenClaw auth failure guard、DB3 merge/write/SQL dry-run report-only 包、goal audit 引证 rendered/coordinate/deploy/relation 证据。</td><td>不写生产，只增强证据。</td></tr>
+      <tr><td>S73-S89</td><td>DB3 identity review workbench、high-risk/source-ref/lineup/non-high queues 和 validation，覆盖全部 2012 review rows。</td><td>coverage gap 为 0，但写门仍为 0。</td></tr>
+      <tr><td>S90-S99</td><td>coordinate/devtools/deploy/remaining blocker next-action packets，OpenClaw scheduler freeze audit，三大 blocker closure matrix。</td><td>三大 blocker 清晰化。</td></tr>
+      <tr><td>S100-S115</td><td>当前化 DevTools、SSOT pointer audit、S109/S111/S112/S113/S114/S115 证据刷新，S115 生成 relation identity write-gate starter。</td><td>最新入口为 S115。</td></tr>
+    </table>
+
+    <h2>最新入口</h2>
+    <p>下一代理先打开：</p>
+    <ul>
+      <li><code>reports/WEEKLY_ATLAS_RELATION_IDENTITY_WRITE_GATE_STARTER_S115_20260601.md</code></li>
+      <li><code>tools/stage7_rewrite/reports/atlas_relation_identity_write_gate_starter_s115_20260601/atlas_relation_identity_write_gate_starter_tasks.jsonl</code></li>
+    </ul>
+    <p>建议下一步做 S116：为 S115 的 24 个 starter rows 生成 source-ref/disposition/field-preservation workbench，继续 no-write。</p>
+
+    <h2>硬边界</h2>
+    <p class="danger">不要运行 OpenClaw/weekly 自动管线、不要地图 provider/geocode、不要 DevTools、不要 deploy/upload/review、不要 DB/graph/vector/public pointer 写、不要坐标写、不要 secrets、不要 D 盘大根扫描。</p>
+  </main>
+</body>
+</html>
