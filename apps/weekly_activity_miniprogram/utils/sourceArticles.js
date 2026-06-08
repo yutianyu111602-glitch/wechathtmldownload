@@ -2,16 +2,35 @@ function safeText(value) {
   return String(value || "").trim();
 }
 
-function sourceHashOf(item) {
-  return safeText(item && (item.sourceHash || item.source_action?.url_hash || item.source_article?.url_hash));
+function isAtlasEvidenceRef(value) {
+  return /^(src|source|source_ref|evidence|activity_src|atlas_src):/i.test(safeText(value));
 }
 
-function sourceHashOfRef(ref) {
-  return safeText(ref && (ref.source_hash || ref.hash || ref.url_hash));
+function sourceActionDisabled(item) {
+  return item && item.source_action && item.source_action.available === false;
 }
 
 function isAggregateLikeItem(item) {
-  return safeText(item && (item.id || item.event_id || item.article_id)).startsWith("agg-child-");
+  return Boolean(item && (item.aggregation_child === true || item.aggregationChild === true))
+    || safeText(item && (item.id || item.event_id || item.article_id)).startsWith("agg-child-");
+}
+
+function sourceHashOf(item) {
+  if (sourceActionDisabled(item) || isAggregateLikeItem(item)) return "";
+  const sourceRefId = safeText(item && (item.sourceRefId || item.source_ref_id));
+  if (isAtlasEvidenceRef(sourceRefId)) return sourceRefId;
+  return safeText(item && (item.sourceHash || sourceRefId || item.source_action?.url_hash || item.source_article?.url_hash));
+}
+
+function sourceHashOfRef(ref) {
+  const sourceRefId = safeText(ref && (ref.source_ref_id || ref.sourceRefId));
+  if (isAtlasEvidenceRef(sourceRefId)) return sourceRefId;
+  return safeText(ref && (ref.source_hash || ref.hash || ref.url_hash || sourceRefId));
+}
+
+function isAggregateLikeRef(ref) {
+  return Boolean(ref && ref.aggregation_child === true)
+    || safeText(ref && (ref.event_id || ref.id || ref.source_event_id)).startsWith("agg-child-");
 }
 
 function compactDate(value) {
@@ -27,22 +46,26 @@ function sourceArticleTitle(events) {
 }
 
 function primarySourceRef(item) {
+  if (isAggregateLikeItem(item)) return null;
   const sourceArticle = item && typeof item.source_article === "object" ? item.source_article : {};
   const hash = sourceHashOf(item);
   if (!hash) return null;
   return {
     source_hash: hash,
-    title: safeText(item && (item.source_title || sourceArticle.title)),
-    account_name: safeText(item && (item.source_account_name || item.account || item.promoter || sourceArticle.account_name)),
-    published_at: safeText(item && (item.source_published_at || sourceArticle.published_at)),
+    source_ref_id: safeText(item && (item.sourceRefId || item.source_ref_id)),
+    title: safeText(item && (item.source_title || item.sourceTitle || sourceArticle.title)),
+    account_name: safeText(item && (item.source_account_name || item.sourceAccountName || item.account || item.promoter || sourceArticle.account_name)),
+    published_at: safeText(item && (item.source_published_at || item.sourcePublishedAt || sourceArticle.published_at)),
     is_primary: true,
   };
 }
 
 function mergedSourceRefs(item) {
+  if (sourceActionDisabled(item)) return [];
   const provenance = item && typeof item.merge_provenance === "object" ? item.merge_provenance : null;
   if (!provenance || provenance.schema_version !== "weekly_merge_provenance.v1") return [];
   return (Array.isArray(provenance.sources) ? provenance.sources : [])
+    .filter((ref) => !isAggregateLikeRef(ref))
     .map((ref) => ({
       source_hash: sourceHashOfRef(ref),
       title: safeText(ref && ref.title),
@@ -55,6 +78,7 @@ function mergedSourceRefs(item) {
 }
 
 function sourceRefsForItem(item) {
+  if (sourceActionDisabled(item)) return [];
   const byHash = new Map();
   const primary = primarySourceRef(item);
   if (primary) byHash.set(primary.source_hash, primary);
@@ -125,7 +149,9 @@ function buildDetailSourceArticles(item) {
   });
 }
 
-function buildVenueSourceArticles(events) {
+function buildVenueSourceArticles(events, options = {}) {
+  const includeSingles = options.includeSingles === true;
+  const maxArticles = Math.max(0, Number(options.maxArticles || 0));
   const groups = new Map();
   for (const item of Array.isArray(events) ? events : []) {
     for (const ref of sourceRefsForItem(item)) {
@@ -151,7 +177,7 @@ function buildVenueSourceArticles(events) {
   }
   return [...groups.entries()]
     .map(([hash, group]) => ({ hash, group }))
-    .filter(({ group }) => group.events.length > 1 || group.events.some(isAggregateLikeItem) || group.isMergedSource)
+    .filter(({ group }) => includeSingles || group.events.length > 1 || group.events.some(isAggregateLikeItem) || group.isMergedSource)
     .map(({ hash, group }) => ({
       id: `source-${hash}`,
       hash,
@@ -163,13 +189,16 @@ function buildVenueSourceArticles(events) {
       eventCount: group.events.length,
       isAggregate: group.events.some(isAggregateLikeItem),
       isMergedSource: group.isMergedSource,
-    }));
+    }))
+    .slice(0, maxArticles || undefined);
 }
 
 module.exports = {
   buildDetailSourceArticles,
   buildVenueSourceArticles,
+  isAtlasEvidenceRef,
   isAggregateLikeItem,
+  isAggregateLikeRef,
   sourceHashOf,
   sourceRefsForItem,
 };

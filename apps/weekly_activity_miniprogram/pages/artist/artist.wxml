@@ -1,28 +1,98 @@
 <view class="page sub-page">
   <view class="sub-nav">
-    <button bindtap="goBack">BACK</button>
+    <button bindtap="goBack">{{t.back}}</button>
   </view>
-  <view wx:if="{{loading}}" class="state">加载中</view>
+  <view wx:if="{{loading}}" class="state">{{t.loading}}</view>
   <view wx:elif="{{error}}" class="state error">{{error}}</view>
   <view wx:else>
+    <!-- Header -->
     <view class="sub-head">
-      <view class="sub-label">ARTIST</view>
-      <view class="sub-title">{{name}}</view>
-      <view class="sub-count">{{events.length}} upcoming</view>
-    </view>
-    <view class="section" wx:if="{{events.length}}">
-      <view class="sub-heading">UPCOMING EVENTS</view>
-      <view wx:for="{{events}}" wx:key="id" class="event-row" data-id="{{item.id}}" bindtap="openDetail">
+      <view class="sub-label">{{t.artist}}</view>
+      <view class="sub-title">{{atlasProfile.displayName || name}}</view>
+      <view wx:if="{{atlasProfile.aliases.length}}" class="aliases">
+        <text wx:for="{{atlasProfile.aliases}}" wx:key="*this" class="alias-chip">{{item}}</text>
+      </view>
+      <view class="sub-count">
+        {{atlasProfile.eventCount || events.length}} {{t.artistPerformances}}
+        <text wx:if="{{atlasProfile.venueCount}}"> · {{atlasProfile.venueCount}} venues</text>
+        <text wx:if="{{atlasProfile.city}}"> · {{atlasProfile.city}}</text>
+      </view>
+      <view wx:if="{{atlasProfile.firstSeenAt}}" class="date-range">
+        {{atlasProfile.firstSeenAt}} — {{atlasProfile.lastSeenAt}}
+      </view>
+      <view class="interview-cta" bindtap="openInterview" hover-class="option-hover">
         <view>
-          <view class="event-title">{{item.displayTitle}}</view>
-          <view class="event-meta">{{item.dateLabel}} · {{item.cardLocationLabel}}</view>
+          <view class="interview-cta-title">{{t.interviewCta}}</view>
+          <view class="interview-cta-copy">{{t.interviewHint}}</view>
+        </view>
+        <text class="interview-cta-arrow">↗</text>
+      </view>
+    </view>
+
+    <!-- Bio -->
+    <view class="section" wx:if="{{bioLines.length || atlasProfile.bio}}">
+      <view class="sub-heading">{{t.description}}</view>
+      <view wx:if="{{bioLines.length}}">
+        <view wx:for="{{bioLines}}" wx:key="*this" class="body-line">{{item}}</view>
+      </view>
+      <view wx:elif="{{atlasProfile.bio}}" class="body-line">{{atlasProfile.bio}}</view>
+      <view wx:if="{{atlasProfile.bioSource}}" class="bio-source">via {{atlasProfile.bioSource}}</view>
+    </view>
+
+    <!-- Atlas History (deduped against weekly events) -->
+    <view class="section" wx:if="{{atlasEvents.length}}">
+      <view class="sub-heading">演出历史</view>
+      <view
+        wx:for="{{atlasEvents}}"
+        wx:key="eventId"
+        class="event-row"
+        data-source-hash="{{item.sourceRefId || item.sourceHash || item.source_ref_id || item.source_hash}}"
+        bindtap="openAtlasEventSource"
+      >
+        <view>
+          <view class="event-title">{{item.title}}</view>
+          <view class="event-meta">
+            <text wx:if="{{item.date}}">{{item.date}} · </text>
+            <text wx:if="{{item.venueName}}" class="venue-link" data-venue="{{item.venueName}}" catchtap="openVenue">{{item.venueName}}</text>
+            <text wx:if="{{item.city}}"> · {{item.city}}</text>
+          </view>
         </view>
         <text class="chevron">›</text>
       </view>
     </view>
-    <view class="section" wx:if="{{bioLines.length}}">
-      <view class="sub-heading">DESCRIPTION</view>
-      <view wx:for="{{bioLines}}" wx:key="*this" class="body-line">{{item}}</view>
+
+    <!-- Weekly Events (current window) -->
+    <view class="section" wx:if="{{events.length}}">
+      <view class="sub-heading">{{t.artistRecords}}</view>
+      <view wx:for="{{events}}" wx:key="id" class="event-row" data-id="{{item.id}}" bindtap="openDetail">
+        <view>
+          <view class="event-title">{{item.displayTitle}}</view>
+          <view wx:if="{{!item.isSourceOverview}}" class="event-meta">{{item.dateLabel}} · {{item.cardLocationLabel}}</view>
+        </view>
+        <text class="chevron">›</text>
+      </view>
+    </view>
+
+    <!-- Frequent Venues -->
+    <view class="section" wx:if="{{atlasVenues.length}}">
+      <view class="sub-heading">经常演出的俱乐部</view>
+      <view class="chip-row">
+        <view wx:for="{{atlasVenues}}" wx:key="venueId" class="chip venue-chip" data-venue="{{item.venueName}}" catchtap="openVenue">
+          <text class="chip-name">{{item.venueName}}</text>
+          <text class="chip-count">{{item.eventCount}}场</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Collaborators -->
+    <view class="section" wx:if="{{atlasCollaborators.length}}">
+      <view class="sub-heading">常合作 DJ</view>
+      <view class="chip-row">
+        <view wx:for="{{atlasCollaborators}}" wx:key="djId" class="chip collab-chip" data-name="{{item.displayName}}" catchtap="openArtist">
+          <text class="chip-name">{{item.displayName}}</text>
+          <text wx:if="{{item.sameEventCount}}" class="chip-count">{{item.sameEventCount}}次同台</text>
+        </view>
+      </view>
     </view>
   </view>
 </view>
