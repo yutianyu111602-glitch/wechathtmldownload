@@ -1,14 +1,14 @@
 <view class="page city-page">
   <view class="sub-nav">
-    <button bindtap="goBack">BACK</button>
+    <button bindtap="goBack">{{t.back}}</button>
   </view>
-  <image class="brand-logo" src="/assets/brand/huaidj-logo-nav-512x128.png" mode="aspectFit"></image>
-  <view class="section-title">城市活动</view>
-  <view class="muted intro">按城市归档本周正在发生的活动。场地档案会跟随活动数据逐步补齐。</view>
+  <image lazy-load class="brand-logo" src="/assets/brand/huaidj-logo-nav-512x128.png" mode="aspectFit" ></image>
+  <view class="section-title">{{t.title}}</view>
+  <view class="muted intro">{{t.intro}}</view>
 
-  <view wx:if="{{loading}}" class="state">加载中</view>
+  <view wx:if="{{loading}}" class="state">{{t.loading}}</view>
   <view wx:elif="{{error}}" class="state error">{{error}}</view>
-  <view wx:elif="{{cities.length === 0}}" class="state">暂无城市数据</view>
+  <view wx:elif="{{cities.length === 0}}" class="state">{{t.empty}}</view>
   <view wx:else class="city-grid">
     <view
       wx:for="{{cities}}"
@@ -18,8 +18,8 @@
       bindtap="openCity"
       hover-class="option-hover"
     >
-      <view class="city-name">{{item.city}}</view>
-      <view class="city-count">{{item.item_count}} 场活动</view>
+      <view class="city-name">{{item.displayCity}}</view>
+      <view class="city-count">{{item.item_count}} {{t.eventCount}}</view>
     </view>
   </view>
 </view>

@@ -1,12 +1,12 @@
 <view class="page saved-page">
   <view class="saved-head">
-    <image class="brand-logo" src="/assets/brand/huaidj-logo-nav-512x128.png" mode="aspectFit"></image>
-    <view class="section-title">收藏</view>
+    <image lazy-load class="brand-logo" src="/assets/brand/huaidj-logo-nav-512x128.png" mode="aspectFit" ></image>
+    <view class="section-title">{{t.title}}</view>
   </view>
-  <view wx:if="{{loading}}" class="state">加载中</view>
+  <view wx:if="{{loading}}" class="state">{{t.loading}}</view>
   <view wx:elif="{{error}}" class="state error">{{error}}</view>
-  <view wx:elif="{{ids.length === 0}}" class="muted empty">还没有收藏活动。</view>
-  <view wx:elif="{{items.length === 0}}" class="muted empty">收藏的活动不在当前发布窗口。</view>
+  <view wx:elif="{{ids.length === 0}}" class="muted empty">{{t.empty}}</view>
+  <view wx:elif="{{items.length === 0}}" class="muted empty">{{t.outOfWindow}}</view>
   <view wx:else class="saved-list">
     <view wx:for="{{items}}" wx:key="id" class="saved-card" data-id="{{item.id}}" bindtap="openDetail">
       <view class="saved-date">{{item.dateCompact}}</view>
