@@ -1,0 +1,65 @@
+{
+  "name": "qwen36-27b-4090-longctx-experimental",
+  "version": "1.0",
+  "description": "长上下文实验profile: 192K+ / YaRN / KV压缩, 不用于生产",
+  "status": "experimental",
+  "backend": "llama-server (v8851)",
+  "target_model": {
+    "path": "D:\\models\\Qwen3.6-27B\\Qwen3.6-27B-Q4_K_M.gguf",
+    "size_gb": 15.7
+  },
+  "known_limitations": {
+    "kv_q2": "不支持 (llama-server v8851无q2_k)",
+    "small_draft_05b": "不存在, 需下载",
+    "ik_llama_cpp": "不存在"
+  },
+  "experiments": [
+    {
+      "name": "192K_reproduction",
+      "ctx": 196608,
+      "kv": "q4_0",
+      "draft_max": 8,
+      "target": "152 tok/s"
+    },
+    {
+      "name": "256K_test",
+      "ctx": 262144,
+      "kv": "q4_0",
+      "draft_max": 6,
+      "note": "需YaRN"
+    },
+    {
+      "name": "384K_yarn",
+      "ctx": 393216,
+      "kv": "q4_0",
+      "draft_max": 4,
+      "yarn": true,
+      "rope_scale": 2.0
+    },
+    {
+      "name": "512K_yarn_q2",
+      "ctx": 524288,
+      "kv": "q4_0",
+      "draft_max": 3,
+      "yarn": true,
+      "note": "KV-Q2不可用"
+    },
+    {
+      "name": "1M_yarn",
+      "ctx": 1048576,
+      "kv": "q4_0",
+      "draft_max": 2,
+      "note": "仅理论, 需KV-Q2+streaming"
+    }
+  ],
+  "yarn_support": {
+    "rope_scaling": "linear|yarn",
+    "rope_scale": true,
+    "note": "当前llama-server v8851支持YaRN, 但未测试稳定性"
+  },
+  "vram_notes": {
+    "192K_q4_0": "~22GB (参照公开数据559MB free)",
+    "256K_q4_0": "可能OOM",
+    "384K+": "需要更激进压缩"
+  }
+}

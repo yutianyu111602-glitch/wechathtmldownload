@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log*
+*.log
+*.pid
+*.zip
+.codex-*.log
+.codex-*.pid
+.local-server.*
+weekly-api-local-*.log
+weekly-api-local-*.err.log
+weekly-api-local-*.pid

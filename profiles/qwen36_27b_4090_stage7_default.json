@@ -1,0 +1,73 @@
+{
+  "name": "qwen36-27b-4090-stage7-default",
+  "version": "1.0",
+  "description": "Stage 7 微信文章结构化抽取生产默认profile",
+  "status": "draft_pending_validation",
+  "backend": "llama-server (v8851) via llama-swap",
+  "llama_swap_model_id": "qwen36-27b-q4-spec-8k",
+  "target_model": {
+    "path": "D:\\models\\Qwen3.6-27B\\Qwen3.6-27B-Q4_K_M.gguf",
+    "size_gb": 15.7
+  },
+  "draft_model": {
+    "path": "D:\\models\\Qwen3-1.7B-Q4_K_M.gguf",
+    "size_gb": 1.03
+  },
+  "production_config": {
+    "context_size": 32768,
+    "draft_ctx_size": 4096,
+    "ngl": 99,
+    "ngld": 99,
+    "flash_attn": true,
+    "cache_type_k": "q8_0",
+    "cache_type_v": "q8_0",
+    "batch_size": 2048,
+    "ubatch_size": 512,
+    "draft_max": 12,
+    "draft_min": 3,
+    "draft_p_min": 0.6
+  },
+  "generation_params": {
+    "temperature": 0.1,
+    "top_p": 0.9,
+    "max_output_tokens": 4096,
+    "json_only": true,
+    "no_markdown": true,
+    "evidence_required": true
+  },
+  "worker_config": {
+    "start_concurrency": 1,
+    "max_concurrency": 2,
+    "scale_up_condition": "parse_success > 98% AND schema_pass > 95%",
+    "scale_down_condition": "invalid_json > 3% OR vram > 22GB OR acceptance_rate < 0.35"
+  },
+  "variants": {
+    "short_article": {
+      "ctx_size": 8192,
+      "draft_ctx_size": 4096,
+      "batch": 4096,
+      "ubatch": 1024
+    },
+    "normal_article": {
+      "ctx_size": 32768,
+      "draft_ctx_size": 4096,
+      "batch": 2048,
+      "ubatch": 512
+    },
+    "long_article": {
+      "ctx_size": 65536,
+      "draft_ctx_size": 8192,
+      "batch": 1024,
+      "ubatch": 512
+    }
+  },
+  "smoke_test_criteria": {
+    "count": 100,
+    "json_parse_success_min": 0.98,
+    "schema_pass_min": 0.95,
+    "evidence_missing_max": 0.05,
+    "terminal_failed_max": 0.02,
+    "acceptance_rate_min": 0.5,
+    "no_oom": true
+  }
+}

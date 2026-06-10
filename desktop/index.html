@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WeChat History HTML Pipeline</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <input type="text" aria-label="搜索当前工作区" hidden>
+      <header class="app-titlebar" aria-label="Title bar">
+        <div class="titlebar-brand">
+          <strong>WeChat History HTML Pipeline</strong>
+          <span>公众号历史文章归档与处理控制台</span>
+        </div>
+        <div class="titlebar-presence">
+          <span class="presence-dot" data-role="titlebar-state-dot" data-status="idle"></span>
+          <span data-role="titlebar-state-text">空闲</span>
+        </div>
+      </header>
+
+      <section class="global-path-bar" aria-label="全局路径配置">
+        <label class="command-field command-field-wide">
+          <span class="field-label">输入目录</span>
+          <div class="command-field-row">
+            <input data-role="input-path" type="text" placeholder="选择归档输入目录或 discovery 根目录">
+            <button data-role="pick-input" type="button">浏览</button>
+          </div>
+        </label>
+        <label class="command-field command-field-wide">
+          <span class="field-label">输出目录</span>
+          <div class="command-field-row">
+            <input data-role="output-path" type="text" placeholder="选择结构化输出目录">
+            <button data-role="pick-output" type="button">浏览</button>
+          </div>
+        </label>
+        <label class="command-toggle">
+          <input data-role="resume-toggle" type="checkbox">
+          <span>Resume 已产出项目</span>
+        </label>
+      </section>
+
+      <header class="app-commandbar" aria-label="Command bar">
+        <input data-role="commandbar-search" type="text" hidden>
+        <div role="menu" hidden></div>
+        <div class="commandbar-center">
+          <div class="commandbar-context">
+            <span class="field-label">当前工作区</span>
+            <strong data-role="workspace-title">任务总线</strong>
+            <span data-role="workspace-subtitle">当前唯一接入实时批处理快照的主工作区。</span>
+          </div>
+        </div>
+
+        <div class="commandbar-right">
+          <div class="compact-counter-strip" data-role="workspace-counter-summary">队列 0 | 运行 0 | 成功 0 | 失败 0</div>
+          <span data-role="workspace-object-name" hidden></span>
+          <span data-role="commandbar-lock-reason" hidden></span>
+          <button data-command-workspace="task-bus" type="button" hidden>任务总线</button>
+          <button data-command-workspace="collect" type="button" hidden>采集</button>
+          <button data-command-workspace="archive" type="button" hidden>归档</button>
+          <button data-command-workspace="process" type="button" hidden>处理</button>
+          <button data-command-workspace="artifact" type="button" hidden>产物</button>
+          <button data-role="compact-inspector-action" type="button" class="ghost-button" hidden>检查器</button>
+          <button data-role="open-output-button" type="button" class="ghost-button">打开输出</button>
+          <button data-role="auto-md-button" type="button" class="ghost-button">一键导出 LLM MD</button>
+          <button data-role="stop-button" type="button" class="danger-button" disabled>停止</button>
+          <button data-role="start-button" type="button" class="primary-button">开始</button>
+        </div>
+      </header>
+
+      <section class="app-body" aria-label="Application body">
+        <nav class="navigation-rail" aria-label="Workspaces">
+          <button class="nav-item is-active" data-workspace="task-bus" type="button" aria-label="切换到任务总线" aria-current="page">
+            <span class="nav-item-label">任务总线</span>
+          </button>
+          <button class="nav-item" data-workspace="collect" type="button" aria-label="切换到采集与账号">
+            <span class="nav-item-label">采集与账号</span>
+          </button>
+          <button class="nav-item" data-workspace="archive" type="button" aria-label="切换到归档与下载">
+            <span class="nav-item-label">归档与下载</span>
+          </button>
+          <button class="nav-item" data-workspace="process" type="button" aria-label="切换到处理与导出">
+            <span class="nav-item-label">处理与导出</span>
+          </button>
+          <button class="nav-item" data-workspace="artifact" type="button" aria-label="切换到产物与审查">
+            <span class="nav-item-label">产物与审查</span>
+          </button>
+        </nav>
+
+        <section class="workspace-frame">
+          <!-- 任务总线 -->
+          <section class="workspace-panel is-active" data-workspace="task-bus" aria-label="任务总线" aria-hidden="false">
+            <header class="workspace-header">
+              <div class="workspace-header-copy">
+                <p class="section-label">任务总线</p>
+                <h1>当前运行任务</h1>
+              </div>
+            </header>
+
+            <section class="table-panel">
+              <div class="table-toolbar table-toolbar-taskbus">
+                <div class="toolbar-group toolbar-group-grow">
+                  <span data-role="activity-summary">当前还没有批处理活动。</span>
+                </div>
+                <div class="toolbar-group">
+                  <button class="filter-button is-active" data-role="taskbus-filter" data-filter="all" type="button" aria-label="任务总线过滤：全部" aria-pressed="true">全部</button>
+                  <button class="filter-button" data-role="taskbus-filter" data-filter="running" type="button" aria-label="任务总线过滤：运行中" aria-pressed="false">运行中</button>
+                  <button class="filter-button" data-role="taskbus-filter" data-filter="failed" type="button" aria-label="任务总线过滤：失败" aria-pressed="false">失败</button>
+                  <button class="filter-button" data-role="taskbus-filter" data-filter="done" type="button" aria-label="任务总线过滤：已完成" aria-pressed="false">已完成</button>
+                </div>
+                <div class="toolbar-group">
+                  <input data-role="taskbus-search" class="table-search" type="text" placeholder="筛选文件名 / 错误消息" aria-label="搜索任务总线">
+                </div>
+              </div>
+              <div class="table-header table-header-taskbus">
+                <span>状态</span>
+                <span>文章 / 文件</span>
+                <span>阶段</span>
+                <span>消息</span>
+              </div>
+              <ul data-role="recent-items" class="item-list">
+                <li class="empty-state">当前没有处理任务。选择输入目录后开始。</li>
+              </ul>
+            </section>
+          </section>
+
+          <!-- 采集与账号 -->
+          <section class="workspace-panel" data-workspace="collect" aria-label="采集与账号" aria-hidden="true" hidden>
+            <header class="workspace-header">
+              <div class="workspace-header-copy">
+                <p class="section-label">采集与账号</p>
+                <h1>账号清单与发现结果</h1>
+                <p class="workspace-copy">按账号对象查看 discovery 状态、queue 规模和异常诊断。</p>
+              </div>
+              <div class="workspace-filter-strip">
+                <span class="filter-chip" data-role="collect-summary-chip">等待读取 discovery 状态</span>
+              </div>
+            </header>
+            <section class="table-panel">
+              <div class="table-toolbar table-toolbar-collect">
+                <div class="toolbar-group toolbar-group-grow">
+                  <span data-role="collect-summary">将从 discovery 根目录读取账号状态、queue 和最近 history 结果。</span>
+                </div>
+                <div class="toolbar-group">
+                  <button class="filter-button is-active" data-role="collect-filter" data-filter="all" type="button" aria-label="采集过滤：全部" aria-pressed="true">全部</button>
+                  <button class="filter-button" data-role="collect-filter" data-filter="failed" type="button" aria-label="采集过滤：异常" aria-pressed="false">异常</button>
+                  <button class="filter-button" data-role="collect-filter" data-filter="ready" type="button" aria-label="采集过滤：Queue>0" aria-pressed="false">Queue>0</button>
+                </div>
+                <div class="toolbar-group">
+                  <input data-role="collect-search" class="table-search" type="text" placeholder="搜索账号名 / fakeid" aria-label="搜索采集账号">
+                </div>
+              </div>
+              <div class="table-header table-header-collect-v2">
+                <span>账号名</span>
+                <span>主状态</span>
+                <span>已发现</span>
+                <span>入队</span>
+                <span>最近发现</span>
+                <span>异常码</span>
+                <span>预估规模</span>
+              </div>
+              <ul data-role="collect-items" class="item-list">
+                <li class="empty-state">切到该工作区后会读取本地状态文件。</li>
+              </ul>
+            </section>
+          </section>
+
+          <!-- 归档与下载 -->
+          <section class="workspace-panel" data-workspace="archive" aria-label="归档与下载" aria-hidden="true" hidden>
+            <header class="workspace-header">
+              <div class="workspace-header-copy">
+                <p class="section-label">归档与下载</p>
+                <h1>归档 bundle 诊断</h1>
+                <p class="workspace-copy">按 bundle 查看 capture 完整度、assets 保留和异常诊断。</p>
+              </div>
+              <div class="workspace-filter-strip">
+                <span class="filter-chip" data-role="archive-summary-chip">等待读取 archive 状态</span>
+              </div>
+            </header>
+            <section class="table-panel">
+              <div class="table-toolbar table-toolbar-archive">
+                <div class="toolbar-group toolbar-group-grow">
+                  <span data-role="archive-summary">将从 archive root 读取 capture 状态和资产保留结果。</span>
+                </div>
+                <div class="toolbar-group">
+                  <button class="filter-button is-active" data-role="archive-filter" data-filter="all" type="button" aria-label="归档过滤：全部" aria-pressed="true">全部</button>
+                  <button class="filter-button" data-role="archive-filter" data-filter="incomplete" type="button" aria-label="归档过滤：不完整" aria-pressed="false">不完整</button>
+                  <button class="filter-button" data-role="archive-filter" data-filter="conflict" type="button" aria-label="归档过滤：冲突" aria-pressed="false">冲突</button>
+                </div>
+                <div class="toolbar-group">
+                  <input data-role="archive-search" class="table-search" type="text" placeholder="搜索 token / 账号" aria-label="搜索归档 bundle">
+                </div>
+              </div>
+              <div class="table-header table-header-archive-v2">
+                <span>主状态</span>
+                <span>Token</span>
+                <span>账号</span>
+                <span>Capture</span>
+                <span>Assets</span>
+                <span>错误摘要</span>
+                <span>异常码</span>
+              </div>
+              <ul data-role="archive-items" class="item-list">
+                <li class="empty-state">切到该工作区后会读取 archive 状态文件和 bundle 目录。</li>
+              </ul>
+            </section>
+          </section>
+
+          <!-- 处理与导出 - 文章级工作台 -->
+          <section class="workspace-panel" data-workspace="process" aria-label="处理与导出" aria-hidden="true" hidden>
+            <header class="workspace-header">
+              <div class="workspace-header-copy">
+                <p class="section-label">处理与导出</p>
+                <h1>文章处理链</h1>
+                <p class="workspace-copy">按文章 bundle 查看 dual-track、导出与 downstream 状态。</p>
+              </div>
+              <div class="workspace-filter-strip">
+                <span class="filter-chip">文章级运维工作台</span>
+                <span class="filter-chip">dual-track / export / downstream</span>
+              </div>
+            </header>
+            <section class="table-panel">
+              <div class="table-toolbar table-toolbar-process">
+                <div class="toolbar-group toolbar-group-grow">
+                  <span data-role="process-summary">当前没有文章处理记录。</span>
+                </div>
+                <div class="toolbar-group">
+                  <button class="filter-button is-active" data-role="process-filter" data-filter="all" type="button" aria-label="处理过滤：全部" aria-pressed="true">全部</button>
+                  <button class="filter-button" data-role="process-filter" data-filter="failed" type="button" aria-label="处理过滤：失败" aria-pressed="false">失败</button>
+                  <button class="filter-button" data-role="process-filter" data-filter="missing" type="button" aria-label="处理过滤：缺产物" aria-pressed="false">缺产物</button>
+                  <button class="filter-button" data-role="process-mode" data-mode="llm" type="button" aria-label="处理与导出模式：LLM 输入" aria-pressed="false">LLM</button>
+                  <button class="filter-button" data-role="process-mode" data-mode="downstream" type="button" aria-label="处理与导出模式：下游处理" aria-pressed="false">Downstream</button>
+                  <button data-role="process-llm-export-button" type="button">LLM 导出</button>
+                </div>
+                <div class="toolbar-group">
+                  <input data-role="process-search" class="table-search" type="text" placeholder="搜索 article id / 标题 / 账号" aria-label="搜索文章处理记录">
+                </div>
+              </div>
+              <div class="table-header table-header-process">
+                <span>状态</span>
+                <span>Article ID</span>
+                <span>账号</span>
+                <span>阶段</span>
+                <span>Quality</span>
+                <span>Sidecar</span>
+                <span>LLM Input</span>
+                <span>Downstream</span>
+                <span>Warnings</span>
+              </div>
+              <ul data-role="process-items" class="item-list">
+                <li class="empty-state">当前没有文章处理记录。在任务总线启动批处理后会显示在这里。</li>
+              </ul>
+            </section>
+          </section>
+
+          <!-- 产物与审查 -->
+          <section class="workspace-panel" data-workspace="artifact" aria-label="产物与审查" aria-hidden="true" hidden>
+            <header class="workspace-header">
+              <div class="workspace-header-copy">
+                <p class="section-label">产物与审查</p>
+                <h1>产物预览与质量抽查</h1>
+                <p class="workspace-copy">查看 sidecar、llm_input、quality report 与人工复核结果。</p>
+              </div>
+              <div class="workspace-filter-strip">
+                <span class="filter-chip">质量审查工作台</span>
+              </div>
+            </header>
+            <section class="table-panel">
+              <div class="table-toolbar">
+                <div class="toolbar-group toolbar-group-grow">
+                  <span data-role="artifact-summary">产物列表将在首次处理完成后显示。</span>
+                </div>
+                <div class="toolbar-group">
+                  <button class="filter-button is-active" data-role="artifact-filter" data-filter="all" type="button" aria-label="产物过滤：全部" aria-pressed="true">全部</button>
+                  <button class="filter-button" data-role="artifact-filter" data-filter="sidecar" type="button" aria-label="产物过滤：Sidecar" aria-pressed="false">Sidecar</button>
+                  <button class="filter-button" data-role="artifact-filter" data-filter="llm-input" type="button" aria-label="产物过滤：LLM Input" aria-pressed="false">LLM Input</button>
+                </div>
+                <div class="toolbar-group">
+                  <input data-role="artifact-search" class="table-search" type="text" placeholder="搜索产物" aria-label="搜索最终 LLM Pack">
+                </div>
+              </div>
+              <div class="table-header">
+                <span>类型</span>
+                <span>产物</span>
+                <span>状态</span>
+                <span>质量</span>
+              </div>
+              <ul data-role="artifact-items" class="item-list">
+                <li class="empty-state">当前没有产物记录。在任务总线启动批处理后会显示在这里。</li>
+              </ul>
+            </section>
+          </section>
+        </section>
+
+        <aside class="right-inspector" aria-label="Inspector">
+          <section class="inspector-section">
+            <div class="inspector-section-header inspector-section-header-stack">
+              <p class="section-label">当前选择</p>
+              <h2 data-role="inspector-selection-title">当前没有活动对象。</h2>
+              <p data-role="inspector-selection-subtitle" class="section-copy">选中任务后，这里显示对象摘要与下一步动作。</p>
+            </div>
+          </section>
+
+          <section class="inspector-section">
+            <div class="inspector-section-header">
+              <p class="section-label">对象摘要</p>
+            </div>
+            <div class="detail-list">
+              <div class="detail-row">
+                <span data-role="detail-label-1">输入根目录</span>
+                <code data-role="detail-input-root">-</code>
+              </div>
+              <div class="detail-row">
+                <span data-role="detail-label-2">输出根目录</span>
+                <code data-role="detail-output-root">-</code>
+              </div>
+              <div class="detail-row">
+                <span data-role="detail-label-3">当前输出目录</span>
+                <code data-role="detail-out-dir">-</code>
+              </div>
+              <div class="detail-row">
+                <span data-role="detail-label-4">当前状态</span>
+                <code data-role="detail-current-status">空闲</code>
+              </div>
+              <div class="detail-row">
+                <span data-role="detail-label-5">当前消息</span>
+                <code data-role="detail-current-message">就绪。</code>
+              </div>
+            </div>
+          </section>
+
+          <section class="inspector-section">
+            <div class="inspector-section-header">
+              <p class="section-label">动作</p>
+            </div>
+            <div class="action-stack">
+              <button data-role="inspector-action-primary" type="button">打开当前对象</button>
+              <button data-role="inspector-action-secondary" type="button">刷新当前工作区</button>
+              <button data-role="inspector-action-tertiary" type="button">切到失败流</button>
+            </div>
+          </section>
+
+          <section class="inspector-section">
+            <div class="inspector-section-header">
+              <p class="section-label">当前工作区说明</p>
+            </div>
+            <ul class="inline-list">
+              <li>当前工作区的目标和动作会显示在这里。</li>
+            </ul>
+          </section>
+        </aside>
+      </section>
+
+      <section class="bottom-run-console" aria-label="Run console">
+        <div class="run-console-summary" data-role="run-console-summary">运行控制台会显示当前 job 的活动流、失败流与系统消息。</div>
+        <div class="run-console-tabs" role="tablist" aria-label="运行控制台标签">
+          <button id="console-tab-activity" data-console="activity" type="button" role="tab" aria-selected="true" aria-controls="console-panel-activity" tabindex="0" class="console-tab is-active">活动流</button>
+          <button id="console-tab-failures" data-console="failures" type="button" role="tab" aria-selected="false" aria-controls="console-panel-failures" tabindex="-1" class="console-tab">失败流</button>
+          <button id="console-tab-system" data-console="system" type="button" role="tab" aria-selected="false" aria-controls="console-panel-system" tabindex="-1" class="console-tab">系统消息</button>
+          <button data-role="theme-toggle" type="button" aria-label="切换主题">主题</button>
+          <button data-role="console-collapse" type="button" title="折叠/展开" aria-label="折叠或展开底部运行控制台" aria-expanded="true"></button>
+        </div>
+
+        <section id="console-panel-activity" data-console="activity" role="tabpanel" aria-labelledby="console-tab-activity" aria-hidden="false" class="console-panel is-active">
+          <div class="console-monitor-strip" data-role="mptext-monitor"></div>
+          <div class="log-summary console-log-summary" data-role="mptext-log-summary"></div>
+          <ul class="console-list" data-role="run-console-activity-list">
+            <li class="empty-state">当前没有活动记录。</li>
+          </ul>
+        </section>
+
+        <section id="console-panel-failures" data-console="failures" role="tabpanel" aria-labelledby="console-tab-failures" aria-hidden="true" class="console-panel" hidden>
+          <div class="console-panel-header">
+            <span data-role="failure-summary">当前快照里没有失败项目。</span>
+          </div>
+          <ul data-role="failure-list" class="console-list">
+            <li class="empty-state">当前快照里没有失败项目。</li>
+          </ul>
+        </section>
+
+        <section id="console-panel-system" data-console="system" role="tabpanel" aria-labelledby="console-tab-system" aria-hidden="true" class="console-panel" hidden>
+          <ul class="console-list" data-role="run-console-system-list">
+            <li class="empty-state">系统消息将在首次加载快照后显示。</li>
+          </ul>
+        </section>
+      </section>
+
+      <footer class="statusbar" role="status" aria-live="polite">
+        <span data-role="statusbar-state">就绪</span>
+        <span data-role="statusbar-input">输入: -</span>
+        <span data-role="statusbar-output">输出: -</span>
+        <span data-role="statusbar-current">当前: -</span>
+        <span data-role="statusbar-progress">0/0 已完成</span>
+      </footer>
+    </main>
+
+    <script type="module" src="./renderer.js"></script>
+  </body>
+</html>

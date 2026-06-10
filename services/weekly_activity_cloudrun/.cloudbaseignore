@@ -1,0 +1,25 @@
+node_modules
+npm-debug.log*
+*.log
+*.pid
+*.zip
+.codex-*.log
+.codex-*.pid
+.local-server.*
+weekly-api-local-*.log
+weekly-api-local-*.err.log
+weekly-api-local-*.pid
+tmp/
+reports/
+tests/
+crontab
+# 排除不需要的备份和历史数据
+data/current_release.bak-*
+data/current_release_backup_*
+data/current_release.broken_backup
+data/releases/
+data/release_*
+data/stage7_atlas/
+data/stage7_atlas_all_deepseek/
+data/stage7_atlas_all_full_llm/
+*.sqlite.bak-*

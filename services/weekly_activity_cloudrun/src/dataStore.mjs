@@ -1091,4 +1091,101 @@ export class WeeklyActivityDataStore {
       eventId: source.event_id || "",
     };
   }
+
+  /**
+   * Find current_release items that reference a DJ name in lineup_artists
+   * and return their yuanbao enrichment fields.
+   */
+  async getDjEnrichmentFromCurrent({ djName, djAliases = [], limit = 20 } = {}) {
+    const query = String(djName || "").trim().toLowerCase();
+    const aliases = (Array.isArray(djAliases) ? djAliases : []).map((a) => String(a || "").trim().toLowerCase()).filter(Boolean);
+    if (!query && !aliases.length) return { items: [], bios: [], profiles: [] };
+
+    try {
+      const current = await readJson(this.baseDir, "current.json");
+      const matches = [];
+
+      for (const item of current.items || []) {
+        const lineup = Array.isArray(item.lineup_artists) ? item.lineup_artists : [];
+        const hasMatch = lineup.some((artist) => {
+          const a = String(artist || "").trim().toLowerCase();
+          if (!a) return false;
+          if (a.includes(query) || query.includes(a)) return true;
+          return aliases.some((alias) => a.includes(alias) || alias.includes(a));
+        });
+        if (!hasMatch) continue;
+
+        const match = {
+          id: item.id || "",
+          title: item.title_display || item.title || "",
+          city: item.city_name || (item.city || [])[0] || "",
+          venue: item.venue_name || "",
+          event_date_start: item.event_date_start || "",
+          event_date_end: item.event_date_end || "",
+          poster_file_id: item.poster_file_id || "",
+          cloudFileId: item.cloudFileId || "",
+        };
+
+        // Attach yuanbao enrichment fields if present
+        const enrichment = {};
+        if (Array.isArray(item.dj_bio_lines) && item.dj_bio_lines.length) {
+          enrichment.dj_bio_lines = item.dj_bio_lines;
+        }
+        if (Array.isArray(item.artist_profiles) && item.artist_profiles.length) {
+          // Filter to profiles matching this DJ
+          enrichment.artist_profiles = item.artist_profiles.filter((p) => {
+            const pn = String(p?.name || "").trim().toLowerCase();
+            if (!pn) return false;
+            return pn.includes(query) || query.includes(pn) ||
+              aliases.some((a) => pn.includes(a) || a.includes(pn));
+          });
+          if (!enrichment.artist_profiles.length) delete enrichment.artist_profiles;
+        }
+        if (item.historical_context) {
+          enrichment.historical_context = item.historical_context;
+        }
+        if (item.extraction_metadata) {
+          enrichment.extraction_metadata = item.extraction_metadata;
+        }
+
+        if (Object.keys(enrichment).length) {
+          match.enrichment = enrichment;
+        }
+
+        matches.push(match);
+        if (matches.length >= limit) break;
+      }
+
+      // Collect unique bios and profiles across all matches
+      const bios = [];
+      const profiles = [];
+      const seenBios = new Set();
+      const seenProfiles = new Set();
+      for (const m of matches) {
+        if (m.enrichment?.dj_bio_lines) {
+          for (const line of m.enrichment.dj_bio_lines) {
+            const key = String(line).slice(0, 80);
+            if (!seenBios.has(key)) {
+              seenBios.add(key);
+              bios.push(line);
+            }
+          }
+        }
+        if (m.enrichment?.artist_profiles) {
+          for (const p of m.enrichment.artist_profiles) {
+            const key = `${p.name || ""}|${p.role || ""}`;
+            if (!seenProfiles.has(key)) {
+              seenProfiles.add(key);
+              profiles.push(p);
+            }
+          }
+        }
+      }
+
+      return { items: matches, bios: bios.slice(0, limit), profiles: profiles.slice(0, limit) };
+    } catch (err) {
+      console.error("[dataStore] getDjEnrichmentFromCurrent failed:", err.message);
+      return { items: [], bios: [], profiles: [] };
+    }
+  }
 }
