@@ -57,9 +57,16 @@ Page({
     this.loadSavedItems(ids);
   },
 
+  onPullDownRefresh() {
+    const ids = wx.getStorageSync("savedActivityIds") || [];
+    this.setData({ ids });
+    this.loadSavedItems(ids);
+  },
+
   async loadSavedItems(ids) {
     if (!ids.length) {
       this.setData({ items: [], loading: false, error: "" });
+      wx.stopPullDownRefresh();
       return;
     }
     this.setData({ loading: true, error: "" });
@@ -77,9 +84,11 @@ Page({
         items: allItems,
         loading: false,
       });
+      wx.stopPullDownRefresh();
     } catch (error) {
       console.error("[saved] loadSavedItems failed", error);
       this.setData({ loading: false, error: this.data.t.loadFailed });
+      wx.stopPullDownRefresh();
     }
   },
 

@@ -297,6 +297,9 @@ const TEXT = {
       linkCopiedConfirm: "知道了",
       sourceExternal: "外部来源（非微信）",
       footer: "内容基于公开 API 演出数据与已验证媒体来源。",
+      empty: "暂无专栏内容",
+      loadFailed: "网络连接失败，显示本地缓存",
+      shareItem: "分享",
     },
     en: {
       title: "Upcoming DJ Profiles",
@@ -309,6 +312,9 @@ const TEXT = {
       linkCopiedConfirm: "Got it",
       sourceExternal: "External source (non-WeChat)",
       footer: "Based on verified API event data and confirmed media sources.",
+      empty: "No column content yet",
+      loadFailed: "Network failed, showing cached data",
+      shareItem: "Share",
     },
   },
   "admin-reviews": {

@@ -6,7 +6,21 @@
     <view class="column-subtitle">{{t.subtitle}}</view>
   </view>
 
-  <view class="tag-filter">
+  <view wx:if="{{loading}}" class="column-loading">
+    <view class="loading-dot"></view>
+    <view class="loading-dot"></view>
+    <view class="loading-dot"></view>
+  </view>
+
+  <view wx:if="{{!loading && filteredItems.length === 0}}" class="column-empty">
+    <text class="empty-text">{{t.empty || "暂无内容"}}</text>
+  </view>
+
+  <view wx:if="{{loadFailed}}" class="column-notice">
+    <text class="notice-text">{{t.loadFailed || "网络连接失败，显示本地缓存"}}</text>
+  </view>
+
+  <view wx:if="{{!loading}}" class="tag-filter">
     <view
       wx:for="{{tags}}"
       wx:key="key"
@@ -68,6 +82,12 @@
           </view>
         </view>
         <view class="card-source">{{t.source}} {{item.sourceName}}</view>
+        <view class="card-share-row">
+          <button class="card-share-btn" open-type="share" data-id="{{item.id}}" data-title="{{item.title}}">
+            <text class="share-icon">↗</text>
+            <text class="share-text">{{t.shareItem || '分享'}}</text>
+          </button>
+        </view>
       </view>
     </view>
   </view>
