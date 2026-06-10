@@ -1,0 +1,101 @@
+"""Text chunker for Chinese articles."""
+from __future__ import annotations
+import re
+import hashlib
+from dataclasses import dataclass
+from typing import List
+
+
+@dataclass
+class Chunk:
+    chunk_id: str
+    chunk_index: int
+    char_start: int
+    char_end: int
+    text_sha1: str
+    chars: int
+    text: str
+
+
+@dataclass
+class ChunkPlan:
+    article_uid: str
+    chunk_count: int
+    strategy: str
+    chunks: List[Chunk]
+
+
+def sha1_text(text: str) -> str:
+    return hashlib.sha1(text.encode("utf-8")).hexdigest()
+
+
+def chunk_article(article_uid: str, text: str, target_chars: int = 4200, max_chars: int = 6000, min_chars: int = 800) -> ChunkPlan:
+    """Split article text into paragraph-aware chunks."""
+    if not text:
+        return ChunkPlan(article_uid=article_uid, chunk_count=0, strategy="paragraph_aware_v1", chunks=[])
+
+    # Split into paragraphs
+    paragraphs = [p.strip() for p in re.split(r'\n\s*\n', text) if p.strip()]
+    if not paragraphs:
+        paragraphs = [text.strip()]
+
+    chunks: List[Chunk] = []
+    current_text = ""
+    current_start = 0
+    chunk_index = 0
+
+    for para in paragraphs:
+        # If adding this paragraph exceeds max_chars, finalize current chunk
+        if current_text and len(current_text) + len(para) + 2 > max_chars:
+            _finalize_chunk(chunks, article_uid, chunk_index, current_text, current_start)
+            chunk_index += 1
+            current_start += len(current_text)
+            current_text = para
+        else:
+            if current_text:
+                current_text += "\n\n" + para
+            else:
+                current_text = para
+
+        # If current chunk reaches target, finalize
+        if len(current_text) >= target_chars:
+            _finalize_chunk(chunks, article_uid, chunk_index, current_text, current_start)
+            chunk_index += 1
+            current_start += len(current_text)
+            current_text = ""
+
+    # Finalize remaining
+    if current_text and len(current_text) >= min_chars:
+        _finalize_chunk(chunks, article_uid, chunk_index, current_text, current_start)
+        chunk_index += 1
+    elif current_text and chunks:
+        # Append to last chunk if too small
+        last = chunks[-1]
+        merged = last.text + "\n\n" + current_text
+        last.text = merged
+        last.char_end = last.char_start + len(merged)
+        last.chars = len(merged)
+        last.text_sha1 = sha1_text(merged)
+        last.chunk_id = f"{article_uid}:{last.chunk_index:03d}"
+    elif current_text:
+        _finalize_chunk(chunks, article_uid, chunk_index, current_text, current_start)
+        chunk_index += 1
+
+    return ChunkPlan(
+        article_uid=article_uid,
+        chunk_count=len(chunks),
+        strategy="paragraph_aware_v1",
+        chunks=chunks,
+    )
+
+
+def _finalize_chunk(chunks: List[Chunk], article_uid: str, chunk_index: int, text: str, char_start: int) -> None:
+    chunks.append(Chunk(
+        chunk_id=f"{article_uid}:{chunk_index:03d}",
+        chunk_index=chunk_index,
+        char_start=char_start,
+        char_end=char_start + len(text),
+        text_sha1=sha1_text(text),
+        chars=len(text),
+        text=text,
+    ))

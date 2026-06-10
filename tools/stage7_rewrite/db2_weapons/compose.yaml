@@ -1,0 +1,108 @@
+name: db2-weapons-arsenal
+
+x-weapons-common: &weapons-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+  network_mode: "host"
+  environment:
+    PYTHONUNBUFFERED: "1"
+    DB2_PATH: /home/pc/swarm_data/atlas_swarm_data.sqlite
+  volumes:
+    - type: bind
+      source: /home/pc/swarm_data
+      target: /db2-data
+      read_only: false
+    - type: bind
+      source: /home/pc/swarm_data
+      target: /home/pc/swarm_data
+      read_only: false
+    - type: bind
+      source: /home/pc/swarm_data/write_spool
+      target: /db2-spool
+      read_only: false
+    - type: bind
+      source: /home/pc/swarm_data/cache
+      target: /db2-cache
+      read_only: false
+    - type: bind
+      source: /home/pc/cookies
+      target: /db2-cookies
+      read_only: true
+    - type: bind
+      source: /home/pc/cookies
+      target: /home/pc/cookies
+      read_only: true
+    - type: bind
+      source: /home/pc/scripts
+      target: /db2-scripts
+      read_only: true
+    - type: bind
+      source: /home/pc/scripts
+      target: /home/pc/scripts
+      read_only: true
+    - type: bind
+      source: /mnt/c/code/githubstar/wechathtmldownload/tools/stage7_rewrite/scripts
+      target: /mnt/c/code/githubstar/wechathtmldownload/tools/stage7_rewrite/scripts
+      read_only: true
+
+services:
+  # SoundCloud API — read-only
+  db2-sc-api:
+    <<: *weapons-common
+    profiles: ["sc", "all"]
+    command: ["sc_api"]
+
+  # SoundCloud deep crawl
+  db2-sc-deep:
+    <<: *weapons-common
+    profiles: ["sc", "all"]
+    command: ["sc_deep"]
+
+  # IG bio extraction
+  db2-ig-fission:
+    <<: *weapons-common
+    profiles: ["ig", "all"]
+    command: ["ig_fission"]
+
+  # Chinese platforms
+  db2-domestic:
+    <<: *weapons-common
+    profiles: ["domestic", "all"]
+    command: ["domestic"]
+
+  # Avatar download
+  db2-avatar:
+    <<: *weapons-common
+    profiles: ["avatar", "all"]
+    command: ["avatar"]
+
+  # Outlink expansion
+  db2-expand:
+    <<: *weapons-common
+    profiles: ["expand", "all"]
+    command: ["expand"]
+
+  # DB writer — single process
+  db2-writer:
+    <<: *weapons-common
+    profiles: ["writer", "all"]
+    command: ["writer"]
+
+  # Cache seeder
+  db2-cache:
+    <<: *weapons-common
+    profiles: ["cache", "all"]
+    command: ["cache"]
+
+  # Dedup map builder
+  db2-dedup:
+    <<: *weapons-common
+    profiles: ["dedup", "all"]
+    command: ["dedup"]
+
+  # Health monitor
+  db2-monitor:
+    <<: *weapons-common
+    profiles: ["monitor", "all"]
+    command: ["monitor"]

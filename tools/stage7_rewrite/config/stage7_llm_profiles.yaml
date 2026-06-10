@@ -1,0 +1,36 @@
+profiles:
+  stable_json_v1:
+    temperature: 0.02
+    top_p: 0.75
+    top_k: 20
+    min_p: 0.0
+    repeat_penalty: 1.03
+    max_tokens: 4096
+    seed: 42
+    stream: false
+    thinking: false
+    reasoning: false
+
+  strict_json_v1:
+    temperature: 0.0
+    top_p: 0.65
+    top_k: 10
+    min_p: 0.0
+    repeat_penalty: 1.03
+    max_tokens: 3072
+    seed: 42
+    stream: false
+    thinking: false
+    reasoning: false
+
+  long_json_v1:
+    temperature: 0.0
+    top_p: 0.75
+    top_k: 20
+    min_p: 0.0
+    repeat_penalty: 1.03
+    max_tokens: 6144
+    seed: 42
+    stream: false
+    thinking: false
+    reasoning: false

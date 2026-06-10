@@ -1,0 +1,16 @@
+chunking:
+  target_chars: 800
+  max_chars: 5000
+  min_chars: 600
+  overlap_chars: 100
+llm:
+  api_style: ollama
+  endpoint: http://192.168.128.1:11434
+  model: qwen3.6:27b
+  max_tokens: 512
+  temperature: 0.1
+  top_p: 0.85
+  timeout_sec: 120
+  max_retries: 1
+  retry_backoff_sec: [5]
+output_root: D:\downstream_results\stage7_rewrite

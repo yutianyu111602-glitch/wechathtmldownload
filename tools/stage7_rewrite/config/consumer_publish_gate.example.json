@@ -1,0 +1,26 @@
+{
+  "schema_version": "stage7_consumer_publish_gate_config.v1",
+  "publish_target": {
+    "channel": "production",
+    "artifact_source": "reports/consumer_release_pack_full_unknown_time_20260514/release_pointer.staging.json",
+    "upload_strategy": "manual_or_external_release_job"
+  },
+  "rollback": {
+    "previous_pointer_path": "reports/consumer_release_pack_full_unknown_time_20260514/release_pointer.staging.json",
+    "rollback_owner": "release_owner"
+  },
+  "post_publish_smoke": {
+    "required_checks": [
+      "endpoint_http_200",
+      "sample_article_count",
+      "unknown_time_rendering"
+    ],
+    "sample_count": 20
+  },
+  "unknown_time_business_acceptance": {
+    "accepted": false,
+    "accepted_by": "release_owner",
+    "accepted_at": "2026-05-15",
+    "user_visible_policy": "hide publish date when publish_time_status is unknown"
+  }
+}

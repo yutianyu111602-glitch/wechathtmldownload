@@ -1,0 +1,123 @@
+name: openclaw-weekly
+
+x-openclaw-common-env: &openclaw-common-env
+  OPENCLAW_COMMAND_SCHEMA_VERSION: "openclaw_weekly_docker_profile_command.v1"
+  OPENCLAW_MODE: "contract-only"
+  OPENCLAW_NETWORK_POLICY: "disabled_or_explicit_release_only"
+  OPENCLAW_SECRET_POLICY: "environment_injection_only_no_value_read"
+  OPENCLAW_DB_WRITE_POLICY: "disabled"
+  OPENCLAW_CLOUDBASE_UPLOAD_POLICY: "disabled"
+
+x-openclaw-contract-common: &openclaw-contract-common
+  build:
+    context: ../../../..
+    dockerfile: tools/stage7_rewrite/docker/openclaw-weekly/Dockerfile
+  network_mode: "none"
+  environment: *openclaw-common-env
+  volumes:
+    - type: bind
+      source: ../../../..
+      target: /workspace
+      read_only: true
+    - type: bind
+      source: ../../reports
+      target: /openclaw-reports
+      read_only: false
+  labels:
+    com.huaidj.openclaw.contract: "report-only"
+    com.huaidj.openclaw.no_secret_values: "true"
+    com.huaidj.openclaw.no_execution_by_default: "true"
+
+services:
+  openclaw-source-exporter:
+    <<: *openclaw-contract-common
+    profiles: ["openclaw-source-exporter"]
+    environment:
+      <<: *openclaw-common-env
+      OPENCLAW_LAYER: "L1"
+      OPENCLAW_PROFILE: "openclaw-source-exporter"
+      OPENCLAW_SERVICE: "openclaw-source-exporter"
+      OPENCLAW_QUEUE_NAME: "openclaw.source_exporter"
+    command: ["--profile", "openclaw-source-exporter", "--service", "openclaw-source-exporter", "--layer", "L1", "--queue-name", "openclaw.source_exporter", "--out-dir", "/openclaw-reports/openclaw_docker_profiles_contract"]
+
+  openclaw-source-queue-cache:
+    <<: *openclaw-contract-common
+    profiles: ["openclaw-source-queue-cache"]
+    environment:
+      <<: *openclaw-common-env
+      OPENCLAW_LAYER: "L2"
+      OPENCLAW_PROFILE: "openclaw-source-queue-cache"
+      OPENCLAW_SERVICE: "openclaw-source-queue-cache"
+      OPENCLAW_QUEUE_NAME: "openclaw.source_queue_cache"
+    command: ["--profile", "openclaw-source-queue-cache", "--service", "openclaw-source-queue-cache", "--layer", "L2", "--queue-name", "openclaw.source_queue_cache", "--out-dir", "/openclaw-reports/openclaw_docker_profiles_contract"]
+
+  openclaw-ocr-worker:
+    <<: *openclaw-contract-common
+    profiles: ["openclaw-ocr"]
+    environment:
+      <<: *openclaw-common-env
+      OPENCLAW_LAYER: "L3"
+      OPENCLAW_PROFILE: "openclaw-ocr"
+      OPENCLAW_SERVICE: "openclaw-ocr-worker"
+      OPENCLAW_QUEUE_NAME: "openclaw.ocr"
+    command: ["--profile", "openclaw-ocr", "--service", "openclaw-ocr-worker", "--layer", "L3", "--queue-name", "openclaw.ocr", "--out-dir", "/openclaw-reports/openclaw_docker_profiles_contract"]
+
+  openclaw-poster-ocr-recovery-worker:
+    <<: *openclaw-contract-common
+    profiles: ["openclaw-poster-ocr-recovery"]
+    environment:
+      <<: *openclaw-common-env
+      OPENCLAW_LAYER: "L3A"
+      OPENCLAW_PROFILE: "openclaw-poster-ocr-recovery"
+      OPENCLAW_SERVICE: "openclaw-poster-ocr-recovery-worker"
+      OPENCLAW_QUEUE_NAME: "openclaw.poster_ocr_recovery"
+      OPENCLAW_POSTER_PACKAGE_POLICY: "cloudbase_file_id_only_no_temp_url"
+    command: ["--profile", "openclaw-poster-ocr-recovery", "--service", "openclaw-poster-ocr-recovery-worker", "--layer", "L3A", "--queue-name", "openclaw.poster_ocr_recovery", "--out-dir", "/openclaw-reports/openclaw_docker_profiles_contract"]
+
+  openclaw-llm-extract-worker:
+    <<: *openclaw-contract-common
+    profiles: ["openclaw-llm-extraction"]
+    environment:
+      <<: *openclaw-common-env
+      OPENCLAW_LAYER: "L4"
+      OPENCLAW_PROFILE: "openclaw-llm-extraction"
+      OPENCLAW_SERVICE: "openclaw-llm-extract-worker"
+      OPENCLAW_QUEUE_NAME: "openclaw.llm_extraction"
+      OPENCLAW_LLM_PROVIDER: "deepseek"
+      OPENCLAW_LLM_PRIMARY_MODEL: "deepseek-v4-flash"
+      OPENCLAW_LLM_RISK_MODEL: "deepseek-v4-pro"
+      OPENCLAW_LLM_THINKING: "disabled"
+    command: ["--profile", "openclaw-llm-extraction", "--service", "openclaw-llm-extract-worker", "--layer", "L4", "--queue-name", "openclaw.llm_extraction", "--out-dir", "/openclaw-reports/openclaw_docker_profiles_contract"]
+
+  openclaw-map-verify-worker:
+    <<: *openclaw-contract-common
+    profiles: ["openclaw-map-verify"]
+    environment:
+      <<: *openclaw-common-env
+      OPENCLAW_LAYER: "L5"
+      OPENCLAW_PROFILE: "openclaw-map-verify"
+      OPENCLAW_SERVICE: "openclaw-map-verify-worker"
+      OPENCLAW_QUEUE_NAME: "openclaw.map_verify"
+    command: ["--profile", "openclaw-map-verify", "--service", "openclaw-map-verify-worker", "--layer", "L5", "--queue-name", "openclaw.map_verify", "--out-dir", "/openclaw-reports/openclaw_docker_profiles_contract"]
+
+  openclaw-package-merge-worker:
+    <<: *openclaw-contract-common
+    profiles: ["openclaw-package-merge"]
+    environment:
+      <<: *openclaw-common-env
+      OPENCLAW_LAYER: "L6"
+      OPENCLAW_PROFILE: "openclaw-package-merge"
+      OPENCLAW_SERVICE: "openclaw-package-merge-worker"
+      OPENCLAW_QUEUE_NAME: "openclaw.package_merge"
+    command: ["--profile", "openclaw-package-merge", "--service", "openclaw-package-merge-worker", "--layer", "L6", "--queue-name", "openclaw.package_merge", "--out-dir", "/openclaw-reports/openclaw_docker_profiles_contract"]
+
+  openclaw-release-wrapper:
+    <<: *openclaw-contract-common
+    profiles: ["openclaw-deploy-upload-wrapper"]
+    environment:
+      <<: *openclaw-common-env
+      OPENCLAW_LAYER: "L7"
+      OPENCLAW_PROFILE: "openclaw-deploy-upload-wrapper"
+      OPENCLAW_SERVICE: "openclaw-release-wrapper"
+      OPENCLAW_QUEUE_NAME: "openclaw.deploy_upload_wrapper"
+    command: ["--profile", "openclaw-deploy-upload-wrapper", "--service", "openclaw-release-wrapper", "--layer", "L7", "--queue-name", "openclaw.deploy_upload_wrapper", "--out-dir", "/openclaw-reports/openclaw_docker_profiles_contract"]

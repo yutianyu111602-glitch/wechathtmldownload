@@ -1,0 +1,290 @@
+"""JSON repair utilities."""
+from __future__ import annotations
+import json
+import re
+from dataclasses import dataclass
+from typing import Optional, Any
+
+
+@dataclass
+class JsonRepairResult:
+    ok: bool
+    used_repair: bool
+    parse_attempts: int
+    value: Optional[Any] = None
+    raw_text: str = ""
+    cleaned_text: Optional[str] = None
+    repaired_text: Optional[str] = None
+    error_type: Optional[str] = None
+    error_message: Optional[str] = None
+
+
+def strip_markdown_fence(text: str) -> str:
+    """Remove ```json ... ``` fences."""
+    # Pattern: ```json\n...\n``` or ```\n...\n```
+    pattern = r'^\s*```(?:json)?\s*\n?(.*?)\n?```\s*$'
+    m = re.match(pattern, text, re.DOTALL)
+    if m:
+        return m.group(1).strip()
+    return text.strip()
+
+
+def remove_bom(text: str) -> str:
+    return text.lstrip('\ufeff')
+
+
+def fix_trailing_commas(text: str) -> str:
+    """Remove trailing commas before } or ]."""
+    text = re.sub(r',(\s*[}\]])', r'\1', text)
+    return text
+
+
+def fix_missing_commas(text: str) -> str:
+    """Insert missing commas between JSON values.
+
+    Common patterns from LLM output:
+    - "value"\n  "key"  (missing comma between object entries)
+    - ]\n  {  (missing comma between array elements)
+    - }\n  {  (missing comma between array elements)
+    - "value"\n  ]  (trailing value before ] — don't add comma here)
+    """
+    # Pattern 1: "string"\n  "key":  -> add comma after closing quote before next key
+    text = re.sub(r'("(?:[^"\\]|\\.)*")(\s*\n\s*")', r'\1,\2', text)
+    # Pattern 2: ]\n  {  or  }\n  {  -> add comma between array elements
+    text = re.sub(r'(\])(\s*\n\s*\{)', r'\1,\2', text)
+    text = re.sub(r'(\})(\s*\n\s*\{)', r'\1,\2', text)
+    # Pattern 3: number/bool/null\n  "key" -> add comma
+    text = re.sub(r'(true|false|null|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)(\s*\n\s*")', r'\1,\2', text)
+    return text
+
+
+def classify_json_error(error_message: str) -> str:
+    """Classify JSON parse error type for targeted repair."""
+    msg = error_message.lower()
+    if "expecting ',' delimiter" in msg or "expecting ','" in msg:
+        return "missing_comma"
+    if "unterminated string" in msg or "unterminated" in msg:
+        return "unterminated_string"
+    if "extra data" in msg:
+        return "extra_data"
+    if 'expecting property name enclosed in double quotes' in msg:
+        return "bad_quote_or_trailing_comma"
+    if "eof" in msg or "expecting value" in msg:
+        return "truncated_json"
+    return "unknown"
+
+
+def fix_truncated_json(text: str) -> str:
+    """Attempt to fix truncated JSON by closing open structures.
+    
+    Common when LLM hits max_tokens: JSON is cut off mid-string or mid-object.
+    Strategy: close unclosed strings, then close unclosed brackets/objects.
+    """
+    # Work from first { to end
+    start = text.find('{')
+    if start == -1:
+        return text
+    
+    text = text[start:]
+    
+    # Track depth and close open structures
+    depth = 0
+    in_string = False
+    escape_next = False
+    result = []
+    bracket_stack = []  # Track bracket types for proper closing
+    
+    for i, ch in enumerate(text):
+        if escape_next:
+            result.append(ch)
+            escape_next = False
+            continue
+        
+        if ch == '\\' and in_string:
+            result.append(ch)
+            escape_next = True
+            continue
+        
+        if ch == '"' and not escape_next:
+            in_string = not in_string
+            result.append(ch)
+            continue
+        
+        if in_string:
+            result.append(ch)
+            continue
+        
+        if ch == '{':
+            depth += 1
+            bracket_stack.append('{')
+            result.append(ch)
+        elif ch == '[':
+            depth += 1
+            bracket_stack.append('[')
+            result.append(ch)
+        elif ch == '}':
+            depth -= 1
+            if bracket_stack and bracket_stack[-1] == '{':
+                bracket_stack.pop()
+            result.append(ch)
+        elif ch == ']':
+            depth -= 1
+            if bracket_stack and bracket_stack[-1] == '[':
+                bracket_stack.pop()
+            result.append(ch)
+        else:
+            result.append(ch)
+    
+    # Close any open string
+    if in_string:
+        result.append('"')
+    
+    # Handle incomplete key-value pairs at the end
+    import re
+    joined = ''.join(result)
+    
+    # Pattern 1: key with empty string value (ends with :")
+    if joined.rstrip().endswith(':"'):
+        result.append('""')
+    # Pattern 2: key with no value at all (ends with :)
+    elif joined.rstrip().endswith(':'):
+        result.append(' null')
+    # Pattern 3: partial key after comma - e.g. ,\n      "confidence"
+    # Remove the orphan key and the preceding comma
+    else:
+        # Match: comma, whitespace, quoted string at end
+        m = re.search(r',\s*"[^"]*"\s*$', joined)
+        if m:
+            result = list(joined[:m.start()])
+        # Pattern 4: trailing comma with nothing after
+        elif joined.rstrip().endswith(','):
+            result = list(joined.rstrip())
+            result.pop()
+    
+    # Close unclosed brackets using the stack
+    while bracket_stack:
+        last = bracket_stack.pop()
+        if last == '{':
+            result.append('}')
+        elif last == '[':
+            result.append(']')
+    
+    return ''.join(result)
+
+
+def extract_first_json_object(text: str) -> str:
+    """Extract the first { ... } block."""
+    start = text.find('{')
+    if start == -1:
+        return text
+    # Find matching }
+    depth = 0
+    for i, ch in enumerate(text[start:], start):
+        if ch == '{':
+            depth += 1
+        elif ch == '}':
+            depth -= 1
+            if depth == 0:
+                return text[start:i+1]
+    return text[start:]
+
+
+def parse_and_repair_json(raw_text: str, repair_prompt_callback: Optional[Any] = None) -> JsonRepairResult:
+    """Attempt to parse JSON with cleaning and optional LLM repair."""
+    result = JsonRepairResult(ok=False, used_repair=False, parse_attempts=0, raw_text=raw_text)
+
+    # Attempt 1: direct parse
+    cleaned = strip_markdown_fence(raw_text)
+    cleaned = remove_bom(cleaned)
+    cleaned = extract_first_json_object(cleaned)
+    result.cleaned_text = cleaned
+
+    result.parse_attempts += 1
+    try:
+        result.value = json.loads(cleaned)
+        result.ok = True
+        return result
+    except json.JSONDecodeError as e:
+        result.error_type = classify_json_error(str(e))
+        result.error_message = str(e)
+
+    # Attempt 2: fix trailing commas + missing commas
+    fixed = fix_trailing_commas(cleaned)
+    fixed = fix_missing_commas(fixed)
+    result.parse_attempts += 1
+    try:
+        result.value = json.loads(fixed)
+        result.ok = True
+        result.cleaned_text = fixed
+        result.used_repair = True
+        return result
+    except json.JSONDecodeError as e:
+        result.error_type = classify_json_error(str(e))
+        result.error_message = str(e)
+
+    # Attempt 3: second pass of missing comma fix (some need two passes)
+    fixed2 = fix_missing_commas(fixed)
+    if fixed2 != fixed:
+        result.parse_attempts += 1
+        try:
+            result.value = json.loads(fixed2)
+            result.ok = True
+            result.cleaned_text = fixed2
+            result.used_repair = True
+            return result
+        except json.JSONDecodeError as e:
+            result.error_type = classify_json_error(str(e))
+            result.error_message = str(e)
+
+    # Attempt 4: aggressive extraction — find first { to last }
+    aggressive = cleaned
+    first_brace = aggressive.find('{')
+    last_brace = aggressive.rfind('}')
+    if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
+        aggressive = aggressive[first_brace:last_brace+1]
+        aggressive = fix_trailing_commas(aggressive)
+        aggressive = fix_missing_commas(aggressive)
+        result.parse_attempts += 1
+        try:
+            result.value = json.loads(aggressive)
+            result.ok = True
+            result.cleaned_text = aggressive
+            result.used_repair = True
+            return result
+        except json.JSONDecodeError as e:
+            result.error_type = classify_json_error(str(e))
+            result.error_message = str(e)
+
+    # Attempt 4b: handle truncated JSON (LLM hit max_tokens)
+    # Close any open brackets/strings to make the JSON parseable
+    truncated = fix_truncated_json(cleaned)
+    if truncated != cleaned:
+        result.parse_attempts += 1
+        try:
+            result.value = json.loads(truncated)
+            result.ok = True
+            result.cleaned_text = truncated
+            result.used_repair = True
+            return result
+        except json.JSONDecodeError:
+            pass  # Fall through to LLM repair
+
+    # Attempt 5: LLM repair (if callback provided)
+    if repair_prompt_callback is not None:
+        result.parse_attempts += 1
+        result.used_repair = True
+        try:
+            repaired_text = repair_prompt_callback(cleaned)
+            result.repaired_text = repaired_text
+            repaired = strip_markdown_fence(repaired_text)
+            repaired = remove_bom(repaired)
+            repaired = extract_first_json_object(repaired)
+            result.value = json.loads(repaired)
+            result.ok = True
+            result.cleaned_text = repaired
+            return result
+        except Exception as e:
+            result.error_type = "repair_failed"
+            result.error_message = str(e)
+
+    return result

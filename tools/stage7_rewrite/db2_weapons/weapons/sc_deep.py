@@ -1,0 +1,1 @@
+from weapons._legacy_wrappers import run_sc_deep as run, run_sc_deep

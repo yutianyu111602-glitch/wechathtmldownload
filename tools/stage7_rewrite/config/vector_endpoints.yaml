@@ -1,0 +1,94 @@
+endpoints:
+  local_mac_vector_endpoint_11435:
+    endpoint_id: "local_mac_vector_endpoint_11435"
+    canonical_url: "http://127.0.0.1:11435"
+    pc_call_url: "http://192.168.8.234:11435"
+    url: "http://192.168.8.234:11435"
+    model: "bge-m3"
+    served_model: "bge-m3-Q4_K_M.gguf"
+    dim: 1024
+    route_role: "wechat_93k_multilingual_fallback"
+    use: "same_dimension_multilingual_fallback"
+    health_path: "/health"
+    meta_path: "/meta"
+
+  local_mac_vector_endpoint_11436:
+    endpoint_id: "local_mac_vector_endpoint_11436"
+    canonical_url: "http://127.0.0.1:11436"
+    pc_call_url: "http://192.168.8.234:11436"
+    url: "http://192.168.8.234:11436"
+    model: "stella_en"
+    served_model: "stella_en_1.5B_v5.gguf"
+    dim: 1536
+    route_role: "english_only"
+    use: "english_collections_only"
+    health_path: "/health"
+    meta_path: "/meta"
+
+  local_mac_vector_endpoint_11437:
+    endpoint_id: "local_mac_vector_endpoint_11437"
+    canonical_url: "http://127.0.0.1:11437"
+    pc_call_url: "http://192.168.8.234:11437"
+    url: "http://192.168.8.234:11437"
+    model: "stella-large-zh-v2"
+    served_model: "stella-large-zh-v2"
+    dim: 1024
+    route_role: "wechat_93k_default"
+    use: "default_93k_wechat_entity_event_relation"
+    health_path: "/health"
+    meta_path: "/meta"
+    is_default: true
+
+  local_mac_vector_endpoint_11438:
+    endpoint_id: "local_mac_vector_endpoint_11438"
+    canonical_url: "http://127.0.0.1:11438"
+    pc_call_url: "http://192.168.8.234:11438"
+    url: "http://192.168.8.234:11438"
+    model: "stella-base-zh-v2"
+    served_model: "stella-base-zh-v2"
+    dim: 768
+    route_role: "zh_lightweight_prefilter"
+    use: "chinese_lightweight_prefilter_only"
+    health_path: "/health"
+    meta_path: "/meta"
+
+default_chinese_endpoint: "local_mac_vector_endpoint_11437"
+
+rules:
+  - "dim must be read from endpoint /meta, not hardcoded"
+  - "dim mismatch must fail fast, no truncation, no padding"
+  - "collection name must include model and dimension"
+  - "different dimensions cannot share a collection"
+  - "11437/stella-large-zh-v2/1024 is default for 93k WeChat entity/event/relation"
+  - "11435/bge-m3/1024 is same-dimension fallback and must be marked as fallback"
+  - "11436/stella_en/1536 is English collections only"
+  - "11438/stella-base-zh-v2/768 is lightweight Chinese prefilter only"
+  - "Qdrant is NOT running on Mac currently"
+  - "cloud Mem0 is disabled unless separately authorized"
+  - "PC runtime calls pc_call_url; canonical_url records the Mac-local endpoint"
+
+collections:
+  wechat_entities_stella_large_zh_1024:
+    endpoint: "local_mac_vector_endpoint_11437"
+    dim: 1024
+    object_kind: "entity"
+  wechat_events_stella_large_zh_1024:
+    endpoint: "local_mac_vector_endpoint_11437"
+    dim: 1024
+    object_kind: "event"
+  wechat_relations_stella_large_zh_1024:
+    endpoint: "local_mac_vector_endpoint_11437"
+    dim: 1024
+    object_kind: "relation"
+  wechat_claims_stella_large_zh_1024:
+    endpoint: "local_mac_vector_endpoint_11437"
+    dim: 1024
+    object_kind: "claim"
+  wechat_articles_stella_large_zh_1024:
+    endpoint: "local_mac_vector_endpoint_11437"
+    dim: 1024
+    object_kind: "article"
+  wechat_ocr_evidence_stella_large_zh_1024:
+    endpoint: "local_mac_vector_endpoint_11437"
+    dim: 1024
+    object_kind: "ocr_evidence"

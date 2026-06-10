@@ -1,0 +1,16 @@
+chunking:
+  target_chars: 1000
+  max_chars: 5000
+  min_chars: 800
+llm:
+  api_style: openai_compatible
+  endpoint: https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1
+  model: qwen3.6-plus
+  api_key: ${TOKEN_PLAN_API_KEY}
+  max_tokens: 512
+  temperature: 0.1
+  top_p: 0.85
+  timeout_sec: 120
+  max_retries: 1
+  retry_backoff_sec: [5]
+output_root: D:\downstream_results\stage7_rewrite

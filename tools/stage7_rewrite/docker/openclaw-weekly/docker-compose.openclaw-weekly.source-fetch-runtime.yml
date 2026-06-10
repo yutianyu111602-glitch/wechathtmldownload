@@ -1,0 +1,16 @@
+name: openclaw-weekly
+
+services:
+  openclaw-source-queue-cache:
+    network_mode: "bridge"
+    environment:
+      OPENCLAW_MODE: "source-fetch-runtime-dry-run"
+      OPENCLAW_NETWORK_POLICY: "explicit_controller_release_l2_source_fetch_only"
+      OPENCLAW_SECRET_POLICY: "environment_injection_only_no_value_read"
+      OPENCLAW_DB_WRITE_POLICY: "disabled"
+      OPENCLAW_CLOUDBASE_UPLOAD_POLICY: "disabled"
+    labels:
+      com.huaidj.openclaw.contract: "explicit-l2-source-fetch-runtime-release-only"
+      com.huaidj.openclaw.no_secret_values: "true"
+      com.huaidj.openclaw.no_db_or_coordinate_write: "true"
+      com.huaidj.openclaw.no_upload_review_release: "true"

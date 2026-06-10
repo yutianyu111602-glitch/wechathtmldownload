@@ -1,0 +1,221 @@
+# DB2 Swarm layered Docker Compose example
+# Reference-only full-stack template imported from D:\DDownload on 2026-06-01.
+# The current live v1 stack is compose.yaml in this directory.
+# Review paths, image tags, entrypoints, and worker script support before live use.
+
+name: db2-swarm
+
+x-worker-common: &worker-common
+  image: db2-swarm-worker:py311
+  build:
+    context: .
+    dockerfile: Dockerfile.worker
+  init: true
+  working_dir: /app/scripts
+  environment:
+    DB2_PATH: /data/atlas_swarm_data.sqlite
+    REPORT_DIR: /reports
+    DB_WRITE_LOCK: /data/.db_write.lock
+    PYTHONUNBUFFERED: "1"
+    http_proxy: ${DB2_HTTP_PROXY:-http://192.168.8.1:7890}
+    https_proxy: ${DB2_HTTPS_PROXY:-http://192.168.8.1:7890}
+    no_proxy: localhost,127.0.0.1,lightpanda,cloak
+  volumes:
+    - /home/pc/scripts:/app/scripts:ro
+    - /home/pc/swarm_data:/data
+    - /home/pc/reports:/reports
+  restart: unless-stopped
+  networks:
+    - db2-control
+    - db2-crawl
+
+x-readonly-common: &readonly-common
+  <<: *worker-common
+  read_only: true
+  volumes:
+    - /home/pc/scripts:/app/scripts:ro
+    - /home/pc/swarm_data:/data:ro
+    - /home/pc/reports:/reports
+  restart: "no"
+  profiles: ["readonly"]
+
+services:
+  db2-health:
+    <<: *readonly-common
+    command: ["python3", "/app/scripts/tri_db_healthcheck.py"]
+    healthcheck:
+      test: ["CMD-SHELL", "python3 - <<'PY'\nimport sqlite3\nconn=sqlite3.connect('file:/data/atlas_swarm_data.sqlite?mode=ro', uri=True, timeout=10)\nok=conn.execute('PRAGMA integrity_check').fetchone()[0]\nconn.close()\nraise SystemExit(0 if ok == 'ok' else 1)\nPY"]
+      interval: 1m
+      timeout: 20s
+      retries: 3
+
+  s125-lineage:
+    <<: *readonly-common
+    command:
+      - python3
+      - /app/scripts/build_db2_outlink_lineage_reconcile_s125.py
+      - --live-db
+      - /data/atlas_swarm_data.sqlite
+      - --output-dir
+      - /reports/db2_outlink_lineage_reconcile_s125
+      - --mirror-wsl-dir
+      - /reports
+
+  s126-preflight:
+    <<: *readonly-common
+    command:
+      - python3
+      - /app/scripts/db2_outlink_recovery_preflight_s126.py
+      - --live-db
+      - /data/atlas_swarm_data.sqlite
+      - --output-dir
+      - /reports/db2_outlink_recovery_preflight_s126
+
+  lightpanda:
+    image: lightpanda/browser:nightly
+    init: true
+    command: ["serve", "--obey-robots", "--host", "0.0.0.0", "--port", "9222", "--log-level", "info"]
+    environment:
+      LIGHTPANDA_DISABLE_TELEMETRY: "true"
+    ports:
+      - "127.0.0.1:9222:9222"
+    profiles: ["browser", "safe", "steady"]
+    restart: unless-stopped
+    networks:
+      - db2-crawl
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:9222/json/version >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+  marathon:
+    <<: *worker-common
+    command: ["python3", "-u", "/app/scripts/swarm_marathon_engine.py"]
+    profiles: ["safe", "steady"]
+
+  swarm-monitor:
+    <<: *worker-common
+    command: ["python3", "-u", "/app/scripts/swarm_monitor_v2.py", "--daemon"]
+    profiles: ["safe", "steady"]
+
+  linktree-1:
+    <<: *worker-common
+    depends_on:
+      lightpanda:
+        condition: service_healthy
+    command: ["python3", "-u", "/app/scripts/linktree_deep_traversal.py", "--worker-id", "linktree_1", "--max-targets", "80", "--daemon"]
+    profiles: ["safe", "steady"]
+
+  linktree-2:
+    <<: *worker-common
+    depends_on:
+      lightpanda:
+        condition: service_healthy
+    command: ["python3", "-u", "/app/scripts/linktree_deep_traversal.py", "--worker-id", "linktree_2", "--max-targets", "80", "--daemon"]
+    profiles: ["steady"]
+
+  outlink-expand-linktree:
+    <<: *worker-common
+    depends_on:
+      lightpanda:
+        condition: service_healthy
+    command: ["python3", "-u", "/app/scripts/outlink_expand_worker.py", "--phase", "linktree", "--limit", "200", "--sleep", "0.8"]
+    profiles: ["safe", "steady"]
+
+  outlink-expand-shorturl:
+    <<: *worker-common
+    command: ["python3", "-u", "/app/scripts/outlink_expand_worker.py", "--phase", "shorturl", "--limit", "200", "--sleep", "0.8"]
+    profiles: ["safe", "steady"]
+
+  sc-deep-1:
+    <<: *worker-common
+    command: ["python3", "-u", "/app/scripts/sc_deep_worker.py", "--worker-id", "sc_v4_1", "--max-profiles", "2000"]
+    profiles: ["safe", "steady"]
+
+  sc-deep-2:
+    <<: *worker-common
+    command: ["python3", "-u", "/app/scripts/sc_deep_worker.py", "--worker-id", "sc_v4_2", "--max-profiles", "2000"]
+    profiles: ["steady"]
+
+  yt-deep:
+    <<: *worker-common
+    command: ["python3", "-u", "/app/scripts/yt_deep_worker.py", "500"]
+    profiles: ["safe", "steady"]
+
+  domestic:
+    <<: *worker-common
+    command: ["python3", "-u", "/app/scripts/domestic_worker.py"]
+    profiles: ["safe", "steady"]
+
+  avatar-dl:
+    <<: *worker-common
+    command: ["python3", "-u", "/app/scripts/avatar_dl_worker.py", "--limit", "500", "--sleep", "0.5"]
+    profiles: ["safe", "steady"]
+
+  maigret:
+    <<: *worker-common
+    command: ["python3", "-u", "/app/scripts/maigret_discover_worker.py", "--limit", "30"]
+    profiles: ["steady"]
+
+  ig-fission-a:
+    <<: *worker-common
+    command: ["python3", "-u", "/app/scripts/ig_nuclear_fission_v2.py", "--worker-id", "ig_a", "--shard", "0-7", "--limit", "200"]
+    profiles: ["steady"]
+
+  ig-fission-b:
+    <<: *worker-common
+    command: ["python3", "-u", "/app/scripts/ig_nuclear_fission_v2.py", "--worker-id", "ig_b", "--shard", "8-f", "--limit", "200"]
+    profiles: ["steady"]
+
+  # Experimental services intentionally do not start unless --profile experimental and service name are used.
+  bc-deep-smoke:
+    <<: *worker-common
+    command: ["python3", "-u", "/app/scripts/bc_deep_worker.py", "--limit", "10", "--dry-run-jsonl", "/reports/bc_deep_smoke.jsonl"]
+    profiles: ["experimental"]
+
+  ra-deep-smoke:
+    <<: *worker-common
+    command: ["python3", "-u", "/app/scripts/scrape_ra_artist_deep.py", "--limit", "10", "--dry-run-jsonl", "/reports/ra_deep_smoke.jsonl"]
+    profiles: ["experimental"]
+
+  nuclear-fission-smoke:
+    <<: *worker-common
+    command: ["python3", "-u", "/app/scripts/nuclear_fission_engine.py", "--rounds", "1", "--limit", "10", "--dry-run-jsonl", "/reports/nuclear_fission_smoke.jsonl"]
+    profiles: ["experimental"]
+
+  codex:
+    image: db2-agent-codex:latest
+    init: true
+    working_dir: /workspace
+    volumes:
+      - ${DB2_REPO_ROOT:-/mnt/c/code/githubstar/wechathtmldownload}:/workspace
+      - /home/pc/reports:/reports
+      - /home/pc/swarm_data/atlas_swarm_data.sqlite:/db/atlas_swarm_data.sqlite:ro
+    profiles: ["agent"]
+    command: ["codex"]
+    stdin_open: true
+    tty: true
+    networks:
+      - db2-control
+
+  deepseek-tui:
+    image: db2-agent-deepseek-tui:latest
+    init: true
+    working_dir: /workspace
+    volumes:
+      - ${DB2_REPO_ROOT:-/mnt/c/code/githubstar/wechathtmldownload}:/workspace
+      - /home/pc/reports:/reports
+      - /home/pc/swarm_data/atlas_swarm_data.sqlite:/db/atlas_swarm_data.sqlite:ro
+    profiles: ["agent"]
+    command: ["codewhale", "--config", "/workspace/.codewhale/config.toml"]
+    stdin_open: true
+    tty: true
+    networks:
+      - db2-control
+
+networks:
+  db2-control:
+    internal: true
+  db2-crawl:
+    driver: bridge

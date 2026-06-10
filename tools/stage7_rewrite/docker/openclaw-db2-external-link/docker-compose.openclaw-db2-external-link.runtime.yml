@@ -1,0 +1,17 @@
+name: openclaw-db2-external-link
+
+services:
+  openclaw-db2-outlink-public-fetch:
+    network_mode: "bridge"
+    environment:
+      OPENCLAW_MODE: "db2-outlink-public-fetch-runtime-dry-run"
+      OPENCLAW_NETWORK_POLICY: "explicit_controller_release_l4_public_metadata_fetch_only"
+      OPENCLAW_SECRET_POLICY: "environment_injection_only_no_value_read"
+      OPENCLAW_DB_WRITE_POLICY: "disabled"
+      OPENCLAW_IDENTITY_PROMOTION_POLICY: "disabled"
+      OPENCLAW_DB2_PROJECTION_POLICY: "disabled"
+    labels:
+      com.huaidj.openclaw.contract: "explicit-l4-public-metadata-fetch-runtime-release-only"
+      com.huaidj.openclaw.no_secret_values: "true"
+      com.huaidj.openclaw.no_db_or_identity_write: "true"
+      com.huaidj.openclaw.no_upload_review_release: "true"

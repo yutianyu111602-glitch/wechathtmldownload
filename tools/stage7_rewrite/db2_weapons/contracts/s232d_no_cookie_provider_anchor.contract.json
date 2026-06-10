@@ -1,0 +1,89 @@
+{
+  "id": "s232d_no_cookie_provider_anchor",
+  "version": 1,
+  "status": "future_contract_not_executable",
+  "purpose": "Define the future no-cookie provider-anchor collector boundary for DB2 external-link candidate discovery.",
+  "openclaw_role": "control_plane_only",
+  "execution_plane": "docker_container_worker",
+  "live_run_allowed": false,
+  "cookie_policy": {
+    "cookies_allowed": false,
+    "browser_profile_reads_allowed": false,
+    "token_reads_allowed": false,
+    "secret_mount_allowed": false
+  },
+  "db_boundary": {
+    "live_db_mount": "read_only",
+    "live_db_writes_allowed": false,
+    "writer_service": "db2-writer",
+    "worker_output_mode": "jsonl_spool_or_report_only"
+  },
+  "input_contract": {
+    "required_fields": [
+      "run_id",
+      "provider_anchor_kind",
+      "provider_anchor_hash",
+      "candidate_eid_hash",
+      "source_provider_hash",
+      "limit",
+      "report_dir"
+    ],
+    "field_rules": {
+      "run_id": "stable operator supplied id; no secret material",
+      "provider_anchor_kind": "one of platform_namespace, source_provider, curated_anchor",
+      "provider_anchor_hash": "sha256 normalized provider anchor; no raw URL or raw handle",
+      "candidate_eid_hash": "sha256 DB2 candidate/entity id; no raw EID in logs",
+      "source_provider_hash": "sha256 normalized provider/source label",
+      "limit": "positive integer bounded by future schedule gate",
+      "report_dir": "repo-local or WSL ext4 report directory; never D drive"
+    },
+    "raw_url_allowed": false,
+    "raw_handle_allowed": false,
+    "raw_cookie_allowed": false
+  },
+  "output_contract": {
+    "mode": "report_only_until_migrated",
+    "spool_schema": {
+      "event": "provider_anchor_candidate",
+      "stable_id_hash": "sha256 stable candidate id",
+      "provider_anchor_hash": "sha256 normalized provider anchor",
+      "candidate_eid_hash": "sha256 source candidate/entity id",
+      "source_provider_hash": "sha256 normalized provider/source label",
+      "confidence_bucket": "low|medium|high",
+      "evidence_hashes": "array of sha256 evidence keys",
+      "status": "candidate|duplicate|blocked|no_signal"
+    },
+    "prints_raw_urls": false,
+    "prints_raw_paths": false,
+    "prints_raw_eids": false
+  },
+  "dedupe_contract": {
+    "pre_crawl_lookup": [
+      "source_processed_cache",
+      "url_seen_cache"
+    ],
+    "source_processed_phase": "provider_anchor:s232d",
+    "completion_statuses": [
+      "candidate",
+      "duplicate",
+      "blocked",
+      "no_signal"
+    ]
+  },
+  "stop_gates": [
+    "cookie_or_token_required",
+    "raw_url_required_for_input",
+    "live_db_write_required",
+    "db2_writer_not_available",
+    "sidecar_cache_unavailable",
+    "provider_anchor_hash_missing",
+    "report_dir_on_d_drive"
+  ],
+  "db2ctl_surface": {
+    "readonly": [
+      "db2ctl contracts list",
+      "db2ctl contracts show s232d_no_cookie_provider_anchor"
+    ],
+    "production": []
+  }
+}

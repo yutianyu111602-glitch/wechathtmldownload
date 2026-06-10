@@ -1,0 +1,64 @@
+{
+  "schema_version": "stage7_consumer_publish_gate_config.v1",
+  "generated_by": "Codex Goal Mode PRD-03 execution",
+  "generated_at": "2026-05-20T07:05:00+08:00",
+  "publish_target": {
+    "channel": "production",
+    "artifact_source": "reports/consumer_release_pack_all_full_llm_runs_138102_20260520/release_pointer.staging.json",
+    "upload_strategy": "manual_or_external_release_job",
+    "cloudbase_env": "huaidjweekly-d8g1go7-d0a07863e3e",
+    "cloudrun_service": "weekly-api",
+    "notes": "Production target sourced from services/weekly_activity_cloudrun/cloudbaserc.json and apps/weekly_activity_miniprogram/app.js. This config enables publish/deploy readiness only; actual upload is owned by PRD-08."
+  },
+  "rollback": {
+    "previous_pointer_path": "reports/consumer_release_pack_all_deepseek_127511_20260520/release_pointer.staging.json",
+    "rollback_owner": "goal_mode_release_owner",
+    "rollback_procedure": "Point the consumer endpoint back to previous_pointer_path."
+  },
+  "post_publish_smoke": {
+    "required_checks": [
+      "endpoint_http_200",
+      "sample_article_count_matches_pack",
+      "unknown_time_article_renders_without_crash",
+      "event_date_renders_correctly",
+      "entity_list_renders_correctly"
+    ],
+    "sample_count": 20,
+    "smoke_timeout_sec": 30
+  },
+  "unknown_time_business_acceptance": {
+    "accepted": true,
+    "accepted_by": "user_goal_mode",
+    "accepted_at": "2026-05-17T05:50:00+08:00",
+    "user_visible_policy": "hide publish date when publish_time_status is unknown",
+    "justification": "User explicitly authorized unblocking unknown publish_time business acceptance in Goal mode. User-visible policy remains to hide publish date when publish_time_status is unknown."
+  },
+  "production_authorization": {
+    "authorized_by": "user_goal_mode",
+    "authorized_at": "2026-05-18T00:00:00+08:00",
+    "production_publish_allowed": true,
+    "production_sqlite_write_allowed": true,
+    "production_graph_labels_allowed": true,
+    "neo4j_staging_write_allowed": true,
+    "qdrant_write_allowed": true,
+    "qdrant_alias_change_allowed": true,
+    "mem0_write_allowed": true,
+    "scope": "User requested unblocking production publish/SQLite, production graph labels, Neo4j/Qdrant/mem0 write gates, Dajiala runtime key, unknown publish_time business acceptance, and on 2026-05-18 requested canceling production gates."
+  },
+  "gate_cancellation_confirmation": {
+    "confirmed_by": "user_goal_mode",
+    "confirmed_at": "2026-05-18T00:00:00+08:00",
+    "instruction": "完成所有计划；取消生产门禁",
+    "status": "production_gates_cancelled_for_current_longrun",
+    "notes": "This config opens authorization gates. Individual runner packets still record whether a publish/write/deploy action actually executed."
+  },
+  "pre_publish_verification": {
+    "pointer_smoke_passed": true,
+    "pointer_smoke_report": "reports/consumer_release_pointer_smoke_all_full_llm_runs_138102_20260520/consumer_release_pointer_smoke.json",
+    "unknown_time_compat_passed": true,
+    "unknown_time_compat_report": "reports/consumer_unknown_time_compat_all_full_llm_runs_138102_20260520/consumer_unknown_time_compat.json",
+    "schema_validation_passed": true,
+    "schema_validation_report": "reports/weekly_schema_compat_full_20260517/schema_compat_report.json",
+    "schema_validation_note": "Stage7 full pack is not used as the direct weekly_event_published.v1 source; weekly production remains on the validated weekly recommendation/exporter path."
+  }
+}

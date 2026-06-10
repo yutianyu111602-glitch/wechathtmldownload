@@ -1,0 +1,50 @@
+input_root: "D:\\DDownload\\_llm_release_v2\\articles"
+output_root: "D:\\downstream_results\\stage7_rewrite"
+
+llm:
+  endpoint: "http://127.0.0.1:11434"
+  api_style: "openai_compatible"
+  model: "Qwen3.6-27B"
+  concurrency: 1
+  timeout_sec: 180
+  max_retries: 3
+  retry_backoff_sec: [5, 20, 60]
+  temperature: 0.02
+  top_p: 0.75
+  max_tokens: 4096
+  thinking: false
+  reasoning: false
+
+chunking:
+  target_chars: 3500
+  max_chars: 5000
+  min_chars: 800
+  overlap_chars: 300
+  paragraph_aware: true
+  hard_max_chars: 6500
+
+quality:
+  min_evidence_hit_rate_pass: 0.85
+  suspicious_empty_entity_min_chars: 2500
+  max_failed_chunks_per_article: 2
+  allow_empty_recovery: false
+
+vector:
+  endpoints:
+    - "http://192.168.8.234:11437"
+    - "http://192.168.8.234:11438"
+    - "http://192.168.8.234:11435"
+    - "http://192.168.8.234:11436"
+  preferred_dimension: 1024
+  batch_size: 16
+  timeout_sec: 60
+  max_retries: 3
+
+pipeline:
+  stage: 7
+  version: "v1"
+  facts_first: true
+  relations_second: true
+  save_raw: true
+  save_bad_samples: true
+  exact_substring_verdict: true

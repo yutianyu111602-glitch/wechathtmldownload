@@ -1,0 +1,109 @@
+stable_json:
+  provider: openai_compatible_or_llama_cpp
+  model: qwen3.6-27b
+  temperature: 0.0
+  top_p: 0.8
+  top_k: 20
+  repeat_penalty: 1.08
+  max_tokens: 4096
+  stream: false
+  no_thinking: true
+  thinking_params:
+    enable_thinking: false
+  response_format: json_object_optional
+  chunk_chars: 1800
+  overlap_chars: 220
+  retries: 3
+  request_timeout_sec: 180
+  checkpoint_every: 1
+  save_raw_response: true
+  allow_empty_recovery: false
+  allow_partial_success: false
+
+canary_fast:
+  provider: openai_compatible_or_llama_cpp
+  model: qwen3.6-27b
+  temperature: 0.0
+  top_p: 0.8
+  top_k: 20
+  repeat_penalty: 1.08
+  max_tokens: 2048
+  stream: false
+  no_thinking: true
+  thinking_params:
+    enable_thinking: false
+  response_format: json_object_optional
+  chunk_chars: 2000
+  overlap_chars: 250
+  retries: 3
+  request_timeout_sec: 120
+  checkpoint_every: 1
+  save_raw_response: true
+  allow_empty_recovery: false
+  allow_partial_success: false
+
+canary_debug:
+  provider: openai_compatible_or_llama_cpp
+  model: qwen3.6-27b
+  temperature: 0.0
+  top_p: 0.8
+  top_k: 20
+  repeat_penalty: 1.08
+  max_tokens: 3072
+  stream: false
+  no_thinking: true
+  thinking_params:
+    enable_thinking: false
+  response_format: json_object_optional
+  chunk_chars: 1200
+  overlap_chars: 180
+  retries: 3
+  request_timeout_sec: 180
+  checkpoint_every: 1
+  save_raw_response: true
+  allow_empty_recovery: false
+  allow_partial_success: false
+
+longrun:
+  provider: openai_compatible_or_llama_cpp
+  model: qwen3.6-27b
+  temperature: 0.0
+  top_p: 0.8
+  top_k: 20
+  repeat_penalty: 1.08
+  max_tokens: 4096
+  stream: false
+  no_thinking: true
+  thinking_params:
+    enable_thinking: false
+  response_format: json_object_optional
+  chunk_chars: 2000
+  overlap_chars: 250
+  retries: 3
+  request_timeout_sec: 240
+  checkpoint_every: 1
+  save_raw_response: false
+  allow_empty_recovery: false
+  allow_partial_success: false
+
+large_article:
+  provider: openai_compatible_or_llama_cpp
+  model: qwen3.6-27b
+  temperature: 0.0
+  top_p: 0.8
+  top_k: 40
+  repeat_penalty: 1.08
+  max_tokens: 4096
+  stream: false
+  no_thinking: true
+  thinking_params:
+    enable_thinking: false
+  response_format: json_object_optional
+  chunk_chars: 3000
+  overlap_chars: 400
+  retries: 3
+  request_timeout_sec: 300
+  checkpoint_every: 1
+  save_raw_response: true
+  allow_empty_recovery: false
+  allow_partial_success: true

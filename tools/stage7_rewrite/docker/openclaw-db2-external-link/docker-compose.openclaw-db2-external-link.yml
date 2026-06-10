@@ -1,0 +1,85 @@
+name: openclaw-db2-external-link
+
+x-openclaw-db2-env-common: &openclaw-db2-env-common
+  OPENCLAW_COMMAND_SCHEMA_VERSION: "openclaw_db2_external_link_docker_profile_command.v1"
+  OPENCLAW_MODE: "contract-only"
+  OPENCLAW_NETWORK_POLICY: "disabled_or_explicit_release_only"
+  OPENCLAW_SECRET_POLICY: "environment_injection_only_no_value_read"
+  OPENCLAW_DB_WRITE_POLICY: "disabled"
+  OPENCLAW_IDENTITY_PROMOTION_POLICY: "disabled"
+  OPENCLAW_DB2_PROJECTION_POLICY: "disabled"
+
+x-openclaw-db2-contract-common: &openclaw-db2-contract-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+  network_mode: "none"
+  environment: *openclaw-db2-env-common
+  volumes:
+    - type: bind
+      source: ../../reports
+      target: /openclaw-reports
+      read_only: false
+  labels:
+    com.huaidj.openclaw.contract: "report-only"
+    com.huaidj.openclaw.no_secret_values: "true"
+    com.huaidj.openclaw.no_db_or_identity_write: "true"
+    com.huaidj.openclaw.no_execution_by_default: "true"
+
+services:
+  openclaw-db2-outlink-exporter:
+    <<: *openclaw-db2-contract-common
+    profiles: ["openclaw-db2-outlink-exporter"]
+    environment:
+      <<: *openclaw-db2-env-common
+      OPENCLAW_LAYER: "L1"
+      OPENCLAW_PROFILE: "openclaw-db2-outlink-exporter"
+      OPENCLAW_SERVICE: "openclaw-db2-outlink-exporter"
+      OPENCLAW_QUEUE_NAME: "openclaw.db2_outlink_exporter"
+    command: ["--profile", "openclaw-db2-outlink-exporter", "--service", "openclaw-db2-outlink-exporter", "--layer", "L1", "--queue-name", "openclaw.db2_outlink_exporter", "--input-contract", "/openclaw-reports/db2_external_link_docker_skill_20260604/db2_external_link_docker_skill_plan.jsonl", "--out-dir", "/openclaw-reports/openclaw_db2_external_link_profiles_contract"]
+
+  openclaw-db2-outlink-queue-cache:
+    <<: *openclaw-db2-contract-common
+    profiles: ["openclaw-db2-outlink-queue-cache"]
+    environment:
+      <<: *openclaw-db2-env-common
+      OPENCLAW_LAYER: "L2"
+      OPENCLAW_PROFILE: "openclaw-db2-outlink-queue-cache"
+      OPENCLAW_SERVICE: "openclaw-db2-outlink-queue-cache"
+      OPENCLAW_QUEUE_NAME: "openclaw.db2_outlink_queue_cache"
+    command: ["--profile", "openclaw-db2-outlink-queue-cache", "--service", "openclaw-db2-outlink-queue-cache", "--layer", "L2", "--queue-name", "openclaw.db2_outlink_queue_cache", "--input-contract", "/openclaw-reports/db2_external_link_docker_skill_20260604/db2_external_link_docker_skill_plan.jsonl", "--out-dir", "/openclaw-reports/openclaw_db2_external_link_profiles_contract"]
+
+  openclaw-db2-outlink-normalize:
+    <<: *openclaw-db2-contract-common
+    profiles: ["openclaw-db2-outlink-normalize"]
+    environment:
+      <<: *openclaw-db2-env-common
+      OPENCLAW_MODE: "db2-outlink-normalize-dry-run"
+      OPENCLAW_LAYER: "L3"
+      OPENCLAW_PROFILE: "openclaw-db2-outlink-normalize"
+      OPENCLAW_SERVICE: "openclaw-db2-outlink-normalize"
+      OPENCLAW_QUEUE_NAME: "openclaw.db2_outlink_normalize"
+    command: ["--profile", "openclaw-db2-outlink-normalize", "--service", "openclaw-db2-outlink-normalize", "--layer", "L3", "--queue-name", "openclaw.db2_outlink_normalize", "--input-contract", "/openclaw-reports/db2_external_link_docker_skill_20260604/db2_external_link_docker_skill_plan.jsonl", "--out-dir", "/openclaw-reports/openclaw_db2_external_link_profiles_contract"]
+
+  openclaw-db2-outlink-public-fetch:
+    <<: *openclaw-db2-contract-common
+    profiles: ["openclaw-db2-outlink-public-fetch"]
+    environment:
+      <<: *openclaw-db2-env-common
+      OPENCLAW_LAYER: "L4"
+      OPENCLAW_PROFILE: "openclaw-db2-outlink-public-fetch"
+      OPENCLAW_SERVICE: "openclaw-db2-outlink-public-fetch"
+      OPENCLAW_QUEUE_NAME: "openclaw.db2_outlink_public_fetch"
+    command: ["--profile", "openclaw-db2-outlink-public-fetch", "--service", "openclaw-db2-outlink-public-fetch", "--layer", "L4", "--queue-name", "openclaw.db2_outlink_public_fetch", "--input-contract", "/openclaw-reports/db2_external_link_docker_skill_20260604/db2_external_link_docker_skill_plan.jsonl", "--out-dir", "/openclaw-reports/openclaw_db2_external_link_profiles_contract"]
+
+  openclaw-db2-outlink-sidecar-merge:
+    <<: *openclaw-db2-contract-common
+    profiles: ["openclaw-db2-outlink-sidecar-merge"]
+    environment:
+      <<: *openclaw-db2-env-common
+      OPENCLAW_MODE: "db2-outlink-sidecar-merge-dry-run"
+      OPENCLAW_LAYER: "L5"
+      OPENCLAW_PROFILE: "openclaw-db2-outlink-sidecar-merge"
+      OPENCLAW_SERVICE: "openclaw-db2-outlink-sidecar-merge"
+      OPENCLAW_QUEUE_NAME: "openclaw.db2_outlink_sidecar_merge"
+    command: ["--profile", "openclaw-db2-outlink-sidecar-merge", "--service", "openclaw-db2-outlink-sidecar-merge", "--layer", "L5", "--queue-name", "openclaw.db2_outlink_sidecar_merge", "--input-contract", "/openclaw-reports/db2_external_link_docker_skill_20260604/db2_external_link_docker_skill_plan.jsonl", "--out-dir", "/openclaw-reports/openclaw_db2_external_link_profiles_contract"]

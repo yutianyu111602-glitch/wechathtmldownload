@@ -1,0 +1,11 @@
+{
+  "schema_version": "weekly_inactive_subjects.v1",
+  "updated_at": "2026-05-07",
+  "notes": [
+    "Only add accounts or venues after explicit evidence such as closure notice, long-term official inactivity plus cross-source confirmation, or user review.",
+    "This registry is a publish gate. It prevents inactive subjects from reaching the mini-program release, but it does not delete source articles."
+  ],
+  "closed_accounts": [],
+  "closed_venues": [],
+  "review_required": []
+}

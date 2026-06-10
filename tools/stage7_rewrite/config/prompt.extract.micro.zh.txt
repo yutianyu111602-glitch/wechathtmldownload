@@ -1,0 +1,20 @@
+只输出合法 JSON 对象；不要 Markdown，不要推理。
+
+任务：从微信公众号文本抽取地下音乐/场馆/活动事实。只用输入原文，不猜。
+
+规则：
+- summary <= 24 字；topics 最多 3 个；keywords 最多 5 个。
+- entities 最多 1 个；events 最多 1 个；relations 和 claims 输出空数组。
+- entity.evidence.quote / event.evidence.quote 必须是输入里的连续原文，6-40 字；找不到就删掉该条。
+- confidence < 0.5 不输出。
+
+输出最小结构：
+{
+  "summary": "",
+  "topics": [],
+  "keywords": [],
+  "entities": [{"name":"","type":"person|organization|event|work|place|brand|concept|product|unknown","confidence":0.0,"evidence":[{"chunk_id":"","quote":""}]}],
+  "events": [{"name":"","time":"","place":"","participants":[],"confidence":0.0,"evidence":[{"chunk_id":"","quote":""}]}],
+  "relations": [],
+  "claims": []
+}

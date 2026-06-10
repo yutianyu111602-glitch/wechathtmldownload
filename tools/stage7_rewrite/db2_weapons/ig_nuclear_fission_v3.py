@@ -1,27 +1,27 @@
 #!/usr/bin/env python3
 """
-DB2 WEAPON: IG Nuclear Fission v3 — Windows-native Instagram bio scraper.
+DB2 WEAPON: IG Nuclear Fission v4 — Windows-native Instagram bio scraper.
 =======================================================================
 Integrated wheels: Scrapling (StealthyFetcher for CDP-grade stealth),
 cloudscraper (Cloudflare bypass fallback), instaloader (alternative data source).
 
-Architecture: Keep SSH OpenClash proxy rotation (337 nodes) from v2.
-Replace curl_cffi with requests+Scrapling dual-mode fetcher.
+Architecture: Clash Verge 7897 proxy (sole verified path past router OpenClash).
+Three-layer fetcher: requests → cloudscraper → Scrapling.
 Windows-native paths for DB and cookies, no WSL dependency.
 
 Usage (import):
-    from ig_nuclear_fission_v3 import fetch_ig_profile, main
+    from ig_nuclear_fission_v4 import fetch_ig_profile, main
     fetch_ig_profile("djname")  # returns user dict or {'_error': ...}
 
 Usage (CLI):
-    python ig_nuclear_fission_v3.py --worker-id 1 --worker-count 2
+    python ig_nuclear_fission_v4.py --worker-id 1 --worker-count 2
 
-v3 Changelog:
-- [NEW] Scrapling StealthyFetcher fallback for 429/blocked requests
-- [NEW] cloudscraper CF bypass integration
-- [NEW] instaloader alternative profile data source  
-- [NEW] Windows-native paths, no WSL required
-- [KEPT] SSH OpenClash 337-node proxy rotation
+v4 Changelog:
+- [REMOVED] SSH OpenClash 337-node proxy rotation (router fake-IP blocks all 443)
+- [ADDED] Clash Verge 7897 proxy as sole verified network path
+- [ADDED] browserforge fingerprint generation for realistic browser headers
+- [ADDED] Exponential backoff on 429 (no more node rotation)
+- [KEPT] Scrapling/cloudscraper/instaloader three-layer fallback
 - [KEPT] Same DB schema (dj_outlinks), backward compatible
 - [KEPT] Worker sharding by eid hex prefix
 """
@@ -36,11 +36,9 @@ DB = str(DB_DIR / "atlas_swarm_data.sqlite")
 COOKIE_DIR = Path(r"C:\code\db2_weapons\cookies")
 WHEELS_DIR = Path(r"C:\code\github_wheels")
 
-# ── SSH/OpenClash Settings (from _network_ssot.md) ──
-OC_SECRET = os.environ.get("OC_SECRET", "")
-OC_ENDPOINT = os.environ.get("OC_ENDPOINT", "http://192.168.31.1:9090")
-OC_GROUP = os.environ.get("OC_GROUP", "IG-Nodes")
-SSH_SERVER = os.environ.get("OPENWRT_SSH", "root@192.168.31.1")
+# ── Proxy: Clash Verge 7897 (sole verified path, router OpenClash blocks direct 443) ──
+PROXY_URL = os.environ.get("IG_PROXY", "http://127.0.0.1:7897")
+PROXY_DICT = {"http": PROXY_URL, "https": PROXY_URL}
 
 # ── Rate Limiting ──
 DELAY = float(os.environ.get("IG_DELAY", "8"))  # seconds between profiles
@@ -120,79 +118,19 @@ def decode_lynx_url(lynx_url):
         return unquote(m.group(1))
     return lynx_url
 
-# ── SSH Proxy Rotation ──
-_rotated_nodes = set()
-_current_ig_node = None
-
-def _ssh_cmd(cmd: str, timeout: int = 15) -> str:
-    """Execute command via SSH to router."""
+# ── Browser Fingerprint Generator ──
+def _gen_browser_headers():
+    """Generate realistic Chrome browser headers via browserforge."""
     try:
-        r = subprocess.run(
-            ["ssh", "-o", "StrictHostKeyChecking=no", "-o", "ConnectTimeout=10", SSH_SERVER, cmd],
-            capture_output=True, text=True, timeout=timeout
-        )
-        return r.stdout.strip()
-    except Exception as e:
-        log(f"SSH error: {e}")
-        return ""
-
-def _get_ig_nodes() -> list:
-    """Get IG proxy nodes from OpenClash."""
-    import urllib.parse as _up
-    encoded = _up.quote(OC_GROUP)
-    result = _ssh_cmd(
-        f"curl -s -H 'Authorization: Bearer {OC_SECRET}' "
-        f"{OC_ENDPOINT}/proxies/{encoded}"
-    )
-    try:
-        data = json.loads(result)
-        return data.get("all", []) if isinstance(data, dict) else []
-    except json.JSONDecodeError:
-        return []
-
-def _get_current_ig_node() -> str:
-    import urllib.parse as _up
-    encoded = _up.quote(OC_GROUP)
-    result = _ssh_cmd(
-        f"curl -s -H 'Authorization: Bearer {OC_SECRET}' "
-        f"{OC_ENDPOINT}/proxies/{encoded}"
-    )
-    try:
-        data = json.loads(result)
-        return data.get("now", "") if isinstance(data, dict) else ""
-    except json.JSONDecodeError:
-        return ""
-
-def rotate_ig_node():
-    """Rotate to next available IG proxy node via OpenClash."""
-    global _current_ig_node, _rotated_nodes
-    import urllib.parse as _up
-    
-    nodes = _get_ig_nodes()
-    current = _get_current_ig_node()
-    _current_ig_node = current
-    _rotated_nodes.add(current)
-    
-    for n in nodes:
-        if n not in _rotated_nodes:
-            encoded = _up.quote(OC_GROUP)
-            payload = json.dumps({"name": n})
-            _ssh_cmd(
-                f"curl -s -X PUT -H 'Authorization: Bearer {OC_SECRET}' "
-                f"-H 'Content-Type: application/json' -d '{payload}' "
-                f"{OC_ENDPOINT}/proxies/{encoded}"
-            )
-            time.sleep(3.0)
-            _rotated_nodes.add(n)
-            _current_ig_node = n
-            if len(_rotated_nodes) > 150:
-                _rotated_nodes = set(list(_rotated_nodes)[-50:])
-            log(f"[rotate] {current[:30]} -> {n[:35]}")
-            return n
-    
-    _rotated_nodes = set()
-    log("[rotate] All nodes exhausted, resetting")
-    return rotate_ig_node()
+        from browserforge.headers import HeaderGenerator
+        headers = HeaderGenerator().generate()
+        return dict(headers)
+    except Exception:
+        return {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.9',
+        }
 
 # ── Cookie Management ──
 def _load_ig_cookies():
@@ -224,36 +162,32 @@ _COOKIE_STR = _load_ig_cookies()
 if _COOKIE_STR:
     IG_HEADERS['Cookie'] = _COOKIE_STR
 
-# ── Fetchers: Multi-layer with Scrapling fallback ──
+# ── Fetchers: Multi-layer with Clash Verge 7897 proxy ──
 def _fetch_with_requests(url, timeout=20):
-    """Layer 1: Plain requests (fastest, works when not blocked)."""
+    """Layer 1: requests via 7897 proxy (fastest, verified path)."""
     import requests
     try:
-        resp = requests.get(url, headers=IG_HEADERS, timeout=timeout)
+        resp = requests.get(url, headers=IG_HEADERS, proxies=PROXY_DICT, timeout=timeout)
         return resp
     except Exception:
         return None
 
 def _fetch_with_cloudscraper(url, timeout=20):
-    """Layer 2: cloudscraper CF bypass."""
+    """Layer 2: cloudscraper CF bypass via 7897 proxy."""
     try:
         sys.path.insert(0, str(WHEELS_DIR / "cloudscraper"))
         import cloudscraper
         scraper = cloudscraper.create_scraper()
-        resp = scraper.get(url, headers=IG_HEADERS, timeout=timeout)
+        resp = scraper.get(url, headers=IG_HEADERS, proxies=PROXY_DICT, timeout=timeout)
         return resp
     except Exception:
         return None
 
 def _fetch_with_scrapling(url, timeout=20):
-    """Layer 3: Scrapling StealthyFetcher (CDP-grade stealth, heaviest)."""
+    """Layer 3: Scrapling StealthyFetcher via 7897 proxy (CDP-grade stealth)."""
     try:
         sys.path.insert(0, str(WHEELS_DIR / "Scrapling"))
         from scrapling.fetchers.stealth_chrome import StealthyFetcher
-        
-        proxy_config = None
-        if _current_ig_node:
-            proxy_config = {"server": f"http://192.168.31.1:7890"}
         
         resp = StealthyFetcher.fetch(
             url,
@@ -262,7 +196,7 @@ def _fetch_with_scrapling(url, timeout=20):
             block_ads=True,
             solve_cloudflare=True,
             timeout=timeout * 1000,
-            proxy=proxy_config,
+            proxy={"server": PROXY_URL},
             extra_headers={'Cookie': IG_HEADERS.get('Cookie', '')} if 'Cookie' in IG_HEADERS else None,
         )
         return resp
@@ -345,7 +279,13 @@ def fetch_ig_profile_instaloader(handle):
         return {'_error': f'instaloader:{str(e)[:80]}'}
 
 # ── DB Operations ──
-from db2_url_validator import validate_url_or_drop
+def validate_url_or_drop(url):
+    """Inline URL validator — drops obviously invalid URLs."""
+    if not url or len(url) < 10 or url.startswith('javascript:'):
+        return None
+    if '@' in url:
+        return None
+    return url
 
 def get_db():
     for attempt in range(10):
@@ -480,14 +420,9 @@ def main(worker_id=1, worker_count=1):
                 elif error == 'rate_limited':
                     stats['rate_limited'] += 1
                     consecutive_429 += 1
-                    log(f"RATE LIMITED (x{consecutive_429}) — rotating node")
-                    try:
-                        new_node = rotate_ig_node()
-                        log(f"  New node: {new_node}")
-                    except Exception as e:
-                        log(f"  Rotate failed: {e}")
-                        backoff = min(60 * (2 ** min(consecutive_429, 5)), 1920)
-                        time.sleep(backoff)
+                    backoff = min(60 * (2 ** min(consecutive_429, 5)), 1920)
+                    log(f"RATE LIMITED (x{consecutive_429}) — backing off {backoff}s")
+                    time.sleep(backoff)
                     consecutive_429 = 0
                     time.sleep(3)
                     continue

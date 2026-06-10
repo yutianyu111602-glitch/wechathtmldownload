@@ -1,0 +1,1 @@
+from weapons._legacy_wrappers import run_ig_fission as run, run_ig_fission

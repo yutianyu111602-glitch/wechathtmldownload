@@ -1,0 +1,47 @@
+chunking:
+  hard_max_chars: 3600
+  max_chars: 2800
+  min_chars: 500
+  overlap_chars: 160
+  paragraph_aware: true
+  target_chars: 1800
+input_root: D:\DDownload\_llm_release_v2\articles
+llm:
+  api_style: openai_compatible
+  concurrency: 1
+  endpoint: http://192.168.128.1:11434
+  max_retries: 2
+  max_tokens: 768
+  model: qwen3.6:35b-a3b
+  no_thinking: true
+  repeat_penalty: 1.08
+  retry_backoff_sec:
+  - 5
+  - 20
+  temperature: 0.0
+  thinking: false
+  timeout_sec: 180
+  top_k: 20
+  top_p: 0.85
+output_root: D:\downstream_results\stage7_rewrite
+pipeline:
+  description: weekly_activity_qwen36_a3b
+  facts_first: true
+  relations_second: false
+  save_bad_samples: true
+  save_raw: true
+  stage: 7
+  version: v1
+quality:
+  allow_empty_recovery: false
+  bio_exact_match_required: true
+  evidence_exact_match_required: true
+  max_failed_chunks_per_article: 2
+  min_evidence_hit_rate_pass: 0.85
+  suspicious_empty_entity_min_chars: 2500
+vector:
+  batch_size: 16
+  endpoints: []
+  max_retries: 3
+  preferred_dimension: 1024
+  timeout_sec: 60

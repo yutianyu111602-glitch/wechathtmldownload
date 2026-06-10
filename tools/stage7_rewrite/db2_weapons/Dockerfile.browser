@@ -1,0 +1,27 @@
+FROM db2-weapons-base:local
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        xvfb \
+        libasound2 \
+        libatk-bridge2.0-0 \
+        libatk1.0-0 \
+        libcups2 \
+        libdrm2 \
+        libgbm1 \
+        libgtk-3-0 \
+        libnss3 \
+        libx11-xcb1 \
+        libxcomposite1 \
+        libxdamage1 \
+        libxrandr2 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN python -m pip install \
+        playwright \
+        camoufox \
+    && python -m playwright install chromium
+
+ENV DISPLAY=:99
+
+CMD ["python", "tools/stage7_rewrite/scripts/db2_worker_profile_runner.py", "--profile", "experimental"]

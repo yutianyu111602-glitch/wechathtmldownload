@@ -1,0 +1,308 @@
+{
+  "schema_version": "atlas.curated_entity_rules.v1",
+  "generated_at": "2026-05-22",
+  "write_policy": "report_only_classification_rules_no_production_db_write",
+  "records": [
+    {
+      "term": "SHCR",
+      "normalized_term": "shcr",
+      "kind": "radio",
+      "confidence": 0.98,
+      "basis": "user_confirmed_public_web",
+      "sources": [
+        "https://www.mqw.at/institutionen/kulturmieterinnen/frei-raum-q21-exhibition-space/no-dancing-allowed/shanghai-community-radio",
+        "https://soundcloud.com/shcradio"
+      ],
+      "notes": "Shanghai Community Radio; classify as media/radio, not venue or label."
+    },
+    {
+      "term": "SHCR电台",
+      "normalized_term": "shcr电台",
+      "kind": "radio",
+      "confidence": 0.98,
+      "basis": "user_confirmed_alias",
+      "sources": [],
+      "notes": "SHCR radio Chinese alias; classify as media/radio."
+    },
+    {
+      "term": "SHCR (Shanghai Community Radio)",
+      "normalized_term": "shcr (shanghai community radio)",
+      "kind": "radio",
+      "confidence": 0.98,
+      "basis": "user_confirmed_alias",
+      "sources": [],
+      "notes": "SHCR full-name alias; classify as media/radio."
+    },
+    {
+      "term": "BYYB",
+      "normalized_term": "byyb",
+      "kind": "radio",
+      "confidence": 0.95,
+      "basis": "user_confirmed_public_web",
+      "sources": [
+        "https://www.smartshanghai.com/event/e-fruity-x-byyb-radio-daytime-party-livestream-2026-03-08",
+        "https://ra.co/events/2037302"
+      ],
+      "notes": "Radio / livestream channel context; classify as media/radio, not venue."
+    },
+    {
+      "term": "byyb.radio",
+      "normalized_term": "byyb.radio",
+      "kind": "radio",
+      "confidence": 0.95,
+      "basis": "user_confirmed_alias",
+      "sources": [],
+      "notes": "BYYB radio alias; classify as media/radio."
+    },
+    {
+      "term": "byyb radio",
+      "normalized_term": "byyb radio",
+      "kind": "radio",
+      "confidence": 0.95,
+      "basis": "user_confirmed_alias",
+      "sources": [],
+      "notes": "BYYB radio alias; classify as media/radio."
+    },
+    {
+      "term": "baihui",
+      "normalized_term": "baihui",
+      "kind": "radio",
+      "confidence": 0.96,
+      "basis": "user_confirmed_public_web",
+      "sources": [
+        "https://ra.co/news/75563",
+        "https://djmag.com/news/new-underground-music-station-baihui-launches-beijing"
+      ],
+      "notes": "Beijing underground music station; classify as media/radio."
+    },
+    {
+      "term": "BAIHUI",
+      "normalized_term": "baihui",
+      "kind": "radio",
+      "confidence": 0.96,
+      "basis": "user_confirmed_alias",
+      "sources": [],
+      "notes": "BAIHUI uppercase alias; classify as media/radio."
+    },
+    {
+      "term": "百会BAIHUI",
+      "normalized_term": "百会baihui",
+      "kind": "radio",
+      "confidence": 0.96,
+      "basis": "user_confirmed_alias",
+      "sources": [],
+      "notes": "Chinese/English BAIHUI alias; classify as media/radio."
+    },
+    {
+      "term": "Baihui电台",
+      "normalized_term": "baihui电台",
+      "kind": "radio",
+      "confidence": 0.96,
+      "basis": "user_confirmed_alias",
+      "sources": [],
+      "notes": "BAIHUI radio alias; classify as media/radio."
+    },
+    {
+      "term": "CDCR",
+      "normalized_term": "cdcr",
+      "kind": "radio",
+      "confidence": 0.96,
+      "basis": "user_confirmed_public_web",
+      "sources": [
+        "https://thechinaproject.com/2021/06/08/sleepless-in-chengdu/",
+        "https://www.rnz.co.nz/national/programmes/culture-101/audio/2018926356/kristen-ng-bridging-aotearoa-and-china-s-musical-undergrounds"
+      ],
+      "notes": "Chengdu Community Radio / CDCR.live; classify as media/radio, not California Department acronym."
+    },
+    {
+      "term": "cdcr.live",
+      "normalized_term": "cdcr.live",
+      "kind": "radio",
+      "confidence": 0.96,
+      "basis": "user_confirmed_alias",
+      "sources": [],
+      "notes": "CDCR.live alias; classify as media/radio."
+    },
+    {
+      "term": "成都社区电台(CDCR)",
+      "normalized_term": "成都社区电台(cdcr)",
+      "kind": "radio",
+      "confidence": 0.96,
+      "basis": "user_confirmed_alias",
+      "sources": [],
+      "notes": "Chengdu Community Radio Chinese alias; classify as media/radio."
+    },
+    {
+      "term": "OIL",
+      "normalized_term": "oil",
+      "kind": "venue",
+      "city": "深圳",
+      "confidence": 0.98,
+      "basis": "local_map_geocode_confirmed",
+      "sources": [],
+      "notes": "Confirmed high-volume Shenzhen club/source account; use as venue city fallback."
+    },
+    {
+      "term": "OIL油",
+      "normalized_term": "oil油",
+      "kind": "venue",
+      "city": "深圳",
+      "confidence": 0.98,
+      "basis": "local_map_geocode_confirmed",
+      "sources": [],
+      "notes": "OIL Chinese source-account alias."
+    },
+    {
+      "term": "BO LIVE",
+      "normalized_term": "bo live",
+      "kind": "venue",
+      "city": "深圳",
+      "confidence": 0.96,
+      "basis": "local_map_geocode_confirmed",
+      "sources": [],
+      "notes": "Confirmed Shenzhen venue/source account; useful when raw place is a tour stop such as 深圳站."
+    },
+    {
+      "term": "VERVO国际独立电音俱乐部",
+      "normalized_term": "vervo国际独立电音俱乐部",
+      "kind": "venue",
+      "city": "昆明",
+      "confidence": 0.96,
+      "basis": "local_map_geocode_confirmed",
+      "sources": [],
+      "notes": "Confirmed Kunming electronic music club/source account."
+    },
+    {
+      "term": "Elevator上海",
+      "normalized_term": "elevator上海",
+      "kind": "venue",
+      "city": "上海",
+      "confidence": 0.96,
+      "basis": "local_map_geocode_confirmed",
+      "sources": [],
+      "notes": "Confirmed Shanghai venue/source account."
+    },
+    {
+      "term": "Elevator",
+      "normalized_term": "elevator",
+      "kind": "venue",
+      "city": "上海",
+      "confidence": 0.94,
+      "basis": "local_map_geocode_confirmed_alias",
+      "sources": [],
+      "notes": "Elevator Shanghai alias; use only as venue/source account fallback."
+    },
+    {
+      "term": "THE WINDOW CLUB",
+      "normalized_term": "the window club",
+      "kind": "venue",
+      "city": "广州",
+      "confidence": 0.94,
+      "basis": "public_web_city_evidence",
+      "sources": [
+        "https://www.kdclub.net/kdBar/detail?id=3630",
+        "https://setoftheday.com/de/clubs/guangzhou/the-window/"
+      ],
+      "notes": "Public pages place THE WINDOW in Guangzhou; use as venue/source account fallback."
+    },
+    {
+      "term": "The Window",
+      "normalized_term": "the window",
+      "kind": "venue",
+      "city": "广州",
+      "confidence": 0.92,
+      "basis": "public_web_city_evidence_alias",
+      "sources": [
+        "https://setoftheday.com/de/clubs/guangzhou/the-window/"
+      ],
+      "notes": "THE WINDOW alias."
+    },
+    {
+      "term": "EchoBay",
+      "normalized_term": "echobay",
+      "kind": "venue",
+      "city": "重庆",
+      "confidence": 0.94,
+      "basis": "public_web_city_evidence",
+      "sources": [
+        "https://china.worldplaces.me/review/88065307-echo-bay.html",
+        "https://www.sohu.com/a/278182278_99898755"
+      ],
+      "notes": "Public pages identify EchoBay as Chongqing underground electronic music club."
+    },
+    {
+      "term": "Echo Bay",
+      "normalized_term": "echo bay",
+      "kind": "venue",
+      "city": "重庆",
+      "confidence": 0.94,
+      "basis": "public_web_city_evidence_alias",
+      "sources": [
+        "https://china.worldplaces.me/review/88065307-echo-bay.html"
+      ],
+      "notes": "EchoBay spaced alias."
+    },
+    {
+      "term": "AXIS",
+      "normalized_term": "axis",
+      "kind": "venue",
+      "city": "成都",
+      "confidence": 0.95,
+      "basis": "public_web_city_evidence",
+      "sources": [
+        "https://ra.co/events/2244220",
+        "https://ra.co/clubs/cn/chengdu"
+      ],
+      "notes": "RA lists AXIS venue in Chengdu; use as venue/source account fallback."
+    },
+    {
+      "term": "AXIS.CHENGDU",
+      "normalized_term": "axis.chengdu",
+      "kind": "venue",
+      "city": "成都",
+      "confidence": 0.95,
+      "basis": "public_web_city_evidence_alias",
+      "sources": [
+        "https://ra.co/events/2244220"
+      ],
+      "notes": "AXIS Chengdu source-account alias."
+    },
+    {
+      "term": "JAR这儿",
+      "normalized_term": "jar这儿",
+      "kind": "venue",
+      "city": "西安",
+      "confidence": 0.95,
+      "basis": "public_web_city_evidence",
+      "sources": [
+        "https://shypeople.cn/JAR",
+        "https://ra.co/events/2042892"
+      ],
+      "notes": "Public music-scene pages place JAR/JAR这儿 in Xi'an."
+    },
+    {
+      "term": "JAR",
+      "normalized_term": "jar",
+      "kind": "venue",
+      "city": "西安",
+      "confidence": 0.94,
+      "basis": "public_web_city_evidence_alias",
+      "sources": [
+        "https://shypeople.cn/JAR",
+        "https://ra.co/events/2042892"
+      ],
+      "notes": "JAR Xi'an alias; apply only as venue/source-account context, not as generic word outside music-scene evidence."
+    },
+    {
+      "term": "c1tyA1d2er",
+      "normalized_term": "c1tya1d2er",
+      "kind": "dj",
+      "confidence": 0.84,
+      "basis": "public_web_lineup_evidence",
+      "sources": [
+        "https://ja.ra.co/events/2198725"
+      ],
+      "notes": "RA lineup evidence shows C1TYA1D2ER as an artist in a Shanghai event; if found in events.place, treat as misfielded performer noise rather than venue."
+    }
+  ]
+}

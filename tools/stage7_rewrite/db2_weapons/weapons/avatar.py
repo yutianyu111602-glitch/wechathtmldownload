@@ -1,0 +1,1 @@
+from weapons._legacy_wrappers import run_avatar as run, run_avatar
