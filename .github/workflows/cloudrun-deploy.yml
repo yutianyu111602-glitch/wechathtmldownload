@@ -1,0 +1,49 @@
+name: cloudrun-deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      git_ref:
+        description: Git ref to deploy
+        required: true
+        default: main
+      expected_item_count:
+        description: Expected manifest.item_count
+        required: true
+        default: '171'
+
+concurrency:
+  group: cloudrun-prod
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: cloudrun-prod
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.git_ref }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - run: npm run bootstrap
+      - run: npm rebuild better-sqlite3
+      - run: npm run validate:weekly-package
+      - run: npm run check:current-release
+
+      - name: Deploy
+        run: pwsh ./scripts/cloudrun/deploy.ps1 -EnvId "${{ secrets.CLOUDBASE_ENV_ID }}"
+
+      - name: Post-deploy smoke
+        run: pwsh ./scripts/cloudrun/postdeploy-smoke.ps1 -BaseUrl "${{ secrets.CLOUDRUN_PUBLIC_URL }}" -ExpectedItemCount "${{ inputs.expected_item_count }}"
