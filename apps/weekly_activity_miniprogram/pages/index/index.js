@@ -614,7 +614,18 @@ Page({
         resolvedDateKey,
       ), []);
       this.setLoadingProgress(90, labels.loadingClean, loadSeq, labels.loadingCleanHint);
-      const resolvedViewData = await resolveIndexViewPosters(nextViewData);
+
+      // Resolve posters with a short timeout to avoid blocking page render
+      var resolvedViewData = nextViewData;
+      try {
+        var posterTimeout = new Promise(function (_, reject) {
+          setTimeout(function () { reject(new Error("POSTER_RESOLVE_TIMEOUT")); }, 3000);
+        });
+        resolvedViewData = await Promise.race([resolveIndexViewPosters(nextViewData), posterTimeout]);
+      } catch (e) {
+        // Poster resolution timeout or error - proceed with unresolved URLs
+        resolvedViewData = nextViewData;
+      }
       if (loadSeq !== this.loadSeq) return null;
       const { items: _unused, ...lightViewData } = resolvedViewData;
       this._fullItems = resolvedViewData.items || [];
