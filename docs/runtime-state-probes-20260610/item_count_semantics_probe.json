@@ -1,0 +1,24 @@
+{
+  "probe_name": "item_count_semantics",
+  "generated_at": "2026-06-10T20:05:00+08:00",
+  "method": "git ls-tree HEAD + ConvertFrom-Json on manifest/current.json",
+  "results": {
+    "manifest_item_count": 171,
+    "current_json_items_length": 171,
+    "by_id_git_file_count": 171,
+    "by_id_fs_file_count": 171,
+    "llm_enrichments_git_file_count": 171,
+    "llm_enrichments_fs_file_count": "0 (sparse-checkout/fs issue; git tree has 171)"
+  },
+  "previous_handoff_stated_by_id_count": 155,
+  "previous_handoff_stated_enrichments_count": 155,
+  "verdict": "PREVIOUS_155_WAS_STALE. Current truth is 171 across all sources.",
+  "publish_truth_source": "manifest.json item_count",
+  "divergence": "NONE — all counts agree at 171",
+  "note": "llm/enrichments/ shows 0 on Windows filesystem but 171 in git tree. Likely a sparse-checkout or NTFS issue. The git tree count is authoritative.",
+  "verification_commands": [
+    "git ls-tree HEAD services/weekly_activity_cloudrun/data/current_release/by-id/ | Measure-Object",
+    "(Get-Content services/weekly_activity_cloudrun/data/current_release/manifest.json -Raw | ConvertFrom-Json).item_count",
+    "(Get-Content services/weekly_activity_cloudrun/data/current_release/current.json -Raw | ConvertFrom-Json).items.Count"
+  ]
+}

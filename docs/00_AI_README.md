@@ -29,13 +29,14 @@
 1. **本文件** (00_AI_README.md) — AI 入口
 2. `README.md` — 人类入口和运行时流程
 3. `AGENTS.md` — Agent 行为边界和模型事实
-4. `LONGRUN_STATE.md` — 当前长跑状态和数据库指标
-5. `docs/current-runtime.md` — 最新运行时状态 (12K+ 行，最新证据)
-6. `docs/03_ARCHITECTURE.md` — 高层架构 (NEW)
-7. `docs/06_API_CONTRACTS.md` — 小程序 API 契约 (NEW)
-8. `docs/07_DATABASE_SCHEMA.md` — 数据库结构 (NEW)
-9. `docs/09_LOCAL_DEV_SOP.md` — 本地启动 (NEW)
-10. `docs/13_SECURITY_PRIVACY.md` — 安全清单 (NEW)
+4. `docs/06_RUNTIME_STATE_TRUTH_TABLE.md` — 运行状态真相表 (当前组件状态)
+5. `docs/03_API_CONTRACTS_WEEKLY.md` — Weekly API 契约 (路由/参数/响应)
+6. `docs/04_DATA_PACKAGE_CONTRACT_WEEKLY.md` — 数据包字段级契约
+7. `docs/01_PROJECT_MAP.md` — 项目目录地图
+8. `docs/10_DEPLOYMENT_SOP.md` — 部署步骤
+9. `docs/11_TROUBLESHOOTING.md` — 常见问题排查
+10. `docs/audit-django-backend-presence-20260610.md` — Django 不存在审计结论
+11. `tools/stage7_rewrite/SSOT.md` — Stage7 当前状态 (如需 Atlas 工作上下文)
 
 ## 4. 本地启动最短路径
 
@@ -76,12 +77,14 @@ WeChat 公众号文章 → 归档采集 (mptext/Dajiala)
 
 | 端点 | 功能 |
 |---|---|
-| GET /api/v1/activities | 活动列表 (支持 city/time 筛选) |
-| GET /api/v1/activities/:id | 活动详情 + 演出 DJ |
-| GET /api/v1/djs | DJ 列表/搜索 |
-| GET /api/v1/djs/:id | DJ 详情 + 演出历史 |
-| GET /api/v1/venues | 场地列表 |
-| GET /api/v1/search | 全文搜索 |
+| GET /api/weekly/current | 当前窗口全部活动 (171 items) |
+| GET /api/weekly/by-city/:city | 按城市筛选活动 |
+| GET /api/weekly/by-date/:date | 按日期筛选活动 |
+| GET /api/weekly/by-id/:id | 单个活动详情 + DJ lineup |
+| GET /api/weekly/manifest | 数据包元信息 (窗口/数量/来源) |
+| GET /api/weekly/source-url-map | 来源公众号文章 URL 映射 |
+| GET /api/v1/stage7/search | Atlas 全文搜索 (需 session) |
+| GET /api/v1/atlas/session/status | Atlas 会话状态 |
 
 ## 7. 最关键数据表 (Atlas Serving SQLite)
 
@@ -143,11 +146,11 @@ npm run build
 
 1. 读 `docs/00_AI_README.md` (本文件)
 2. 读 `README.md` + `AGENTS.md`
-3. 读 `docs/current-runtime.md` 最新段
-4. 读 `docs/03_ARCHITECTURE.md`
-5. 读 `docs/06_API_CONTRACTS.md`
-6. 读 `docs/07_DATABASE_SCHEMA.md`
-7. 本地按 `docs/09_LOCAL_DEV_SOP.md` 跑起来
-8. 运行 `npm run build` 确认编译通过
-9. 运行 smoke test 确认环境正常
-10. 修改代码前检查 `docs/13_SECURITY_PRIVACY.md`
+3. 读 `docs/06_RUNTIME_STATE_TRUTH_TABLE.md` 了解当前运行状态
+4. 读 `docs/03_API_CONTRACTS_WEEKLY.md` 了解 API 路由
+5. 读 `docs/04_DATA_PACKAGE_CONTRACT_WEEKLY.md` 了解数据字段
+6. 本地按 `docs/09_LOCAL_DEV_SOP.md` 跑起来
+7. 运行 `npm rebuild better-sqlite3 && npm run build` 确认编译通过
+8. 运行 smoke test 确认环境正常
+9. 修改代码前检查 `docs/11_TROUBLESHOOTING.md` 和 `docs/security/SECRET_ROTATION_NOTICE_20260610.md`
+10. 部署前读 `docs/10_DEPLOYMENT_SOP.md`

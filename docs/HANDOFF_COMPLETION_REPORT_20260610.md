@@ -3,13 +3,13 @@
 ## Summary
 
 Completed P0 handoff documentation pack for `wechathtmldownload` project.
-All 8 tasks (A-H) executed. New docs committed locally; push to private repo blocked by TLS (network issue).
+All 8 tasks (A-H) executed. **PUSHED_TO_PRIVATE_REPO** — remote `main` contains this handoff pack.
 
 ## Task Completion
 
 | Task | Status | Output |
 |------|--------|--------|
-| A: Sample data | DONE | `data/samples/` — 7 files, all fake/anonymized |
+| A: Sample data | DONE | `services/weekly_activity_cloudrun/data/samples/` — 8 files, all fake/anonymized |
 | B: Runtime truth table | DONE | `docs/06_RUNTIME_STATE_TRUTH_TABLE.md` + 3 probe scripts |
 | C: Django audit | DONE | `docs/audit-django-backend-presence-20260610.md` — NOT FOUND |
 | D: API contracts | DONE | `docs/03_API_CONTRACTS_WEEKLY.md` — all routes documented |
@@ -70,12 +70,21 @@ docs/adr/ADR-004-cloudrun-cloudbase-dual-hosting.md
 
 | Item | Severity | Action Needed |
 |------|----------|---------------|
-| Git push blocked by TLS | HIGH | Retry when network stable: `git -c http.proxy= push private wip/rescue-20260605-160743:main` |
-| DEEPSEEK_API_KEY exposed in `.env` | HIGH | Rotate key; file not tracked but readable on disk |
+| ~~Git push blocked by TLS~~ | ~~HIGH~~ | **RESOLVED** — pushed successfully on 2026-06-10 |
+| DEEPSEEK_API_KEY in local `.env` | **P0 HUMAN** | Rotate key immediately; file not tracked but readable on disk; see `docs/security/SECRET_ROTATION_NOTICE_20260610.md` |
 | CloudRun NOT deployed to Tencent | MEDIUM | Deploy when ready: see `docs/10_DEPLOYMENT_SOP.md` |
 | Mini-program NOT uploaded to DevPlatform | MEDIUM | Upload experience version when ready |
 | 1 pre-existing test failure | LOW | `cacheMaxAgeMs zero disables cached fallback` test — needs investigation |
 | Atlas reports are report-only | INFO | No production DB mutation occurred; all reports under `tools/stage7_rewrite/reports/` |
+
+## Push Evidence
+
+- **Commit 1**: `77d6904` — 410 files (root entry files, CloudRun data, handover docs)
+- **Commit 2**: `6279d8b` — 24 files (P0 handoff completion pack Tasks A-H)
+- **Remote**: `private` = `https://github.com/yutianyu111602-glitch/wechathtmldownload-private.git`
+- **Branch**: `wip/rescue-20260605-160743` → `main`
+- **Push time**: 2026-06-10 (same session)
+- **Total pushed files**: 434
 
 ## Architecture Truth (Corrected)
 
@@ -85,8 +94,8 @@ Previous handoffs incorrectly described this as "Django + WeChat mini-program".
 
 ## Next Session Entry Points
 
-1. **Push to private repo**: `git -c http.proxy= -c https.proxy= push private wip/rescue-20260605-160743:main`
-2. **Deploy CloudRun**: Follow `docs/10_DEPLOYMENT_SOP.md`
+1. **Deploy CloudRun**: Follow `docs/10_DEPLOYMENT_SOP.md`
+2. **Rotate DEEPSEEK_API_KEY**: See `docs/security/SECRET_ROTATION_NOTICE_20260610.md`
 3. **Upload mini-program**: Use DevTools CLI per SOP
 4. **Fix pre-existing test**: Investigate `api-static-fallback.test.cjs:585`
 5. **Continue Atlas work**: See `tools/stage7_rewrite/SSOT.md` for current report-only state

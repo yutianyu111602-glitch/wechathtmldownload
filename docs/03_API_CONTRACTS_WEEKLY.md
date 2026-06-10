@@ -7,19 +7,28 @@ Source: `services/weekly_activity_cloudrun/src/server.mjs`, `apps/weekly_activit
 
 Base URL: CloudRun service URL or `http://127.0.0.1:3000` (local)
 
-### Public Weekly Routes (no auth)
+### Public Weekly Routes — Developer Reference
 
-| Endpoint | Method | Description | Response Shape |
-|----------|--------|-------------|----------------|
-| `/api/weekly/current` | GET | All events for current window | `{ generated_at, item_count, items[] }` |
-| `/api/weekly/by-city/:city` | GET | Events by city key (e.g. `shanghai`) | `{ generated_at, city, items[] }` |
-| `/api/weekly/by-city/index.json` | GET | City index | `{ cities: [{ city_key, city, count }] }` |
-| `/api/weekly/by-date/:date` | GET | Events by ISO date (e.g. `2026-06-10`) | `{ generated_at, date, items[] }` |
-| `/api/weekly/by-date/index.json` | GET | Date index | `{ dates: [{ date, count }] }` |
-| `/api/weekly/by-id/:id` | GET | Single event detail | `{ schema_version, generated_at, item: {...} }` |
-| `/api/weekly/manifest` | GET | Pack manifest metadata | `{ schema_version, generated_at, item_count, window_start, window_end, ... }` |
-| `/api/weekly/source-url-map` | GET | Source URL mapping | `{ items: [{ account_name, url_hash, source_type, url, event_ids[] }] }` |
-| `/api/weekly/llm/status` | GET | LLM enrichment status | `{ status, model, last_run }` |
+| Endpoint | Method | Description | Backend Handler | Frontend Call Site | Test File |
+|----------|--------|-------------|-----------------|-------------------|-----------|
+| `/api/weekly/current` | GET | All events | `dataStore.mjs` → `current.json` | `api.js` `requestApi("/api/weekly/current")` | `production-data-source.test.cjs` |
+| `/api/weekly/by-city/:city` | GET | Events by city | `dataStore.mjs` → `by-city/:city.json` | `api.js` `requestApi("/api/weekly/by-city/" + city)` | `production-data-source.test.cjs` |
+| `/api/weekly/by-city/index.json` | GET | City index | `dataStore.mjs` → `by-city/index.json` | `api.js` `requestApi("/api/weekly/by-city/index.json")` | — |
+| `/api/weekly/by-date/:date` | GET | Events by date | `dataStore.mjs` → `by-date/:date.json` | `api.js` `requestApi("/api/weekly/by-date/" + date)` | — |
+| `/api/weekly/by-date/index.json` | GET | Date index | `dataStore.mjs` → `by-date/index.json` | `api.js` `requestApi("/api/weekly/by-date/index.json")` | — |
+| `/api/weekly/by-id/:id` | GET | Event detail | `dataStore.mjs` → `by-id/:id.json` | `api.js` `requestApi("/api/weekly/by-id/" + id)` | — |
+| `/api/weekly/manifest` | GET | Pack metadata | `dataStore.mjs` → `manifest.json` | `api.js` `requestApi("/api/weekly/manifest")` | `production-data-source.test.cjs` |
+| `/api/weekly/source-url-map` | GET | Source URL map | `dataStore.mjs` → `source_actions/source_url_map.json` | — | — |
+| `/api/weekly/llm/status` | GET | LLM status | `deepSeekClient.mjs` | `api.js` `requestLlmApi("/status")` | — |
+
+### Known Risks
+
+| Risk | Mitigation |
+|------|-----------|
+| `/api/weekly/current` returns all 171 items — large payload | Gzip compression enabled; consider `limit` param |
+| `/api/weekly/by-id/:id` file not found | Returns 404; mini-program falls back to offline snapshot |
+| City/date keys must match slug format exactly | `chengdu` not `成都`; see `by-city/index.json` for valid keys |
+| `/api/weekly/source-url-map` contains URL hashes, not real URLs | URLs are REDACTED; `url` field says `FAKE_URL_REDACTED` in samples |
 
 ### Query Parameters (common)
 

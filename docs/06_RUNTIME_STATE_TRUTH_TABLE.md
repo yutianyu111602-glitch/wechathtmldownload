@@ -11,7 +11,7 @@ An AI taking over the project can use this to quickly assess what is running, wh
 |-----------|----------|---------------|-------------|---------------|---------------|
 | CloudRun API server | `services/weekly_activity_cloudrun/` | NOT DEPLOYED | Local `npm start` only | 2026-06-10 | YES — deploy to CloudBase |
 | `current_release/` data | `services/weekly_activity_cloudrun/data/current_release/` | 171 items, generated 2026-06-10T16:43 | `manifest.json` | 2026-06-10 | NO — fresh |
-| `better-sqlite3` native module | `node_modules/better-sqlite3` | NEEDS REBUILD | `npm rebuild` | 2026-06-09 | YES — rebuild required |
+| `better-sqlite3` native module | `node_modules/better-sqlite3` | REBUILT_OK | `npm rebuild better-sqlite3` | 2026-06-10 | NO — local verified; new clones may need `npm rebuild better-sqlite3` |
 | Mini-program (local) | `apps/weekly_activity_miniprogram/` | Code updated, NOT uploaded | DevTools CLI | 2026-06-09 | YES — upload experience version |
 | Mini-program (remote) | WeChat DevPlatform | STALE — last upload 2026-06-08 | DevPlatform console | 2026-06-09 | YES — upload new version |
 | CloudBase Storage | Tencent CloudBase | Poster images uploaded 2026-06-04 | CloudBase console | 2026-06-04 | MAYBE — check new posters |
@@ -27,8 +27,35 @@ An AI taking over the project can use this to quickly assess what is running, wh
 | `current.json` | 2026-06-10T16:43:33+08:00 | 2026-06-02 ~ 2026-06-16 | 171 | 2026-06-17 |
 | `by-city/*.json` | 2026-06-10T16:43:33+08:00 | Same as current.json | 25 cities | 2026-06-17 |
 | `by-date/*.json` | 2026-06-10T16:43:33+08:00 | Same as current.json | 13 dates | 2026-06-17 |
-| `by-id/*.json` | 2026-06-10T16:43:33+08:00 | Same as current.json | 155 items | 2026-06-17 |
-| `llm/enrichments/` | 2026-06-10T16:43:33+08:00 | Same as current.json | 155 enrichments | 2026-06-17 |
+| `by-id/*.json` | 2026-06-10T16:43:33+08:00 | Same as current.json | 171 items | 2026-06-17 |
+| `llm/enrichments/` | 2026-06-10T16:43:33+08:00 | Same as current.json | 171 enrichments | 2026-06-17 |
+
+## Item Count Semantics
+
+| Source | Count | Description |
+|--------|-------|-------------|
+| `manifest.json` `item_count` | 171 | Pipeline output count after repair |
+| `current.json` `items.length` | 171 | All published events in current window |
+| `by-id/` file count (git) | 171 | One JSON file per event detail |
+| `llm/enrichments/` file count (git) | 171 | One enrichment per event |
+
+**All counts are 171.** The previous handoff incorrectly stated 155 for by-id and enrichments.
+That was a stale number from an earlier data pack. The current truth is 171 across all sources.
+
+Verification command:
+```powershell
+# Check manifest
+(Get-Content services\weekly_activity_cloudrun\data\current_release\manifest.json -Raw | ConvertFrom-Json).item_count
+# Check current.json items
+(Get-Content services\weekly_activity_cloudrun\data\current_release\current.json -Raw | ConvertFrom-Json).items.Count
+# Check by-id file count
+(Get-ChildItem services\weekly_activity_cloudrun\data\current_release\by-id\*.json).Count
+# Check by-id in git (most reliable)
+git ls-tree HEAD services/weekly_activity_cloudrun/data/current_release/by-id/ | Measure-Object
+```
+
+If counts diverge after a new pipeline run, the **publish truth** is `manifest.json` `item_count`.
+Re-run `probe-data-freshness.ps1` to detect divergence.
 
 ## API Route Health
 

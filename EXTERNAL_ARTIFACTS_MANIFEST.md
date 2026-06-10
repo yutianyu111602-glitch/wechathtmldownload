@@ -9,16 +9,15 @@
 
 | 制品 | 类型 | 位置 | 版本/日期 | 大小(约) | 是否脱敏 | 用途 | sha256 获取命令 |
 |---|---|---|---|---|---|---|---|
-| atlas_merged.sqlite | 源数据库 | /tmp/atlas_merged.sqlite (WSL) | 2026-06-01 | 3.8GB | 否 | 合并后的事件/实体源数据 | `sha256sum /tmp/atlas_merged.sqlite` |
-| atlas_serving.sqlite (v4) | 服务数据库 | /tmp/atlas_serving_final_v4/atlas_serving.sqlite | 2026-06-01 | 1.6GB | 否 | 当前 selected serving 数据库 | `sha256sum <path>` |
-| atlas_serving.sqlite (历史) | 服务数据库 | reports/atlas_serving_*/atlas_serving.sqlite | 多个版本 | 1.5-1.6GB | 否 | 历史版本服务数据库 | - |
-| 报告 SQLite | 侧车数据库 | reports/atlas_*/*.sqlite | 多个日期 | 1-50MB | 部分 | 各类分析侧车数据库 | - |
-| FullMap 数据 | JSON/JSONL | D:/downstream_results/stage7_rewrite/longrun/ | 每周 | GB级 | 否 | Stage7 完整 map 输出 | - |
-| 每周活动增量包 | ZIP | D:/downstream_results/.../WEEKLY_ACTIVITY_*/ | 每周 | 450MB+ | 否 | 每周活动 OCR/提取结果 | - |
-| Dajiala 归档数据 | HTML/ZIP | D:/DDownload/_archive_mptext/ | 持续 | TB级 | 否 | WeChat 文章归档原始数据 | - |
-| rawwechat 源数据 | HTML/资产 | D:/rawwechat/ | 持续 | TB级 | 否 | WeChat 文章原始 HTML 及资产 | - |
-| 产品 PDF | PDF | ProductIntroduction.pdf | - | - | 否 | 产品介绍 PDF | - |
-| NIGHT_WATCHER 打包 | ZIP | NIGHT_WATCHER_COMPLETE_PACKAGE.zip | 2026-04-27 | - | 否 | Night Watcher 完整打包 | - |
+| atlas_merged.sqlite | 源数据库 | /tmp/atlas_merged.sqlite (WSL) | 2026-06-01 | 3.8GB | 否 | 合并后的事件/实体源数据 | UNKNOWN_NEEDS_HUMAN |
+| atlas_serving.sqlite (selected) | 服务数据库 | reports/atlas_serving_activity_current_time_dedupe_strict_20260525-1625/atlas_serving.sqlite | 2026-05-25 | 1.6GB | 否 | 当前 selected serving 数据库 | UNKNOWN_NEEDS_HUMAN |
+| 报告 SQLite | 侧车数据库 | reports/atlas_*/*.sqlite | 多个日期 | 1-50MB | 部分 | 各类分析侧车数据库 | UNKNOWN_NEEDS_HUMAN |
+| 每周活动增量包 (2026-06-10) | JSON | D:/downstream_results/stage7_rewrite/longrun/WEEKLY_ACTIVITY_MINIPROGRAM_API_20260610/ | 2026-06-10 | UNKNOWN_NEEDS_HUMAN | 否 | 最新 weekly 活动 API 输出 | UNKNOWN_NEEDS_HUMAN |
+| 每周活动增量包 (merged) | JSON | D:/downstream_results/stage7_rewrite/longrun/WEEKLY_ACTIVITY_MINIPROGRAM_API_20260610_MERGED_CURRENT/ | 2026-06-10 | UNKNOWN_NEEDS_HUMAN | 否 | 合并后的 weekly API 包 | UNKNOWN_NEEDS_HUMAN |
+| FullMap 数据 | JSON/JSONL | D:/downstream_results/stage7_rewrite/longrun/ | 每周 | GB级 | 否 | Stage7 完整 map 输出 | UNKNOWN_NEEDS_HUMAN |
+| Dajiala 归档数据 | HTML/ZIP | D:/DDownload/_archive_mptext/ | 持续 | TB级 | 否 | WeChat 文章归档原始数据 | 不可扫描 |
+| rawwechat 源数据 | HTML/资产 | D:/rawwechat/ | 持续 | TB级 | 否 | WeChat 文章原始 HTML 及资产 | 不可扫描 |
+| 样例数据 (脱敏) | JSON/MD | services/weekly_activity_cloudrun/data/samples/ | 2026-06-10 | ~15KB | **是** | AI 接手用脱敏样例 | `git ls-tree HEAD services/weekly_activity_cloudrun/data/samples/` |
 
 ## 导入机制
 
@@ -42,5 +41,5 @@
 
 1. 所有生产数据库包含真实用户数据（openid/unionid），不可分享
 2. Dajiala 归档含 WeChat 平台版权内容，仅限个人研究使用
-3. 本地开发使用脱敏样例数据，见 data/samples/（待创建）
+3. 本地开发使用脱敏样例数据，见 `services/weekly_activity_cloudrun/data/samples/`（仓库级入口：`data/samples/README.md`）
 4. 外部制品路径中 `D:/` 指本地机械硬盘，非仓库内路径
