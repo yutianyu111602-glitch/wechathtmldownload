@@ -1,0 +1,75 @@
+<view class="page column-page">
+  <image lazy-load class="brand-logo" src="/assets/brand/huaidj-logo-nav-512x128.png" mode="aspectFit"></image>
+
+  <view class="column-header">
+    <view class="column-title">{{t.title}}</view>
+    <view class="column-subtitle">{{t.subtitle}}</view>
+  </view>
+
+  <view class="tag-filter">
+    <view
+      wx:for="{{tags}}"
+      wx:key="key"
+      class="tag-pill {{activeTag === item.key ? 'tag-pill-active' : ''}}"
+      data-tag="{{item.key}}"
+      bindtap="onTagTap"
+    >{{item.label}}</view>
+  </view>
+
+  <view class="column-list">
+    <view
+      wx:for="{{filteredItems}}"
+      wx:key="id"
+      class="column-card"
+    >
+      <view class="card-header">
+        <image wx:if="{{item.avatar}}" class="card-avatar" src="{{item.avatar}}" mode="aspectFill" lazy-load></image>
+        <view class="card-header-text">
+          <view class="card-meta">
+            <text class="card-tag tag-{{item.tag}}">{{item.tagDisplay}}</text>
+            <text class="card-date">{{item.date}}</text>
+          </view>
+          <view class="card-title">{{item.title}}</view>
+        </view>
+      </view>
+      <view class="card-body">
+        <view class="card-summary">{{item.summary}}</view>
+        <view wx:if="{{item.hasForeignMedia}}" class="card-foreign">
+          <text class="foreign-label">{{t.foreignMedia}}</text>
+          <text>{{item.foreignMedia}}</text>
+        </view>
+        <view wx:if="{{item.soundcloud}}" class="card-link-row" data-url="{{item.soundcloud}}" bindtap="openSourceLink">
+          <text class="card-link-icon">🎧</text>
+          <text class="card-link-text">SoundCloud</text>
+          <text class="card-link-arrow">›</text>
+        </view>
+        <view wx:if="{{item.bandcamp}}" class="card-link-row" data-url="{{item.bandcamp}}" bindtap="openSourceLink">
+          <text class="card-link-icon">🎵</text>
+          <text class="card-link-text">Bandcamp</text>
+          <text class="card-link-arrow">›</text>
+        </view>
+        <view wx:if="{{item.eventUrl && !item.isFictionalUrl}}" class="card-link-row" data-url="{{item.eventUrl}}" bindtap="openSourceLink">
+          <text class="card-link-icon">📰</text>
+          <text class="card-link-text">{{t.eventSource}}</text>
+          <text class="card-link-arrow">›</text>
+        </view>
+        <view wx:if="{{item.eventUrl && item.isFictionalUrl}}" class="card-link-row card-link-row-disabled">
+          <text class="card-link-icon">📰</text>
+          <text class="card-link-text">{{t.sourceExternal}}</text>
+          <text class="card-link-arrow">·</text>
+        </view>
+        <view wx:if="{{item.tracks && item.tracks.length}}" class="card-tracks">
+          <view wx:for="{{item.tracks}}" wx:key="*this" wx:for-item="track" class="card-track-item">
+            <text class="track-dot">·</text>
+            <text>{{track}}</text>
+          </view>
+        </view>
+        <view class="card-source">{{t.source}} {{item.sourceName}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="column-footer">
+    <text>{{t.footer}}</text>
+  </view>
+</view>

@@ -127,10 +127,10 @@ const TEXT = {
       openMap: "打开定位",
       openMapFallback: "缺少坐标，已复制定位",
       openMapFailed: "无法打开定位，已复制地址",
-      lineupHint: "点击原文查看公众号详情",
+      lineupHint: "点击海报跳转公众号原文查看",
       sourcePreparing: "原文准备中",
-      posterUnavailable: "暂无海报",
-      viewSource: "打开公众号原文",
+      posterUnavailable: "暂无原文链接",
+      viewSource: "点击海报跳转公众号原文查看",
       sourceArticles: "SOURCE ARTICLES",
       primary: "PRIMARY",
     },
@@ -161,10 +161,10 @@ const TEXT = {
       openMap: "Open location",
       openMapFallback: "No coordinates yet. Location copied",
       openMapFailed: "Unable to open location. Address copied",
-      lineupHint: "Tap source to view details",
+      lineupHint: "Tap poster to view source",
       sourcePreparing: "Preparing source",
-      posterUnavailable: "No poster yet",
-      viewSource: "Open source",
+      posterUnavailable: "No source link yet",
+      viewSource: "Tap poster to view source",
       sourceArticles: "Source articles",
       primary: "Primary",
     },
@@ -195,18 +195,26 @@ const TEXT = {
   },
   saved: {
     zh: {
-      title: "收藏",
+      title: "ATLAS",
+      subtitle: "中国地下电子音乐图谱",
+      intro: "ATLAS 把城市、俱乐部、DJ、活动和原文证据放在同一张可核对的关系网里。收藏活动即加入个人档案线索。",
       loading: "加载中",
       loadFailed: "加载失败",
       empty: "还没有收藏活动。",
       outOfWindow: "收藏的活动不在当前发布窗口。",
+      interviewTitle: "提交 Mixtape / 采访线索",
+      interviewHint: "补充 ins、mixtape 或采访笔记，进入人工审核队列",
     },
     en: {
-      title: "Saved",
+      title: "ATLAS",
+      subtitle: "China Underground Music Graph",
+      intro: "ATLAS connects cities, clubs, DJs, events, and source evidence in one verifiable graph. Saved events become your personal archive trail.",
       loading: "Loading",
       loadFailed: "Failed to load",
       empty: "No saved events yet.",
       outOfWindow: "Saved events are outside the current release window.",
+      interviewTitle: "Submit Mixtape / Interview Lead",
+      interviewHint: "Add Instagram, mixtape, or interview notes for human review",
     },
   },
   city: {
@@ -237,24 +245,13 @@ const TEXT = {
       sourceTitle: "数据来源",
       source1: "活动信息来自公开发布的活动文章，经整理后展示。详情页保留来源摘要，方便用户核对。",
       source2: "日期、场地、地址、阵容、风格等字段仅作信息检索参考；拿不准的字段会留空或提示查看原文。详情请以活动主办方公开发布内容为准。",
-      interviewKicker: "FIELD NOTES",
-      interviewTitle: "DJ 采访专栏",
-      interviewBody: "收集本地 DJ 的演出记忆、mixtape、ins 和可核对来源，先进入授权与人工审核队列，再成为 Atlas 的档案线索。",
-      interviewMeta: "只保存外链和授权状态；不下载、不转存、不公开音频。",
-      atlasTitle: "城市声音猎手 Atlas Beta",
+      atlasTitle: "ATLAS Beta",
       atlasStatus: "BETA",
       atlasBody: "Atlas 是中国地下电子音乐图谱，把城市、俱乐部、DJ、活动和原文证据放在同一张可核对的关系网里。",
       atlasMeta: "所有人都可以使用 Beta 预览版，探索图谱和活动档案。数据、交互和权限还会持续调整。",
       atlasDisclaimer: "Beta 版仅用于早期体验和信息核对；正式判断仍以俱乐部或主办方公开信息为准。",
       atlasAction: "进入受控外链页",
-      atlasUrlLabel: "huaidj.club",
-      aiPanelKicker: "AI",
-      aiPanelTitle: "LLM 活动摘要",
-      aiPanelBody: "基于微信云开发 AI 与云托管接口，生成本周活动摘要，按活动 ID 查看 AI 增强补充。",
-      aiPanelHint: "支持物化摘要、实时生成、活动补充。",
-      soundFullAccessTitle: "高清设备图共建完整版",
-      soundFullAccessBody: "提交高清设备图片的俱乐部，会优先获得完整版 Atlas 图谱使用权，并获得排期档案整理支持。",
-      soundReviewNote: "所有素材先由人工确认，再交给 LLM 做型号识别和一致性复核。",
+      atlasUrlLabel: "https://huaidj.club",
       atlasCopied: "链接已复制",
       atlasBrowserGuideTitle: "打开 Atlas Beta",
       atlasBrowserGuide: "链接已复制到剪贴板，请在手机浏览器（Safari / Chrome）中粘贴打开。\n\nhttps://huaidj.club/",
@@ -271,24 +268,13 @@ const TEXT = {
       sourceTitle: "Data sources",
       source1: "Event information comes from publicly published articles and is structured for browsing. Detail pages keep source summaries for checking.",
       source2: "Date, club, address, lineup, and style fields are reference fields. Uncertain fields stay blank or point back to the source article.",
-      interviewKicker: "FIELD NOTES",
-      interviewTitle: "DJ Interview Column",
-      interviewBody: "Collect local DJ memories, mixtapes, Instagram links, and verifiable sources before human review and Atlas sidecar promotion.",
-      interviewMeta: "Source links and consent only. No audio download, reposting, or public raw media.",
       atlasTitle: "Atlas Beta",
       atlasStatus: "BETA",
       atlasBody: "Atlas is a Chinese underground electronic music graph, connecting cities, clubs, DJs, events, and source evidence in one verifiable network.",
       atlasMeta: "Everyone can use the Beta preview to explore the graph and event archives. Data, interactions, and access rules will continue to evolve.",
       atlasDisclaimer: "The Beta is for early access and information checking only. Official club and organizer posts remain the final reference.",
       atlasAction: "Enter Atlas Beta",
-      atlasUrlLabel: "huaidj.club",
-      aiPanelKicker: "AI",
-      aiPanelTitle: "LLM summary assistant",
-      aiPanelBody: "Use WeChat Cloud AI and CloudRun AI routes to load weekly summaries and per-event enrichment.",
-      aiPanelHint: "Supports materialized summary, live generation, and event enrichment.",
-      soundFullAccessTitle: "Sound system photo access",
-      soundFullAccessBody: "Clubs that submit high-resolution sound system photos get priority access to the full Atlas graph and schedule archive support.",
-      soundReviewNote: "Every asset is human-checked first, then reviewed by the LLM for model recognition and consistency.",
+      atlasUrlLabel: "https://huaidj.club",
       atlasCopied: "Link copied",
       atlasBrowserGuideTitle: "Open Atlas Beta",
       atlasBrowserGuide: "Link copied to clipboard. Please paste and open in your mobile browser (Safari / Chrome).\n\nhttps://huaidj.club/",
@@ -297,6 +283,74 @@ const TEXT = {
       build: "Build",
       copied: "Copied",
       footer: "This mini-program does not provide ticketing, registration, transactions, event hosting, or social services.",
+    },
+  },
+  column: {
+    zh: {
+      title: "未来演出DJ介绍",
+      subtitle: "全球地下电子音乐资讯 · 真实演出 · 已确认阵容",
+      source: "来源：",
+      foreignMedia: "外媒：",
+      eventSource: "演出原文",
+      linkCopiedTitle: "已复制链接",
+      linkCopiedBody: "请在 Safari / Chrome 浏览器中粘贴打开。",
+      linkCopiedConfirm: "知道了",
+      sourceExternal: "外部来源（非微信）",
+      footer: "内容基于公开 API 演出数据与已验证媒体来源。",
+    },
+    en: {
+      title: "Upcoming DJ Profiles",
+      subtitle: "Global underground · Verified lineups · Confirmed dates",
+      source: "Source: ",
+      foreignMedia: "Press: ",
+      eventSource: "Event Source",
+      linkCopiedTitle: "Link copied",
+      linkCopiedBody: "Paste and open in your browser (Safari / Chrome).",
+      linkCopiedConfirm: "Got it",
+      sourceExternal: "External source (non-WeChat)",
+      footer: "Based on verified API event data and confirmed media sources.",
+    },
+  },
+  "admin-reviews": {
+    zh: {
+      title: "表单审核",
+      meta: "待审核",
+      refresh: "刷新列表",
+      refreshing: "刷新中…",
+      empty: "暂无待审核提交",
+      loadFailed: "加载失败",
+      reviewTitle: "表单审核",
+      reviewHint: "查看并审核用户提交的采访线索表单",
+      reviewMeta: "待审核",
+      reviewEmpty: "暂无待审核提交",
+      reviewPending: "PENDING",
+      approve: "通过",
+      delete: "删除",
+      reviewApproved: "已通过",
+      reviewDeleted: "已删除",
+      reviewActionFailed: "操作失败",
+      confirmDeleteTitle: "确认删除",
+      confirmDeleteBody: "删除后不可恢复",
+    },
+    en: {
+      title: "Review Queue",
+      meta: "Pending",
+      refresh: "Refresh list",
+      refreshing: "Refreshing…",
+      empty: "No pending submissions",
+      loadFailed: "Failed to load",
+      reviewTitle: "Review submissions",
+      reviewHint: "Review and approve interview lead submissions",
+      reviewMeta: "Pending",
+      reviewEmpty: "No pending submissions",
+      reviewPending: "PENDING",
+      approve: "Approve",
+      delete: "Delete",
+      reviewApproved: "Approved",
+      reviewDeleted: "Deleted",
+      reviewActionFailed: "Action failed",
+      confirmDeleteTitle: "Confirm delete",
+      confirmDeleteBody: "This cannot be undone",
     },
   },
   ai: {
@@ -432,7 +486,7 @@ const TEXT = {
       back: "返回",
       title: "DJ 采访",
       kicker: "ATLAS FIELD NOTES",
-      introTitle: "把小 DJ 的线索留下来",
+      introTitle: "把DJ的线索留下来",
       introBody: "这里收采访意向、ins、mixtape 原链接和授权状态。音频不公开、不缓存、不下载；确认后只把事实候选送进 Atlas sidecar。",
       djName: "DJ 名字",
       djNamePlaceholder: "例如 DJ Spell",
@@ -584,11 +638,13 @@ const NAV_TITLES = {
   map: { zh: "俱乐部地图", en: "Club Map" },
   sound: { zh: "声音设备", en: "Sound" },
   interview: { zh: "DJ 采访", en: "Interview" },
+  column: { zh: "地下音乐专栏", en: "Underground" },
+  "admin-reviews": { zh: "表单审核", en: "Reviews" },
 };
 
 const TAB_LABELS = {
-  zh: ["本周", "收藏", "关于"],
-  en: ["Weekly", "Saved", "About"],
+  zh: ["活动", "专栏", "ATLAS计划", "关于"],
+  en: ["Events", "Column", "ATLAS Plan", "About"],
 };
 
 const WEEKDAYS = {
@@ -771,23 +827,20 @@ function localizedSourceArticles(articles, lang) {
 function localizeItem(item, lang) {
   const safeLang = normalizeLang(lang);
   const base = item || {};
-  const isSourceOverview = Boolean(base.isSourceOverview);
   const rawCityLabel = base.rawCityLabel || base.cityLabel || (Array.isArray(base.city) ? base.city[0] : base.city) || base.city_key || "";
   const cityLabel = translateCity(rawCityLabel, safeLang, base.city_key);
   const rawPriceItems = base.rawPriceItems || base.price || [];
-  const priceItems = isSourceOverview
-    ? []
-    : (Array.isArray(rawPriceItems) ? rawPriceItems : [rawPriceItems])
-      .filter(Boolean)
-      .map((value) => priceText(value, safeLang));
+  const priceItems = (Array.isArray(rawPriceItems) ? rawPriceItems : [rawPriceItems])
+    .filter(Boolean)
+    .map((value) => priceText(value, safeLang));
   const rawCardLocation = base.rawCardLocationLabel || base.cardLocationLabel || "";
   const cityLikeCard = cityKeyFor(rawCardLocation, base.city_key) || normalizeText(rawCardLocation) === normalizeText(rawCityLabel);
-  const cardLocationLabel = isSourceOverview ? "" : (cityLikeCard ? cityLabel : rawCardLocation);
+  const cardLocationLabel = cityLikeCard ? cityLabel : rawCardLocation;
   const range = itemDateRange(base);
-  const rangeLabel = isSourceOverview ? "" : base.dateRangeLabel || (range.start && range.end !== range.start ? `${range.start} - ${range.end}` : base.dateLabel);
-  const weekday = isSourceOverview ? "" : weekdayRangeLabel(range.start, range.end, safeLang) || base.weekdayLabel || "";
-  const dateCompactLabel = isSourceOverview ? "" : compactDateRange(range.start, range.end) || compactDate(base.dateLabel || base.dateCompact);
-  const detailMetaLine = isSourceOverview ? "" : [cityLabel, rangeLabel].filter(Boolean).join(" · ");
+  const rangeLabel = base.dateRangeLabel || (range.start && range.end !== range.start ? `${range.start} - ${range.end}` : base.dateLabel);
+  const weekday = weekdayRangeLabel(range.start, range.end, safeLang) || base.weekdayLabel || "";
+  const dateCompactLabel = compactDateRange(range.start, range.end) || compactDate(base.dateLabel || base.dateCompact);
+  const detailMetaLine = [cityLabel, rangeLabel].filter(Boolean).join(" · ");
   const calendarPreviewLabel = base.isCalendarPreview ? (safeLang === "zh" ? (base.calendarPreviewLabel || "活动一览") : "Preview") : "";
   const localized = {
     ...base,
