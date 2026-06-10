@@ -27,7 +27,7 @@ App({
       cloudInitTimeoutMs: 3000,
       cloudCallTimeoutMs: 6000,
       publicFallbackDelayMs: 250,
-      publicRequestTimeoutMs: 3000,
+      publicRequestTimeoutMs: 8000,
       cacheFallbackDelayMs: 2200,
       offlineSnapshotFallbackDelayMs: 2500,
       cacheMaxAgeMs: 6 * 60 * 60 * 1000,

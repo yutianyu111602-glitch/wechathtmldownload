@@ -34,7 +34,7 @@ const LOAD_RETRY_DELAYS_MS = [1200, 2600, 4200];
 const MAX_SILENT_LOAD_RETRIES = LOAD_RETRY_DELAYS_MS.length;
 const BUSY_TOAST_COOLDOWN_MS = 2200;
 const MIN_BACKGROUND_REFRESH_INTERVAL_MS = 120000;
-const FILTER_META_TIMEOUT_MS = 600;
+const FILTER_META_TIMEOUT_MS = 5000;
 const POSTER_WARM_LIMIT = 6;
 
 function toIndexListItem(item) {
@@ -62,11 +62,14 @@ function toIndexListItem(item) {
     city_key: item.city_key || "",
     city_keys: Array.isArray(item.city_keys) ? item.city_keys : (item.city_key ? [item.city_key] : []),
     cityLabel: item.cityLabel || "",
+    venueLabel: item.venueLabel || item.venue_name || "",
+    promoter: item.promoter || item.account || "",
     listLocationLabel: item.listLocationLabel || item.cardLocationLabel || item.cityLabel || "",
     hasStyle: Boolean(item.hasStyle),
     styleLabel: item.styleLabel || "",
     hasLineup: Boolean(item.hasLineup),
     lineupLabel: item.lineupLabel || "",
+    lineupItems: Array.isArray(item.lineupItems) ? item.lineupItems : [],
     hasLineupHint: Boolean(item.hasLineupHint),
     lineupHint: item.lineupHint || "",
     hasAddress: Boolean(item.hasAddress),
@@ -815,27 +818,6 @@ Page({
       .catch(() => {});
   },
 
-  setPreviewRange(event) {
-    const previewRange = normalizeRange(event.currentTarget.dataset.range || "all");
-    if (previewRange !== this.data.previewRange) {
-      this.lightHaptic(HAPTIC.tabInterval);
-      this.suppressFeedHaptic(1100);
-    }
-    const nextViewData = applyPosterErrorMask(buildIndexViewData(
-        this._fullItems,
-        this.posterSourceItems,
-        this.data.activeTab,
-        this.data.selectedCity,
-        this.data.lang,
-        previewRange,
-        this.data.selectedDate,
-      ), this.data.posterImageFailedIds);
-    this.setData(nextViewData);
-    resolveIndexViewPosters(nextViewData)
-      .then((resolvedViewData) => this.setData(resolvedViewData))
-      .catch(() => {});
-  },
-
   onTabItemTap() {
     this.lightHaptic(HAPTIC.tabInterval);
   },
@@ -937,6 +919,16 @@ Page({
     wx.navigateTo({
       url: `/pages/detail/detail?id=${id}&lang=${lang}`,
     });
+  },
+
+  openArtist(e) {
+    vibrateLight("light");
+    const name = e.currentTarget.dataset.name;
+    if (name) {
+      wx.navigateTo({
+        url: `/pages/artist/artist?name=${encodeURIComponent(name)}&lang=${this.data.lang || "zh"}`,
+      });
+    }
   },
 
   openMap() {
