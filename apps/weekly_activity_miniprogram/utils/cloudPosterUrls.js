@@ -29,6 +29,13 @@ function withTimeout(promise, timeoutMs, label) {
 
 function cloudClient() {
   if (typeof wx !== "undefined" && wx.cloud && typeof wx.cloud.getTempFileURL === "function") {
+    var app = null;
+    try { app = getApp(); } catch (e) {}
+    var cloudData = (app && app.globalData && app.globalData.cloud) || {};
+    if (cloudData.cloudReady) return Promise.resolve(wx.cloud);
+    if (cloudData.cloudInitPromise) {
+      return cloudData.cloudInitPromise.then(function () { return wx.cloud; });
+    }
     return Promise.resolve(wx.cloud);
   }
   try {
