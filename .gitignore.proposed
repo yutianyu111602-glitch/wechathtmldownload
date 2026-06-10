@@ -1,0 +1,152 @@
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== IDE =====
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# ===== Secrets & Credentials =====
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.crt
+*.cer
+*.jks
+*.keystore
+id_rsa
+id_rsa.pub
+secrets/
+credentials/
+private/
+*.secret
+*.credential
+
+# ===== Node =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+miniprogram_npm/
+dist/
+build/
+*.tsbuildinfo
+
+# ===== WeChat Mini Program =====
+project.private.config.json
+apps/*/project.private.config.json
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+venv/
+.venv/
+env/
+ENV/
+.python-version
+
+# ===== Django-like (if applicable) =====
+db.sqlite3
+*.sqlite3
+*.db
+*.sqlite
+staticfiles/
+media/
+
+# ===== Database / Data / Artifacts =====
+data/raw/
+data/prod/
+data/backups/
+data/private/
+*.sql
+*.dump
+*.bak
+*.backup
+*.tar
+*.tar.gz
+*.zip
+*.7z
+*.rar
+
+# Allow committed samples, schemas, manifests
+!data/samples/
+!data/samples/**
+!data/schemas/
+!data/schemas/**
+!data/manifests/
+!data/manifests/**
+!*_sample*.zip
+!*sample*.zip
+
+# ===== Logs =====
+logs/
+*.log
+*.log.err
+celerybeat-schedule
+*.pid
+
+# ===== Uploads / Media =====
+media/uploads/
+uploads/
+
+# ===== Temp / Scratch =====
+tmp/
+temp/
+.cache/
+tmp-*
+tmp.*
+!tmp-*/__init__.py
+
+# ===== Large report artifacts (sqlite inside reports) =====
+reports/**/*.sqlite
+reports/**/*.sqlite3
+reports/**/*.db
+reports/**/atlas_serving.sqlite
+
+# ===== Local inspection / scrape scratch =====
+tmp-dajiala-app.js
+tmp-site-inspect/
+
+# ===== Build outputs =====
+dist/
+release/*.exe
+release/*.zip
+release/win-unpacked/
+
+# ===== Understand-Anything artifacts =====
+.understand-anything/
+.codegraph/
+
+# ===== OpenClaw / Hermes runtime =====
+_openclaw_backups/
+.hermes/
+.atlas-serving-*.pid
+.local-server.pid
+
+# ===== Mem0 local =====
+.mem0/
+
+# ===== CloudBase CLI cache =====
+.cloudbase/
+
+# ===== Misc runtime state =====
+*.pid
+HEARTBEAT.json
+*.backup.*
