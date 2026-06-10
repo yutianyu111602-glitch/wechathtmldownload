@@ -1,0 +1,511 @@
+﻿✔ CloudRun current feed dedupe follows weekly_dedup_spec.v1 (77.1718ms)
+✔ DeepSeek client disables request timeout when timeoutMs is zero (1.8025ms)
+✔ DeepSeek client keeps explicit positive timeout (0.4985ms)
+✔ createDeepSeekClient defaults to no request timeout (0.6657ms)
+✔ DJ interview API stores consented submissions as private sidecar entries (53.7235ms)
+[atlas-miniapp] Cross-DB merge_map loaded in 9ms (db2→db3: 3064, subject_remap: 16927)
+[atlas-miniapp] Index loaded in 1214ms (82782 subjects)
+✔ DJ interview markdown intake parses front matter and redacts output summaries (14.2992ms)
+✔ DJ interview intake rejects missing internal processing consent without writing sidecar (10.4916ms)
+✔ DJ interview intake imports valid records and feeds redacted review packet (18.6297ms)
+✔ DJ interview intake reads a directory of supported files only (8.933ms)
+✔ DJ interview review packet exports source evidence without raw private fields (34.4788ms)
+✔ DJ interview review workbench renders a redacted local tool surface (49.5044ms)
+✔ DJ interview store accepts authorized mixtape links without exposing private fields (19.4397ms)
+✔ DJ interview store builds a redacted review queue with promotion blockers (13.2658ms)
+✔ DJ interview store requires internal processing consent (1.1449ms)
+✔ DJ interview store drops direct media file urls from mixtape fields (11.9378ms)
+✔ external music links normalize interview urls into copyright-safe canonical fields (1.2247ms)
+✔ external url helpers reject non-http urls and detect known platforms (0.1296ms)
+✔ external music links keep platform pages and drop direct media files (0.5925ms)
+✔ 边界值: limit=0 返回空列表但不崩溃 (74.9961ms)
+✔ 边界值: limit=99999 被限制到 maxLimit (39.8526ms)
+[atlas-miniapp] Cross-DB merge_map loaded in 11ms (db2→db3: 3064, subject_remap: 16927)
+✔ 边界值: cursor=-1 当作 0 (9.6688ms)
+✔ 边界值: cursor=NaN 当作 0 (2.0504ms)
+✔ 边界值: 超长 cityKey 不崩溃 (4.0282ms)
+✔ 边界值: 不存在的 item ID 返回 404 (5.8605ms)
+✔ 边界值: items/batch 空 ids 返回 400 (1.8904ms)
+✔ 边界值: items/batch 超过 100 ids 返回 400 (1.2562ms)
+✔ 并发: 20 个同时 manifest 请求全部 200 (17.5449ms)
+✔ 并发: 10 个同时 current 请求 body 一致 (41.3912ms)
+✔ 并发: 混合端点并发不崩溃 (13.8419ms)
+✔ 缓存: 第二次请求返回 HIT (不指定 lookbackDays) (5.0248ms)
+✔ 缓存: 不同参数产生不同 cache key (7.0044ms)
+✔ 缓存: manifest 被缓存 (60s TTL) (1.6002ms)
+✔ 注入: URL 编码斜杠在 item ID 中正常处理 (3.4888ms)
+✔ 注入: 特殊字符 cityKey 安全处理 (3.0637ms)
+✔ 注入: XSS payload 在 date 参数中安全处理 (58.8425ms)
+✔ 大响应: 500 items 全量加载不超过 500ms (1.6536ms)
+✔ 大响应: gzip 压缩正常 (500 items) (3.716ms)
+[dataStore] getCurrent failed to read current.json: ENOENT: no such file or directory, open 'C:\Users\pc\AppData\Local\Temp\broken-Alw5yO\current.json'
+✔ 错误恢复: 缺少 current.json 时返回空数组不崩溃 (1.917ms)
+✔ 错误恢复: 损坏的 JSON 不崩溃 (9.5985ms)
+✔ 错误恢复: 路径穿越尝试被阻止 (3.6946ms)
+✔ 分页: 连续分页无重复/无遗漏 (486.3634ms)
+✔ 分页: nextCursor 为 null 时不再有数据 (26.732ms)
+[atlas-miniapp] Index loaded in 1967ms (82782 subjects)
+✔ builds DeepSeek enrichment messages with no-hallucination constraints (0.6959ms)
+✔ ticketing prompt requires exact evidence and abstains on QR-only links (0.5347ms)
+✔ sound system prompt requires explicit source-backed equipment evidence (0.2014ms)
+[atlas-miniapp] Index loaded in 7ms (2 subjects)
+✔ miniapp Atlas API exposes source refs for artist and venue history (14.5787ms)
+[atlas-miniapp] Cross-DB merge_map loaded in 10ms (db2→db3: 3064, subject_remap: 16927)
+✖ cleans listing titles and does not render venue lines as DJ bio (3.1176ms)
+✖ keeps real artist bio and removes club names from lineup (1.3067ms)
+✖ filters operational facts out of description copy (1.6623ms)
+✖ does not require post_date for card display fields (1.6015ms)
+✖ serves local SQLite status, map, search, and page (66.3951ms)
+✖ serves bounded Atlas graph explorer and read-only graph API (0.5221ms)
+✖ prioritizes exact entity graph search and scopes local atlas ids by source article (0.0665ms)
+✖ reads DJ-first Atlas serving read model for graph windows and profiles (0.0264ms)
+✖ serving search falls back to unicode companion FTS when legacy trigram misses (0.0351ms)
+✖ ATLAS_CORE_SQLITE_DB selects an opt-in core exported serving read model (0.0373ms)
+✖ serves full entity profile rollup for historical clubs and performers (0.0441ms)
+✖ serves mobile-first Atlas graph profile contract for mini-program (0.0311ms)
+✖ serves Atlas family profile product API without exposing raw internals (0.0405ms)
+✖ serves Atlas family relationship and evidence APIs with public-safe fields (0.0445ms)
+✖ expands venue profile across canonical aliases without oil false positives (0.03ms)
+✖ self-tests high-confidence graph searches with related database context (0.0159ms)
+✖ filters alcohol menu and product entities from public Atlas graph surfaces (0.0259ms)
+✖ filters non-electronic art, cafe, class, and reading-club noise from public Atlas graph surfaces (0.0157ms)
+✖ gates Atlas data APIs behind Turnstile session when enabled (0.0139ms)
+✖ serves graph API but blocks local ledger writes in read-only SQLite mode (0.0199ms)
+✖ persists geocode review actions in the local SQLite ledger (0.0164ms)
+✖ persists adjudication actions in the local SQLite ledger (0.014ms)
+[atlas-miniapp] Cross-DB merge_map loaded in 9ms (db2→db3: 3064, subject_remap: 16927)
+[atlas-miniapp] Index loaded in 1211ms (82782 subjects)
+✔ returns manifest (42.8504ms)
+✔ serves Stage7 atlas manifest and search from a release pointer (11.7295ms)
+✔ serves Stage7 vector router status without connecting to Qdrant (3.1954ms)
+✔ serves Stage7 materialized recommendations and Graph RAG drafts without provider calls (6.8139ms)
+✔ serves Stage7 atlas overview and browser page (16.2227ms)
+✔ serves Stage7 identity review workbench without graph writes (4.3945ms)
+[atlas-miniapp] Cross-DB merge_map loaded in 9ms (db2→db3: 3064, subject_remap: 16927)
+✔ serves Stage7 atlas detail API and browser page with related evidence (21.4756ms)
+✔ default packaged data source is available for CloudBase Run (1.2433ms)
+✔ reports DeepSeek LLM provider status without secrets (4.071ms)
+✔ serves materialized LLM summary without triggering provider calls (2.7784ms)
+✔ serves materialized LLM enrichment index and detail (4.629ms)
+✔ serves a browser landing page (1.1173ms)
+✔ serves huaidj brand asset (2.7745ms)
+✔ serves a browser preview page backed by current data (6.7034ms)
+✔ serves browser preview with English UI labels (3.523ms)
+✔ serves item pages without visible source links or placeholder venues (2.5177ms)
+✔ infers verified detailed venue addresses and exposes copy action (2.3104ms)
+✔ serves item pages with English UI labels (2.3502ms)
+✔ filters current items by city and excludes review candidates (3.7851ms)
+✔ filters multi-day events by inclusive date range (2.1773ms)
+✔ explicit single-day current filters ignore extra non-primary parser guesses (9.4784ms)
+✔ default current feed is strict while explicit lookback can include recent past events (3.1606ms)
+✔ default current feed returns up to 100 rows so manifest 73 is not truncated to 50 (25.1298ms)
+✔ date index hides past date chips when today advances (1.2838ms)
+✔ default current feed keeps the previous event date before late-night cutoff (7.0747ms)
+✔ default current feed drops the previous event date after late-night cutoff (0.8511ms)
+✔ current feed can include a bounded lookback window for venue source schedules (0.8341ms)
+✔ current feed dedupe preserves non-empty fields from lower-score duplicates (10.7483ms)
+✔ supports cursor pagination (3.0299ms)
+✔ caches repeated current list requests while ignoring cache-busting timestamps (3.2667ms)
+✔ uses normalized current-list query values for cache keys (3.0617ms)
+✔ compresses public weekly JSON responses without changing the payload shape (2.6366ms)
+✔ returns detail by id (3.7042ms)
+✔ returns club profile contract on batch detail items (2.3916ms)
+✔ returns source action by hash without exposing it in current list (2.8861ms)
+✔ returns weekly atlas event snapshot without exposing fuzzy candidate ids (1.8996ms)
+✔ uses unified error shape (1.7862ms)
+✔ llm enrich disabled by default (1.4229ms)
+✔ llm enrich requires id parameter (0.8876ms)
+✔ llm enrich returns 404 for unknown id (1.9976ms)
+✔ llm weekly-summary disabled by default (0.9754ms)
+[llm] weekly-summary failed TypeError: llmClient.generateWeeklySummary is not a function
+    at Server.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/src/server.mjs:1363:43)
+✔ llm weekly-summary falls back to materialized summary when live provider fails (3.2135ms)
+[atlas-miniapp] Index loaded in 1281ms (82782 subjects)
+ℹ tests 110
+ℹ suites 0
+ℹ pass 88
+ℹ fail 22
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2317.4528
+
+✖ failing tests:
+
+test at tests\miniprogramFormat.test.mjs:18:1
+✖ cleans listing titles and does not render venue lines as DJ bio (3.1176ms)
+  C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\utils\format.js:1
+  const { VERIFIED_ADDRESS_BOOK } = require("./addressBook");
+                                    ^
+  
+  ReferenceError: require is not defined
+      at C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\utils\format.js:1:35
+      at Script.runInContext (node:vm:149:12)
+      at Script.runInNewContext (node:vm:154:17)
+      at Object.runInNewContext (node:vm:310:38)
+      at loadMiniProgramFormat (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/miniprogramFormat.test.mjs:14:6)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/miniprogramFormat.test.mjs:19:27)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17)
+
+test at tests\miniprogramFormat.test.mjs:44:1
+✖ keeps real artist bio and removes club names from lineup (1.3067ms)
+  C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\utils\format.js:1
+  const { VERIFIED_ADDRESS_BOOK } = require("./addressBook");
+                                    ^
+  
+  ReferenceError: require is not defined
+      at C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\utils\format.js:1:35
+      at Script.runInContext (node:vm:149:12)
+      at Script.runInNewContext (node:vm:154:17)
+      at Object.runInNewContext (node:vm:310:38)
+      at loadMiniProgramFormat (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/miniprogramFormat.test.mjs:14:6)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/miniprogramFormat.test.mjs:45:27)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+
+test at tests\miniprogramFormat.test.mjs:69:1
+✖ filters operational facts out of description copy (1.6623ms)
+  C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\utils\format.js:1
+  const { VERIFIED_ADDRESS_BOOK } = require("./addressBook");
+                                    ^
+  
+  ReferenceError: require is not defined
+      at C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\utils\format.js:1:35
+      at Script.runInContext (node:vm:149:12)
+      at Script.runInNewContext (node:vm:154:17)
+      at Object.runInNewContext (node:vm:310:38)
+      at loadMiniProgramFormat (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/miniprogramFormat.test.mjs:14:6)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/miniprogramFormat.test.mjs:70:27)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+
+test at tests\miniprogramFormat.test.mjs:96:1
+✖ does not require post_date for card display fields (1.6015ms)
+  C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\utils\format.js:1
+  const { VERIFIED_ADDRESS_BOOK } = require("./addressBook");
+                                    ^
+  
+  ReferenceError: require is not defined
+      at C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\utils\format.js:1:35
+      at Script.runInContext (node:vm:149:12)
+      at Script.runInNewContext (node:vm:154:17)
+      at Object.runInNewContext (node:vm:310:38)
+      at loadMiniProgramFormat (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/miniprogramFormat.test.mjs:14:6)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/miniprogramFormat.test.mjs:97:27)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+
+test at tests\stage7SqliteLocal.test.mjs:1046:1
+✖ serves local SQLite status, map, search, and page (66.3951ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:1084:1
+✖ serves bounded Atlas graph explorer and read-only graph API (0.5221ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:1163:1
+✖ prioritizes exact entity graph search and scopes local atlas ids by source article (0.0665ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:1190:1
+✖ reads DJ-first Atlas serving read model for graph windows and profiles (0.0264ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:1899:1
+✖ serving search falls back to unicode companion FTS when legacy trigram misses (0.0351ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:2009:1
+✖ ATLAS_CORE_SQLITE_DB selects an opt-in core exported serving read model (0.0373ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:2112:1
+✖ serves full entity profile rollup for historical clubs and performers (0.0441ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:2135:1
+✖ serves mobile-first Atlas graph profile contract for mini-program (0.0311ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:2152:1
+✖ serves Atlas family profile product API without exposing raw internals (0.0405ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:2185:1
+✖ serves Atlas family relationship and evidence APIs with public-safe fields (0.0445ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:2210:1
+✖ expands venue profile across canonical aliases without oil false positives (0.03ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:2228:1
+✖ self-tests high-confidence graph searches with related database context (0.0159ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:2252:1
+✖ filters alcohol menu and product entities from public Atlas graph surfaces (0.0259ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:2270:1
+✖ filters non-electronic art, cafe, class, and reading-club noise from public Atlas graph surfaces (0.0157ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:2289:1
+✖ gates Atlas data APIs behind Turnstile session when enabled (0.0139ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:2392:1
+✖ serves graph API but blocks local ledger writes in read-only SQLite mode (0.0199ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:2435:1
+✖ persists geocode review actions in the local SQLite ledger (0.0164ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }
+
+test at tests\stage7SqliteLocal.test.mjs:2482:1
+✖ persists adjudication actions in the local SQLite ledger (0.014ms)
+  Error: \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node is not a valid Win32 application.
+  \\?\C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\build\Release\better_sqlite3.node
+      at Object..node (node:internal/modules/cjs/loader:1988:18)
+      at Module.load (node:internal/modules/cjs/loader:1553:32)
+      at Module._load (node:internal/modules/cjs/loader:1355:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+      at Module.require (node:internal/modules/cjs/loader:1576:12)
+      at require (node:internal/modules/helpers:153:16)
+      at bindings (C:\code\githubstar\wechathtmldownload\node_modules\bindings\bindings.js:112:48)
+      at new Database (C:\code\githubstar\wechathtmldownload\node_modules\better-sqlite3\lib\database.js:48:64)
+      at createAtlasDb (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:53:14)
+      at TestContext.<anonymous> (file:///C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/tests/stage7SqliteLocal.test.mjs:995:3) {
+    code: 'ERR_DLOPEN_FAILED'
+  }

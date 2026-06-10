@@ -1,0 +1,30 @@
+﻿18ff781 (HEAD -> wip/rescue-20260605-160743, private/main) chore: add Stage7 Python pipeline - scripts/, tests/, stage7/, docker/, db2_weapons/
+dcbab35 chore: add full source code - src/, desktop/, services/, scripts/, pipelines/, prompts/, profiles/
+0ef9e63 docs: generate AI handover documentation suite (00-09, 13)
+2bd455e chore: add comprehensive .gitignore, .env.example, upload manifests, and security audit
+11bd76a feat: 3 new Windows-native DB2 weapons (IG v3 + Linktree + Weibo/XHS)
+48cb29d feat(miniprogram): regenerate offline snapshot from 2026-06-07 data
+06113f3 fix(miniprogram): fix wx:key field in artist page — venueName not venueId
+0d5a4a6 docs: sync runtime log, documentation index, and handoff checkpoints (2026-06-07)
+866b98f feat: Atlas bridge observations and venue test coverage
+e2ce4b7 test: format-quality, repair-conflicts, source-articles, and API coverage
+b4459e5 feat: dataStore current/future filtering, lookbackDays, and enhanced pipeline repair
+4fa6156 fix: poster error handling, saved page state, and UI polish
+6b528e3 feat: Atlas artist/venue profile UI with alias chips, event counts, and collaborator data
+d4c9bde feat: centralized i18n module across all mini-program pages
+d47f91f test: update production-data-source for 166-item package (1 agg-child no poster)
+374177f (origin/wip/rescue-20260605-160743) fix: DevTools test reads totalItems instead of items array (v1.3.0 compat)
+87b2f08 perf: offload items from setData to this._fullItems, avoid 256KB WeChat limit; fix WXML empty state to use totalItems
+9b9fd58 fix: move format.js requires to top, add extracted-data-integrity test (addressBook>=3, mapLocation>=100, styles>=20, snapshot cities>=10)
+1003292 refactor: split format.js data blocks + dynamic DevTools thresholds + externalize offline snapshot
+bd3af29 docs: 2026-06-07 weekly miniprogram acceptance takeover — TRUST geo resolved, quality gate ok, DevTools render proof
+10678fc (feature/weekly-integrated-bridge, codex/atlas-db-unification-20260531) docs: clarify weekly guardian gate modes
+4a504dc feat: wire weekly club source provenance
+df1e15a docs: sync weekly miniprogram ssot
+fbcf151 docs: trim source integration eof
+fdca46f feat: preserve source provenance during weekly dedup
+82e6c0f docs: trim weekly dedup parity eof
+3f94620 test: add weekly dedup parity spec
+8942e2b test: refresh weekly sprint1 baseline evidence
+9c8a5d7 test: prevent baseline tests from rewriting handoff
+82535d2 docs: close weekly miniprogram sprint1 gates

@@ -1,0 +1,645 @@
+﻿✔ about page exposes Atlas beta as a direct huaidj.club entry (1.5196ms)
+✔ source page uses a controlled external fallback for huaidj.club (0.5769ms)
+✔ falls back to static current data when cloud container fails (16.8023ms)
+✔ falls back when cloud container resolves with an error payload (5.807ms)
+✔ static fallback filters multi-day events by inclusive date range (4.715ms)
+✔ static fallback default feed hides ended past events but keeps active ranges (4.5065ms)
+✔ static fallback date index hides past date chips (4.2144ms)
+✔ falls back to static item detail when cloud container fails (3.0923ms)
+✔ uses release storage slug for static item ids with punctuation (2.6741ms)
+✔ decodes encoded item ids before static fallback lookup (3.0321ms)
+✔ falls back to static source map when cloud container fails (3.7692ms)
+✔ falls back to static atlas event snapshot without exposing fuzzy candidate ids (3.4133ms)
+✔ falls back to static batch items preserving requested order (3.0367ms)
+✔ uses devtools mock fallback when cloud container hangs and static base is absent (9.5093ms)
+✔ falls back to public API when cloud container fails and no static base is configured (3.1361ms)
+✔ uses CloudBase hot database function for first-screen current and dates (3.4531ms)
+✔ starts public fallback before a hanging cloud container timeout (8.618ms)
+✔ uses last successful cached weekly response when VPN-like routes hang (9.4989ms)
+✖ cacheMaxAgeMs zero disables cached fallback during first-load probes (5.1043ms)
+✔ uses bundled snapshot when VPN-like routes hang before any cache exists (101.8009ms)
+✔ uses bundled snapshots for all first-screen endpoints when every route hangs (76.2561ms)
+✔ fast bundled snapshot can win before public timeout on no-cache first load (178.893ms)
+✔ does not let a configured snapshot delay beat a healthy public API without explicit fast-snapshot opt-in (43.9059ms)
+✔ prefers bundled snapshot before devtools mock after public fallback fails (66.8176ms)
+✔ does not persist bundled snapshot as the last successful cache (22.8613ms)
+✔ ignores late wx.request success after the JS hard timeout chooses snapshot (119.2233ms)
+✔ dedupes identical in-flight requests so retry tapping cannot fan out API calls (12.141ms)
+✔ resolves CloudBase poster file IDs to temp URLs and preserves original fileId (1.2298ms)
+✔ resolves backend cloudFileId weekly-posters package field to temp URL (0.3529ms)
+✔ falls back to original CloudBase file ID when temp URL resolving fails (1.2974ms)
+✔ cloud fallback only retries once from temp URL back to original file ID (0.3418ms)
+✔ poster image error fallback downloads CloudBase file before retrying file ID (0.4214ms)
+✔ poster fallback state keeps original file ID after local temp download (0.1905ms)
+✔ poster fallback state marks final cloud file ID retry (0.2824ms)
+✔ poster image error fallback retries file ID when cloud download fails (0.3343ms)
+✔ preview range bounds cover upcoming week and month (1.0788ms)
+✔ preview filters keep this week and this month distinct at month boundary (0.4271ms)
+✔ preview range reads backend date aliases before projection (0.1307ms)
+✔ preview range keeps calendar overview items that overlap the selected window (0.139ms)
+✔ preview range does not turn non-contiguous date guesses into a fake range (0.6287ms)
+✔ explicit single-day event date ignores extra parser guesses (0.1379ms)
+ok - weekly_dedup_spec.v1 parity with L2 expectations
+✔ tests\dedup-parity.test.cjs (154.1001ms)
+✔ detail address opens WeChat map with destination only when taxi-grade coordinates are present (3.6372ms)
+✔ detail address copies fallback if WeChat map rejects destination (2.1483ms)
+✔ detail address copies fallback if stored map coordinates are invalid (1.1664ms)
+✔ detail address keeps copy fallback when coordinates are missing (1.0579ms)
+✔ rendered DevTools scripts default to launch mode instead of fixed websocket connect (59.5051ms)
+✔ external link action copies original platform pages without media handling (0.6643ms)
+✔ external link action rejects direct media files (0.153ms)
+✔ interview external link validation blocks media links before submit (0.1233ms)
+✔ copy action uses clipboard instead of downloading or proxying audio (0.5392ms)
+✔ extracted addressBook preserves original entries (2.1034ms)
+✔ extracted mapLocationBook preserves original entries (1.6399ms)
+✔ extracted styleRules preserves original entries (0.8072ms)
+✔ extracted offlineSnapshot preserves original entries (3.8364ms)
+ok - dedupe key ignores emoji and punctuation in duplicate event titles
+ok - compact item hides venue-default time and keeps source-text time
+ok - compact item prefers verified venue coordinates when package carries stale address fields
+ok - compact item does not show 3am free-entry cutoff as 3 yuan ticket
+ok - compact item recovers source-backed tiered ticketing before stale price
+ok - compact item trims article-body noise from overlong backend display titles
+ok - compact item ignores entity-only display titles and falls back to real event title
+ok - compact item keeps cancellation marker but drops narrative article body
+ok - compact item does not cross evidence lines into a date-like ticket price
+ok - compact item hides YuYuan-only ticketing when no amount is visible
+ok - compact item does not publish drink special as ticket price
+ok - sentence-like lineup values are suppressed and replaced with a source hint
+ok - simple artist names survive conservative lineup filtering
+ok - Shanghai cards prefer venue names over repeated city labels
+ok - compact item exposes stable organizer key and club profile v1 shell
+ok - compact item preserves backend organizer key and club profile contract
+ok - compact item canonicalizes field aliases without empty fields wiping values
+ok - compact item routes Tencent article posters through CloudRun when no internal file ID exists
+ok - compact item prefers internal CloudBase poster file IDs over public article URLs
+ok - compact item suppresses aggregate child overview posters and source actions
+ok - compact item fail-closes aggregate child source and poster even if upstream forgets flags
+ok - monthly or weekly overview rows render only the original article title
+ok - ordinary this-week event titles are not treated as overview rows
+ok - compact item reads event_date_start and event_date_end when legacy date fields are blank
+ok - dedupe keeps non-empty fields from the lower-score duplicate
+ok - atlas event adapter emits the same canonical source fields as weekly items
+ok - atlas activity sidecar source refs take precedence over opaque source hashes
+ok - atlas source_ref ids take precedence over opaque source hashes
+ok - mergeNonEmpty ignores empty overlay fields but accepts explicit booleans
+ok - compact item exposes trusted GCJ-02 destination coordinates for wx.openLocation
+ok - localized item translates city date and ticket copy without mutating map destination
+not ok - calendar preview overview titles hide derived date range fields
+C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\tests\format-quality.test.cjs:48
+    throw error;
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
++ actual - expected
+
++ 'Shanghai · 2026-06-01 - 2026-06-07'
+- ''
+
+    at C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\tests\format-quality.test.cjs:625:10
+    at test (C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\tests\format-quality.test.cjs:44:5)
+    at Object.<anonymous> (C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\tests\format-quality.test.cjs:606:1)
+    at Module._compile (node:internal/modules/cjs/loader:1830:14)
+    at Object..js (node:internal/modules/cjs/loader:1961:10)
+    at Module.load (node:internal/modules/cjs/loader:1553:32)
+    at Module._load (node:internal/modules/cjs/loader:1355:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 'Shanghai · 2026-06-01 - 2026-06-07',
+  expected: '',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.15.0
+✖ tests\format-quality.test.cjs (166.1108ms)
+✔ scroll haptics speed up but stay restrained (0.7458ms)
+✔ poster haptics match feed scroll feel (0.5504ms)
+✔ feed haptics follow back-and-forth scroll travel instead of net displacement (0.1374ms)
+✔ haptic probe is opt-in for devtools cli (0.3091ms)
+✔ home feed refresh uses restrained medium haptics (2.3868ms)
+✖ home feed loading keeps one active request and queues retries (2.7023ms)
+✖ DJ interview is promoted to a primary mini-program column (5.8385ms)
+✔ all-city list keeps city label for non-Shanghai scanning (0.4996ms)
+✔ city-filtered list shows venue or club name under event title (0.0816ms)
+✔ decorates list rows without mutating source items (0.0866ms)
+✔ source overview rows do not receive city or venue fallback labels (0.0562ms)
+✔ home page source overview rows are rendered as calendar placeholders (1.648ms)
+✔ all mini-program WXML event handlers resolve to page methods (9.516ms)
+✔ home poster images expose load and error counters for rendered proof (0.8795ms)
+✔ home projected list items keep city identity for filter proof (0.3761ms)
+✔ home filter handlers reload with explicit selected filter state (0.4692ms)
+✔ home first load does not wait on slow filter metadata before rendering events (0.36ms)
+✔ home date filters are derived from local activity bounds clamped by API date index (0.353ms)
+✔ city page opens index tab through pending city storage instead of navigateTo (1.8327ms)
+✔ detail page has a dedicated merged source article section (0.6014ms)
+✔ detail poster tap previews the poster and does not open source article (1.0572ms)
+✔ source routing treats Atlas activity sidecar refs as evidence refs (7.0991ms)
+✔ aggregate children never expose parent overview source hashes on the frontend (0.3599ms)
+✔ source hash lookup does not fabricate WeChat URLs from internal hashes (0.8214ms)
+✔ source action normalizes encoded mp links before opening (0.4581ms)
+✔ mini-program package keeps source url map server-side (0.9309ms)
+✔ detail page exposes club and DJ as profile entry points (0.5239ms)
+✔ venue and saved routes preserve key and language context (0.4652ms)
+✔ poster strip has bounded height so long card text cannot push the feed down (0.9507ms)
+✔ poster pool expands narrow city/date results with nationwide posters (8.9438ms)
+✔ poster pool loops a tiny source to keep horizontal swipe useful (0.5059ms)
+✔ poster pool prefers poster-backed items before fallback cards (0.0921ms)
+✔ poster pool excludes suppressed aggregate overview posters (0.0854ms)
+✔ poster pool preserves source overview projection guard (0.113ms)
+✔ poster pool dedupes aggregate children that share the same raw poster (0.1367ms)
+✔ poster pool prefers information-rich main poster over qr or ticketing artwork (0.2843ms)
+✔ production config enables offline snapshot fallback to prevent black screen (0.6144ms)
+✖ current release package uses the 2026-06-02 data window with CloudBase poster file IDs (12.9769ms)
+✔ normalizes high-confidence external links for display only (7.6427ms)
+✔ groups links by entity for compact mini-program sections (0.6219ms)
+✔ build action from item still rejects direct media URLs (0.2081ms)
+✔ venue profile still resolves by club name when the carried organizer key is stale (4.2265ms)
+✔ artist profile loads recent performance history instead of current-only events (1.505ms)
+✔ artist profile keeps Atlas collaborators and frequent venues when weekly list is empty (1.0368ms)
+✔ venue profile restores Atlas historical source articles (2.2136ms)
+✔ venue profile keeps Atlas resident DJs when weekly list is empty (1.7642ms)
+✔ venue Atlas historical event taps open source evidence instead of weekly detail (2.717ms)
+✔ artist Atlas history rows open their source evidence (1.0874ms)
+✔ venue address tap opens cached destination without requesting user location (1.1087ms)
+✔ all visible pages expose native WeChat share handlers (3.8988ms)
+✔ detail native share button is backed by page share handler (0.8713ms)
+✔ detail share payload preserves item id, language, title, and poster (0.5791ms)
+✔ index share payload preserves active city and date filters (0.1611ms)
+✔ venue home does not surface aggregate parent overview articles for child events (1.0245ms)
+✔ single non-aggregate event does not create a venue source article block (0.2656ms)
+✔ detail surfaces every merged source once without duplicating the retained article (0.4159ms)
+✔ venue source block includes merged source provenance even for one retained event card (0.2374ms)
+✔ merged source provenance skips aggregate child parent overview refs (0.5923ms)
+✔ disabled aggregate child source action does not surface parent article links (0.124ms)
+✔ CONTRACT: aggregate child sourceActionEnabled is false and sourceHash is empty (7.9614ms)
+✔ CONTRACT: direct source item has sourceActionEnabled and non-empty sourceHash (2.0653ms)
+✔ CONTRACT: aggregate child with no source_action falls back cleanly (1.2392ms)
+✔ CONTRACT: post_date is NOT used as event_date_start when event_date_start is present (1.0288ms)
+✔ CONTRACT: post_date alone is NOT enough to create a dateLabel (1.1473ms)
+✔ CONTRACT: aggregate child has its own posterFileId, not parent overview (1.4095ms)
+✔ CONTRACT: isSourceOverview item has empty posterUrl (0.357ms)
+✔ CONTRACT: item where organizer is label but venue is missing has no address (1.3791ms)
+✔ CONTRACT: item with real venue has address (1.1859ms)
+✔ CONTRACT: item with event_date_end before current window is not calendar_preview (1.1941ms)
+✔ CONTRACT: canonicalizeItemFields resolves posterFileId from canonical aliases (0.2195ms)
+✔ CONTRACT: canonicalizeItemFields does not treat post_date as event date (0.1685ms)
+✔ weeklyDataSync hot read matches inclusive date ranges (16.5532ms)
+✔ weeklyDataSync default hot current excludes stable past items (1.0991ms)
+✔ weeklyDataSync hot read derives date index from local package ranges (2.1844ms)
+✔ weeklyDataSync mini-program hot reads skip slow container freshness probe (0.8372ms)
+ℹ tests 131
+ℹ suites 0
+ℹ pass 126
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5798.1331
+
+✖ failing tests:
+
+test at tests\api-static-fallback.test.cjs:585:1
+✖ cacheMaxAgeMs zero disables cached fallback during first-load probes (5.1043ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\tests\api-static-fallback.test.cjs:617:3)
+      at async Test.run (node:internal/test_runner/test:1208:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at tests\format-quality.test.cjs:1:1
+✖ tests\format-quality.test.cjs (166.1108ms)
+  'test failed'
+
+test at tests\haptic-refresh.test.cjs:50:1
+✖ home feed loading keeps one active request and queues retries (2.7023ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /priority/. Input:
+  
+  'const TEXT = {\n' +
+    '  index: {\n' +
+    '    zh: {\n' +
+    '      lang: "zh",\n' +
+    '      langToggle: "EN",\n' +
+    '      brandKicker: "坏DJclub",\n' +
+    '      heroTitle: "本周电音活动查询",\n' +
+    '      tabAll: "全部",\n' +
+    '      tabForYou: "信息完整",\n' +
+    '      tabNew: "新发布",\n' +
+    '      previewWeek: "本周预览",\n' +
+    '      previewMonth: "本月预览",\n' +
+    '      previewAll: "全部预览",\n' +
+    '      featured: "海报推荐",\n' +
+    '      allEvents: "按日期浏览",\n' +
+    '      allCities: "全部城市",\n' +
+    '      allDates: "全部日期",\n' +
+    '      loading: "加载中",\n' +
+    '      loadingStart: "正在连接活动源",\n' +
+    '      loadingStartHint: "正在准备活动数据，马上就好。如果网络较慢，离线数据会自动顶上。",\n' +
+    '      loadingConnecting: "正在连接活动源",\n' +
+    '      loadingConnectingHint: "网络较慢时会自动切换备用通道，请保持页面打开。",\n' +
+    '      loadingFallback: "后台刷新中",\n' +
+    '      loadingFallbackHint: "已先显示可用数据；你不用等在这里，页面会继续静默刷新。",\n' +
+    '      loadingStillWaiting: "仍在同步活动源",\n' +
+    '      loadingStillWaitingHint: "当前列表已可用，后台继续刷新中。如长时间无更新请检查网络后重试。",\n' +
+    '      loadingCachedNotice: "已先显示上次成功数据，后台会继续刷新。",\n' +
+    '      loadingOfflineNotice: "已先显示随包活动快照，后台会继续刷新。",\n' +
+    '      loadingRetrying: "后台重试中",\n' +
+    '      loadingRetryHint: "已先显示可用数据，不用停在加载页等待。如长时间无更新请检查网络连接。",\n' +
+    '      loadingEvents: "读取活动列表",\n' +
+    '      loadingEventsHint: "正在拉取本周活动，请保持页面打开。",\n' +
+    '      loadingFilters: "同步筛选项",\n' +
+    '      loadingFiltersHint: "活动列表已返回，正在整理城市和日期。",\n' +
+    '      loadingClean: "整理重复与冲突",\n' +
+    '      loadingCleanHint: "正在整理展示数据。",\n' +
+    '      loadingReady: "准备完成",\n' +
+    '      empty: "这组筛选下暂无活动",\n' +
+    '      loadFailed: "网络连接失败，请检查网络后重试",\n' +
+    '      loadFailedHint: "如仍无法连接，页面会在后台继续尝试。",\n' +
+    '      retry: "重新连接",\n' +
+    '      retryBusy: "正在连接活动源，请稍等",\n' +
+    '      dateTitle: "日期",\n' +
+    '      locationTitle: "城市",\n' +
+    '      thisWeekend: "本周末",\n' +
+    '      nextWeekend: "下周末",\n' +
+    '      resetToday: "全部日期",\n' +
+    '      resetLocation: "全部城市",\n' +
+    '      apply: "确定",\n' +
+    '      china: "全国",\n' +
+    '    },\n' +
+    '    en: {\n' +
+    '      lang: "en",\n' +
+    '      langToggle: "中文",\n' +
+    '      brandKicker: "HUAIDJ CLUB",\n' +
+    '      heroTitle: "Electronic music events this week",\n' +
+    '      tabAll: "All",\n' +
+    '      tabForYou: "Complete info",\n' +
+    '      tabNew: "New",\n' +
+    '      previewWeek: "This week",\n' +
+    '      previewMonth: "This month",\n' +
+    '      previewAll: "All dates",\n' +
+    '      featured: "Poster picks",\n' +
+    '      allEvents: "By date",\n' +
+    '      allCities: "All cities",\n' +
+    '      allDates: "All dates",\n' +
+    '      loading: "Loading",\n' +
+    '      loadingStart: "Connecting to event source",\n' +
+    '      loadingStartHint: "Preparing event data, almost ready. Offline data loads automatically if the network is slow.",\n' +
+    '      loadingConnecting: "Connecting to event source",\n' +
+    '      loadingConnectingHint: "Backup route starts automatically on slow networks. Keep the page open.",\n' +
+    '      loadingFallback: "Refreshing in background",\n' +
+    '      loadingFallbackHint: "Available data is shown first. Refresh continues silently.",\n' +
+    '      loadingStillWaiting: "Still syncing events",\n' +
+    '      loadingStillWaitingHint: "Feed is already usable. If no update after a while, check your network and retry.",\n' +
+    '      loadingCachedNotice: "Showing the last successful data while refresh continues.",\n' +
+    '      loadingOfflineNotice: "Showing the bundled snapshot while refresh continues.",\n' +
+    '      loadingRetrying: "Retrying in background",\n' +
+    '      loadingRetryHint: "Data is already shown. If no update after a while, check your network connection.",\n' +
+    '      loadingEvents: "Loading events",\n' +
+    `      loadingEventsHint: "Fetching this week's events. Keep the page open.",\n` +
+    '      loadingFilters: "Loading filters",\n' +
+    '      loadingFiltersHint: "Events are back. Syncing city and date filters.",\n' +
+    '      loadingClean: "Cleaning duplicates",\n' +
+    '      loadingCleanHint: "Preparing the feed.",\n' +
+    '      loadingReady: "Ready",\n' +
+    '      empty: "No events for this filter",\n' +
+    '      loadFailed: "Network error. Check your network and retry.",\n' +
+    '      loadFailedHint: "If it still fails, the page will keep retrying in the background.",\n' +
+    '      retry: "Reconnect",\n' +
+    '      retryBusy: "Connecting to event source. Please wait.",\n' +
+    '      dateTitle: "Date",\n' +
+    '      locationTitle: "City",\n' +
+    '      thisWeekend: "This weekend",\n' +
+    '      nextWeekend: "Next weekend",\n' +
+    '      resetToday: "All dates",\n' +
+    '      resetLocation: "All cities",\n' +
+    '      apply: "Apply",\n' +
+    '      china: "China",\n' +
+    '    },\n' +
+    '  },\n' +
+    '  detail: {\n' +
+    '    zh: {\n' +
+    '      lang: "zh",\n' +
+    '      langToggle: "EN",\n' +
+    '      back: "返回",\n' +
+    '      share: "分享",\n' +
+    '      loading: "加载中",\n' +
+    '      loadFailed: "加载失败",\n' +
+    '      notFound: "活动不存在",\n' +
+    '      date: "日期",\n' +
+    '      club: "俱乐部",\n' +
+    '      clubSchedule: "未来排期",\n' +
+    '      dj: "DJ",\n' +
+    '      address: "定位",\n' +
+    '      lineup: "DJ LINEUP",\n' +
+    '      artists: "DJ 演出记录",\n' +
+    '      atlas: "ATLAS",\n' +
+    '      atlasVerified: "VERIFIED",\n' +
+    '      atlasHint: "HINT",\n' +
+    '      description: "简介",\n' +
+    '      save: "收藏",\n' +
+    '      saved: "已收藏",\n' +
+    '      about: "About",\n' +
+    '      copyAddress: "复制定位",\n' +
+    '      addressCopied: "定位已复制",\n' +
+    '      openMap: "打开定位",\n' +
+    '      openMapFallback: "缺少坐标，已复制定位",\n' +
+    '      openMapFailed: "无法打开定位，已复制地址",\n' +
+    '      lineupHint: "点击海报跳转公众号原文查看",\n' +
+    '      sourcePreparing: "原文准备中",\n' +
+    '      posterUnavailable: "暂无原文链接",\n' +
+    '      viewSource: "点击海报跳转公众号原文查看",\n' +
+    '      sourceArticles: "SOURCE ARTICLES",\n' +
+    '      primary: "PRIMARY",\n' +
+    '    },\n' +
+    '    en: {\n' +
+    '      lang: "en",\n' +
+    '      langToggle: "中文",\n' +
+    '      back: "Back",\n' +
+    '      share: "Share",\n' +
+    '      loading: "Loading",\n' +
+    '      loadFailed: "Failed to load",\n' +
+    '      notFound: "Event not found",\n' +
+    '      date: "Date",\n' +
+    '      club: "Club",\n' +
+    '      clubSchedule: "Upcoming schedule",\n' +
+    '      dj: "DJ",\n' +
+    '      address: "Location",\n' +
+    '      lineup: "Lineup",\n' +
+    '      artists: "DJ history",\n' +
+    '      atlas: "Atlas",\n' +
+    '      atlasVerified: "Verified",\n' +
+    '      atlasHint: "Hint",\n' +
+    '      description: "Description",\n' +
+    '      save: "Save",\n' +
+    '      saved: "Saved",\n' +
+    '      about: "About",\n' +
+    '      copyAddress: "Copy location",\n' +
+    '      addressCopied: "Location copied",\n' +
+    '      openMap: "Open location",\n' +
+    '      openMapFallback: "No coordinates yet. Location copied",\n' +
+    '      openMapFailed: "Unable to open location. Address copied",\n' +
+    '      lineupHint: "Tap poster to view source",\n' +
+    '      sourcePreparing: "Preparing source",\n' +
+    '      posterUnavailable: "No source link yet",\n' +
+    '      viewSource: "Tap poster to view source",\n' +
+    '      sourceArticles: "Source articles",\n' +
+    '      primary: "Primary",\n' +
+    '    },\n' +
+    '  },\n' +
+    '  source: {\n' +
+    '    zh: {\n' +
+    '      loading: "准备公众号原文",\n' +
+    '      open: "打开原文",\n' +
+    '      failed: "原文暂时打不开",\n' +
+    '      hint: "原文已准备好，点击按钮打开微信公众号原文。",\n' +
+    '      externalTitle: "打开 Atlas Beta",\n' +
+    '      externalHint: "微信小程序不能直接拉起系统浏览器。复制链接后，用 Safari 或浏览器打开 huaidj.club。",\n' +
+    '      atlasEvidenceTitle: "Atlas 来源证据",\n' +
+    '      copyLink: "复制链接",\n' +
+    '      linkCopied: "链接已复制",\n' +
+    '    },\n' +
+    '    en: {\n' +
+    '      loading: "Preparing source",\n' +
+    '      open: "Open source",\n' +
+    '      failed: "Source is unavailable",\n' +
+    '      hint: "Source is ready. Tap the button to open the official WeChat article.",\n' +
+    '      externalTitle: "Open Atlas Beta",\n' +
+    '      externalHint: "WeChat mini programs cannot open the system browser directly. Copy the link and open huaidj.club in Safari or your browser.",\n' +
+    '      atlasEvidenceTitle: "Atlas source evidence",\n' +
+    '      copyLink: "Copy link",\n' +
+    '      linkCopied: "Link copied",\n' +
+    '    },\n' +
+    '  },\n' +
+    '  saved: {\n' +
+    '    zh: {\n' +
+    '      title: "ATLAS",\n' +
+    '      subtitle: "中国地下电子音乐图谱",\n' +
+    '      intro: "ATLAS 把城市、俱乐部、DJ、活动和原文证据放在同一张可核对的关系网里。收藏活动即加入个人档案线索。",\n' +
+    '      loading: "加载中",\n' +
+    '      loadFailed: "加载失败",\n' +
+    '      empty: "还没有收藏活动。",\n' +
+    '      outOfWindow: "收藏的活动不在当前发布窗口。",\n' +
+    '      interviewTitle: "提交 Mixtape / 采访线索",\n' +
+    '      interviewHint: "补充 ins、mixtape 或采访笔记，进入人工审核队列",\n' +
+    '    },\n' +
+    '    en: {\n' +
+    '      title: "ATLAS",\n' +
+    '      subtitle: "China Underground Music Graph",\n' +
+    '      intro: "ATLAS connects cities, clubs, DJs, events, and source evidence in one verifiable graph. Saved events become your personal archive trail.",\n' +
+    '      loading: "Loading",\n' +
+    '      loadFailed: "Failed to load",\n' +
+    '      empty: "No saved events yet.",\n' +
+    '      outOfWindow: "Saved events are outside the current release window.",\n' +
+    '      interviewTitle: "Submit Mixtape / Interview Lead",\n' +
+    '      interviewHint: "Add Instagram, mixtape, or interview notes for human review",\n' +
+    '    },\n' +
+    '  },\n' +
+    '  city: {\n' +
+    '    zh: {\n' +
+    '      back: "返回",\n' +
+    '      title: "城市活动",\n' +
+    '      intro: "按城市归档本周正在发生的活动。场地档案会跟随活动数据逐步补齐。",\n' +
+    '      loading: "加载中",\n' +
+    '      loadFailed: "加载失败",\n' +
+    '      empty: "暂无城市数据",\n' +
+    '      eventCount: "场活动",\n' +
+    '    },\n' +
+    '    en: {\n' +
+    '      back: "Back",\n' +
+    '      title: "City events",\n' +
+    `      intro: "Browse this week's events by city. Club archives fill in as event data improves.",\n` +
+    '      loading: "Loading",\n' +
+    '      loadFailed: "Failed to load",\n' +
+    '      empty: "No city data",\n' +
+    '      eventCount: "events",\n' +
+    '    },\n' +
+    '  },\n' +
+    '  about: {\n' +
+    '    zh: {\n' +
+    '      title: "关于活动查询",\n' +
+    '      copy1: "本小程序提供公开电子音乐活动信息查询。用户可按日期、城市查看活动，并查看时间、场地、地址、阵容、风格和来源摘要。",\n' +
+    '      copy2: "活动信息仅作整理和检索参考，不提供售票、报名、交易、演出主办或社交服务。",\n' +
+    '      sourceTitle: "数据来源",\n' +
+    '      source1: "活动信息来自公开发布的活动文章，经整理后展示。详情页保留来源摘要，方便用户核对。",\n' +
+    '      source2: "日期、场地、地址、阵容、风格等字段仅作信息检索参考；拿不准的字段会留空或提示查看原文。详情请以活动主办方公开发布内容为准。",\n' +
+    '      atlasTitle: "ATLAS Beta",\n' +
+    '      atlasStatus: "BETA",\n' +
+    '      atlasBody: "Atlas 是中国地下电子音乐图谱，把城市、俱乐部、DJ、活动和原文证据放在同一张可核对的关系网里。",\n' +
+    '      atlasMeta: "所有人都可以使用 Beta 预览版，探索图谱和活动档案。数据、交互和权限还会持续调整。",\n' +
+    '      atlasDisclaimer: "Beta 版仅用于早期体验和信息核对；正式判断仍以俱乐部或主办方公开信息为准。",\n' +
+    '      atlasAction: "进入受控外链页",\n' +
+    '      atlasUrlLabel: "https://huaidj.club",\n' +
+    '      atlasCopied: "链接已复制",\n' +
+    '      atlasBrowserGuideTitle: "打开 Atlas Beta",\n' +
+    '      atlasBrowserGuide: "链接已复制到剪贴板，请在手机浏览器（Safari / Chrome）中粘贴打开。\\n\\nhttps://huaidj.club/",\n' +
+    '      atlasBrowserConfirm: "知道了",\n' +
+    '      version: "版本",\n' +
+    '      build: "构建",\n' +
+    '      copied: "已复制",\n' +
+    '      footer: "本小程序不提供售票、报名、交易、演出主办或社交服务。",\n' +
+    '    },\n' +
+    '    en: {\n' +
+    '      title: "About event search",\n' +
+    '      copy1: "This mini-program organizes public electronic music event information by date and city, including time, club, address, lineup, style, and source summary.",\n' +
+    '      copy2: "The information is for discovery and reference only. It does not provide ticketing, registration, transactions, event hosting, or social services.",\n' +
+    '      sourceTitle: "Data sources",\n' +
+    '      source1: "Event information comes from publicly published articles and is structured for browsing. Detail pages keep source summaries for checking.",\n' +
+    '      source2: "Date, club, address, lineup, and style fields are reference fields. Uncertain fields stay blank or point back to the source article.",\n' +
+    '      atlasTitle: "Atlas Beta",\n' +
+    '      atlasStatus: "BETA",\n' +
+    '      atlasBody: "Atlas is a Chinese underground electronic music graph, connecting cities, clubs, DJs, events, and source evidence in one verifiable network.",\n' +
+    '      atlas'... 21870 more characters
+  
+      at TestContext.<anonymous> (C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\tests\haptic-refresh.test.cjs:83:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: `const TEXT = {\n  index: {\n    zh: {\n      lang: "zh",\n      langToggle: "EN",\n      brandKicker: "坏DJclub",\n      heroTitle: "本周电音活动查询",\n      tabAll: "全部",\n      tabForYou: "信息完整",\n      tabNew: "新发布",\n      previewWeek: "本周预览",\n      previewMonth: "本月预览",\n      previewAll: "全部预览",\n      featured: "海报推荐",\n      allEvents: "按日期浏览",\n      allCities: "全部城市",\n      allDates: "全部日期",\n      loading: "加载中",\n      loadingStart: "正在连接活动源",\n      loadingStartHint: "正在准备活动数据，马上就好。如果网络较慢，离线数据会自动顶上。",\n      loadingConnecting: "正在连接活动源",\n      loadingConnectingHint: "网络较慢时会自动切换备用通道，请保持页面打开。",\n      loadingFallback: "后台刷新中",\n      loadingFallbackHint: "已先显示可用数据；你不用等在这里，页面会继续静默刷新。",\n      loadingStillWaiting: "仍在同步活动源",\n      loadingStillWaitingHint: "当前列表已可用，后台继续刷新中。如长时间无更新请检查网络后重试。",\n      loadingCachedNotice: "已先显示上次成功数据，后台会继续刷新。",\n      loadingOfflineNotice: "已先显示随包活动快照，后台会继续刷新。",\n      loadingRetrying: "后台重试中",\n      loadingRetryHint: "已先显示可用数据，不用停在加载页等待。如长时间无更新请检查网络连接。",\n      loadingEvents: "读取活动列表",\n      loadingEventsHint: "正在拉取本周活动，请保持页面打开。",\n      loadingFilters: "同步筛选项",\n      loadingFiltersHint: "活动列表已返回，正在整理城市和日期。",\n      loadingClean: "整理重复与冲突",\n      loadingCleanHint: "正在整理展示数据。",\n      loadingReady: "准备完成",\n      empty: "这组筛选下暂无活动",\n      loadFailed: "网络连接失败，请检查网络后重试",\n      loadFailedHint: "如仍无法连接，页面会在后台继续尝试。",\n      retry: "重新连接",\n      retryBusy: "正在连接活动源，请稍等",\n      dateTitle: "日期",\n      locationTitle: "城市",\n      thisWeekend: "本周末",\n      nextWeekend: "下周末",\n      resetToday: "全部日期",\n      resetLocation: "全部城市",\n      apply: "确定",\n      china: "全国",\n    },\n    en: {\n      lang: "en",\n      langToggle: "中文",\n      brandKicker: "HUAIDJ CLUB",\n      heroTitle: "Electronic music events this week",\n      tabAll: "All",\n      tabForYou: "Complete info",\n      tabNew: "New",\n      previewWeek: "This week",\n      previewMonth: "This month",\n      previewAll: "All dates",\n      featured: "Poster picks",\n      allEvents: "By date",\n      allCities: "All cities",\n      allDates: "All dates",\n      loading: "Loading",\n      loadingStart: "Connecting to event source",\n      loadingStartHint: "Preparing event data, almost ready. Offline data loads automatically if the network is slow.",\n      loadingConnecting: "Connecting to event source",\n      loadingConnectingHint: "Backup route starts automatically on slow networks. Keep the page open.",\n      loadingFallback: "Refreshing in background",\n      loadingFallbackHint: "Available data is shown first. Refresh continues silently.",\n      loadingStillWaiting: "Still syncing events",\n      loadingStillWaitingHint: "Feed is already usable. If no update after a while, check your network and retry.",\n      loadingCachedNotice: "Showing the last successful data while refresh continues.",\n      loadingOfflineNotice: "Showing the bundled snapshot while refresh continues.",\n      loadingRetrying: "Retrying in background",\n      loadingRetryHint: "Data is already shown. If no update after a while, check your network connection.",\n      loadingEvents: "Loading events",\n      loadingEventsHint: "Fetching this week's events. Keep the page open.",\n      loadingFilters: "Loading filters",\n      loadingFiltersHint: "Events are back. Syncing city and date filters.",\n      loadingClean: "Cleaning duplicates",\n      loadingCleanHint: "Preparing the feed.",\n      loadingReady: "Ready",\n      empty: "No events for this filter",\n      loadFailed: "Network error. Check your network and retry.",\n      loadFailedHint: "If it still fails, the page will keep retrying in the background.",\n      retry: "Reconnect",\n      retryBusy: "Connecting to event source. Please wait.",\n      dateTitle: "Date",\n      locationTitle: "City",\n      thisWeekend: "This weekend",\n      nextWeekend: "Next weekend",\n      resetToday: "All dates",\n      resetLocation: "All cities",\n      apply: "Apply",\n      china: "China",\n    },\n  },\n  detail: {\n    zh: {\n      lang: "zh",\n      langToggle: "EN",\n      back: "返回",\n      share: "分享",\n      loading: "加载中",\n      loadFailed: "加载失败",\n      notFound: "活动不存在",\n      date: "日期",\n      club: "俱乐部",\n      clubSchedule: "未来排期",\n      dj: "DJ",\n      address: "定位",\n      lineup: "DJ LINEUP",\n      artists: "DJ 演出记录",\n      atlas: "ATLAS",\n      atlasVerified: "VERIFIED",\n      atlasHint: "HINT",\n      description: "简介",\n      save: "收藏",\n      saved: "已收藏",\n      about: "About",\n      copyAddress: "复制定位",\n      addressCopied: "定位已复制",\n      openMap: "打开定位",\n      openMapFallback: "缺少坐标，已复制定位",\n      openMapFailed: "无法打开定位，已复制地址",\n      lineupHint: "点击海报跳转公众号原文查看",\n      sourcePreparing: "原文准备中",\n      posterUnavailable: "暂无原文链接",\n      viewSource: "点击海报跳转公众号原文查看",\n      sourceArticles: "SOURCE ARTICLES",\n      primary: "PRIMARY",\n    },\n    en: {\n      lang: "en",\n      langToggle: "中文",\n      back: "Back",\n      share: "Share",\n      loading: "Loading",\n      loadFailed: "Failed to load",\n      notFound: "Event not found",\n      date: "Date",\n      club: "Club",\n      clubSchedule: "Upcoming schedule",\n      dj: "DJ",\n      address: "Location",\n      lineup: "Lineup",\n      artists: "DJ history",\n      atlas: "Atlas",\n      atlasVerified: "Verified",\n      atlasHint: "Hint",\n      description: "Description",\n      save: "Save",\n      saved: "Saved",\n      about: "About",\n      copyAddress: "Copy location",\n      addressCopied: "Location copied",\n      openMap: "Open location",\n      openMapFallback: "No coordinates yet. Location copied",\n      openMapFailed: "Unable to open location. Address copied",\n      lineupHint: "Tap poster to view source",\n      sourcePreparing: "Preparing source",\n      posterUnavailable: "No source link yet",\n      viewSource: "Tap poster to view source",\n      sourceArticles: "Source articles",\n      primary: "Primary",\n    },\n  },\n  source: {\n    zh: {\n      loading: "准备公众号原文",\n      open: "打开原文",\n      failed: "原文暂时打不开",\n      hint: "原文已准备好，点击按钮打开微信公众号原文。",\n      externalTitle: "打开 Atlas Beta",\n      externalHint: "微信小程序不能直接拉起系统浏览器。复制链接后，用 Safari 或浏览器打开 huaidj.club。",\n      atlasEvidenceTitle: "Atlas 来源证据",\n      copyLink: "复制链接",\n      linkCopied: "链接已复制",\n    },\n    en: {\n      loading: "Preparing source",\n      open: "Open source",\n      failed: "Source is unavailable",\n      hint: "Source is ready. Tap the button to open the official WeChat article.",\n      externalTitle: "Open Atlas Beta",\n      externalHint: "WeChat mini programs cannot open the system browser directly. Copy the link and open huaidj.club in Safari or your browser.",\n      atlasEvidenceTitle: "Atlas source evidence",\n      copyLink: "Copy link",\n      linkCopied: "Link copied",\n    },\n  },\n  saved: {\n    zh: {\n      title: "ATLAS",\n      subtitle: "中国地下电子音乐图谱",\n      intro: "ATLAS 把城市、俱乐部、DJ、活动和原文证据放在同一张可核对的关系网里。收藏活动即加入个人档案线索。",\n      loading: "加载中",\n      loadFailed: "加载失败",\n      empty: "还没有收藏活动。",\n      outOfWindow: "收藏的活动不在当前发布窗口。",\n      interviewTitle: "提交 Mixtape / 采访线索",\n      interviewHint: "补充 ins、mixtape 或采访笔记，进入人工审核队列",\n    },\n    en: {\n      title: "ATLAS",\n      subtitle: "China Underground Music Graph",\n      intro: "ATLAS connects cities, clubs, DJs, events, and source evidence in one verifiable graph. Saved events become your personal archive trail.",\n      loading: "Loading",\n      loadFailed: "Failed to load",\n      empty: "No saved events yet.",\n      outOfWindow: "Saved events are outside the current release window.",\n      interviewTitle: "Submit Mixtape / Interview Lead",\n      interviewHint: "Add Instagram, mixtape, or interview notes for human review",\n    },\n  },\n  city: {\n    zh: {\n      back: "返回",\n      title: "城市活动",\n      intro: "按城市归档本周正在发生的活动。场地档案会跟随活动数据逐步补齐。",\n      loading: "加载中",\n      loadFailed: "加载失败",\n      empty: "暂无城市数据",\n      eventCount: "场活动",\n    },\n    en: {\n      back: "Back",\n      title: "City events",\n      intro: "Browse this week's events by city. Club archives fill in as event data improves.",\n      loading: "Loading",\n      loadFailed: "Failed to load",\n      empty: "No city data",\n      eventCount: "events",\n    },\n  },\n  about: {\n    zh: {\n      title: "关于活动查询",\n      copy1: "本小程序提供公开电子音乐活动信息查询。用户可按日期、城市查看活动，并查看时间、场地、地址、阵容、风格和来源摘要。",\n      copy2: "活动信息仅作整理和检索参考，不提供售票、报名、交易、演出主办或社交服务。",\n      sourceTitle: "数据来源",\n      source1: "活动信息来自公开发布的活动文章，经整理后展示。详情页保留来源摘要，方便用户核对。",\n      source2: "日期、场地、地址、阵容、风格等字段仅作信息检索参考；拿不准的字段会留空或提示查看原文。详情请以活动主办方公开发布内容为准。",\n      atlasTitle: "ATLAS Beta",\n      atlasStatus: "BETA",\n      atlasBody: "Atlas 是中国地下电子音乐图谱，把城市、俱乐部、DJ、活动和原文证据放在同一张可核对的关系网里。",\n      atlasMeta: "所有人都可以使用 Beta 预览版，探索图谱和活动档案。数据、交互和权限还会持续调整。",\n      atlasDisclaimer: "Beta 版仅用于早期体验和信息核对；正式判断仍以俱乐部或主办方公开信息为准。",\n      atlasAction: "进入受控外链页",\n      atlasUrlLabel: "https://huaidj.club",\n      atlasCopied: "链接已复制",\n      atlasBrowserGuideTitle: "打开 Atlas Beta",\n      atlasBrowserGuide: "链接已复制到剪贴板，请在手机浏览器（Safari / Chrome）中粘贴打开。\\n\\nhttps://huaidj.club/",\n      atlasBrowserConfirm: "知道了",\n      version: "版本",\n      build: "构建",\n      copied: "已复制",\n      footer: "本小程序不提供售票、报名、交易、演出主办或社交服务。",\n    },\n    en: {\n      title: "About event search",\n      copy1: "This mini-program organizes public electronic music event information by date and city, including time, club, address, lineup, style, and source summary.",\n      copy2: "The information is for discovery and reference only. It does not provide ticketing, registration, transactions, event hosting, or social services.",\n      sourceTitle: "Data sources",\n      source1: "Event information comes from publicly published articles and is structured for browsing. Detail pages keep source summaries for checking.",\n      source2: "Date, club, address, lineup, and style fields are reference fields. Uncertain fields stay blank or point back to the source article.",\n      atlasTitle: "Atlas Beta",\n      atlasStatus: "BETA",\n      atlasBody: "Atlas is a Chinese underground electronic music graph, connecting cities, clubs, DJs, events, and source evidence in one verifiable network.",\n      atlas`... 21870 more characters,
+    expected: /priority/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests\interview-column.test.cjs:12:1
+✖ DJ interview is promoted to a primary mini-program column (5.8385ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /dev-notice/. Input:
+  
+  '<view class="page interview-page">\n' +
+    '  <view class="interview-nav">\n' +
+    '    <view class="nav-back" bindtap="goBack" hover-class="option-hover">← {{t.back}}</view>\n' +
+    '    <view class="interview-nav-title">{{t.title}}</view>\n' +
+    '  </view>\n' +
+    '\n' +
+    '  <scroll-view class="interview-body" scroll-y enhanced show-scrollbar="{{false}}">\n' +
+    '    <view class="interview-panel">\n' +
+    '      <view class="panel-kicker">{{t.kicker}}</view>\n' +
+    '      <view class="panel-title">{{t.introTitle}}</view>\n' +
+    '      <view class="panel-copy">{{t.introBody}}</view>\n' +
+    '    </view>\n' +
+    '\n' +
+    '    <view class="form-section">\n' +
+    '      <view class="section-label">{{t.djName}} <text class="required">*</text></view>\n' +
+    '      <input class="interview-input" value="{{form.djName}}" data-key="djName" bindinput="onFieldInput" placeholder="{{t.djNamePlaceholder}}" maxlength="80"/>\n' +
+    '    </view>\n' +
+    '\n' +
+    '    <view class="form-section">\n' +
+    '      <view class="section-label">{{t.city}}</view>\n' +
+    '      <input class="interview-input" value="{{form.city}}" data-key="city" bindinput="onFieldInput" placeholder="{{t.cityPlaceholder}}" maxlength="60"/>\n' +
+    '    </view>\n' +
+    '\n' +
+    '    <view class="form-section">\n' +
+    '      <view class="section-label">{{t.contact}}</view>\n' +
+    '      <input class="interview-input" value="{{form.contact}}" data-key="contact" bindinput="onFieldInput" placeholder="{{t.contactPlaceholder}}" maxlength="180"/>\n' +
+    '      <view class="field-hint">{{t.contactHint}}</view>\n' +
+    '    </view>\n' +
+    '\n' +
+    '    <view class="form-section compact-stack">\n' +
+    '      <view class="section-label">{{t.links}}</view>\n' +
+    '      <input class="interview-input" value="{{form.instagramUrl}}" data-key="instagramUrl" bindinput="onFieldInput" placeholder="{{t.instagramPlaceholder}}" maxlength="300"/>\n' +
+    '      <input class="interview-input" value="{{form.mixtapeUrl}}" data-key="mixtapeUrl" bindinput="onFieldInput" placeholder="{{t.mixtapePlaceholder}}" maxlength="300"/>\n' +
+    '      <input class="interview-input" value="{{form.sourceUrl}}" data-key="sourceUrl" bindinput="onFieldInput" placeholder="{{t.sourcePlaceholder}}" maxlength="300"/>\n' +
+    '      <view class="link-action-row">\n' +
+    '        <button class="link-action" data-key="mixtapeUrl" bindtap="openOriginalLink" hover-class="option-hover">{{t.listenOriginal}}</button>\n' +
+    '        <button class="link-action" data-key="instagramUrl" bindtap="openOriginalLink" hover-class="option-hover">{{t.copyInstagram}}</button>\n' +
+    '      </view>\n' +
+    '      <view class="field-hint">{{t.linkHint}}</view>\n' +
+    '    </view>\n' +
+    '\n' +
+    '    <view class="form-section">\n' +
+    '      <view class="section-label">{{t.answer}}</view>\n' +
+    '      <textarea class="interview-textarea" value="{{form.answerText}}" data-key="answerText" bindinput="onFieldInput" placeholder="{{t.answerPlaceholder}}" maxlength="900" auto-height="{{true}}"></textarea>\n' +
+    '    </view>\n' +
+    '\n' +
+    '    <view class="form-section consent-section">\n' +
+    '      <view class="section-label">{{t.consentTitle}} <text class="required">*</text></view>\n' +
+    '      <checkbox-group bindchange="onConsentChange">\n' +
+    '        <label class="consent-row">\n' +
+    '          <checkbox value="internal" checked="{{form.consentInternal}}" color="#b6ff3b"/>\n' +
+    '          <text>{{t.consentInternal}}</text>\n' +
+    '        </label>\n' +
+    '        <label class="consent-row">\n' +
+    '          <checkbox value="public" checked="{{form.consentPublic}}" color="#b6ff3b"/>\n' +
+    '          <text>{{t.consentPublic}}</text>\n' +
+    '        </label>\n' +
+    '        <label class="consent-row">\n' +
+    '          <checkbox value="graph" checked="{{form.consentGraph}}" color="#b6ff3b"/>\n' +
+    '          <text>{{t.consentGraph}}</text>\n' +
+    '        </label>\n' +
+    '      </checkbox-group>\n' +
+    '      <view class="field-hint">{{t.consentHint}}</view>\n' +
+    '    </view>\n' +
+    '\n' +
+    '    <button class="submit-btn" bindtap="submitForm" disabled="{{submitting}}" hover-class="option-hover">\n' +
+    '      {{submitting ? t.submitting : t.submit}}\n' +
+    '    </button>\n' +
+    '\n' +
+    '    <view wx:if="{{submissions.length}}" class="history-section">\n' +
+    '      <view class="section-label">{{t.history}} ({{submissions.length}})</view>\n' +
+    '      <view wx:for="{{submissions}}" wx:key="submittedAt" class="history-card">\n' +
+    '        <view class="history-head">\n' +
+    '          <view class="history-dj">{{item.djName}}</view>\n' +
+    '          <view class="history-remove" data-index="{{index}}" catchtap="removeSubmission">{{t.remove}}</view>\n' +
+    '        </view>\n' +
+    '        <view class="history-meta">\n' +
+    '          <text wx:if="{{item.city}}">{{item.city}} · </text>\n' +
+    '          <text>{{item.submittedAt}}</text>\n' +
+    '        </view>\n' +
+    '        <view class="history-flags">\n' +
+    '          <text wx:if="{{item.hasMixtapeUrl}}" class="flag">mixtape</text>\n' +
+    '          <text wx:if="{{item.hasInstagramUrl}}" class="flag">ins</text>\n' +
+    '          <text wx:if="{{item.consentGraph}}" class="flag">{{t.graphFlag}}</text>\n' +
+    '        </view>\n' +
+    '      </view>\n' +
+    '    </view>\n' +
+    '  </scroll-view>\n' +
+    '</view>\n'
+  
+      at TestContext.<anonymous> (C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\tests\interview-column.test.cjs:45:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '<view class="page interview-page">\n  <view class="interview-nav">\n    <view class="nav-back" bindtap="goBack" hover-class="option-hover">← {{t.back}}</view>\n    <view class="interview-nav-title">{{t.title}}</view>\n  </view>\n\n  <scroll-view class="interview-body" scroll-y enhanced show-scrollbar="{{false}}">\n    <view class="interview-panel">\n      <view class="panel-kicker">{{t.kicker}}</view>\n      <view class="panel-title">{{t.introTitle}}</view>\n      <view class="panel-copy">{{t.introBody}}</view>\n    </view>\n\n    <view class="form-section">\n      <view class="section-label">{{t.djName}} <text class="required">*</text></view>\n      <input class="interview-input" value="{{form.djName}}" data-key="djName" bindinput="onFieldInput" placeholder="{{t.djNamePlaceholder}}" maxlength="80"/>\n    </view>\n\n    <view class="form-section">\n      <view class="section-label">{{t.city}}</view>\n      <input class="interview-input" value="{{form.city}}" data-key="city" bindinput="onFieldInput" placeholder="{{t.cityPlaceholder}}" maxlength="60"/>\n    </view>\n\n    <view class="form-section">\n      <view class="section-label">{{t.contact}}</view>\n      <input class="interview-input" value="{{form.contact}}" data-key="contact" bindinput="onFieldInput" placeholder="{{t.contactPlaceholder}}" maxlength="180"/>\n      <view class="field-hint">{{t.contactHint}}</view>\n    </view>\n\n    <view class="form-section compact-stack">\n      <view class="section-label">{{t.links}}</view>\n      <input class="interview-input" value="{{form.instagramUrl}}" data-key="instagramUrl" bindinput="onFieldInput" placeholder="{{t.instagramPlaceholder}}" maxlength="300"/>\n      <input class="interview-input" value="{{form.mixtapeUrl}}" data-key="mixtapeUrl" bindinput="onFieldInput" placeholder="{{t.mixtapePlaceholder}}" maxlength="300"/>\n      <input class="interview-input" value="{{form.sourceUrl}}" data-key="sourceUrl" bindinput="onFieldInput" placeholder="{{t.sourcePlaceholder}}" maxlength="300"/>\n      <view class="link-action-row">\n        <button class="link-action" data-key="mixtapeUrl" bindtap="openOriginalLink" hover-class="option-hover">{{t.listenOriginal}}</button>\n        <button class="link-action" data-key="instagramUrl" bindtap="openOriginalLink" hover-class="option-hover">{{t.copyInstagram}}</button>\n      </view>\n      <view class="field-hint">{{t.linkHint}}</view>\n    </view>\n\n    <view class="form-section">\n      <view class="section-label">{{t.answer}}</view>\n      <textarea class="interview-textarea" value="{{form.answerText}}" data-key="answerText" bindinput="onFieldInput" placeholder="{{t.answerPlaceholder}}" maxlength="900" auto-height="{{true}}"></textarea>\n    </view>\n\n    <view class="form-section consent-section">\n      <view class="section-label">{{t.consentTitle}} <text class="required">*</text></view>\n      <checkbox-group bindchange="onConsentChange">\n        <label class="consent-row">\n          <checkbox value="internal" checked="{{form.consentInternal}}" color="#b6ff3b"/>\n          <text>{{t.consentInternal}}</text>\n        </label>\n        <label class="consent-row">\n          <checkbox value="public" checked="{{form.consentPublic}}" color="#b6ff3b"/>\n          <text>{{t.consentPublic}}</text>\n        </label>\n        <label class="consent-row">\n          <checkbox value="graph" checked="{{form.consentGraph}}" color="#b6ff3b"/>\n          <text>{{t.consentGraph}}</text>\n        </label>\n      </checkbox-group>\n      <view class="field-hint">{{t.consentHint}}</view>\n    </view>\n\n    <button class="submit-btn" bindtap="submitForm" disabled="{{submitting}}" hover-class="option-hover">\n      {{submitting ? t.submitting : t.submit}}\n    </button>\n\n    <view wx:if="{{submissions.length}}" class="history-section">\n      <view class="section-label">{{t.history}} ({{submissions.length}})</view>\n      <view wx:for="{{submissions}}" wx:key="submittedAt" class="history-card">\n        <view class="history-head">\n          <view class="history-dj">{{item.djName}}</view>\n          <view class="history-remove" data-index="{{index}}" catchtap="removeSubmission">{{t.remove}}</view>\n        </view>\n        <view class="history-meta">\n          <text wx:if="{{item.city}}">{{item.city}} · </text>\n          <text>{{item.submittedAt}}</text>\n        </view>\n        <view class="history-flags">\n          <text wx:if="{{item.hasMixtapeUrl}}" class="flag">mixtape</text>\n          <text wx:if="{{item.hasInstagramUrl}}" class="flag">ins</text>\n          <text wx:if="{{item.consentGraph}}" class="flag">{{t.graphFlag}}</text>\n        </view>\n      </view>\n    </view>\n  </scroll-view>\n</view>\n',
+    expected: /dev-notice/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests\production-data-source.test.cjs:51:1
+✖ current release package uses the 2026-06-02 data window with CloudBase poster file IDs (12.9769ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + '2026-06-25'
+  - '2026-06-16'
+             ^
+  
+      at TestContext.<anonymous> (C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram\tests\production-data-source.test.cjs:101:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '2026-06-25',
+    expected: '2026-06-16',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
