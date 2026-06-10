@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "account_name": "fake_club_sh",
+      "url_hash": "a1b2c3d4e5f6a7b8",
+      "source_type": "wechat_article",
+      "url": "FAKE_URL_REDACTED",
+      "label": "公众号",
+      "event_ids": ["fake_club_sh:a1b2c3d4e5f6a7b8"]
+    },
+    {
+      "account_name": "neon_hall_bj",
+      "url_hash": "f1e2d3c4b5a69788",
+      "source_type": "wechat_article",
+      "url": "FAKE_URL_REDACTED",
+      "label": "公众号",
+      "event_ids": ["neon_hall_bj:f1e2d3c4b5a69788"]
+    },
+    {
+      "account_name": "pulse_gz",
+      "url_hash": "99887766ffeeddcc",
+      "source_type": "wechat_article",
+      "url": "FAKE_URL_REDACTED",
+      "label": "公众号",
+      "event_ids": ["pulse_gz:99887766ffeeddcc"]
+    }
+  ]
+}

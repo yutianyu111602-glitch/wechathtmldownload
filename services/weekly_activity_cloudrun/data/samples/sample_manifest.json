@@ -1,0 +1,32 @@
+{
+  "schema_version": "weekly_activity_miniprogram_api.v1",
+  "generated_at": "2026-01-15T12:00:00+08:00",
+  "item_count": 3,
+  "window_start": "2026-01-15",
+  "window_end": "2026-01-22",
+  "filtered_counts": {
+    "missing_source_date": 5,
+    "missing_time_warning": 1,
+    "outside_date_window": 50,
+    "publish_blocked": 2
+  },
+  "venue_registry_count": 3,
+  "account_registry_count": 3,
+  "city_route_count": 3,
+  "date_route_count": 2,
+  "routes": {
+    "current": "current.json",
+    "manifest": "manifest.json",
+    "by_city_index": "by-city/index.json",
+    "by_date_index": "by-date/index.json",
+    "source_url_map": "source_actions/source_url_map.json"
+  },
+  "repair_report": {
+    "schema_version": "weekly_activity_release_repair.v1",
+    "repaired_at": "2026-01-15T12:00:00+08:00",
+    "raw_item_count": 3,
+    "repaired_item_count": 3,
+    "removed_duplicate_count": 0,
+    "quarantined_conflict_item_count": 0
+  }
+}

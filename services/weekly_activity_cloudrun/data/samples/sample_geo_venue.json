@@ -1,0 +1,15 @@
+{
+  "venue_id": "fake_club_sh_shanghai",
+  "venue_name": "FAKE CLUB",
+  "city": "上海",
+  "city_key": "shanghai",
+  "address": "上海市黄浦区南京东路100号大厦3楼",
+  "geo_lat": 31.230416,
+  "geo_lng": 121.473701,
+  "geo_coord_system": "GCJ-02",
+  "geo_source": "tencent_map_picker_user_confirmed",
+  "geo_verified_at": "2026-01-10",
+  "place_fields_locked": true,
+  "aliases": ["Fake Club Shanghai", "FC上海"],
+  "account_keys": ["fake_club_sh"]
+}
