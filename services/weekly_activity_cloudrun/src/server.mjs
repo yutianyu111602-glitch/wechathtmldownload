@@ -968,6 +968,15 @@ export function createServer(options = {}) {
         return;
       }
 
+      if (pathname === "/api/v1/weekly/column") {
+        const columnData = await store.getColumnItems({
+          tag: url.searchParams.get("tag") || undefined,
+          lang: url.searchParams.get("lang") || "zh",
+        });
+        sendJson(res, 200, columnData, {}, { req, cacheMaxAge: 300 });
+        return;
+      }
+
       if (pathname === "/api/v1/stage7/manifest") {
         sendJson(res, 200, await stage7Store.getManifest());
         return;

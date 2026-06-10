@@ -1,0 +1,170 @@
+{
+  "schema_version": "weekly_activity_miniprogram_column.v1",
+  "generated_at": "2026-06-10T23:30:00+08:00",
+  "items": [
+    {
+      "id": "col_small_8",
+      "title": "Babyching：深圳OIL地下放techno的人",
+      "djName": "Babyching",
+      "summary": "Babyching在OIL的后排放歌，选曲奇怪但上头——从硬核techno跳到碎拍bass，偶尔插一首trance让舞池愣住。她不是明星，只是每周四准时出现在俱乐部，用set讲述一个没人听过的故事。",
+      "date": "2026-06-11",
+      "tag": "dj",
+      "sourceName": "OIL"
+    },
+    {
+      "id": "col_small_9",
+      "title": "99God：上海ILLUM后座的跨风格焊工",
+      "djName": "99God",
+      "summary": "99God这个名字本身就是个meme——自称'神'但只放99%没人听过的歌。在上海ILLUM的地下室里，他敢把Kendrick Lamar的acapella塞进techno鼓里，或者用house bassline托着一段老派hip-hop break。",
+      "date": "2026-06-12",
+      "tag": "dj",
+      "sourceName": "ILLUM Shanghai"
+    },
+    {
+      "id": "col_small_1",
+      "title": "DJ小山：大理古城里放迪斯科的人",
+      "djName": "DJ小山",
+      "summary": "DJ小山在大理干镇404号放歌三年了。他不是那种非要放冷门歌的装逼犯，但也不屑于跟风放抖音热曲。他的set从老school hip-hop切到house，再到意大利disco，选曲逻辑只有一个——能不能让人跳起来。",
+      "date": "2026-06-12",
+      "tag": "dj",
+      "sourceName": "HUAIDJ"
+    },
+    {
+      "id": "col_small_6",
+      "title": "Hello Shitty：上海EXIT的垃圾美学",
+      "djName": "Hello Shitty",
+      "summary": "本名王磊，白天是广告公司的平面设计师，晚上戴上墨镜就成了EXIT俱乐部最朋克的DJ。名字是故意反讽——不是Hello Kitty，是Hello Shitty。他的set是house和electro的混合体，中间会突然塞进一首老disco。",
+      "date": "2026-06-13",
+      "tag": "dj",
+      "sourceName": "EXIT Shanghai"
+    },
+    {
+      "id": "col_small_7",
+      "title": "Altieri3000：上海EXIT的意大利未来主义暗流",
+      "djName": "Altieri3000",
+      "summary": "Altieri3000，一个意大利名字配上3000的锐利后缀。在EXIT Club的地下室，他的set像一场精心设计的派对：house的律动打底，穿插electro的机械脉动，偶尔蹦出一段disco的温暖旋律。",
+      "date": "2026-06-13",
+      "tag": "dj",
+      "sourceName": "EXIT Shanghai"
+    },
+    {
+      "id": "col_small_2",
+      "title": "丝绒公路：重庆坚果里的公路电影",
+      "djName": "丝绒公路",
+      "summary": "丝绒公路是个奇怪的组合——名字像公路电影，音乐却游走在摇滚与电子之间。他们在重庆坚果NUTS演出，一个本地独立音乐地标。成员白天是设计师、教师，晚上把合成器和吉他拧在一起。",
+      "date": "2026-06-13",
+      "tag": "dj",
+      "sourceName": "坚果NUTS"
+    },
+    {
+      "id": "col_small_3",
+      "title": "JAKELxx：长春敲敲俱乐部的hip-hop与house混音师",
+      "djName": "JAKELxx",
+      "summary": "JAKELxx是长春'敲敲电子俱乐部'的驻场DJ，在这个东北城市坚持做电子乐本身就是种态度。他的set把hip-hop的狠劲和house的律动搅在一起，选曲逻辑古怪但上头。",
+      "date": "2026-06-13",
+      "tag": "dj",
+      "sourceName": "敲敲电子俱乐部"
+    },
+    {
+      "id": "col_small_4",
+      "title": "C.S.B.Q乐队：重庆坚果的朋克钉子户",
+      "djName": "C.S.B.Q乐队",
+      "summary": "一支在重庆地下坚持了快十年的朋克乐队，主唱嗓子像砂纸磨过钢管，吉他手总在台上摔效果器。他们的歌里全是重庆的街道、火锅和烂尾楼，不装深刻，就是吼。",
+      "date": "2026-06-14",
+      "tag": "dj",
+      "sourceName": "坚果NUTS"
+    },
+    {
+      "id": "col_small_10",
+      "title": "Franceschini Gianluigi：广州陀地士多现场实验者",
+      "djName": "Franceschini Gianluigi",
+      "summary": "Franceschini Gianluigi，一个意大利名字，在没人知道他是谁的情况下出现在广州的陀地士多。一个完全未知的表演者，准备在周五晚上制造一些不确定的声音。",
+      "date": "2026-06-14",
+      "tag": "dj",
+      "sourceName": "陀地士多"
+    },
+    {
+      "id": "col_small_5",
+      "title": "Techn：天津气厂里放Techno的人",
+      "djName": "Techn",
+      "summary": "Techn，天津本土DJ，名字直白得像在说'我就是放Techno的'。6月16日在Gas Nation氣厂，和Ma Haiping同场。他的set从techno切到electro，再滑进disco和ambient。",
+      "date": "2026-06-16",
+      "tag": "dj",
+      "sourceName": "Gas Nation气厂"
+    },
+    {
+      "id": "col_news_1",
+      "title": "Berghain 2026夏至马拉松：48小时不停歇",
+      "summary": "Berghain公布2026年夏至48小时马拉松活动，顶尖techno DJ阵容+沉浸式装置艺术。",
+      "date": "2026-06-09",
+      "tag": "event",
+      "sourceName": "Berghain",
+      "foreignMedia": "Resident Advisor"
+    },
+    {
+      "id": "col_news_2",
+      "title": "DVS1 创立新厂牌 HUSH：专注极简 techno",
+      "djName": "DVS1",
+      "summary": "DVS1启动新厂牌HUSH，专注原始极简techno，首发EP来自一位匿名地下制作人。",
+      "date": "2026-06-09",
+      "tag": "label",
+      "sourceName": "HUSH",
+      "foreignMedia": "Mixmag"
+    },
+    {
+      "id": "col_news_3",
+      "title": "底特律Movement 2026阵容公布",
+      "summary": "Movement 2026公布headliner：Jeff Mills, Carl Craig，以及来自非洲的地下阵容。",
+      "date": "2026-06-10",
+      "tag": "event",
+      "sourceName": "Movement",
+      "foreignMedia": "DJ Mag"
+    },
+    {
+      "id": "col_news_4",
+      "title": "AI DJ 引发地下俱乐部争议",
+      "summary": "柏林一场AI DJ演出引发地下电子乐圈关于真实性的大辩论。",
+      "date": "2026-06-10",
+      "tag": "trend",
+      "sourceName": "全球",
+      "foreignMedia": "The Guardian"
+    },
+    {
+      "id": "col_news_5",
+      "title": "黑胶复兴：全球销量大涨20%",
+      "summary": "2026年全球黑胶销量同比上涨20%，地下电子乐藏家为主要推动力。",
+      "date": "2026-06-10",
+      "tag": "trend",
+      "sourceName": "全球",
+      "foreignMedia": "Billboard"
+    },
+    {
+      "id": "col_news_6",
+      "title": "Nina Kraviz 东京 Womb 三个月驻场",
+      "djName": "Nina Kraviz",
+      "summary": "Nina Kraviz宣布在东京Womb进行三个月驻场，融合techno与日本实验声音。",
+      "date": "2026-06-11",
+      "tag": "dj",
+      "sourceName": "Womb",
+      "foreignMedia": "RA News"
+    },
+    {
+      "id": "col_news_7",
+      "title": "Erica Synths 发布 Pulsar-1 模块合成器",
+      "summary": "Erica Synths推出Pulsar-1，专为现场techno演出设计的紧凑型模块合成器。",
+      "date": "2026-06-11",
+      "tag": "gear",
+      "sourceName": "Erica Synths",
+      "foreignMedia": "Synthtopia"
+    },
+    {
+      "id": "col_news_8",
+      "title": "柏林俱乐部文化危机：新噪音法威胁营业时间",
+      "summary": "柏林拟议噪音新规可能限制俱乐部营业时长，电子乐社区大规模抗议。",
+      "date": "2026-06-10",
+      "tag": "city",
+      "sourceName": "柏林",
+      "foreignMedia": "The Berliner"
+    }
+  ]
+}

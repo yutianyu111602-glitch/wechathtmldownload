@@ -330,6 +330,18 @@ Page({
     this.setData({ activeTag: key, filteredItems: filtered });
   },
 
+  onCardTap: function(e) {
+    var id = e.currentTarget.dataset.id;
+    var items = this.data.filteredItems;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].id === id) {
+        var key = "filteredItems[" + i + "].expanded";
+        this.setData({ [key]: !items[i].expanded });
+        break;
+      }
+    }
+  },
+
   onTabItemTap: function() {
     vibrateLight();
   },

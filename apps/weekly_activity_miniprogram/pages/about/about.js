@@ -1,5 +1,5 @@
-const VERSION = "0.5.13";
-const BUILD_DATE = "2026-06-10";
+const VERSION = "0.5.15";
+const BUILD_DATE = "2026-06-11";
 const ATLAS_BETA_URL = "https://huaidj.club/";
 const ABOUT_TAB_INDEX = 3;
 const { HAPTIC, vibrateLight } = require("../../utils/haptics");

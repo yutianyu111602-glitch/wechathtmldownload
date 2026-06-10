@@ -21,6 +21,8 @@
       wx:for="{{filteredItems}}"
       wx:key="id"
       class="column-card"
+      data-id="{{item.id}}"
+      bindtap="onCardTap"
     >
       <view class="card-header">
         <image wx:if="{{item.avatar}}" class="card-avatar" src="{{item.avatar}}" mode="aspectFill" lazy-load></image>
@@ -31,8 +33,9 @@
           </view>
           <view class="card-title">{{item.title}}</view>
         </view>
+        <view class="card-expand-icon">{{item.expanded ? '▾' : '▸'}}</view>
       </view>
-      <view class="card-body">
+      <view class="card-body {{item.expanded ? 'card-body-expanded' : 'card-body-collapsed'}}">
         <view class="card-summary">{{item.summary}}</view>
         <view wx:if="{{item.hasForeignMedia}}" class="card-foreign">
           <text class="foreign-label">{{t.foreignMedia}}</text>

@@ -787,6 +787,31 @@ export class WeeklyActivityDataStore {
     }
   }
 
+  async getColumnItems({ tag, lang } = {}) {
+    const COLUMN_JSON = path.resolve(this.baseDir, "column.json");
+    try {
+      const raw = await readFile(COLUMN_JSON, "utf8");
+      const data = JSON.parse(raw);
+      let items = Array.isArray(data.items) ? data.items : [];
+      if (tag && tag !== "all") {
+        items = items.filter((item) => item.tag === tag);
+      }
+      return {
+        schema_version: "weekly_activity_miniprogram_column.v1",
+        generated_at: data.generated_at || null,
+        item_count: items.length,
+        items,
+      };
+    } catch {
+      return {
+        schema_version: "weekly_activity_miniprogram_column.v1",
+        generated_at: null,
+        item_count: 0,
+        items: [],
+      };
+    }
+  }
+
   async getCurrent({ cityKey, date, limit, cursor, lookbackDays } = {}) {
     let current;
     try {
