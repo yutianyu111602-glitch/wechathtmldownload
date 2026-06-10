@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "agg-child-bd5c71530dcdbcd1",
+  "sourceItemHash": "798b4f9b86b33a5b4c2af0b4631e434657b73c3be413ce3aeaf5a66d77160d17",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Weekly Listening w/ chai",
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "22:00 - Late",
+      "city_name": "上海",
+      "venue_name": "wigwam",
+      "address_candidate": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+      "lineup_artists": [
+        "chai",
+        "chai"
+      ],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06.07 SUN",
+        "22:00-Late Weekly Listening",
+        "w/ chai",
+        "Free Entry"
+      ],
+      "ticketing_text": [
+        "Free Entry"
+      ],
+      "dedupe_signals": [
+        "Weekly Listening w/ chai",
+        "2026-06-07",
+        "上海",
+        "wigwam"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

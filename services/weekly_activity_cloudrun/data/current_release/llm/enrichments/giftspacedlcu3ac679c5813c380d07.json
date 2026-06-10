@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "giftspacedlc:c679c5813c380d07",
+  "sourceItemHash": "951ac4adf641b07e8d4b3c391344690a04abdaba4dfc176ef6030fc8d028b6cc",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "ROOM2 本周六 | 老婆不在家孤单寂寞，来放点千禧舞曲。那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "大连",
+      "venue_name": "GiftSpaceDLC",
+      "address_candidate": "辽宁省大连市中山区胜利文化广场西侧",
+      "lineup_artists": [
+        "DJ Kosevic江水平",
+        "DJ Kosevic江水平"
+      ],
+      "music_styles": [
+        "club trax",
+        "Y2K舞曲",
+        "Club Trax",
+        "Deconstructed Club",
+        "Post-Club",
+        "riddim",
+        "dancehall"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "06.06 ROOM2 本周六｜老婆不在家孤单寂寞，来放点千禧舞曲。那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+        "那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+        "六月六，我们邀请了那个B站主页用“诺基亚”直播的男人——DJ Kosevic江水平！内陆草根复兴Y2K舞曲守"
+      ],
+      "description_original_lines": [
+        "06.06 ROOM2 本周六｜老婆不在家孤单寂寞，来放点千禧舞曲。那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+        "06.06 ROOM2 本周六｜老婆不在家孤单寂寞，来放点千禧舞曲",
+        "那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+        "六月六，我们邀请了那个B站主页用“诺基亚”直播的男人——DJ Kosevic江水平！内陆草根复兴Y2K舞曲守"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "ROOM2 本周六 | 老婆不在家孤单寂寞，来放点千禧舞曲。那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+        "2026-06-06",
+        "大连",
+        "GiftSpaceDLC"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

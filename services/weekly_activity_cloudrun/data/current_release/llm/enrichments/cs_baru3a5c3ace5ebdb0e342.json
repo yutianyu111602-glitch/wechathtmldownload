@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "cs_bar:5c3ace5ebdb0e342",
+  "sourceItemHash": "6c7fab013990655098a7cc0cf35e68f0daea5ba14c670cde31dba87a982760cf",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "TECHSPECTRUM",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "19:30 - Late",
+      "city_name": "上海",
+      "venue_name": "Cs Bar",
+      "address_candidate": "长宁区定西路685号地下一层!",
+      "lineup_artists": [
+        "DJ OMB",
+        "DJ OMB"
+      ],
+      "music_styles": [
+        "techno",
+        "house",
+        "electro",
+        "bass",
+        "techno",
+        "house",
+        "electro",
+        "bass",
+        "minimal",
+        "tech house"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "DJ OMB Classic Roots, Modern Beats. From iconic synth-pop to high-voltage techno.A sonic journey through the past and present of the dancefloor.NO LABELS. PURE ENERGy"
+      ],
+      "description_original_lines": [
+        "6月5日 周五 ｜TECHSPECTRUM",
+        "Free entrance!免票!",
+        "长宁区定西路685号地下一层!",
+        "DJ OMB Classic Roots, Modern Beats. From iconic synth-pop to high-voltage techno.A sonic journey through the past and present of the dancefloor.NO LABELS. PURE ENERGy"
+      ],
+      "ticketing_text": [
+        "免票"
+      ],
+      "dedupe_signals": [
+        "TECHSPECTRUM",
+        "2026-06-05",
+        "上海",
+        "Cs Bar"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

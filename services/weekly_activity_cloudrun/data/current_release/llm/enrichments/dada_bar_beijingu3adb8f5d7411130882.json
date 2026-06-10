@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "dada_bar_beijing:db8f5d7411130882",
+  "sourceItemHash": "6a0fd315fb5dbcf05376f98b1d3e5a3f22e13db4fc44f5a23f0b9b512a9d088f",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "今晚6月4日 - 生肉 RAW MEAT",
+      "event_date_start": "2026-06-04",
+      "event_date_end": "2026-06-04",
+      "event_time_text": null,
+      "city_name": "北京",
+      "venue_name": "dadabar(日坛国际贸易中心A座店)",
+      "address_candidate": "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+      "lineup_artists": [
+        "magicmolly",
+        "Fak9Master",
+        "magicmolly",
+        "Fak9Master"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "house",
+        "disco",
+        "psychedelic house",
+        "dark disco",
+        "tribal groove"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "magicmolly",
+        "Fak9Master",
+        "FRNA ERE SCA i TIS RRR UROL EE COMER CONS ERIE PSII ACS RESIN Sis OCP esate"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "今晚6月4日 - 生肉 RAW MEAT",
+        "2026-06-04",
+        "北京",
+        "dadabar(日坛国际贸易中心A座店)"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

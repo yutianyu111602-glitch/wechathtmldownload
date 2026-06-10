@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "nu_lab:a161c84a421e87ef",
+  "sourceItemHash": "a82e42b7c7756df425d12ee304ada9156f5cedc376bf3aa35b5209a92705b7e1",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "丨Psyma Festival 2026 预热派对 @成都站",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "成都",
+      "venue_name": "NU Lab",
+      "address_candidate": "四川省成都市锦江区永安路666号NUART锦江5楼",
+      "lineup_artists": [],
+      "music_styles": [
+        "trance",
+        "psytrance"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.6丨Psyma Festival 2026 预热派对 @成都站",
+        "爱 · 和平 · 分享",
+        "FESTIVAL 2026"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "丨Psyma Festival 2026 预热派对 @成都站",
+        "2026-06-06",
+        "成都",
+        "NU Lab"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

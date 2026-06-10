@@ -1,0 +1,151 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "tote_music:aa0f2bd3d283f8ce",
+    "event_id": "tote_music:aa0f2bd3d283f8ce",
+    "article_id": "tote_music:aa0f2bd3d283f8ce",
+    "queue_id": "tote_music:aa0f2bd3d283f8ce",
+    "title": "【6/14 周日】The Reflections Duet｜不插电爵士二重奏 Unplugged Jazz",
+    "title_original": "【6/14 周日】The Reflections Duet｜不插电爵士二重奏 Unplugged Jazz",
+    "title_display": "【6/14 周日】The Reflections Duet | 不插电爵士二重奏 Unplugged Jazz",
+    "account": "陀地音乐TOTE MUSIC",
+    "account_key": "tote_music",
+    "promoter": "陀地音乐TOTE MUSIC",
+    "source_article": {
+      "url_hash": "aa0f2bd3d283f8ce",
+      "account_name": "陀地音乐TOTE MUSIC",
+      "published_at": "2026-05-29"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "aa0f2bd3d283f8ce",
+      "disabled_reason": ""
+    },
+    "aggregation_child": false,
+    "post_date": "2026-05-29",
+    "source_account_name": "陀地音乐TOTE MUSIC",
+    "source_published_at": "2026-05-29",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3aaa0f2bd3d283f8ce--c4edffd5ffa3dba44565.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3aaa0f2bd3d283f8ce--c4edffd5ffa3dba44565.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3aaa0f2bd3d283f8ce--c4edffd5ffa3dba44565.jpg",
+    "poster_source": "cloudbase_storage_from_wechat_article",
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "event_date_text": [
+      "2026-06-14"
+    ],
+    "event_date_iso_guess": "2026-06-14",
+    "event_date_iso_guesses": [
+      "2026-06-14"
+    ],
+    "event_date_start": "2026-06-14",
+    "event_date_end": "2026-06-14",
+    "event_time_text": "20:00 - Late",
+    "event_time_source": "source_text",
+    "time_start": "20:00",
+    "time_end": "Late",
+    "running_hours_text": "20:00 - Late",
+    "running_hours_source": "source_text",
+    "city": [
+      "广州"
+    ],
+    "city_key": "guangzhou",
+    "city_name": "广州",
+    "city_keys": [
+      "guangzhou"
+    ],
+    "venue": [],
+    "venue_id": "tote_store_guangzhou",
+    "venue_name": "陀地士多 Tote Store",
+    "address": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+    "address_full": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+    "address_source": "venue_registry_verified",
+    "geo_lng": 113.262634,
+    "geo_lat": 23.097666,
+    "lineup": [
+      "Franceschini Gianluigi"
+    ],
+    "lineup_artists": [
+      "Franceschini Gianluigi"
+    ],
+    "genres": [
+      "jazz"
+    ],
+    "music_styles": [],
+    "price": [
+      "免票"
+    ],
+    "price_text": "免票",
+    "ticketing_text": "免票",
+    "evidence": [
+      "【6/14 周日】The Reflections Duet｜不插电爵士二重奏 Unplugged Jazz",
+      "「 不插电爵士吉他二重奏 」 6月14日 周日 Sun. 22:00 免票进场 一人一消 陀地士多 ↓↓↓交通指引点击下方链接↓↓↓ 如何找到我们!How to find us !",
+      "2026-06-14",
+      "20:00-late",
+      "来陀地士多，感受一场纯粹的爵士吉他二重奏！"
+    ],
+    "description_original_lines": [
+      "来陀地士多，感受一场纯粹的爵士吉他二重奏！",
+      "Franceschini Gianluigi (Guitar)",
+      "- 意大利籍吉他手，简称 GIGI",
+      "- 意大利 Roberto franceschin 手工JAZZ吉他代言人"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "广州|陀地士多totestore|2026-06-14|614周日thereflectionsduet不插电爵士二重奏unpluggedjazz",
+    "detail_path": "by-id/tote_musicu3aaa0f2bd3d283f8ce.json",
+    "detail_url": "by-id/tote_musicu3aaa0f2bd3d283f8ce.json",
+    "lineup_quality": {
+      "status": "verified",
+      "decision": "scoring_retained_lineup",
+      "note": "retained lineup artists with score >= 0.6: Franceschini Gianluigi"
+    },
+    "venue_lat": 23.097666,
+    "venue_lng": 113.262634,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "tencent_map_picker_user_confirmed",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "tote_store_guangzhou",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3aaa0f2bd3d283f8ce--c4edffd5ffa3dba44565.jpg",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3aaa0f2bd3d283f8ce--c4edffd5ffa3dba44565.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3aaa0f2bd3d283f8ce--c4edffd5ffa3dba44565.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3aaa0f2bd3d283f8ce--c4edffd5ffa3dba44565.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3aaa0f2bd3d283f8ce--c4edffd5ffa3dba44565.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3aaa0f2bd3d283f8ce--c4edffd5ffa3dba44565.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster_cloud_path": "weekly-posters/20260607/tote_musicu3aaa0f2bd3d283f8ce--c4edffd5ffa3dba44565.jpg",
+    "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+    "poster_public_source_hash": "c4edffd5ffa3dba4",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3aaa0f2bd3d283f8ce--c4edffd5ffa3dba44565.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3aaa0f2bd3d283f8ce--c4edffd5ffa3dba44565.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3aaa0f2bd3d283f8ce--c4edffd5ffa3dba44565.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3aaa0f2bd3d283f8ce--c4edffd5ffa3dba44565.jpg"
+  }
+}

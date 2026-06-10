@@ -1,0 +1,138 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "abyss_shanghai:aa48f237993a769f",
+    "event_id": "abyss_shanghai:aa48f237993a769f",
+    "article_id": "abyss_shanghai:aa48f237993a769f",
+    "queue_id": "abyss_shanghai:aa48f237993a769f",
+    "title": "6·5｜速报：柏林地下鼠王THAM空降‼️亲自喂药🪳专治恋鼠癖",
+    "title_original": "6·5｜速报：柏林地下鼠王THAM空降‼️亲自喂药🪳专治恋鼠癖",
+    "title_display": "6·5 | 速报：柏林地下鼠王THAM空降‼️亲自喂药🪳专治恋鼠癖",
+    "account": "ABYSS Shanghai",
+    "account_key": "abyss_shanghai",
+    "promoter": "ABYSS Shanghai",
+    "source_article": {
+      "url_hash": "aa48f237993a769f",
+      "account_name": "ABYSS Shanghai",
+      "published_at": "2026-06-03"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "aa48f237993a769f"
+    },
+    "post_date": "2026-06-03",
+    "source_account_name": "ABYSS Shanghai",
+    "source_published_at": "2026-06-03",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/abyss_shanghai_aa48f237993a769f--56ef3096f00625f54b0ffd97.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/abyss_shanghai_aa48f237993a769f--56ef3096f00625f54b0ffd97.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/abyss_shanghai_aa48f237993a769f--56ef3096f00625f54b0ffd97.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "22:00-05:00",
+    "event_time_source": "source_text",
+    "time_start": "22:00",
+    "time_end": "05:00",
+    "running_hours_text": "22:00-05:00",
+    "running_hours_source": "source_text",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [],
+    "venue_id": "abyss_shanghai",
+    "venue_name": "ABYSS Shanghai",
+    "address": "上海市黄浦区淮海中路523-527号B1层01商铺",
+    "address_full": "上海市黄浦区淮海中路523-527号B1层01商铺",
+    "address_source": "manual_registry",
+    "geo_lng": 121.468253,
+    "geo_lat": 31.220106,
+    "lineup": [
+      "THAM",
+      "SATURN [CULT]",
+      "Extreme John",
+      "SELFISH b2b NABEL"
+    ],
+    "lineup_artists": [
+      "THAM",
+      "SATURN [CULT]",
+      "Extreme John",
+      "SELFISH b2b NABEL"
+    ],
+    "genres": [
+      "techno",
+      "schranz",
+      "hard techno",
+      "industrial techno",
+      "hardstyle",
+      "rawstyle"
+    ],
+    "music_styles": [
+      "techno"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "6·5｜速报：柏林地下鼠王THAM空降‼️亲自喂药🪳专治恋鼠癖",
+      "2026-06-05",
+      "𝙏𝙃𝘼𝙈 𝙎𝘼𝙏𝙐𝙍𝙉 [𝘾𝙐𝙇𝙏]",
+      "SELFISH b2b NABEL",
+      "Extreme John"
+    ],
+    "description_original_lines": [
+      "𝙏𝙃𝘼𝙈 𝙎𝘼𝙏𝙐𝙍𝙉 [𝘾𝙐𝙇𝙏]",
+      "SELFISH b2b NABEL",
+      "Extreme John",
+      "OPENDECKS"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "上海|abyssshanghai|2026-06-05|65速报柏林地下鼠王tham空降‼️亲自喂药专治恋鼠癖",
+    "detail_path": "by-id/abyss_shanghaiu3aaa48f237993a769f.json",
+    "detail_url": "by-id/abyss_shanghaiu3aaa48f237993a769f.json",
+    "lineup_quality": {
+      "status": "verified",
+      "decision": "scoring_retained_lineup",
+      "note": "retained lineup artists with score >= 0.6: THAM, SATURN [CULT], Extreme John, SELFISH b2b NABEL"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/abyss_shanghai_aa48f237993a769f--56ef3096f00625f54b0ffd97.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/abyss_shanghai_aa48f237993a769f--56ef3096f00625f54b0ffd97.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/abyss_shanghai_aa48f237993a769f--56ef3096f00625f54b0ffd97.png",
+    "poster_cloud_path": "weekly-posters/20260604/abyss_shanghai_aa48f237993a769f--56ef3096f00625f54b0ffd97.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/abyss_shanghai_aa48f237993a769f--56ef3096f00625f54b0ffd97.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/abyss_shanghai_aa48f237993a769f--56ef3096f00625f54b0ffd97.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/abyss_shanghai_aa48f237993a769f--56ef3096f00625f54b0ffd97.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/abyss_shanghai_aa48f237993a769f--56ef3096f00625f54b0ffd97.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/abyss_shanghai_aa48f237993a769f--56ef3096f00625f54b0ffd97.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/abyss_shanghai_aa48f237993a769f--56ef3096f00625f54b0ffd97.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/abyss_shanghai_aa48f237993a769f--56ef3096f00625f54b0ffd97.png"
+  }
+}

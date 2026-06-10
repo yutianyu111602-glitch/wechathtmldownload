@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "flat_club:a2155eede469b668",
+  "sourceItemHash": "1a05e5273a88b6c5456a25dd79ae1308c3f6fd9be20adc56fd129b32a73f277c",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "FLAT：Kimmy6.6.6(HK)惊喜空降！🆓",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "22:00-02:30",
+      "city_name": "成都",
+      "venue_name": "FLAT Club",
+      "address_candidate": "四川省成都市成华区猛追湾街94号339购物中心A栋2层(海伦司旁)",
+      "lineup_artists": [
+        "Qzdada",
+        "D.SHU",
+        "Qzdada",
+        "D.SHU"
+      ],
+      "music_styles": [
+        "techno",
+        "house",
+        "disco",
+        "techno",
+        "house",
+        "disco",
+        "acid techno",
+        "hard techno",
+        "funky house"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "别错过这场律动盛宴! - Timetable - 22:00-23:30 Qzdada 23:30-01:00 D.SHU 01:00-02:30 KIMMY6.6.6(HK) 🕺Free Entry🕺 FLATClub . FLAT 的 HOUSE NATION 主题周末,今晚继续为你带来高能体验",
+        "别错过这场律动盛宴! - Timetable - 22:00-23:30 Qzdada 23:30-01:00 D.SHU 01:00-02:30 KIMMY6.6.6(HK) 🕺Free Entry🕺 FLATClub",
+        "独立电子音乐人 Qzdada 将用纯正 Funky House&Groove Disco 点燃舞池"
+      ],
+      "description_original_lines": [
+        "今晚｜FLAT：Kimmy6.6.6(HK)惊喜空降！🆓",
+        "🕺Free Entry🕺",
+        "别错过这场律动盛宴! - Timetable - 22:00-23:30 Qzdada 23:30-01:00 D.SHU 01:00-02:30 KIMMY6.6.6(HK) 🕺Free Entry🕺 FLATClub . FLAT 的 HOUSE NATION 主题周末,今晚继续为你带来高能体验",
+        "别错过这场律动盛宴! - Timetable - 22:00-23:30 Qzdada 23:30-01:00 D.SHU 01:00-02:30 KIMMY6.6.6(HK) 🕺Free Entry🕺 FLATClub"
+      ],
+      "ticketing_text": [
+        "Free Entry"
+      ],
+      "dedupe_signals": [
+        "FLAT：Kimmy6.6.6(HK)惊喜空降！🆓",
+        "2026-06-06",
+        "成都",
+        "FLAT Club"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

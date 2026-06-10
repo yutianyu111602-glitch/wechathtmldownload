@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "nuts:ba295258057c04d3",
+  "sourceItemHash": "b30e4efd0745923136f064e24b23c7ac961091746f1154fd75d61ef77e323a4b",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "毕业季听毕业歌——印尼emo乐队Murphy Radio | 坚果NUTS",
+      "event_date_start": "2026-06-12",
+      "event_date_end": "2026-06-12",
+      "event_time_text": "20:00",
+      "city_name": "重庆",
+      "venue_name": "坚果NUTS",
+      "address_candidate": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6/12 20:00",
+        "2026新专辑预热巡演",
+        "Poster OCR date: 2026-06-03 / 2026-06-05 / 2026-06-06 / 2026-06-07"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "毕业季听毕业歌——印尼emo乐队Murphy Radio | 坚果NUTS",
+        "2026-06-12",
+        "重庆",
+        "坚果NUTS"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

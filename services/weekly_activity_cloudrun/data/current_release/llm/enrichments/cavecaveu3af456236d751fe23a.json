@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "cavecave:f456236d751fe23a",
+  "sourceItemHash": "3c979bf34b0ed4a85265655513a3d25c02e2cd95e5413ddc97beecd30d97de75",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "【6.5周五】*洞洞杯街霸挑战赛*",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "22:30",
+      "city_name": "深圳",
+      "venue_name": "CaveCave",
+      "address_candidate": "广东省深圳市罗湖区红岭北路与桃园路交汇处粤华奥特城五楼",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "Fri. 22:30-1ate",
+        "Poster OCR time: 22:30"
+      ],
+      "ticketing_text": [
+        "门票30"
+      ],
+      "dedupe_signals": [
+        "【6.5周五】*洞洞杯街霸挑战赛*",
+        "2026-06-05",
+        "深圳",
+        "CaveCave"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

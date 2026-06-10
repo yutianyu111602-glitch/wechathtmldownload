@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "deepcool:9aba3c881843e3ea:schedule:20260605:1",
+  "sourceItemHash": "1f063879e5528d9b33f98255088729acc3e84834e4063ad694f88b7b08db8f7a",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "（周五）BIRD鸟人 | 南宁声音文化综合实践者：在阳光与深夜之间，找到 groove 的本体",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "00:00-01:30",
+      "city_name": "南宁",
+      "venue_name": "DEEPCOOL地库酒吧",
+      "address_candidate": "广西壮族自治区南宁市青秀区桂花路9号君耀香港园B1006",
+      "lineup_artists": [
+        "BIRD鸟人",
+        "BIRD鸟人"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "hip-hop"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "他是音乐人、Beatmaker、说唱创作者、DJ，也是一位声音文化观察者——BIRD鸟人，一个从南宁本土场景中生长出来的 多面体节奏生命体",
+        "从早期中文 Hip-Hop 场景中颇具影响力的说唱乐团 PNC，到 精气神 CheeProduction 厂牌的创作经历，再到 Beat 制作、DJ Set、电台节目 《流派大乱斗 StyleWar》，以及黑胶文化与听感实践的长期深耕——BIRD 鸟人的创作路径从未被单一身份框定，却始终绕不开三个关键词：groove、城市气候，以及人与人之间逐渐氧化的情绪",
+        "这一夜，BIRD鸟人会把他在 PNC 的街头叙事、精气神的厂牌审美、流派大乱斗的混音玩法，以及黑胶唱片的颗粒温度，全部装进他的 Set 里——从阳光下的南宁街头，到深夜地库的舞池中央，他用 groove 为时间染色"
+      ],
+      "description_original_lines": [
+        "DeepCool地库｜6/5（周五）BIRD鸟人｜南宁声音文化综合实践者：在阳光与深夜之间，找到 groove 的本体",
+        "6/5（周五）BIRD鸟人｜南宁声音文化综合实践者：在阳光与深夜之间，找到 groove 的本体",
+        "他是音乐人、Beatmaker、说唱创作者、DJ，也是一位声音文化观察者——BIRD鸟人，一个从南宁本土场景中生长出来的 多面体节奏生命体",
+        "从早期中文 Hip-Hop 场景中颇具影响力的说唱乐团 PNC，到 精气神 CheeProduction 厂牌的创作经历，再到 Beat 制作、DJ Set、电台节目 《流派大乱斗 StyleWar》，以及黑胶文化与听感实践的长期深耕——BIRD 鸟人的创作路径从未被单一身份框定，却始终绕不开三个关键词：groove、城市气候，以及人与人之间逐渐氧化的情绪"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "（周五）BIRD鸟人 | 南宁声音文化综合实践者：在阳光与深夜之间，找到 groove 的本体",
+        "2026-06-05",
+        "南宁",
+        "DEEPCOOL地库酒吧"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "deeproll:4cfb69e86b66f3f9",
+  "sourceItemHash": "f91d2449d5b2093059d8b195b379b2405bfce3f0a6e066d94877e3ed00656edb",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "喝！舞！虎！特！别！版！12位DJ双厅齐开车轮战！",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "01:00-02:00",
+      "city_name": "苏州",
+      "venue_name": "热情商店&电容Deep Roll",
+      "address_candidate": "江苏省苏州市姑苏区廖家巷28号唐寅故居文化区3栋102",
+      "lineup_artists": [
+        "Fischmonger",
+        "Fischmonger"
+      ],
+      "music_styles": [
+        "techno",
+        "house",
+        "breaks",
+        "trance",
+        "house",
+        "techno",
+        "neo rave",
+        "hard techno",
+        "breaks",
+        "trance"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06.05|喝！舞！虎！特！别！版！12位DJ双厅齐开车轮战！",
+        "集结江浙沪12位好手，热情&电容双厅齐开！",
+        "Fischmonger(南京)"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "喝！舞！虎！特！别！版！12位DJ双厅齐开车轮战！",
+        "2026-06-05",
+        "苏州",
+        "热情商店&电容Deep Roll"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

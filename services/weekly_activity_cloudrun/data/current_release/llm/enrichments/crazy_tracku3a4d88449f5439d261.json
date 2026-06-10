@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "crazy_track:4d88449f5439d261",
+  "sourceItemHash": "7db42324a58d1f0f6a6445c704c2c3cdd756271acb4d2ef4493bd4a22e68f785",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "周三：注意！旋律热浪扑面袭来",
+      "event_date_start": "2026-06-03",
+      "event_date_end": "2026-06-03",
+      "event_time_text": null,
+      "city_name": "北京",
+      "venue_name": "TRACK",
+      "address_candidate": "北京市朝阳区751园区火车街区3号车厢",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6月3日·周三：注意！旋律热浪扑面袭来"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "周三：注意！旋律热浪扑面袭来",
+        "2026-06-03",
+        "北京",
+        "TRACK"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

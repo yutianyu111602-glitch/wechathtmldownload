@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "exit_shanghai:11efb162f7194d3d",
+  "sourceItemHash": "7fca22426baaecebc1c4f8cbcae88d8cae0fa1a9cc74967c1b0df5c2bd652a46",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Interzone, Ltd. (间域有限公司) · 夏令时调整",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "22:00-23:00",
+      "city_name": "上海",
+      "venue_name": "EXIT Club",
+      "address_candidate": "上海市长宁区新华路街道幸福路298号",
+      "lineup_artists": [],
+      "music_styles": [
+        "house",
+        "house"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.5 周五 | Interzone, Ltd. (间域有限公司) · 夏令时调整",
+        "预售 88¥",
+        "双人 168¥",
+        "现场 118¥"
+      ],
+      "ticketing_text": [
+        "预售 88¥ / 双人 168¥ / 现场 118¥ / 3am 后免费入场"
+      ],
+      "dedupe_signals": [
+        "Interzone, Ltd. (间域有限公司) · 夏令时调整",
+        "2026-06-05",
+        "上海",
+        "EXIT Club"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "hakka_bar:030867d1a5b9c944",
+    "event_id": "hakka_bar:030867d1a5b9c944",
+    "article_id": "hakka_bar:030867d1a5b9c944",
+    "queue_id": "hakka_bar:030867d1a5b9c944",
+    "title": "06.07 周日 |「OPEN DECKS」 ·   150XS",
+    "title_original": "06.07 周日 |「OPEN DECKS」 ·   150XS",
+    "title_display": "「OPEN DECKS」 ·   150XS",
+    "account": "院吧 Hakka Bar",
+    "account_key": "hakka_bar",
+    "promoter": "院吧 Hakka Bar",
+    "source_article": {
+      "url_hash": "030867d1a5b9c944",
+      "account_name": "院吧 Hakka Bar",
+      "published_at": "2026-06-01"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "030867d1a5b9c944",
+      "disabled_reason": ""
+    },
+    "aggregation_child": false,
+    "post_date": "2026-06-01",
+    "source_account_name": "院吧 Hakka Bar",
+    "source_published_at": "2026-06-01",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+    "poster_source": "cloudbase_storage_from_wechat_article",
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "event_date_text": [
+      "2026-06-07"
+    ],
+    "event_date_iso_guess": "2026-06-07",
+    "event_date_iso_guesses": [
+      "2026-06-07"
+    ],
+    "event_date_start": "2026-06-07",
+    "event_date_end": "2026-06-07",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "成都"
+    ],
+    "city_key": "chengdu",
+    "city_name": "成都",
+    "city_keys": [
+      "chengdu"
+    ],
+    "venue": [],
+    "venue_id": "hakka_bar_chengdu",
+    "venue_name": "Hakkabar 院吧",
+    "address": "四川省成都市武侯区玉林街道科华北路60号科华沸城12楼1201",
+    "address_full": "四川省成都市武侯区玉林街道科华北路60号科华沸城12楼1201",
+    "address_source": "manual_registry",
+    "geo_lng": 104.076219,
+    "geo_lat": 30.624273,
+    "lineup": [
+      "150XS"
+    ],
+    "lineup_artists": [
+      "150XS"
+    ],
+    "genres": [],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "06.07 周日 |「OPEN DECKS」 · 150XS",
+      "2026-06-07",
+      "跃跃欲试的新手们，快来报名！",
+      "http://mmbiz.qpic.cn/sz_mmbiz_png/ogUhhaxnCtAZOodicx4PFlsMRTwic2icGjhB6prniaY8eMkGT6npovhNCURf2DQ3rf88k8jTINAkKLPScJicnONHU8hDe1yrSqc7ylEbPpT13dsw/0?wx_fmt=png",
+      "https://mmbiz.qpic.cn/mmbiz_jpg/ogUhhaxnCtAlV8f3CmZQnuKriaLW5ZEo4BMwle003TYm3tKf57ZVElVc0icDqhZHsYHzNhH5BnTyH1ol8R8gxiaTmbhpMnBmmCUT9AG0Y5Zzxc/640?wx_fmt=jpeg&from=appmsg"
+    ],
+    "description_original_lines": [
+      "06.07 周日 |「OPEN DECKS」 · 150XS",
+      "跃跃欲试的新手们，快来报名！",
+      "OPEN",
+      "06.07星期日"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "成都|hakkabar院吧|2026-06-07|「opendecks」150xs",
+    "detail_path": "by-id/hakka_baru3a030867d1a5b9c944.json",
+    "detail_url": "by-id/hakka_baru3a030867d1a5b9c944.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster_cloud_path": "weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+    "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+    "poster_public_source_hash": "74519612ea8c4708",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg"
+  }
+}

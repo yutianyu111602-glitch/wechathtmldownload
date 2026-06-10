@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "defun:c1fe0c09fe78ba44",
+  "sourceItemHash": "158e8fa2365efa2a4f0851c0ea38aad971528c595283b7ae59818cb82377e38c",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "19Hz w.Fractale (IT) DNB_Dubstep_Breaks @DEFUN",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "上海",
+      "venue_name": "DEFUN",
+      "address_candidate": "上海市普陀区长寿路401号亚新生活广场",
+      "lineup_artists": [
+        "FRACTALE",
+        "FRACTALE"
+      ],
+      "music_styles": [
+        "bass",
+        "drum & bass",
+        "breaks",
+        "drum & bass",
+        "dubstep",
+        "breaks",
+        "bass",
+        "jungle",
+        "UK garage"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "6.5｜19Hz w.Fractale (IT) DNB_Dubstep_Breaks @DEFUN",
+        "这场特别企划中，我们欢迎 Fractale 回归——来自老上海 DnB 场景的熟悉信号",
+        "为了让这次重聚更加完整，中国 Drum & Bass OG 女王 Siesta 也将加入系统，与 Yadong 以及 19Hz 常驻成员 Aho 和 Kalapas 一同带来整夜声压"
+      ],
+      "description_original_lines": [
+        "6.5｜19Hz w.Fractale (IT) DNB_Dubstep_Breaks @DEFUN",
+        "免票Free Entry",
+        "上海普陀区长寿路401号亚新广场一楼中庭 DEFUN Atrium",
+        "这一次，19Hz 将暂时离开熟悉坐标，接入上海地下场景最新的场地之一：DEFUN"
+      ],
+      "ticketing_text": [
+        "免票"
+      ],
+      "dedupe_signals": [
+        "19Hz w.Fractale (IT) DNB_Dubstep_Breaks @DEFUN",
+        "2026-06-05",
+        "上海",
+        "DEFUN"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

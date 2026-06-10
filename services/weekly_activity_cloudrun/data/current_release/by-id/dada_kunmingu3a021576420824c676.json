@@ -1,0 +1,200 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "dada_kunming:021576420824c676",
+    "event_id": "dada_kunming:021576420824c676",
+    "article_id": "dada_kunming:021576420824c676",
+    "queue_id": "dada_kunming:021576420824c676",
+    "title": "周六 6月6日-【Love Bang】成立16周年巡演派对-昆明站@Dada Kunming",
+    "title_original": "周六 6月6日-【Love Bang】成立16周年巡演派对-昆明站@Dada Kunming",
+    "title_display": "周六 6月6日-【Love Bang】成立16周年巡演派对-昆明站@Dada Kunming",
+    "account": "Dada Kunming",
+    "account_key": "dada_kunming",
+    "promoter": "Dada Kunming",
+    "source_article": {
+      "url_hash": "021576420824c676",
+      "account_name": "Dada Kunming",
+      "published_at": "2026-06-03"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "021576420824c676"
+    },
+    "post_date": "2026-06-03",
+    "source_account_name": "Dada Kunming",
+    "source_published_at": "2026-06-03",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "昆明"
+    ],
+    "city_key": "kunming",
+    "city_name": "昆明",
+    "city_keys": [
+      "kunming"
+    ],
+    "venue": [],
+    "venue_id": "dada_kunming",
+    "venue_name": "Dada Kunming",
+    "address": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+    "address_full": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+    "address_source": "manual_registry",
+    "geo_lng": 102.691192,
+    "geo_lat": 25.053387,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "hip-hop",
+      "house",
+      "techno",
+      "electro",
+      "club music",
+      "bass"
+    ],
+    "music_styles": [
+      "hip-hop",
+      "techno",
+      "house",
+      "club trax"
+    ],
+    "price": [
+      "TICKETS 30RMB",
+      "免票"
+    ],
+    "price_text": "TICKETS 30RMB / 免票",
+    "ticketing_text": "TICKETS 30RMB / 免票",
+    "evidence": [
+      "周六 6月6日-【Love Bang】成立16周年巡演派对-昆明站@Dada Kunming",
+      "免票·免票·免票",
+      "00:00前购票可得30元酒卡 (仅限派对当晚使用)",
+      "2026-06-06",
+      "享受颠簸·享受Love Bang"
+    ],
+    "description_original_lines": [
+      "免票·免票·免票",
+      "00:00前购票可得30元酒卡 (仅限派对当晚使用)",
+      "享受颠簸·享受Love Bang",
+      "Love Bang"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [
+      {
+        "artist_id": "dj_0c0a37f4",
+        "canonical_name": "Heatwolves",
+        "matched_name": "Heatwolves",
+        "verified": true,
+        "source": "dj_profiles",
+        "city": "China",
+        "genres": [],
+        "bio": "",
+        "links": [
+          "https://soundcloud.com/heatwolves",
+          "https://app.chartmetric.com/artist/6840820",
+          "https://ra.co/dj/heatwolves",
+          "https://pl.ra.co/events/1873920",
+          "https://www.youtube.com/user/HeatWolves/videos"
+        ]
+      },
+      {
+        "artist_id": "dj_419a38f7",
+        "canonical_name": "Just Alexander",
+        "matched_name": "Just Alexander",
+        "verified": true,
+        "source": "dj_profiles",
+        "city": "Shanghai",
+        "genres": [],
+        "bio": "",
+        "links": [
+          "https://www.instagram.com/alexandermixes/",
+          "https://soundcloud.com/justalexander",
+          "https://ra.co/dj/justalexander",
+          "https://www.xiaohongshu.com/user/profile/6837035f000000001b01adcc"
+        ]
+      }
+    ],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "昆明|dadakunming|2026-06-06|周六6月6日lovebang成立16周年巡演派对昆明站dadakunming",
+    "detail_path": "by-id/dada_kunmingu3a021576420824c676.json",
+    "detail_url": "by-id/dada_kunmingu3a021576420824c676.json",
+    "merge_provenance": {
+      "schema_version": "weekly_merge_provenance.v1",
+      "reason": "duplicate_cluster",
+      "retained_id": "dada_kunming:021576420824c676",
+      "retained_source_hash": "021576420824c676",
+      "merged_from": [
+        "dada_kunming:682fcafb85842c99",
+        "dada_kunming:021576420824c676"
+      ],
+      "merged_source_hashes": [
+        "021576420824c676",
+        "682fcafb85842c99"
+      ],
+      "source_count": 2,
+      "sources": [
+        {
+          "event_id": "dada_kunming:682fcafb85842c99",
+          "source_hash": "682fcafb85842c99",
+          "title": "周六 6月6日-【Love Bang】成立16周年巡演派对-昆明站@Dada Kunming",
+          "published_at": "2026-06-02",
+          "account_name": "dada_kunming",
+          "source_type": "wechat_article"
+        },
+        {
+          "event_id": "dada_kunming:021576420824c676",
+          "source_hash": "021576420824c676",
+          "title": "周六 6月6日-【Love Bang】成立16周年巡演派对-昆明站@Dada Kunming",
+          "published_at": "2026-06-03",
+          "account_name": "Dada Kunming",
+          "source_type": "wechat_article"
+        }
+      ]
+    },
+    "lineup_display_hint": "点击海报跳转公众号原文查看",
+    "lineup_quality": {
+      "status": "uncertain",
+      "decision": "cleared_untrusted_lineup",
+      "note": "public mini-program policy: lineup was prose, aggregate text, bio-like text, or not source-grounded enough for display"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg"
+  }
+}

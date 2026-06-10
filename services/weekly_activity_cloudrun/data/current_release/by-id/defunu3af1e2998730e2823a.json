@@ -1,0 +1,149 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "defun:f1e2998730e2823a",
+    "event_id": "defun:f1e2998730e2823a",
+    "article_id": "defun:f1e2998730e2823a",
+    "queue_id": "defun:f1e2998730e2823a",
+    "title": "6.7 | “小孩桌”2.0 HIPHOP NIGHT GUEST&RANGE&DEFUN",
+    "title_original": "6.7 | “小孩桌”2.0 HIPHOP NIGHT GUEST&RANGE&DEFUN",
+    "title_display": "“小孩桌”2.0 HIPHOP NIGHT GUEST&RANGE&DEFUN",
+    "account": "DEFUN",
+    "account_key": "defun",
+    "promoter": "DEFUN",
+    "source_article": {
+      "url_hash": "f1e2998730e2823a",
+      "account_name": "DEFUN",
+      "published_at": "2026-05-31"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "f1e2998730e2823a",
+      "disabled_reason": ""
+    },
+    "aggregation_child": false,
+    "post_date": "2026-05-31",
+    "source_account_name": "DEFUN",
+    "source_published_at": "2026-05-31",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+    "poster_source": "cloudbase_storage_from_wechat_article",
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "event_date_text": [
+      "2026-06-07"
+    ],
+    "event_date_iso_guess": "2026-06-07",
+    "event_date_iso_guesses": [
+      "2026-06-07"
+    ],
+    "event_date_start": "2026-06-07",
+    "event_date_end": "2026-06-07",
+    "event_time_text": "21:00 - Late",
+    "event_time_source": "source_text",
+    "time_start": "21:00",
+    "time_end": "Late",
+    "running_hours_text": "21:00 - Late",
+    "running_hours_source": "source_text",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [],
+    "venue_id": "defun_shanghai",
+    "venue_name": "DEFUN",
+    "address": "上海市普陀区长寿路401号亚新生活广场",
+    "address_full": "上海市普陀区长寿路401号亚新生活广场",
+    "address_source": "venue_registry_verified",
+    "geo_lng": 121.437551,
+    "geo_lat": 31.239228,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "hip-hop"
+    ],
+    "music_styles": [
+      "hip-hop"
+    ],
+    "price": [
+      "FREE ENTRY"
+    ],
+    "price_text": "FREE ENTRY",
+    "ticketing_text": "FREE ENTRY",
+    "evidence": [
+      "6.7 | “小孩桌”2.0 HIPHOP NIGHT GUEST&RANGE&DEFUN",
+      "FREE ENTRY",
+      "2026-06-07",
+      "21:00-LATE",
+      "“小孩桌2.0” HIPHOP NIGHT GUEST&RANGE&DEFUN"
+    ],
+    "description_original_lines": [
+      "6.7 | “小孩桌”2.0 HIPHOP NIGHT GUEST&RANGE&DEFUN",
+      "FREE ENTRY",
+      "21:00-LATE",
+      "“小孩桌2.0” HIPHOP NIGHT GUEST&RANGE&DEFUN"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "上海|defun|2026-06-07|小孩桌20hiphopnightguest&range&defun",
+    "detail_path": "by-id/defunu3af1e2998730e2823a.json",
+    "detail_url": "by-id/defunu3af1e2998730e2823a.json",
+    "address_verification": {
+      "decision": "registry_over_poster_ocr_address",
+      "note": "poster OCR address conflicts with the verified venue registry; public release keeps the registry address instead of OCR-only override",
+      "rejected_source_address": "GUESTRANGE 普陀区长寿路401号亚新广场1楼中庭 Atrium, G/F, Yaxin Plaza, No.401, Changshou Road"
+    },
+    "venue_lat": 31.239228,
+    "venue_lng": 121.437551,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "frontend_verified_map_location_book",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "defun_shanghai",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster_cloud_path": "weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+    "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+    "poster_public_source_hash": "01797ed84c4634ed",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png"
+  }
+}

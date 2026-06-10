@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "knock_knockclub:76f1c481f6ad213b",
+  "sourceItemHash": "e73d1bf1d19aee6fb284c81d2498cb73588400ee1e75fe9ebaf9a6f2e729ed79",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "0606 | @敲敲俱乐部【我不高考了】校服主题派对",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "长春",
+      "venue_name": "敲敲电子俱乐部",
+      "address_candidate": "吉林省长春市朝阳区桂林街道新疆街西康路交汇处长白山宾馆后院叁叁火锅后身",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "每周二休息(節假日除外)"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "0606 | @敲敲俱乐部【我不高考了】校服主题派对",
+        "2026-06-06",
+        "长春",
+        "敲敲电子俱乐部"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

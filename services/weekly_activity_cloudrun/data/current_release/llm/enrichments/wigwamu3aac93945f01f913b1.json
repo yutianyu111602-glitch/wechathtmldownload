@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "wigwam:ac93945f01f913b1",
+  "sourceItemHash": "8c48f86cea483b99970d44ced7efb72af68584e10faebc8fdeebe983ce28cb97",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Listening 🔮 w/ Notte Infinita",
+      "event_date_start": "2026-06-04",
+      "event_date_end": "2026-06-04",
+      "event_time_text": "03:00",
+      "city_name": "上海",
+      "venue_name": "wigwam",
+      "address_candidate": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+      "lineup_artists": [
+        "Notte Infinita",
+        "Notte Infinita"
+      ],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "今晚 Listening 🔮 w/ Notte Infinita",
+        "Free Entry",
+        "Opening Hours",
+        "Poster OCR time: 03:00"
+      ],
+      "ticketing_text": [
+        "免票入场"
+      ],
+      "dedupe_signals": [
+        "Listening 🔮 w/ Notte Infinita",
+        "2026-06-04",
+        "上海",
+        "wigwam"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

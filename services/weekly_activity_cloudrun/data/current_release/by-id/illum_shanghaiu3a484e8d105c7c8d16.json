@@ -1,0 +1,152 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "illum_shanghai:484e8d105c7c8d16",
+    "event_id": "illum_shanghai:484e8d105c7c8d16",
+    "article_id": "illum_shanghai:484e8d105c7c8d16",
+    "queue_id": "illum_shanghai:484e8d105c7c8d16",
+    "title": "06/06 Sat.｜3v3v3v3 Brutal Hardcore Battle 硬核竞技场",
+    "title_original": "06/06 Sat.｜3v3v3v3 Brutal Hardcore Battle 硬核竞技场",
+    "title_display": "Sat. | 3v3v3v3 Brutal Hardcore Battle 硬核竞技场",
+    "account": "ILLUM Shanghai",
+    "account_key": "illum_shanghai",
+    "promoter": "ILLUM Shanghai",
+    "source_article": {
+      "url_hash": "484e8d105c7c8d16",
+      "account_name": "ILLUM Shanghai",
+      "published_at": "2026-06-03"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "484e8d105c7c8d16"
+    },
+    "post_date": "2026-06-03",
+    "source_account_name": "ILLUM Shanghai",
+    "source_published_at": "2026-06-03",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/illum_shanghai_484e8d105c7c8d16--2ca2657b104c989f40f1deed.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/illum_shanghai_484e8d105c7c8d16--2ca2657b104c989f40f1deed.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/illum_shanghai_484e8d105c7c8d16--2ca2657b104c989f40f1deed.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "10:00",
+    "event_time_source": "source_text",
+    "time_start": "10:00",
+    "time_end": "",
+    "running_hours_text": "10:00",
+    "running_hours_source": "source_text",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [],
+    "venue_id": "illum_shanghai",
+    "venue_name": "ILLUM Shanghai",
+    "address": "上海市长宁区昭化路658号海粟文化广场D栋地下一层LG-16室",
+    "address_full": "上海市长宁区昭化路658号海粟文化广场D栋地下一层LG-16室",
+    "address_source": "manual_registry",
+    "geo_lng": 121.419529,
+    "geo_lat": 31.210481,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "hardcore",
+      "electro",
+      "hard techno",
+      "hardstyle",
+      "gabber",
+      "rawstyle"
+    ],
+    "music_styles": [
+      "techno",
+      "electro"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "06/06 Sat.｜3v3v3v3 Brutal Hardcore Battle 硬核竞技场",
+      "2026-06-06"
+    ],
+    "description_original_lines": [
+      "06/06 Sat.｜3v3v3v3 Brutal Hardcore Battle 硬核竞技场",
+      "周五、周六"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "上海|illumshanghai|2026-06-06|sat3v3v3v3brutalhardcorebattle硬核竞技场",
+    "detail_path": "by-id/illum_shanghaiu3a484e8d105c7c8d16.json",
+    "detail_url": "by-id/illum_shanghaiu3a484e8d105c7c8d16.json",
+    "merge_provenance": {
+      "schema_version": "weekly_merge_provenance.v1",
+      "reason": "duplicate_cluster",
+      "retained_id": "illum_shanghai:484e8d105c7c8d16",
+      "retained_source_hash": "484e8d105c7c8d16",
+      "merged_from": [
+        "illum_shanghai:d42da70cc866d2da",
+        "illum_shanghai:484e8d105c7c8d16"
+      ],
+      "merged_source_hashes": [
+        "484e8d105c7c8d16",
+        "d42da70cc866d2da"
+      ],
+      "source_count": 2,
+      "sources": [
+        {
+          "event_id": "illum_shanghai:d42da70cc866d2da",
+          "source_hash": "d42da70cc866d2da",
+          "title": "Sat. | 3v3v3v3 Brutal Hardcore Battle 硬核竞技场",
+          "published_at": "2026-06-01",
+          "account_name": "illum_shanghai",
+          "source_type": "wechat_article"
+        },
+        {
+          "event_id": "illum_shanghai:484e8d105c7c8d16",
+          "source_hash": "484e8d105c7c8d16",
+          "title": "Sat. | 3v3v3v3 Brutal Hardcore Battle 硬核竞技场",
+          "published_at": "2026-06-03",
+          "account_name": "ILLUM Shanghai",
+          "source_type": "wechat_article"
+        }
+      ]
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/illum_shanghai_484e8d105c7c8d16--2ca2657b104c989f40f1deed.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/illum_shanghai_484e8d105c7c8d16--2ca2657b104c989f40f1deed.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/illum_shanghai_484e8d105c7c8d16--2ca2657b104c989f40f1deed.png",
+    "poster_cloud_path": "weekly-posters/20260604/illum_shanghai_484e8d105c7c8d16--2ca2657b104c989f40f1deed.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/illum_shanghai_484e8d105c7c8d16--2ca2657b104c989f40f1deed.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/illum_shanghai_484e8d105c7c8d16--2ca2657b104c989f40f1deed.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/illum_shanghai_484e8d105c7c8d16--2ca2657b104c989f40f1deed.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/illum_shanghai_484e8d105c7c8d16--2ca2657b104c989f40f1deed.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/illum_shanghai_484e8d105c7c8d16--2ca2657b104c989f40f1deed.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/illum_shanghai_484e8d105c7c8d16--2ca2657b104c989f40f1deed.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/illum_shanghai_484e8d105c7c8d16--2ca2657b104c989f40f1deed.png"
+  }
+}

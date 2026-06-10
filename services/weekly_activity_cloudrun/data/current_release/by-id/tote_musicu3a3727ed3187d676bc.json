@@ -1,0 +1,112 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "tote_music:3727ed3187d676bc",
+    "event_id": "tote_music:3727ed3187d676bc",
+    "article_id": "tote_music:3727ed3187d676bc",
+    "queue_id": "tote_music:3727ed3187d676bc",
+    "title": "【6/13 周六】VAE SOLIS 暗黑舞会 + Sonic Youth Nirvana 纪录片放映",
+    "title_original": "【6/13 周六】VAE SOLIS 暗黑舞会 + Sonic Youth Nirvana 纪录片放映",
+    "title_display": "【6/13 周六】VAE SOLIS 暗黑舞会 + Sonic Youth Nirvana 纪录片放映",
+    "account": "陀地音乐TOTE MUSIC",
+    "account_key": "tote_music",
+    "promoter": "陀地音乐TOTE MUSIC",
+    "source_article": {
+      "url_hash": "3727ed3187d676bc",
+      "account_name": "陀地音乐TOTE MUSIC",
+      "published_at": "2026-06-06"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "3727ed3187d676bc",
+      "disabled_reason": ""
+    },
+    "aggregation_child": false,
+    "post_date": "2026-06-06",
+    "source_account_name": "陀地音乐TOTE MUSIC",
+    "source_published_at": "2026-06-06",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a3727ed3187d676bc--a90ae578cbd38bfaef5f.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a3727ed3187d676bc--a90ae578cbd38bfaef5f.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a3727ed3187d676bc--a90ae578cbd38bfaef5f.jpg",
+    "poster_source": "cloudbase_storage_from_wechat_article",
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "event_date_text": [
+      "2026-06-13"
+    ],
+    "event_date_iso_guess": "2026-06-13",
+    "event_date_iso_guesses": [
+      "2026-06-13"
+    ],
+    "event_date_start": "2026-06-13",
+    "event_date_end": "2026-06-13",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "广州"
+    ],
+    "city_key": "guangzhou",
+    "city_name": "广州",
+    "city_keys": [
+      "guangzhou"
+    ],
+    "venue": [],
+    "venue_id": "tote_store_guangzhou",
+    "venue_name": "陀地士多 Tote Store",
+    "address": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+    "address_full": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+    "address_source": "manual_registry",
+    "geo_lng": 113.262634,
+    "geo_lat": 23.097666,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "【6/13 周六】VAE SOLIS 暗黑舞会 + Sonic Youth Nirvana 纪录片放映",
+      "2026-06-13",
+      "一起来陀地士多，看看经典纪录片再舞入暗黑音乐派对！"
+    ],
+    "description_original_lines": [
+      "一起来陀地士多，看看经典纪录片再舞入暗黑音乐派对！"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "广州|陀地士多totestore|2026-06-13|613周六vaesolis暗黑舞会+sonicyouthnirvana纪录片放映",
+    "detail_path": "by-id/tote_musicu3a3727ed3187d676bc.json",
+    "detail_url": "by-id/tote_musicu3a3727ed3187d676bc.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a3727ed3187d676bc--a90ae578cbd38bfaef5f.jpg",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a3727ed3187d676bc--a90ae578cbd38bfaef5f.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a3727ed3187d676bc--a90ae578cbd38bfaef5f.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a3727ed3187d676bc--a90ae578cbd38bfaef5f.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a3727ed3187d676bc--a90ae578cbd38bfaef5f.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a3727ed3187d676bc--a90ae578cbd38bfaef5f.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster_cloud_path": "weekly-posters/20260607/tote_musicu3a3727ed3187d676bc--a90ae578cbd38bfaef5f.jpg",
+    "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+    "poster_public_source_hash": "a90ae578cbd38bfa",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a3727ed3187d676bc--a90ae578cbd38bfaef5f.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a3727ed3187d676bc--a90ae578cbd38bfaef5f.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a3727ed3187d676bc--a90ae578cbd38bfaef5f.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a3727ed3187d676bc--a90ae578cbd38bfaef5f.jpg"
+  }
+}

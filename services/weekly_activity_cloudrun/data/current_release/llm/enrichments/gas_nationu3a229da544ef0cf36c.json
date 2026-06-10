@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "gas_nation:229da544ef0cf36c",
+  "sourceItemHash": "b6500891b64bbc8227c5bec43fd45dbd3608bf96c6626cd72de26baf6032b10c",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "本周五【鸡飞狗跳】S.M.S.H + Bearback “碉堡Pillbox双雄”做客津门GAS俱乐部",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "21:30 - Late",
+      "city_name": "天津",
+      "venue_name": "Gas Nation氣厂",
+      "address_candidate": "天津市河西区万科广场（人民公园店）4楼露台",
+      "lineup_artists": [
+        "S.M.S.H",
+        "Bearback",
+        "S.M.S.H",
+        "Bearback"
+      ],
+      "music_styles": [
+        "techno",
+        "house",
+        "electro",
+        "breaks",
+        "techno",
+        "house",
+        "electro",
+        "breaks",
+        "hard techno",
+        "minimal techno"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "本周六之夜，GAS邀请到北京 派对厂牌 SAFEROOM似福绒 / 俱乐部 PILLBOX碉堡 核心成员S.M.S.H&Bearback，为津门舞池带来高速锐舞能量！“去规则化”的狂热是似福绒SAFEROOM一直以来所坚持的审美内核"
+      ],
+      "description_original_lines": [
+        "如果说高能享乐主义是派对血液里最狂野的基因，那么《鸡飞狗跳》系列，便是那个亲手将这股电流引入国内舞池的“始作俑者”",
+        "在那个被温吞律动与陈旧规则长期占据的压抑期，新一代舞客对超高能量的渴望早已积压成疾",
+        "是似福绒 SAFEROOM 捕捉到了这股暗涌，以《鸡飞狗跳》为名，将那股曾在 90 年代至千禧年间令整个欧洲 Raving 场景癫狂的Hard浪潮，以前所未有的姿态，完整且纯粹地嫁接到了这片土地",
+        "本周六之夜，GAS邀请到北京 派对厂牌 SAFEROOM似福绒 / 俱乐部 PILLBOX碉堡 核心成员S.M.S.H&Bearback，为津门舞池带来高速锐舞能量！“去规则化”的狂热是似福绒SAFEROOM一直以来所坚持的审美内核"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "本周五【鸡飞狗跳】S.M.S.H + Bearback “碉堡Pillbox双雄”做客津门GAS俱乐部",
+        "2026-06-05",
+        "天津",
+        "Gas Nation氣厂"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

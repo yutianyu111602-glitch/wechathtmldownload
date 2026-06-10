@@ -1,0 +1,176 @@
+# WeChat History HTML Pipeline
+
+Updated: 2026-05-26
+
+This repository is the current `wechathtmldownload` / `wechat-ingest` working repo at `C:\code\githubstar\wechathtmldownload`.
+
+It is a self-use pipeline for collecting WeChat history URLs, capturing article/archive bundles, retaining local assets, converting article HTML/archive bundles into Markdown and LLM-ready artifacts, running downstream LLM stages, and operating the PC UI / Electron workbench around those artifacts.
+
+2026-05-19 atlas-thread authority:
+
+- `docs/ELECTRONIC_MUSIC_GRAPH_CURRENT_AUTHORITY_20260518.md`
+- `docs/ELECTRONIC_MUSIC_GRAPH_PIPELINE_STAGE_MAP_20260518.md`
+- `tools/stage7_rewrite/STAGE7_GRAPH_CURRENT_AUTHORITY_20260518.md`
+- `tools/stage7_rewrite/reports/atlas_full_source_lineage_47k_93k_gap_20260519/atlas_full_source_lineage.md`
+
+For the current China underground/electronic music atlas thread, the product line is **中国地下电子音乐图鉴**. Graph markers, vector retrieval, and network/social evidence are the atlas data and search substrate. Stage7 is one large production stage inside the whole pipeline. Weekly/miniprogram artifacts are downstream consumer evidence unless explicitly routed.
+
+2026-05-31 Atlas / Weekly deploy-upload preflight: before any future CloudRun deploy or mini-program upload claim, run `npm run weekly:deploy-upload:preflight`. It executes the DB2/DB3 relation-field integrity guard, `weekly-api:test`, and selected mini-program static tests, while excluding deploy/upload/review/geocode/rebuild/LLM/key-read actions. Current report: `reports\WEEKLY_DEPLOY_UPLOAD_PREFLIGHT_S26_20260531.md`.
+
+2026-05-31 DJ Interview local intake: use `npm run weekly:dj-interview:import -- --input <file-or-dir> --dry-run` with `services\weekly_activity_cloudrun\templates\dj_interview_intake_template.md` to validate Markdown/JSON/JSONL drafts before importing them into the private sidecar and redacted review workbench. Current report: `reports\WEEKLY_DJ_INTERVIEW_INTAKE_S27_20260531.md`.
+
+2026-05-31 mini-program external-link action: `apps\weekly_activity_miniprogram\utils\externalLinkAction.js` and `pages\interview\interview.*` copy mixtape/Instagram original links and reject direct media file URLs before submit. No audio/video download, cache, proxy, embed, or republish path is added. Current report: `reports\WEEKLY_MINIPROGRAM_EXTERNAL_LINK_ACTION_S28_20260531.md`.
+
+2026-05-31 deploy/upload preflight expansion: `tools\stage7_rewrite\scripts\run_weekly_deploy_upload_preflight.py` now dynamically includes every `apps\weekly_activity_miniprogram\tests\*.test.cjs` file, including `external-link-action` and `page-event-handler-coverage`. Current report: `reports\WEEKLY_DEPLOY_UPLOAD_PREFLIGHT_FULL_MINIAPP_S30_20260531.md`; real S30 preflight passed `20/21` with the explicit-key Clean-CI gate skipped.
+
+2026-05-31 mini-program event-handler coverage: `apps\weekly_activity_miniprogram\tests\page-event-handler-coverage.test.cjs` scans every page in `app.json` and verifies static WXML event handlers resolve to page JS methods. `share-wiring.test.cjs` also derives native-share coverage from `app.json`. Current report: `reports\WEEKLY_MINIPROGRAM_EVENT_HANDLER_COVERAGE_S29_20260531.md`; S29 local preflight passed `8/9` with the explicit-key Clean-CI gate skipped, and CodeGraph pending is `0/0/0`.
+
+2026-05-26 T6 manual participant source/OCR localization note: `reports\ATLAS_T6_MANUAL_PARTICIPANT_SOURCE_OCR_LOCALIZATION_PROBE_20260526.md` is the latest report-only Q6 gate. It consumes the single source/OCR recovery work order, finds source DB article rows `1`, source URL sidecar rows `1`, exact-date candidates `1`, but OCR/Markdown candidate rows `0`; acceptance-ready rows remain `0`. No OCR execution, network/model call, source/raw Atlas DB mutation, serving SQLite rebuild/write, graph/vector/DB production write, public pointer, deploy, upload/review, memory, credential, 9router, or D: root action occurred.
+
+2026-05-23 Atlas serving promotion note: the current selected public-safe local serving candidate is `reports\atlas_serving_field_repair_fullcomplete_strict_20260523-1658\atlas_serving.sqlite`. The report-only production execution packet is `reports\atlas_serving_production_execution_packet_20260523_2119\atlas_serving_production_execution_packet.md`; it records rollout, rollback, and post-write verification steps, but no public pointer update, deploy, Neo4j/Qdrant write, or remote-effective promotion has been executed by that packet. A 2026-05-23 22:20 public-target prewrite smoke against `https://atlas.huaidj.club` was blocked by 403/session-gated Stage7 API responses.
+
+2026-05-25 Q5/Q6 product-truth mutation note: `reports\ATLAS_Q5_Q6_PRODUCT_TRUTH_MUTATION_PACKET_20260525.md` is the latest report-only gate after the Q5/Q6 promotion review. It defines `3` local Neo4j staging social-profile edge metadata targets plus readback and rollback Cypher for Gekko, FullHouse, and 4Tael. It did not execute Neo4j writes, identity proof promotion, avatar display, public serving fields, production graph labels, Qdrant/SQLite writes, public pointer updates, deploy/upload/review, or memory writes.
+
+2026-05-25 T6 YYYY identity acceptance note: `reports\ATLAS_T6_YYYY_IDENTITY_ACCEPTANCE_GATE_20260525.md` is the latest report-only sidecar packet. It joins the accepted local source-context row for `YYYY` with rendered public SoundCloud profile evidence from `reports\ATLAS_T6_YYYY_RENDERED_PROFILE_EVIDENCE_PACKET_20260525.md`, marks `YYYY` as a staging-review identity candidate, and keeps accepted_for_graph, identity_proof promotion, avatar display, public serving field, and graph_write_allowed at `0`. `Cod.Act` remains blocked without local source context; no graph/vector/DB write, public pointer, deploy/upload/review, memory, network/model/paid API, secret, or D: root action occurred.
+
+2026-05-26 T6 broader recovery acceptance note: `reports\ATLAS_T6_BROADER_RECOVERY_ACCEPTANCE_GATE_20260526.md` is the latest report-only T6 gate. It consumes the 320-row broader recovery combined review slice, finds `0` deterministic acceptance-ready rows, `114` manual participant review candidates, and leak hits `0/0/0`. It does not accept graph facts, rebuild serving, write source/raw Atlas DB, update public pointer, deploy, write graph/vector/DB state, upload/review, write memory, call network/model/paid APIs, read credentials, use 9router, or scan D: roots.
+
+2026-05-25 T5 venue alias/lineage acceptance note: `reports\ATLAS_T5_VENUE_ALIAS_LINEAGE_ACCEPTANCE_GATE_20260525.md` is the latest report-only Q5 venue gate. It consumes the 20:11 alias/lineage follow-up outputs, checks selected serving SQLite read-only, and records decision `atlas_dj_venue_alias_lineage_acceptance_no_serving_patch_report_only`: alias-map review-ready groups `2`, lineage input rows `45`, lineage blocked rows `45`, lineage patch candidates `0`, serving patch candidates `0`. No alias-map write, serving rebuild, public pointer, deploy, graph/vector/DB write, upload/review, memory, network/model/paid API, secret, 9router, or D: root action occurred.
+
+2026-05-25 T5 venue acceptance note: `reports\ATLAS_T5_VENUE_ACCEPTANCE_GATE_20260525.md` remains active evidence. It consumes the 17:08 venue auto-candidate sidecar, checks source/serving SQLite read-only, and records decision `atlas_dj_venue_acceptance_no_patch_candidates_report_only`: input rows `932`, patch candidates `0`, blocked rows `304`, already matching rows `628`. No serving rebuild, public pointer, deploy, graph/vector/DB write, upload/review, memory, network/model/paid API, secret, 9router, or D: root action occurred.
+
+2026-05-24 T6 strict-manual-acceptance note: `reports\ATLAS_T6_STRICT_MANUAL_ACCEPTANCE_REVIEW_PACKET_20260524.md` is the latest report-only sidecar packet. It accepts Gekko, FullHouse, and 4Tael as staging-review identity candidates only after joining rendered public-profile evidence with the manual acceptance queue. It keeps accepted_for_graph, identity_proof promotion, avatar display, public serving field, and graph_write_allowed at `0`; a separate graph/write gate is still required.
+
+2026-05-24 T6 rendered-profile note: `reports\ATLAS_T6_RENDERED_PROFILE_EVIDENCE_PACKET_20260524.md` remains active evidence. It uses OpenCLI public rendering over the `3` manual acceptance-review-ready SoundCloud rows (Gekko, FullHouse, 4Tael) and records `3` review-ready evidence rows while keeping accepted_for_graph, identity_proof promotion, avatar display, public serving field, and graph_write_allowed at `0`.
+
+2026-05-24 T6 acceptance-gate note: `reports\ATLAS_T6_IDENTITY_ACCEPTANCE_GATE_PACKET_20260524.md` remains active evidence. It converts the `5` source-context review entities into `3` manual acceptance-review-ready rows (Gekko, FullHouse, 4Tael) and `2` blocked rows (Cod.Act, YYYY still need Atlas source context). No product truth, avatar display, public serving field, graph/vector/DB write, memory write, deploy, upload, or review submission is authorized by this packet.
+
+2026-05-24 T6 identity-review note: `reports\ATLAS_T6_IDENTITY_REVIEW_CRITERIA_PACKET_20260524.md` remains active evidence. It turns the `12` SoundCloud metadata rows from the bounded fetch into `10` deduped manual-review rows / `5` unique entities while keeping accepted_for_graph, identity_proof promotion, and graph_write_allowed at `0`.
+
+2026-05-23 T6 outlink triage note: `reports\ATLAS_T6_OUTLINK_TOP_REVIEW_TRIAGE_20260523.md` remains active evidence. It turns the `80`-row top-review queue into a `12`-row candidate-only bounded fetch plan.
+
+## Current code reality
+
+- Package name: `wechat-ingest`
+- Version: `0.1.0`
+- Node engine: `>=20`
+- Module type: `module`
+- Main desktop entry: `desktop/main.mjs`
+- TypeScript strict mode: enabled through `tsconfig.json`
+- CLI entry: `src/cli.ts`
+- History URL CLI entry: `src/historyCli.ts`
+- Electron desktop app: `desktop/main.mjs` + `desktop/renderer.js` + PCUI modules
+- Build output: `dist/`
+- Windows portable output: `release/`
+
+## Runtime flow
+
+```text
+WeChat/public article source
+  -> URL prefetch / archive capture / mptext capture
+  -> HTML/archive asset retention
+  -> OCR / MarkItDown / clean Markdown / LLM input Markdown
+  -> LLM export / downstream text extraction
+  -> Stage7 structured article/entity/event extraction
+  -> graph candidate packs / graph marker for the atlas data layer
+  -> 1024-d isolated vector retrieval lanes
+  -> bounded network/social evidence
+  -> downstream consumers and PCUI inspection
+```
+
+The repo also contains many historical handoffs and long-run logs. Treat generated docs below as the current code-aligned SSOT before following older dated handoff files.
+
+## Current SSOT docs
+
+- `docs/current-runtime.md` — 2026-05-17 current entry, latest safe verification, Stage7 authority split, and forbidden actions.
+- `AGENTS.md` — agent boundaries and safety rules.
+- `docs/CURRENT_CODE_MAP.md` — generated source/tree map.
+- `docs/CLI_REFERENCE.md` — generated CLI/package script map.
+- `docs/CODE_AUDIT.md` — current code audit and risk notes.
+- `docs/CONFIGURATION.md` — configuration/profile/output-path reference.
+- `docs/DOCUMENTATION_INDEX.md` — documentation inventory and alignment policy.
+- `docs/RUNBOOK.md` — operator runbook entry.
+- `docs/PRD.md` — product requirements, with current-code alignment note.
+- `docs/PROJECT_STATUS_2026-05-07.md` — concise current 93k recovery status, active cursor, blockers, and next action.
+- `LONGRUN_STATE.md` — active recapture/OCR/Stage7 recovery state.
+- `tools/stage7_rewrite/WECHAT_93K_MASTER_HANDOFF_AND_PLAN_2026-05-07.md` — latest master handoff, progress, guardrails, and next execution plan.
+- `tools/stage7_rewrite/WECHAT_93K_CODE_DOC_REVIEW_2026-05-07.md` — latest code/documentation review and verification results.
+- `VECTOR_MODEL_REGISTRY_SSOT.md` — Mac vector model routing, dimensions, and mixing rules.
+- `MAC_VECTOR_ENDPOINT_USAGE_GUIDE.md` — curl/Python templates and read-only vector smoke/probe/validate commands.
+- `tools/stage7_rewrite/VECTOR_ENDPOINT_DEV_HANDOFF_2026-05-07.md` — current Stage8 vector endpoint development status and next safe slice.
+- `tools/stage7_rewrite/STAGE8_WRITE_STRATEGY_TEST_REPORT_2026-05-07.md` — bounded test report for existing-data Stage8 embedding, Qdrant test collections, PC SQLite ledger, and Neo4j reachability.
+- `tools/stage7_rewrite/OPENCLAW_LONGRUN_TASK_2026-05-06.md` — OpenClaw handoff/runbook for the current recovery.
+- `tools/stage7_rewrite/NIGHT_LONGRUN_PLAN_2026-05-06.md` — current night watchdog plan and quality gates.
+- `tools/stage7_rewrite/NIGHT_LONGRUN_HANDOFF_2026-05-06.md` — resumable handoff for the 2026-05-06 night run.
+- `tools/stage7_rewrite/WECHAT_93K_NEXT_AI_HANDOFF_2026-05-07.md` — operational next-agent handoff; latest master handoff overrides older wave6 sections.
+- `tools/stage7_rewrite/WECHAT_93K_THREAD_SCOPE_SPLIT_2026-05-08.md` — current split between this PC-side WeChat URL extraction thread and the separate vector/Qdrant/Neo4j/PC DB/knowledge-graph write thread.
+- `tools/stage7_rewrite/WECHAT_93K_VECTOR_TO_STAGE7_LINK_EXTRACT_HANDOFF_2026-05-08_0850.md` — interface handoff from the vector thread to this Stage7 link extraction thread; defines when a completed root is safe for vector consumption.
+- `tools/stage7_rewrite/SUPER_LONGRUN_ACTIVE_BOARD_2026-05-07.md` — active story board for OCR, full-empty recovery, Stage7 canary, and vector JSONL gates.
+- `tools/stage7_rewrite/FULL_EMPTY_LINK_RECOVERY_PLAN_2026-05-07.md` — historical empty-link wave recovery plan.
+- `tools/stage7_rewrite/WEEKLY_ACTIVITY_RECOMMENDATION_PIPELINE_PLAN_2026-05-07.md` — weekly activity recommendation lane plan.
+- `tools/stage7_rewrite/SSOT.md` — Stage7/8/9 current runtime overlay plus historical P4 evidence boundary.
+- `tools/stage7_rewrite/reports/atlas_full_source_lineage_47k_93k_gap_20260519/atlas_full_source_lineage.md` — current script-derived 47k/93k/FULL_MAP/V6/OCR/Dajiala/vector/network source-lineage and production decision table.
+- `tools/stage7_rewrite/reports/atlas_gap_backfill_execution_packet_20260519/gap_backfill_execution_packet.md` — current no-rerun / hold / gated-backfill execution packet for 47k+93k+漏补.
+- `tools/stage7_rewrite/reports/qdrant_role_alias_apply_47k_delta375_20260519/qdrant_role_alias_apply_report.md` — current Qdrant role-isolated alias production apply, rollback packet, and verified alias targets.
+- `tools/stage7_rewrite/reports/qdrant_role_alias_router_smoke_47k_delta375_20260519/qdrant_role_alias_router_smoke.md` — current post-apply alias-path vector router smoke.
+- `tools/stage7_rewrite/reports/graph_candidate_pack_final_lock_47k_delta375_20260519/graph_candidate_pack_readiness.md` — current GraphCandidatePack final lock after source-context/future-proof evidence gates.
+- `tools/stage7_rewrite/reports/graph_rag_recommendation_current_smoke_47k_delta375_final_lock_20260519/graph_rag_recommendation_current_smoke.md` — current report-only Graph/RAG/recommendation smoke synthesis after final lock.
+- `tools/stage7_rewrite/docs/STAGE8_VECTOR_PLAN.md` — vector JSONL canary status and production-vector boundary.
+- `tools/stage7_rewrite/docs/STAGE9_GRAPH_PLAN.md` — graph JSONL pack status and graph-DB boundary.
+- `docs/DOCUMENTATION_SYNC_REPORT_2026-05-07.md` — documentation unification report for the 2026-05-07 status sync.
+
+2026-05-17 docs audit note: `docs/PROJECT_STATUS_2026-05-07.md` remains the 93k recovery snapshot, but current Stage7 authority has moved to `tools/stage7_rewrite/STAGE7_SSOT_20260514.md` and `tools/stage7_rewrite/SSOT.md`. Safe verification passed `npm run build`, 27 targeted TypeScript tests, 46 targeted Stage7/weekly Python tests, and a 450-file Stage7 Python AST scan with 0 syntax errors.
+
+## Install and validate
+
+```powershell
+npm install
+npm run build
+npm test
+```
+
+Useful commands:
+
+```powershell
+npm run process-article
+npm run archive-batch
+npm run mptext-archive-batch
+npm run export-markitdown-batch
+npm run export-llm-batch
+npm run finalize-llm-pack
+npm run run-downstream-llm-batch
+npm run start:gui
+node dist\cli.js finalize-llm-pack --inputDir <artifact-root> --outDir <release-root> --intakeManifestPath <llm_intake_manifest.json> --intakeOnly --limit 200
+node tools\buildRecaptureQueueFromArtifacts.mjs --artifactListPath <list> --outDir <run-root>
+.\tools\stage7_rewrite\scripts\run-recapture-asset-chunks.ps1 -QueuePath <queue.jsonl> -RunRoot <run-root>
+.\tools\stage7_rewrite\scripts\run-night-watchdog.ps1 -CycleSeconds 180 -EnableDajialaCanary
+python .\tools\stage7_rewrite\scripts\build_full_empty_recovery_wave.py --wave-size 200 --out-dir <wave-plan-root>
+python .\tools\stage7_rewrite\scripts\build_weekly_activity_queue.py --out-dir <weekly-run-root>
+python .\tools\stage7_rewrite\scripts\build_weekly_activity_miniprogram_api.py --pack-dir <weekly-pack-root> --out-dir <static-api-root>
+python .\tools\stage7_rewrite\scripts\build_atlas_full_source_lineage.py
+```
+
+## Data and safety boundaries
+
+- Do not read real account exports, cookies, tokens, API keys, private `.env`, or unscoped raw archive payloads.
+- Do not scan or mutate huge D: roots. If D: paths are required, use only explicitly scoped directories and bounded reads.
+- Do not run long capture/archive/LLM jobs without explicit operator approval.
+- Do not treat captcha/platform HTML, failed Dajiala records, partial archives, or stale empty `assets_local.json` as successful recovery.
+- Use `--intakeOnly --limit N` for bounded release candidates when a canary should avoid recursively scanning a large D: artifact root.
+- Do not treat `tmp-*`, `runs/`, `reports/`, `artifacts/`, `.mptext-data/`, `.omc/`, or `dist/` as documentation SSOT.
+- PCUI/Electron is an operator surface; runtime data truth is in manifests/status files/artifact packs, not screenshots alone.
+
+## Current generated counts
+
+| Area | Count |
+|---|---:|
+| package scripts | 50 |
+| CLI commands in `src/cli.ts` | 26 |
+| source TS files | 84 |
+| TS tests | 60 |
+| Stage7 Python tests | 8 |
+| desktop files | 37 |
+| tools files | 36 |
+| profiles | 4 |
+| prompts | 16 |
+| Python stage scripts | 6 |

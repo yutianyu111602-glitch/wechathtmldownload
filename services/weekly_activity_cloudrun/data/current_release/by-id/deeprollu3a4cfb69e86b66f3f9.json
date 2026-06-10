@@ -1,0 +1,151 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "deeproll:4cfb69e86b66f3f9",
+    "event_id": "deeproll:4cfb69e86b66f3f9",
+    "article_id": "deeproll:4cfb69e86b66f3f9",
+    "queue_id": "deeproll:4cfb69e86b66f3f9",
+    "title": "06.05|喝！舞！虎！特！别！版！12位DJ双厅齐开车轮战！",
+    "title_original": "06.05|喝！舞！虎！特！别！版！12位DJ双厅齐开车轮战！",
+    "title_display": "喝！舞！虎！特！别！版！12位DJ双厅齐开车轮战！",
+    "account": "电容DeepRoll",
+    "account_key": "deeproll",
+    "promoter": "电容DeepRoll",
+    "source_article": {
+      "url_hash": "4cfb69e86b66f3f9",
+      "account_name": "电容DeepRoll",
+      "published_at": "2026-06-01"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "4cfb69e86b66f3f9"
+    },
+    "post_date": "2026-06-01",
+    "source_account_name": "电容DeepRoll",
+    "source_published_at": "2026-06-01",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "01:00-02:00",
+    "event_time_source": "source_text",
+    "time_start": "01:00",
+    "time_end": "02:00",
+    "running_hours_text": "01:00-02:00",
+    "running_hours_source": "source_text",
+    "city": [
+      "苏州"
+    ],
+    "city_key": "suzhou",
+    "city_name": "苏州",
+    "city_keys": [
+      "suzhou"
+    ],
+    "venue": [],
+    "venue_id": "deeproll_suzhou",
+    "venue_name": "热情商店&电容Deep Roll",
+    "address": "江苏省苏州市姑苏区廖家巷28号唐寅故居文化区3栋102",
+    "address_full": "江苏省苏州市姑苏区廖家巷28号唐寅故居文化区3栋102",
+    "address_source": "venue_registry_verified",
+    "geo_lng": 120.613767,
+    "geo_lat": 31.321621,
+    "lineup": [
+      "Fischmonger"
+    ],
+    "lineup_artists": [
+      "Fischmonger"
+    ],
+    "genres": [
+      "house",
+      "techno",
+      "neo rave",
+      "hard techno",
+      "breaks",
+      "trance"
+    ],
+    "music_styles": [
+      "techno",
+      "house",
+      "breaks",
+      "trance"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "06.05|喝！舞！虎！特！别！版！12位DJ双厅齐开车轮战！",
+      "2026-06-05",
+      "集结江浙沪12位好手，热情&电容双厅齐开！"
+    ],
+    "description_original_lines": [
+      "06.05|喝！舞！虎！特！别！版！12位DJ双厅齐开车轮战！",
+      "集结江浙沪12位好手，热情&电容双厅齐开！",
+      "Fischmonger(南京)"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "苏州|热情商店&电容deeproll|2026-06-05|喝！舞！虎！特！别！版！12位dj双厅齐开车轮战！",
+    "detail_path": "by-id/deeprollu3a4cfb69e86b66f3f9.json",
+    "detail_url": "by-id/deeprollu3a4cfb69e86b66f3f9.json",
+    "venue_lat": 31.321621,
+    "venue_lng": 120.613767,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "tencent_map_picker_user_confirmed",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "deeproll_suzhou",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "lineup_quality": {
+      "status": "verified",
+      "decision": "scoring_retained_lineup",
+      "note": "retained lineup artists with score >= 0.6: Fischmonger"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+    "poster_cloud_path": "weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png"
+  }
+}

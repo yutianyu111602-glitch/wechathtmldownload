@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "hakka_bar:e46742cca431baaf",
+  "sourceItemHash": "f6912e9a29d4dae8b5d504f546ac58025cf04a69d21904aed66d0373875fa0eb",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "城市阳台·微醺计划",
+      "event_date_start": "2026-06-08",
+      "event_date_end": "2026-06-08",
+      "event_time_text": null,
+      "city_name": "成都",
+      "venue_name": "Hakkabar 院吧",
+      "address_candidate": "四川省成都市武侯区玉林街道科华北路60号科华沸城12楼1201",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06.08 周一｜城市阳台·微醺计划",
+        "「城市阳台·微醺计划」阳台大约是家中最柔软的边界—— 它悬于现实之上，盛放晚风、暮色与一份可以独自斟酌的寂静"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "城市阳台·微醺计划",
+        "2026-06-08",
+        "成都",
+        "Hakkabar 院吧"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "agg-child-c010fea189cdfe84",
+  "sourceItemHash": "fc7d9e486d2231511daf0ad8dff22af3d9c2b867e2272901dabe4d6b6e01727e",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "新面子Lxin mian kong Vol.46",
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": null,
+      "city_name": "深圳",
+      "venue_name": "OIL CLUB",
+      "address_candidate": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "lineup_artists": [
+        "XS.iv",
+        "MAZA",
+        "c14",
+        "XS.iv",
+        "MAZA",
+        "c14"
+      ],
+      "music_styles": [
+        "disco"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "XS.iv, MAZA, c14",
+        "Sun",
+        "凭2025年任意OIL购票记录可免票入场",
+        "持有SEASONPASS油卡可享现场购票优惠"
+      ],
+      "ticketing_text": [
+        "免票入场"
+      ],
+      "dedupe_signals": [
+        "新面子Lxin mian kong Vol.46",
+        "2026-06-07",
+        "深圳",
+        "OIL CLUB"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

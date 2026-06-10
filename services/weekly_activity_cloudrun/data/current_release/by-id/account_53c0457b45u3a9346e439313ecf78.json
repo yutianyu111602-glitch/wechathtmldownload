@@ -1,0 +1,118 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "account_53c0457b45:9346e439313ecf78",
+    "event_id": "account_53c0457b45:9346e439313ecf78",
+    "article_id": "account_53c0457b45:9346e439313ecf78",
+    "queue_id": "account_53c0457b45:9346e439313ecf78",
+    "title": "06/06 徐灏新Hosun·新专辑《Star from the Trenches》试听会",
+    "title_original": "06/06 徐灏新Hosun·新专辑《Star from the Trenches》试听会",
+    "title_display": "徐灏新Hosun·新专辑《Star from the Trenches》试听会",
+    "account": "星期六极好",
+    "account_key": "account_53c0457b45",
+    "promoter": "星期六极好",
+    "source_article": {
+      "url_hash": "9346e439313ecf78",
+      "account_name": "星期六极好",
+      "published_at": "2026-05-30"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "9346e439313ecf78"
+    },
+    "post_date": "2026-05-30",
+    "source_account_name": "星期六极好",
+    "source_published_at": "2026-05-30",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_53c0457b45_9346e439313ecf78--3983be00679e29829adb3274.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_53c0457b45_9346e439313ecf78--3983be00679e29829adb3274.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_53c0457b45_9346e439313ecf78--3983be00679e29829adb3274.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "广州"
+    ],
+    "city_key": "guangzhou",
+    "city_name": "广州",
+    "city_keys": [
+      "guangzhou"
+    ],
+    "venue": [],
+    "venue_id": "sat_best_guangzhou",
+    "venue_name": "星期六极好",
+    "address": "广东省广州市越秀区华侨新村爱国路14号",
+    "address_full": "广东省广州市越秀区华侨新村爱国路14号",
+    "address_source": "manual_registry",
+    "geo_lng": 113.290322,
+    "geo_lat": 23.136564,
+    "lineup": [
+      "徐灏新Hosun"
+    ],
+    "lineup_artists": [
+      "徐灏新Hosun"
+    ],
+    "genres": [
+      "hip-hop"
+    ],
+    "music_styles": [
+      "hip-hop"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "06/06 徐灏新Hosun·新专辑《Star from the Trenches》试听会",
+      "2026-06-06",
+      "感受粤语说唱带来的魅力与躁动"
+    ],
+    "description_original_lines": [
+      "06/06 徐灏新Hosun·新专辑《Star from the Trenches》试听会",
+      "感受粤语说唱带来的魅力与躁动",
+      "TIME",
+      "徐灏新HOSUN全新专辑"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "广州|星期六极好|2026-06-06|徐灏新hosun新专辑《starfromthetrenches》试听会",
+    "detail_path": "by-id/account_53c0457b45u3a9346e439313ecf78.json",
+    "detail_url": "by-id/account_53c0457b45u3a9346e439313ecf78.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_53c0457b45_9346e439313ecf78--3983be00679e29829adb3274.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_53c0457b45_9346e439313ecf78--3983be00679e29829adb3274.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_53c0457b45_9346e439313ecf78--3983be00679e29829adb3274.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/account_53c0457b45_9346e439313ecf78--3983be00679e29829adb3274.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_53c0457b45_9346e439313ecf78--3983be00679e29829adb3274.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_53c0457b45_9346e439313ecf78--3983be00679e29829adb3274.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_53c0457b45_9346e439313ecf78--3983be00679e29829adb3274.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_53c0457b45_9346e439313ecf78--3983be00679e29829adb3274.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_53c0457b45_9346e439313ecf78--3983be00679e29829adb3274.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_53c0457b45_9346e439313ecf78--3983be00679e29829adb3274.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_53c0457b45_9346e439313ecf78--3983be00679e29829adb3274.jpg"
+  }
+}

@@ -1,0 +1,138 @@
+{
+  "schema_version": "weekly_activity_miniprogram_city.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "city_key": "shenyang",
+  "city": "沈阳",
+  "item_count": 1,
+  "items": [
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "substation:1e875a98fe94d079",
+      "event_id": "substation:1e875a98fe94d079",
+      "article_id": "substation:1e875a98fe94d079",
+      "queue_id": "substation:1e875a98fe94d079",
+      "title": "6.5｜你要记住！再不播种就晚了！",
+      "title_original": "6.5｜你要记住！再不播种就晚了！",
+      "title_display": "你要记住！再不播种就晚了！",
+      "account": "SUBSTATION",
+      "account_key": "substation",
+      "promoter": "SUBSTATION",
+      "source_article": {
+        "url_hash": "1e875a98fe94d079",
+        "account_name": "SUBSTATION",
+        "published_at": "2026-06-04"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "1e875a98fe94d079"
+      },
+      "post_date": "2026-06-04",
+      "source_account_name": "SUBSTATION",
+      "source_published_at": "2026-06-04",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/substation_1e875a98fe94d079--197d95e3b39259a399495b95.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/substation_1e875a98fe94d079--197d95e3b39259a399495b95.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/substation_1e875a98fe94d079--197d95e3b39259a399495b95.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-05"
+      ],
+      "event_date_iso_guess": "2026-06-05",
+      "event_date_iso_guesses": [
+        "2026-06-05"
+      ],
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "01:00 - Late",
+      "event_time_source": "source_text",
+      "time_start": "01:00",
+      "time_end": "Late",
+      "running_hours_text": "01:00 - Late",
+      "running_hours_source": "source_text",
+      "city": [
+        "沈阳"
+      ],
+      "city_key": "shenyang",
+      "city_name": "沈阳",
+      "city_keys": [
+        "shenyang"
+      ],
+      "venue": [],
+      "venue_id": "substation_shenyang",
+      "venue_name": "SUBSTATION",
+      "address": "辽宁省沈阳市和平区桂林街69号院内深处蓝绿色建筑2楼",
+      "address_full": "辽宁省沈阳市和平区桂林街69号院内深处蓝绿色建筑2楼",
+      "address_source": "manual_registry",
+      "geo_lng": 123.414717,
+      "geo_lat": 41.798291,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [
+        "minimal",
+        "downtempo",
+        "chill house",
+        "deep house",
+        "ethno",
+        "techno"
+      ],
+      "music_styles": [
+        "techno",
+        "house"
+      ],
+      "price": [
+        "单人55",
+        "双人100"
+      ],
+      "price_text": "单人55 / 双人100",
+      "ticketing_text": "单人55 / 双人100",
+      "evidence": [
+        "6.5｜你要记住！再不播种就晚了！",
+        "单人55 双人100 三人同行135",
+        "2026-06-05",
+        "1:00-LATE",
+        "一个地下俱乐部也是如此"
+      ],
+      "description_original_lines": [
+        "6.5｜你要记住！再不播种就晚了！",
+        "单人55 双人100 三人同行135",
+        "1:00-LATE",
+        "一个地下俱乐部也是如此"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "沈阳|substation|2026-06-05|你要记住！再不播种就晚了！",
+      "detail_path": "by-id/substationu3a1e875a98fe94d079.json",
+      "detail_url": "by-id/substationu3a1e875a98fe94d079.json",
+      "lineup_display_hint": "点击海报跳转公众号原文查看",
+      "lineup_quality": {
+        "status": "uncertain",
+        "decision": "cleared_untrusted_lineup",
+        "note": "public mini-program policy: lineup was prose, aggregate text, bio-like text, or not source-grounded enough for display"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/substation_1e875a98fe94d079--197d95e3b39259a399495b95.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/substation_1e875a98fe94d079--197d95e3b39259a399495b95.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/substation_1e875a98fe94d079--197d95e3b39259a399495b95.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/substation_1e875a98fe94d079--197d95e3b39259a399495b95.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/substation_1e875a98fe94d079--197d95e3b39259a399495b95.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/substation_1e875a98fe94d079--197d95e3b39259a399495b95.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/substation_1e875a98fe94d079--197d95e3b39259a399495b95.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/substation_1e875a98fe94d079--197d95e3b39259a399495b95.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/substation_1e875a98fe94d079--197d95e3b39259a399495b95.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/substation_1e875a98fe94d079--197d95e3b39259a399495b95.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/substation_1e875a98fe94d079--197d95e3b39259a399495b95.jpg"
+    }
+  ]
+}

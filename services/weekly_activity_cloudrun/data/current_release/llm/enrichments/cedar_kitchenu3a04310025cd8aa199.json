@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "cedar_kitchen:04310025cd8aa199",
+  "sourceItemHash": "bee83b04cf4d73bfbb29b4a08c78e34da7c34f239faa53afaf7546cf4ce2bb16",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "周日丨巨鹿路免费夜市回归 自由摆摊和放歌",
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "周日八点到深夜",
+      "city_name": "上海",
+      "venue_name": "Cedar Kitchen",
+      "address_candidate": "周日丨巨鹿路免费夜市回归 自由摆摊和放歌",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "逛:免票入场,便宜好逛,珍奇异宝,旁边店里有阿拉伯卷饼和调酒",
+        "周日八点到深夜！上海巨鹿路272号Cedar自由贸易市场",
+        "摆摊：汽修车库任意消费入场，自由摆摊，不用报名，自带毯子，一两件闲置也可以拿手上随缘出",
+        "本次夜市有电视台来拍，多叫朋友来玩！"
+      ],
+      "ticketing_text": [
+        "免票入场"
+      ],
+      "dedupe_signals": [
+        "周日丨巨鹿路免费夜市回归 自由摆摊和放歌",
+        "2026-06-07",
+        "上海",
+        "Cedar Kitchen"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

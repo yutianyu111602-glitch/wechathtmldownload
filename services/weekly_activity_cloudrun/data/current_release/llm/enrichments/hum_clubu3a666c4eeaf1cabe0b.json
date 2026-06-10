@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "hum_club:666c4eeaf1cabe0b",
+  "sourceItemHash": "1b2cc32f32329f395a7df9745e37b22c6b531ba255fa55bb267c912cfe4c0004",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Fri. | 「拳场失控」巴西地下拳王Victin前来嗡嗡踢馆！@Hum",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "贵阳",
+      "venue_name": "贵阳市·HUMClub",
+      "address_candidate": "贵州省贵阳市云岩区普陀路街道普陀路黔达花园AB座负一层",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.5 Fri.｜「拳场失控」巴西地下拳王Victin前来嗡嗡踢馆！@Hum",
+        "纵享激情巴西之夜！",
+        "2026",
+        "Poster OCR date: 2026-05-02 / 2026-06-10"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "Fri. | 「拳场失控」巴西地下拳王Victin前来嗡嗡踢馆！@Hum",
+        "2026-06-05",
+        "贵阳",
+        "贵阳市·HUMClub"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

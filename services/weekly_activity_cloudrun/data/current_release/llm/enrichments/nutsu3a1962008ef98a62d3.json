@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "nuts:1962008ef98a62d3",
+  "sourceItemHash": "8a92fd339d3f7383bde959e42ec27680f9feeea70e78645fb3e2134028a7134b",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "FFF | 坚果波比友友联谊赛·第十弹［免费］",
+      "event_date_start": "2026-06-14",
+      "event_date_end": "2026-06-14",
+      "event_time_text": "20:00",
+      "city_name": "重庆",
+      "venue_name": "坚果NUTS",
+      "address_candidate": "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "坚果NUTS",
+        "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+        "FOOSBALL·FRIENDS·FUN",
+        "▁▁▁▁▁▁▁▁▁▁▁"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "FFF | 坚果波比友友联谊赛·第十弹［免费］",
+        "2026-06-14",
+        "重庆",
+        "坚果NUTS"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

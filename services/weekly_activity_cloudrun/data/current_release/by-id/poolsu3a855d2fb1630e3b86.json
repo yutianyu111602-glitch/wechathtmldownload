@@ -1,0 +1,145 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "pools:855d2fb1630e3b86",
+    "event_id": "pools:855d2fb1630e3b86",
+    "article_id": "pools:855d2fb1630e3b86",
+    "queue_id": "pools:855d2fb1630e3b86",
+    "title": "06.06 周六｜浮动游泳池 FLOATING #106",
+    "title_original": "06.06 周六｜浮动游泳池 FLOATING #106",
+    "title_display": "浮动游泳池 FLOATING #106",
+    "account": "POOLS",
+    "account_key": "pools",
+    "promoter": "POOLS",
+    "source_article": {
+      "url_hash": "855d2fb1630e3b86",
+      "account_name": "POOLS",
+      "published_at": "2026-06-04"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "855d2fb1630e3b86"
+    },
+    "post_date": "2026-06-04",
+    "source_account_name": "POOLS",
+    "source_published_at": "2026-06-04",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_855d2fb1630e3b86--93e264f3f6da1ab6cb67a1f6.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_855d2fb1630e3b86--93e264f3f6da1ab6cb67a1f6.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_855d2fb1630e3b86--93e264f3f6da1ab6cb67a1f6.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "大理"
+    ],
+    "city_key": "dali",
+    "city_name": "大理",
+    "city_keys": [
+      "dali"
+    ],
+    "venue": [],
+    "venue_id": "pools_dali",
+    "venue_name": "POOLS",
+    "address": "云南省大理白族自治州大理市下关街道洱河南路下关金港中民城市广场B幢1-58号",
+    "address_full": "云南省大理白族自治州大理市下关街道洱河南路下关金港中民城市广场B幢1-58号",
+    "address_source": "manual_user_confirmed_map_crosscheck",
+    "geo_lng": 100.227515,
+    "geo_lat": 25.596385,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "06.06 周六｜浮动游泳池 FLOATING #106",
+      "2026-06-06",
+      "六月进入最适合舞池生长的时节",
+      "白天的热度尚未散去，夜晚的空气开始变得柔软，低频在空间里获得更自然的回响",
+      "那些关于“六六顺”的美好寓意，或许最终都会落回音乐本身——让身体顺着节奏移动，让时间顺着律动流淌"
+    ],
+    "description_original_lines": [
+      "06.06 周六｜浮动游泳池 FLOATING #106",
+      "六月进入最适合舞池生长的时节",
+      "白天的热度尚未散去，夜晚的空气开始变得柔软，低频在空间里获得更自然的回响",
+      "那些关于“六六顺”的美好寓意，或许最终都会落回音乐本身——让身体顺着节奏移动，让时间顺着律动流淌"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "大理|pools|2026-06-06|浮动游泳池floating#106",
+    "detail_path": "by-id/poolsu3a855d2fb1630e3b86.json",
+    "detail_url": "by-id/poolsu3a855d2fb1630e3b86.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_855d2fb1630e3b86--93e264f3f6da1ab6cb67a1f6.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_855d2fb1630e3b86--93e264f3f6da1ab6cb67a1f6.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_855d2fb1630e3b86--93e264f3f6da1ab6cb67a1f6.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/pools_855d2fb1630e3b86--93e264f3f6da1ab6cb67a1f6.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_855d2fb1630e3b86--93e264f3f6da1ab6cb67a1f6.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_855d2fb1630e3b86--93e264f3f6da1ab6cb67a1f6.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_855d2fb1630e3b86--93e264f3f6da1ab6cb67a1f6.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_855d2fb1630e3b86--93e264f3f6da1ab6cb67a1f6.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_855d2fb1630e3b86--93e264f3f6da1ab6cb67a1f6.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_855d2fb1630e3b86--93e264f3f6da1ab6cb67a1f6.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_855d2fb1630e3b86--93e264f3f6da1ab6cb67a1f6.jpg",
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "user_tencent_map_picker_confirmed",
+    "geo_provider": "user_tencent_map_picker",
+    "geo_provider_title": "Love POOLS",
+    "geo_provider_address": "云南省大理白族自治州大理市下关街道洱河南路下关金港中民城市广场B幢1-58号",
+    "geo_reverse_address": "云南省大理白族自治州大理市下关街道洱河南路下关金港中民城市广场B幢1-58号",
+    "place_fields_locked": true,
+    "geo_locked": true,
+    "geo_override_reason": "User confirmed POOLS exists in Dali; Shanghai POOLS is invalid for these POOLS rows.",
+    "poi_id": "1816199312489970978",
+    "map_poi_name": "Love POOLS",
+    "map_search_aliases": [
+      "POOLS 大理",
+      "Love POOLS",
+      "大理 POOLS",
+      "下关金港中民城市广场 POOLS"
+    ],
+    "geo_search_aliases": [
+      "POOLS 大理",
+      "Love POOLS",
+      "大理 POOLS",
+      "下关金港中民城市广场 POOLS"
+    ],
+    "poi_aliases": [
+      "POOLS 大理",
+      "Love POOLS",
+      "大理 POOLS",
+      "下关金港中民城市广场 POOLS"
+    ],
+    "venue_lat": 25.596385,
+    "venue_lng": 100.227515,
+    "geo_verified_at": "2026-06-06T15:28:01+0800",
+    "geo_candidate_id": "manual-20260606-pools-dali"
+  }
+}

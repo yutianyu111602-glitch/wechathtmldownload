@@ -1,0 +1,145 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "dada_kunming:184ee4194079c5c6",
+    "event_id": "dada_kunming:184ee4194079c5c6",
+    "article_id": "dada_kunming:184ee4194079c5c6",
+    "queue_id": "dada_kunming:184ee4194079c5c6",
+    "title": "周四 6月4日- 第二季【学打碟】DJ Training Workshop第十堂课@Dada Kunming",
+    "title_original": "周四 6月4日- 第二季【学打碟】DJ Training Workshop第十堂课@Dada Kunming",
+    "title_display": "周四 6月4日- 第二季【学打碟】DJ Training Workshop第十堂课@Dada Kunming",
+    "account": "Dada Kunming",
+    "account_key": "dada_kunming",
+    "promoter": "Dada Kunming",
+    "source_article": {
+      "url_hash": "184ee4194079c5c6",
+      "account_name": "Dada Kunming",
+      "published_at": "2026-06-03"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "184ee4194079c5c6"
+    },
+    "post_date": "2026-06-03",
+    "source_account_name": "Dada Kunming",
+    "source_published_at": "2026-06-03",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-04"
+    ],
+    "event_date_iso_guess": "2026-06-04",
+    "event_date_iso_guesses": [
+      "2026-06-04"
+    ],
+    "event_date_start": "2026-06-04",
+    "event_date_end": "2026-06-04",
+    "event_time_text": "21:00 - Late",
+    "event_time_source": "source_text",
+    "time_start": "21:00",
+    "time_end": "Late",
+    "running_hours_text": "21:00 - Late",
+    "running_hours_source": "source_text",
+    "city": [
+      "昆明"
+    ],
+    "city_key": "kunming",
+    "city_name": "昆明",
+    "city_keys": [
+      "kunming"
+    ],
+    "venue": [],
+    "venue_id": "dada_kunming",
+    "venue_name": "Dada Kunming",
+    "address": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+    "address_full": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+    "address_source": "manual_registry",
+    "geo_lng": 102.691192,
+    "geo_lat": 25.053387,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "周四 6月4日- 第二季【学打碟】DJ Training Workshop第十堂课@Dada Kunming",
+      "2026-06-04",
+      "一起实现一个音乐的小理想"
+    ],
+    "description_original_lines": [
+      "一起实现一个音乐的小理想",
+      "WED. - SUN. & National Holidays",
+      "Poster OCR time: 21:00 - Late",
+      "Poster OCR address: Eebarh Ase Qo Quarsskre Ror 2F, Block 9, No.4 East Hong Shan Lu"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "昆明|dadakunming|2026-06-04|周四6月4日第二季学打碟djtrainingworkshop第十堂课dadakunming",
+    "detail_path": "by-id/dada_kunmingu3a184ee4194079c5c6.json",
+    "detail_url": "by-id/dada_kunmingu3a184ee4194079c5c6.json",
+    "merge_provenance": {
+      "schema_version": "weekly_merge_provenance.v1",
+      "reason": "duplicate_cluster",
+      "retained_id": "dada_kunming:184ee4194079c5c6",
+      "retained_source_hash": "184ee4194079c5c6",
+      "merged_from": [
+        "dada_kunming:f96617a2a1a23f9d",
+        "dada_kunming:184ee4194079c5c6"
+      ],
+      "merged_source_hashes": [
+        "184ee4194079c5c6",
+        "f96617a2a1a23f9d"
+      ],
+      "source_count": 2,
+      "sources": [
+        {
+          "event_id": "dada_kunming:f96617a2a1a23f9d",
+          "source_hash": "f96617a2a1a23f9d",
+          "title": "周四 6月4日- 第二季【学打碟】DJ Training Workshop第十堂课@Dada Kunming",
+          "published_at": "2026-06-02",
+          "account_name": "dada_kunming",
+          "source_type": "wechat_article"
+        },
+        {
+          "event_id": "dada_kunming:184ee4194079c5c6",
+          "source_hash": "184ee4194079c5c6",
+          "title": "周四 6月4日- 第二季【学打碟】DJ Training Workshop第十堂课@Dada Kunming",
+          "published_at": "2026-06-03",
+          "account_name": "Dada Kunming",
+          "source_type": "wechat_article"
+        }
+      ]
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg"
+  }
+}

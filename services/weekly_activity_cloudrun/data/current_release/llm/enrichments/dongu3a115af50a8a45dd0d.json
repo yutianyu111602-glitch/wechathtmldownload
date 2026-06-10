@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "dong:115af50a8a45dd0d",
+  "sourceItemHash": "12493352a0cb5b36c8fc8ca897ce4b58223ece46e2903db60ada82f9c0851aa2",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "TFT pres. 666 派对 --- DJ STOLEYOURBAE& Kino &Haomiiya @DONG",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "杭州",
+      "venue_name": "DONG 洞",
+      "address_candidate": "浙江省杭州市上城区紫阳街道中山南路77号利星名品广场",
+      "lineup_artists": [
+        "DJ STOLEYOURBAE",
+        "Kino",
+        "Haomiiya",
+        "DJ STOLEYOURBAE",
+        "Kino",
+        "Haomiiya"
+      ],
+      "music_styles": [
+        "house",
+        "bass",
+        "breaks",
+        "footwork",
+        "Chicago hard house",
+        "breakbeat",
+        "Miami bass",
+        "grime"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "6.6 周六 | TFT pres. 666 派对 --- DJ STOLEYOURBAE& Kino &Haomiiya @DONG",
+        "TFT Crew 与DJ SYB（DJ STOLEYOURBAE，aka DJ 小男孩）和来自 vulcan"
+      ],
+      "description_original_lines": [
+        "6.6 周六 | TFT pres. 666 派对 --- DJ STOLEYOURBAE& Kino &Haomiiya @DONG",
+        "TFT Crew 与DJ SYB（DJ STOLEYOURBAE，aka DJ 小男孩）和来自 vulcan",
+        "MONSTER"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "TFT pres. 666 派对 --- DJ STOLEYOURBAE& Kino &Haomiiya @DONG",
+        "2026-06-06",
+        "杭州",
+        "DONG 洞"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

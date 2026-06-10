@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "tote_music:3727ed3187d676bc",
+  "sourceItemHash": "770234fcbb6f1dba8f8992b6f11df0f757a9b195169428fd70ddd7db887b8b3a",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "【6/13 周六】VAE SOLIS 暗黑舞会 + Sonic Youth Nirvana 纪录片放映",
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": null,
+      "city_name": "广州",
+      "venue_name": "陀地士多 Tote Store",
+      "address_candidate": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "一起来陀地士多，看看经典纪录片再舞入暗黑音乐派对！"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "【6/13 周六】VAE SOLIS 暗黑舞会 + Sonic Youth Nirvana 纪录片放映",
+        "2026-06-13",
+        "广州",
+        "陀地士多 Tote Store"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

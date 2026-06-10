@@ -1,0 +1,161 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "tin:ac5703ce1b232217",
+    "event_id": "tin:ac5703ce1b232217",
+    "article_id": "tin:ac5703ce1b232217",
+    "queue_id": "tin:ac5703ce1b232217",
+    "title": "「厅」本周五｜成都超新星的震荡",
+    "title_original": "「厅」本周五｜成都超新星的震荡",
+    "title_display": "「厅」本周五 | 成都超新星的震荡",
+    "account": "厅Tin",
+    "account_key": "tin",
+    "promoter": "厅Tin",
+    "source_article": {
+      "url_hash": "ac5703ce1b232217",
+      "account_name": "厅Tin",
+      "published_at": "2026-06-03"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "ac5703ce1b232217"
+    },
+    "post_date": "2026-06-03",
+    "source_account_name": "厅Tin",
+    "source_published_at": "2026-06-03",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tin_ac5703ce1b232217--e3632e4fbc21e2b35a5a317e.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tin_ac5703ce1b232217--e3632e4fbc21e2b35a5a317e.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tin_ac5703ce1b232217--e3632e4fbc21e2b35a5a317e.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "22:00-23:30",
+    "event_time_source": "source_text",
+    "time_start": "22:00",
+    "time_end": "23:30",
+    "running_hours_text": "22:00-23:30",
+    "running_hours_source": "source_text",
+    "city": [
+      "成都"
+    ],
+    "city_key": "chengdu",
+    "city_name": "成都",
+    "city_keys": [
+      "chengdu"
+    ],
+    "venue": [],
+    "venue_id": "tin_chengdu",
+    "venue_name": "厅Tin",
+    "address": "四川省成都市锦江区国华街",
+    "address_full": "四川省成都市锦江区国华街",
+    "address_source": "manual_user_confirmed_map_crosscheck",
+    "geo_lng": 104.080481,
+    "geo_lat": 30.588569,
+    "lineup": [
+      "GOvernmentsLie"
+    ],
+    "lineup_artists": [
+      "GOvernmentsLie"
+    ],
+    "genres": [
+      "bass",
+      "dub",
+      "trance",
+      "half-step",
+      "bass music"
+    ],
+    "music_styles": [
+      "bass",
+      "trance"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "「厅」本周五｜成都超新星的震荡",
+      "2026-06-05",
+      "22:00-23:30",
+      "本周五，「厅」邀请来自不同坐标的三组声音，共同构建一场关于 Bass、Dub、实验电子与意识流舞池的星际漫游🌌",
+      "GOvernmentsLie 的声音则更像一次无目的地漂流"
+    ],
+    "description_original_lines": [
+      "本周五，「厅」邀请来自不同坐标的三组声音，共同构建一场关于 Bass、Dub、实验电子与意识流舞池的星际漫游🌌",
+      "GOvernmentsLie 的声音则更像一次无目的地漂流",
+      "随机、碎片化、非线性的结构不断出现又消失，在快速转换的节奏与异质音景之间，敲击、噪音与低频交错生长",
+      "没有明确方向，也无需寻找答案，只需要跟随声音向前，无论最终抵达海面还是海底🌊"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "成都|厅tin|2026-06-05|「厅」本周五成都超新星的震荡",
+    "detail_path": "by-id/tinu3aac5703ce1b232217.json",
+    "detail_url": "by-id/tinu3aac5703ce1b232217.json",
+    "lineup_quality": {
+      "status": "verified",
+      "decision": "scoring_retained_lineup",
+      "note": "retained lineup artists with score >= 0.6: GOvernmentsLie"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tin_ac5703ce1b232217--e3632e4fbc21e2b35a5a317e.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tin_ac5703ce1b232217--e3632e4fbc21e2b35a5a317e.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tin_ac5703ce1b232217--e3632e4fbc21e2b35a5a317e.png",
+    "poster_cloud_path": "weekly-posters/20260604/tin_ac5703ce1b232217--e3632e4fbc21e2b35a5a317e.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tin_ac5703ce1b232217--e3632e4fbc21e2b35a5a317e.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tin_ac5703ce1b232217--e3632e4fbc21e2b35a5a317e.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tin_ac5703ce1b232217--e3632e4fbc21e2b35a5a317e.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tin_ac5703ce1b232217--e3632e4fbc21e2b35a5a317e.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tin_ac5703ce1b232217--e3632e4fbc21e2b35a5a317e.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tin_ac5703ce1b232217--e3632e4fbc21e2b35a5a317e.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tin_ac5703ce1b232217--e3632e4fbc21e2b35a5a317e.png",
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "user_tencent_map_picker_confirmed",
+    "geo_provider": "user_tencent_map_picker",
+    "geo_provider_title": "锦江区艺尚锦江(国华街东)",
+    "geo_provider_address": "四川省成都市锦江区国华街",
+    "geo_reverse_address": "四川省成都市锦江区国华街",
+    "place_fields_locked": true,
+    "geo_locked": true,
+    "geo_override_reason": "User provided Tencent map picker screenshot for the Tin Chengdu row; POI ID was empty in the picker.",
+    "map_poi_name": "锦江区艺尚锦江(国华街东)",
+    "map_search_aliases": [
+      "厅Tin 成都",
+      "永安路666号院 厅Tin",
+      "锦江区国华街 厅Tin"
+    ],
+    "geo_search_aliases": [
+      "厅Tin 成都",
+      "永安路666号院 厅Tin",
+      "锦江区国华街 厅Tin"
+    ],
+    "poi_aliases": [
+      "厅Tin 成都",
+      "永安路666号院 厅Tin",
+      "锦江区国华街 厅Tin"
+    ],
+    "venue_lat": 30.588569,
+    "venue_lng": 104.080481,
+    "geo_verified_at": "2026-06-06T15:28:01+0800",
+    "geo_candidate_id": "manual-20260606-tin-chengdu"
+  }
+}

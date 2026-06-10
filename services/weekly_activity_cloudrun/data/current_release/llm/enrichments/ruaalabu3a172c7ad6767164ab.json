@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "ruaalab:172c7ad6767164ab",
+  "sourceItemHash": "eb0c013c4b4dfcb210797fd0cd9c6353eb72fdc2b874eb2c18bfdf9182645b25",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "海岛地下电子夜",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "22:00 - Late",
+      "city_name": "三亚",
+      "venue_name": "RUAALAB",
+      "address_candidate": "海南省三亚市天涯区回辉四村一路",
+      "lineup_artists": [],
+      "music_styles": [
+        "techno",
+        "house",
+        "club trax",
+        "trance",
+        "techno",
+        "house",
+        "club trax",
+        "disco"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "▸22:00-23:00｜神秘暖场DJ"
+      ],
+      "description_original_lines": [
+        "06.06 周六海岛地下电子夜",
+        "22:00-LATE",
+        "扎根三亚热带海岸的低频据点RUAA LAB，6月6日周六晚间开启整夜Techno&House& Psy Trance沉浸式律动，四位实力派DJ依次接棒，从落日余温入夜直至凌晨，把海浪气息揉进4/4拍里，在狭小空间构筑野性与细腻并存的舞池声场",
+        "阵容时序｜22:00-LATE"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "海岛地下电子夜",
+        "2026-06-06",
+        "三亚",
+        "RUAALAB"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

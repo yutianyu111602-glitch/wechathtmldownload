@@ -1,0 +1,107 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "heim_shanghai:00ce94883472f9bb",
+    "event_id": "heim_shanghai:00ce94883472f9bb",
+    "article_id": "heim_shanghai:00ce94883472f9bb",
+    "queue_id": "heim_shanghai:00ce94883472f9bb",
+    "title": "6.6 周六 ~ Butterfree 跳舞乐园，浓度超标！",
+    "title_original": "6.6 周六 ~ Butterfree 跳舞乐园，浓度超标！",
+    "title_display": "~ Butterfree 跳舞乐园，浓度超标！",
+    "account": "Heim Shanghai",
+    "account_key": "heim_shanghai",
+    "promoter": "Heim Shanghai",
+    "source_article": {
+      "url_hash": "00ce94883472f9bb",
+      "account_name": "Heim Shanghai",
+      "published_at": "2026-06-03"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "00ce94883472f9bb"
+    },
+    "post_date": "2026-06-03",
+    "source_account_name": "Heim Shanghai",
+    "source_published_at": "2026-06-03",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_00ce94883472f9bb--dbb667b5ad345449651eed05.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_00ce94883472f9bb--dbb667b5ad345449651eed05.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_00ce94883472f9bb--dbb667b5ad345449651eed05.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [],
+    "venue_id": "heim_shanghai",
+    "venue_name": "Heim Shanghai",
+    "address": "上海市黄浦区长乐路462号M101",
+    "address_full": "上海市黄浦区长乐路462号M101",
+    "address_source": "manual_registry",
+    "geo_lng": 121.457897,
+    "geo_lat": 31.220855,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "6.6 周六 ~ Butterfree 跳舞乐园，浓度超标！",
+      "2026-06-06"
+    ],
+    "description_original_lines": [
+      "6.6 周六 ~ Butterfree 跳舞乐园，浓度超标！",
+      "Poster OCR date: 2026-06-03 / 2026-06-06"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "上海|heimshanghai|2026-06-06|~butterfree跳舞乐园浓度超标！",
+    "detail_path": "by-id/heim_shanghaiu3a00ce94883472f9bb.json",
+    "detail_url": "by-id/heim_shanghaiu3a00ce94883472f9bb.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_00ce94883472f9bb--dbb667b5ad345449651eed05.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_00ce94883472f9bb--dbb667b5ad345449651eed05.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_00ce94883472f9bb--dbb667b5ad345449651eed05.png",
+    "poster_cloud_path": "weekly-posters/20260604/heim_shanghai_00ce94883472f9bb--dbb667b5ad345449651eed05.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_00ce94883472f9bb--dbb667b5ad345449651eed05.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_00ce94883472f9bb--dbb667b5ad345449651eed05.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_00ce94883472f9bb--dbb667b5ad345449651eed05.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_00ce94883472f9bb--dbb667b5ad345449651eed05.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_00ce94883472f9bb--dbb667b5ad345449651eed05.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_00ce94883472f9bb--dbb667b5ad345449651eed05.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_00ce94883472f9bb--dbb667b5ad345449651eed05.png"
+  }
+}

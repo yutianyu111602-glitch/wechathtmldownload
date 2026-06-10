@@ -1,0 +1,120 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "nuts:1962008ef98a62d3",
+    "event_id": "nuts:1962008ef98a62d3",
+    "article_id": "nuts:1962008ef98a62d3",
+    "queue_id": "nuts:1962008ef98a62d3",
+    "title": "FFF｜坚果波比友友联谊赛·第十弹［免费］",
+    "title_original": "FFF｜坚果波比友友联谊赛·第十弹［免费］",
+    "title_display": "FFF | 坚果波比友友联谊赛·第十弹［免费］",
+    "account": "坚果NUTS",
+    "account_key": "nuts",
+    "promoter": "坚果NUTS",
+    "source_article": {
+      "url_hash": "1962008ef98a62d3",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-06-02"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "1962008ef98a62d3"
+    },
+    "post_date": "2026-06-02",
+    "source_account_name": "坚果NUTS",
+    "source_published_at": "2026-06-02",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-14"
+    ],
+    "event_date_iso_guess": "2026-06-14",
+    "event_date_iso_guesses": [
+      "2026-06-14"
+    ],
+    "event_date_start": "2026-06-14",
+    "event_date_end": "2026-06-14",
+    "event_time_text": "20:00",
+    "event_time_source": "source_text",
+    "time_start": "20:00",
+    "time_end": "",
+    "running_hours_text": "20:00",
+    "running_hours_source": "source_text",
+    "city": [
+      "重庆"
+    ],
+    "city_key": "chongqing",
+    "city_name": "重庆",
+    "city_keys": [
+      "chongqing"
+    ],
+    "venue": [
+      "坚果NUTS"
+    ],
+    "venue_id": "nuts_chongqing",
+    "venue_name": "坚果NUTS",
+    "address": "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+    "address_full": "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+    "address_source": "source_text_over_registry",
+    "geo_lng": 106.468644,
+    "geo_lat": 29.561095,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "FFF｜坚果波比友友联谊赛·第十弹［免费］",
+      "2026-06-05",
+      "2026-06-06",
+      "2026-06-07",
+      "2026-06-12"
+    ],
+    "description_original_lines": [
+      "坚果NUTS",
+      "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+      "FOOSBALL·FRIENDS·FUN",
+      "▁▁▁▁▁▁▁▁▁▁▁"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "重庆|坚果nuts|2026-06-14|fff坚果波比友友联谊赛第十弹［免费］",
+    "detail_path": "by-id/nutsu3a1962008ef98a62d3.json",
+    "detail_url": "by-id/nutsu3a1962008ef98a62d3.json",
+    "address_verification": {
+      "decision": "source_candidate_over_registry",
+      "note": "source description contains an explicit address that conflicts with the venue registry; public release keeps the source-grounded address"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg"
+  }
+}

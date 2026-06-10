@@ -1,0 +1,124 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "account": "wigwam",
+    "account_key": "wigwam",
+    "address": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+    "address_full": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+    "address_source": "venue_registry_verified",
+    "article_id": "wigwam:d2c00e6b6a0c429e",
+    "artist_profiles": [],
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_keys": [
+      "shanghai"
+    ],
+    "city_name": "上海",
+    "content_type": "calendar_preview",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_d2c00e6b6a0c429e--e189f278cbbd3405d6ae2cef.jpg",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_d2c00e6b6a0c429e--e189f278cbbd3405d6ae2cef.jpg",
+    "dedupe_key": "上海|wigwam|2026-06-02|weeklylisteningw新生",
+    "description_original_lines": [
+      "今晚 22:00- Late Weekly Listening w/ 新生",
+      "一场刚刚好的相聚"
+    ],
+    "detail_path": "by-id/wigwamu3ad2c00e6b6a0c429e.json",
+    "detail_url": "by-id/wigwamu3ad2c00e6b6a0c429e.json",
+    "dj_bio_lines": [],
+    "event_date_end": "2026-06-02",
+    "event_date_iso_guess": "2026-06-02",
+    "event_date_iso_guesses": [
+      "2026-06-02"
+    ],
+    "event_date_start": "2026-06-02",
+    "event_date_text": [
+      "2026-06-02"
+    ],
+    "event_id": "wigwam:d2c00e6b6a0c429e",
+    "event_time_source": "source_text",
+    "event_time_text": "22:00 - Late",
+    "evidence": [
+      "今晚 22:00- Late Weekly Listening w/ 新生",
+      "2026-06-02",
+      "22:00- Late",
+      "一场刚刚好的相聚"
+    ],
+    "genres": [],
+    "geo_candidate_id": "wigwam_shanghai",
+    "geo_coord_system": "GCJ-02",
+    "geo_lat": 31.210481,
+    "geo_lng": 121.419529,
+    "geo_source": "frontend_verified_map_location_book",
+    "geo_verified_at": "2026-06-01",
+    "id": "wigwam:d2c00e6b6a0c429e",
+    "is_calendar_preview": true,
+    "lineup": [
+      "新生"
+    ],
+    "lineup_artists": [
+      "新生"
+    ],
+    "music_styles": [],
+    "place_fields_locked": true,
+    "post_date": "2026-06-02",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_d2c00e6b6a0c429e--e189f278cbbd3405d6ae2cef.jpg",
+    "poster_source": "cloudbase_storage",
+    "price": [],
+    "price_text": "",
+    "promoter": "wigwam",
+    "publish_status": "published",
+    "quality_flags": [
+      "calendar_preview"
+    ],
+    "quality_status": "READY",
+    "queue_id": "wigwam:d2c00e6b6a0c429e",
+    "running_hours_source": "source_text",
+    "running_hours_text": "22:00 - Late",
+    "schema_version": "weekly_event_published.v1",
+    "source_account_name": "wigwam",
+    "source_action": {
+      "available": true,
+      "label": "公众号",
+      "type": "wechat_article",
+      "url_hash": "d2c00e6b6a0c429e"
+    },
+    "source_article": {
+      "account_name": "wigwam",
+      "published_at": "2026-06-02",
+      "url_hash": "d2c00e6b6a0c429e"
+    },
+    "source_published_at": "2026-06-02",
+    "ticketing_text": "",
+    "time_end": "Late",
+    "time_start": "22:00",
+    "title": "今晚 22:00- Late Weekly Listening w/ 新生",
+    "title_display": "Weekly Listening w/ 新生",
+    "title_original": "今晚 22:00- Late Weekly Listening w/ 新生",
+    "venue": [],
+    "venue_id": "wigwam_shanghai",
+    "venue_lat": 31.210481,
+    "venue_lng": 121.419529,
+    "venue_name": "wigwam",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_d2c00e6b6a0c429e--e189f278cbbd3405d6ae2cef.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_d2c00e6b6a0c429e--e189f278cbbd3405d6ae2cef.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_d2c00e6b6a0c429e--e189f278cbbd3405d6ae2cef.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/wigwam_d2c00e6b6a0c429e--e189f278cbbd3405d6ae2cef.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_d2c00e6b6a0c429e--e189f278cbbd3405d6ae2cef.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_d2c00e6b6a0c429e--e189f278cbbd3405d6ae2cef.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_d2c00e6b6a0c429e--e189f278cbbd3405d6ae2cef.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_d2c00e6b6a0c429e--e189f278cbbd3405d6ae2cef.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_d2c00e6b6a0c429e--e189f278cbbd3405d6ae2cef.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_d2c00e6b6a0c429e--e189f278cbbd3405d6ae2cef.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_d2c00e6b6a0c429e--e189f278cbbd3405d6ae2cef.jpg"
+  }
+}

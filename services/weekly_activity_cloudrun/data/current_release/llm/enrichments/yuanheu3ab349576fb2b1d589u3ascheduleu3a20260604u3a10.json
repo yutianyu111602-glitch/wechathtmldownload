@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "yuanhe:b349576fb2b1d589:schedule:20260604:10",
+  "sourceItemHash": "a884dc58a7fcfde16dc3ab89858a2a264a33b17d8527ef615f6b08bd587a9715",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Layzzz,HU211GH71i,Hower",
+      "event_date_start": "2026-06-04",
+      "event_date_end": "2026-06-04",
+      "event_time_text": null,
+      "city_name": "北京",
+      "venue_name": "YUANHE 原核",
+      "address_candidate": "北京市朝阳区西大望路27号E6-2号楼103",
+      "lineup_artists": [
+        "Layzzz,HU211GH71i,Hower",
+        "Layzzz,HU211GH71i,Hower"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "techno",
+        "bass",
+        "hip-hop",
+        "techno",
+        "drum & bass"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "YUANHE 原核｜6.04:Layzzz,HU211GH71i,Hower",
+        "6.04:Layzzz,HU211GH71i,Hower"
+      ],
+      "ticketing_text": [
+        "FreeEntry"
+      ],
+      "dedupe_signals": [
+        "Layzzz,HU211GH71i,Hower",
+        "2026-06-04",
+        "北京",
+        "YUANHE 原核"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

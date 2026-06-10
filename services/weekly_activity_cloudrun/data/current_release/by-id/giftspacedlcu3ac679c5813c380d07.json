@@ -1,0 +1,181 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "giftspacedlc:c679c5813c380d07",
+    "event_id": "giftspacedlc:c679c5813c380d07",
+    "article_id": "giftspacedlc:c679c5813c380d07",
+    "queue_id": "giftspacedlc:c679c5813c380d07",
+    "title": "06.06 ROOM2 本周六｜老婆不在家孤单寂寞，来放点千禧舞曲。那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+    "title_original": "06.06 ROOM2 本周六｜老婆不在家孤单寂寞，来放点千禧舞曲。那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+    "title_display": "ROOM2 本周六 | 老婆不在家孤单寂寞，来放点千禧舞曲。那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+    "account": "GiftSpaceDLC",
+    "account_key": "giftspacedlc",
+    "promoter": "GiftSpaceDLC",
+    "source_article": {
+      "url_hash": "c679c5813c380d07",
+      "account_name": "GiftSpaceDLC",
+      "published_at": "2026-06-01"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "c679c5813c380d07"
+    },
+    "post_date": "2026-06-01",
+    "source_account_name": "GiftSpaceDLC",
+    "source_published_at": "2026-06-01",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/giftspacedlc_c679c5813c380d07--349e7bb21702e3259c7ba48a.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/giftspacedlc_c679c5813c380d07--349e7bb21702e3259c7ba48a.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/giftspacedlc_c679c5813c380d07--349e7bb21702e3259c7ba48a.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "大连"
+    ],
+    "city_key": "dalian",
+    "city_name": "大连",
+    "city_keys": [
+      "dalian"
+    ],
+    "venue": [],
+    "venue_id": "gift_space_dalian",
+    "venue_name": "GiftSpaceDLC",
+    "address": "辽宁省大连市中山区胜利文化广场西侧",
+    "address_full": "辽宁省大连市中山区胜利文化广场西侧",
+    "address_source": "venue_registry_verified",
+    "geo_lng": 121.634967,
+    "geo_lat": 38.919829,
+    "lineup": [
+      "DJ Kosevic江水平"
+    ],
+    "lineup_artists": [
+      "DJ Kosevic江水平"
+    ],
+    "genres": [
+      "Y2K舞曲",
+      "Club Trax",
+      "Deconstructed Club",
+      "Post-Club",
+      "riddim",
+      "dancehall"
+    ],
+    "music_styles": [
+      "club trax"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "06.06 ROOM2 本周六｜老婆不在家孤单寂寞，来放点千禧舞曲。那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+      "2026-06-06",
+      "06.06 ROOM2 本周六｜老婆不在家孤单寂寞，来放点千禧舞曲",
+      "那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+      "六月六，我们邀请了那个B站主页用“诺基亚”直播的男人——DJ Kosevic江水平！内陆草根复兴Y2K舞曲守"
+    ],
+    "description_original_lines": [
+      "06.06 ROOM2 本周六｜老婆不在家孤单寂寞，来放点千禧舞曲。那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+      "06.06 ROOM2 本周六｜老婆不在家孤单寂寞，来放点千禧舞曲",
+      "那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+      "六月六，我们邀请了那个B站主页用“诺基亚”直播的男人——DJ Kosevic江水平！内陆草根复兴Y2K舞曲守"
+    ],
+    "dj_bio_lines": [
+      "06.06 ROOM2 本周六｜老婆不在家孤单寂寞，来放点千禧舞曲。那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+      "那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+      "六月六，我们邀请了那个B站主页用“诺基亚”直播的男人——DJ Kosevic江水平！内陆草根复兴Y2K舞曲守"
+    ],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "大连|giftspacedlc|2026-06-06|room2本周六老婆不在家孤单寂寞来放点千禧舞曲那个在b站首页用诺基亚直播的大叔来了！djkosevic江水平",
+    "detail_path": "by-id/giftspacedlcu3ac679c5813c380d07.json",
+    "detail_url": "by-id/giftspacedlcu3ac679c5813c380d07.json",
+    "venue_lat": 38.919829,
+    "venue_lng": 121.634967,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "frontend_verified_map_location_book",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "gift_space_dalian",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "merge_provenance": {
+      "schema_version": "weekly_merge_provenance.v1",
+      "reason": "duplicate_cluster",
+      "retained_id": "giftspacedlc:c679c5813c380d07",
+      "retained_source_hash": "c679c5813c380d07",
+      "merged_from": [
+        "giftspacedlc:414aec06b6d30109",
+        "giftspacedlc:c679c5813c380d07"
+      ],
+      "merged_source_hashes": [
+        "414aec06b6d30109",
+        "c679c5813c380d07"
+      ],
+      "source_count": 2,
+      "sources": [
+        {
+          "event_id": "giftspacedlc:414aec06b6d30109",
+          "source_hash": "414aec06b6d30109",
+          "title": "ROOM2 周六 | 老婆不在家孤单寂寞，来放点千禧舞曲。那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平@GIFT SPACE ROOM2",
+          "published_at": "2026-05-30",
+          "account_name": "GiftSpaceDLC",
+          "source_type": "wechat_article"
+        },
+        {
+          "event_id": "giftspacedlc:c679c5813c380d07",
+          "source_hash": "c679c5813c380d07",
+          "title": "ROOM2 本周六 | 老婆不在家孤单寂寞，来放点千禧舞曲。那个在B站首页用“诺基亚”直播的大叔来了！DJ Kosevic江水平",
+          "published_at": "2026-06-01",
+          "account_name": "GiftSpaceDLC",
+          "source_type": "wechat_article"
+        }
+      ]
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/giftspacedlc_c679c5813c380d07--349e7bb21702e3259c7ba48a.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/giftspacedlc_c679c5813c380d07--349e7bb21702e3259c7ba48a.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/giftspacedlc_c679c5813c380d07--349e7bb21702e3259c7ba48a.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/giftspacedlc_c679c5813c380d07--349e7bb21702e3259c7ba48a.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/giftspacedlc_c679c5813c380d07--349e7bb21702e3259c7ba48a.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/giftspacedlc_c679c5813c380d07--349e7bb21702e3259c7ba48a.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/giftspacedlc_c679c5813c380d07--349e7bb21702e3259c7ba48a.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/giftspacedlc_c679c5813c380d07--349e7bb21702e3259c7ba48a.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/giftspacedlc_c679c5813c380d07--349e7bb21702e3259c7ba48a.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/giftspacedlc_c679c5813c380d07--349e7bb21702e3259c7ba48a.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/giftspacedlc_c679c5813c380d07--349e7bb21702e3259c7ba48a.jpg"
+  }
+}

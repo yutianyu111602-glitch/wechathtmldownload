@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "dada_bar_beijing:f08c45fef5186b83",
+  "sourceItemHash": "137460a944fd964dea6bd5c1beb69eccefda42efc861f4cdd28d07306e439f29",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "双子座的生日派对简直“令人发指”",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "北京",
+      "venue_name": "dadabar(日坛国际贸易中心A座店)",
+      "address_candidate": "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6月6日 - 双子座的生日派对简直“令人发指”",
+        "双子座紧急集合，把你令人发指的另一面叫来跳舞",
+        "Poster OCR date: 2026-06-06"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "双子座的生日派对简直“令人发指”",
+        "2026-06-06",
+        "北京",
+        "dadabar(日坛国际贸易中心A座店)"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

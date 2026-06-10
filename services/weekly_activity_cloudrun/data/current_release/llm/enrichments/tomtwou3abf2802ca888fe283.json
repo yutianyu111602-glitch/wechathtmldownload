@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "tomtwo:bf2802ca888fe283",
+  "sourceItemHash": "6c10f1443e516ca6d992aee3e8546f077d1abc6143a7d17f8d4a846eb2f3a782",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "无料入场！突如其来的偶像Live Vol.14",
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "14:30",
+      "city_name": "福州",
+      "venue_name": "TOMTWO通透现场",
+      "address_candidate": "福建省福州市台江区宁化街道长汀街39号福州滨江市民广场（左海光年PARK）项目一层L1-39商铺",
+      "lineup_artists": [
+        "TrueMask",
+        "Rising Star",
+        "Rena&Kirin",
+        "EXIOM_界外法则",
+        "TrueMask",
+        "Rising Star",
+        "Rena&Kirin",
+        "EXIOM_界外法则"
+      ],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06/07 无料入场！突如其来的偶像Live Vol.14",
+        "TrueMask /Rising Star/Rena&Kirin/EXIOM_界外法则",
+        "OpEn 14:30/Start 15:00",
+        "(SUN)"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "无料入场！突如其来的偶像Live Vol.14",
+        "2026-06-07",
+        "福州",
+        "TOMTWO通透现场"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

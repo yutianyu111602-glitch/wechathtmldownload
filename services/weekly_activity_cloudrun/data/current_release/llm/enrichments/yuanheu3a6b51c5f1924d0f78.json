@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "yuanhe:6b51c5f1924d0f78",
+  "sourceItemHash": "5769d9cbad4de9453b49af6037f0195e1ca2dbcacdeb0c861ae9ccfd8a6dd543",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Club listening day w/舒服音乐",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "北京",
+      "venue_name": "YUANHE 原核",
+      "address_candidate": "北京市朝阳区西大望路27号E6-2号楼103",
+      "lineup_artists": [
+        "Watermelon",
+        "SSL",
+        "菬zhǎo",
+        "Chen Liujing",
+        "Watermelon",
+        "SSL",
+        "菬zhǎo",
+        "Chen Liujing"
+      ],
+      "music_styles": [
+        "breaks",
+        "Downtempo",
+        "Triphop",
+        "IDM",
+        "Tribal",
+        "Hypnotic",
+        "Breaks"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.05 Club listening day w/舒服音乐",
+        "w/Watermelon,SSL,菬zhǎo,Chen Liujing",
+        "2026/06/05Fri"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "Club listening day w/舒服音乐",
+        "2026-06-05",
+        "北京",
+        "YUANHE 原核"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

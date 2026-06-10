@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "oonoo:d32bcedf70d9b78e",
+  "sourceItemHash": "48458256c3497e3265fff20ffa6cc50fdeac7d82bc581a4bea95f0e077db7795",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "一只日本迷你猫冲进了懊恼的舞池",
+      "event_date_start": "2026-06-12",
+      "event_date_end": "2026-06-12",
+      "event_time_text": "22:00 - Late",
+      "city_name": "杭州",
+      "venue_name": "OONOO",
+      "address_candidate": "杭州市上城区延安路18号地下一层104室",
+      "lineup_artists": [],
+      "music_styles": [
+        "hip-hop",
+        "techno",
+        "house",
+        "electro",
+        "minimal",
+        "house",
+        "techno",
+        "electro"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "「06/12周五」OONOO CLUB ｜一只日本迷你猫冲进了懊恼的舞池",
+        "一只日本迷你猫冲进了懊恼的舞池并在舞池中间发呆了一整晚",
+        "#minimal #house #groove",
+        "Poster OCR time: 22:00-LATE"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "一只日本迷你猫冲进了懊恼的舞池",
+        "2026-06-12",
+        "杭州",
+        "OONOO"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

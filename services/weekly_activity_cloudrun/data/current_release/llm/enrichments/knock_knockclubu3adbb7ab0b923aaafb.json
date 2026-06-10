@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "knock_knockclub:dbb7ab0b923aaafb",
+  "sourceItemHash": "5599759a85dfc8068d5135c648b5ef25ccfedcfdd830593f0ccf6a5f93300055",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "[禁止低头]Hiphop派对 GUEST DJ JAKELxx",
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": null,
+      "city_name": "长春",
+      "venue_name": "敲敲电子俱乐部",
+      "address_candidate": "吉林省长春市朝阳区桂林街道新疆街西康路交汇处长白山宾馆后院叁叁火锅后身",
+      "lineup_artists": [
+        "JAKELxx",
+        "JAKELxx"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "house",
+        "hip-hop",
+        "trap",
+        "oldschool",
+        "drill",
+        "tech house",
+        "R&B"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "长春 | 2026.6.13 [禁止低头]Hiphop派对 GUEST DJ JAKELxx"
+      ],
+      "description_original_lines": [
+        "长春 | 2026.6.13 [禁止低头]Hiphop派对 GUEST DJ JAKELxx",
+        "2026.6.13"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "[禁止低头]Hiphop派对 GUEST DJ JAKELxx",
+        "2026-06-13",
+        "长春",
+        "敲敲电子俱乐部"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

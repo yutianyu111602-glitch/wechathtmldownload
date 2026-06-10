@@ -1,0 +1,142 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "rnslive:eb92b38a938eca80",
+    "event_id": "rnslive:eb92b38a938eca80",
+    "article_id": "rnslive:eb92b38a938eca80",
+    "queue_id": "rnslive:eb92b38a938eca80",
+    "title": "Ruins入灵寺 ｜6.9 “藏在阿尔卑斯山脚仙雾中的东欧科学怪人”  Daniel Maszkowicz",
+    "title_original": "Ruins入灵寺 ｜6.9 “藏在阿尔卑斯山脚仙雾中的东欧科学怪人”  Daniel Maszkowicz",
+    "title_display": "Ruins入灵寺 | “藏在阿尔卑斯山脚仙雾中的东欧科学怪人”  Daniel Maszkowicz",
+    "account": "RNSLIVE",
+    "account_key": "rnslive",
+    "promoter": "RNSLIVE",
+    "source_article": {
+      "url_hash": "eb92b38a938eca80",
+      "account_name": "RNSLIVE",
+      "published_at": "2026-06-01"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "eb92b38a938eca80",
+      "disabled_reason": ""
+    },
+    "aggregation_child": false,
+    "post_date": "2026-06-01",
+    "source_account_name": "RNSLIVE",
+    "source_published_at": "2026-06-01",
+    "cover_url": "https://mmbiz.qpic.cn/mmbiz_png/JOhTxN9lalnLjTBPia6MaRFLxhiaYrpySH3pEyPw4Znj2tHc5kAzBkrk4jlKXnMe2M83xJkbCfia8BdCVabnJ2J9g/640?wx_fmt=png",
+    "cover_image_url": "https://mmbiz.qpic.cn/mmbiz_png/JOhTxN9lalnLjTBPia6MaRFLxhiaYrpySH3pEyPw4Znj2tHc5kAzBkrk4jlKXnMe2M83xJkbCfia8BdCVabnJ2J9g/640?wx_fmt=png",
+    "poster_file_id": "",
+    "poster_source": "wechat_article",
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "event_date_text": [
+      "2026-06-09"
+    ],
+    "event_date_iso_guess": "2026-06-09",
+    "event_date_iso_guesses": [
+      "2026-06-09"
+    ],
+    "event_date_start": "2026-06-09",
+    "event_date_end": "2026-06-09",
+    "event_time_text": "2026.6.9 20:00",
+    "event_time_source": "source_text",
+    "time_start": "2026.6.9 20:00",
+    "time_end": "",
+    "running_hours_text": "2026.6.9 20:00",
+    "running_hours_source": "source_text",
+    "city": [
+      "重庆"
+    ],
+    "city_key": "chongqing",
+    "city_name": "重庆",
+    "city_keys": [
+      "chongqing"
+    ],
+    "venue": [],
+    "venue_id": "ruinslive_chongqing",
+    "venue_name": "Ruins入灵寺",
+    "address": "重庆市两江新区建新东路64号(轻轨9/10号线鲤鱼池站3A出口后行50米)",
+    "address_full": "重庆市两江新区建新东路64号(轻轨9/10号线鲤鱼池站3A出口后行50米)",
+    "address_source": "venue_registry_verified",
+    "geo_lng": 106.551922,
+    "geo_lat": 29.574563,
+    "lineup": [
+      "Daniel Maszkowicz"
+    ],
+    "lineup_artists": [
+      "Daniel Maszkowicz"
+    ],
+    "genres": [
+      "techno",
+      "house",
+      "electro"
+    ],
+    "music_styles": [
+      "techno",
+      "house",
+      "electro"
+    ],
+    "price": [
+      "免票入场"
+    ],
+    "price_text": "免票入场",
+    "ticketing_text": "免票入场",
+    "evidence": [
+      "Ruins入灵寺 ｜6.9 “藏在阿尔卑斯山脚仙雾中的东欧科学怪人” Daniel Maszkowicz",
+      "“藏在阿尔卑斯山脚仙雾中的东欧科学怪人” Daniel Maszkowicz 2026.6.9 20:00 免票入场 演出时长:30Min ADD:重庆Ruins入灵寺实验艺术空间",
+      "2026-06-09",
+      "重庆市江北区建新东路与融景路交叉口西南160米/合作村国际青年社区A区13号楼",
+      "EMC:EMIbyDanielMaszkowiczCave12Genève,22.02.2026©Cave12 Olive"
+    ],
+    "description_original_lines": [
+      "Ruins入灵寺 ｜6.9 “藏在阿尔卑斯山脚仙雾中的东欧科学怪人” Daniel Maszkowicz",
+      "“藏在阿尔卑斯山脚仙雾中的东欧科学怪人” Daniel Maszkowicz 2026.6.9 20:00 免票入场 演出时长:30Min ADD:重庆Ruins入灵寺实验艺术空间",
+      "重庆市江北区建新东路与融景路交叉口西南160米/合作村国际青年社区A区13号楼",
+      "EMC:EMIbyDanielMaszkowiczCave12Genève,22.02.2026©Cave12 Olive"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "重庆|ruins入灵寺|2026-06-09|ruins入灵寺藏在阿尔卑斯山脚仙雾中的东欧科学怪人danielmaszkowicz",
+    "detail_path": "by-id/rnsliveu3aeb92b38a938eca80.json",
+    "detail_url": "by-id/rnsliveu3aeb92b38a938eca80.json",
+    "address_verification": {
+      "decision": "registry_over_poster_ocr_address",
+      "note": "poster OCR address conflicts with the verified venue registry; public release keeps the registry address instead of OCR-only override",
+      "rejected_source_address": "重庆市江北区建新东路与融景路交叉口西南160米/合作村国际青年社区A区13号楼"
+    },
+    "venue_lat": 29.574563,
+    "venue_lng": 106.551922,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "tencent_map_picker_user_confirmed",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "ruinslive_chongqing",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    }
+  }
+}

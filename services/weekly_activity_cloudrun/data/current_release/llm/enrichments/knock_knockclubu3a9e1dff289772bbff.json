@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "knock_knockclub:9e1dff289772bbff",
+  "sourceItemHash": "3c1dc0358490379690a9680fff608f5f5f4a58d7ddf7cd3bf9b82cc7c4ec023d",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "【暴雨黄色预警】雨季来临Chill一下",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "21:00",
+      "city_name": "长春",
+      "venue_name": "敲敲电子俱乐部",
+      "address_candidate": "吉林省长春市朝阳区桂林街道新疆街西康路交汇处长白山宾馆后院叁叁火锅后身",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "⚠️DJ：Nazal Yaya Lisianythus"
+      ],
+      "description_original_lines": [
+        "6/5｜【暴雨黄色预警】雨季来临Chill一下",
+        "免票制俱乐部",
+        "时间：2026/6/5 Fri",
+        "21：00——Late"
+      ],
+      "ticketing_text": [
+        "免票"
+      ],
+      "dedupe_signals": [
+        "【暴雨黄色预警】雨季来临Chill一下",
+        "2026-06-05",
+        "长春",
+        "敲敲电子俱乐部"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

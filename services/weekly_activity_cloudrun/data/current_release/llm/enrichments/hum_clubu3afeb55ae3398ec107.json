@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "hum_club:feb55ae3398ec107",
+  "sourceItemHash": "68dfdf4c69ebd6048a078f300f11932f742f464ded40e44c744e82d657cd09b7",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Wed. | Open Decks Vol.128 DJ台開放日 @Hum",
+      "event_date_start": "2026-06-03",
+      "event_date_end": "2026-06-03",
+      "event_time_text": null,
+      "city_name": "贵阳",
+      "venue_name": "hum_club",
+      "address_candidate": "贵州省贵阳市云岩区普陀路街道普陀路黔达花园AB座负一层",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.3 Wed.｜Open Decks Vol.128 DJ台開放日 @Hum",
+        "本周由哥叫哥提供教学"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "Wed. | Open Decks Vol.128 DJ台開放日 @Hum",
+        "2026-06-03",
+        "贵阳",
+        "hum_club"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

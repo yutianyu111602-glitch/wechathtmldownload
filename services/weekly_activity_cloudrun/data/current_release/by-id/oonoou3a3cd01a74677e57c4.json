@@ -1,0 +1,127 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "oonoo:3cd01a74677e57c4",
+    "event_id": "oonoo:3cd01a74677e57c4",
+    "article_id": "oonoo:3cd01a74677e57c4",
+    "queue_id": "oonoo:3cd01a74677e57c4",
+    "title": "2026/6/6  幻舞穿行  以太脉冲 <六人共演迷幻马拉松 不爽不活>",
+    "title_original": "2026/6/6  幻舞穿行  以太脉冲 <六人共演迷幻马拉松 不爽不活>",
+    "title_display": "幻舞穿行  以太脉冲 <六人共演迷幻马拉松 不爽不活>",
+    "account": "OONOO",
+    "account_key": "oonoo",
+    "promoter": "OONOO",
+    "source_article": {
+      "url_hash": "3cd01a74677e57c4",
+      "account_name": "OONOO",
+      "published_at": "2026-06-02"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "3cd01a74677e57c4"
+    },
+    "post_date": "2026-06-02",
+    "source_account_name": "OONOO",
+    "source_published_at": "2026-06-02",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_3cd01a74677e57c4--f824c1771b2eb36834f034a4.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_3cd01a74677e57c4--f824c1771b2eb36834f034a4.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_3cd01a74677e57c4--f824c1771b2eb36834f034a4.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "杭州"
+    ],
+    "city_key": "hangzhou",
+    "city_name": "杭州",
+    "city_keys": [
+      "hangzhou"
+    ],
+    "venue": [],
+    "venue_id": "oonoo_hangzhou",
+    "venue_name": "OONOO",
+    "address": "杭州市上城区延安路18号地下一层104室",
+    "address_full": "杭州市上城区延安路18号地下一层104室",
+    "address_source": "manual_registry",
+    "geo_lng": 120.16488,
+    "geo_lat": 30.24104,
+    "lineup": [
+      "RUO",
+      "LING"
+    ],
+    "lineup_artists": [
+      "RUO",
+      "LING"
+    ],
+    "genres": [
+      "psy trance",
+      "minimal",
+      "minimal techno",
+      "dark techno",
+      "deep house",
+      "techno"
+    ],
+    "music_styles": [
+      "techno",
+      "house",
+      "trance"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "2026/6/6 幻舞穿行 以太脉冲 <六人共演迷幻马拉松 不爽不活>",
+      "2026-06-06",
+      "2026/6/6 幻舞穿行 以太脉冲",
+      "（海报：LING/RUO)神秘的波浪般的鼓点与呼声 唤醒了那片精神向往而我们又从未在清醒时踏足过的虚幻世界用"
+    ],
+    "description_original_lines": [
+      "2026/6/6 幻舞穿行 以太脉冲 <六人共演迷幻马拉松 不爽不活>",
+      "2026/6/6 幻舞穿行 以太脉冲",
+      "（海报：LING/RUO)神秘的波浪般的鼓点与呼声 唤醒了那片精神向往而我们又从未在清醒时踏足过的虚幻世界用"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "杭州|oonoo|2026-06-06|幻舞穿行以太脉冲<六人共演迷幻马拉松不爽不活>",
+    "detail_path": "by-id/oonoou3a3cd01a74677e57c4.json",
+    "detail_url": "by-id/oonoou3a3cd01a74677e57c4.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_3cd01a74677e57c4--f824c1771b2eb36834f034a4.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_3cd01a74677e57c4--f824c1771b2eb36834f034a4.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_3cd01a74677e57c4--f824c1771b2eb36834f034a4.png",
+    "poster_cloud_path": "weekly-posters/20260604/oonoo_3cd01a74677e57c4--f824c1771b2eb36834f034a4.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_3cd01a74677e57c4--f824c1771b2eb36834f034a4.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_3cd01a74677e57c4--f824c1771b2eb36834f034a4.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_3cd01a74677e57c4--f824c1771b2eb36834f034a4.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_3cd01a74677e57c4--f824c1771b2eb36834f034a4.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_3cd01a74677e57c4--f824c1771b2eb36834f034a4.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_3cd01a74677e57c4--f824c1771b2eb36834f034a4.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_3cd01a74677e57c4--f824c1771b2eb36834f034a4.png"
+  }
+}

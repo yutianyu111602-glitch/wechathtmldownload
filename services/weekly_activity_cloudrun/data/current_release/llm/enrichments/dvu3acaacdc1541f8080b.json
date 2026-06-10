@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "dv:caacdc1541f8080b",
+  "sourceItemHash": "882f7c1b592616ba53c79592a4d6c33ed6885b42a34dc0d2f53f148495ddcd82",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "免票 | Young Kids Rock",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "苏州",
+      "venue_name": "dv 苏州",
+      "address_candidate": "江苏省苏州市姑苏区平桥直街120号2-3楼",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.6 周六 免票｜Young Kids Rock",
+        "2026年4月组建",
+        "Poster OCR date: 2026-06-06 / 2026-02-03"
+      ],
+      "ticketing_text": [
+        "免票"
+      ],
+      "dedupe_signals": [
+        "免票 | Young Kids Rock",
+        "2026-06-06",
+        "苏州",
+        "dv 苏州"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

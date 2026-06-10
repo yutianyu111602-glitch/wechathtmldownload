@@ -1,0 +1,133 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "yuanhe:f07f9c2d47e2484c",
+    "event_id": "yuanhe:f07f9c2d47e2484c",
+    "article_id": "yuanhe:f07f9c2d47e2484c",
+    "queue_id": "yuanhe:f07f9c2d47e2484c",
+    "title": "今晚YuanHe 魔丸降世",
+    "title_original": "今晚YuanHe 魔丸降世",
+    "title_display": "今晚YuanHe 魔丸降世",
+    "account": "YUANHE 原核",
+    "account_key": "yuanhe",
+    "promoter": "YUANHE 原核",
+    "source_article": {
+      "url_hash": "f07f9c2d47e2484c",
+      "account_name": "YUANHE 原核",
+      "published_at": "2026-06-04"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "f07f9c2d47e2484c"
+    },
+    "post_date": "2026-06-04",
+    "source_account_name": "YUANHE 原核",
+    "source_published_at": "2026-06-04",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_f07f9c2d47e2484c--616cd733e7345877eeeed364.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_f07f9c2d47e2484c--616cd733e7345877eeeed364.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_f07f9c2d47e2484c--616cd733e7345877eeeed364.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-04"
+    ],
+    "event_date_iso_guess": "2026-06-04",
+    "event_date_iso_guesses": [
+      "2026-06-04"
+    ],
+    "event_date_start": "2026-06-04",
+    "event_date_end": "2026-06-04",
+    "event_time_text": "22:00-23:30",
+    "event_time_source": "source_text",
+    "time_start": "22:00",
+    "time_end": "23:30",
+    "running_hours_text": "22:00-23:30",
+    "running_hours_source": "source_text",
+    "city": [
+      "北京"
+    ],
+    "city_key": "beijing",
+    "city_name": "北京",
+    "city_keys": [
+      "beijing"
+    ],
+    "venue": [],
+    "venue_id": "yuanhe_beijing",
+    "venue_name": "YUANHE 原核",
+    "address": "北京市朝阳区西大望路27号E6-2号楼103",
+    "address_full": "北京市朝阳区西大望路27号E6-2号楼103",
+    "address_source": "manual_registry",
+    "geo_lng": 116.481883,
+    "geo_lat": 39.885909,
+    "lineup": [
+      "Layzzz",
+      "HU211GH71i"
+    ],
+    "lineup_artists": [
+      "Layzzz",
+      "HU211GH71i"
+    ],
+    "genres": [
+      "club music",
+      "electronic pop"
+    ],
+    "music_styles": [
+      "club trax",
+      "electro"
+    ],
+    "price": [
+      "FreeEntry"
+    ],
+    "price_text": "FreeEntry",
+    "ticketing_text": "FreeEntry",
+    "evidence": [
+      "今晚YuanHe 魔丸降世",
+      "2026-06-04",
+      "22:00-23:30",
+      "今晚，你能听到三组",
+      "富含坚强的柔软的情绪的暴力的愤怒的恐惧的悲伤的欢愉的善变的沉默的平凡的孤单的不堪的艰难的可敬的可畏的可怕的生长的凋败的热烈的冷酷的连续的断裂的饱满的疯狂的绝望的无助的无力的疲惫的笨拙情绪Set！"
+    ],
+    "description_original_lines": [
+      "今晚，你能听到三组",
+      "富含坚强的柔软的情绪的暴力的愤怒的恐惧的悲伤的欢愉的善变的沉默的平凡的孤单的不堪的艰难的可敬的可畏的可怕的生长的凋败的热烈的冷酷的连续的断裂的饱满的疯狂的绝望的无助的无力的疲惫的笨拙情绪Set！",
+      "22:00-23:30:Layzzz",
+      "23:30-01:00:HU211GH71i"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "北京|yuanhe原核|2026-06-04|yuanhe魔丸降世",
+    "detail_path": "by-id/yuanheu3af07f9c2d47e2484c.json",
+    "detail_url": "by-id/yuanheu3af07f9c2d47e2484c.json",
+    "lineup_quality": {
+      "status": "verified",
+      "decision": "scoring_retained_lineup",
+      "note": "retained lineup artists with score >= 0.6: Layzzz, HU211GH71i"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_f07f9c2d47e2484c--616cd733e7345877eeeed364.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_f07f9c2d47e2484c--616cd733e7345877eeeed364.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_f07f9c2d47e2484c--616cd733e7345877eeeed364.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/yuanhe_f07f9c2d47e2484c--616cd733e7345877eeeed364.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_f07f9c2d47e2484c--616cd733e7345877eeeed364.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_f07f9c2d47e2484c--616cd733e7345877eeeed364.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_f07f9c2d47e2484c--616cd733e7345877eeeed364.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_f07f9c2d47e2484c--616cd733e7345877eeeed364.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_f07f9c2d47e2484c--616cd733e7345877eeeed364.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_f07f9c2d47e2484c--616cd733e7345877eeeed364.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_f07f9c2d47e2484c--616cd733e7345877eeeed364.jpg"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "hakka_bar:8ec6d516a7e2db3a",
+  "sourceItemHash": "580bee0963008bc9f5ceb3f3d5473d562acbb464dc4c630efd21d0ea58a10ab9",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "「OPEN DECKS」 ·   DJ WINDVEYR",
+      "event_date_start": "2026-06-02",
+      "event_date_end": "2026-06-02",
+      "event_time_text": null,
+      "city_name": "成都",
+      "venue_name": "hakka_bar",
+      "address_candidate": "四川省成都市武侯区玉林街道科华北路60号科华沸城12楼1201",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06.02 今晚 |「OPEN DECKS」 · DJ WINDVEYR",
+        "跃跃欲试的新手们，快来报名！"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "「OPEN DECKS」 ·   DJ WINDVEYR",
+        "2026-06-02",
+        "成都",
+        "hakka_bar"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

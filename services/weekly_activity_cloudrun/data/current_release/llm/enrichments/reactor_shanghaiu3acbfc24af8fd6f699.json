@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "reactor_shanghai:cbfc24af8fd6f699",
+  "sourceItemHash": "75d785133c1b0e4862d93f147fe152bff3b32440aa4edc2b5f4d6a43c547a034",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "本周五 双厅共振 | GR九周年呈现：Zean 新EP发布，偏离既定标签，探索无限可能",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "上海",
+      "venue_name": "REACTOR Shanghai",
+      "address_candidate": "上海市长宁区昭化路658号海粟文化广场D栋",
+      "lineup_artists": [
+        "Zean",
+        "Zean"
+      ],
+      "music_styles": [
+        "club trax",
+        "bass",
+        "drum'n'bass",
+        "dubstep",
+        "grime",
+        "bass",
+        "club trax",
+        "garage"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "GR主理人Zean新EP “Off-Route Grooves”发布预热"
+      ],
+      "description_original_lines": [
+        "GR主理人Zean新EP “Off-Route Grooves”发布预热",
+        "5THJUNE2026@REACTORSHANGHAI",
+        "Poster OCR date: 2026-03-03"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "本周五 双厅共振 | GR九周年呈现：Zean 新EP发布，偏离既定标签，探索无限可能",
+        "2026-06-05",
+        "上海",
+        "REACTOR Shanghai"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

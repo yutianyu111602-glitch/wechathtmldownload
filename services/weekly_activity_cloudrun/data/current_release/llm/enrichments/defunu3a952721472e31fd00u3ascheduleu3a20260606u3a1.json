@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "defun:952721472e31fd00:schedule:20260606:1",
+  "sourceItemHash": "00680f1ee0d1892393c682e86f81709f8753236d52fa28d77a1da71ad4955575",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "DEFUN｜6.6 周六",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "21:30 - Late",
+      "city_name": "上海",
+      "venue_name": "DEFUN",
+      "address_candidate": "上海市普陀区长寿路401号亚新生活广场",
+      "lineup_artists": [],
+      "music_styles": [
+        "hip-hop",
+        "techno",
+        "house",
+        "electro",
+        "techno",
+        "house",
+        "electro",
+        "hip-hop",
+        "deep tech",
+        "dub techno"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "FREE ENTRY",
+        "21:30-LATE",
+        "PRGRM 021 x DEFUN",
+        "2026"
+      ],
+      "ticketing_text": [
+        "FREE ENTRY"
+      ],
+      "dedupe_signals": [
+        "DEFUN｜6.6 周六",
+        "2026-06-06",
+        "上海",
+        "DEFUN"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

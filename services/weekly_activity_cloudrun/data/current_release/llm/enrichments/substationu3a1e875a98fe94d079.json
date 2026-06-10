@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "substation:1e875a98fe94d079",
+  "sourceItemHash": "2fe2d557c9ed89306ef9f8cdb8077be97d91dbe79f91f8633e24182e53cf99bc",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "你要记住！再不播种就晚了！",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "01:00 - Late",
+      "city_name": "沈阳",
+      "venue_name": "SUBSTATION",
+      "address_candidate": "辽宁省沈阳市和平区桂林街69号院内深处蓝绿色建筑2楼",
+      "lineup_artists": [],
+      "music_styles": [
+        "techno",
+        "house",
+        "minimal",
+        "downtempo",
+        "chill house",
+        "deep house",
+        "ethno",
+        "techno"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.5｜你要记住！再不播种就晚了！",
+        "单人55 双人100 三人同行135",
+        "1:00-LATE",
+        "一个地下俱乐部也是如此"
+      ],
+      "ticketing_text": [
+        "单人55 / 双人100"
+      ],
+      "dedupe_signals": [
+        "你要记住！再不播种就晚了！",
+        "2026-06-05",
+        "沈阳",
+        "SUBSTATION"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

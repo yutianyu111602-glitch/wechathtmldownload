@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "oil:7a1e84c5c675adf8",
+  "sourceItemHash": "99930760726a627d7b69c485901960fdcb7d20fdc7c60991293e463328048ef4",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "一场献给工业压迫感, 极端 BPM 与地下原始之魂的仪式：C.U.M 三周年 w/ Tham",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "深圳",
+      "venue_name": "OIL CLUB",
+      "address_candidate": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "lineup_artists": [
+        "Tham",
+        "Tham"
+      ],
+      "music_styles": [
+        "techno",
+        "techno",
+        "hard techno",
+        "hardcore",
+        "darkstyle"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6/06｜一场献给工业压迫感, 极端 BPM 与地下原始之魂的仪式：C.U.M 三周年 w/ Tham",
+        "harder, darker, faster",
+        "2028"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "一场献给工业压迫感, 极端 BPM 与地下原始之魂的仪式：C.U.M 三周年 w/ Tham",
+        "2026-06-06",
+        "深圳",
+        "OIL CLUB"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

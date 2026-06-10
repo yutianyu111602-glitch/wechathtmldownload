@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "account_c32511ebe6:584999ad02f8a2e1",
+  "sourceItemHash": "d9d81e1873602794daf6ec7a7d3fa02e60085447a7e5e46b4f286802b6171f39",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Opal Records 六周年庆生派对!",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "西安",
+      "venue_name": "播放室",
+      "address_candidate": "陕西省西安市莲湖区环城西路天品西岸临街上层广场北侧COMMUNE幻师楼上",
+      "lineup_artists": [],
+      "music_styles": [
+        "house",
+        "breaks",
+        "Psychedelic",
+        "Acid House",
+        "Minimal",
+        "Micro House",
+        "Breaks",
+        "Tribal"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06/06 Opal Records 六周年庆生派对!",
+        "2026.6.6"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "Opal Records 六周年庆生派对!",
+        "2026-06-06",
+        "西安",
+        "播放室"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

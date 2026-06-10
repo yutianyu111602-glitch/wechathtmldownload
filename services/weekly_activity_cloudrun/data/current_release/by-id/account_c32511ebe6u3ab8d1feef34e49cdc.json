@@ -1,0 +1,122 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "account_c32511ebe6:b8d1feef34e49cdc",
+    "event_id": "account_c32511ebe6:b8d1feef34e49cdc",
+    "article_id": "account_c32511ebe6:b8d1feef34e49cdc",
+    "queue_id": "account_c32511ebe6:b8d1feef34e49cdc",
+    "title": "06/05 “免票入场” èn的音乐，谁点的菜！开饭了！",
+    "title_original": "06/05 “免票入场” èn的音乐，谁点的菜！开饭了！",
+    "title_display": "“免票入场” èn的音乐，谁点的菜！开饭了！",
+    "account": "播放室",
+    "account_key": "account_c32511ebe6",
+    "promoter": "播放室",
+    "source_article": {
+      "url_hash": "b8d1feef34e49cdc",
+      "account_name": "播放室",
+      "published_at": "2026-06-03"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "b8d1feef34e49cdc"
+    },
+    "post_date": "2026-06-03",
+    "source_account_name": "播放室",
+    "source_published_at": "2026-06-03",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_c32511ebe6_b8d1feef34e49cdc--aede870121b0044b866a2502.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_c32511ebe6_b8d1feef34e49cdc--aede870121b0044b866a2502.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_c32511ebe6_b8d1feef34e49cdc--aede870121b0044b866a2502.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "西安"
+    ],
+    "city_key": "xian",
+    "city_name": "西安",
+    "city_keys": [
+      "xian"
+    ],
+    "venue": [],
+    "venue_id": "rop_xian",
+    "venue_name": "播放室",
+    "address": "陕西省西安市莲湖区环城西路天品西岸临街上层广场北侧COMMUNE幻师楼上",
+    "address_full": "陕西省西安市莲湖区环城西路天品西岸临街上层广场北侧COMMUNE幻师楼上",
+    "address_source": "manual_registry",
+    "geo_lng": 108.924232,
+    "geo_lat": 34.255488,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "hard techno",
+      "dnb",
+      "bass",
+      "techno"
+    ],
+    "music_styles": [
+      "techno",
+      "bass",
+      "drum & bass"
+    ],
+    "price": [
+      "免票入场"
+    ],
+    "price_text": "免票入场",
+    "ticketing_text": "免票入场",
+    "evidence": [
+      "06/05 “免票入场” èn的音乐，谁点的菜！开饭了！",
+      "06/05 “免票入场” èn的音乐,谁点的菜!开饭了!",
+      "2026-06-05",
+      "听点èn的电子音乐"
+    ],
+    "description_original_lines": [
+      "06/05 “免票入场” èn的音乐，谁点的菜！开饭了！",
+      "06/05 “免票入场” èn的音乐,谁点的菜!开饭了!",
+      "听点èn的电子音乐",
+      "2026106105"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "西安|播放室|2026-06-05|免票入场èn的音乐谁点的菜！开饭了！",
+    "detail_path": "by-id/account_c32511ebe6u3ab8d1feef34e49cdc.json",
+    "detail_url": "by-id/account_c32511ebe6u3ab8d1feef34e49cdc.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_c32511ebe6_b8d1feef34e49cdc--aede870121b0044b866a2502.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_c32511ebe6_b8d1feef34e49cdc--aede870121b0044b866a2502.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_c32511ebe6_b8d1feef34e49cdc--aede870121b0044b866a2502.png",
+    "poster_cloud_path": "weekly-posters/20260604/account_c32511ebe6_b8d1feef34e49cdc--aede870121b0044b866a2502.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_c32511ebe6_b8d1feef34e49cdc--aede870121b0044b866a2502.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_c32511ebe6_b8d1feef34e49cdc--aede870121b0044b866a2502.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_c32511ebe6_b8d1feef34e49cdc--aede870121b0044b866a2502.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_c32511ebe6_b8d1feef34e49cdc--aede870121b0044b866a2502.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_c32511ebe6_b8d1feef34e49cdc--aede870121b0044b866a2502.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_c32511ebe6_b8d1feef34e49cdc--aede870121b0044b866a2502.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_c32511ebe6_b8d1feef34e49cdc--aede870121b0044b866a2502.png"
+  }
+}

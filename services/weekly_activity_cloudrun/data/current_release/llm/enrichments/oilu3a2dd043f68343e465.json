@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "oil:2dd043f68343e465",
+  "sourceItemHash": "67bd84e406bf4832c622055167bb9bca81146bf95d94ff785b3aa57c8c5c29dd",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "D1S“亂天堂”呈现：Mssingno + eden2001, 神祇与魔鬼在人间共舞",
+      "event_date_start": "2026-06-12",
+      "event_date_end": "2026-06-12",
+      "event_time_text": null,
+      "city_name": "深圳",
+      "venue_name": "OIL CLUB",
+      "address_candidate": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "lineup_artists": [
+        "Mssingno",
+        "eden2001",
+        "Mssingno",
+        "eden2001"
+      ],
+      "music_styles": [
+        "techno",
+        "bass",
+        "trance",
+        "Trance",
+        "UK Wave",
+        "Bass",
+        "Techno",
+        "Hard Groove",
+        "UKG"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6/12｜D1S“亂天堂”呈现：Mssingno + eden2001, 神祇与魔鬼在人间共舞",
+        "天堂倾覆，地狱升腾，泪珠化成云，声波泛做海",
+        "eden200110"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "D1S“亂天堂”呈现：Mssingno + eden2001, 神祇与魔鬼在人间共舞",
+        "2026-06-12",
+        "深圳",
+        "OIL CLUB"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

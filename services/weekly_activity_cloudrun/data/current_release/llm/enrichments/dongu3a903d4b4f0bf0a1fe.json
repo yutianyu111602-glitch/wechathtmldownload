@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "dong:903d4b4f0bf0a1fe",
+  "sourceItemHash": "6d6f2bf9ddc498de7cf0cb236bbaf49183ffe398ad76788738506dc68cbaab7c",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "年中巨献】MssingNo China Tour 杭州站 by mualot & EVERLASTING @DONG",
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": null,
+      "city_name": "杭州",
+      "venue_name": "DONG 洞",
+      "address_candidate": "浙江省杭州市上城区紫阳街道中山南路77号利星名品广场",
+      "lineup_artists": [
+        "MssingNo",
+        "MssingNo"
+      ],
+      "music_styles": [
+        "trance",
+        "trance"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "与Travis Scott & SOPHIE 同台、TranceParty系列活动的座上宾—— MssingNo ：定义一个时代的英伦音乐天才"
+      ],
+      "description_original_lines": [
+        "6/13【预告 | 年中巨献】MssingNo China Tour 杭州站 by mualot & EVERLASTING @DONG",
+        "与Travis Scott & SOPHIE 同台、TranceParty系列活动的座上宾—— MssingNo ：定义一个时代的英伦音乐天才",
+        "FRI MAR 13",
+        "SAT MAR 14"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "年中巨献】MssingNo China Tour 杭州站 by mualot & EVERLASTING @DONG",
+        "2026-06-13",
+        "杭州",
+        "DONG 洞"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

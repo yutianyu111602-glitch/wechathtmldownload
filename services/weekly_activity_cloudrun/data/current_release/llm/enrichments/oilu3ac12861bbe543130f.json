@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "oil:c12861bbe543130f",
+  "sourceItemHash": "e365628e47f217c5d96a985e7979faed57bf4b0927a5d9862bfff4e490c5f529",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "🤜Unchained十周年🤛献上dBridge与Dynamite MC王牌阵容‼️",
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": null,
+      "city_name": "深圳",
+      "venue_name": "OIL CLUB",
+      "address_candidate": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "lineup_artists": [
+        "dBridge",
+        "Dynamite MC",
+        "dBridge",
+        "Dynamite MC"
+      ],
+      "music_styles": [
+        "bass",
+        "Drum & Bass",
+        "Jungle",
+        "Neurofunk",
+        "Halftime",
+        "Bass Music",
+        "UK Bass"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6/13🤜Unchained十周年🤛献上dBridge与Dynamite MC王牌阵容‼️",
+        "UKF：“Unchained是中国Bass music最强大的力量”",
+        "SATURDAY13THJUNE"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "🤜Unchained十周年🤛献上dBridge与Dynamite MC王牌阵容‼️",
+        "2026-06-13",
+        "深圳",
+        "OIL CLUB"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

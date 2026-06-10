@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "oonoo:3cd01a74677e57c4",
+  "sourceItemHash": "cd603c2810bbf289a543b9de0e98b14fc027779bfae42c29e6b0a497ed188491",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "幻舞穿行  以太脉冲 <六人共演迷幻马拉松 不爽不活>",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "杭州",
+      "venue_name": "OONOO",
+      "address_candidate": "杭州市上城区延安路18号地下一层104室",
+      "lineup_artists": [
+        "RUO",
+        "LING",
+        "RUO",
+        "LING"
+      ],
+      "music_styles": [
+        "techno",
+        "house",
+        "trance",
+        "psy trance",
+        "minimal",
+        "minimal techno",
+        "dark techno",
+        "deep house",
+        "techno"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "2026/6/6 幻舞穿行 以太脉冲 <六人共演迷幻马拉松 不爽不活>",
+        "2026/6/6 幻舞穿行 以太脉冲",
+        "（海报：LING/RUO)神秘的波浪般的鼓点与呼声 唤醒了那片精神向往而我们又从未在清醒时踏足过的虚幻世界用"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "幻舞穿行  以太脉冲 <六人共演迷幻马拉松 不爽不活>",
+        "2026-06-06",
+        "杭州",
+        "OONOO"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

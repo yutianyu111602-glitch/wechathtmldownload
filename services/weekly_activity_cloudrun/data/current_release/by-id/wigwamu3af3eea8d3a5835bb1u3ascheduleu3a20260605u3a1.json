@@ -1,0 +1,152 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "wigwam:f3eea8d3a5835bb1:schedule:20260605:1",
+    "event_id": "wigwam:f3eea8d3a5835bb1:schedule:20260605:1",
+    "article_id": "wigwam:f3eea8d3a5835bb1",
+    "queue_id": "wigwam:f3eea8d3a5835bb1:schedule:20260605:1",
+    "title": "wigwam｜06.05 — Wigwam / 上海 Shanghai",
+    "title_original": "wigwam｜06.05 — Wigwam / 上海 Shanghai",
+    "title_display": "Wigwam / 上海 Shanghai",
+    "account": "wigwam",
+    "account_key": "wigwam",
+    "promoter": "wigwam",
+    "source_article": {
+      "url_hash": "f3eea8d3a5835bb1",
+      "account_name": "wigwam",
+      "published_at": "2026-06-02"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "f3eea8d3a5835bb1"
+    },
+    "post_date": "2026-06-02",
+    "source_account_name": "wigwam",
+    "source_published_at": "2026-06-02",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_f3eea8d3a5835bb1_schedule_20260605_1--e71e05e2c8df46cc8dd99ae3.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_f3eea8d3a5835bb1_schedule_20260605_1--e71e05e2c8df46cc8dd99ae3.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_f3eea8d3a5835bb1_schedule_20260605_1--e71e05e2c8df46cc8dd99ae3.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [],
+    "venue_id": "wigwam_shanghai",
+    "venue_name": "wigwam",
+    "address": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+    "address_full": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+    "address_source": "manual_registry",
+    "geo_lng": 121.419529,
+    "geo_lat": 31.210481,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "hip-hop",
+      "house",
+      "electro",
+      "disco"
+    ],
+    "music_styles": [
+      "hip-hop",
+      "house",
+      "electro",
+      "disco"
+    ],
+    "price": [
+      "¥100"
+    ],
+    "price_text": "¥100",
+    "ticketing_text": "¥100",
+    "evidence": [
+      "wigwam｜06.05 — Wigwam / 上海 Shanghai",
+      "2026-06-05",
+      "06.05 — Wigwam / 上海 Shanghai"
+    ],
+    "description_original_lines": [
+      "wigwam｜06.05 — Wigwam / 上海 Shanghai",
+      "06.05 — Wigwam / 上海 Shanghai"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "上海|wigwam|2026-06-05|wigwam上海shanghai",
+    "detail_path": "by-id/wigwamu3af3eea8d3a5835bb1u3ascheduleu3a20260605u3a1.json",
+    "detail_url": "by-id/wigwamu3af3eea8d3a5835bb1u3ascheduleu3a20260605u3a1.json",
+    "merge_provenance": {
+      "schema_version": "weekly_merge_provenance.v1",
+      "reason": "duplicate_cluster",
+      "retained_id": "wigwam:f3eea8d3a5835bb1:schedule:20260605:1",
+      "retained_source_hash": "f3eea8d3a5835bb1",
+      "merged_from": [
+        "wigwam:f3eea8d3a5835bb1",
+        "wigwam:f3eea8d3a5835bb1:schedule:20260605:1"
+      ],
+      "merged_source_hashes": [
+        "f3eea8d3a5835bb1"
+      ],
+      "source_count": 2,
+      "sources": [
+        {
+          "event_id": "wigwam:f3eea8d3a5835bb1",
+          "source_hash": "f3eea8d3a5835bb1",
+          "title": "Fountain Pres: Dean Chew / Darker Than Wax 15周年中国巡演上海站",
+          "published_at": "2026-06-02",
+          "account_name": "wigwam",
+          "source_type": "wechat_article"
+        },
+        {
+          "event_id": "wigwam:f3eea8d3a5835bb1:schedule:20260605:1",
+          "source_hash": "f3eea8d3a5835bb1",
+          "title": "Wigwam / 上海 Shanghai",
+          "published_at": "2026-06-02",
+          "account_name": "wigwam",
+          "source_type": "wechat_article"
+        }
+      ]
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_f3eea8d3a5835bb1_schedule_20260605_1--e71e05e2c8df46cc8dd99ae3.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_f3eea8d3a5835bb1_schedule_20260605_1--e71e05e2c8df46cc8dd99ae3.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_f3eea8d3a5835bb1_schedule_20260605_1--e71e05e2c8df46cc8dd99ae3.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/wigwam_f3eea8d3a5835bb1_schedule_20260605_1--e71e05e2c8df46cc8dd99ae3.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_f3eea8d3a5835bb1_schedule_20260605_1--e71e05e2c8df46cc8dd99ae3.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_f3eea8d3a5835bb1_schedule_20260605_1--e71e05e2c8df46cc8dd99ae3.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_f3eea8d3a5835bb1_schedule_20260605_1--e71e05e2c8df46cc8dd99ae3.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_f3eea8d3a5835bb1_schedule_20260605_1--e71e05e2c8df46cc8dd99ae3.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_f3eea8d3a5835bb1_schedule_20260605_1--e71e05e2c8df46cc8dd99ae3.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_f3eea8d3a5835bb1_schedule_20260605_1--e71e05e2c8df46cc8dd99ae3.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_f3eea8d3a5835bb1_schedule_20260605_1--e71e05e2c8df46cc8dd99ae3.jpg"
+  }
+}

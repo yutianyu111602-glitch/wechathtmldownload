@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "dada_kunming:01a5754ae510df68",
+  "sourceItemHash": "ca61a344abc18e188bff74a7c712a8137d133b9c4263740a17d7be3ad162b7f5",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "营业时间调整通知",
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": null,
+      "city_name": "昆明",
+      "venue_name": "Dada Kunming",
+      "address_candidate": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "2026年6月7日，店休",
+        "助力高考，下周再会！"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "营业时间调整通知",
+        "2026-06-07",
+        "昆明",
+        "Dada Kunming"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "exit_shanghai:23ef3755473ecec7",
+    "event_id": "exit_shanghai:23ef3755473ecec7",
+    "article_id": "exit_shanghai:23ef3755473ecec7",
+    "queue_id": "exit_shanghai:23ef3755473ecec7",
+    "title": "今晚 📌 JACK'N",
+    "title_original": "今晚 📌 JACK'N",
+    "title_display": "📌 JACK'N",
+    "account": "EXIT Shanghai",
+    "account_key": "exit_shanghai",
+    "promoter": "EXIT Shanghai",
+    "source_article": {
+      "url_hash": "23ef3755473ecec7",
+      "account_name": "EXIT Shanghai",
+      "published_at": "2026-06-04"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "23ef3755473ecec7"
+    },
+    "post_date": "2026-06-04",
+    "source_account_name": "EXIT Shanghai",
+    "source_published_at": "2026-06-04",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_23ef3755473ecec7--6c5e17c6053ef381329ddb14.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_23ef3755473ecec7--6c5e17c6053ef381329ddb14.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_23ef3755473ecec7--6c5e17c6053ef381329ddb14.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-04"
+    ],
+    "event_date_iso_guess": "2026-06-04",
+    "event_date_iso_guesses": [
+      "2026-06-04"
+    ],
+    "event_date_start": "2026-06-04",
+    "event_date_end": "2026-06-04",
+    "event_time_text": "22:00-23:00",
+    "event_time_source": "source_text",
+    "time_start": "22:00",
+    "time_end": "23:00",
+    "running_hours_text": "22:00-23:00",
+    "running_hours_source": "source_text",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [
+      "EXIT Club"
+    ],
+    "venue_id": "exit_shanghai",
+    "venue_name": "EXIT Club",
+    "address": "上海市长宁区新华路街道幸福路298号",
+    "address_full": "上海市长宁区新华路街道幸福路298号",
+    "address_source": "manual_registry",
+    "geo_lng": 121.431325,
+    "geo_lat": 31.208066,
+    "lineup": [
+      "YUKI"
+    ],
+    "lineup_artists": [
+      "YUKI"
+    ],
+    "genres": [
+      "techno",
+      "techhouse"
+    ],
+    "music_styles": [
+      "techno",
+      "house"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "今晚 📌 JACK'N",
+      "2026-06-04",
+      "22:00-23:00",
+      "EXIT Club",
+      "上海市长宁区新华路街道幸福路298号"
+    ],
+    "description_original_lines": [
+      "今晚 📌 JACK'N",
+      "EXIT Club",
+      "🎼 𝐋𝐈𝐍𝐄 𝐔𝐏",
+      "22:00-23:00 : YUKI"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "上海|exitclub|2026-06-04|jackn",
+    "detail_path": "by-id/exit_shanghaiu3a23ef3755473ecec7.json",
+    "detail_url": "by-id/exit_shanghaiu3a23ef3755473ecec7.json",
+    "merge_provenance": {
+      "schema_version": "weekly_merge_provenance.v1",
+      "reason": "duplicate_cluster",
+      "retained_id": "exit_shanghai:23ef3755473ecec7",
+      "retained_source_hash": "23ef3755473ecec7",
+      "merged_from": [
+        "exit_shanghai:dc097cabb784442a",
+        "exit_shanghai:23ef3755473ecec7"
+      ],
+      "merged_source_hashes": [
+        "23ef3755473ecec7",
+        "dc097cabb784442a"
+      ],
+      "source_count": 2,
+      "sources": [
+        {
+          "event_id": "exit_shanghai:dc097cabb784442a",
+          "source_hash": "dc097cabb784442a",
+          "title": "JACK'N",
+          "published_at": "2026-05-31",
+          "account_name": "EXIT Shanghai",
+          "source_type": "wechat_article"
+        },
+        {
+          "event_id": "exit_shanghai:23ef3755473ecec7",
+          "source_hash": "23ef3755473ecec7",
+          "title": "📌 JACK'N",
+          "published_at": "2026-06-04",
+          "account_name": "EXIT Shanghai",
+          "source_type": "wechat_article"
+        }
+      ]
+    },
+    "lineup_quality": {
+      "status": "verified",
+      "decision": "scoring_retained_lineup",
+      "note": "retained lineup artists with score >= 0.6: YUKI"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_23ef3755473ecec7--6c5e17c6053ef381329ddb14.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_23ef3755473ecec7--6c5e17c6053ef381329ddb14.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_23ef3755473ecec7--6c5e17c6053ef381329ddb14.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/exit_shanghai_23ef3755473ecec7--6c5e17c6053ef381329ddb14.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_23ef3755473ecec7--6c5e17c6053ef381329ddb14.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_23ef3755473ecec7--6c5e17c6053ef381329ddb14.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_23ef3755473ecec7--6c5e17c6053ef381329ddb14.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_23ef3755473ecec7--6c5e17c6053ef381329ddb14.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_23ef3755473ecec7--6c5e17c6053ef381329ddb14.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_23ef3755473ecec7--6c5e17c6053ef381329ddb14.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_23ef3755473ecec7--6c5e17c6053ef381329ddb14.jpg"
+  }
+}

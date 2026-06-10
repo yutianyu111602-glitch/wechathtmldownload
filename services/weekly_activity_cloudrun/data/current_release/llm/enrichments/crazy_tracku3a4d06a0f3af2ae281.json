@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "crazy_track:4d06a0f3af2ae281",
+  "sourceItemHash": "17df33a118dbe15553b92c5e55a4b80113fb022e31fff79137fd761df7ba2ea8",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "重磅登场！6.6户外GoaTrance派对落地Track",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "上海",
+      "venue_name": "Crazy Track",
+      "address_candidate": "北京市朝阳区751园区火车街区3号车厢",
+      "lineup_artists": [],
+      "music_styles": [
+        "techno",
+        "house",
+        "trance",
+        "goa trance",
+        "trance",
+        "acid techno",
+        "acid trance",
+        "house"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "斥巨资添置百平巨幕天幕，沉浸式迷幻派对整装待发",
+        "活动时间:2025年11月21日EventDate:November21,2025"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "重磅登场！6.6户外GoaTrance派对落地Track",
+        "2026-06-06",
+        "上海",
+        "Crazy Track"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

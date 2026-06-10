@@ -1,0 +1,158 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "nuts:dbaf27293c8eb75d",
+    "event_id": "nuts:dbaf27293c8eb75d",
+    "article_id": "nuts:dbaf27293c8eb75d",
+    "queue_id": "nuts:dbaf27293c8eb75d",
+    "title": "预告·ROUND2两周年｜坚果NUTS & INWARD",
+    "title_original": "预告·ROUND2两周年｜坚果NUTS & INWARD",
+    "title_display": "ROUND2两周年 | 坚果NUTS & INWARD",
+    "account": "坚果NUTS",
+    "account_key": "nuts",
+    "promoter": "坚果NUTS",
+    "source_article": {
+      "url_hash": "dbaf27293c8eb75d",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-05-28"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "dbaf27293c8eb75d"
+    },
+    "post_date": "2026-05-28",
+    "source_account_name": "坚果NUTS",
+    "source_published_at": "2026-05-28",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "22:00-23:30",
+    "event_time_source": "source_text",
+    "time_start": "22:00",
+    "time_end": "23:30",
+    "running_hours_text": "22:00-23:30",
+    "running_hours_source": "source_text",
+    "city": [
+      "重庆"
+    ],
+    "city_key": "chongqing",
+    "city_name": "重庆",
+    "city_keys": [
+      "chongqing"
+    ],
+    "venue": [
+      "坚果NUTS"
+    ],
+    "venue_id": "nuts_chongqing",
+    "venue_name": "坚果NUTS",
+    "address": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+    "address_full": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+    "address_source": "manual_registry",
+    "geo_lng": 106.468644,
+    "geo_lat": 29.561095,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [],
+    "music_styles": [],
+    "price": [
+      "早鸟 66¥",
+      "DOOR 89¥"
+    ],
+    "price_text": "早鸟 66¥ / DOOR 89¥",
+    "ticketing_text": "早鸟 66¥ / DOOR 89¥",
+    "evidence": [
+      "预告·ROUND2两周年｜坚果NUTS & INWARD",
+      "入场ENTRY丨早鸟 66¥(66张限量供应)",
+      "预售ADV 79¥/现场DOOR 89¥",
+      "2026-06-06",
+      "22:00 - 23:30"
+    ],
+    "description_original_lines": [
+      "预告·ROUND2两周年｜坚果NUTS & INWARD",
+      "入场ENTRY丨早鸟 66¥(66张限量供应)",
+      "预售ADV 79¥/现场DOOR 89¥",
+      "坚果NUTS"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "重庆|坚果nuts|2026-06-06|round2两周年坚果nuts&inward",
+    "detail_path": "by-id/nutsu3adbaf27293c8eb75d.json",
+    "detail_url": "by-id/nutsu3adbaf27293c8eb75d.json",
+    "merge_provenance": {
+      "schema_version": "weekly_merge_provenance.v1",
+      "reason": "duplicate_cluster",
+      "retained_id": "nuts:dbaf27293c8eb75d",
+      "retained_source_hash": "dbaf27293c8eb75d",
+      "merged_from": [
+        "inward_street:16fd95408e5942fc",
+        "nuts:dbaf27293c8eb75d"
+      ],
+      "merged_source_hashes": [
+        "16fd95408e5942fc",
+        "dbaf27293c8eb75d"
+      ],
+      "source_count": 2,
+      "sources": [
+        {
+          "event_id": "inward_street:16fd95408e5942fc",
+          "source_hash": "16fd95408e5942fc",
+          "title": "预告丨ROUND2两周年 @坚果NUTS&INWARD",
+          "published_at": "2026-05-28",
+          "account_name": "Inward Street",
+          "source_type": "wechat_article"
+        },
+        {
+          "event_id": "nuts:dbaf27293c8eb75d",
+          "source_hash": "dbaf27293c8eb75d",
+          "title": "ROUND2两周年 | 坚果NUTS & INWARD",
+          "published_at": "2026-05-28",
+          "account_name": "坚果NUTS",
+          "source_type": "wechat_article"
+        }
+      ]
+    },
+    "lineup_display_hint": "点击海报跳转公众号原文查看",
+    "lineup_quality": {
+      "status": "uncertain",
+      "decision": "cleared_untrusted_lineup",
+      "note": "public mini-program policy: lineup was prose, aggregate text, bio-like text, or not source-grounded enough for display"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg"
+  }
+}

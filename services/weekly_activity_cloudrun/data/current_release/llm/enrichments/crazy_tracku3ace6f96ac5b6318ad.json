@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "crazy_track:ce6f96ac5b6318ad",
+  "sourceItemHash": "ed4577e361ee1ff6d8b1a64a9cfc9ffcbe3d86ed3d4803d8b27682c6ea5e4907",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "TRUST x BE STUPID | Sound Form 声态 06.05 ㈤ @ TRACK",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "21:00 - Late",
+      "city_name": "北京",
+      "venue_name": "TRACK",
+      "address_candidate": "北京市朝阳区751园区火车街区3号车厢",
+      "lineup_artists": [],
+      "music_styles": [
+        "techno",
+        "house",
+        "house",
+        "techno",
+        "minimal",
+        "tech house",
+        "minimal house",
+        "deep tech"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "本周五：一起让身体自由流动，构建一个临时而真实的 “声态” 系统……",
+        "6.05 Fri"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "TRUST x BE STUPID | Sound Form 声态 06.05 ㈤ @ TRACK",
+        "2026-06-05",
+        "北京",
+        "TRACK"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "account_c32511ebe6:b8d1feef34e49cdc",
+  "sourceItemHash": "65f2ed1d990641258f84dc06b5c87a27fba5319b99116454dc41ff0518161cf8",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "“免票入场” èn的音乐，谁点的菜！开饭了！",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "西安",
+      "venue_name": "播放室",
+      "address_candidate": "陕西省西安市莲湖区环城西路天品西岸临街上层广场北侧COMMUNE幻师楼上",
+      "lineup_artists": [],
+      "music_styles": [
+        "techno",
+        "bass",
+        "drum & bass",
+        "hard techno",
+        "dnb",
+        "bass",
+        "techno"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06/05 “免票入场” èn的音乐，谁点的菜！开饭了！",
+        "06/05 “免票入场” èn的音乐,谁点的菜!开饭了!",
+        "听点èn的电子音乐",
+        "2026106105"
+      ],
+      "ticketing_text": [
+        "免票入场"
+      ],
+      "dedupe_signals": [
+        "“免票入场” èn的音乐，谁点的菜！开饭了！",
+        "2026-06-05",
+        "西安",
+        "播放室"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

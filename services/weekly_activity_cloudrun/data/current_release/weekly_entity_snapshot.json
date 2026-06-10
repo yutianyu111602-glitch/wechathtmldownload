@@ -1,0 +1,11 @@
+{
+  "schema_version": "weekly_atlas_entity.v1",
+  "generated_at": "2026-06-02T19:14:19",
+  "publish_package": "WEEKLY_ACTIVITY_EXPANDED_PACK_20260602",
+  "artist_profiles": [],
+  "lineup_resolved": [],
+  "source": "weekly_activity_entity_enrichment",
+  "graph_write_executed": false,
+  "qdrant_write_executed": false,
+  "production_write_executed": false
+}

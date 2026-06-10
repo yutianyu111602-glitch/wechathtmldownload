@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "loopy_club:0231000c813d6bb8",
+  "sourceItemHash": "57506e18501a07dae2e138edb47dd68bcb5253308fa97d4a148f843c1005f3aa",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "贤者时间 KenjaTime - 沏壶高的",
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "17:00-21:00",
+      "city_name": "杭州",
+      "venue_name": "loopy Club",
+      "address_candidate": "浙江省杭州市西湖区天目山路398号天目里7号楼负一层",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.07 周日｜贤者时间 KenjaTime - 沏壶高的",
+        "时间: 2026.06.07 17:00-21:00",
+        "Poster OCR time: 17:00-21:00",
+        "Poster OCR date: 2026-06-07"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "贤者时间 KenjaTime - 沏壶高的",
+        "2026-06-07",
+        "杭州",
+        "loopy Club"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

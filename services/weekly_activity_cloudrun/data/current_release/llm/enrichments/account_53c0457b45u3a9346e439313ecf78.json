@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "account_53c0457b45:9346e439313ecf78",
+  "sourceItemHash": "073c72c366c5f50aa71c121de106478eded4ab4c4f94aafe7a120ce372f04776",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "徐灏新Hosun·新专辑《Star from the Trenches》试听会",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "广州",
+      "venue_name": "星期六极好",
+      "address_candidate": "广东省广州市越秀区华侨新村爱国路14号",
+      "lineup_artists": [
+        "徐灏新Hosun",
+        "徐灏新Hosun"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "hip-hop"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06/06 徐灏新Hosun·新专辑《Star from the Trenches》试听会",
+        "感受粤语说唱带来的魅力与躁动",
+        "TIME",
+        "徐灏新HOSUN全新专辑"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "徐灏新Hosun·新专辑《Star from the Trenches》试听会",
+        "2026-06-06",
+        "广州",
+        "星期六极好"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

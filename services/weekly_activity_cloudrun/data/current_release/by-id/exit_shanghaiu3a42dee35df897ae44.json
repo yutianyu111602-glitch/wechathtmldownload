@@ -1,0 +1,186 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "exit_shanghai:42dee35df897ae44",
+    "event_id": "exit_shanghai:42dee35df897ae44",
+    "article_id": "exit_shanghai:42dee35df897ae44",
+    "queue_id": "exit_shanghai:42dee35df897ae44",
+    "title": "6.13 周六｜Wave Wave Wave!  合成迷恋 Double Live Sets:  ALTIERI3000 (Italy) & Velvet Robot, plus Uptown Records Hello Shitty!",
+    "title_original": "6.13 周六｜Wave Wave Wave!  合成迷恋 Double Live Sets:  ALTIERI3000 (Italy) & Velvet Robot, plus Uptown Records Hello Shitty!",
+    "title_display": "Wave Wave Wave!  合成迷恋 Double Live Sets:  ALTIERI3000 (Italy) & Velvet Robot, plus Uptown Records Hello Shitty!",
+    "account": "EXIT Shanghai",
+    "account_key": "exit_shanghai",
+    "promoter": "EXIT Shanghai",
+    "source_article": {
+      "url_hash": "42dee35df897ae44",
+      "account_name": "EXIT Shanghai",
+      "published_at": "2026-06-03"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "42dee35df897ae44"
+    },
+    "post_date": "2026-06-03",
+    "source_account_name": "EXIT Shanghai",
+    "source_published_at": "2026-06-03",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_42dee35df897ae44--1adb5121bdd3f3c68d8d616e.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_42dee35df897ae44--1adb5121bdd3f3c68d8d616e.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_42dee35df897ae44--1adb5121bdd3f3c68d8d616e.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-13"
+    ],
+    "event_date_iso_guess": "2026-06-13",
+    "event_date_iso_guesses": [
+      "2026-06-13"
+    ],
+    "event_date_start": "2026-06-13",
+    "event_date_end": "2026-06-13",
+    "event_time_text": "03:30 - Late",
+    "event_time_source": "source_text",
+    "time_start": "03:30",
+    "time_end": "Late",
+    "running_hours_text": "03:30 - Late",
+    "running_hours_source": "source_text",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [],
+    "venue_id": "exit_shanghai",
+    "venue_name": "EXIT Club",
+    "address": "上海市长宁区新华路街道幸福路298号",
+    "address_full": "上海市长宁区新华路街道幸福路298号",
+    "address_source": "manual_registry",
+    "geo_lng": 121.431325,
+    "geo_lat": 31.208066,
+    "lineup": [
+      "Altieri3000",
+      "Velvet Robot",
+      "Hello Shitty"
+    ],
+    "lineup_artists": [
+      "Altieri3000",
+      "Velvet Robot",
+      "Hello Shitty"
+    ],
+    "genres": [
+      "Any Wave",
+      "Italo Disco",
+      "House",
+      "Electro",
+      "EBM",
+      "Industrial"
+    ],
+    "music_styles": [
+      "house",
+      "electro",
+      "disco"
+    ],
+    "price": [
+      "预售 88¥",
+      "双人 158¥",
+      "现场 118¥",
+      "3am 后免费入场"
+    ],
+    "price_text": "预售 88¥ / 双人 158¥ / 现场 118¥ / 3am 后免费入场",
+    "ticketing_text": "预售 88¥ / 双人 158¥ / 现场 118¥ / 3am 后免费入场",
+    "evidence": [
+      "6.13 周六｜Wave Wave Wave! 合成迷恋 Double Live Sets: ALTIERI3000 (Italy) & Velvet Robot, plus Uptown Records Hello Shitty!",
+      "预售 88¥",
+      "双人 158¥",
+      "现场 118¥",
+      "2026-06-13"
+    ],
+    "description_original_lines": [
+      "6.13 周六｜Wave Wave Wave! 合成迷恋 Double Live Sets: ALTIERI3000 (Italy) & Velvet Robot, plus Uptown Records Hello Shitty!",
+      "预售 88¥",
+      "双人 158¥",
+      "现场 118¥"
+    ],
+    "dj_bio_lines": [
+      "本次邀请2位资深音乐人-意大利制作人Altieri3000,与Uptown唱片主理Hello Shitty"
+    ],
+    "artist_profiles": [
+      {
+        "artist_id": "dj_5e255c2c",
+        "canonical_name": "Altieri3000",
+        "matched_name": "Altieri3000",
+        "verified": true,
+        "source": "dj_profiles",
+        "city": "",
+        "genres": [],
+        "bio": "",
+        "links": [
+          "https://www.instagram.com/altieri3000/",
+          "https://soundcloud.com/altieri3000"
+        ]
+      },
+      {
+        "artist_id": "dj_f5d65782",
+        "canonical_name": "Illsee",
+        "matched_name": "Illsee",
+        "verified": true,
+        "source": "dj_profiles",
+        "city": "Aranya",
+        "genres": [],
+        "bio": "",
+        "links": [
+          "https://www.instagram.com/illsee9119/",
+          "https://ra.co/dj/illsee",
+          "https://www.xiaohongshu.com/user/profile/5f1a50520000000001000d14"
+        ]
+      },
+      {
+        "artist_id": "dj_30d95b24",
+        "canonical_name": "Velvet Robot",
+        "matched_name": "Velvet Robot",
+        "verified": true,
+        "source": "dj_profiles",
+        "city": "",
+        "genres": [],
+        "bio": "",
+        "links": []
+      }
+    ],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "上海|exitclub|2026-06-13|wavewavewave!合成迷恋doublelivesetsaltieri3000italy&velvetrobotplusuptownrecordshelloshitty!",
+    "detail_path": "by-id/exit_shanghaiu3a42dee35df897ae44.json",
+    "detail_url": "by-id/exit_shanghaiu3a42dee35df897ae44.json",
+    "lineup_quality": {
+      "status": "verified",
+      "decision": "scoring_retained_lineup",
+      "note": "retained lineup artists with score >= 0.6: Altieri3000, Velvet Robot, Hello Shitty"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_42dee35df897ae44--1adb5121bdd3f3c68d8d616e.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_42dee35df897ae44--1adb5121bdd3f3c68d8d616e.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_42dee35df897ae44--1adb5121bdd3f3c68d8d616e.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/exit_shanghai_42dee35df897ae44--1adb5121bdd3f3c68d8d616e.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_42dee35df897ae44--1adb5121bdd3f3c68d8d616e.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_42dee35df897ae44--1adb5121bdd3f3c68d8d616e.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_42dee35df897ae44--1adb5121bdd3f3c68d8d616e.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_42dee35df897ae44--1adb5121bdd3f3c68d8d616e.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_42dee35df897ae44--1adb5121bdd3f3c68d8d616e.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_42dee35df897ae44--1adb5121bdd3f3c68d8d616e.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/exit_shanghai_42dee35df897ae44--1adb5121bdd3f3c68d8d616e.jpg"
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "account": "hakka_bar",
+    "account_key": "hakka_bar",
+    "address": "四川省成都市武侯区玉林街道科华北路60号科华沸城12楼1201",
+    "address_full": "四川省成都市武侯区玉林街道科华北路60号科华沸城12楼1201",
+    "address_source": "venue_registry_verified",
+    "article_id": "hakka_bar:8ec6d516a7e2db3a",
+    "artist_profiles": [],
+    "city": [
+      "成都"
+    ],
+    "city_key": "chengdu",
+    "city_keys": [
+      "chengdu"
+    ],
+    "city_name": "成都",
+    "content_type": "event",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hakka_bar_8ec6d516a7e2db3a--8fc73960814d114fc834879c.jpg",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hakka_bar_8ec6d516a7e2db3a--8fc73960814d114fc834879c.jpg",
+    "dedupe_key": "成都|hakkabar|2026-06-02|「opendecks」djwindveyr",
+    "description_original_lines": [
+      "06.02 今晚 |「OPEN DECKS」 · DJ WINDVEYR",
+      "跃跃欲试的新手们，快来报名！"
+    ],
+    "detail_path": "by-id/hakka_baru3a8ec6d516a7e2db3a.json",
+    "detail_url": "by-id/hakka_baru3a8ec6d516a7e2db3a.json",
+    "dj_bio_lines": [],
+    "event_date_end": "2026-06-02",
+    "event_date_iso_guess": "2026-06-02",
+    "event_date_iso_guesses": [
+      "2026-06-02"
+    ],
+    "event_date_start": "2026-06-02",
+    "event_date_text": [
+      "2026-06-02"
+    ],
+    "event_id": "hakka_bar:8ec6d516a7e2db3a",
+    "event_time_source": "",
+    "event_time_text": "",
+    "evidence": [
+      "06.02 今晚 |「OPEN DECKS」 · DJ WINDVEYR",
+      "2026-06-02",
+      "跃跃欲试的新手们，快来报名！"
+    ],
+    "genres": [],
+    "geo_candidate_id": "hakka_bar_chengdu",
+    "geo_coord_system": "GCJ-02",
+    "geo_lat": 30.624273,
+    "geo_lng": 104.076219,
+    "geo_source": "tencent_map_picker_user_confirmed",
+    "geo_verified_at": "2026-06-01",
+    "id": "hakka_bar:8ec6d516a7e2db3a",
+    "is_calendar_preview": false,
+    "lineup": [],
+    "lineup_artists": [],
+    "music_styles": [],
+    "place_fields_locked": true,
+    "post_date": "2026-06-02",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hakka_bar_8ec6d516a7e2db3a--8fc73960814d114fc834879c.jpg",
+    "poster_source": "cloudbase_storage",
+    "price": [],
+    "price_text": "",
+    "promoter": "hakka_bar",
+    "publish_status": "published",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "quality_status": "READY",
+    "queue_id": "hakka_bar:8ec6d516a7e2db3a",
+    "running_hours_source": "",
+    "running_hours_text": "",
+    "schema_version": "weekly_event_published.v1",
+    "source_account_name": "hakka_bar",
+    "source_action": {
+      "available": true,
+      "label": "公众号",
+      "type": "wechat_article",
+      "url_hash": "8ec6d516a7e2db3a"
+    },
+    "source_article": {
+      "account_name": "hakka_bar",
+      "published_at": "2026-06-02",
+      "url_hash": "8ec6d516a7e2db3a"
+    },
+    "source_published_at": "2026-06-02",
+    "ticketing_text": "",
+    "time_end": "",
+    "time_start": "",
+    "title": "06.02 今晚 |「OPEN DECKS」 ·   DJ WINDVEYR",
+    "title_display": "「OPEN DECKS」 ·   DJ WINDVEYR",
+    "title_original": "06.02 今晚 |「OPEN DECKS」 ·   DJ WINDVEYR",
+    "venue": [],
+    "venue_id": "hakka_bar_chengdu",
+    "venue_lat": 30.624273,
+    "venue_lng": 104.076219,
+    "venue_name": "hakka_bar",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hakka_bar_8ec6d516a7e2db3a--8fc73960814d114fc834879c.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hakka_bar_8ec6d516a7e2db3a--8fc73960814d114fc834879c.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hakka_bar_8ec6d516a7e2db3a--8fc73960814d114fc834879c.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/hakka_bar_8ec6d516a7e2db3a--8fc73960814d114fc834879c.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hakka_bar_8ec6d516a7e2db3a--8fc73960814d114fc834879c.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hakka_bar_8ec6d516a7e2db3a--8fc73960814d114fc834879c.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hakka_bar_8ec6d516a7e2db3a--8fc73960814d114fc834879c.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hakka_bar_8ec6d516a7e2db3a--8fc73960814d114fc834879c.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hakka_bar_8ec6d516a7e2db3a--8fc73960814d114fc834879c.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hakka_bar_8ec6d516a7e2db3a--8fc73960814d114fc834879c.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hakka_bar_8ec6d516a7e2db3a--8fc73960814d114fc834879c.jpg"
+  }
+}

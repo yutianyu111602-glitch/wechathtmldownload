@@ -1,0 +1,107 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "fouroneone_hangzhou:9735340ff5c5a07a",
+    "event_id": "fouroneone_hangzhou:9735340ff5c5a07a",
+    "article_id": "fouroneone_hangzhou:9735340ff5c5a07a",
+    "queue_id": "fouroneone_hangzhou:9735340ff5c5a07a",
+    "title": "06.13 不知了 · 即兴第三期 ｜迷失的音节",
+    "title_original": "06.13 不知了 · 即兴第三期 ｜迷失的音节",
+    "title_display": "不知了 · 即兴第三期 | 迷失的音节",
+    "account": "肆幺幺杭州",
+    "account_key": "fouroneone_hangzhou",
+    "promoter": "肆幺幺杭州",
+    "source_article": {
+      "url_hash": "9735340ff5c5a07a",
+      "account_name": "肆幺幺杭州",
+      "published_at": "2026-05-25"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "9735340ff5c5a07a",
+      "disabled_reason": ""
+    },
+    "aggregation_child": false,
+    "post_date": "2026-05-25",
+    "source_account_name": "肆幺幺杭州",
+    "source_published_at": "2026-05-25",
+    "cover_url": "https://mmbiz.qpic.cn/mmbiz_png/nbRzO9m50nu3maG2yOr9pJ2U8BKA7u0DUMOlribq6vYJIedaoWeLra7eIa8icNNCL8dBv79EraPt0m4fEic0dKLNiaEkSspKHxFAuvAqCPlTp0w/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1#imgIndex=5",
+    "cover_image_url": "https://mmbiz.qpic.cn/mmbiz_png/nbRzO9m50nu3maG2yOr9pJ2U8BKA7u0DUMOlribq6vYJIedaoWeLra7eIa8icNNCL8dBv79EraPt0m4fEic0dKLNiaEkSspKHxFAuvAqCPlTp0w/640?wx_fmt=png&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1#imgIndex=5",
+    "poster_file_id": "",
+    "poster_source": "wechat_article",
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "event_date_text": [
+      "2026-06-13"
+    ],
+    "event_date_iso_guess": "2026-06-13",
+    "event_date_iso_guesses": [
+      "2026-06-13"
+    ],
+    "event_date_start": "2026-06-13",
+    "event_date_end": "2026-06-13",
+    "event_time_text": "19:00",
+    "event_time_source": "source_text",
+    "time_start": "19:00",
+    "time_end": "",
+    "running_hours_text": "19:00",
+    "running_hours_source": "source_text",
+    "city": [
+      "杭州"
+    ],
+    "city_key": "hangzhou",
+    "city_name": "杭州",
+    "city_keys": [
+      "hangzhou"
+    ],
+    "venue": [],
+    "venue_id": "fouroneone_hangzhou",
+    "venue_name": "肆幺幺",
+    "address": "浙江省杭州市上城区中山南路411号",
+    "address_full": "浙江省杭州市上城区中山南路411号",
+    "address_source": "manual_registry",
+    "geo_lng": 120.170683,
+    "geo_lat": 30.23502,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [],
+    "music_styles": [],
+    "price": [
+      "预售:41.1元",
+      "现场:60元"
+    ],
+    "price_text": "预售:41.1元 / 现场:60元",
+    "ticketing_text": "预售:41.1元 / 现场:60元",
+    "evidence": [
+      "06.13 不知了 · 即兴第三期 ｜迷失的音节",
+      "预售:41.1元",
+      "现场:60元",
+      "2026-06-13",
+      "19:00"
+    ],
+    "description_original_lines": [
+      "06.13 不知了 · 即兴第三期 ｜迷失的音节",
+      "预售:41.1元",
+      "现场:60元",
+      "阿德拉倾斜着身子靠在阳台的扶手上，望向远方城市翻腾汹涌的喧嚣，把其中最响亮的音调抽了出来，微笑着把这些迷失的音节排"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "杭州|肆幺幺|2026-06-13|不知了即兴第三期迷失的音节",
+    "detail_path": "by-id/fouroneone_hangzhouu3a9735340ff5c5a07a.json",
+    "detail_url": "by-id/fouroneone_hangzhouu3a9735340ff5c5a07a.json",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    }
+  }
+}

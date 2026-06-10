@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "reactor_shanghai:71ebab72a139abfe",
+  "sourceItemHash": "9548dfac08ad16a6a63b43cbba1990541676de3225f839b4e33f05f991830df4",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "六月巨献 | REACTOR Pres. Nosaj Thing：用节拍雕刻时代的轮廓",
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": null,
+      "city_name": "上海",
+      "venue_name": "REACTOR Shanghai",
+      "address_candidate": "上海市长宁区昭化路658号海粟文化广场D栋",
+      "lineup_artists": [
+        "Nosaj Thing",
+        "Nosaj Thing"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "techno",
+        "house",
+        "ambient",
+        "techno",
+        "house",
+        "hip-hop",
+        "experimental",
+        "ambient"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "预告 6.13 六月巨献 | REACTOR Pres. Nosaj Thing：用节拍雕刻时代的轮廓",
+        "2026 06 13th Sat"
+      ],
+      "ticketing_text": [
+        "8rMb / 1cnY"
+      ],
+      "dedupe_signals": [
+        "六月巨献 | REACTOR Pres. Nosaj Thing：用节拍雕刻时代的轮廓",
+        "2026-06-13",
+        "上海",
+        "REACTOR Shanghai"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

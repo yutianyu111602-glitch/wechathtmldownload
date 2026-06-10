@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "tote_music:4f7904c8f6060616",
+  "sourceItemHash": "884e2d432a0c18d57b1dfa430cfa7d728abc28f4ac3df337610eb0c20afb9ec2",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "【6/4 周四】deLight 个人流行摇滚原创作品专场",
+      "event_date_start": "2026-06-04",
+      "event_date_end": "2026-06-04",
+      "event_time_text": "22:00 - Late",
+      "city_name": "广州",
+      "venue_name": "陀地士多 Tote Store",
+      "address_candidate": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+      "lineup_artists": [
+        "deLight",
+        "deLight"
+      ],
+      "music_styles": [
+        "pop",
+        "rock"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "deLight 是来自韩国的创作歌手与摇滚明星，拥有三张正式录音室专辑"
+      ],
+      "description_original_lines": [
+        "deLight 又来广州啦，这次她带来更多原创作品",
+        "Singer-songwriter and rockstar deLight!",
+        "创作歌手兼摇滚明星 deLight!",
+        "deLight 是来自韩国的创作歌手与摇滚明星，拥有三张正式录音室专辑"
+      ],
+      "ticketing_text": [
+        "免票"
+      ],
+      "dedupe_signals": [
+        "【6/4 周四】deLight 个人流行摇滚原创作品专场",
+        "2026-06-04",
+        "广州",
+        "陀地士多 Tote Store"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

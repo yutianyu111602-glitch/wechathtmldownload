@@ -1,0 +1,172 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "wozhihuiweinixindong:b9d4c882cbd6ce3c",
+    "event_id": "wozhihuiweinixindong:b9d4c882cbd6ce3c",
+    "article_id": "wozhihuiweinixindong:b9d4c882cbd6ce3c",
+    "queue_id": "wozhihuiweinixindong:b9d4c882cbd6ce3c",
+    "title": "6.4丨门洞放映「主要音调」",
+    "title_original": "6.4丨门洞放映「主要音调」",
+    "title_display": "丨门洞放映「主要音调」",
+    "account": "我只会为你心动",
+    "account_key": "wozhihuiweinixindong",
+    "promoter": "我只会为你心动",
+    "source_article": {
+      "url_hash": "b9d4c882cbd6ce3c",
+      "account_name": "我只会为你心动",
+      "published_at": "2026-06-01"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "b9d4c882cbd6ce3c"
+    },
+    "post_date": "2026-06-01",
+    "source_account_name": "我只会为你心动",
+    "source_published_at": "2026-06-01",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wozhihuiweinixindong_b9d4c882cbd6ce3c--998d0895aeb8eff528ae5d7a.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wozhihuiweinixindong_b9d4c882cbd6ce3c--998d0895aeb8eff528ae5d7a.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wozhihuiweinixindong_b9d4c882cbd6ce3c--998d0895aeb8eff528ae5d7a.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-04"
+    ],
+    "event_date_iso_guess": "2026-06-04",
+    "event_date_iso_guesses": [
+      "2026-06-04"
+    ],
+    "event_date_start": "2026-06-04",
+    "event_date_end": "2026-06-04",
+    "event_time_text": "19:30-21:11",
+    "event_time_source": "source_text",
+    "time_start": "19:30",
+    "time_end": "21:11",
+    "running_hours_text": "19:30-21:11",
+    "running_hours_source": "source_text",
+    "city": [
+      "杭州"
+    ],
+    "city_key": "hangzhou",
+    "city_name": "杭州",
+    "city_keys": [
+      "hangzhou"
+    ],
+    "venue": [],
+    "venue_id": "mendong_hangzhou",
+    "venue_name": "门洞商店",
+    "address": "浙江省杭州市拱墅区氧气公寓湖墅南路店近南1门",
+    "address_full": "浙江省杭州市拱墅区氧气公寓湖墅南路店近南1门",
+    "address_source": "operator_map_picker_user_confirmed",
+    "geo_lng": 120.147479,
+    "geo_lat": 30.291677,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "disco",
+      "ambient"
+    ],
+    "music_styles": [
+      "disco",
+      "ambient"
+    ],
+    "price": [
+      "免票"
+    ],
+    "price_text": "免票",
+    "ticketing_text": "免票",
+    "evidence": [
+      "6.4丨门洞放映「主要音调」",
+      "2026-06-04",
+      "19:30-21:11",
+      "氧气公寓湖墅南路店1楼(近南1",
+      "“我是在接收某种频率”"
+    ],
+    "description_original_lines": [
+      "6.4丨门洞放映「主要音调」",
+      "氧气公寓湖墅南路店1楼(近南1",
+      "“我是在接收某种频率”",
+      "“我也不清楚，可能是我妈妈”"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "杭州|门洞商店|2026-06-04|丨门洞放映「主要音调」",
+    "detail_path": "by-id/wozhihuiweinixindongu3ab9d4c882cbd6ce3c.json",
+    "detail_url": "by-id/wozhihuiweinixindongu3ab9d4c882cbd6ce3c.json",
+    "venue_lat": 30.291677,
+    "venue_lng": 120.147479,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "tencent_map_picker_user_confirmed",
+    "geo_provider": "tencent_map_picker",
+    "geo_reliability": "locked",
+    "geo_level": "poi",
+    "geo_provider_title": "门洞商店",
+    "geo_provider_address": "浙江省杭州市拱墅区氧气公寓湖墅南路店近南1门",
+    "geo_reverse_address": "浙江省杭州市拱墅区氧气公寓湖墅南路店近南1门",
+    "geo_verified_at": "2026-06-03",
+    "geo_candidate_id": "mendong_hangzhou",
+    "map_search_aliases": [
+      "门洞商店",
+      "浙江省杭州市拱墅区氧气公寓湖墅南路店近南1门"
+    ],
+    "geo_search_aliases": [
+      "浙江省杭州市拱墅区氧气公寓湖墅南路店近南1门",
+      "门洞商店"
+    ],
+    "poi_aliases": [
+      "门洞商店",
+      "10495027886128268181"
+    ],
+    "map_poi_name": "门洞商店",
+    "poi_id": "10495027886128268181",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_level",
+        "geo_provider",
+        "geo_provider_address",
+        "geo_provider_title",
+        "geo_reliability",
+        "geo_reverse_address",
+        "geo_search_aliases",
+        "geo_source",
+        "geo_verified_at",
+        "map_poi_name",
+        "map_search_aliases",
+        "poi_aliases",
+        "poi_id",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wozhihuiweinixindong_b9d4c882cbd6ce3c--998d0895aeb8eff528ae5d7a.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wozhihuiweinixindong_b9d4c882cbd6ce3c--998d0895aeb8eff528ae5d7a.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wozhihuiweinixindong_b9d4c882cbd6ce3c--998d0895aeb8eff528ae5d7a.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/wozhihuiweinixindong_b9d4c882cbd6ce3c--998d0895aeb8eff528ae5d7a.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wozhihuiweinixindong_b9d4c882cbd6ce3c--998d0895aeb8eff528ae5d7a.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wozhihuiweinixindong_b9d4c882cbd6ce3c--998d0895aeb8eff528ae5d7a.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wozhihuiweinixindong_b9d4c882cbd6ce3c--998d0895aeb8eff528ae5d7a.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wozhihuiweinixindong_b9d4c882cbd6ce3c--998d0895aeb8eff528ae5d7a.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wozhihuiweinixindong_b9d4c882cbd6ce3c--998d0895aeb8eff528ae5d7a.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wozhihuiweinixindong_b9d4c882cbd6ce3c--998d0895aeb8eff528ae5d7a.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wozhihuiweinixindong_b9d4c882cbd6ce3c--998d0895aeb8eff528ae5d7a.jpg"
+  }
+}

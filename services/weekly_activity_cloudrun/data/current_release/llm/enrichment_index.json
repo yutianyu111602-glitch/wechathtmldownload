@@ -1,0 +1,867 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment_index.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "provider": "source-grounded",
+  "model": "deterministic-release-fields",
+  "thinking": "disabled",
+  "itemCount": 171,
+  "allReleaseItems": true,
+  "lookbackDays": null,
+  "enrichments": [
+    {
+      "id": "404:4b545528832d89db",
+      "sourceItemHash": "45ed76e7b158341f9dd411c19b47b22eba2a7303f01811e6549e8619c9a527df",
+      "path": "llm/enrichments/404u3a4b545528832d89db.json"
+    },
+    {
+      "id": "abyss_shanghai:aa48f237993a769f",
+      "sourceItemHash": "e84ed794539db4e24b979d3c0e9553f63f28b6045a8e072378c952dd471b5272",
+      "path": "llm/enrichments/abyss_shanghaiu3aaa48f237993a769f.json"
+    },
+    {
+      "id": "account_53c0457b45:9346e439313ecf78",
+      "sourceItemHash": "073c72c366c5f50aa71c121de106478eded4ab4c4f94aafe7a120ce372f04776",
+      "path": "llm/enrichments/account_53c0457b45u3a9346e439313ecf78.json"
+    },
+    {
+      "id": "account_c32511ebe6:584999ad02f8a2e1",
+      "sourceItemHash": "d9d81e1873602794daf6ec7a7d3fa02e60085447a7e5e46b4f286802b6171f39",
+      "path": "llm/enrichments/account_c32511ebe6u3a584999ad02f8a2e1.json"
+    },
+    {
+      "id": "account_c32511ebe6:b8d1feef34e49cdc",
+      "sourceItemHash": "65f2ed1d990641258f84dc06b5c87a27fba5319b99116454dc41ff0518161cf8",
+      "path": "llm/enrichments/account_c32511ebe6u3ab8d1feef34e49cdc.json"
+    },
+    {
+      "id": "account_d186bcf5bc:06b99725a526d911",
+      "sourceItemHash": "0634d3dae7cf5afb7567500c8a1c304a356772a977618cf10b58abe03cc4a89d",
+      "path": "llm/enrichments/account_d186bcf5bcu3a06b99725a526d911.json"
+    },
+    {
+      "id": "account_d186bcf5bc:e018208e9dd2370b",
+      "sourceItemHash": "5077ca28be7aaf5aae030febc6d2aa133c4302b09cdd4634bc03e277f4be4554",
+      "path": "llm/enrichments/account_d186bcf5bcu3ae018208e9dd2370b.json"
+    },
+    {
+      "id": "account_f07ee3e4a5:02ed8ed1d6750095",
+      "sourceItemHash": "7bee9ddd3add4bde1b61c19694b3bf0248436f0380db2d5cb13ec3fbaf58d16c",
+      "path": "llm/enrichments/account_f07ee3e4a5u3a02ed8ed1d6750095.json"
+    },
+    {
+      "id": "account_f07ee3e4a5:e19416f162afcd78",
+      "sourceItemHash": "3fe041c4d7bfed4d46d7a842dbd1dc190488d81e3112e6f16a07371e599a7795",
+      "path": "llm/enrichments/account_f07ee3e4a5u3ae19416f162afcd78.json"
+    },
+    {
+      "id": "agg-child-2ca6c50f6844b3d0",
+      "sourceItemHash": "9d18bdb1f403f016454c5134afb44a8ec663187312f99360a13f0749050089d8",
+      "path": "llm/enrichments/agg-child-2ca6c50f6844b3d0.json"
+    },
+    {
+      "id": "agg-child-2e8d8eb3423dea4c",
+      "sourceItemHash": "f5179e5ed7ec1361c1a563066bf89dd5d170df7d35c0940773a14e927ae36f68",
+      "path": "llm/enrichments/agg-child-2e8d8eb3423dea4c.json"
+    },
+    {
+      "id": "agg-child-2e9834d546635e85",
+      "sourceItemHash": "9fd9c77ed0292b648f2b8a97ec485dcbe26c65d5c454a592013ad6a4a6b0bf28",
+      "path": "llm/enrichments/agg-child-2e9834d546635e85.json"
+    },
+    {
+      "id": "agg-child-4c57f81e1b0e6652",
+      "sourceItemHash": "3b0a044505211407ac36f63171ced1274b8f6a145f2e9a9f4b289b76cddaab3e",
+      "path": "llm/enrichments/agg-child-4c57f81e1b0e6652.json"
+    },
+    {
+      "id": "agg-child-6aa6ef765575e2f8",
+      "sourceItemHash": "85d550948d83568353baf7eebe4549dfec66b37d9e4a24604d24b0ed79ef3e72",
+      "path": "llm/enrichments/agg-child-6aa6ef765575e2f8.json"
+    },
+    {
+      "id": "agg-child-86c0cdb71bdba7f2",
+      "sourceItemHash": "3d03f2a69d47670dba884bfe4cb2c3f102603d807b395ad0d5e1d9d46158a2ae",
+      "path": "llm/enrichments/agg-child-86c0cdb71bdba7f2.json"
+    },
+    {
+      "id": "agg-child-9464865e7e155f45",
+      "sourceItemHash": "787505ba9ce9341eff94512ee17b1cfbaca9d008bc87ab234dcb82c618ab3a27",
+      "path": "llm/enrichments/agg-child-9464865e7e155f45.json"
+    },
+    {
+      "id": "agg-child-ac6d19eefbe25321",
+      "sourceItemHash": "d9c3b09c2a28fafb26e7fc7c8260834c093b8b667a37a2d01449a78caddddcd3",
+      "path": "llm/enrichments/agg-child-ac6d19eefbe25321.json"
+    },
+    {
+      "id": "agg-child-af75dcca2de5ee59",
+      "sourceItemHash": "3f11a1ff48ea98cd528d4e90c3cbfa87a813b000fe896b540e52a92b16cbb52b",
+      "path": "llm/enrichments/agg-child-af75dcca2de5ee59.json"
+    },
+    {
+      "id": "agg-child-bd5c71530dcdbcd1",
+      "sourceItemHash": "798b4f9b86b33a5b4c2af0b4631e434657b73c3be413ce3aeaf5a66d77160d17",
+      "path": "llm/enrichments/agg-child-bd5c71530dcdbcd1.json"
+    },
+    {
+      "id": "agg-child-c010fea189cdfe84",
+      "sourceItemHash": "fc7d9e486d2231511daf0ad8dff22af3d9c2b867e2272901dabe4d6b6e01727e",
+      "path": "llm/enrichments/agg-child-c010fea189cdfe84.json"
+    },
+    {
+      "id": "alkaline:abfe3783bbf064bd",
+      "sourceItemHash": "dd8c4d0d11585cee85c1c43e5541c55275fc347f2f7c1c8c3a176adf5a6e89e3",
+      "path": "llm/enrichments/alkalineu3aabfe3783bbf064bd.json"
+    },
+    {
+      "id": "alkaline:b5e531c105dc48ea",
+      "sourceItemHash": "47001afca2f762f11c08aab792a818d50892f99754515eb58f288829865381a4",
+      "path": "llm/enrichments/alkalineu3ab5e531c105dc48ea.json"
+    },
+    {
+      "id": "cavecave:f456236d751fe23a",
+      "sourceItemHash": "3c979bf34b0ed4a85265655513a3d25c02e2cd95e5413ddc97beecd30d97de75",
+      "path": "llm/enrichments/cavecaveu3af456236d751fe23a.json"
+    },
+    {
+      "id": "cedar_kitchen:04310025cd8aa199",
+      "sourceItemHash": "bee83b04cf4d73bfbb29b4a08c78e34da7c34f239faa53afaf7546cf4ce2bb16",
+      "path": "llm/enrichments/cedar_kitchenu3a04310025cd8aa199.json"
+    },
+    {
+      "id": "cedar_kitchen:0f0b0d4c2e8f88b4",
+      "sourceItemHash": "bfe26280fc2b072e6b8b9a0a763ffae47cb513d4b07cfe8e91561c23e8eb7f78",
+      "path": "llm/enrichments/cedar_kitchenu3a0f0b0d4c2e8f88b4.json"
+    },
+    {
+      "id": "cicipark:2d005a889516f59c",
+      "sourceItemHash": "2e74121cbc3e30673693789d9ff9b7f82c35ba19b076fa39369fcf2e133a08f0",
+      "path": "llm/enrichments/ciciparku3a2d005a889516f59c.json"
+    },
+    {
+      "id": "cicipark:b1fac5fca263cde3",
+      "sourceItemHash": "8552e3164aa1b03311cf67f61931a02ebfb0c66034781a8ee09642d9f4a2e734",
+      "path": "llm/enrichments/ciciparku3ab1fac5fca263cde3.json"
+    },
+    {
+      "id": "crazy_track:4d06a0f3af2ae281",
+      "sourceItemHash": "17df33a118dbe15553b92c5e55a4b80113fb022e31fff79137fd761df7ba2ea8",
+      "path": "llm/enrichments/crazy_tracku3a4d06a0f3af2ae281.json"
+    },
+    {
+      "id": "crazy_track:4d88449f5439d261",
+      "sourceItemHash": "7db42324a58d1f0f6a6445c704c2c3cdd756271acb4d2ef4493bd4a22e68f785",
+      "path": "llm/enrichments/crazy_tracku3a4d88449f5439d261.json"
+    },
+    {
+      "id": "crazy_track:ce6f96ac5b6318ad",
+      "sourceItemHash": "ed4577e361ee1ff6d8b1a64a9cfc9ffcbe3d86ed3d4803d8b27682c6ea5e4907",
+      "path": "llm/enrichments/crazy_tracku3ace6f96ac5b6318ad.json"
+    },
+    {
+      "id": "cs_bar:4703d12b57439042",
+      "sourceItemHash": "ac2c0963b42436202771543f4c4b109e6b1c8257b7d28106c00300ecae57b5b8",
+      "path": "llm/enrichments/cs_baru3a4703d12b57439042.json"
+    },
+    {
+      "id": "cs_bar:5c3ace5ebdb0e342",
+      "sourceItemHash": "6c7fab013990655098a7cc0cf35e68f0daea5ba14c670cde31dba87a982760cf",
+      "path": "llm/enrichments/cs_baru3a5c3ace5ebdb0e342.json"
+    },
+    {
+      "id": "dada_bar_beijing:25dac8f4ef04d3df",
+      "sourceItemHash": "1459272e79e594f41b6c3ddd2e06df981248ce15dacd2bb71bf82b9fbc2278a6",
+      "path": "llm/enrichments/dada_bar_beijingu3a25dac8f4ef04d3df.json"
+    },
+    {
+      "id": "dada_bar_beijing:2d96233af75419d9",
+      "sourceItemHash": "58ad78b21fb8a445de975bd4ff0ddf9ac126290d01484663716cdac6e887a6de",
+      "path": "llm/enrichments/dada_bar_beijingu3a2d96233af75419d9.json"
+    },
+    {
+      "id": "dada_bar_beijing:db8f5d7411130882",
+      "sourceItemHash": "6a0fd315fb5dbcf05376f98b1d3e5a3f22e13db4fc44f5a23f0b9b512a9d088f",
+      "path": "llm/enrichments/dada_bar_beijingu3adb8f5d7411130882.json"
+    },
+    {
+      "id": "dada_bar_beijing:f08c45fef5186b83",
+      "sourceItemHash": "137460a944fd964dea6bd5c1beb69eccefda42efc861f4cdd28d07306e439f29",
+      "path": "llm/enrichments/dada_bar_beijingu3af08c45fef5186b83.json"
+    },
+    {
+      "id": "dada_kunming:01a5754ae510df68",
+      "sourceItemHash": "ca61a344abc18e188bff74a7c712a8137d133b9c4263740a17d7be3ad162b7f5",
+      "path": "llm/enrichments/dada_kunmingu3a01a5754ae510df68.json"
+    },
+    {
+      "id": "dada_kunming:021576420824c676",
+      "sourceItemHash": "4f23224d29300e49588486ee3c74c3581b3bd2d02eebc8dfcf37654d314c981a",
+      "path": "llm/enrichments/dada_kunmingu3a021576420824c676.json"
+    },
+    {
+      "id": "dada_kunming:184ee4194079c5c6",
+      "sourceItemHash": "9cdd3601e66bdf80c8fb3110e79d4a52a54329869268b36554830b3992976fcf",
+      "path": "llm/enrichments/dada_kunmingu3a184ee4194079c5c6.json"
+    },
+    {
+      "id": "dada_kunming:c840d5e4c5c47f5e",
+      "sourceItemHash": "c80e8887446f89a144a46f77cc88ecdd4b5ed43ff1f8d879e118e6c9557ca57a",
+      "path": "llm/enrichments/dada_kunmingu3ac840d5e4c5c47f5e.json"
+    },
+    {
+      "id": "deepcool:9aba3c881843e3ea:schedule:20260605:1",
+      "sourceItemHash": "1f063879e5528d9b33f98255088729acc3e84834e4063ad694f88b7b08db8f7a",
+      "path": "llm/enrichments/deepcoolu3a9aba3c881843e3eau3ascheduleu3a20260605u3a1.json"
+    },
+    {
+      "id": "deeproll:4cfb69e86b66f3f9",
+      "sourceItemHash": "f91d2449d5b2093059d8b195b379b2405bfce3f0a6e066d94877e3ed00656edb",
+      "path": "llm/enrichments/deeprollu3a4cfb69e86b66f3f9.json"
+    },
+    {
+      "id": "deeproll:623236f1d53cf63a",
+      "sourceItemHash": "1610acdf7c44e6f7d53a4e5080092cb20599aedda93d231f89e0b5799699ffbc",
+      "path": "llm/enrichments/deeprollu3a623236f1d53cf63a.json"
+    },
+    {
+      "id": "defun:952721472e31fd00:schedule:20260606:1",
+      "sourceItemHash": "00680f1ee0d1892393c682e86f81709f8753236d52fa28d77a1da71ad4955575",
+      "path": "llm/enrichments/defunu3a952721472e31fd00u3ascheduleu3a20260606u3a1.json"
+    },
+    {
+      "id": "defun:c1fe0c09fe78ba44",
+      "sourceItemHash": "158e8fa2365efa2a4f0851c0ea38aad971528c595283b7ae59818cb82377e38c",
+      "path": "llm/enrichments/defunu3ac1fe0c09fe78ba44.json"
+    },
+    {
+      "id": "defun:f1e2998730e2823a",
+      "sourceItemHash": "eff8708e6d5f81995f066e56c969fd5106afc4fa364bb10574d0b4331ebf64c1",
+      "path": "llm/enrichments/defunu3af1e2998730e2823a.json"
+    },
+    {
+      "id": "dirty_house:10fd2807b8a49225",
+      "sourceItemHash": "811c3191c4a5e7bb5bb40be79005854db4d3f984128c18ff18021e4bc3c7776d",
+      "path": "llm/enrichments/dirty_houseu3a10fd2807b8a49225.json"
+    },
+    {
+      "id": "dirty_house:25e0b7c7abe5b276",
+      "sourceItemHash": "7ecc4cc56fd01d997310814bb93d7fd577771e3697680c6cbf0824af915328ea",
+      "path": "llm/enrichments/dirty_houseu3a25e0b7c7abe5b276.json"
+    },
+    {
+      "id": "dirty_house:8b5bb3519b3ff72d",
+      "sourceItemHash": "d77538b6ef330bfe7922e5e33d7f7e69a20a42edc8b1e482e46cc82fcf455eb9",
+      "path": "llm/enrichments/dirty_houseu3a8b5bb3519b3ff72d.json"
+    },
+    {
+      "id": "dirty_house:aef439133de0c4be",
+      "sourceItemHash": "b4189db5639e06c7c46b771044b458babb028a9839f55136842b18dfea4e69d7",
+      "path": "llm/enrichments/dirty_houseu3aaef439133de0c4be.json"
+    },
+    {
+      "id": "dong:115af50a8a45dd0d",
+      "sourceItemHash": "12493352a0cb5b36c8fc8ca897ce4b58223ece46e2903db60ada82f9c0851aa2",
+      "path": "llm/enrichments/dongu3a115af50a8a45dd0d.json"
+    },
+    {
+      "id": "dong:903d4b4f0bf0a1fe",
+      "sourceItemHash": "6d6f2bf9ddc498de7cf0cb236bbaf49183ffe398ad76788738506dc68cbaab7c",
+      "path": "llm/enrichments/dongu3a903d4b4f0bf0a1fe.json"
+    },
+    {
+      "id": "dv:3879c24ffa94b78d",
+      "sourceItemHash": "9ab831fe1605530a20dd5b4568de52c2982db1769854ad9c3f248cf8a637348e",
+      "path": "llm/enrichments/dvu3a3879c24ffa94b78d.json"
+    },
+    {
+      "id": "dv:49e85f51a7693786",
+      "sourceItemHash": "aa81546530129b5636e45837a4899688d5e4bc8566ec58f7cff96f71793310d3",
+      "path": "llm/enrichments/dvu3a49e85f51a7693786.json"
+    },
+    {
+      "id": "dv:caacdc1541f8080b",
+      "sourceItemHash": "882f7c1b592616ba53c79592a4d6c33ed6885b42a34dc0d2f53f148495ddcd82",
+      "path": "llm/enrichments/dvu3acaacdc1541f8080b.json"
+    },
+    {
+      "id": "dv:fbf7da9fd63a78c3",
+      "sourceItemHash": "2de7d1efcb2e2e3c8aa9171c0d007b44340c40ecd08e30d21eabbd4c86ad62a9",
+      "path": "llm/enrichments/dvu3afbf7da9fd63a78c3.json"
+    },
+    {
+      "id": "enlightening:3b16d6bc94d80656",
+      "sourceItemHash": "9acb19d432b2a33299f65f7361a9dd4b382327ea823cb881d65327cb83ef6926",
+      "path": "llm/enrichments/enlighteningu3a3b16d6bc94d80656.json"
+    },
+    {
+      "id": "enlightening:5ef012075761f3ef",
+      "sourceItemHash": "7e9c903e6c88bbf9371312e617c1aee462d77c3e3f428c98eb4acba4e4ad8f98",
+      "path": "llm/enrichments/enlighteningu3a5ef012075761f3ef.json"
+    },
+    {
+      "id": "enlightening:b350f56b08c80586",
+      "sourceItemHash": "5e2a67d1f46b8399fc6d084ab6b0f2343000693021730422637fc62e35758969",
+      "path": "llm/enrichments/enlighteningu3ab350f56b08c80586.json"
+    },
+    {
+      "id": "exit_shanghai:11efb162f7194d3d",
+      "sourceItemHash": "7fca22426baaecebc1c4f8cbcae88d8cae0fa1a9cc74967c1b0df5c2bd652a46",
+      "path": "llm/enrichments/exit_shanghaiu3a11efb162f7194d3d.json"
+    },
+    {
+      "id": "exit_shanghai:23ef3755473ecec7",
+      "sourceItemHash": "0f9884f5d52c46ca17cfbf9f7581fcd9e3fc2fc8615d8eff6041706087f68cd9",
+      "path": "llm/enrichments/exit_shanghaiu3a23ef3755473ecec7.json"
+    },
+    {
+      "id": "exit_shanghai:42dee35df897ae44",
+      "sourceItemHash": "a4474fa61c1ee4e305cc0796853d8f16085081aec58c01e14e5fbca8a102917a",
+      "path": "llm/enrichments/exit_shanghaiu3a42dee35df897ae44.json"
+    },
+    {
+      "id": "exit_shanghai:c463790f486461f1",
+      "sourceItemHash": "d2446c4ee2471966d3687b9395c0c9af49d4feefda85bcbdf30b66fa22d9cf2d",
+      "path": "llm/enrichments/exit_shanghaiu3ac463790f486461f1.json"
+    },
+    {
+      "id": "flat_club:a2155eede469b668",
+      "sourceItemHash": "1a05e5273a88b6c5456a25dd79ae1308c3f6fd9be20adc56fd129b32a73f277c",
+      "path": "llm/enrichments/flat_clubu3aa2155eede469b668.json"
+    },
+    {
+      "id": "flat_club:d8dc7622be1b0eb2",
+      "sourceItemHash": "ea8ffbb7e7245f2d3966591a55e7406d9ecf83cb156f1f1819ca320e93cc1664",
+      "path": "llm/enrichments/flat_clubu3ad8dc7622be1b0eb2.json"
+    },
+    {
+      "id": "foundation:a25ceba42fe3265c",
+      "sourceItemHash": "bd514f0d276c10a7dbaa5c985ecd6adf82b97f62ef3d8560ab3a59b31e89d0b3",
+      "path": "llm/enrichments/foundationu3aa25ceba42fe3265c.json"
+    },
+    {
+      "id": "foundation:a38adb9b4d534a93",
+      "sourceItemHash": "6da27d431085712b9ec2e3ceb37df3bcd20d7906414ee9f90db8b0597d7686ce",
+      "path": "llm/enrichments/foundationu3aa38adb9b4d534a93.json"
+    },
+    {
+      "id": "fouroneone_hangzhou:9735340ff5c5a07a",
+      "sourceItemHash": "07fb2363a84144e03403d278dc668b82bce6351e50ac484d4c9a2ca02fa6c3c7",
+      "path": "llm/enrichments/fouroneone_hangzhouu3a9735340ff5c5a07a.json"
+    },
+    {
+      "id": "fouroneone_hangzhou:a8e142f7e3276488",
+      "sourceItemHash": "06f05e62e8499fd548bb5a2536e6a786e0f799cc309c1e12f63c402c5078df82",
+      "path": "llm/enrichments/fouroneone_hangzhouu3aa8e142f7e3276488.json"
+    },
+    {
+      "id": "gas_nation:229da544ef0cf36c",
+      "sourceItemHash": "b6500891b64bbc8227c5bec43fd45dbd3608bf96c6626cd72de26baf6032b10c",
+      "path": "llm/enrichments/gas_nationu3a229da544ef0cf36c.json"
+    },
+    {
+      "id": "gas_nation:34be3c40e71370cf",
+      "sourceItemHash": "344fd4d19b42006aaf4f7edcfec16de4f6be68351cbe87b358b64dc5012abe1c",
+      "path": "llm/enrichments/gas_nationu3a34be3c40e71370cf.json"
+    },
+    {
+      "id": "gas_nation:adc21d0813af3229",
+      "sourceItemHash": "b9905754b6f376a41132d9d44a5e55f94d9e658f36ce33dab46baa48bc8f7035",
+      "path": "llm/enrichments/gas_nationu3aadc21d0813af3229.json"
+    },
+    {
+      "id": "giftspacedlc:c67095ad53ead413",
+      "sourceItemHash": "a807e67b5f18a3c2676b6b5f8323ef2ae70efa19a735b99c997efb7362ccb126",
+      "path": "llm/enrichments/giftspacedlcu3ac67095ad53ead413.json"
+    },
+    {
+      "id": "giftspacedlc:c679c5813c380d07",
+      "sourceItemHash": "951ac4adf641b07e8d4b3c391344690a04abdaba4dfc176ef6030fc8d028b6cc",
+      "path": "llm/enrichments/giftspacedlcu3ac679c5813c380d07.json"
+    },
+    {
+      "id": "gum_guangzhou:77ae233df5f7783a",
+      "sourceItemHash": "2eeb23ddc526e65795274b7ba97898c2e8060935da7e7cabda3101fdbb25203e",
+      "path": "llm/enrichments/gum_guangzhouu3a77ae233df5f7783a.json"
+    },
+    {
+      "id": "gum_guangzhou:9f45f0a80092697f",
+      "sourceItemHash": "45424afc424228e4a1ae25eaf0c914913c8ad69b49f3e70c8da766f59eec3e86",
+      "path": "llm/enrichments/gum_guangzhouu3a9f45f0a80092697f.json"
+    },
+    {
+      "id": "gum_guangzhou:ed1ce7907910496a",
+      "sourceItemHash": "0e0ce37af05bf4f5f1ccaa8e333f11fbf0dc45503b422430595b3657de1b3845",
+      "path": "llm/enrichments/gum_guangzhouu3aed1ce7907910496a.json"
+    },
+    {
+      "id": "hakka_bar:030867d1a5b9c944",
+      "sourceItemHash": "58df5fbe12214d9f911122525b19057fb0c4401973a33c21b3f6f11b5baef5f1",
+      "path": "llm/enrichments/hakka_baru3a030867d1a5b9c944.json"
+    },
+    {
+      "id": "hakka_bar:2642c9354a42a41e",
+      "sourceItemHash": "a36afcf7b13a6c3586a91921ec22cfc9612b34b7ad4989266d5486353221e4ec",
+      "path": "llm/enrichments/hakka_baru3a2642c9354a42a41e.json"
+    },
+    {
+      "id": "hakka_bar:8ec6d516a7e2db3a",
+      "sourceItemHash": "580bee0963008bc9f5ceb3f3d5473d562acbb464dc4c630efd21d0ea58a10ab9",
+      "path": "llm/enrichments/hakka_baru3a8ec6d516a7e2db3a.json"
+    },
+    {
+      "id": "hakka_bar:900dec7f4e81a24b",
+      "sourceItemHash": "ea3e907fa265bf0f6e057aa77fb1cb7464e28af7d699ddeac824d99e6b4aab6e",
+      "path": "llm/enrichments/hakka_baru3a900dec7f4e81a24b.json"
+    },
+    {
+      "id": "hakka_bar:de3ef063fcfa1f14",
+      "sourceItemHash": "7757309b7ce8448208b3aca3a25af439b8f5f03ad1af237df7d728ec954b93f4",
+      "path": "llm/enrichments/hakka_baru3ade3ef063fcfa1f14.json"
+    },
+    {
+      "id": "hakka_bar:e46742cca431baaf",
+      "sourceItemHash": "f6912e9a29d4dae8b5d504f546ac58025cf04a69d21904aed66d0373875fa0eb",
+      "path": "llm/enrichments/hakka_baru3ae46742cca431baaf.json"
+    },
+    {
+      "id": "hakka_bar:f15fa3f5484beba9",
+      "sourceItemHash": "ede6a355433d344dc8a114fb2dee5bd00f5433594ecb14ea1557b314ae2cd20d",
+      "path": "llm/enrichments/hakka_baru3af15fa3f5484beba9.json"
+    },
+    {
+      "id": "heim_shanghai:00ce94883472f9bb",
+      "sourceItemHash": "5273d1d69d052aa969d39c2532de1c807e4aa49166edf823914e7adebd238494",
+      "path": "llm/enrichments/heim_shanghaiu3a00ce94883472f9bb.json"
+    },
+    {
+      "id": "heim_shanghai:062195f22e817974",
+      "sourceItemHash": "a415f9b40a7884bba05da7371a2e30dbbdfa14a727cbb133b4db3a7aa66a0e9d",
+      "path": "llm/enrichments/heim_shanghaiu3a062195f22e817974.json"
+    },
+    {
+      "id": "heim_shanghai:a9245f98f9585a9f",
+      "sourceItemHash": "5b0630c167e71695eb782bfd7b404e0380d846d1f94aab3eda4fc1f8cc02cb5e",
+      "path": "llm/enrichments/heim_shanghaiu3aa9245f98f9585a9f.json"
+    },
+    {
+      "id": "heim_shanghai:b55a608fb8be4433",
+      "sourceItemHash": "e33ee2e5c973898a985443d882f8a17108df440a8d8bb3d7ed6b97eb4b209471",
+      "path": "llm/enrichments/heim_shanghaiu3ab55a608fb8be4433.json"
+    },
+    {
+      "id": "hum_club:2ddc751322b6568f",
+      "sourceItemHash": "dcb89678e73d86833105222983fb9232361d7315d7e6e272f91b2abdf591503e",
+      "path": "llm/enrichments/hum_clubu3a2ddc751322b6568f.json"
+    },
+    {
+      "id": "hum_club:666c4eeaf1cabe0b",
+      "sourceItemHash": "1b2cc32f32329f395a7df9745e37b22c6b531ba255fa55bb267c912cfe4c0004",
+      "path": "llm/enrichments/hum_clubu3a666c4eeaf1cabe0b.json"
+    },
+    {
+      "id": "hum_club:feb55ae3398ec107",
+      "sourceItemHash": "68dfdf4c69ebd6048a078f300f11932f742f464ded40e44c744e82d657cd09b7",
+      "path": "llm/enrichments/hum_clubu3afeb55ae3398ec107.json"
+    },
+    {
+      "id": "illum_shanghai:47a41f912034e62a",
+      "sourceItemHash": "ef6749f50a9a36010dd2658965fc168a2935c54f1768231f6af8e1b53bd3d69a",
+      "path": "llm/enrichments/illum_shanghaiu3a47a41f912034e62a.json"
+    },
+    {
+      "id": "illum_shanghai:484e8d105c7c8d16",
+      "sourceItemHash": "4c8c608323d940dcbfe46c79c28276b84fcbcdda6637d32671342cfe78bfd9c8",
+      "path": "llm/enrichments/illum_shanghaiu3a484e8d105c7c8d16.json"
+    },
+    {
+      "id": "illum_shanghai:959aeb6c66952794",
+      "sourceItemHash": "f124f85a8d971b5acde8f0de54f219e24b40ee1143fccd196a4d45e53c69b5be",
+      "path": "llm/enrichments/illum_shanghaiu3a959aeb6c66952794.json"
+    },
+    {
+      "id": "inward_street:4e9c840a60cc5175",
+      "sourceItemHash": "5f06c7af49da6af19c41c219fabe04c8f858dc32fe4beb344d6471133d3a06a2",
+      "path": "llm/enrichments/inward_streetu3a4e9c840a60cc5175.json"
+    },
+    {
+      "id": "key_jinan:64ae13017b2570f2",
+      "sourceItemHash": "243049c8a2edd8b90d347ccf5520ff8a420f91715c86d7efcaa0d0a821eec580",
+      "path": "llm/enrichments/key_jinanu3a64ae13017b2570f2.json"
+    },
+    {
+      "id": "key_jinan:ac1aca53250bab1c",
+      "sourceItemHash": "b488b687bf192ac1622da687f446558cc2e1b62c01f0abd9876c09b56c2d90d2",
+      "path": "llm/enrichments/key_jinanu3aac1aca53250bab1c.json"
+    },
+    {
+      "id": "knock_knockclub:76f1c481f6ad213b",
+      "sourceItemHash": "e73d1bf1d19aee6fb284c81d2498cb73588400ee1e75fe9ebaf9a6f2e729ed79",
+      "path": "llm/enrichments/knock_knockclubu3a76f1c481f6ad213b.json"
+    },
+    {
+      "id": "knock_knockclub:9e1dff289772bbff",
+      "sourceItemHash": "3c1dc0358490379690a9680fff608f5f5f4a58d7ddf7cd3bf9b82cc7c4ec023d",
+      "path": "llm/enrichments/knock_knockclubu3a9e1dff289772bbff.json"
+    },
+    {
+      "id": "knock_knockclub:dbb7ab0b923aaafb",
+      "sourceItemHash": "5599759a85dfc8068d5135c648b5ef25ccfedcfdd830593f0ccf6a5f93300055",
+      "path": "llm/enrichments/knock_knockclubu3adbb7ab0b923aaafb.json"
+    },
+    {
+      "id": "loopy_club:0231000c813d6bb8",
+      "sourceItemHash": "57506e18501a07dae2e138edb47dd68bcb5253308fa97d4a148f843c1005f3aa",
+      "path": "llm/enrichments/loopy_clubu3a0231000c813d6bb8.json"
+    },
+    {
+      "id": "loopy_club:2cc45a50093ef00b",
+      "sourceItemHash": "cddf8665e61b6577a405b03ce3c5adc89932cbbd3d50f49edd9efa5d2025051d",
+      "path": "llm/enrichments/loopy_clubu3a2cc45a50093ef00b.json"
+    },
+    {
+      "id": "loopy_club:74614bf966eb59bb",
+      "sourceItemHash": "779d23920a057ead7b49e78d516f9f62e118228195a79febc7c961f92ffd7737",
+      "path": "llm/enrichments/loopy_clubu3a74614bf966eb59bb.json"
+    },
+    {
+      "id": "loopy_club:a66ebac5e03cea3f",
+      "sourceItemHash": "a414341bdad6c5ae5085bc0d8291397ec243b9f622ebaacfc50e16799d1a6af3",
+      "path": "llm/enrichments/loopy_clubu3aa66ebac5e03cea3f.json"
+    },
+    {
+      "id": "loopy_club:b62bef0f16e894aa",
+      "sourceItemHash": "94df742ea5b08bbf3fd2d1b1d628d1028014fd9145ea8df90e6c1d3b8ec0d129",
+      "path": "llm/enrichments/loopy_clubu3ab62bef0f16e894aa.json"
+    },
+    {
+      "id": "loopy_club:e7da5a40f9fbbf2c:schedule:20260606:1",
+      "sourceItemHash": "3417d4c08a03e8f785273b3e8c279772af17e245efc35bcb2306fed69d80585a",
+      "path": "llm/enrichments/loopy_clubu3ae7da5a40f9fbbf2cu3ascheduleu3a20260606u3a1.json"
+    },
+    {
+      "id": "nu_lab:a161c84a421e87ef",
+      "sourceItemHash": "a82e42b7c7756df425d12ee304ada9156f5cedc376bf3aa35b5209a92705b7e1",
+      "path": "llm/enrichments/nu_labu3aa161c84a421e87ef.json"
+    },
+    {
+      "id": "nu_lab:dafadf063ae2b075:schedule:20260605:1",
+      "sourceItemHash": "d4608e1be1a84c4123a9824b36677b7e4364a18f13133bb873bcb4763074812a",
+      "path": "llm/enrichments/nu_labu3adafadf063ae2b075u3ascheduleu3a20260605u3a1.json"
+    },
+    {
+      "id": "nuts:1962008ef98a62d3",
+      "sourceItemHash": "8a92fd339d3f7383bde959e42ec27680f9feeea70e78645fb3e2134028a7134b",
+      "path": "llm/enrichments/nutsu3a1962008ef98a62d3.json"
+    },
+    {
+      "id": "nuts:2cf68dc3fb3b55d4",
+      "sourceItemHash": "b38c5b56b8e9b2c8022dccfc8cd90068509474cac358a3ab48e2125a1bd6e5d8",
+      "path": "llm/enrichments/nutsu3a2cf68dc3fb3b55d4.json"
+    },
+    {
+      "id": "nuts:4da37c16191f823f",
+      "sourceItemHash": "e5100f3bc10623fd8fe2b5dd6b7cf5f7bff84e23caf91b30d4820aaaa5d31c9e",
+      "path": "llm/enrichments/nutsu3a4da37c16191f823f.json"
+    },
+    {
+      "id": "nuts:9ccb6527e8932a7a",
+      "sourceItemHash": "f87ac55a52939cc211854a8c68cc4d3ccff715f2226e2525fa0426a105b543b0",
+      "path": "llm/enrichments/nutsu3a9ccb6527e8932a7a.json"
+    },
+    {
+      "id": "nuts:9ef91206069cad25",
+      "sourceItemHash": "3d35792e9b956826349b588d754bd63d1e676bd52e453bc888d9964e456c8446",
+      "path": "llm/enrichments/nutsu3a9ef91206069cad25.json"
+    },
+    {
+      "id": "nuts:ba295258057c04d3",
+      "sourceItemHash": "b30e4efd0745923136f064e24b23c7ac961091746f1154fd75d61ef77e323a4b",
+      "path": "llm/enrichments/nutsu3aba295258057c04d3.json"
+    },
+    {
+      "id": "nuts:bd91e6311e3e3c77",
+      "sourceItemHash": "764ff69909efb9b67d994fc0d6d6456edea24e2f1a7b970acc9ff84984bf4230",
+      "path": "llm/enrichments/nutsu3abd91e6311e3e3c77.json"
+    },
+    {
+      "id": "nuts:ca5535e940ae0465",
+      "sourceItemHash": "c148fcdc2a44e0db9a6bcfca72b64021c831d86dee82b02c6b4020ebd333e81d",
+      "path": "llm/enrichments/nutsu3aca5535e940ae0465.json"
+    },
+    {
+      "id": "nuts:dbaf27293c8eb75d",
+      "sourceItemHash": "46338cfb511f7f293e8141fb46430eec99a6b33e01a0cf45946ffae89d95ac07",
+      "path": "llm/enrichments/nutsu3adbaf27293c8eb75d.json"
+    },
+    {
+      "id": "oil:21a2e0c277155a8b",
+      "sourceItemHash": "9a5c36c21bd64d9155168d778448e00903b1c37e908ac311be0ecb53c065b1d8",
+      "path": "llm/enrichments/oilu3a21a2e0c277155a8b.json"
+    },
+    {
+      "id": "oil:2c1a5f8841c19da3",
+      "sourceItemHash": "9e5ef6feeb10fc925ef6c171754983f0fa68606adb54b143a25b64c979cf24a0",
+      "path": "llm/enrichments/oilu3a2c1a5f8841c19da3.json"
+    },
+    {
+      "id": "oil:2dd043f68343e465",
+      "sourceItemHash": "67bd84e406bf4832c622055167bb9bca81146bf95d94ff785b3aa57c8c5c29dd",
+      "path": "llm/enrichments/oilu3a2dd043f68343e465.json"
+    },
+    {
+      "id": "oil:7a1e84c5c675adf8",
+      "sourceItemHash": "99930760726a627d7b69c485901960fdcb7d20fdc7c60991293e463328048ef4",
+      "path": "llm/enrichments/oilu3a7a1e84c5c675adf8.json"
+    },
+    {
+      "id": "oil:c12861bbe543130f",
+      "sourceItemHash": "e365628e47f217c5d96a985e7979faed57bf4b0927a5d9862bfff4e490c5f529",
+      "path": "llm/enrichments/oilu3ac12861bbe543130f.json"
+    },
+    {
+      "id": "oonoo:3cd01a74677e57c4",
+      "sourceItemHash": "cd603c2810bbf289a543b9de0e98b14fc027779bfae42c29e6b0a497ed188491",
+      "path": "llm/enrichments/oonoou3a3cd01a74677e57c4.json"
+    },
+    {
+      "id": "oonoo:58bfa3f10aa36476",
+      "sourceItemHash": "124a1127cc85929809e792208bf83970d232ba000d589890d679809dc57ad189",
+      "path": "llm/enrichments/oonoou3a58bfa3f10aa36476.json"
+    },
+    {
+      "id": "oonoo:d32bcedf70d9b78e",
+      "sourceItemHash": "48458256c3497e3265fff20ffa6cc50fdeac7d82bc581a4bea95f0e077db7795",
+      "path": "llm/enrichments/oonoou3ad32bcedf70d9b78e.json"
+    },
+    {
+      "id": "pillbox_beijing:36a42fe36b736a10",
+      "sourceItemHash": "bbf6eea1278bdc0f46cb6465b916c19bd03c365493ca10b05f679cd47b027349",
+      "path": "llm/enrichments/pillbox_beijingu3a36a42fe36b736a10.json"
+    },
+    {
+      "id": "pillbox_beijing:5590177a7bcf27f7",
+      "sourceItemHash": "4e159f3b15b2a7230a69ddd7c6e59e5cd4bdfcce539968ba81768933f7c3fc8e",
+      "path": "llm/enrichments/pillbox_beijingu3a5590177a7bcf27f7.json"
+    },
+    {
+      "id": "pools:149bc4362ef89ac8",
+      "sourceItemHash": "164976a05baddbbab10e4af20da85384300eccd1dae80eacfd7410b0af6d9a9e",
+      "path": "llm/enrichments/poolsu3a149bc4362ef89ac8.json"
+    },
+    {
+      "id": "pools:855d2fb1630e3b86",
+      "sourceItemHash": "da378a37c4d0d70e1bdbe7951b6d4982ae053fd55cc7500427d00d22c35ea8ed",
+      "path": "llm/enrichments/poolsu3a855d2fb1630e3b86.json"
+    },
+    {
+      "id": "pools:fcd7568608a510a4",
+      "sourceItemHash": "12d1c9021520828c32e1b56a20fd5522d98544cce048bcdc258e4f9489ff38e7",
+      "path": "llm/enrichments/poolsu3afcd7568608a510a4.json"
+    },
+    {
+      "id": "potent:05a000229b04bee7",
+      "sourceItemHash": "1fda9ecb080c2088f019ce244e843b80d549de3edb7852f881fae23c9106e784",
+      "path": "llm/enrichments/potentu3a05a000229b04bee7.json"
+    },
+    {
+      "id": "potent:2081287433672df7",
+      "sourceItemHash": "4d636cf2aca64c6eb70928e3a910f33d4342f5862c67d5a1feedd1d611bec138",
+      "path": "llm/enrichments/potentu3a2081287433672df7.json"
+    },
+    {
+      "id": "reactor_shanghai:2f7f6375bf4767a8",
+      "sourceItemHash": "1f86a10b3363442a265892d11e4416190947a9fc14a2f72442e88758d52514d7",
+      "path": "llm/enrichments/reactor_shanghaiu3a2f7f6375bf4767a8.json"
+    },
+    {
+      "id": "reactor_shanghai:71ebab72a139abfe",
+      "sourceItemHash": "9548dfac08ad16a6a63b43cbba1990541676de3225f839b4e33f05f991830df4",
+      "path": "llm/enrichments/reactor_shanghaiu3a71ebab72a139abfe.json"
+    },
+    {
+      "id": "reactor_shanghai:cbfc24af8fd6f699",
+      "sourceItemHash": "75d785133c1b0e4862d93f147fe152bff3b32440aa4edc2b5f4d6a43c547a034",
+      "path": "llm/enrichments/reactor_shanghaiu3acbfc24af8fd6f699.json"
+    },
+    {
+      "id": "rnslive:eb92b38a938eca80",
+      "sourceItemHash": "97b13551d0cbf0f77f7a8b7023e15814e72785367e389f39905b67d417b75578",
+      "path": "llm/enrichments/rnsliveu3aeb92b38a938eca80.json"
+    },
+    {
+      "id": "ruaalab:172c7ad6767164ab",
+      "sourceItemHash": "eb0c013c4b4dfcb210797fd0cd9c6353eb72fdc2b874eb2c18bfdf9182645b25",
+      "path": "llm/enrichments/ruaalabu3a172c7ad6767164ab.json"
+    },
+    {
+      "id": "rust_club:23f93e36f664ad27",
+      "sourceItemHash": "c6a38ceb08a492e4936b82348595bd89314805c5517a4af3cd3fbb3e874d503b",
+      "path": "llm/enrichments/rust_clubu3a23f93e36f664ad27.json"
+    },
+    {
+      "id": "stereo52:19c1d786ece038aa",
+      "sourceItemHash": "9f790059b0edc4146a08a762a32558ab69237d252be98ade1f4820d023413eec",
+      "path": "llm/enrichments/stereo52u3a19c1d786ece038aa.json"
+    },
+    {
+      "id": "substation:1e875a98fe94d079",
+      "sourceItemHash": "2fe2d557c9ed89306ef9f8cdb8077be97d91dbe79f91f8633e24182e53cf99bc",
+      "path": "llm/enrichments/substationu3a1e875a98fe94d079.json"
+    },
+    {
+      "id": "tilt:5ba2890a67c30746",
+      "sourceItemHash": "6b03f3dbc73b7445063d8ec17b067fc2863f69592de4955b3a27d22b41c7f943",
+      "path": "llm/enrichments/tiltu3a5ba2890a67c30746.json"
+    },
+    {
+      "id": "tin:ac5703ce1b232217",
+      "sourceItemHash": "d3086f1a9f0810046fee559d0d680d1496f23b8a780bb861bf4c3509f8841b66",
+      "path": "llm/enrichments/tinu3aac5703ce1b232217.json"
+    },
+    {
+      "id": "tomtwo:17b2c1be7cb76fcc",
+      "sourceItemHash": "b1951e2d91ec3150cb94d9de8f7307896c1dbda7b736bc8c976d9521b2f986f0",
+      "path": "llm/enrichments/tomtwou3a17b2c1be7cb76fcc.json"
+    },
+    {
+      "id": "tomtwo:bf2802ca888fe283",
+      "sourceItemHash": "6c10f1443e516ca6d992aee3e8546f077d1abc6143a7d17f8d4a846eb2f3a782",
+      "path": "llm/enrichments/tomtwou3abf2802ca888fe283.json"
+    },
+    {
+      "id": "tote_music:16d16ef92899aa2d",
+      "sourceItemHash": "057dca00427800497e57ba4e4db4439dd312000af880b15f7a3b7da29c26f4d9",
+      "path": "llm/enrichments/tote_musicu3a16d16ef92899aa2d.json"
+    },
+    {
+      "id": "tote_music:3727ed3187d676bc",
+      "sourceItemHash": "770234fcbb6f1dba8f8992b6f11df0f757a9b195169428fd70ddd7db887b8b3a",
+      "path": "llm/enrichments/tote_musicu3a3727ed3187d676bc.json"
+    },
+    {
+      "id": "tote_music:4f7904c8f6060616",
+      "sourceItemHash": "884e2d432a0c18d57b1dfa430cfa7d728abc28f4ac3df337610eb0c20afb9ec2",
+      "path": "llm/enrichments/tote_musicu3a4f7904c8f6060616.json"
+    },
+    {
+      "id": "tote_music:590aaae1b13e06db",
+      "sourceItemHash": "d0e6b273a0c7b34a2d9bc165a679d19e037db739364a9f7b9e05e9ed09790520",
+      "path": "llm/enrichments/tote_musicu3a590aaae1b13e06db.json"
+    },
+    {
+      "id": "tote_music:627e53fbadcab4e1",
+      "sourceItemHash": "0c80a6b2f6b430f2b0a6d0b74732e0be24d67e717f760dbf41d083772cb4328d",
+      "path": "llm/enrichments/tote_musicu3a627e53fbadcab4e1.json"
+    },
+    {
+      "id": "tote_music:7211e34cda5be0bb",
+      "sourceItemHash": "7acb2143c90fd35351101ea0278bd2d116357a3859f48d293439c5f2ecc7a3ba",
+      "path": "llm/enrichments/tote_musicu3a7211e34cda5be0bb.json"
+    },
+    {
+      "id": "tote_music:aa0f2bd3d283f8ce",
+      "sourceItemHash": "75a395316ab3bd8132ba479445c53918652d7e7bcb9b74a4a80810aa551d78f3",
+      "path": "llm/enrichments/tote_musicu3aaa0f2bd3d283f8ce.json"
+    },
+    {
+      "id": "trust:23faaa29c19ad6eb",
+      "sourceItemHash": "f185a90008c1b208a932381ffb043d8ce4cb9e353895712ec5ec30bdd977435c",
+      "path": "llm/enrichments/trustu3a23faaa29c19ad6eb.json"
+    },
+    {
+      "id": "trust:5b3d09797685195f",
+      "sourceItemHash": "868c5d57a463c4b0693b4169a1cda6b524b90396edbdb665a63e35207a366e1d",
+      "path": "llm/enrichments/trustu3a5b3d09797685195f.json"
+    },
+    {
+      "id": "twinklab:271d803f42afe59c",
+      "sourceItemHash": "58bba59568efe73dda4bba3fae58d7778b705ea19ec7bec4d7e3104328c5e15c",
+      "path": "llm/enrichments/twinklabu3a271d803f42afe59c.json"
+    },
+    {
+      "id": "twinklab:53636baac6ab99c2",
+      "sourceItemHash": "7bf7746b4e76801ab5b3d2bff18abc8084ac41055f0ccc5116a6ee24c88c2e6c",
+      "path": "llm/enrichments/twinklabu3a53636baac6ab99c2.json"
+    },
+    {
+      "id": "vervo:a642ac94ed4c0df0",
+      "sourceItemHash": "3364a4165f56b7bb1daece427fe9f2c01b80ad2f07b43c50d0abb645dd4a92f7",
+      "path": "llm/enrichments/vervou3aa642ac94ed4c0df0.json"
+    },
+    {
+      "id": "vervo:c36953658ecace79",
+      "sourceItemHash": "25d86435f5fa79a028770be8f61abb890192c33d9012d0a62e712c2ce5d12454",
+      "path": "llm/enrichments/vervou3ac36953658ecace79.json"
+    },
+    {
+      "id": "wigwam:ac93945f01f913b1",
+      "sourceItemHash": "8c48f86cea483b99970d44ced7efb72af68584e10faebc8fdeebe983ce28cb97",
+      "path": "llm/enrichments/wigwamu3aac93945f01f913b1.json"
+    },
+    {
+      "id": "wigwam:d2c00e6b6a0c429e",
+      "sourceItemHash": "c3dd8a56c7b383a056c3f31a0bb8667c9100aacded813d796668d96be71b9454",
+      "path": "llm/enrichments/wigwamu3ad2c00e6b6a0c429e.json"
+    },
+    {
+      "id": "wigwam:f3eea8d3a5835bb1:schedule:20260605:1",
+      "sourceItemHash": "f92bef5702bc018091555829954f1998ce99e936b1ba7b3a575f134034b3c2e5",
+      "path": "llm/enrichments/wigwamu3af3eea8d3a5835bb1u3ascheduleu3a20260605u3a1.json"
+    },
+    {
+      "id": "wigwam:f3eea8d3a5835bb1:schedule:20260612:3",
+      "sourceItemHash": "58dbc44c534e7478921f3d9e50af5d9dc0ddfd519525afc04b320df531e86870",
+      "path": "llm/enrichments/wigwamu3af3eea8d3a5835bb1u3ascheduleu3a20260612u3a3.json"
+    },
+    {
+      "id": "wozhihuiweinixindong:b9d4c882cbd6ce3c",
+      "sourceItemHash": "77091ba930a7585fc86bd8145619550310116aa2d387cfb8ef6bba5c26596620",
+      "path": "llm/enrichments/wozhihuiweinixindongu3ab9d4c882cbd6ce3c.json"
+    },
+    {
+      "id": "yuanhe:5885acb21ff9e8ea",
+      "sourceItemHash": "14bb45e9a95c482c76ccf2557325308883a8a2484e4f4fa5fb3f12a0c3dbbeda",
+      "path": "llm/enrichments/yuanheu3a5885acb21ff9e8ea.json"
+    },
+    {
+      "id": "yuanhe:6b51c5f1924d0f78",
+      "sourceItemHash": "5769d9cbad4de9453b49af6037f0195e1ca2dbcacdeb0c861ae9ccfd8a6dd543",
+      "path": "llm/enrichments/yuanheu3a6b51c5f1924d0f78.json"
+    },
+    {
+      "id": "yuanhe:9cf24d417658a8a1",
+      "sourceItemHash": "8428b23d87766415c5e09091f508a568ea9eaf481ca23974db7f24c46d5b5508",
+      "path": "llm/enrichments/yuanheu3a9cf24d417658a8a1.json"
+    },
+    {
+      "id": "yuanhe:b349576fb2b1d589:schedule:20260604:10",
+      "sourceItemHash": "a884dc58a7fcfde16dc3ab89858a2a264a33b17d8527ef615f6b08bd587a9715",
+      "path": "llm/enrichments/yuanheu3ab349576fb2b1d589u3ascheduleu3a20260604u3a10.json"
+    },
+    {
+      "id": "yuanhe:dd2e9d3e9d6fb7c9",
+      "sourceItemHash": "e3cf88f791eeca9937b21795bdd35fa7da8241b22699735ef3f17625b712d308",
+      "path": "llm/enrichments/yuanheu3add2e9d3e9d6fb7c9.json"
+    },
+    {
+      "id": "yuanhe:f07f9c2d47e2484c",
+      "sourceItemHash": "6a3e1bed5fabaaf4788f8b2c1c28d4e04e1d297d7e50aeb29918a734a73a7814",
+      "path": "llm/enrichments/yuanheu3af07f9c2d47e2484c.json"
+    },
+    {
+      "id": "zhaodai:306c5fa17e1fdfd7",
+      "sourceItemHash": "322ff2602a8a6f80a4f1d9fe32a95ae7a01d56f8ec91028e7403b99771112b4b",
+      "path": "llm/enrichments/zhaodaiu3a306c5fa17e1fdfd7.json"
+    },
+    {
+      "id": "zhaodai:310d48b7c9a698e7",
+      "sourceItemHash": "a1cd8cddf0c5ab5f45baa876dc4771fb4f0a1864dab627da2ff24b3f263fe73f",
+      "path": "llm/enrichments/zhaodaiu3a310d48b7c9a698e7.json"
+    },
+    {
+      "id": "zhaodai:6622b6ce15fdf60f",
+      "sourceItemHash": "e7cc366507b7ccd3fc214266d2d826a005ca0644e036646946794f100867cb1e",
+      "path": "llm/enrichments/zhaodaiu3a6622b6ce15fdf60f.json"
+    }
+  ]
+}

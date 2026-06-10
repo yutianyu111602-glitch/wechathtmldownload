@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "foundation:a38adb9b4d534a93",
+  "sourceItemHash": "6da27d431085712b9ec2e3ceb37df3bcd20d7906414ee9f90db8b0597d7686ce",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": ".周五 | 𝐊𝐨𝐛𝐞 𝐂𝐡𝐞𝐧“声入群山，意越峰峦”",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "南京",
+      "venue_name": "FOUNDATION",
+      "address_candidate": "江苏省南京市鼓楼区石头城路97号水木秦淮街区C12",
+      "lineup_artists": [
+        "Kobe Chen",
+        "Kobe Chen"
+      ],
+      "music_styles": [
+        "ambient",
+        "ambient"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "𝟎𝟔.𝟎𝟓.周五｜𝐊𝐨𝐛𝐞 𝐂𝐡𝐞𝐧“声入群山，意越峰峦”",
+        "低频缓慢堆积，如山体隆起",
+        "氛围层层蔓延，像云雾穿过峡谷",
+        "而那些偶然闪现的旋律与采样，则如夜色中的萤火，短暂出现，却足够照亮前路"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        ".周五 | 𝐊𝐨𝐛𝐞 𝐂𝐡𝐞𝐧“声入群山，意越峰峦”",
+        "2026-06-05",
+        "南京",
+        "FOUNDATION"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

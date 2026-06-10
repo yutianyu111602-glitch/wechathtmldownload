@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "wozhihuiweinixindong:b9d4c882cbd6ce3c",
+  "sourceItemHash": "77091ba930a7585fc86bd8145619550310116aa2d387cfb8ef6bba5c26596620",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "丨门洞放映「主要音调」",
+      "event_date_start": "2026-06-04",
+      "event_date_end": "2026-06-04",
+      "event_time_text": "19:30-21:11",
+      "city_name": "杭州",
+      "venue_name": "门洞商店",
+      "address_candidate": "浙江省杭州市拱墅区氧气公寓湖墅南路店近南1门",
+      "lineup_artists": [],
+      "music_styles": [
+        "disco",
+        "ambient",
+        "disco",
+        "ambient"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.4丨门洞放映「主要音调」",
+        "氧气公寓湖墅南路店1楼(近南1",
+        "“我是在接收某种频率”",
+        "“我也不清楚，可能是我妈妈”"
+      ],
+      "ticketing_text": [
+        "免票"
+      ],
+      "dedupe_signals": [
+        "丨门洞放映「主要音调」",
+        "2026-06-04",
+        "杭州",
+        "门洞商店"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

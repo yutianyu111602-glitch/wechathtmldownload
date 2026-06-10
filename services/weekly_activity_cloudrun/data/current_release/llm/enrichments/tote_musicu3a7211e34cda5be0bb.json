@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "tote_music:7211e34cda5be0bb",
+  "sourceItemHash": "7acb2143c90fd35351101ea0278bd2d116357a3859f48d293439c5f2ecc7a3ba",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "【6/5 周五】Make You Dance 第二弹·新老声音的碰撞 | DJ set 跳舞派对",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "22:00 - Late",
+      "city_name": "广州",
+      "venue_name": "陀地士多 Tote Store",
+      "address_candidate": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+      "lineup_artists": [
+        "DJ KID",
+        "DJ RONG",
+        "DRK",
+        "DJ KID",
+        "DJ RONG",
+        "DRK"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "house",
+        "electro",
+        "disco",
+        "hip-hop",
+        "house",
+        "electro",
+        "disco",
+        "funk"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "而本月将继续延续最动听的声音，好的音乐重来不设限，为了探索更多的可能性，本月邀请两位DJ老朋友DJ KID和DJ RONG 一个是驰骋在先锋音乐和潮流服装的年轻DJ KID,同时也是广东歌的忠实粉丝",
+        "一个是在HIPHOP圈里深耕多年的DJ RONG，对音乐有极高要求，无论是在派对、街舞比赛都时常能够听到他自己制作的音乐，当然还有老朋友DRK继续为大家保驾护航"
+      ],
+      "description_original_lines": [
+        "如果你想和我们一起翩翩起舞，陀地舞池，不见不散！",
+        "回忆起五一假期的精彩声音，有Dancehall的狂野，有R&B的松弛，更有新老hiphop的激烈碰撞，久久不能忘怀",
+        "而本月将继续延续最动听的声音，好的音乐重来不设限，为了探索更多的可能性，本月邀请两位DJ老朋友DJ KID和DJ RONG 一个是驰骋在先锋音乐和潮流服装的年轻DJ KID,同时也是广东歌的忠实粉丝",
+        "一个是在HIPHOP圈里深耕多年的DJ RONG，对音乐有极高要求，无论是在派对、街舞比赛都时常能够听到他自己制作的音乐，当然还有老朋友DRK继续为大家保驾护航"
+      ],
+      "ticketing_text": [
+        "免票"
+      ],
+      "dedupe_signals": [
+        "【6/5 周五】Make You Dance 第二弹·新老声音的碰撞 | DJ set 跳舞派对",
+        "2026-06-05",
+        "广州",
+        "陀地士多 Tote Store"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

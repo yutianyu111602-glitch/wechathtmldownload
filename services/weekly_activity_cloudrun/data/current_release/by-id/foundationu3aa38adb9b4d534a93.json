@@ -1,0 +1,139 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "foundation:a38adb9b4d534a93",
+    "event_id": "foundation:a38adb9b4d534a93",
+    "article_id": "foundation:a38adb9b4d534a93",
+    "queue_id": "foundation:a38adb9b4d534a93",
+    "title": "𝟎𝟔.𝟎𝟓.周五｜𝐊𝐨𝐛𝐞 𝐂𝐡𝐞𝐧“声入群山，意越峰峦”",
+    "title_original": "𝟎𝟔.𝟎𝟓.周五｜𝐊𝐨𝐛𝐞 𝐂𝐡𝐞𝐧“声入群山，意越峰峦”",
+    "title_display": ".周五 | 𝐊𝐨𝐛𝐞 𝐂𝐡𝐞𝐧“声入群山，意越峰峦”",
+    "account": "FOUNDATION俱乐部",
+    "account_key": "foundation",
+    "promoter": "FOUNDATION俱乐部",
+    "source_article": {
+      "url_hash": "a38adb9b4d534a93",
+      "account_name": "FOUNDATION俱乐部",
+      "published_at": "2026-06-02"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "a38adb9b4d534a93"
+    },
+    "post_date": "2026-06-02",
+    "source_account_name": "FOUNDATION俱乐部",
+    "source_published_at": "2026-06-02",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a38adb9b4d534a93--430c630ca54211bd8c8770e0.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a38adb9b4d534a93--430c630ca54211bd8c8770e0.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a38adb9b4d534a93--430c630ca54211bd8c8770e0.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "南京"
+    ],
+    "city_key": "nanjing",
+    "city_name": "南京",
+    "city_keys": [
+      "nanjing"
+    ],
+    "venue": [],
+    "venue_id": "foundation_nanjing",
+    "venue_name": "FOUNDATION",
+    "address": "江苏省南京市鼓楼区石头城路97号水木秦淮街区C12",
+    "address_full": "江苏省南京市鼓楼区石头城路97号水木秦淮街区C12",
+    "address_source": "venue_registry_verified",
+    "geo_lng": 118.750235,
+    "geo_lat": 32.061451,
+    "lineup": [
+      "Kobe Chen"
+    ],
+    "lineup_artists": [
+      "Kobe Chen"
+    ],
+    "genres": [
+      "ambient"
+    ],
+    "music_styles": [
+      "ambient"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "𝟎𝟔.𝟎𝟓.周五｜𝐊𝐨𝐛𝐞 𝐂𝐡𝐞𝐧“声入群山，意越峰峦”",
+      "2026-06-05",
+      "低频缓慢堆积，如山体隆起",
+      "氛围层层蔓延，像云雾穿过峡谷",
+      "而那些偶然闪现的旋律与采样，则如夜色中的萤火，短暂出现，却足够照亮前路"
+    ],
+    "description_original_lines": [
+      "𝟎𝟔.𝟎𝟓.周五｜𝐊𝐨𝐛𝐞 𝐂𝐡𝐞𝐧“声入群山，意越峰峦”",
+      "低频缓慢堆积，如山体隆起",
+      "氛围层层蔓延，像云雾穿过峡谷",
+      "而那些偶然闪现的旋律与采样，则如夜色中的萤火，短暂出现，却足够照亮前路"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "南京|foundation|2026-06-05|周五声入群山意越峰峦",
+    "detail_path": "by-id/foundationu3aa38adb9b4d534a93.json",
+    "detail_url": "by-id/foundationu3aa38adb9b4d534a93.json",
+    "venue_lat": 32.061451,
+    "venue_lng": 118.750235,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "frontend_verified_map_location_book",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "foundation_nanjing",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a38adb9b4d534a93--430c630ca54211bd8c8770e0.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a38adb9b4d534a93--430c630ca54211bd8c8770e0.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a38adb9b4d534a93--430c630ca54211bd8c8770e0.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/foundation_a38adb9b4d534a93--430c630ca54211bd8c8770e0.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a38adb9b4d534a93--430c630ca54211bd8c8770e0.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a38adb9b4d534a93--430c630ca54211bd8c8770e0.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a38adb9b4d534a93--430c630ca54211bd8c8770e0.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a38adb9b4d534a93--430c630ca54211bd8c8770e0.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a38adb9b4d534a93--430c630ca54211bd8c8770e0.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a38adb9b4d534a93--430c630ca54211bd8c8770e0.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a38adb9b4d534a93--430c630ca54211bd8c8770e0.jpg"
+  }
+}

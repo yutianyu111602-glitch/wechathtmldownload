@@ -1,0 +1,270 @@
+{
+  "schema_version": "weekly_activity_miniprogram_city.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "city_key": "jinan",
+  "city": "济南",
+  "item_count": 2,
+  "items": [
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "key_jinan:ac1aca53250bab1c",
+      "event_id": "key_jinan:ac1aca53250bab1c",
+      "article_id": "key_jinan:ac1aca53250bab1c",
+      "queue_id": "key_jinan:ac1aca53250bab1c",
+      "title": "6.5 本周五｜超危险低音陷阱🤯 来自斯拉夫的凶狠Bass能量",
+      "title_original": "6.5 本周五｜超危险低音陷阱🤯 来自斯拉夫的凶狠Bass能量",
+      "title_display": "本周五 | 超危险低音陷阱🤯 来自斯拉夫的凶狠Bass能量",
+      "account": "KEY JINAN",
+      "account_key": "key_jinan",
+      "promoter": "KEY JINAN",
+      "source_article": {
+        "url_hash": "ac1aca53250bab1c",
+        "account_name": "KEY JINAN",
+        "published_at": "2026-06-02"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "ac1aca53250bab1c"
+      },
+      "post_date": "2026-06-02",
+      "source_account_name": "KEY JINAN",
+      "source_published_at": "2026-06-02",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_ac1aca53250bab1c--510bf3428af3e567feef182a.png",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_ac1aca53250bab1c--510bf3428af3e567feef182a.png",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_ac1aca53250bab1c--510bf3428af3e567feef182a.png",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-05"
+      ],
+      "event_date_iso_guess": "2026-06-05",
+      "event_date_iso_guesses": [
+        "2026-06-05"
+      ],
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "济南"
+      ],
+      "city_key": "jinan",
+      "city_name": "济南",
+      "city_keys": [
+        "jinan"
+      ],
+      "venue": [],
+      "venue_id": "key_jinan",
+      "venue_name": "KEY JINAN",
+      "address": "山东省济南市历下区县西巷泉乐坊224室",
+      "address_full": "山东省济南市历下区县西巷泉乐坊224室",
+      "address_source": "manual_registry",
+      "geo_lng": 117.028103,
+      "geo_lat": 36.668296,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [
+        "bass",
+        "breakbeat",
+        "jungle",
+        "techno"
+      ],
+      "music_styles": [
+        "techno",
+        "bass",
+        "breaks"
+      ],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "6.5 本周五｜超危险低音陷阱🤯 来自斯拉夫的凶狠Bass能量",
+        "2026-06-05",
+        "BASS/BREAKBEAT/JUNGLE/TECHNO"
+      ],
+      "description_original_lines": [
+        "6.5 本周五｜超危险低音陷阱🤯 来自斯拉夫的凶狠Bass能量",
+        "BASS/BREAKBEAT/JUNGLE/TECHNO",
+        "FRIDAY"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "济南|keyjinan|2026-06-05|五超危险低音陷阱来自斯拉夫的凶狠bass能量",
+      "detail_path": "by-id/key_jinanu3aac1aca53250bab1c.json",
+      "detail_url": "by-id/key_jinanu3aac1aca53250bab1c.json",
+      "lineup_display_hint": "点击海报跳转公众号原文查看",
+      "lineup_quality": {
+        "status": "uncertain",
+        "decision": "cleared_untrusted_lineup",
+        "note": "public mini-program policy: lineup was prose, aggregate text, bio-like text, or not source-grounded enough for display"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_ac1aca53250bab1c--510bf3428af3e567feef182a.png",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_ac1aca53250bab1c--510bf3428af3e567feef182a.png",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_ac1aca53250bab1c--510bf3428af3e567feef182a.png",
+      "poster_cloud_path": "weekly-posters/20260604/key_jinan_ac1aca53250bab1c--510bf3428af3e567feef182a.png",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_ac1aca53250bab1c--510bf3428af3e567feef182a.png",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_ac1aca53250bab1c--510bf3428af3e567feef182a.png",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_ac1aca53250bab1c--510bf3428af3e567feef182a.png",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_ac1aca53250bab1c--510bf3428af3e567feef182a.png",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_ac1aca53250bab1c--510bf3428af3e567feef182a.png",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_ac1aca53250bab1c--510bf3428af3e567feef182a.png",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_ac1aca53250bab1c--510bf3428af3e567feef182a.png"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "key_jinan:64ae13017b2570f2",
+      "event_id": "key_jinan:64ae13017b2570f2",
+      "article_id": "key_jinan:64ae13017b2570f2",
+      "queue_id": "key_jinan:64ae13017b2570f2",
+      "title": "6.5 本周五｜满格输出🫵 斯洛文尼亚低音狂人 w/Fujita Pinnacle",
+      "title_original": "6.5 本周五｜满格输出🫵 斯洛文尼亚低音狂人 w/Fujita Pinnacle",
+      "title_display": "本周五 | 满格输出🫵 斯洛文尼亚低音狂人 w/Fujita Pinnacle",
+      "account": "KEY JINAN",
+      "account_key": "key_jinan",
+      "promoter": "KEY JINAN",
+      "source_article": {
+        "url_hash": "64ae13017b2570f2",
+        "account_name": "KEY JINAN",
+        "published_at": "2026-06-04"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "64ae13017b2570f2"
+      },
+      "post_date": "2026-06-04",
+      "source_account_name": "KEY JINAN",
+      "source_published_at": "2026-06-04",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_64ae13017b2570f2--510bf3428af3e567feef182a.png",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_64ae13017b2570f2--510bf3428af3e567feef182a.png",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_64ae13017b2570f2--510bf3428af3e567feef182a.png",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-05"
+      ],
+      "event_date_iso_guess": "2026-06-05",
+      "event_date_iso_guesses": [
+        "2026-06-05"
+      ],
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "济南"
+      ],
+      "city_key": "jinan",
+      "city_name": "济南",
+      "city_keys": [
+        "jinan"
+      ],
+      "venue": [],
+      "venue_id": "key_jinan",
+      "venue_name": "KEY JINAN",
+      "address": "山东省济南市历下区县西巷泉乐坊224室",
+      "address_full": "山东省济南市历下区县西巷泉乐坊224室",
+      "address_source": "manual_registry",
+      "geo_lng": 117.028103,
+      "geo_lat": 36.668296,
+      "lineup": [
+        "Fujita Pinnacle"
+      ],
+      "lineup_artists": [
+        "Fujita Pinnacle"
+      ],
+      "genres": [
+        "bass",
+        "breakbeat",
+        "jungle",
+        "techno"
+      ],
+      "music_styles": [
+        "techno",
+        "bass",
+        "breaks"
+      ],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "6.5 本周五｜满格输出🫵 斯洛文尼亚低音狂人 w/Fujita Pinnacle",
+        "2026-06-05",
+        "BASS/BREAKBEAT/JUNGLE/TECHNO"
+      ],
+      "description_original_lines": [
+        "6.5 本周五｜满格输出🫵 斯洛文尼亚低音狂人 w/Fujita Pinnacle",
+        "BASS/BREAKBEAT/JUNGLE/TECHNO",
+        "FRIDAY"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [
+        {
+          "artist_id": "dj_8b8d0794",
+          "canonical_name": "Fujita Pinnacle",
+          "matched_name": "Fujita Pinnacle",
+          "verified": true,
+          "source": "dj_profiles",
+          "city": "",
+          "genres": [],
+          "bio": "@____echo0000____ @nimas_izbire\n📍Berlin currently\n🌪️🌪️🌪️ Bookings: booking@nimasizbire.com\nContact/submissions: fujitapinnacle@gmail.com",
+          "links": [
+            "https://www.instagram.com/fujitapinnacle/",
+            "https://soundcloud.com/fujitapinnacle",
+            "https://open.spotify.com/track/3382JI4WUatA2HOdKSkafY",
+            "https://ra.co/dj/fujitapinnacle",
+            "https://www.youtube.com/watch"
+          ]
+        }
+      ],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "济南|keyjinan|2026-06-05|五满格输出斯洛文尼亚低音狂人wfujitapinnacle",
+      "detail_path": "by-id/key_jinanu3a64ae13017b2570f2.json",
+      "detail_url": "by-id/key_jinanu3a64ae13017b2570f2.json",
+      "lineup_quality": {
+        "status": "verified",
+        "decision": "scoring_retained_lineup",
+        "note": "retained lineup artists with score >= 0.6: Fujita Pinnacle"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_64ae13017b2570f2--510bf3428af3e567feef182a.png",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_64ae13017b2570f2--510bf3428af3e567feef182a.png",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_64ae13017b2570f2--510bf3428af3e567feef182a.png",
+      "poster_cloud_path": "weekly-posters/20260604/key_jinan_64ae13017b2570f2--510bf3428af3e567feef182a.png",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_64ae13017b2570f2--510bf3428af3e567feef182a.png",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_64ae13017b2570f2--510bf3428af3e567feef182a.png",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_64ae13017b2570f2--510bf3428af3e567feef182a.png",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_64ae13017b2570f2--510bf3428af3e567feef182a.png",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_64ae13017b2570f2--510bf3428af3e567feef182a.png",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_64ae13017b2570f2--510bf3428af3e567feef182a.png",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/key_jinan_64ae13017b2570f2--510bf3428af3e567feef182a.png"
+    }
+  ]
+}

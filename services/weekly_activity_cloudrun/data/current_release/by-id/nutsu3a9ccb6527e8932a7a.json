@@ -1,0 +1,156 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "nuts:9ccb6527e8932a7a",
+    "event_id": "nuts:9ccb6527e8932a7a",
+    "article_id": "nuts:9ccb6527e8932a7a",
+    "queue_id": "nuts:9ccb6527e8932a7a",
+    "title": "「荒野舞会」：拓荒乐队首次专场｜坚果NUTS",
+    "title_original": "「荒野舞会」：拓荒乐队首次专场｜坚果NUTS",
+    "title_display": "「荒野舞会」：拓荒乐队首次专场 | 坚果NUTS",
+    "account": "坚果NUTS",
+    "account_key": "nuts",
+    "promoter": "坚果NUTS",
+    "source_article": {
+      "url_hash": "9ccb6527e8932a7a",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-05-13"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "9ccb6527e8932a7a",
+      "disabled_reason": ""
+    },
+    "aggregation_child": false,
+    "post_date": "2026-05-13",
+    "source_account_name": "坚果NUTS",
+    "source_published_at": "2026-05-13",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+    "poster_source": "cloudbase_storage_from_wechat_article",
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "20:00",
+    "event_time_source": "source_text",
+    "time_start": "20:00",
+    "time_end": "",
+    "running_hours_text": "20:00",
+    "running_hours_source": "source_text",
+    "city": [
+      "重庆"
+    ],
+    "city_key": "chongqing",
+    "city_name": "重庆",
+    "city_keys": [
+      "chongqing"
+    ],
+    "venue": [
+      "坚果NUTS"
+    ],
+    "venue_id": "nuts_chongqing_longhu",
+    "venue_name": "坚果NUTS",
+    "address": "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+    "address_full": "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+    "address_source": "source_text",
+    "geo_lng": 106.526277,
+    "geo_lat": 29.582209,
+    "lineup": [
+      "拓荒乐队"
+    ],
+    "lineup_artists": [
+      "拓荒乐队"
+    ],
+    "genres": [
+      "hard rock"
+    ],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "「荒野舞会」：拓荒乐队首次专场｜坚果NUTS",
+      "2026-06-05",
+      "2026-05-15",
+      "2026-05-16",
+      "2026-05-17"
+    ],
+    "description_original_lines": [
+      "坚果NUTS",
+      "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+      "6/5 20:00",
+      "6/5 20:00 @NUTS 「荒野舞会」 当钢筋森林的喧嚣褪去，当循规蹈矩的日常被撕裂，拓荒乐队携首次专场，以硬摇滚为火种，点燃一场「荒野舞会」"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "重庆|坚果nuts|2026-06-05|「荒野舞会」拓荒乐队首次专场坚果nuts",
+    "detail_path": "by-id/nutsu3a9ccb6527e8932a7a.json",
+    "detail_url": "by-id/nutsu3a9ccb6527e8932a7a.json",
+    "address_verification": {
+      "decision": "registry_over_poster_ocr_address",
+      "note": "poster OCR address conflicts with the verified venue registry; public release keeps the registry address instead of OCR-only override",
+      "rejected_source_address": "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F"
+    },
+    "venue_lat": 29.582209,
+    "venue_lng": 106.526277,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "tencent_map_picker_user_confirmed",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "nuts_chongqing_longhu",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address",
+        "address_full",
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_lat",
+        "geo_lng",
+        "geo_source",
+        "geo_verified_at",
+        "venue_id",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+    "poster_cloud_path": "weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+    "poster_migrated_at": "2026-06-05T18:01:30+08:00",
+    "poster_public_source_hash": "795adce0b4f226e1",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg"
+  }
+}

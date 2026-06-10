@@ -1,0 +1,119 @@
+{
+  "schema_version": "weekly_activity_miniprogram_city.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "city_key": "daqing",
+  "city": "大庆",
+  "item_count": 1,
+  "items": [
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "rust_club:23f93e36f664ad27",
+      "event_id": "rust_club:23f93e36f664ad27",
+      "article_id": "rust_club:23f93e36f664ad27",
+      "queue_id": "rust_club:23f93e36f664ad27",
+      "title": "锈蚀俱乐部|畅饮星期四|THIRSTY THURSDAY",
+      "title_original": "锈蚀俱乐部|畅饮星期四|THIRSTY THURSDAY",
+      "title_display": "锈蚀俱乐部 | 畅饮星期四 | THIRSTY THURSDAY",
+      "account": "Rust Club 锈蚀俱乐部",
+      "account_key": "rust_club",
+      "promoter": "Rust Club 锈蚀俱乐部",
+      "source_article": {
+        "url_hash": "23f93e36f664ad27",
+        "account_name": "Rust Club 锈蚀俱乐部",
+        "published_at": "2026-06-04"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "23f93e36f664ad27"
+      },
+      "post_date": "2026-06-04",
+      "source_account_name": "Rust Club 锈蚀俱乐部",
+      "source_published_at": "2026-06-04",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/rust_club_23f93e36f664ad27--e7117dd2d6ca2970f2d27f31.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/rust_club_23f93e36f664ad27--e7117dd2d6ca2970f2d27f31.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/rust_club_23f93e36f664ad27--e7117dd2d6ca2970f2d27f31.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-04"
+      ],
+      "event_date_iso_guess": "2026-06-04",
+      "event_date_iso_guesses": [
+        "2026-06-04"
+      ],
+      "event_date_start": "2026-06-04",
+      "event_date_end": "2026-06-04",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "大庆"
+      ],
+      "city_key": "daqing",
+      "city_name": "大庆",
+      "city_keys": [
+        "daqing"
+      ],
+      "venue": [],
+      "venue_id": "rust_club_daqing",
+      "venue_name": "Rust Club 锈蚀俱乐部",
+      "address": "黑龙江省大庆市龙凤区黎明街道黎明湖酒吧一条街3号集装箱",
+      "address_full": "黑龙江省大庆市龙凤区黎明街道黎明湖酒吧一条街3号集装箱",
+      "address_source": "manual_registry",
+      "geo_lng": 125.129893,
+      "geo_lat": 46.593972,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [
+        "99元"
+      ],
+      "price_text": "99元",
+      "ticketing_text": "99元",
+      "evidence": [
+        "锈蚀俱乐部|畅饮星期四|THIRSTY THURSDAY",
+        "2026-06-04",
+        "除了每周末的音乐类活动外",
+        "未来的周中淡日让酒鬼们提前进入周末状态",
+        "畅饮/折扣酒水活动将在特定日期开展"
+      ],
+      "description_original_lines": [
+        "除了每周末的音乐类活动外",
+        "未来的周中淡日让酒鬼们提前进入周末状态",
+        "畅饮/折扣酒水活动将在特定日期开展",
+        "本周 畅饮星期四"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "大庆|rustclub锈蚀俱乐部|2026-06-04|锈蚀俱乐部畅饮星期四thirstythursday",
+      "detail_path": "by-id/rust_clubu3a23f93e36f664ad27.json",
+      "detail_url": "by-id/rust_clubu3a23f93e36f664ad27.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/rust_club_23f93e36f664ad27--e7117dd2d6ca2970f2d27f31.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/rust_club_23f93e36f664ad27--e7117dd2d6ca2970f2d27f31.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/rust_club_23f93e36f664ad27--e7117dd2d6ca2970f2d27f31.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/rust_club_23f93e36f664ad27--e7117dd2d6ca2970f2d27f31.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/rust_club_23f93e36f664ad27--e7117dd2d6ca2970f2d27f31.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/rust_club_23f93e36f664ad27--e7117dd2d6ca2970f2d27f31.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/rust_club_23f93e36f664ad27--e7117dd2d6ca2970f2d27f31.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/rust_club_23f93e36f664ad27--e7117dd2d6ca2970f2d27f31.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/rust_club_23f93e36f664ad27--e7117dd2d6ca2970f2d27f31.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/rust_club_23f93e36f664ad27--e7117dd2d6ca2970f2d27f31.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/rust_club_23f93e36f664ad27--e7117dd2d6ca2970f2d27f31.jpg"
+    }
+  ]
+}

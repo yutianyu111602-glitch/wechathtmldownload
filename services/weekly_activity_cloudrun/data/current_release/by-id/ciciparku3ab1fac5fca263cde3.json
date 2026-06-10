@@ -1,0 +1,148 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "account": "cicipark",
+    "account_key": "cicipark",
+    "address": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+    "address_full": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+    "address_source": "operator_map_picker_user_confirmed",
+    "article_id": "cicipark:b1fac5fca263cde3",
+    "artist_profiles": [],
+    "city": [
+      "重庆"
+    ],
+    "city_key": "chongqing",
+    "city_keys": [
+      "chongqing"
+    ],
+    "city_name": "重庆",
+    "content_type": "event",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+    "dedupe_key": "重庆|重庆开埠遗址公园2号停车场|2026-06-03|opendeckcicipark",
+    "description_original_lines": [
+      "6.03周三｜Open Deck @cicipark",
+      "重庆开埠遗址公园2号停车场",
+      "音乐·唱片·美酒·波比球",
+      "好吃·好喝·好玩·好音乐"
+    ],
+    "detail_path": "by-id/ciciparku3ab1fac5fca263cde3.json",
+    "detail_url": "by-id/ciciparku3ab1fac5fca263cde3.json",
+    "dj_bio_lines": [],
+    "event_date_end": "2026-06-03",
+    "event_date_iso_guess": "2026-06-03",
+    "event_date_iso_guesses": [
+      "2026-06-03"
+    ],
+    "event_date_start": "2026-06-03",
+    "event_date_text": [
+      "2026-06-03"
+    ],
+    "event_id": "cicipark:b1fac5fca263cde3",
+    "event_time_source": "source_text",
+    "event_time_text": "22:00-23:00",
+    "evidence": [
+      "6.03周三｜Open Deck @cicipark",
+      "2026-06-03",
+      "22:00-23:00",
+      "重庆开埠遗址公园2号停车场",
+      "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右"
+    ],
+    "genres": [],
+    "geo_lat": 29.55206,
+    "geo_lng": 106.592744,
+    "id": "cicipark:b1fac5fca263cde3",
+    "is_calendar_preview": false,
+    "lineup": [],
+    "lineup_artists": [],
+    "music_styles": [],
+    "post_date": "2026-06-02",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+    "poster_source": "cloudbase_storage",
+    "price": [],
+    "price_text": "",
+    "promoter": "cicipark",
+    "publish_status": "published",
+    "quality_flags": [],
+    "quality_status": "READY",
+    "queue_id": "cicipark:b1fac5fca263cde3",
+    "running_hours_source": "source_text",
+    "running_hours_text": "22:00-23:00",
+    "schema_version": "weekly_event_published.v1",
+    "source_account_name": "cicipark",
+    "source_action": {
+      "available": true,
+      "label": "公众号",
+      "type": "wechat_article",
+      "url_hash": "b1fac5fca263cde3"
+    },
+    "source_article": {
+      "account_name": "cicipark",
+      "published_at": "2026-06-02",
+      "url_hash": "b1fac5fca263cde3"
+    },
+    "source_published_at": "2026-06-02",
+    "ticketing_text": "",
+    "time_end": "23:00",
+    "time_start": "22:00",
+    "title": "6.03周三｜Open Deck @cicipark",
+    "title_display": "Open Deck @cicipark",
+    "title_original": "6.03周三｜Open Deck @cicipark",
+    "venue": [
+      "重庆开埠遗址公园2号停车场"
+    ],
+    "venue_id": "cicipark_chongqing",
+    "venue_name": "重庆开埠遗址公园2号停车场",
+    "venue_lng": 106.592744,
+    "venue_lat": 29.55206,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "tencent_map_picker_user_confirmed",
+    "geo_provider": "tencent_map_picker",
+    "geo_reliability": "locked",
+    "geo_level": "poi",
+    "geo_verified_at": "2026-06-03",
+    "geo_candidate_id": "cicipark_chongqing",
+    "geo_provider_title": "cicipark",
+    "geo_provider_address": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+    "geo_reverse_address": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+    "map_poi_name": "cicipark",
+    "poi_id": "8135527839569863634",
+    "place_fields_locked": true,
+    "geo_locked": true,
+    "geo_override_reason": "2026-06-03 operator supplied cicipark POI/address/GCJ-02 coordinate; explicit override of prior cicipark registry/current address drift; POI ID 8135527839569863634.",
+    "map_search_aliases": [
+      "cicipark",
+      "重庆开埠遗址公园2号停车场",
+      "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右"
+    ],
+    "geo_search_aliases": [
+      "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+      "重庆开埠遗址公园2号停车场",
+      "cicipark"
+    ],
+    "poi_aliases": [
+      "cicipark",
+      "重庆开埠遗址公园2号停车场",
+      "8135527839569863634"
+    ],
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "fouroneone_hangzhou:9735340ff5c5a07a",
+  "sourceItemHash": "07fb2363a84144e03403d278dc668b82bce6351e50ac484d4c9a2ca02fa6c3c7",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "不知了 · 即兴第三期 | 迷失的音节",
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": "19:00",
+      "city_name": "杭州",
+      "venue_name": "肆幺幺",
+      "address_candidate": "浙江省杭州市上城区中山南路411号",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06.13 不知了 · 即兴第三期 ｜迷失的音节",
+        "预售:41.1元",
+        "现场:60元",
+        "阿德拉倾斜着身子靠在阳台的扶手上，望向远方城市翻腾汹涌的喧嚣，把其中最响亮的音调抽了出来，微笑着把这些迷失的音节排"
+      ],
+      "ticketing_text": [
+        "预售:41.1元 / 现场:60元"
+      ],
+      "dedupe_signals": [
+        "不知了 · 即兴第三期 | 迷失的音节",
+        "2026-06-13",
+        "杭州",
+        "肆幺幺"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

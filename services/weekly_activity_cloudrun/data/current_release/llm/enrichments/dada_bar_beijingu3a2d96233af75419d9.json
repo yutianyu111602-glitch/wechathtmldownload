@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "dada_bar_beijing:2d96233af75419d9",
+  "sourceItemHash": "58ad78b21fb8a445de975bd4ff0ddf9ac126290d01484663716cdac6e887a6de",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "今晚6月7日 - 声破天pres. Sounday Groove  w/Spectrxm",
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "21:00 - Late",
+      "city_name": "北京",
+      "venue_name": "南营坊胡同日坛国际贸易中心",
+      "address_candidate": "北京朝阳区南营坊胡同日坛国际贸易中心A座北门B1",
+      "lineup_artists": [
+        "Spectrxm",
+        "Spectrxm"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "house",
+        "electro",
+        "bass",
+        "hip-hop",
+        "house",
+        "electro",
+        "bass"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "免票FREE",
+        "北京朝阳区南营坊胡同日坛国际贸易中心A座北门B1",
+        "Spectrxm",
+        "6月7日｜Sun"
+      ],
+      "ticketing_text": [
+        "免票"
+      ],
+      "dedupe_signals": [
+        "今晚6月7日 - 声破天pres. Sounday Groove  w/Spectrxm",
+        "2026-06-07",
+        "北京",
+        "南营坊胡同日坛国际贸易中心"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

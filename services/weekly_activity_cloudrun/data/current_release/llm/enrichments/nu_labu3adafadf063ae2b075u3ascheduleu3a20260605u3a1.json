@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "nu_lab:dafadf063ae2b075:schedule:20260605:1",
+  "sourceItemHash": "d4608e1be1a84c4123a9824b36677b7e4364a18f13133bb873bcb4763074812a",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "丨Clinic Out with TOMO",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "成都",
+      "venue_name": "NU Lab",
+      "address_candidate": "四川省成都市锦江区永安路666号NUART锦江5楼",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "NU Lab｜6.5丨Clinic Out with TOMO",
+        "6.5丨Clinic Out with TOMO",
+        "LeFrit(live)",
+        "Frit"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "丨Clinic Out with TOMO",
+        "2026-06-05",
+        "成都",
+        "NU Lab"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

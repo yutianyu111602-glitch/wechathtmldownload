@@ -1,0 +1,138 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "tote_music:7211e34cda5be0bb",
+    "event_id": "tote_music:7211e34cda5be0bb",
+    "article_id": "tote_music:7211e34cda5be0bb",
+    "queue_id": "tote_music:7211e34cda5be0bb",
+    "title": "【6/5 周五】Make You Dance 第二弹·新老声音的碰撞｜DJ set 跳舞派对",
+    "title_original": "【6/5 周五】Make You Dance 第二弹·新老声音的碰撞｜DJ set 跳舞派对",
+    "title_display": "【6/5 周五】Make You Dance 第二弹·新老声音的碰撞 | DJ set 跳舞派对",
+    "account": "陀地音乐TOTE MUSIC",
+    "account_key": "tote_music",
+    "promoter": "陀地音乐TOTE MUSIC",
+    "source_article": {
+      "url_hash": "7211e34cda5be0bb",
+      "account_name": "陀地音乐TOTE MUSIC",
+      "published_at": "2026-05-25"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "7211e34cda5be0bb"
+    },
+    "post_date": "2026-05-25",
+    "source_account_name": "陀地音乐TOTE MUSIC",
+    "source_published_at": "2026-05-25",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tote_music_7211e34cda5be0bb--5348c7acc76dbb83d4d57859.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tote_music_7211e34cda5be0bb--5348c7acc76dbb83d4d57859.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tote_music_7211e34cda5be0bb--5348c7acc76dbb83d4d57859.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "22:00 - Late",
+    "event_time_source": "source_text",
+    "time_start": "22:00",
+    "time_end": "Late",
+    "running_hours_text": "22:00 - Late",
+    "running_hours_source": "source_text",
+    "city": [
+      "广州"
+    ],
+    "city_key": "guangzhou",
+    "city_name": "广州",
+    "city_keys": [
+      "guangzhou"
+    ],
+    "venue": [],
+    "venue_id": "tote_store_guangzhou",
+    "venue_name": "陀地士多 Tote Store",
+    "address": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+    "address_full": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+    "address_source": "manual_registry",
+    "geo_lng": 113.262634,
+    "geo_lat": 23.097666,
+    "lineup": [
+      "DJ KID",
+      "DJ RONG",
+      "DRK"
+    ],
+    "lineup_artists": [
+      "DJ KID",
+      "DJ RONG",
+      "DRK"
+    ],
+    "genres": [
+      "hip-hop",
+      "house",
+      "electro",
+      "disco",
+      "funk"
+    ],
+    "music_styles": [
+      "hip-hop",
+      "house",
+      "electro",
+      "disco"
+    ],
+    "price": [
+      "免票"
+    ],
+    "price_text": "免票",
+    "ticketing_text": "免票",
+    "evidence": [
+      "【6/5 周五】Make You Dance 第二弹·新老声音的碰撞｜DJ set 跳舞派对",
+      "「 Make You Dance 第二弹」 6月5日 周五 Fri. 22:00- late 免票进场 一人一消 陀地士多 ↓↓↓交通指引点击下方链接↓↓↓ 如何找到我们!How to find us !",
+      "2026-06-05",
+      "22:00- late",
+      "如果你想和我们一起翩翩起舞，陀地舞池，不见不散！"
+    ],
+    "description_original_lines": [
+      "如果你想和我们一起翩翩起舞，陀地舞池，不见不散！",
+      "回忆起五一假期的精彩声音，有Dancehall的狂野，有R&B的松弛，更有新老hiphop的激烈碰撞，久久不能忘怀",
+      "而本月将继续延续最动听的声音，好的音乐重来不设限，为了探索更多的可能性，本月邀请两位DJ老朋友DJ KID和DJ RONG 一个是驰骋在先锋音乐和潮流服装的年轻DJ KID,同时也是广东歌的忠实粉丝",
+      "一个是在HIPHOP圈里深耕多年的DJ RONG，对音乐有极高要求，无论是在派对、街舞比赛都时常能够听到他自己制作的音乐，当然还有老朋友DRK继续为大家保驾护航"
+    ],
+    "dj_bio_lines": [
+      "而本月将继续延续最动听的声音，好的音乐重来不设限，为了探索更多的可能性，本月邀请两位DJ老朋友DJ KID和DJ RONG 一个是驰骋在先锋音乐和潮流服装的年轻DJ KID,同时也是广东歌的忠实粉丝",
+      "一个是在HIPHOP圈里深耕多年的DJ RONG，对音乐有极高要求，无论是在派对、街舞比赛都时常能够听到他自己制作的音乐，当然还有老朋友DRK继续为大家保驾护航"
+    ],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "广州|陀地士多totestore|2026-06-05|65周五makeyoudance第二弹新老声音的碰撞djset跳舞派对",
+    "detail_path": "by-id/tote_musicu3a7211e34cda5be0bb.json",
+    "detail_url": "by-id/tote_musicu3a7211e34cda5be0bb.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tote_music_7211e34cda5be0bb--5348c7acc76dbb83d4d57859.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tote_music_7211e34cda5be0bb--5348c7acc76dbb83d4d57859.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tote_music_7211e34cda5be0bb--5348c7acc76dbb83d4d57859.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/tote_music_7211e34cda5be0bb--5348c7acc76dbb83d4d57859.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tote_music_7211e34cda5be0bb--5348c7acc76dbb83d4d57859.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tote_music_7211e34cda5be0bb--5348c7acc76dbb83d4d57859.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tote_music_7211e34cda5be0bb--5348c7acc76dbb83d4d57859.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tote_music_7211e34cda5be0bb--5348c7acc76dbb83d4d57859.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tote_music_7211e34cda5be0bb--5348c7acc76dbb83d4d57859.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tote_music_7211e34cda5be0bb--5348c7acc76dbb83d4d57859.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tote_music_7211e34cda5be0bb--5348c7acc76dbb83d4d57859.jpg"
+  }
+}

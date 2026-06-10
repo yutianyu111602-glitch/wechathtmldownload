@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "pools:fcd7568608a510a4",
+  "sourceItemHash": "12d1c9021520828c32e1b56a20fd5522d98544cce048bcdc258e4f9489ff38e7",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "这几天，把夜晚留给考生 | 高考期间停业通知：2026年6月6–9 日",
+      "event_date_start": "2026-06-09",
+      "event_date_end": "2026-06-09",
+      "event_time_text": null,
+      "city_name": "上海",
+      "venue_name": "POOLS",
+      "address_candidate": null,
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "根据相关部门要求，为保障 2026 年高考期间考生拥有安静的考试与休息环境，POOLS 将于 6月6日至6月9日 暂停营业"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "这几天，把夜晚留给考生 | 高考期间停业通知：2026年6月6–9 日",
+        "2026-06-09",
+        "上海",
+        "POOLS"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

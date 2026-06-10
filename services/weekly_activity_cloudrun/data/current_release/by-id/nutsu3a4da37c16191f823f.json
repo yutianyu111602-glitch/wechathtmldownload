@@ -1,0 +1,153 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "nuts:4da37c16191f823f",
+    "event_id": "nuts:4da37c16191f823f",
+    "article_id": "nuts:4da37c16191f823f",
+    "queue_id": "nuts:4da37c16191f823f",
+    "title": "持续蔓延！十九年硬摇乐队「丝绒公路」｜6月13日@坚果NUTS",
+    "title_original": "持续蔓延！十九年硬摇乐队「丝绒公路」｜6月13日@坚果NUTS",
+    "title_display": "持续蔓延！十九年硬摇乐队「丝绒公路」 | @坚果NUTS",
+    "account": "坚果NUTS",
+    "account_key": "nuts",
+    "promoter": "坚果NUTS",
+    "source_article": {
+      "url_hash": "4da37c16191f823f",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-06-02"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "4da37c16191f823f",
+      "disabled_reason": ""
+    },
+    "aggregation_child": false,
+    "post_date": "2026-06-02",
+    "source_account_name": "坚果NUTS",
+    "source_published_at": "2026-06-02",
+    "cover_url": "https://mmbiz.qpic.cn/sz_mmbiz_jpg/X2TFYhMElU5x3xEF4CcVKXJUslia4BeXGmWKJmmoMU7HHYqghDmvZHuwZXiaQ0cznSflL6hDj6I4VxHKlHviaHicxTPOHoXLIGIWHkRvrwDeBMo/640?wx_fmt=jpeg",
+    "cover_image_url": "https://mmbiz.qpic.cn/sz_mmbiz_jpg/X2TFYhMElU5x3xEF4CcVKXJUslia4BeXGmWKJmmoMU7HHYqghDmvZHuwZXiaQ0cznSflL6hDj6I4VxHKlHviaHicxTPOHoXLIGIWHkRvrwDeBMo/640?wx_fmt=jpeg",
+    "poster_file_id": "",
+    "poster_source": "wechat_article",
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "event_date_text": [
+      "2026-06-13"
+    ],
+    "event_date_iso_guess": "2026-06-13",
+    "event_date_iso_guesses": [
+      "2026-06-13"
+    ],
+    "event_date_start": "2026-06-13",
+    "event_date_end": "2026-06-13",
+    "event_time_text": "20:00",
+    "event_time_source": "source_text",
+    "time_start": "20:00",
+    "time_end": "",
+    "running_hours_text": "20:00",
+    "running_hours_source": "source_text",
+    "city": [
+      "重庆"
+    ],
+    "city_key": "chongqing",
+    "city_name": "重庆",
+    "city_keys": [
+      "chongqing"
+    ],
+    "venue": [],
+    "venue_id": "nuts_chongqing",
+    "venue_name": "坚果NUTS",
+    "address": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+    "address_full": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+    "address_source": "manual_registry",
+    "geo_lng": 106.468644,
+    "geo_lat": 29.561095,
+    "lineup": [
+      "丝绒公路"
+    ],
+    "lineup_artists": [
+      "丝绒公路"
+    ],
+    "genres": [
+      "hard rock"
+    ],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "持续蔓延！十九年硬摇乐队「丝绒公路」｜6月13日@坚果NUTS",
+      "2026-06-13",
+      "20:00",
+      "hard rock",
+      "6/13 20:00"
+    ],
+    "description_original_lines": [
+      "持续蔓延！十九年硬摇乐队「丝绒公路」｜6月13日@坚果NUTS",
+      "hard rock",
+      "6/13 20:00",
+      "丝绒公路2026全国巡演"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "重庆|坚果nuts|2026-06-13|持续蔓延！十九年硬摇乐队「丝绒公路」坚果nuts",
+    "detail_path": "by-id/nutsu3a4da37c16191f823f.json",
+    "detail_url": "by-id/nutsu3a4da37c16191f823f.json",
+    "merge_provenance": {
+      "schema_version": "weekly_merge_provenance.v1",
+      "reason": "duplicate_cluster",
+      "retained_id": "nuts:4da37c16191f823f",
+      "retained_source_hash": "4da37c16191f823f",
+      "merged_from": [
+        "nuts:dc7f7768cfadd65f",
+        "nuts:d8ccdd77982aac06",
+        "nuts:4da37c16191f823f"
+      ],
+      "merged_source_hashes": [
+        "4da37c16191f823f",
+        "d8ccdd77982aac06",
+        "dc7f7768cfadd65f"
+      ],
+      "source_count": 3,
+      "sources": [
+        {
+          "event_id": "nuts:dc7f7768cfadd65f",
+          "source_hash": "dc7f7768cfadd65f",
+          "title": "丝绒公路「持续蔓延」2026巡演",
+          "published_at": "2026-05-16",
+          "account_name": "坚果NUTS",
+          "source_type": "wechat_article"
+        },
+        {
+          "event_id": "nuts:d8ccdd77982aac06",
+          "source_hash": "d8ccdd77982aac06",
+          "title": "中国硬摇滚代表——丝绒公路「持续蔓延」 | 坚果NUTS",
+          "published_at": "2026-05-23",
+          "account_name": "坚果NUTS",
+          "source_type": "wechat_article"
+        },
+        {
+          "event_id": "nuts:4da37c16191f823f",
+          "source_hash": "4da37c16191f823f",
+          "title": "持续蔓延！十九年硬摇乐队「丝绒公路」 | @坚果NUTS",
+          "published_at": "2026-06-02",
+          "account_name": "坚果NUTS",
+          "source_type": "wechat_article"
+        }
+      ]
+    },
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    }
+  }
+}

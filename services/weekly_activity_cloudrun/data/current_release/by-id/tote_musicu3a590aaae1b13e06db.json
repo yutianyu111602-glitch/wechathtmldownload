@@ -1,0 +1,155 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "tote_music:590aaae1b13e06db",
+    "event_id": "tote_music:590aaae1b13e06db",
+    "article_id": "tote_music:590aaae1b13e06db",
+    "queue_id": "tote_music:590aaae1b13e06db",
+    "title": "【6/6 周六】Falling For You：一场蓄谋已久的坠落｜安娜万千·2026全国巡演广州站",
+    "title_original": "【6/6 周六】Falling For You：一场蓄谋已久的坠落｜安娜万千·2026全国巡演广州站",
+    "title_display": "【6/6 周六】Falling For You：一场蓄谋已久的坠落 | 安娜万千·2026全国巡演广州站",
+    "account": "陀地音乐TOTE MUSIC",
+    "account_key": "tote_music",
+    "promoter": "陀地音乐TOTE MUSIC",
+    "source_article": {
+      "url_hash": "590aaae1b13e06db",
+      "account_name": "陀地音乐TOTE MUSIC",
+      "published_at": "2026-05-18"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "590aaae1b13e06db",
+      "disabled_reason": ""
+    },
+    "aggregation_child": false,
+    "post_date": "2026-05-18",
+    "source_account_name": "陀地音乐TOTE MUSIC",
+    "source_published_at": "2026-05-18",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/tote_musicu3a590aaae1b13e06db--629b6f4e0d43fd1bc707.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/tote_musicu3a590aaae1b13e06db--629b6f4e0d43fd1bc707.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/tote_musicu3a590aaae1b13e06db--629b6f4e0d43fd1bc707.jpg",
+    "poster_source": "cloudbase_storage_from_wechat_article",
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "22:00 - Late",
+    "event_time_source": "source_text",
+    "time_start": "22:00",
+    "time_end": "Late",
+    "running_hours_text": "22:00 - Late",
+    "running_hours_source": "source_text",
+    "city": [
+      "广州"
+    ],
+    "city_key": "guangzhou",
+    "city_name": "广州",
+    "city_keys": [
+      "guangzhou"
+    ],
+    "venue": [],
+    "venue_id": "tote_store_guangzhou",
+    "venue_name": "陀地士多 Tote Store",
+    "address": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+    "address_full": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+    "address_source": "venue_registry_verified",
+    "geo_lng": 113.262634,
+    "geo_lat": 23.097666,
+    "lineup": [
+      "安娜万千"
+    ],
+    "lineup_artists": [
+      "安娜万千"
+    ],
+    "genres": [
+      "trip hop",
+      "hip-hop",
+      "house",
+      "electro",
+      "disco"
+    ],
+    "music_styles": [
+      "hip-hop",
+      "house",
+      "electro",
+      "disco"
+    ],
+    "price": [
+      "免票"
+    ],
+    "price_text": "免票",
+    "ticketing_text": "免票",
+    "evidence": [
+      "【6/6 周六】Falling For You：一场蓄谋已久的坠落｜安娜万千·2026全国巡演广州站",
+      "「 Falling For You 一场蓄谋已久的坠落」 安娜万千2026全国巡演广州站 6月6日 周六 Sat. 22:00 免票进场 一人一消 陀地士多 ↓↓↓交通指引点击下方链接↓↓↓ 如何找到我们!How to find us ! [观演须知] - 支持原创、支持场地、一人一消",
+      "2026-06-06",
+      "22:00-late",
+      "来陀地士多，共同迎接她的音乐与故事！"
+    ],
+    "description_original_lines": [
+      "来陀地士多，共同迎接她的音乐与故事！",
+      "来陀地士多，共同迎接她的音乐与故事！ 她是一位难以被定义的女性唱作人，也是包揽词曲、编曲与制作的独立制作人、 Beat maker",
+      "她把电子乐的冷峻光泽、 Hip Hop 的律动呼吸，悉数揉进 Trip Hop 的幽暗梦境里，锻造出一种只属于她的音乐语言——迷离中带着韧性，慵懒里藏着锋芒",
+      "三张个人创作全长专辑，从第一个音符到最后一秒混音，全部由她亲手构筑"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "广州|陀地士多totestore|2026-06-06|66周六fallingforyou一场蓄谋已久的坠落安娜万千2026全国巡演广州站",
+    "detail_path": "by-id/tote_musicu3a590aaae1b13e06db.json",
+    "detail_url": "by-id/tote_musicu3a590aaae1b13e06db.json",
+    "venue_lat": 23.097666,
+    "venue_lng": 113.262634,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "tencent_map_picker_user_confirmed",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "tote_store_guangzhou",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/tote_musicu3a590aaae1b13e06db--629b6f4e0d43fd1bc707.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/tote_musicu3a590aaae1b13e06db--629b6f4e0d43fd1bc707.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/tote_musicu3a590aaae1b13e06db--629b6f4e0d43fd1bc707.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/tote_musicu3a590aaae1b13e06db--629b6f4e0d43fd1bc707.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/tote_musicu3a590aaae1b13e06db--629b6f4e0d43fd1bc707.jpg",
+    "poster_cloud_path": "weekly-posters/20260605/tote_musicu3a590aaae1b13e06db--629b6f4e0d43fd1bc707.jpg",
+    "poster_migrated_at": "2026-06-05T18:01:30+08:00",
+    "poster_public_source_hash": "629b6f4e0d43fd1b",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/tote_musicu3a590aaae1b13e06db--629b6f4e0d43fd1bc707.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/tote_musicu3a590aaae1b13e06db--629b6f4e0d43fd1bc707.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/tote_musicu3a590aaae1b13e06db--629b6f4e0d43fd1bc707.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/tote_musicu3a590aaae1b13e06db--629b6f4e0d43fd1bc707.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/tote_musicu3a590aaae1b13e06db--629b6f4e0d43fd1bc707.jpg"
+  }
+}

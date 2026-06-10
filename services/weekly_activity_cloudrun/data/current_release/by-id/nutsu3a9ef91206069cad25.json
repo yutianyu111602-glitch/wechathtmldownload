@@ -1,0 +1,181 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "nuts:9ef91206069cad25",
+    "event_id": "nuts:9ef91206069cad25",
+    "article_id": "nuts:9ef91206069cad25",
+    "queue_id": "nuts:9ef91206069cad25",
+    "title": "春山后潮「马上迷幻」｜6月6日@坚果NUTS",
+    "title_original": "春山后潮「马上迷幻」｜6月6日@坚果NUTS",
+    "title_display": "春山后潮「马上迷幻」 | @坚果NUTS",
+    "account": "坚果NUTS",
+    "account_key": "nuts",
+    "promoter": "坚果NUTS",
+    "source_article": {
+      "url_hash": "9ef91206069cad25",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-06-01"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "9ef91206069cad25"
+    },
+    "post_date": "2026-06-01",
+    "source_account_name": "坚果NUTS",
+    "source_published_at": "2026-06-01",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "20:00",
+    "event_time_source": "source_text",
+    "time_start": "20:00",
+    "time_end": "",
+    "running_hours_text": "20:00",
+    "running_hours_source": "source_text",
+    "city": [
+      "重庆"
+    ],
+    "city_key": "chongqing",
+    "city_name": "重庆",
+    "city_keys": [
+      "chongqing"
+    ],
+    "venue": [],
+    "venue_id": "nuts_chongqing",
+    "venue_name": "坚果NUTS",
+    "address": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+    "address_full": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+    "address_source": "venue_registry_verified",
+    "geo_lng": 106.468644,
+    "geo_lat": 29.561095,
+    "lineup": [
+      "春山后潮"
+    ],
+    "lineup_artists": [
+      "春山后潮"
+    ],
+    "genres": [
+      "迷幻"
+    ],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "春山后潮「马上迷幻」｜6月6日@坚果NUTS",
+      "2026-06-06",
+      "20:00",
+      "6/6 20:00"
+    ],
+    "description_original_lines": [
+      "春山后潮「马上迷幻」｜6月6日@坚果NUTS",
+      "6/6 20:00",
+      "2026",
+      "春山后潮「马上迷幻]2026全国巡演"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "重庆|坚果nuts|2026-06-06|春山后潮「马上迷幻」坚果nuts",
+    "detail_path": "by-id/nutsu3a9ef91206069cad25.json",
+    "detail_url": "by-id/nutsu3a9ef91206069cad25.json",
+    "venue_lat": 29.561095,
+    "venue_lng": 106.468644,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "current_release_amap_geocoder_backfill_20260531",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "nuts_chongqing",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "merge_provenance": {
+      "schema_version": "weekly_merge_provenance.v1",
+      "reason": "duplicate_cluster",
+      "retained_id": "nuts:9ef91206069cad25",
+      "retained_source_hash": "9ef91206069cad25",
+      "merged_from": [
+        "nuts:555141c9cfa0d49c",
+        "nuts:b8a0a991fe8389bd",
+        "nuts:9ef91206069cad25"
+      ],
+      "merged_source_hashes": [
+        "555141c9cfa0d49c",
+        "9ef91206069cad25",
+        "b8a0a991fe8389bd"
+      ],
+      "source_count": 3,
+      "sources": [
+        {
+          "event_id": "nuts:555141c9cfa0d49c",
+          "source_hash": "555141c9cfa0d49c",
+          "title": "时代发展了，60块就可以去太空漫游了 | 春山后潮@坚果NUTS",
+          "published_at": "2026-05-18",
+          "account_name": "坚果NUTS",
+          "source_type": "wechat_article"
+        },
+        {
+          "event_id": "nuts:b8a0a991fe8389bd",
+          "source_hash": "b8a0a991fe8389bd",
+          "title": "春山后潮·马上迷幻 | @坚果NUTS",
+          "published_at": "2026-05-21",
+          "account_name": "坚果NUTS",
+          "source_type": "wechat_article"
+        },
+        {
+          "event_id": "nuts:9ef91206069cad25",
+          "source_hash": "9ef91206069cad25",
+          "title": "春山后潮「马上迷幻」 | @坚果NUTS",
+          "published_at": "2026-06-01",
+          "account_name": "坚果NUTS",
+          "source_type": "wechat_article"
+        }
+      ]
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg"
+  }
+}

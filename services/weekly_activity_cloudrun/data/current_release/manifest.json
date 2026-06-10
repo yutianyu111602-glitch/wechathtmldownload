@@ -1,0 +1,130 @@
+{
+  "schema_version": "weekly_activity_miniprogram_api.v1",
+  "generated_at": "2026-06-10T16:43:33+08:00",
+  "source_pack_dir": "D:\\downstream_results\\stage7_rewrite\\longrun\\WEEKLY_ACTIVITY_RECOMMENDATION_PACK_DEEPSEEK_20260610",
+  "out_dir": "C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/data/current_release",
+  "source_url_map_path": "D:\\downstream_results\\stage7_rewrite\\longrun\\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260610_MERGED_CURRENT\\source_actions\\source_url_map.json",
+  "static_source_url_map_path": "D:\\downstream_results\\stage7_rewrite\\longrun\\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260610_MERGED_CURRENT\\source_actions\\source_url_map.json",
+  "max_items": 10000,
+  "evidence_limit": 5,
+  "window_start": "2026-06-02",
+  "window_end": "2026-06-25",
+  "item_count": 171,
+  "filtered_counts": {
+    "missing_source_date": 117,
+    "missing_time_warning": 48,
+    "outside_date_window": 1633,
+    "publish_blocked": 30
+  },
+  "deleted_source_registry_path": "",
+  "deleted_source_registry_count": 0,
+  "source_queue_path": "D:\\downstream_results\\stage7_rewrite\\longrun\\LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE\\latest_queue.jsonl",
+  "source_queue_match_count": 1860,
+  "venue_registry_path": "C:\\code\\githubstar\\wechathtmldownload\\tools\\stage7_rewrite\\registries\\weekly_venues_seed.json",
+  "venue_registry_count": 74,
+  "account_registry_path": "C:\\code\\githubstar\\wechathtmldownload\\tools\\stage7_rewrite\\registries\\weekly_accounts_seed.json",
+  "account_registry_count": 130,
+  "city_route_count": 25,
+  "date_route_count": 13,
+  "routes": {
+    "current": "current.json",
+    "manifest": "manifest.json",
+    "by_city_index": "by-city/index.json",
+    "by_date_index": "by-date/index.json",
+    "source_url_map": "source_actions/source_url_map.json"
+  },
+  "source_summary": {
+    "weekly_queue_total": null,
+    "matched_articles": null,
+    "candidates": null,
+    "review_candidates": null,
+    "source_rows_loaded": 1874
+  },
+  "repair_report": {
+    "schema_version": "weekly_activity_release_repair.v1",
+    "repaired_at": "2026-06-10T16:43:33+08:00",
+    "raw_item_count": 171,
+    "repaired_item_count": 171,
+    "removed_duplicate_count": 0,
+    "quarantined_conflict_item_count": 0
+  },
+  "repair_report_path": "repair_report.json",
+  "source_base_api_dir": "C:\\code\\githubstar\\wechathtmldownload\\services\\weekly_activity_cloudrun\\data\\current_release",
+  "source_incremental_api_dir": "D:\\downstream_results\\stage7_rewrite\\longrun\\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260610",
+  "incremental_merge": {
+    "schema_version": "weekly_incremental_api_merge.v1.current",
+    "generated_at": "2026-06-10T16:43:31+08:00",
+    "base_api_dir": "C:\\code\\githubstar\\wechathtmldownload\\services\\weekly_activity_cloudrun\\data\\current_release",
+    "incremental_api_dir": "D:\\downstream_results\\stage7_rewrite\\longrun\\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260610",
+    "base_generated_at": "2026-06-08T20:41:45+08:00",
+    "incremental_generated_at": "2026-06-10T16:43:25+08:00",
+    "base_count": 171,
+    "incremental_count": 2,
+    "merged_count": 173,
+    "added_count": 2,
+    "replaced_count": 0,
+    "added_ids": [
+      "nuts:dc7f7768cfadd65f",
+      "tomtwo:2365dc9891cbd39e"
+    ],
+    "replaced_ids": [],
+    "duplicate_base_ids": [],
+    "duplicate_incremental_ids": [],
+    "protected_replacement_count": 0,
+    "protected_replacements": {}
+  },
+  "geocode_enrichment": {
+    "schema_version": "weekly_geocode_enrichment.v1",
+    "applied_at": "2026-06-06T16:20:02+0800",
+    "accepted_place_count": 1,
+    "updated_item_count": 1,
+    "coord_system": "GCJ-02",
+    "accepted_geocodes_path": "tools\\stage7_rewrite\\reports\\weekly_geocode_20260606_trust_venue\\accepted_geocodes.jsonl",
+    "backup_dir": "tools\\stage7_rewrite\\reports\\weekly_geocode_20260606_trust_venue\\apply_backup"
+  },
+  "manual_place_overrides": {
+    "schema_version": "weekly_manual_place_overrides.v1",
+    "applied_at": "2026-06-06T15:48:04+0800",
+    "accepted_place_count": 1,
+    "updated_item_count": 1,
+    "accepted_geocodes_path": "tools\\stage7_rewrite\\reports\\weekly_manual_place_overrides_user_confirmed_20260606_cedar_kitchen.jsonl",
+    "backup_dir": "tools\\stage7_rewrite\\reports\\weekly_manual_place_override_backup_20260606_cedar_kitchen",
+    "does_not_request_user_location": true,
+    "coord_system": "GCJ-02"
+  },
+  "locked_place_patch": {
+    "schema_version": "weekly_locked_place_patch.v1",
+    "applied_at": "2026-06-01T21:25:04+08:00",
+    "updated_item_ids": [
+      "gum_guangzhou:77ae233df5f7783a",
+      "nuts:9ccb6527e8932a7a",
+      "nuts:dbaf27293c8eb75d"
+    ],
+    "locked_fields": [
+      "venue_id",
+      "address",
+      "address_full",
+      "venue_lat",
+      "venue_lng",
+      "geo_lat",
+      "geo_lng",
+      "geo_source",
+      "map_search_aliases",
+      "poi_id"
+    ],
+    "backup_dir": "C:\\code\\githubstar\\wechathtmldownload\\tools\\stage7_rewrite\\reports\\weekly_locked_place_patch_backup_20260601_gum_nuts",
+    "policy": "preserve verified place fields across incremental merges unless explicit override evidence is present"
+  },
+  "source_base_pack_dir": "D:\\downstream_results\\stage7_rewrite\\longrun\\WEEKLY_ACTIVITY_RECOMMENDATION_PACK_DEEPSEEK_20260608",
+  "source_incremental_pack_dir": "D:\\downstream_results\\stage7_rewrite\\longrun\\WEEKLY_ACTIVITY_RECOMMENDATION_PACK_DEEPSEEK_20260610",
+  "poster_storage": "cloudbase",
+  "poster_file_id_count": 167,
+  "deployed_current_release_dir": "C:/code/githubstar/wechathtmldownload/services/weekly_activity_cloudrun/data/current_release",
+  "poster_migration": {
+    "schema_version": "weekly_public_poster_cloudbase_migration.v1.manifest",
+    "migrated_at": "2026-06-07T15:30:34+08:00",
+    "migrated_count": 40,
+    "cloud_dir": "weekly-posters/20260607",
+    "env_id": "huaidjweekly-d8g1go7-d0a07863e3e"
+  }
+}

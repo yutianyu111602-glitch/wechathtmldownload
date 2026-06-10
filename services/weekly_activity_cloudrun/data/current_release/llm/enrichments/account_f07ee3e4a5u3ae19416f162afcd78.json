@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "account_f07ee3e4a5:e19416f162afcd78",
+  "sourceItemHash": "3fe041c4d7bfed4d46d7a842dbd1dc190488d81e3112e6f16a07371e599a7795",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "免票！粗野主义的异变都市：THE BRVTALIST；一层TRANCE WEEKEND接管！",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "22:00 - Late",
+      "city_name": "北京",
+      "venue_name": "莫须有工厂(798新厂)Groundless Factory",
+      "address_candidate": "北京市朝阳区798艺术区706路B06-2",
+      "lineup_artists": [
+        "THE BRVTALIST",
+        "THE BRVTALIST"
+      ],
+      "music_styles": [
+        "techno",
+        "electro",
+        "trance",
+        "trance",
+        "techno",
+        "acid",
+        "wave",
+        "EBM",
+        "electro"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.05｜免票！粗野主义的异变都市：THE BRVTALIST；一层TRANCE WEEKEND接管！",
+        "6.05|免票!粗野主义的异变都市:THE BRVTALIST",
+        "6.05｜免票！粗野主义的异变都市：THE BRVTALIST",
+        "一层TRANCE WEEKEND接管！"
+      ],
+      "ticketing_text": [
+        "免票"
+      ],
+      "dedupe_signals": [
+        "免票！粗野主义的异变都市：THE BRVTALIST；一层TRANCE WEEKEND接管！",
+        "2026-06-05",
+        "北京",
+        "莫须有工厂(798新厂)Groundless Factory"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

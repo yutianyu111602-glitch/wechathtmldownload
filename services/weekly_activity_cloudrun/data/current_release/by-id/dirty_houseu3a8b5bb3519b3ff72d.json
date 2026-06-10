@@ -1,0 +1,110 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "dirty_house:8b5bb3519b3ff72d",
+    "event_id": "dirty_house:8b5bb3519b3ff72d",
+    "article_id": "dirty_house:8b5bb3519b3ff72d",
+    "queue_id": "dirty_house:8b5bb3519b3ff72d",
+    "title": "6.05｜Dirty Beats",
+    "title_original": "6.05｜Dirty Beats",
+    "title_display": "Dirty Beats",
+    "account": "DIRTY HOUSE 得体",
+    "account_key": "dirty_house",
+    "promoter": "DIRTY HOUSE 得体",
+    "source_article": {
+      "url_hash": "8b5bb3519b3ff72d",
+      "account_name": "DIRTY HOUSE 得体",
+      "published_at": "2026-06-02"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "8b5bb3519b3ff72d"
+    },
+    "post_date": "2026-06-02",
+    "source_account_name": "DIRTY HOUSE 得体",
+    "source_published_at": "2026-06-02",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dirty_house_8b5bb3519b3ff72d--f3192a0576d6f17669bc6825.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dirty_house_8b5bb3519b3ff72d--f3192a0576d6f17669bc6825.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dirty_house_8b5bb3519b3ff72d--f3192a0576d6f17669bc6825.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [],
+    "venue_id": "dirty_house_shanghai",
+    "venue_name": "INS新乐园·Dirty House",
+    "address": "上海市黄浦区雁荡路109号4楼2室",
+    "address_full": "上海市黄浦区雁荡路109号4楼2室",
+    "address_source": "manual_registry",
+    "geo_lng": 121.470334,
+    "geo_lat": 31.217874,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [],
+    "music_styles": [
+      "house"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "6.05｜Dirty Beats",
+      "2026-06-05"
+    ],
+    "description_original_lines": [
+      "6.05｜Dirty Beats",
+      "Fri",
+      "Sat"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "上海|ins新乐园dirtyhouse|2026-06-05|dirtybeats",
+    "detail_path": "by-id/dirty_houseu3a8b5bb3519b3ff72d.json",
+    "detail_url": "by-id/dirty_houseu3a8b5bb3519b3ff72d.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dirty_house_8b5bb3519b3ff72d--f3192a0576d6f17669bc6825.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dirty_house_8b5bb3519b3ff72d--f3192a0576d6f17669bc6825.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dirty_house_8b5bb3519b3ff72d--f3192a0576d6f17669bc6825.png",
+    "poster_cloud_path": "weekly-posters/20260604/dirty_house_8b5bb3519b3ff72d--f3192a0576d6f17669bc6825.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dirty_house_8b5bb3519b3ff72d--f3192a0576d6f17669bc6825.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dirty_house_8b5bb3519b3ff72d--f3192a0576d6f17669bc6825.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dirty_house_8b5bb3519b3ff72d--f3192a0576d6f17669bc6825.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dirty_house_8b5bb3519b3ff72d--f3192a0576d6f17669bc6825.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dirty_house_8b5bb3519b3ff72d--f3192a0576d6f17669bc6825.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dirty_house_8b5bb3519b3ff72d--f3192a0576d6f17669bc6825.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dirty_house_8b5bb3519b3ff72d--f3192a0576d6f17669bc6825.png"
+  }
+}

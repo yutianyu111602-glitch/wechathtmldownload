@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "weekly_activity_api.source_grounded_materialize_report.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "provider": "source-grounded",
+  "model": "deterministic-release-fields",
+  "itemCount": 171,
+  "allReleaseItems": true,
+  "lookbackDays": null,
+  "summaryWritten": true,
+  "enrichWritten": 171,
+  "llmCallExecuted": false,
+  "paidApiUsed": false
+}

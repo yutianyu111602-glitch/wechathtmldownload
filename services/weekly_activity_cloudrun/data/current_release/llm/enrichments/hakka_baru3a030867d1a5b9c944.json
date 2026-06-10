@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "hakka_bar:030867d1a5b9c944",
+  "sourceItemHash": "58df5fbe12214d9f911122525b19057fb0c4401973a33c21b3f6f11b5baef5f1",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "「OPEN DECKS」 ·   150XS",
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": null,
+      "city_name": "成都",
+      "venue_name": "Hakkabar 院吧",
+      "address_candidate": "四川省成都市武侯区玉林街道科华北路60号科华沸城12楼1201",
+      "lineup_artists": [
+        "150XS",
+        "150XS"
+      ],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06.07 周日 |「OPEN DECKS」 · 150XS",
+        "跃跃欲试的新手们，快来报名！",
+        "OPEN",
+        "06.07星期日"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "「OPEN DECKS」 ·   150XS",
+        "2026-06-07",
+        "成都",
+        "Hakkabar 院吧"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "cicipark:2d005a889516f59c",
+  "sourceItemHash": "2e74121cbc3e30673693789d9ff9b7f82c35ba19b076fa39369fcf2e133a08f0",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "潮汐CHAOXI pres.Cosmjn",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "22:00 - Late",
+      "city_name": "重庆",
+      "venue_name": "Cici Park",
+      "address_candidate": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+      "lineup_artists": [
+        "Cosmjn",
+        "Cosmjn"
+      ],
+      "music_styles": [
+        "techno",
+        "house",
+        "electro",
+        "breaks",
+        "techno",
+        "house",
+        "electro",
+        "breaks",
+        "minimal",
+        "deep tech"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "跳舞活动「潮汐」是重庆电子俱乐部cicipark & EchoBay主理人 Sunyoung 发起了一项 Project，定期邀请心仪的 DJ / 音乐人朋友分享最新的音乐故事、声音品味与氛围体验，渴望着全方位与新朋老友发生舞池共鸣与思想交流～",
+        "六月「潮汐」，特别邀请到罗马尼亚才华横溢的DJ/制作人Cosmjn，他的音乐风格巧妙融合了"
+      ],
+      "description_original_lines": [
+        "6.05周五｜潮汐CHAOXI pres.Cosmjn",
+        "重庆开埠遗址公园2号停车场 观光电梯至2楼 青年文化空间",
+        "Youth Cultural Space, 2nd Floor, Opening Port Park Gate2, NanAn District, Chongqing",
+        "- 预售通道 -"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "潮汐CHAOXI pres.Cosmjn",
+        "2026-06-05",
+        "重庆",
+        "Cici Park"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

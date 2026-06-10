@@ -1,0 +1,143 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "agg-child-4c57f81e1b0e6652",
+    "event_id": "agg-child-4c57f81e1b0e6652",
+    "article_id": "agg-child-4c57f81e1b0e6652",
+    "queue_id": "agg-child-4c57f81e1b0e6652",
+    "title": "Silicon Kure Pres. Eric Cloutier",
+    "title_original": "Silicon Kure Pres. Eric Cloutier",
+    "title_display": "Silicon Kure Pres. Eric Cloutier",
+    "account": "OIL油",
+    "account_key": "oil",
+    "promoter": "OIL油",
+    "source_article": {
+      "url_hash": "",
+      "account_name": "OIL油",
+      "published_at": "2026-06-01"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": false,
+      "url_hash": "",
+      "disabled_reason": "aggregate_child_parent_article"
+    },
+    "post_date": "2026-06-01",
+    "source_account_name": "OIL油",
+    "source_published_at": "2026-06-01",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "深圳"
+    ],
+    "city_key": "shenzhen",
+    "city_name": "深圳",
+    "city_keys": [
+      "shenzhen"
+    ],
+    "venue": [
+      "OIL"
+    ],
+    "venue_id": "oil_shenzhen",
+    "venue_name": "OIL CLUB",
+    "address": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+    "address_full": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+    "address_source": "manual_registry",
+    "geo_lng": 114.022385,
+    "geo_lat": 22.530283,
+    "lineup": [
+      "Eric Cloutier",
+      "Sulk",
+      "Nebulae",
+      "Fengshui",
+      "Tomasz Guiddo",
+      "EmiX",
+      "ZenLu"
+    ],
+    "lineup_artists": [
+      "Eric Cloutier",
+      "Sulk",
+      "Nebulae",
+      "Fengshui",
+      "Tomasz Guiddo",
+      "EmiX",
+      "ZenLu"
+    ],
+    "genres": [],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "2026.06.05-2026.06.07",
+      "05",
+      "Silicon Kure Pres",
+      "Eric Cloutier [Palinoia/ Tresor, Berin]",
+      "Sulk,Nebulae,Fengshui,Tomasz Guiddo,EmiX,ZenLu"
+    ],
+    "description_original_lines": [
+      "2026.06.05-2026.06.07",
+      "Silicon Kure Pres",
+      "Eric Cloutier [Palinoia/ Tresor, Berin]",
+      "Sulk,Nebulae,Fengshui,Tomasz Guiddo,EmiX,ZenLu"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "深圳|oilclub|2026-06-05|siliconkurepresericcloutier",
+    "detail_path": "by-id/agg-child-4c57f81e1b0e6652.json",
+    "detail_url": "by-id/agg-child-4c57f81e1b0e6652.json",
+    "lineup_quality": {
+      "status": "verified",
+      "decision": "scoring_retained_lineup",
+      "note": "retained lineup artists with score >= 0.6: Eric Cloutier, Sulk, Nebulae, Fengshui, Tomasz Guiddo, EmiX, ZenLu"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "aggregation_child": true,
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+    "discovery_source": "wechat-aggregate-yuanbao",
+    "extraction_model": "yuanbao",
+    "aggregation_source_kind": "yuanbao_overview",
+    "metadata_enriched_at": "2026-06-08T20:05:38.918907"
+  }
+}

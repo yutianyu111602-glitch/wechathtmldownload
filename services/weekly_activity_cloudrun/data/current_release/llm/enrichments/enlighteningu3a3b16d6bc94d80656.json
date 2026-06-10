@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "enlightening:3b16d6bc94d80656",
+  "sourceItemHash": "9acb19d432b2a33299f65f7361a9dd4b382327ea823cb881d65327cb83ef6926",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "光芒·喜闻乐见 | Milonga Cadencia",
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": "20:30-00:30",
+      "city_name": "广州",
+      "venue_name": "光芒喜剧脱口秀(体育西路广州购书中心店)",
+      "address_candidate": "广东省广州市天河区天河路123号广州购书中心6楼",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "🎧 DJ：大源jensen"
+      ],
+      "description_original_lines": [
+        "6/13 光芒·喜闻乐见｜Milonga Cadencia",
+        "🎟 舞会门票:单人 80元,双人 150元",
+        "光芒enlightening(广州购书中心店6楼)",
+        "🪩 Milonga Cadencia No. 50"
+      ],
+      "ticketing_text": [
+        "单人 80元 / 双人 150元"
+      ],
+      "dedupe_signals": [
+        "光芒·喜闻乐见 | Milonga Cadencia",
+        "2026-06-13",
+        "广州",
+        "光芒喜剧脱口秀(体育西路广州购书中心店)"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

@@ -1,0 +1,1287 @@
+{
+  "schema_version": "weekly_activity_miniprogram_city.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "city_key": "shenzhen",
+  "city": "深圳",
+  "item_count": 10,
+  "items": [
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "agg-child-4c57f81e1b0e6652",
+      "event_id": "agg-child-4c57f81e1b0e6652",
+      "article_id": "agg-child-4c57f81e1b0e6652",
+      "queue_id": "agg-child-4c57f81e1b0e6652",
+      "title": "Silicon Kure Pres. Eric Cloutier",
+      "title_original": "Silicon Kure Pres. Eric Cloutier",
+      "title_display": "Silicon Kure Pres. Eric Cloutier",
+      "account": "OIL油",
+      "account_key": "oil",
+      "promoter": "OIL油",
+      "source_article": {
+        "url_hash": "",
+        "account_name": "OIL油",
+        "published_at": "2026-06-01"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": false,
+        "url_hash": "",
+        "disabled_reason": "aggregate_child_parent_article"
+      },
+      "post_date": "2026-06-01",
+      "source_account_name": "OIL油",
+      "source_published_at": "2026-06-01",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-05"
+      ],
+      "event_date_iso_guess": "2026-06-05",
+      "event_date_iso_guesses": [
+        "2026-06-05"
+      ],
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "深圳"
+      ],
+      "city_key": "shenzhen",
+      "city_name": "深圳",
+      "city_keys": [
+        "shenzhen"
+      ],
+      "venue": [
+        "OIL"
+      ],
+      "venue_id": "oil_shenzhen",
+      "venue_name": "OIL CLUB",
+      "address": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_full": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_source": "manual_registry",
+      "geo_lng": 114.022385,
+      "geo_lat": 22.530283,
+      "lineup": [
+        "Eric Cloutier",
+        "Sulk",
+        "Nebulae",
+        "Fengshui",
+        "Tomasz Guiddo",
+        "EmiX",
+        "ZenLu"
+      ],
+      "lineup_artists": [
+        "Eric Cloutier",
+        "Sulk",
+        "Nebulae",
+        "Fengshui",
+        "Tomasz Guiddo",
+        "EmiX",
+        "ZenLu"
+      ],
+      "genres": [],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "2026.06.05-2026.06.07",
+        "05",
+        "Silicon Kure Pres",
+        "Eric Cloutier [Palinoia/ Tresor, Berin]",
+        "Sulk,Nebulae,Fengshui,Tomasz Guiddo,EmiX,ZenLu"
+      ],
+      "description_original_lines": [
+        "2026.06.05-2026.06.07",
+        "Silicon Kure Pres",
+        "Eric Cloutier [Palinoia/ Tresor, Berin]",
+        "Sulk,Nebulae,Fengshui,Tomasz Guiddo,EmiX,ZenLu"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "深圳|oilclub|2026-06-05|siliconkurepresericcloutier",
+      "detail_path": "by-id/agg-child-4c57f81e1b0e6652.json",
+      "detail_url": "by-id/agg-child-4c57f81e1b0e6652.json",
+      "lineup_quality": {
+        "status": "verified",
+        "decision": "scoring_retained_lineup",
+        "note": "retained lineup artists with score >= 0.6: Eric Cloutier, Sulk, Nebulae, Fengshui, Tomasz Guiddo, EmiX, ZenLu"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "aggregation_child": true,
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-4c57f81e1b0e6652--72d22b29ef74f68f114d6fbe.jpg",
+      "discovery_source": "wechat-aggregate-yuanbao",
+      "extraction_model": "yuanbao",
+      "aggregation_source_kind": "yuanbao_overview",
+      "metadata_enriched_at": "2026-06-08T20:05:38.918907"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "cavecave:f456236d751fe23a",
+      "event_id": "cavecave:f456236d751fe23a",
+      "article_id": "cavecave:f456236d751fe23a",
+      "queue_id": "cavecave:f456236d751fe23a",
+      "title": "【6.5周五】*洞洞杯街霸挑战赛*",
+      "title_original": "【6.5周五】*洞洞杯街霸挑战赛*",
+      "title_display": "【6.5周五】*洞洞杯街霸挑战赛*",
+      "account": "CaveCave",
+      "account_key": "cavecave",
+      "promoter": "CaveCave",
+      "source_article": {
+        "url_hash": "f456236d751fe23a",
+        "account_name": "CaveCave",
+        "published_at": "2026-06-03"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "f456236d751fe23a"
+      },
+      "post_date": "2026-06-03",
+      "source_account_name": "CaveCave",
+      "source_published_at": "2026-06-03",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cavecave_f456236d751fe23a--54ccc24d2cac0681850eb439.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cavecave_f456236d751fe23a--54ccc24d2cac0681850eb439.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cavecave_f456236d751fe23a--54ccc24d2cac0681850eb439.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-05"
+      ],
+      "event_date_iso_guess": "2026-06-05",
+      "event_date_iso_guesses": [
+        "2026-06-05"
+      ],
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "22:30",
+      "event_time_source": "source_text",
+      "time_start": "22:30",
+      "time_end": "",
+      "running_hours_text": "22:30",
+      "running_hours_source": "source_text",
+      "city": [
+        "深圳"
+      ],
+      "city_key": "shenzhen",
+      "city_name": "深圳",
+      "city_keys": [
+        "shenzhen"
+      ],
+      "venue": [],
+      "venue_id": "cavecave_shenzhen",
+      "venue_name": "CaveCave",
+      "address": "广东省深圳市罗湖区红岭北路与桃园路交汇处粤华奥特城五楼",
+      "address_full": "广东省深圳市罗湖区红岭北路与桃园路交汇处粤华奥特城五楼",
+      "address_source": "manual_registry",
+      "geo_lng": 114.105445,
+      "geo_lat": 22.559571,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [
+        "门票30"
+      ],
+      "price_text": "门票30",
+      "ticketing_text": "门票30",
+      "evidence": [
+        "【6.5周五】*洞洞杯街霸挑战赛*",
+        "2026-06-05"
+      ],
+      "description_original_lines": [
+        "Fri. 22:30-1ate",
+        "Poster OCR time: 22:30"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "深圳|cavecave|2026-06-05|65周五*洞洞杯街霸挑战赛*",
+      "detail_path": "by-id/cavecaveu3af456236d751fe23a.json",
+      "detail_url": "by-id/cavecaveu3af456236d751fe23a.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cavecave_f456236d751fe23a--54ccc24d2cac0681850eb439.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cavecave_f456236d751fe23a--54ccc24d2cac0681850eb439.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cavecave_f456236d751fe23a--54ccc24d2cac0681850eb439.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/cavecave_f456236d751fe23a--54ccc24d2cac0681850eb439.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cavecave_f456236d751fe23a--54ccc24d2cac0681850eb439.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cavecave_f456236d751fe23a--54ccc24d2cac0681850eb439.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cavecave_f456236d751fe23a--54ccc24d2cac0681850eb439.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cavecave_f456236d751fe23a--54ccc24d2cac0681850eb439.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cavecave_f456236d751fe23a--54ccc24d2cac0681850eb439.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cavecave_f456236d751fe23a--54ccc24d2cac0681850eb439.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cavecave_f456236d751fe23a--54ccc24d2cac0681850eb439.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "oil:7a1e84c5c675adf8",
+      "event_id": "oil:7a1e84c5c675adf8",
+      "article_id": "oil:7a1e84c5c675adf8",
+      "queue_id": "oil:7a1e84c5c675adf8",
+      "title": "6/06｜一场献给工业压迫感, 极端 BPM 与地下原始之魂的仪式：C.U.M 三周年 w/ Tham",
+      "title_original": "6/06｜一场献给工业压迫感, 极端 BPM 与地下原始之魂的仪式：C.U.M 三周年 w/ Tham",
+      "title_display": "一场献给工业压迫感, 极端 BPM 与地下原始之魂的仪式：C.U.M 三周年 w/ Tham",
+      "account": "OIL油",
+      "account_key": "oil",
+      "promoter": "OIL油",
+      "source_article": {
+        "url_hash": "7a1e84c5c675adf8",
+        "account_name": "OIL油",
+        "published_at": "2026-05-24"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "7a1e84c5c675adf8"
+      },
+      "post_date": "2026-05-24",
+      "source_account_name": "OIL油",
+      "source_published_at": "2026-05-24",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_7a1e84c5c675adf8--5f6e67d7c149382b443c83d0.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_7a1e84c5c675adf8--5f6e67d7c149382b443c83d0.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_7a1e84c5c675adf8--5f6e67d7c149382b443c83d0.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-06"
+      ],
+      "event_date_iso_guess": "2026-06-06",
+      "event_date_iso_guesses": [
+        "2026-06-06"
+      ],
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "深圳"
+      ],
+      "city_key": "shenzhen",
+      "city_name": "深圳",
+      "city_keys": [
+        "shenzhen"
+      ],
+      "venue": [],
+      "venue_id": "oil_shenzhen",
+      "venue_name": "OIL CLUB",
+      "address": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_full": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_source": "manual_registry",
+      "geo_lng": 114.022385,
+      "geo_lat": 22.530283,
+      "lineup": [
+        "Tham"
+      ],
+      "lineup_artists": [
+        "Tham"
+      ],
+      "genres": [
+        "techno",
+        "hard techno",
+        "hardcore",
+        "darkstyle"
+      ],
+      "music_styles": [
+        "techno"
+      ],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "6/06｜一场献给工业压迫感, 极端 BPM 与地下原始之魂的仪式：C.U.M 三周年 w/ Tham",
+        "2026-06-06",
+        "harder, darker, faster"
+      ],
+      "description_original_lines": [
+        "6/06｜一场献给工业压迫感, 极端 BPM 与地下原始之魂的仪式：C.U.M 三周年 w/ Tham",
+        "harder, darker, faster",
+        "2028"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "深圳|oilclub|2026-06-06|一场献给工业压迫感极端bpm与地下原始之魂的仪式cum三周年wtham",
+      "detail_path": "by-id/oilu3a7a1e84c5c675adf8.json",
+      "detail_url": "by-id/oilu3a7a1e84c5c675adf8.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_7a1e84c5c675adf8--5f6e67d7c149382b443c83d0.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_7a1e84c5c675adf8--5f6e67d7c149382b443c83d0.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_7a1e84c5c675adf8--5f6e67d7c149382b443c83d0.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/oil_7a1e84c5c675adf8--5f6e67d7c149382b443c83d0.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_7a1e84c5c675adf8--5f6e67d7c149382b443c83d0.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_7a1e84c5c675adf8--5f6e67d7c149382b443c83d0.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_7a1e84c5c675adf8--5f6e67d7c149382b443c83d0.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_7a1e84c5c675adf8--5f6e67d7c149382b443c83d0.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_7a1e84c5c675adf8--5f6e67d7c149382b443c83d0.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_7a1e84c5c675adf8--5f6e67d7c149382b443c83d0.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_7a1e84c5c675adf8--5f6e67d7c149382b443c83d0.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "oil:21a2e0c277155a8b",
+      "event_id": "oil:21a2e0c277155a8b",
+      "article_id": "oil:21a2e0c277155a8b",
+      "queue_id": "oil:21a2e0c277155a8b",
+      "title": "6/06｜在 ROOMTOO 复刻香港 宀Club 王牌黑胶派对夜 VG+",
+      "title_original": "6/06｜在 ROOMTOO 复刻香港 宀Club 王牌黑胶派对夜 VG+",
+      "title_display": "在 ROOMTOO 复刻香港 宀Club 王牌黑胶派对夜 VG+",
+      "account": "OIL油",
+      "account_key": "oil",
+      "promoter": "OIL油",
+      "source_article": {
+        "url_hash": "21a2e0c277155a8b",
+        "account_name": "OIL油",
+        "published_at": "2026-05-31"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "21a2e0c277155a8b"
+      },
+      "post_date": "2026-05-31",
+      "source_account_name": "OIL油",
+      "source_published_at": "2026-05-31",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_21a2e0c277155a8b--0d3af5a673903606599b6de8.png",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_21a2e0c277155a8b--0d3af5a673903606599b6de8.png",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_21a2e0c277155a8b--0d3af5a673903606599b6de8.png",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-06"
+      ],
+      "event_date_iso_guess": "2026-06-06",
+      "event_date_iso_guesses": [
+        "2026-06-06"
+      ],
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "深圳"
+      ],
+      "city_key": "shenzhen",
+      "city_name": "深圳",
+      "city_keys": [
+        "shenzhen"
+      ],
+      "venue": [],
+      "venue_id": "oil_shenzhen",
+      "venue_name": "OIL CLUB",
+      "address": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_full": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_source": "manual_registry",
+      "geo_lng": 114.022385,
+      "geo_lat": 22.530283,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [
+        "techno",
+        "acid house",
+        "electro"
+      ],
+      "music_styles": [
+        "techno",
+        "house",
+        "electro"
+      ],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "6/06｜在 ROOMTOO 复刻香港 宀Club 王牌黑胶派对夜 VG+",
+        "2026-06-06",
+        "数字时代的黑胶乌托邦：Vinyl Session 联手香港知名派对 VG+",
+        "Poster OCR date: 2026-06-06 / 2026-05-02 / 2026-11-08 / 2026-12-05",
+        "Poster OCR address: ADD OIL ROOMTOO *广东省深圳市福田区车公庙"
+      ],
+      "description_original_lines": [
+        "6/06｜在 ROOMTOO 复刻香港 宀Club 王牌黑胶派对夜 VG+",
+        "数字时代的黑胶乌托邦：Vinyl Session 联手香港知名派对 VG+",
+        "Poster OCR date: 2026-06-06 / 2026-05-02 / 2026-11-08 / 2026-12-05",
+        "Poster OCR address: ADD OIL ROOMTOO *广东省深圳市福田区车公庙"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "深圳|oilclub|2026-06-06|在roomtoo复刻香港宀club王牌黑胶派对夜vg+",
+      "detail_path": "by-id/oilu3a21a2e0c277155a8b.json",
+      "detail_url": "by-id/oilu3a21a2e0c277155a8b.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_21a2e0c277155a8b--0d3af5a673903606599b6de8.png",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_21a2e0c277155a8b--0d3af5a673903606599b6de8.png",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_21a2e0c277155a8b--0d3af5a673903606599b6de8.png",
+      "poster_cloud_path": "weekly-posters/20260604/oil_21a2e0c277155a8b--0d3af5a673903606599b6de8.png",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_21a2e0c277155a8b--0d3af5a673903606599b6de8.png",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_21a2e0c277155a8b--0d3af5a673903606599b6de8.png",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_21a2e0c277155a8b--0d3af5a673903606599b6de8.png",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_21a2e0c277155a8b--0d3af5a673903606599b6de8.png",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_21a2e0c277155a8b--0d3af5a673903606599b6de8.png",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_21a2e0c277155a8b--0d3af5a673903606599b6de8.png",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oil_21a2e0c277155a8b--0d3af5a673903606599b6de8.png"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "agg-child-9464865e7e155f45",
+      "event_id": "agg-child-9464865e7e155f45",
+      "article_id": "agg-child-9464865e7e155f45",
+      "queue_id": "agg-child-9464865e7e155f45",
+      "title": "C.U.M: The Third Cycle Anniversary",
+      "title_original": "C.U.M: The Third Cycle Anniversary",
+      "title_display": "C.U.M: The Third Cycle Anniversary",
+      "account": "OIL油",
+      "account_key": "oil",
+      "promoter": "OIL油",
+      "source_article": {
+        "url_hash": "",
+        "account_name": "OIL油",
+        "published_at": "2026-06-01"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": false,
+        "url_hash": "",
+        "disabled_reason": "aggregate_child_parent_article"
+      },
+      "post_date": "2026-06-01",
+      "source_account_name": "OIL油",
+      "source_published_at": "2026-06-01",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-9464865e7e155f45--72d22b29ef74f68f114d6fbe.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-9464865e7e155f45--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-9464865e7e155f45--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-06"
+      ],
+      "event_date_iso_guess": "2026-06-06",
+      "event_date_iso_guesses": [
+        "2026-06-06"
+      ],
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "深圳"
+      ],
+      "city_key": "shenzhen",
+      "city_name": "深圳",
+      "city_keys": [
+        "shenzhen"
+      ],
+      "venue": [
+        "OIL"
+      ],
+      "venue_id": "oil_shenzhen",
+      "venue_name": "OIL CLUB",
+      "address": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_full": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_source": "manual_registry",
+      "geo_lng": 114.022385,
+      "geo_lat": 22.530283,
+      "lineup": [
+        "Tham"
+      ],
+      "lineup_artists": [
+        "Tham"
+      ],
+      "genres": [],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "06",
+        "C.U.M:",
+        "The Third Cycle Anniversary",
+        "Sat",
+        "Tham"
+      ],
+      "description_original_lines": [
+        "C.U.M:",
+        "The Third Cycle Anniversary",
+        "Sat",
+        "Tham"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "深圳|oilclub|2026-06-06|cumthethirdcycleanniversary",
+      "detail_path": "by-id/agg-child-9464865e7e155f45.json",
+      "detail_url": "by-id/agg-child-9464865e7e155f45.json",
+      "lineup_quality": {
+        "status": "verified",
+        "decision": "scoring_retained_lineup",
+        "note": "retained lineup artists with score >= 0.6: Tham"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-9464865e7e155f45--72d22b29ef74f68f114d6fbe.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-9464865e7e155f45--72d22b29ef74f68f114d6fbe.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-9464865e7e155f45--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/agg-child-9464865e7e155f45--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-9464865e7e155f45--72d22b29ef74f68f114d6fbe.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-9464865e7e155f45--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "aggregation_child": true,
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-9464865e7e155f45--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-9464865e7e155f45--72d22b29ef74f68f114d6fbe.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-9464865e7e155f45--72d22b29ef74f68f114d6fbe.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-9464865e7e155f45--72d22b29ef74f68f114d6fbe.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-9464865e7e155f45--72d22b29ef74f68f114d6fbe.jpg",
+      "discovery_source": "wechat-aggregate-yuanbao",
+      "extraction_model": "yuanbao",
+      "aggregation_source_kind": "yuanbao_overview",
+      "metadata_enriched_at": "2026-06-08T20:05:38.918915"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "agg-child-2e9834d546635e85",
+      "event_id": "agg-child-2e9834d546635e85",
+      "article_id": "agg-child-2e9834d546635e85",
+      "queue_id": "agg-child-2e9834d546635e85",
+      "title": "Vinyl Session Vol.7 Pres. VG+",
+      "title_original": "Vinyl Session Vol.7 Pres. VG+",
+      "title_display": "Vinyl Session Vol.7 Pres. VG+",
+      "account": "OIL油",
+      "account_key": "oil",
+      "promoter": "OIL油",
+      "source_article": {
+        "url_hash": "",
+        "account_name": "OIL油",
+        "published_at": "2026-06-01"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": false,
+        "url_hash": "",
+        "disabled_reason": "aggregate_child_parent_article"
+      },
+      "post_date": "2026-06-01",
+      "source_account_name": "OIL油",
+      "source_published_at": "2026-06-01",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2e9834d546635e85--72d22b29ef74f68f114d6fbe.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2e9834d546635e85--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2e9834d546635e85--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-06"
+      ],
+      "event_date_iso_guess": "2026-06-06",
+      "event_date_iso_guesses": [
+        "2026-06-06"
+      ],
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "22:00 - Late",
+      "event_time_source": "source_text",
+      "time_start": "22:00",
+      "time_end": "Late",
+      "running_hours_text": "22:00 - Late",
+      "running_hours_source": "source_text",
+      "city": [
+        "深圳"
+      ],
+      "city_key": "shenzhen",
+      "city_name": "深圳",
+      "city_keys": [
+        "shenzhen"
+      ],
+      "venue": [
+        "OIL Roomtoo"
+      ],
+      "venue_id": "oil_shenzhen",
+      "venue_name": "OIL CLUB",
+      "address": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_full": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_source": "manual_registry",
+      "geo_lng": 114.022385,
+      "geo_lat": 22.530283,
+      "lineup": [
+        "Vence",
+        "Anyss",
+        "Twelvo"
+      ],
+      "lineup_artists": [
+        "Vence",
+        "Anyss",
+        "Twelvo"
+      ],
+      "genres": [],
+      "music_styles": [],
+      "price": [
+        "Pre-sale¥50",
+        "Door¥60"
+      ],
+      "price_text": "Pre-sale¥50 / Door¥60",
+      "ticketing_text": "Pre-sale¥50 / Door¥60",
+      "evidence": [
+        "Vinyl Session Vol.7 Pres. VG+",
+        "Vence [VG+,HK],Anyss[VG+,HK],Twelvo",
+        "ROOMTOO",
+        "2026.06.06 Sat",
+        "Vinyl Session Vol.7 pres. VGt"
+      ],
+      "description_original_lines": [
+        "Vence [VG+,HK],Anyss[VG+,HK],Twelvo",
+        "ROOMTOO",
+        "2026.06.06 Sat",
+        "Vinyl Session Vol.7 pres. VGt"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "深圳|oilclub|2026-06-06|vinylsessionvol7presvg+",
+      "detail_path": "by-id/agg-child-2e9834d546635e85.json",
+      "detail_url": "by-id/agg-child-2e9834d546635e85.json",
+      "lineup_quality": {
+        "status": "verified",
+        "decision": "scoring_retained_lineup",
+        "note": "retained lineup artists with score >= 0.6: Vence, Anyss, Twelvo"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2e9834d546635e85--72d22b29ef74f68f114d6fbe.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2e9834d546635e85--72d22b29ef74f68f114d6fbe.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2e9834d546635e85--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/agg-child-2e9834d546635e85--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2e9834d546635e85--72d22b29ef74f68f114d6fbe.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2e9834d546635e85--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "aggregation_child": true,
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2e9834d546635e85--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2e9834d546635e85--72d22b29ef74f68f114d6fbe.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2e9834d546635e85--72d22b29ef74f68f114d6fbe.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2e9834d546635e85--72d22b29ef74f68f114d6fbe.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2e9834d546635e85--72d22b29ef74f68f114d6fbe.jpg",
+      "discovery_source": "wechat-aggregate-yuanbao",
+      "extraction_model": "yuanbao",
+      "aggregation_source_kind": "yuanbao_overview",
+      "metadata_enriched_at": "2026-06-08T20:05:38.918917"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "agg-child-c010fea189cdfe84",
+      "event_id": "agg-child-c010fea189cdfe84",
+      "article_id": "agg-child-c010fea189cdfe84",
+      "queue_id": "agg-child-c010fea189cdfe84",
+      "title": "新面子Lxin mian kong Vol.46",
+      "title_original": "新面子Lxin mian kong Vol.46",
+      "title_display": "新面子Lxin mian kong Vol.46",
+      "account": "OIL油",
+      "account_key": "oil",
+      "promoter": "OIL油",
+      "source_article": {
+        "url_hash": "",
+        "account_name": "OIL油",
+        "published_at": "2026-06-01"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": false,
+        "url_hash": "",
+        "disabled_reason": "aggregate_child_parent_article"
+      },
+      "post_date": "2026-06-01",
+      "source_account_name": "OIL油",
+      "source_published_at": "2026-06-01",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "深圳"
+      ],
+      "city_key": "shenzhen",
+      "city_name": "深圳",
+      "city_keys": [
+        "shenzhen"
+      ],
+      "venue": [
+        "OIL"
+      ],
+      "venue_id": "oil_shenzhen",
+      "venue_name": "OIL CLUB",
+      "address": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_full": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_source": "manual_registry",
+      "geo_lng": 114.022385,
+      "geo_lat": 22.530283,
+      "lineup": [
+        "XS.iv",
+        "MAZA",
+        "c14"
+      ],
+      "lineup_artists": [
+        "XS.iv",
+        "MAZA",
+        "c14"
+      ],
+      "genres": [],
+      "music_styles": [
+        "disco"
+      ],
+      "price": [
+        "免票入场"
+      ],
+      "price_text": "免票入场",
+      "ticketing_text": "免票入场",
+      "evidence": [
+        "07",
+        "新面子Lxin mian kong Vol.46",
+        "XS.iv, MAZA, c14",
+        "Sun",
+        "凭2025年任意OIL购票记录可免票入场"
+      ],
+      "description_original_lines": [
+        "XS.iv, MAZA, c14",
+        "Sun",
+        "凭2025年任意OIL购票记录可免票入场",
+        "持有SEASONPASS油卡可享现场购票优惠"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "深圳|oilclub|2026-06-07|新面子lxinmiankongvol46",
+      "detail_path": "by-id/agg-child-c010fea189cdfe84.json",
+      "detail_url": "by-id/agg-child-c010fea189cdfe84.json",
+      "lineup_quality": {
+        "status": "verified",
+        "decision": "scoring_retained_lineup",
+        "note": "retained lineup artists with score >= 0.6: XS.iv, MAZA, c14"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "aggregation_child": true,
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "merge_provenance": {
+        "schema_version": "weekly_merge_provenance.v1",
+        "reason": "duplicate_cluster",
+        "retained_id": "agg-child-c010fea189cdfe84",
+        "retained_source_hash": "23dfdfd311a756aa",
+        "merged_from": [],
+        "merged_source_hashes": [],
+        "source_count": 0,
+        "sources": []
+      },
+      "discovery_source": "wechat-aggregate-yuanbao",
+      "extraction_model": "yuanbao",
+      "aggregation_source_kind": "yuanbao_overview",
+      "metadata_enriched_at": "2026-06-08T20:05:38.918924"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "oil:2c1a5f8841c19da3",
+      "event_id": "oil:2c1a5f8841c19da3",
+      "article_id": "oil:2c1a5f8841c19da3",
+      "queue_id": "oil:2c1a5f8841c19da3",
+      "title": "6/11 ｜次元壁彼端的劲爆派对！OTAKU SPEEDWAY 初夏特别场",
+      "title_original": "6/11 ｜次元壁彼端的劲爆派对！OTAKU SPEEDWAY 初夏特别场",
+      "title_display": "次元壁彼端的劲爆派对！OTAKU SPEEDWAY 初夏特别场",
+      "account": "OIL油",
+      "account_key": "oil",
+      "promoter": "OIL油",
+      "source_article": {
+        "url_hash": "2c1a5f8841c19da3",
+        "account_name": "OIL油",
+        "published_at": "2026-06-03"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "2c1a5f8841c19da3",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-06-03",
+      "source_account_name": "OIL油",
+      "source_published_at": "2026-06-03",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2c1a5f8841c19da3--a869e8ce098ba940351f.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2c1a5f8841c19da3--a869e8ce098ba940351f.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2c1a5f8841c19da3--a869e8ce098ba940351f.jpg",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-11"
+      ],
+      "event_date_iso_guess": "2026-06-11",
+      "event_date_iso_guesses": [
+        "2026-06-11"
+      ],
+      "event_date_start": "2026-06-11",
+      "event_date_end": "2026-06-11",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "深圳"
+      ],
+      "city_key": "shenzhen",
+      "city_name": "深圳",
+      "city_keys": [
+        "shenzhen"
+      ],
+      "venue": [],
+      "venue_id": "oil_shenzhen",
+      "venue_name": "OIL CLUB",
+      "address": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_full": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_source": "manual_registry",
+      "geo_lng": 114.022385,
+      "geo_lat": 22.530283,
+      "lineup": [
+        "Babyching",
+        "Simon B"
+      ],
+      "lineup_artists": [
+        "Babyching",
+        "Simon B"
+      ],
+      "genres": [
+        "j-core",
+        "hardcore",
+        "breakcore",
+        "trance",
+        "techno",
+        "uk bass"
+      ],
+      "music_styles": [
+        "techno",
+        "bass",
+        "trance"
+      ],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "6/11 ｜次元壁彼端的劲爆派对！OTAKU SPEEDWAY 初夏特别场",
+        "2026-06-11",
+        "将同人音乐、J-Core 以及各种小众二次元声音带到地下俱乐部舞池",
+        "https://mmbiz.qpic.cn/mmbiz_gif/RtUkB7CMT2n9yxKfwWZBITm60wzZwh2JTCI3LeZ5JjLicn9eqdPvlKEgVyHVlFpmucOZ2zKuCxbJwt0EJ7NjMPT5CP3TpUoRF3iatJphyl7J8/640?wx_fmt=gif&from=appmsg",
+        "https://mmbiz.qpic.cn/sz_mmbiz_gif/RtUkB7CMT2mUjwdt32e1vhbcszYsFCpeDyvGuDFMEeXtKHjDJDu7n6x50Og0GIDiagk3ibN5qYRK9Uh5boSNTa4KoNWIuvJQ6a36u3icZtSmCA/640?wx_fmt=gif&from=appmsg"
+      ],
+      "description_original_lines": [
+        "6/11 ｜次元壁彼端的劲爆派对！OTAKU SPEEDWAY 初夏特别场",
+        "将同人音乐、J-Core 以及各种小众二次元声音带到地下俱乐部舞池",
+        "DJs MarukcBabyching SimonB 塑月真白"
+      ],
+      "dj_bio_lines": [
+        "DJs MarukcBabyching SimonB 塑月真白"
+      ],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "深圳|oilclub|2026-06-11|次元壁彼端的劲爆派对！otakuspeedway初夏特别场",
+      "detail_path": "by-id/oilu3a2c1a5f8841c19da3.json",
+      "detail_url": "by-id/oilu3a2c1a5f8841c19da3.json",
+      "lineup_quality": {
+        "status": "verified",
+        "decision": "scoring_retained_lineup",
+        "note": "retained lineup artists with score >= 0.6: Babyching, Simon B"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2c1a5f8841c19da3--a869e8ce098ba940351f.jpg",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2c1a5f8841c19da3--a869e8ce098ba940351f.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2c1a5f8841c19da3--a869e8ce098ba940351f.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2c1a5f8841c19da3--a869e8ce098ba940351f.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2c1a5f8841c19da3--a869e8ce098ba940351f.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2c1a5f8841c19da3--a869e8ce098ba940351f.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster_cloud_path": "weekly-posters/20260607/oilu3a2c1a5f8841c19da3--a869e8ce098ba940351f.jpg",
+      "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+      "poster_public_source_hash": "a869e8ce098ba940",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2c1a5f8841c19da3--a869e8ce098ba940351f.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2c1a5f8841c19da3--a869e8ce098ba940351f.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2c1a5f8841c19da3--a869e8ce098ba940351f.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2c1a5f8841c19da3--a869e8ce098ba940351f.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "oil:2dd043f68343e465",
+      "event_id": "oil:2dd043f68343e465",
+      "article_id": "oil:2dd043f68343e465",
+      "queue_id": "oil:2dd043f68343e465",
+      "title": "6/12｜D1S“亂天堂”呈现：Mssingno + eden2001, 神祇与魔鬼在人间共舞",
+      "title_original": "6/12｜D1S“亂天堂”呈现：Mssingno + eden2001, 神祇与魔鬼在人间共舞",
+      "title_display": "D1S“亂天堂”呈现：Mssingno + eden2001, 神祇与魔鬼在人间共舞",
+      "account": "OIL油",
+      "account_key": "oil",
+      "promoter": "OIL油",
+      "source_article": {
+        "url_hash": "2dd043f68343e465",
+        "account_name": "OIL油",
+        "published_at": "2026-05-28"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "2dd043f68343e465",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-05-28",
+      "source_account_name": "OIL油",
+      "source_published_at": "2026-05-28",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2dd043f68343e465--91950f22173c479bf0a1.png",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2dd043f68343e465--91950f22173c479bf0a1.png",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2dd043f68343e465--91950f22173c479bf0a1.png",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-12"
+      ],
+      "event_date_iso_guess": "2026-06-12",
+      "event_date_iso_guesses": [
+        "2026-06-12"
+      ],
+      "event_date_start": "2026-06-12",
+      "event_date_end": "2026-06-12",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "深圳"
+      ],
+      "city_key": "shenzhen",
+      "city_name": "深圳",
+      "city_keys": [
+        "shenzhen"
+      ],
+      "venue": [],
+      "venue_id": "oil_shenzhen",
+      "venue_name": "OIL CLUB",
+      "address": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_full": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_source": "manual_registry",
+      "geo_lng": 114.022385,
+      "geo_lat": 22.530283,
+      "lineup": [
+        "Mssingno",
+        "eden2001"
+      ],
+      "lineup_artists": [
+        "Mssingno",
+        "eden2001"
+      ],
+      "genres": [
+        "Trance",
+        "UK Wave",
+        "Bass",
+        "Techno",
+        "Hard Groove",
+        "UKG"
+      ],
+      "music_styles": [
+        "techno",
+        "bass",
+        "trance"
+      ],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "6/12｜D1S“亂天堂”呈现：Mssingno + eden2001, 神祇与魔鬼在人间共舞",
+        "2026-06-12",
+        "天堂倾覆，地狱升腾，泪珠化成云，声波泛做海",
+        "https://mmbiz.qpic.cn/sz_mmbiz_jpg/Fibgz6nPVU8ldiaQFTkdfoyJcqQPZpwGFPQ0RLZhrn4EbyfWtdk6VBv0M8wzFIueZEg6jNNfXMqqFhrp8hiaFia2XTxcbiaMWvdPG98OdE7N5pPQ/640?wx_fmt=jpeg&from=appmsg",
+        "https://mmbiz.qpic.cn/sz_mmbiz_gif/RtUkB7CMT2kxaicvX4cxzhyibic08evYWEpvicERE2m1Jm5LmSZialSYQC62nCqUfBKrscicB5s5iaDzwVBB4pibbvmgVMibRhVc1dSyjSzJTibf5ULIk/640?wx_fmt=gif&from=appmsg"
+      ],
+      "description_original_lines": [
+        "6/12｜D1S“亂天堂”呈现：Mssingno + eden2001, 神祇与魔鬼在人间共舞",
+        "天堂倾覆，地狱升腾，泪珠化成云，声波泛做海",
+        "eden200110"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "深圳|oilclub|2026-06-12|d1s亂天堂呈现mssingno+eden2001神祇与魔鬼在人间共舞",
+      "detail_path": "by-id/oilu3a2dd043f68343e465.json",
+      "detail_url": "by-id/oilu3a2dd043f68343e465.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2dd043f68343e465--91950f22173c479bf0a1.png",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2dd043f68343e465--91950f22173c479bf0a1.png",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2dd043f68343e465--91950f22173c479bf0a1.png",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2dd043f68343e465--91950f22173c479bf0a1.png",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2dd043f68343e465--91950f22173c479bf0a1.png",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2dd043f68343e465--91950f22173c479bf0a1.png",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster_cloud_path": "weekly-posters/20260607/oilu3a2dd043f68343e465--91950f22173c479bf0a1.png",
+      "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+      "poster_public_source_hash": "91950f22173c479b",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2dd043f68343e465--91950f22173c479bf0a1.png",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2dd043f68343e465--91950f22173c479bf0a1.png",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2dd043f68343e465--91950f22173c479bf0a1.png",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3a2dd043f68343e465--91950f22173c479bf0a1.png"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "oil:c12861bbe543130f",
+      "event_id": "oil:c12861bbe543130f",
+      "article_id": "oil:c12861bbe543130f",
+      "queue_id": "oil:c12861bbe543130f",
+      "title": "6/13🤜Unchained十周年🤛献上dBridge与Dynamite MC王牌阵容‼️",
+      "title_original": "6/13🤜Unchained十周年🤛献上dBridge与Dynamite MC王牌阵容‼️",
+      "title_display": "🤜Unchained十周年🤛献上dBridge与Dynamite MC王牌阵容‼️",
+      "account": "OIL油",
+      "account_key": "oil",
+      "promoter": "OIL油",
+      "source_article": {
+        "url_hash": "c12861bbe543130f",
+        "account_name": "OIL油",
+        "published_at": "2026-05-27"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "c12861bbe543130f",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-05-27",
+      "source_account_name": "OIL油",
+      "source_published_at": "2026-05-27",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3ac12861bbe543130f--1a1c33ae99ec67af002b.png",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3ac12861bbe543130f--1a1c33ae99ec67af002b.png",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3ac12861bbe543130f--1a1c33ae99ec67af002b.png",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-13"
+      ],
+      "event_date_iso_guess": "2026-06-13",
+      "event_date_iso_guesses": [
+        "2026-06-13"
+      ],
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "深圳"
+      ],
+      "city_key": "shenzhen",
+      "city_name": "深圳",
+      "city_keys": [
+        "shenzhen"
+      ],
+      "venue": [],
+      "venue_id": "oil_shenzhen",
+      "venue_name": "OIL CLUB",
+      "address": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_full": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_source": "manual_registry",
+      "geo_lng": 114.022385,
+      "geo_lat": 22.530283,
+      "lineup": [
+        "dBridge",
+        "Dynamite MC"
+      ],
+      "lineup_artists": [
+        "dBridge",
+        "Dynamite MC"
+      ],
+      "genres": [
+        "Drum & Bass",
+        "Jungle",
+        "Neurofunk",
+        "Halftime",
+        "Bass Music",
+        "UK Bass"
+      ],
+      "music_styles": [
+        "bass"
+      ],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "6/13🤜Unchained十周年🤛献上dBridge与Dynamite MC王牌阵容‼️",
+        "2026-06-13",
+        "UKF：“Unchained是中国Bass music最强大的力量”",
+        "https://mmbiz.qpic.cn/mmbiz_jpg/RtUkB7CMT2mvxzJia17Z52Y0skyAC54LfN11QP49fHz8OQv4niaCUqBmicO8HxDrQc6ia9ncrvFx2wq1VHxDF2X8aqk69NeL7Bed8iaKrRBasTbc/640?wx_fmt=jpeg",
+        "https://mmbiz.qpic.cn/sz_mmbiz_png/RtUkB7CMT2n41VmlpUe3AXqdspMGlhAKBUBWqhnerOPgxiacJes5UM5uxRvPwIibAOUOAtjDJibkOxT0XNU4rPCDnp1mICjibic7E7D1wVicDAMLY/640?wx_fmt=png"
+      ],
+      "description_original_lines": [
+        "6/13🤜Unchained十周年🤛献上dBridge与Dynamite MC王牌阵容‼️",
+        "UKF：“Unchained是中国Bass music最强大的力量”",
+        "SATURDAY13THJUNE"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "深圳|oilclub|2026-06-13|unchained十周年献上dbridge与dynamitemc王牌阵容‼️",
+      "detail_path": "by-id/oilu3ac12861bbe543130f.json",
+      "detail_url": "by-id/oilu3ac12861bbe543130f.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3ac12861bbe543130f--1a1c33ae99ec67af002b.png",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3ac12861bbe543130f--1a1c33ae99ec67af002b.png",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3ac12861bbe543130f--1a1c33ae99ec67af002b.png",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3ac12861bbe543130f--1a1c33ae99ec67af002b.png",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3ac12861bbe543130f--1a1c33ae99ec67af002b.png",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3ac12861bbe543130f--1a1c33ae99ec67af002b.png",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster_cloud_path": "weekly-posters/20260607/oilu3ac12861bbe543130f--1a1c33ae99ec67af002b.png",
+      "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+      "poster_public_source_hash": "1a1c33ae99ec67af",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3ac12861bbe543130f--1a1c33ae99ec67af002b.png",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3ac12861bbe543130f--1a1c33ae99ec67af002b.png",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3ac12861bbe543130f--1a1c33ae99ec67af002b.png",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oilu3ac12861bbe543130f--1a1c33ae99ec67af002b.png"
+    }
+  ]
+}

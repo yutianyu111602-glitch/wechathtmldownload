@@ -1,0 +1,766 @@
+{
+  "schema_version": "weekly_activity_miniprogram_city.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "city_key": "suzhou",
+  "city": "苏州",
+  "item_count": 6,
+  "items": [
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "dv:fbf7da9fd63a78c3",
+      "event_id": "dv:fbf7da9fd63a78c3",
+      "article_id": "dv:fbf7da9fd63a78c3",
+      "queue_id": "dv:fbf7da9fd63a78c3",
+      "title": "6.4 周四｜「短暂地，迁徙到热带吧 」  吹花 HANA FUKI 专场",
+      "title_original": "6.4 周四｜「短暂地，迁徙到热带吧 」  吹花 HANA FUKI 专场",
+      "title_display": "「短暂地，迁徙到热带吧 」  吹花 HANA FUKI 专场",
+      "account": "dv 苏州",
+      "account_key": "dv",
+      "promoter": "dv 苏州",
+      "source_article": {
+        "url_hash": "fbf7da9fd63a78c3",
+        "account_name": "dv 苏州",
+        "published_at": "2026-06-02"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "fbf7da9fd63a78c3"
+      },
+      "post_date": "2026-06-02",
+      "source_account_name": "dv 苏州",
+      "source_published_at": "2026-06-02",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_fbf7da9fd63a78c3--62370a6bf25395609f67e781.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_fbf7da9fd63a78c3--62370a6bf25395609f67e781.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_fbf7da9fd63a78c3--62370a6bf25395609f67e781.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-04"
+      ],
+      "event_date_iso_guess": "2026-06-04",
+      "event_date_iso_guesses": [
+        "2026-06-04"
+      ],
+      "event_date_start": "2026-06-04",
+      "event_date_end": "2026-06-04",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "苏州"
+      ],
+      "city_key": "suzhou",
+      "city_name": "苏州",
+      "city_keys": [
+        "suzhou"
+      ],
+      "venue": [],
+      "venue_id": "dv_suzhou",
+      "venue_name": "dv 苏州",
+      "address": "江苏省苏州市姑苏区平桥直街120号2-3楼",
+      "address_full": "江苏省苏州市姑苏区平桥直街120号2-3楼",
+      "address_source": "venue_registry_verified",
+      "geo_lng": 120.62715,
+      "geo_lat": 31.301155,
+      "lineup": [
+        "吹花 HANA FUKI"
+      ],
+      "lineup_artists": [
+        "吹花 HANA FUKI"
+      ],
+      "genres": [
+        "Shoegaze",
+        "Indie Rock"
+      ],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "6.4 周四｜「短暂地，迁徙到热带吧 」 吹花 HANA FUKI 专场",
+        "2026-06-04"
+      ],
+      "description_original_lines": [
+        "6.4 周四｜「短暂地，迁徙到热带吧 」 吹花 HANA FUKI 专场",
+        "Poster OCR date: 2026-06-01 / 2026-06-03 / 2026-06-04"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "苏州|dv苏州|2026-06-04|「短暂地迁徙到热带吧」吹花hanafuki专场",
+      "detail_path": "by-id/dvu3afbf7da9fd63a78c3.json",
+      "detail_url": "by-id/dvu3afbf7da9fd63a78c3.json",
+      "venue_lat": 31.301155,
+      "venue_lng": 120.62715,
+      "geo_coord_system": "GCJ-02",
+      "geo_source": "frontend_verified_map_location_book",
+      "geo_verified_at": "2026-06-01",
+      "geo_candidate_id": "dv_suzhou",
+      "protected_field_merge": {
+        "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+        "preserved_fields": [
+          "address_source",
+          "geo_candidate_id",
+          "geo_coord_system",
+          "geo_source",
+          "geo_verified_at",
+          "venue_lat",
+          "venue_lng"
+        ],
+        "reason": "base row carried verified place fields; incremental row did not request explicit override"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_fbf7da9fd63a78c3--62370a6bf25395609f67e781.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_fbf7da9fd63a78c3--62370a6bf25395609f67e781.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_fbf7da9fd63a78c3--62370a6bf25395609f67e781.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/dv_fbf7da9fd63a78c3--62370a6bf25395609f67e781.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_fbf7da9fd63a78c3--62370a6bf25395609f67e781.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_fbf7da9fd63a78c3--62370a6bf25395609f67e781.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_fbf7da9fd63a78c3--62370a6bf25395609f67e781.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_fbf7da9fd63a78c3--62370a6bf25395609f67e781.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_fbf7da9fd63a78c3--62370a6bf25395609f67e781.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_fbf7da9fd63a78c3--62370a6bf25395609f67e781.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_fbf7da9fd63a78c3--62370a6bf25395609f67e781.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "dv:3879c24ffa94b78d",
+      "event_id": "dv:3879c24ffa94b78d",
+      "article_id": "dv:3879c24ffa94b78d",
+      "queue_id": "dv:3879c24ffa94b78d",
+      "title": "6.5 周五｜极简主义二重奏",
+      "title_original": "6.5 周五｜极简主义二重奏",
+      "title_display": "极简主义二重奏",
+      "account": "dv 苏州",
+      "account_key": "dv",
+      "promoter": "dv 苏州",
+      "source_article": {
+        "url_hash": "3879c24ffa94b78d",
+        "account_name": "dv 苏州",
+        "published_at": "2026-05-29"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "3879c24ffa94b78d"
+      },
+      "post_date": "2026-05-29",
+      "source_account_name": "dv 苏州",
+      "source_published_at": "2026-05-29",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_3879c24ffa94b78d--6d0647a87e9e753b28e6b9c9.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_3879c24ffa94b78d--6d0647a87e9e753b28e6b9c9.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_3879c24ffa94b78d--6d0647a87e9e753b28e6b9c9.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-05"
+      ],
+      "event_date_iso_guess": "2026-06-05",
+      "event_date_iso_guesses": [
+        "2026-06-05"
+      ],
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "20:30",
+      "event_time_source": "source_text",
+      "time_start": "20:30",
+      "time_end": "",
+      "running_hours_text": "20:30",
+      "running_hours_source": "source_text",
+      "city": [
+        "苏州"
+      ],
+      "city_key": "suzhou",
+      "city_name": "苏州",
+      "city_keys": [
+        "suzhou"
+      ],
+      "venue": [],
+      "venue_id": "dv_suzhou",
+      "venue_name": "dv 苏州",
+      "address": "江苏省苏州市姑苏区平桥直街120号2-3楼",
+      "address_full": "江苏省苏州市姑苏区平桥直街120号2-3楼",
+      "address_source": "manual_registry",
+      "geo_lng": 120.62715,
+      "geo_lat": 31.301155,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "6.5 周五｜极简主义二重奏",
+        "2026-06-05",
+        "20:30",
+        "Poster OCR date: 2026-06-05 / 2026-06-06 / 2026-06-02"
+      ],
+      "description_original_lines": [
+        "6.5 周五｜极简主义二重奏",
+        "Poster OCR date: 2026-06-05 / 2026-06-06 / 2026-06-02"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "苏州|dv苏州|2026-06-05|极简主义二重奏",
+      "detail_path": "by-id/dvu3a3879c24ffa94b78d.json",
+      "detail_url": "by-id/dvu3a3879c24ffa94b78d.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_3879c24ffa94b78d--6d0647a87e9e753b28e6b9c9.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_3879c24ffa94b78d--6d0647a87e9e753b28e6b9c9.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_3879c24ffa94b78d--6d0647a87e9e753b28e6b9c9.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/dv_3879c24ffa94b78d--6d0647a87e9e753b28e6b9c9.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_3879c24ffa94b78d--6d0647a87e9e753b28e6b9c9.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_3879c24ffa94b78d--6d0647a87e9e753b28e6b9c9.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_3879c24ffa94b78d--6d0647a87e9e753b28e6b9c9.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_3879c24ffa94b78d--6d0647a87e9e753b28e6b9c9.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_3879c24ffa94b78d--6d0647a87e9e753b28e6b9c9.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_3879c24ffa94b78d--6d0647a87e9e753b28e6b9c9.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_3879c24ffa94b78d--6d0647a87e9e753b28e6b9c9.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "deeproll:4cfb69e86b66f3f9",
+      "event_id": "deeproll:4cfb69e86b66f3f9",
+      "article_id": "deeproll:4cfb69e86b66f3f9",
+      "queue_id": "deeproll:4cfb69e86b66f3f9",
+      "title": "06.05|喝！舞！虎！特！别！版！12位DJ双厅齐开车轮战！",
+      "title_original": "06.05|喝！舞！虎！特！别！版！12位DJ双厅齐开车轮战！",
+      "title_display": "喝！舞！虎！特！别！版！12位DJ双厅齐开车轮战！",
+      "account": "电容DeepRoll",
+      "account_key": "deeproll",
+      "promoter": "电容DeepRoll",
+      "source_article": {
+        "url_hash": "4cfb69e86b66f3f9",
+        "account_name": "电容DeepRoll",
+        "published_at": "2026-06-01"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "4cfb69e86b66f3f9"
+      },
+      "post_date": "2026-06-01",
+      "source_account_name": "电容DeepRoll",
+      "source_published_at": "2026-06-01",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-05"
+      ],
+      "event_date_iso_guess": "2026-06-05",
+      "event_date_iso_guesses": [
+        "2026-06-05"
+      ],
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "01:00-02:00",
+      "event_time_source": "source_text",
+      "time_start": "01:00",
+      "time_end": "02:00",
+      "running_hours_text": "01:00-02:00",
+      "running_hours_source": "source_text",
+      "city": [
+        "苏州"
+      ],
+      "city_key": "suzhou",
+      "city_name": "苏州",
+      "city_keys": [
+        "suzhou"
+      ],
+      "venue": [],
+      "venue_id": "deeproll_suzhou",
+      "venue_name": "热情商店&电容Deep Roll",
+      "address": "江苏省苏州市姑苏区廖家巷28号唐寅故居文化区3栋102",
+      "address_full": "江苏省苏州市姑苏区廖家巷28号唐寅故居文化区3栋102",
+      "address_source": "venue_registry_verified",
+      "geo_lng": 120.613767,
+      "geo_lat": 31.321621,
+      "lineup": [
+        "Fischmonger"
+      ],
+      "lineup_artists": [
+        "Fischmonger"
+      ],
+      "genres": [
+        "house",
+        "techno",
+        "neo rave",
+        "hard techno",
+        "breaks",
+        "trance"
+      ],
+      "music_styles": [
+        "techno",
+        "house",
+        "breaks",
+        "trance"
+      ],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "06.05|喝！舞！虎！特！别！版！12位DJ双厅齐开车轮战！",
+        "2026-06-05",
+        "集结江浙沪12位好手，热情&电容双厅齐开！"
+      ],
+      "description_original_lines": [
+        "06.05|喝！舞！虎！特！别！版！12位DJ双厅齐开车轮战！",
+        "集结江浙沪12位好手，热情&电容双厅齐开！",
+        "Fischmonger(南京)"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "苏州|热情商店&电容deeproll|2026-06-05|喝！舞！虎！特！别！版！12位dj双厅齐开车轮战！",
+      "detail_path": "by-id/deeprollu3a4cfb69e86b66f3f9.json",
+      "detail_url": "by-id/deeprollu3a4cfb69e86b66f3f9.json",
+      "venue_lat": 31.321621,
+      "venue_lng": 120.613767,
+      "geo_coord_system": "GCJ-02",
+      "geo_source": "tencent_map_picker_user_confirmed",
+      "geo_verified_at": "2026-06-01",
+      "geo_candidate_id": "deeproll_suzhou",
+      "protected_field_merge": {
+        "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+        "preserved_fields": [
+          "address_source",
+          "geo_candidate_id",
+          "geo_coord_system",
+          "geo_source",
+          "geo_verified_at",
+          "venue_lat",
+          "venue_lng"
+        ],
+        "reason": "base row carried verified place fields; incremental row did not request explicit override"
+      },
+      "lineup_quality": {
+        "status": "verified",
+        "decision": "scoring_retained_lineup",
+        "note": "retained lineup artists with score >= 0.6: Fischmonger"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+      "poster_cloud_path": "weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_4cfb69e86b66f3f9--1dafdec623f3699d5d4619e1.png"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "dv:caacdc1541f8080b",
+      "event_id": "dv:caacdc1541f8080b",
+      "article_id": "dv:caacdc1541f8080b",
+      "queue_id": "dv:caacdc1541f8080b",
+      "title": "6.6 周六 免票｜Young Kids Rock",
+      "title_original": "6.6 周六 免票｜Young Kids Rock",
+      "title_display": "免票 | Young Kids Rock",
+      "account": "dv 苏州",
+      "account_key": "dv",
+      "promoter": "dv 苏州",
+      "source_article": {
+        "url_hash": "caacdc1541f8080b",
+        "account_name": "dv 苏州",
+        "published_at": "2026-05-31"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "caacdc1541f8080b"
+      },
+      "post_date": "2026-05-31",
+      "source_account_name": "dv 苏州",
+      "source_published_at": "2026-05-31",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-06"
+      ],
+      "event_date_iso_guess": "2026-06-06",
+      "event_date_iso_guesses": [
+        "2026-06-06"
+      ],
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "苏州"
+      ],
+      "city_key": "suzhou",
+      "city_name": "苏州",
+      "city_keys": [
+        "suzhou"
+      ],
+      "venue": [],
+      "venue_id": "dv_suzhou",
+      "venue_name": "dv 苏州",
+      "address": "江苏省苏州市姑苏区平桥直街120号2-3楼",
+      "address_full": "江苏省苏州市姑苏区平桥直街120号2-3楼",
+      "address_source": "manual_registry",
+      "geo_lng": 120.62715,
+      "geo_lat": 31.301155,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [
+        "免票"
+      ],
+      "price_text": "免票",
+      "ticketing_text": "免票",
+      "evidence": [
+        "6.6 周六 免票｜Young Kids Rock",
+        "2026-06-06",
+        "2026年4月组建",
+        "Poster OCR date: 2026-06-06 / 2026-02-03"
+      ],
+      "description_original_lines": [
+        "6.6 周六 免票｜Young Kids Rock",
+        "2026年4月组建",
+        "Poster OCR date: 2026-06-06 / 2026-02-03"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "苏州|dv苏州|2026-06-06|免票youngkidsrock",
+      "detail_path": "by-id/dvu3acaacdc1541f8080b.json",
+      "detail_url": "by-id/dvu3acaacdc1541f8080b.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+      "poster_cloud_path": "weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "deeproll:623236f1d53cf63a",
+      "event_id": "deeproll:623236f1d53cf63a",
+      "article_id": "deeproll:623236f1d53cf63a",
+      "queue_id": "deeproll:623236f1d53cf63a",
+      "title": "06.06|高考界最严厉的母亲@Limbolimbs",
+      "title_original": "06.06|高考界最严厉的母亲@Limbolimbs",
+      "title_display": "高考界最严厉的母亲@Limbolimbs",
+      "account": "电容DeepRoll",
+      "account_key": "deeproll",
+      "promoter": "电容DeepRoll",
+      "source_article": {
+        "url_hash": "623236f1d53cf63a",
+        "account_name": "电容DeepRoll",
+        "published_at": "2026-06-02"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "623236f1d53cf63a"
+      },
+      "post_date": "2026-06-02",
+      "source_account_name": "电容DeepRoll",
+      "source_published_at": "2026-06-02",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_623236f1d53cf63a--bc9793a1062e6ada0575cf06.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_623236f1d53cf63a--bc9793a1062e6ada0575cf06.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_623236f1d53cf63a--bc9793a1062e6ada0575cf06.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-06"
+      ],
+      "event_date_iso_guess": "2026-06-06",
+      "event_date_iso_guesses": [
+        "2026-06-06"
+      ],
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "22:00 - Late",
+      "event_time_source": "source_text",
+      "time_start": "22:00",
+      "time_end": "Late",
+      "running_hours_text": "22:00 - Late",
+      "running_hours_source": "source_text",
+      "city": [
+        "苏州"
+      ],
+      "city_key": "suzhou",
+      "city_name": "苏州",
+      "city_keys": [
+        "suzhou"
+      ],
+      "venue": [],
+      "venue_id": "deeproll_suzhou",
+      "venue_name": "热情商店&电容Deep Roll",
+      "address": "江苏省苏州市姑苏区廖家巷28号唐寅故居文化区3栋102",
+      "address_full": "江苏省苏州市姑苏区廖家巷28号唐寅故居文化区3栋102",
+      "address_source": "venue_registry_verified",
+      "geo_lng": 120.613767,
+      "geo_lat": 31.321621,
+      "lineup": [
+        "LimboLimbs"
+      ],
+      "lineup_artists": [
+        "LimboLimbs"
+      ],
+      "genres": [
+        "footwork",
+        "bass",
+        "ukg",
+        "indie pop"
+      ],
+      "music_styles": [
+        "bass"
+      ],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "06.06|高考界最严厉的母亲@Limbolimbs",
+        "2026-06-06",
+        "LimboLimbs，来自 88rising 的唱作人、制作人、DJ、派对组织者",
+        "Poster OCR time: 22:00-LATE",
+        "Poster OCR date: 2026-06-06 / 2026-04-05 / 2026-04-07 / 2026-09-08"
+      ],
+      "description_original_lines": [
+        "06.06|高考界最严厉的母亲@Limbolimbs",
+        "LimboLimbs，来自 88rising 的唱作人、制作人、DJ、派对组织者",
+        "Poster OCR time: 22:00-LATE",
+        "Poster OCR date: 2026-06-06 / 2026-04-05 / 2026-04-07 / 2026-09-08"
+      ],
+      "dj_bio_lines": [
+        "LimboLimbs，来自 88rising 的唱作人、制作人、DJ、派对组织者"
+      ],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "苏州|热情商店&电容deeproll|2026-06-06|高考界最严厉的母亲limbolimbs",
+      "detail_path": "by-id/deeprollu3a623236f1d53cf63a.json",
+      "detail_url": "by-id/deeprollu3a623236f1d53cf63a.json",
+      "venue_lat": 31.321621,
+      "venue_lng": 120.613767,
+      "geo_coord_system": "GCJ-02",
+      "geo_source": "tencent_map_picker_user_confirmed",
+      "geo_verified_at": "2026-06-01",
+      "geo_candidate_id": "deeproll_suzhou",
+      "protected_field_merge": {
+        "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+        "preserved_fields": [
+          "address_source",
+          "geo_candidate_id",
+          "geo_coord_system",
+          "geo_source",
+          "geo_verified_at",
+          "venue_lat",
+          "venue_lng"
+        ],
+        "reason": "base row carried verified place fields; incremental row did not request explicit override"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_623236f1d53cf63a--bc9793a1062e6ada0575cf06.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_623236f1d53cf63a--bc9793a1062e6ada0575cf06.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_623236f1d53cf63a--bc9793a1062e6ada0575cf06.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/deeproll_623236f1d53cf63a--bc9793a1062e6ada0575cf06.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_623236f1d53cf63a--bc9793a1062e6ada0575cf06.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_623236f1d53cf63a--bc9793a1062e6ada0575cf06.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_623236f1d53cf63a--bc9793a1062e6ada0575cf06.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_623236f1d53cf63a--bc9793a1062e6ada0575cf06.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_623236f1d53cf63a--bc9793a1062e6ada0575cf06.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_623236f1d53cf63a--bc9793a1062e6ada0575cf06.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deeproll_623236f1d53cf63a--bc9793a1062e6ada0575cf06.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "dv:49e85f51a7693786",
+      "event_id": "dv:49e85f51a7693786",
+      "article_id": "dv:49e85f51a7693786",
+      "queue_id": "dv:49e85f51a7693786",
+      "title": "6.13 周六｜还得了啊 II",
+      "title_original": "6.13 周六｜还得了啊 II",
+      "title_display": "还得了啊 II",
+      "account": "dv 苏州",
+      "account_key": "dv",
+      "promoter": "dv 苏州",
+      "source_article": {
+        "url_hash": "49e85f51a7693786",
+        "account_name": "dv 苏州",
+        "published_at": "2026-05-31"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "49e85f51a7693786",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-05-31",
+      "source_account_name": "dv 苏州",
+      "source_published_at": "2026-05-31",
+      "cover_url": "https://mmbiz.qpic.cn/sz_mmbiz_jpg/R4o1Ifk93ed700lEe28MDJzickWJGUnt5XqodCMoCeVG2Z3q42pP8cHicDQCL7n3n9ruwoiav5Fib8PF8E8icVPduQ1Xuc3c5VBHKKaTe0XhrnBM/640?wx_fmt=jpeg&amp;from=appmsg",
+      "cover_image_url": "https://mmbiz.qpic.cn/sz_mmbiz_jpg/R4o1Ifk93ed700lEe28MDJzickWJGUnt5XqodCMoCeVG2Z3q42pP8cHicDQCL7n3n9ruwoiav5Fib8PF8E8icVPduQ1Xuc3c5VBHKKaTe0XhrnBM/640?wx_fmt=jpeg&amp;from=appmsg",
+      "poster_file_id": "",
+      "poster_source": "wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-13"
+      ],
+      "event_date_iso_guess": "2026-06-13",
+      "event_date_iso_guesses": [
+        "2026-06-13"
+      ],
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "苏州"
+      ],
+      "city_key": "suzhou",
+      "city_name": "苏州",
+      "city_keys": [
+        "suzhou"
+      ],
+      "venue": [],
+      "venue_id": "dv_suzhou",
+      "venue_name": "dv 苏州",
+      "address": "江苏省苏州市姑苏区平桥直街120号2-3楼",
+      "address_full": "江苏省苏州市姑苏区平桥直街120号2-3楼",
+      "address_source": "venue_registry_verified",
+      "geo_lng": 120.62715,
+      "geo_lat": 31.301155,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [
+        "punk",
+        "Oi Punk",
+        "Old School Punk",
+        "器乐摇滚",
+        "自由即兴",
+        "氛围实验"
+      ],
+      "music_styles": [
+        "ambient"
+      ],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "6.13 周六｜还得了啊 II",
+        "2026-06-13",
+        "Time",
+        "Poster OCR date: 2026-06-13 / 2026-02-03"
+      ],
+      "description_original_lines": [
+        "6.13 周六｜还得了啊 II",
+        "Time",
+        "Poster OCR date: 2026-06-13 / 2026-02-03"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "苏州|dv苏州|2026-06-13|还得了啊ii",
+      "detail_path": "by-id/dvu3a49e85f51a7693786.json",
+      "detail_url": "by-id/dvu3a49e85f51a7693786.json",
+      "venue_lat": 31.301155,
+      "venue_lng": 120.62715,
+      "geo_coord_system": "GCJ-02",
+      "geo_source": "frontend_verified_map_location_book",
+      "geo_verified_at": "2026-06-01",
+      "geo_candidate_id": "dv_suzhou",
+      "protected_field_merge": {
+        "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+        "preserved_fields": [
+          "address_source",
+          "geo_candidate_id",
+          "geo_coord_system",
+          "geo_source",
+          "geo_verified_at",
+          "venue_lat",
+          "venue_lng"
+        ],
+        "reason": "base row carried verified place fields; incremental row did not request explicit override"
+      }
+    }
+  ]
+}

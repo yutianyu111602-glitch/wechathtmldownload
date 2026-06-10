@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "dv:49e85f51a7693786",
+  "sourceItemHash": "aa81546530129b5636e45837a4899688d5e4bc8566ec58f7cff96f71793310d3",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "还得了啊 II",
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": null,
+      "city_name": "苏州",
+      "venue_name": "dv 苏州",
+      "address_candidate": "江苏省苏州市姑苏区平桥直街120号2-3楼",
+      "lineup_artists": [],
+      "music_styles": [
+        "ambient",
+        "punk",
+        "Oi Punk",
+        "Old School Punk",
+        "器乐摇滚",
+        "自由即兴",
+        "氛围实验"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.13 周六｜还得了啊 II",
+        "Time",
+        "Poster OCR date: 2026-06-13 / 2026-02-03"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "还得了啊 II",
+        "2026-06-13",
+        "苏州",
+        "dv 苏州"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

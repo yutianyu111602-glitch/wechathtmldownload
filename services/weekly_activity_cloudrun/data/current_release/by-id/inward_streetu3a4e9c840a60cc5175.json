@@ -1,0 +1,141 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "inward_street:4e9c840a60cc5175",
+    "event_id": "inward_street:4e9c840a60cc5175",
+    "article_id": "inward_street:4e9c840a60cc5175",
+    "queue_id": "inward_street:4e9c840a60cc5175",
+    "title": "6.5 Fri｜遁地机 INWARD CLUB",
+    "title_original": "6.5 Fri｜遁地机 INWARD CLUB",
+    "title_display": "Fri | 遁地机 INWARD CLUB",
+    "account": "Inward Street",
+    "account_key": "inward_street",
+    "promoter": "Inward Street",
+    "source_article": {
+      "url_hash": "4e9c840a60cc5175",
+      "account_name": "Inward Street",
+      "published_at": "2026-06-02"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "4e9c840a60cc5175"
+    },
+    "post_date": "2026-06-02",
+    "source_account_name": "Inward Street",
+    "source_published_at": "2026-06-02",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "22:30-03:00",
+    "event_time_source": "source_text",
+    "time_start": "22:30",
+    "time_end": "03:00",
+    "running_hours_text": "22:30-03:00",
+    "running_hours_source": "source_text",
+    "city": [
+      "重庆"
+    ],
+    "city_key": "chongqing",
+    "city_name": "重庆",
+    "city_keys": [
+      "chongqing"
+    ],
+    "venue": [],
+    "venue_id": "inward_club_chongqing",
+    "venue_name": "INWARD CLUB",
+    "address": "重庆市江北区龙湖新壹街C馆2楼 Inward Club",
+    "address_full": "重庆市江北区龙湖新壹街C馆2楼 Inward Club",
+    "address_source": "venue_registry_verified",
+    "geo_lng": 106.526237,
+    "geo_lat": 29.582444,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "acid electro",
+      "hard groove",
+      "industrial techno",
+      "breakbeat"
+    ],
+    "music_styles": [
+      "techno",
+      "electro",
+      "breaks"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "6.5 Fri｜遁地机 INWARD CLUB",
+      "2026-06-05",
+      "低频在岩层中跳跃、反射，以深邃充能的Acid Electro、Hard Groove、Industrial Techno为锋利运转的刀盘"
+    ],
+    "description_original_lines": [
+      "6.5 Fri｜遁地机 INWARD CLUB",
+      "低频在岩层中跳跃、反射，以深邃充能的Acid Electro、Hard Groove、Industrial Techno为锋利运转的刀盘",
+      "2026.06.05 22:30-03:00 egy"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "重庆|inwardclub|2026-06-05|fri遁地机inwardclub",
+    "detail_path": "by-id/inward_streetu3a4e9c840a60cc5175.json",
+    "detail_url": "by-id/inward_streetu3a4e9c840a60cc5175.json",
+    "venue_lat": 29.582444,
+    "venue_lng": 106.526237,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "frontend_verified_map_location_book",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "inward_club_chongqing",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address",
+        "address_full",
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+    "poster_cloud_path": "weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif"
+  }
+}

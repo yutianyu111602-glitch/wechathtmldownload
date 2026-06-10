@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "yuanhe:9cf24d417658a8a1",
+  "sourceItemHash": "8428b23d87766415c5e09091f508a568ea9eaf481ca23974db7f24c46d5b5508",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "今晚YuanHe 放肆喝！酒水畅饮日",
+      "event_date_start": "2026-06-02",
+      "event_date_end": "2026-06-02",
+      "event_time_text": "22:00",
+      "city_name": "北京",
+      "venue_name": "yuanhe",
+      "address_candidate": "北京市朝阳区西大望路27号E6-2号楼103",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "每周一日酒水畅饮日来咯😋",
+        "今晚全部鸡尾酒享188畅饮",
+        "不要再去便利店买酒了！",
+        "这里的畅饮更划算！我们的出品更优质！请尊重每一位上台的DJ，他们的收入来源于酒水分成！"
+      ],
+      "ticketing_text": [
+        "FreeEntry"
+      ],
+      "dedupe_signals": [
+        "今晚YuanHe 放肆喝！酒水畅饮日",
+        "2026-06-02",
+        "北京",
+        "yuanhe"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

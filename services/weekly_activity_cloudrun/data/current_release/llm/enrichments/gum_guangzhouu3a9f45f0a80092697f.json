@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "gum_guangzhou:9f45f0a80092697f",
+  "sourceItemHash": "45424afc424228e4a1ae25eaf0c914913c8ad69b49f3e70c8da766f59eec3e86",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "0606 Sat. | 666 | 无处可逃的炼狱",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "21:00-02:00",
+      "city_name": "广州",
+      "venue_name": "GUM Guangzhou",
+      "address_candidate": "广东省广州市海珠区工业大道北路132号自编45号102室",
+      "lineup_artists": [],
+      "music_styles": [
+        "techno",
+        "bass",
+        "breaks",
+        "Hard Techno",
+        "EBM",
+        "Drum & Bass",
+        "Dubstep",
+        "Breakbeat",
+        "Techno"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "于是我们把无法安放的部分带进低频，把无法言说的情绪交给鼓点",
+        "STARTAT"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "0606 Sat. | 666 | 无处可逃的炼狱",
+        "2026-06-06",
+        "广州",
+        "GUM Guangzhou"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

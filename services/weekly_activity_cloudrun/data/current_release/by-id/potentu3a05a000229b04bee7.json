@@ -1,0 +1,129 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "potent:05a000229b04bee7",
+    "event_id": "potent:05a000229b04bee7",
+    "article_id": "potent:05a000229b04bee7",
+    "queue_id": "potent:05a000229b04bee7",
+    "title": "6.6 周六 • 不错不错🥴",
+    "title_original": "6.6 周六 • 不错不错🥴",
+    "title_display": "• 不错不错🥴",
+    "account": "POTENT",
+    "account_key": "potent",
+    "promoter": "POTENT",
+    "source_article": {
+      "url_hash": "05a000229b04bee7",
+      "account_name": "POTENT",
+      "published_at": "2026-06-03"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "05a000229b04bee7"
+    },
+    "post_date": "2026-06-03",
+    "source_account_name": "POTENT",
+    "source_published_at": "2026-06-03",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/potent_05a000229b04bee7--f21c0ec6a2539fd0b3556a87.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/potent_05a000229b04bee7--f21c0ec6a2539fd0b3556a87.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/potent_05a000229b04bee7--f21c0ec6a2539fd0b3556a87.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [],
+    "venue_id": "potent_shanghai",
+    "venue_name": "POTENT",
+    "address": "上海市黄浦区淮海中路523号",
+    "address_full": "上海市黄浦区淮海中路523号",
+    "address_source": "manual_registry",
+    "geo_lng": 121.468915,
+    "geo_lat": 31.220517,
+    "lineup": [
+      "Acierate",
+      "The Brvtalist"
+    ],
+    "lineup_artists": [
+      "Acierate",
+      "The Brvtalist"
+    ],
+    "genres": [
+      "hip-hop",
+      "techno",
+      "house",
+      "electro",
+      "acid",
+      "wave"
+    ],
+    "music_styles": [
+      "hip-hop",
+      "techno",
+      "house",
+      "electro"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "6.6 周六 • 不错不错🥴",
+      "2026-06-06",
+      "本周六，POTENT CLUB 邀请到Acierate、The Brvtalist两位猛将登陆POTENT小厅"
+    ],
+    "description_original_lines": [
+      "6.6 周六 • 不错不错🥴",
+      "本周六，POTENT CLUB 邀请到Acierate、The Brvtalist两位猛将登陆POTENT小厅",
+      "sat ee ae ae A ~~ tee erent \\ ie"
+    ],
+    "dj_bio_lines": [
+      "本周六，POTENT CLUB 邀请到Acierate、The Brvtalist两位猛将登陆POTENT小厅"
+    ],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "上海|potent|2026-06-06|•不错不错",
+    "detail_path": "by-id/potentu3a05a000229b04bee7.json",
+    "detail_url": "by-id/potentu3a05a000229b04bee7.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/potent_05a000229b04bee7--f21c0ec6a2539fd0b3556a87.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/potent_05a000229b04bee7--f21c0ec6a2539fd0b3556a87.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/potent_05a000229b04bee7--f21c0ec6a2539fd0b3556a87.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/potent_05a000229b04bee7--f21c0ec6a2539fd0b3556a87.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/potent_05a000229b04bee7--f21c0ec6a2539fd0b3556a87.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/potent_05a000229b04bee7--f21c0ec6a2539fd0b3556a87.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/potent_05a000229b04bee7--f21c0ec6a2539fd0b3556a87.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/potent_05a000229b04bee7--f21c0ec6a2539fd0b3556a87.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/potent_05a000229b04bee7--f21c0ec6a2539fd0b3556a87.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/potent_05a000229b04bee7--f21c0ec6a2539fd0b3556a87.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/potent_05a000229b04bee7--f21c0ec6a2539fd0b3556a87.jpg"
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "schema_version": "weekly_activity_miniprogram_date_index.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "date_count": 13,
+  "dates": [
+    {
+      "date": "2026-06-02",
+      "count": 3,
+      "path": "by-date/2026-06-02.json",
+      "url": "by-date/2026-06-02.json"
+    },
+    {
+      "date": "2026-06-03",
+      "count": 5,
+      "path": "by-date/2026-06-03.json",
+      "url": "by-date/2026-06-03.json"
+    },
+    {
+      "date": "2026-06-04",
+      "count": 14,
+      "path": "by-date/2026-06-04.json",
+      "url": "by-date/2026-06-04.json"
+    },
+    {
+      "date": "2026-06-05",
+      "count": 47,
+      "path": "by-date/2026-06-05.json",
+      "url": "by-date/2026-06-05.json"
+    },
+    {
+      "date": "2026-06-06",
+      "count": 49,
+      "path": "by-date/2026-06-06.json",
+      "url": "by-date/2026-06-06.json"
+    },
+    {
+      "date": "2026-06-07",
+      "count": 14,
+      "path": "by-date/2026-06-07.json",
+      "url": "by-date/2026-06-07.json"
+    },
+    {
+      "date": "2026-06-08",
+      "count": 1,
+      "path": "by-date/2026-06-08.json",
+      "url": "by-date/2026-06-08.json"
+    },
+    {
+      "date": "2026-06-09",
+      "count": 2,
+      "path": "by-date/2026-06-09.json",
+      "url": "by-date/2026-06-09.json"
+    },
+    {
+      "date": "2026-06-11",
+      "count": 1,
+      "path": "by-date/2026-06-11.json",
+      "url": "by-date/2026-06-11.json"
+    },
+    {
+      "date": "2026-06-12",
+      "count": 11,
+      "path": "by-date/2026-06-12.json",
+      "url": "by-date/2026-06-12.json"
+    },
+    {
+      "date": "2026-06-13",
+      "count": 20,
+      "path": "by-date/2026-06-13.json",
+      "url": "by-date/2026-06-13.json"
+    },
+    {
+      "date": "2026-06-14",
+      "count": 3,
+      "path": "by-date/2026-06-14.json",
+      "url": "by-date/2026-06-14.json"
+    },
+    {
+      "date": "2026-06-16",
+      "count": 1,
+      "path": "by-date/2026-06-16.json",
+      "url": "by-date/2026-06-16.json"
+    }
+  ]
+}

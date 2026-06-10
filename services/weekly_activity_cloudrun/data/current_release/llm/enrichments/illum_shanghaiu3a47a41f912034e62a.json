@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "illum_shanghai:47a41f912034e62a",
+  "sourceItemHash": "ef6749f50a9a36010dd2658965fc168a2935c54f1768231f6af8e1b53bd3d69a",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Fri. | 百万点击！马来西亚鬼才制作人空降上海！GOEN pres. DJ KOTE LEMBU aka Mulan Theory & GG LOBSTER",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "10:00",
+      "city_name": "上海",
+      "venue_name": "ILLUM Shanghai",
+      "address_candidate": "上海市长宁区昭化路658号海粟文化广场D栋地下一层LG-16室",
+      "lineup_artists": [
+        "DJ KOTE LEMBU",
+        "GG LOBSTER",
+        "DJ KOTE LEMBU",
+        "GG LOBSTER"
+      ],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "DJ KOTE LEMBU"
+      ],
+      "description_original_lines": [
+        "DJ KOTE LEMBU",
+        "GG LOBSTER",
+        "is it raining in your mouth?",
+        "周五、周六"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "Fri. | 百万点击！马来西亚鬼才制作人空降上海！GOEN pres. DJ KOTE LEMBU aka Mulan Theory & GG LOBSTER",
+        "2026-06-05",
+        "上海",
+        "ILLUM Shanghai"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

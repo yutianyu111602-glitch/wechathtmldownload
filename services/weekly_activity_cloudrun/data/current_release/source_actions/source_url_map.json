@@ -1,0 +1,1448 @@
+{
+  "schema_version": "weekly_activity_source_url_map.v1",
+  "generated_at": "2026-06-08T20:41:43+08:00",
+  "source_count": 188,
+  "sources": {
+    "d2c00e6b6a0c429e": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/q7w-iyDw4iSke4gFNUFVMg",
+      "account_name": "wigwam",
+      "published_at": "2026-06-02",
+      "event_id": "wigwam:d2c00e6b6a0c429e"
+    },
+    "9cf24d417658a8a1": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/Ns2EYRZsxZPvu8ZpbwtUXg",
+      "account_name": "yuanhe",
+      "published_at": "2026-06-02",
+      "event_id": "yuanhe:9cf24d417658a8a1"
+    },
+    "8ec6d516a7e2db3a": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/z55BcN3LY5_OZwVYlxp0dg",
+      "account_name": "hakka_bar",
+      "published_at": "2026-06-02",
+      "event_id": "hakka_bar:8ec6d516a7e2db3a"
+    },
+    "b1fac5fca263cde3": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/uyKWDXNRjK6iBq0XyDPq0A",
+      "account_name": "cicipark",
+      "published_at": "2026-06-02",
+      "event_id": "cicipark:b1fac5fca263cde3"
+    },
+    "dd2e9d3e9d6fb7c9": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/Q52mmj2JqPPSxE5WWm_MYw",
+      "account_name": "yuanhe",
+      "published_at": "2026-06-01",
+      "event_id": "yuanhe:dd2e9d3e9d6fb7c9"
+    },
+    "feb55ae3398ec107": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/is1lBbHoEXnb3DFEYViTUA",
+      "account_name": "hum_club",
+      "published_at": "2026-06-01",
+      "event_id": "hum_club:feb55ae3398ec107"
+    },
+    "23faaa29c19ad6eb": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/NP4zEEwCYdDEQryIXA1DPg",
+      "account_name": "trust",
+      "published_at": "2026-06-01",
+      "event_id": "trust:23faaa29c19ad6eb"
+    },
+    "4d88449f5439d261": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/1WpX_BsHcPzbzV5vQJYAmQ",
+      "account_name": "crazy_track",
+      "published_at": "2026-06-02",
+      "event_id": "crazy_track:4d88449f5439d261"
+    },
+    "dc097cabb784442a": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/exZ6AJ3rnG9aKKtkU-iFUg",
+      "account_name": "EXIT Shanghai",
+      "published_at": "2026-05-31",
+      "event_id": "exit_shanghai:23ef3755473ecec7",
+      "merged_into_event_id": "exit_shanghai:23ef3755473ecec7",
+      "merged_into_source_hash": "23ef3755473ecec7",
+      "merge_reason": "duplicate_cluster"
+    },
+    "b9d4c882cbd6ce3c": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/R0ANIeqpLksju3GEfXGT4w",
+      "account_name": "我只会为你心动",
+      "published_at": "2026-06-01",
+      "event_id": "wozhihuiweinixindong:b9d4c882cbd6ce3c"
+    },
+    "fbf7da9fd63a78c3": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/pk7JXD40pevrB5L3e3d2EA",
+      "account_name": "dv 苏州",
+      "published_at": "2026-06-02",
+      "event_id": "dv:fbf7da9fd63a78c3"
+    },
+    "f96617a2a1a23f9d": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/OVr-9Qh5ssHNyAfMio80mg",
+      "account_name": "dada_kunming",
+      "published_at": "2026-06-02",
+      "event_id": "dada_kunming:184ee4194079c5c6",
+      "merged_into_event_id": "dada_kunming:184ee4194079c5c6",
+      "merged_into_source_hash": "184ee4194079c5c6",
+      "merge_reason": "duplicate_cluster"
+    },
+    "dafadf063ae2b075": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/oS9Jv2DYNHd1-GMk9yS9hg",
+      "account_name": "NU Lab",
+      "published_at": "2026-06-02",
+      "event_id": "nu_lab:dafadf063ae2b075:schedule:20260605:1"
+    },
+    "9ccb6527e8932a7a": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/1o1lXoQS1_mTcBIhAPqUFw",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-05-13",
+      "event_id": "nuts:9ccb6527e8932a7a"
+    },
+    "9e1dff289772bbff": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/sks9JLLp51Vel7S9Qr6-CA",
+      "account_name": "敲敲电子俱乐部 KNOCK&KNOCKCLUB",
+      "published_at": "2026-05-31",
+      "event_id": "knock_knockclub:9e1dff289772bbff"
+    },
+    "e19416f162afcd78": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/EF3woEMwHBXk0jghk_OnJA",
+      "account_name": "莫须有公社",
+      "published_at": "2026-06-01",
+      "event_id": "account_f07ee3e4a5:e19416f162afcd78"
+    },
+    "5ba2890a67c30746": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/K0XL62vkjeAyKIC6Xo6N8A",
+      "account_name": "TilT地下室",
+      "published_at": "2026-06-01",
+      "event_id": "tilt:5ba2890a67c30746"
+    },
+    "cbfc24af8fd6f699": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/s-EdU5V-yWm2UCdenaU6EQ",
+      "account_name": "REACTOR Shanghai",
+      "published_at": "2026-06-01",
+      "event_id": "reactor_shanghai:cbfc24af8fd6f699"
+    },
+    "6b51c5f1924d0f78": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/LcGw1gG9wlvFhX64-DacJg",
+      "account_name": "YUANHE 原核",
+      "published_at": "2026-06-02",
+      "event_id": "yuanhe:6b51c5f1924d0f78"
+    },
+    "2081287433672df7": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/Ow2jEIOg9n7dFs4o59haSw",
+      "account_name": "POTENT",
+      "published_at": "2026-06-02",
+      "event_id": "potent:2081287433672df7"
+    },
+    "cf8bfd971df89304": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/SDoiIb7Ma49yif4iFNHG3A",
+      "account_name": "ILLUM Shanghai",
+      "published_at": "2026-06-01",
+      "event_id": "illum_shanghai:47a41f912034e62a",
+      "merged_into_event_id": "illum_shanghai:47a41f912034e62a",
+      "merged_into_source_hash": "47a41f912034e62a",
+      "merge_reason": "duplicate_cluster"
+    },
+    "b5e531c105dc48ea": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/6p0n5TBYYpWjVh3AaHAD8g",
+      "account_name": "南碱Alkaline",
+      "published_at": "2026-05-27",
+      "event_id": "alkaline:b5e531c105dc48ea"
+    },
+    "5ef012075761f3ef": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/VcLZPsLJ0YNQ62ht_mzgDg",
+      "account_name": "光芒enlightening",
+      "published_at": "2026-05-29",
+      "event_id": "enlightening:5ef012075761f3ef"
+    },
+    "77ae233df5f7783a": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/7JkU5FEiuR4cuiXTsvKD3w",
+      "account_name": "GUM Guangzhou",
+      "published_at": "2026-05-30",
+      "event_id": "gum_guangzhou:77ae233df5f7783a"
+    },
+    "4cfb69e86b66f3f9": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/DeTcnTykcr_Zc0rcm9o6Ew",
+      "account_name": "电容DeepRoll",
+      "published_at": "2026-06-01",
+      "event_id": "deeproll:4cfb69e86b66f3f9"
+    },
+    "666c4eeaf1cabe0b": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/g5Q0HOA6q4qoPskmpRD7ag",
+      "account_name": "Hum Club",
+      "published_at": "2026-06-01",
+      "event_id": "hum_club:666c4eeaf1cabe0b"
+    },
+    "11efb162f7194d3d": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/saNdxl-pZ38Gm1TxmT_rtw",
+      "account_name": "EXIT Shanghai",
+      "published_at": "2026-06-01",
+      "event_id": "exit_shanghai:11efb162f7194d3d"
+    },
+    "c1fe0c09fe78ba44": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/dEhw_k3WZFSzwcXfHp3p_Q",
+      "account_name": "DEFUN",
+      "published_at": "2026-06-01",
+      "event_id": "defun:c1fe0c09fe78ba44"
+    },
+    "5590177a7bcf27f7": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/1v_Ldj4nsjsLtBDuoq12lA",
+      "account_name": "PILLBOX Beijing",
+      "published_at": "2026-06-01",
+      "event_id": "pillbox_beijing:5590177a7bcf27f7"
+    },
+    "76af70e0879bd70d": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/06I_RE68Ridiv7lthW2d5g",
+      "account_name": "TRUST 相信电音",
+      "published_at": "2026-06-01",
+      "event_id": "crazy_track:ce6f96ac5b6318ad",
+      "merged_into_event_id": "crazy_track:ce6f96ac5b6318ad",
+      "merged_into_source_hash": "ce6f96ac5b6318ad",
+      "merge_reason": "duplicate_cluster"
+    },
+    "306c5fa17e1fdfd7": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/4dT0_SLHxx8FWSOecaDJKg",
+      "account_name": "ZhaoDai",
+      "published_at": "2026-06-01",
+      "event_id": "zhaodai:306c5fa17e1fdfd7"
+    },
+    "35a9e383eb5d614a": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/WWiUvnqRzndk2F-R2gtxvA",
+      "account_name": "gas_nation",
+      "published_at": "2026-06-01",
+      "event_id": "gas_nation:229da544ef0cf36c",
+      "merged_into_event_id": "gas_nation:229da544ef0cf36c",
+      "merged_into_source_hash": "229da544ef0cf36c",
+      "merge_reason": "duplicate_cluster"
+    },
+    "f3eea8d3a5835bb1": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/GLNMbChOZyLDsY6JtzLaNg",
+      "account_name": "wigwam",
+      "published_at": "2026-06-02",
+      "event_id": "wigwam:f3eea8d3a5835bb1:schedule:20260612:3"
+    },
+    "715a430858ed5184": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/GbHlV9_lXxqfsK_ZXR5sPw",
+      "account_name": "pools",
+      "published_at": "2026-06-02",
+      "event_id": "pools:149bc4362ef89ac8",
+      "merged_into_event_id": "pools:149bc4362ef89ac8",
+      "merged_into_source_hash": "149bc4362ef89ac8",
+      "merge_reason": "duplicate_cluster"
+    },
+    "4e9c840a60cc5175": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/IhOgN8oGcopanIM-7Vi5lQ",
+      "account_name": "Inward Street",
+      "published_at": "2026-06-02",
+      "event_id": "inward_street:4e9c840a60cc5175"
+    },
+    "a9245f98f9585a9f": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/KDGd9ntH0yG8XDecti_Xfg",
+      "account_name": "Heim Shanghai",
+      "published_at": "2026-06-02",
+      "event_id": "heim_shanghai:a9245f98f9585a9f"
+    },
+    "ce6f96ac5b6318ad": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/lb2hhe6lbCDSeM_UI7jTKQ",
+      "account_name": "Crazy Track",
+      "published_at": "2026-06-02",
+      "event_id": "crazy_track:ce6f96ac5b6318ad"
+    },
+    "3e582ca27409b058": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/7YOYOHuCtsfiUSgD7CLHfg",
+      "account_name": "dada_kunming",
+      "published_at": "2026-06-02",
+      "event_id": "dada_kunming:c840d5e4c5c47f5e",
+      "merged_into_event_id": "dada_kunming:c840d5e4c5c47f5e",
+      "merged_into_source_hash": "c840d5e4c5c47f5e",
+      "merge_reason": "duplicate_cluster"
+    },
+    "a38adb9b4d534a93": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/oK4dhSOGQxXt1aTRAMj6Sg",
+      "account_name": "FOUNDATION俱乐部",
+      "published_at": "2026-06-02",
+      "event_id": "foundation:a38adb9b4d534a93"
+    },
+    "c463790f486461f1": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/VkvOpyxVUYFfG-xRe3Zj-A",
+      "account_name": "EXIT Shanghai",
+      "published_at": "2026-05-19",
+      "event_id": "exit_shanghai:c463790f486461f1"
+    },
+    "a2155eede469b668": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/-Jmywd2d09mT9-zcSYqUWQ",
+      "account_name": "FLAT Club",
+      "published_at": "2026-05-10",
+      "event_id": "flat_club:a2155eede469b668"
+    },
+    "16fd95408e5942fc": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/lzmm14lKq3kTdwnqDGNfQw",
+      "account_name": "Inward Street",
+      "published_at": "2026-05-28",
+      "event_id": "nuts:dbaf27293c8eb75d",
+      "merged_into_event_id": "nuts:dbaf27293c8eb75d",
+      "merged_into_source_hash": "dbaf27293c8eb75d",
+      "merge_reason": "duplicate_cluster"
+    },
+    "590aaae1b13e06db": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/l9UNEiL_ffqTAQqyil54vw",
+      "account_name": "陀地音乐TOTE MUSIC",
+      "published_at": "2026-05-18",
+      "event_id": "tote_music:590aaae1b13e06db"
+    },
+    "9ef91206069cad25": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/XcKQvOesffOs1RpSFTfauA",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-06-01",
+      "event_id": "nuts:9ef91206069cad25"
+    },
+    "062195f22e817974": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/p71Hd7BEe9UGUvEaBC8bpw",
+      "account_name": "Heim Shanghai",
+      "published_at": "2026-05-31",
+      "event_id": "heim_shanghai:062195f22e817974"
+    },
+    "02ed8ed1d6750095": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/uDFMhhuFuDlIQsKG1xNX9Q",
+      "account_name": "莫须有公社",
+      "published_at": "2026-06-02",
+      "event_id": "account_f07ee3e4a5:02ed8ed1d6750095"
+    },
+    "36a42fe36b736a10": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/mpSt2BZhKwbwWnWqcS9lug",
+      "account_name": "PILLBOX Beijing",
+      "published_at": "2026-06-02",
+      "event_id": "pillbox_beijing:36a42fe36b736a10"
+    },
+    "b350f56b08c80586": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/yrpdKshXgcDOP6q2k78-gA",
+      "account_name": "光芒enlightening",
+      "published_at": "2026-05-26",
+      "event_id": "enlightening:b350f56b08c80586"
+    },
+    "4d06a0f3af2ae281": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/X_BLpbTS9ycB-WNEdFywGQ",
+      "account_name": "Crazy Track",
+      "published_at": "2026-05-28",
+      "event_id": "crazy_track:4d06a0f3af2ae281"
+    },
+    "414aec06b6d30109": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/EVu57b5OjMIHP4hjRL_1HQ",
+      "account_name": "GiftSpaceDLC",
+      "published_at": "2026-05-30",
+      "event_id": "giftspacedlc:c679c5813c380d07",
+      "merged_into_event_id": "giftspacedlc:c679c5813c380d07",
+      "merged_into_source_hash": "c679c5813c380d07",
+      "merge_reason": "duplicate_cluster"
+    },
+    "76f1c481f6ad213b": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/P5sKAuUlSxnSwIwrflLEZw",
+      "account_name": "敲敲电子俱乐部 KNOCK&KNOCKCLUB",
+      "published_at": "2026-05-31",
+      "event_id": "knock_knockclub:76f1c481f6ad213b"
+    },
+    "c679c5813c380d07": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/lfO0xJlruEr7-xXnW2sKKg",
+      "account_name": "GiftSpaceDLC",
+      "published_at": "2026-06-01",
+      "event_id": "giftspacedlc:c679c5813c380d07"
+    },
+    "19c1d786ece038aa": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/ISHyYaP5H_0AQtuhdxkBEw",
+      "account_name": "Stereo.52",
+      "published_at": "2026-06-01",
+      "event_id": "stereo52:19c1d786ece038aa"
+    },
+    "d42da70cc866d2da": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/r9JMNFg3Izvmp-ZwnDNvzA",
+      "account_name": "illum_shanghai",
+      "published_at": "2026-06-01",
+      "event_id": "illum_shanghai:484e8d105c7c8d16",
+      "merged_into_event_id": "illum_shanghai:484e8d105c7c8d16",
+      "merged_into_source_hash": "484e8d105c7c8d16",
+      "merge_reason": "duplicate_cluster"
+    },
+    "2f7f6375bf4767a8": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/_Agb7HG3C24SMHPof18cPQ",
+      "account_name": "REACTOR Shanghai",
+      "published_at": "2026-06-01",
+      "event_id": "reactor_shanghai:2f7f6375bf4767a8"
+    },
+    "623236f1d53cf63a": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/P94rbKr3lkzAawO40Rfcqg",
+      "account_name": "电容DeepRoll",
+      "published_at": "2026-06-02",
+      "event_id": "deeproll:623236f1d53cf63a"
+    },
+    "115af50a8a45dd0d": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/G4wZsvKFxBqB27R5NDo4Aw",
+      "account_name": "DONG 洞",
+      "published_at": "2026-06-02",
+      "event_id": "dong:115af50a8a45dd0d"
+    },
+    "b4e9faacc5d2a573": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/hKZPbhE59LAXRt8KaYKtjw",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-06-02",
+      "event_id": "nuts:dbaf27293c8eb75d",
+      "merged_into_event_id": "nuts:dbaf27293c8eb75d",
+      "merged_into_source_hash": "dbaf27293c8eb75d",
+      "merge_reason": "duplicate_cluster"
+    },
+    "682fcafb85842c99": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/u18FY-prHYHUPb3wQ3dG9g",
+      "account_name": "dada_kunming",
+      "published_at": "2026-06-02",
+      "event_id": "dada_kunming:021576420824c676",
+      "merged_into_event_id": "dada_kunming:021576420824c676",
+      "merged_into_source_hash": "021576420824c676",
+      "merge_reason": "duplicate_cluster"
+    },
+    "6622b6ce15fdf60f": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/ypzZG-AMNrxWwsZyM45MQg",
+      "account_name": "ZhaoDai",
+      "published_at": "2026-06-02",
+      "event_id": "zhaodai:6622b6ce15fdf60f"
+    },
+    "f1e2998730e2823a": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/mcWhrlnebayBdyjmKeazoQ",
+      "account_name": "DEFUN",
+      "published_at": "2026-05-31",
+      "event_id": "defun:f1e2998730e2823a"
+    },
+    "16d16ef92899aa2d": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/zroGuzVF7coqyVhVx3vIxw",
+      "account_name": "陀地音乐TOTE MUSIC",
+      "published_at": "2026-05-26",
+      "event_id": "tote_music:16d16ef92899aa2d"
+    },
+    "27deea81b3f441b5": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/zSb2XjQpOTF6_IKb86VscA",
+      "account_name": "rnslive",
+      "published_at": "2026-05-31",
+      "event_id": "rnslive:eb92b38a938eca80",
+      "merged_into_event_id": "rnslive:eb92b38a938eca80",
+      "merged_into_source_hash": "eb92b38a938eca80",
+      "merge_reason": "duplicate_cluster"
+    },
+    "eb92b38a938eca80": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/SAWj5sbF8muRxqgNyivlag",
+      "account_name": "RNSLIVE",
+      "published_at": "2026-06-01",
+      "event_id": "rnslive:eb92b38a938eca80"
+    },
+    "4b545528832d89db": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/7ZetOh71dGhkzxnju_gjgg",
+      "account_name": "阿干镇404号",
+      "published_at": "2026-05-29",
+      "event_id": "404:4b545528832d89db"
+    },
+    "ba295258057c04d3": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/JXrE3ibnLiVJLFbqEKCiIQ",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-06-02",
+      "event_id": "nuts:ba295258057c04d3"
+    },
+    "abfe3783bbf064bd": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/BksqUc-BTqP8_tF7ZLJvQw",
+      "account_name": "南碱Alkaline",
+      "published_at": "2026-05-25",
+      "event_id": "alkaline:abfe3783bbf064bd"
+    },
+    "627e53fbadcab4e1": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/hvtIgLaBoGGCQOIPXEAikA",
+      "account_name": "陀地音乐TOTE MUSIC",
+      "published_at": "2026-05-28",
+      "event_id": "tote_music:627e53fbadcab4e1"
+    },
+    "959aeb6c66952794": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/pYzJUexdTrfIUsRK-uI7sQ",
+      "account_name": "ILLUM Shanghai",
+      "published_at": "2026-06-02",
+      "event_id": "illum_shanghai:959aeb6c66952794"
+    },
+    "dc7f7768cfadd65f": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/_Yu7MbLbxJc_VC6RXsVXKg",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-05-16",
+      "event_id": "nuts:4da37c16191f823f",
+      "merged_into_event_id": "nuts:4da37c16191f823f",
+      "merged_into_source_hash": "4da37c16191f823f",
+      "merge_reason": "duplicate_cluster"
+    },
+    "903d4b4f0bf0a1fe": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/5dpxdwLXcJLcVZI28IyhOA",
+      "account_name": "DONG 洞",
+      "published_at": "2026-05-27",
+      "event_id": "dong:903d4b4f0bf0a1fe"
+    },
+    "dbb7ab0b923aaafb": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/Q8O6S3wM6uK-UUPUmAiYVA",
+      "account_name": "敲敲电子俱乐部 KNOCK&KNOCKCLUB",
+      "published_at": "2026-05-29",
+      "event_id": "knock_knockclub:dbb7ab0b923aaafb"
+    },
+    "49e85f51a7693786": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/QnmUqPawDjHOTZGIiYtU4g",
+      "account_name": "dv 苏州",
+      "published_at": "2026-05-31",
+      "event_id": "dv:49e85f51a7693786"
+    },
+    "aa0f2bd3d283f8ce": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/L1vba_1yBjRoTfTZKG6uZg",
+      "account_name": "陀地音乐TOTE MUSIC",
+      "published_at": "2026-05-29",
+      "event_id": "tote_music:aa0f2bd3d283f8ce"
+    },
+    "23ef3755473ecec7": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/z_3B7UGN8nCPPSRbdYiQHw",
+      "account_name": "EXIT Shanghai",
+      "published_at": "2026-06-04",
+      "event_id": "exit_shanghai:23ef3755473ecec7"
+    },
+    "4f7904c8f6060616": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/GGN6iFkMq1YvhjD9qkDQ3A",
+      "account_name": "陀地音乐TOTE MUSIC",
+      "published_at": "2026-05-24",
+      "event_id": "tote_music:4f7904c8f6060616"
+    },
+    "2cc45a50093ef00b": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/faa2LIs8W8XBkOscnYWaXw",
+      "account_name": "loopy Club",
+      "published_at": "2026-05-28",
+      "event_id": "loopy_club:2cc45a50093ef00b"
+    },
+    "ac93945f01f913b1": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/GYFC3Ie5h3fIRPP92_yNeg",
+      "account_name": "wigwam",
+      "published_at": "2026-06-04",
+      "event_id": "wigwam:ac93945f01f913b1"
+    },
+    "b349576fb2b1d589": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/8o50KJrZiCmPMmNZQC1JTA",
+      "account_name": "YUANHE 原核",
+      "published_at": "2026-05-31",
+      "event_id": "yuanhe:b349576fb2b1d589:schedule:20260604:10"
+    },
+    "f07f9c2d47e2484c": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/B2NhtbxDkjub0HXC8V7uWw",
+      "account_name": "YUANHE 原核",
+      "published_at": "2026-06-04",
+      "event_id": "yuanhe:f07f9c2d47e2484c"
+    },
+    "23f93e36f664ad27": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/OX8FLejIwQAr8K0UINhT6g",
+      "account_name": "Rust Club 锈蚀俱乐部",
+      "published_at": "2026-06-04",
+      "event_id": "rust_club:23f93e36f664ad27"
+    },
+    "900dec7f4e81a24b": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/Etvmv7GqkBTjGmUuFRXh5Q",
+      "account_name": "院吧 Hakka Bar",
+      "published_at": "2026-06-01",
+      "event_id": "hakka_bar:900dec7f4e81a24b"
+    },
+    "db8f5d7411130882": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/xf1epKmpnP9YwYetwFTaXw",
+      "account_name": "Dada Bar Beijing",
+      "published_at": "2026-06-03",
+      "event_id": "dada_bar_beijing:db8f5d7411130882"
+    },
+    "184ee4194079c5c6": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/yBcoU1JLROTDUX5PWoNo2g",
+      "account_name": "Dada Kunming",
+      "published_at": "2026-06-03",
+      "event_id": "dada_kunming:184ee4194079c5c6"
+    },
+    "a66ebac5e03cea3f": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/g-fwMRFkA7vtCKN8L_bl3A",
+      "account_name": "loopy Club",
+      "published_at": "2026-06-02",
+      "event_id": "loopy_club:a66ebac5e03cea3f"
+    },
+    "1962008ef98a62d3": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/y2hn-sDEsSIA7KObc4ZKfA",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-06-02",
+      "event_id": "nuts:1962008ef98a62d3"
+    },
+    "5c3ace5ebdb0e342": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/B4bd0N3yQRxap-n09Y805g",
+      "account_name": "Cs Bar",
+      "published_at": "2026-06-03",
+      "event_id": "cs_bar:5c3ace5ebdb0e342"
+    },
+    "7211e34cda5be0bb": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/HwahRIlHFLOpQRydxIkSIQ",
+      "account_name": "陀地音乐TOTE MUSIC",
+      "published_at": "2026-05-25",
+      "event_id": "tote_music:7211e34cda5be0bb"
+    },
+    "271d803f42afe59c": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/81JdgWB7RHW4ovCVRMNXaA",
+      "account_name": "蜕壳TwinKlab",
+      "published_at": "2026-06-03",
+      "event_id": "twinklab:271d803f42afe59c"
+    },
+    "1e875a98fe94d079": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/dzKYwD2C8qXGlmAXqCfU1A",
+      "account_name": "SUBSTATION",
+      "published_at": "2026-06-04",
+      "event_id": "substation:1e875a98fe94d079"
+    },
+    "ac5703ce1b232217": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/4zvOH0-L7_V18rTobHbiig",
+      "account_name": "厅Tin",
+      "published_at": "2026-06-03",
+      "event_id": "tin:ac5703ce1b232217"
+    },
+    "9aba3c881843e3ea": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/5RpDKrX80J5CP_9qqtHMMA",
+      "account_name": "DeepCool地库",
+      "published_at": "2026-06-02",
+      "event_id": "deepcool:9aba3c881843e3ea:schedule:20260605:1"
+    },
+    "c840d5e4c5c47f5e": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/uopLizcxRdVbZ9FkSvkgRw",
+      "account_name": "Dada Kunming",
+      "published_at": "2026-06-03",
+      "event_id": "dada_kunming:c840d5e4c5c47f5e"
+    },
+    "3879c24ffa94b78d": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/QAaNmlM8NsRnAGbnQF-FHA",
+      "account_name": "dv 苏州",
+      "published_at": "2026-05-29",
+      "event_id": "dv:3879c24ffa94b78d"
+    },
+    "74614bf966eb59bb": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/l-oBCcueMF1aUrRw4W57Wg",
+      "account_name": "loopy Club",
+      "published_at": "2026-06-02",
+      "event_id": "loopy_club:74614bf966eb59bb"
+    },
+    "b8d1feef34e49cdc": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/XrjdZ_ajK6ToaojdrtEpCQ",
+      "account_name": "播放室",
+      "published_at": "2026-06-03",
+      "event_id": "account_c32511ebe6:b8d1feef34e49cdc"
+    },
+    "2d005a889516f59c": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/0G0DIyhCBqrP0ASEr1VPPQ",
+      "account_name": "cicipark",
+      "published_at": "2026-06-03",
+      "event_id": "cicipark:2d005a889516f59c"
+    },
+    "229da544ef0cf36c": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/0u1RhAiKEnxb3zwrupAX2w",
+      "account_name": "Gas Nation氣厂",
+      "published_at": "2026-06-03",
+      "event_id": "gas_nation:229da544ef0cf36c"
+    },
+    "64ae13017b2570f2": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/qQtyKrQy84G9SiLmUi_Oeg",
+      "account_name": "KEY JINAN",
+      "published_at": "2026-06-04",
+      "event_id": "key_jinan:64ae13017b2570f2"
+    },
+    "3f804bfdb1b6deb5": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/kYnA6yvg_JV7Hqoeb7goCQ",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-05-19",
+      "event_id": "nuts:9ccb6527e8932a7a",
+      "merged_into_event_id": "nuts:9ccb6527e8932a7a",
+      "merged_into_source_hash": "9ccb6527e8932a7a",
+      "merge_reason": "duplicate_cluster"
+    },
+    "a79df2b7af91ebdf": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/A8GJdOmZTH0AF_zeyj4svg",
+      "account_name": "REACTOR Shanghai",
+      "published_at": "2026-05-24",
+      "event_id": "reactor_shanghai:cbfc24af8fd6f699",
+      "merged_into_event_id": "reactor_shanghai:cbfc24af8fd6f699",
+      "merged_into_source_hash": "cbfc24af8fd6f699",
+      "merge_reason": "duplicate_cluster"
+    },
+    "30c78082a5a73493": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/kAuip4MWnlUslnRmZnVzig",
+      "account_name": "REACTOR Shanghai",
+      "published_at": "2026-05-26",
+      "event_id": "reactor_shanghai:cbfc24af8fd6f699",
+      "merged_into_event_id": "reactor_shanghai:cbfc24af8fd6f699",
+      "merged_into_source_hash": "cbfc24af8fd6f699",
+      "merge_reason": "duplicate_cluster"
+    },
+    "d827859c8a9dab20": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/hwaf15_cfBsLZQlYShMtcw",
+      "account_name": "ILLUM Shanghai",
+      "published_at": "2026-05-27",
+      "event_id": "illum_shanghai:47a41f912034e62a",
+      "merged_into_event_id": "illum_shanghai:47a41f912034e62a",
+      "merged_into_source_hash": "47a41f912034e62a",
+      "merge_reason": "duplicate_cluster"
+    },
+    "25dac8f4ef04d3df": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/Q6cvhaOtWL983RbfUYcgzQ",
+      "account_name": "Dada Bar Beijing",
+      "published_at": "2026-05-30",
+      "event_id": "dada_bar_beijing:25dac8f4ef04d3df"
+    },
+    "8b5bb3519b3ff72d": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/MkIN0iAjPS2QeRHpYqEIMw",
+      "account_name": "DIRTY HOUSE 得体",
+      "published_at": "2026-06-02",
+      "event_id": "dirty_house:8b5bb3519b3ff72d"
+    },
+    "d8dc7622be1b0eb2": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/TvFyG0pZZhe8hi6azI1SHA",
+      "account_name": "FLAT Club",
+      "published_at": "2026-06-02",
+      "event_id": "flat_club:d8dc7622be1b0eb2"
+    },
+    "ac1aca53250bab1c": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/1RHw_lmhVJ8MwPuH4r4kXQ",
+      "account_name": "KEY JINAN",
+      "published_at": "2026-06-02",
+      "event_id": "key_jinan:ac1aca53250bab1c"
+    },
+    "1e429c97de9244c2": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/KPerIo5LZq0RwIKyzVeSWw",
+      "account_name": "AURORA BJ",
+      "published_at": "2026-06-02",
+      "event_id": "crazy_track:ce6f96ac5b6318ad",
+      "merged_into_event_id": "crazy_track:ce6f96ac5b6318ad",
+      "merged_into_source_hash": "ce6f96ac5b6318ad",
+      "merge_reason": "duplicate_cluster"
+    },
+    "58bfa3f10aa36476": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/Dq-8J8S6nFUpDhyMtKvSMA",
+      "account_name": "OONOO",
+      "published_at": "2026-06-02",
+      "event_id": "oonoo:58bfa3f10aa36476"
+    },
+    "47a41f912034e62a": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/DLl2Mcutm0e2khwN_o2G2g",
+      "account_name": "ILLUM Shanghai",
+      "published_at": "2026-06-03",
+      "event_id": "illum_shanghai:47a41f912034e62a"
+    },
+    "c36953658ecace79": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/uOY9BOSUzjc8SQRfSORPxw",
+      "account_name": "VERVO国际独立电音俱乐部",
+      "published_at": "2026-06-03",
+      "event_id": "vervo:c36953658ecace79"
+    },
+    "aa48f237993a769f": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/QLvsoIsKVyg6WIWglM4gsA",
+      "account_name": "ABYSS Shanghai",
+      "published_at": "2026-06-03",
+      "event_id": "abyss_shanghai:aa48f237993a769f"
+    },
+    "f456236d751fe23a": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/t25rhmWqhASUvapOcBgwaA",
+      "account_name": "CaveCave",
+      "published_at": "2026-06-03",
+      "event_id": "cavecave:f456236d751fe23a"
+    },
+    "149bc4362ef89ac8": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/T9rmAP5RVjYdQAB_UFkyMw",
+      "account_name": "POOLS",
+      "published_at": "2026-06-04",
+      "event_id": "pools:149bc4362ef89ac8"
+    },
+    "dbaf27293c8eb75d": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/uWJl7srjQr8NpCC1Dw2JQA",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-05-28",
+      "event_id": "nuts:dbaf27293c8eb75d"
+    },
+    "172c7ad6767164ab": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/2Xs4S6zN8GqAHHTb4nKPCw",
+      "account_name": "RUAALAB",
+      "published_at": "2026-06-03",
+      "event_id": "ruaalab:172c7ad6767164ab"
+    },
+    "e7da5a40f9fbbf2c": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/sCkHCA_OK7mhmdQPHZ-_9g",
+      "account_name": "loopy Club",
+      "published_at": "2026-06-03",
+      "event_id": "loopy_club:e7da5a40f9fbbf2c:schedule:20260606:1"
+    },
+    "53636baac6ab99c2": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/Q7cY2QBUm2uinqQZudSqpg",
+      "account_name": "蜕壳TwinKlab",
+      "published_at": "2026-06-03",
+      "event_id": "twinklab:53636baac6ab99c2"
+    },
+    "952721472e31fd00": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/rO7ePVLZm-RqQ_o3iMk9gw",
+      "account_name": "DEFUN",
+      "published_at": "2026-06-04",
+      "event_id": "defun:952721472e31fd00:schedule:20260606:1"
+    },
+    "34be3c40e71370cf": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/VLPhIww1IiH8PqiAlPT9_g",
+      "account_name": "Gas Nation氣厂",
+      "published_at": "2026-06-02",
+      "event_id": "gas_nation:34be3c40e71370cf"
+    },
+    "021576420824c676": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/CdGFBn5k60M4Pzf-EUxEIA",
+      "account_name": "Dada Kunming",
+      "published_at": "2026-06-03",
+      "event_id": "dada_kunming:021576420824c676"
+    },
+    "555141c9cfa0d49c": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/Oh9cKK8g30Zwf-oDrvPjRw",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-05-18",
+      "event_id": "nuts:9ef91206069cad25",
+      "merged_into_event_id": "nuts:9ef91206069cad25",
+      "merged_into_source_hash": "9ef91206069cad25",
+      "merge_reason": "duplicate_cluster"
+    },
+    "b8a0a991fe8389bd": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/RTrrC1J6acfofy15HHhM-Q",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-05-21",
+      "event_id": "nuts:9ef91206069cad25",
+      "merged_into_event_id": "nuts:9ef91206069cad25",
+      "merged_into_source_hash": "9ef91206069cad25",
+      "merge_reason": "duplicate_cluster"
+    },
+    "7a1e84c5c675adf8": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/p2O36Hv696wfJQG-H4M0Eg",
+      "account_name": "OIL油",
+      "published_at": "2026-05-24",
+      "event_id": "oil:7a1e84c5c675adf8"
+    },
+    "305605c9b1b310ba": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/D4B-H-J_rxGzCg-8Si1kdA",
+      "account_name": "REACTOR Shanghai",
+      "published_at": "2026-05-29",
+      "event_id": "reactor_shanghai:2f7f6375bf4767a8",
+      "merged_into_event_id": "reactor_shanghai:2f7f6375bf4767a8",
+      "merged_into_source_hash": "2f7f6375bf4767a8",
+      "merge_reason": "duplicate_cluster"
+    },
+    "caacdc1541f8080b": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/gK5Jf87jEgcX1uBvafDToQ",
+      "account_name": "dv 苏州",
+      "published_at": "2026-05-31",
+      "event_id": "dv:caacdc1541f8080b"
+    },
+    "5885acb21ff9e8ea": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/ViPse3JXBbJJ7UCmu5QvCQ",
+      "account_name": "YUANHE 原核",
+      "published_at": "2026-06-03",
+      "event_id": "yuanhe:5885acb21ff9e8ea"
+    },
+    "a161c84a421e87ef": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/TSTbVlrpsKbrpw_rCKo-qQ",
+      "account_name": "NU Lab",
+      "published_at": "2026-05-28",
+      "event_id": "nu_lab:a161c84a421e87ef"
+    },
+    "9346e439313ecf78": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/bbRjT-OEr7D_mzr--XkcHg",
+      "account_name": "星期六极好",
+      "published_at": "2026-05-30",
+      "event_id": "account_53c0457b45:9346e439313ecf78"
+    },
+    "f08c45fef5186b83": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/a03hFHz7_fbZLhJO1dP2Yw",
+      "account_name": "Dada Bar Beijing",
+      "published_at": "2026-05-30",
+      "event_id": "dada_bar_beijing:f08c45fef5186b83"
+    },
+    "21a2e0c277155a8b": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/0B1BH3p8MwCdYb1T1ZPxJg",
+      "account_name": "OIL油",
+      "published_at": "2026-05-31",
+      "event_id": "oil:21a2e0c277155a8b"
+    },
+    "de3ef063fcfa1f14": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/uhNDw9OC3C8p28Uxn5gHNg",
+      "account_name": "院吧 Hakka Bar",
+      "published_at": "2026-06-01",
+      "event_id": "hakka_bar:de3ef063fcfa1f14"
+    },
+    "9f45f0a80092697f": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/H74jlfJ0JohaO1Z1ah-W-A",
+      "account_name": "GUM Guangzhou",
+      "published_at": "2026-06-02",
+      "event_id": "gum_guangzhou:9f45f0a80092697f"
+    },
+    "3cd01a74677e57c4": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/DTnKI_JpqDWWgmd6HskquQ",
+      "account_name": "OONOO",
+      "published_at": "2026-06-02",
+      "event_id": "oonoo:3cd01a74677e57c4"
+    },
+    "584999ad02f8a2e1": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/SCxSI2WZ1JgUFfbGjPpf7w",
+      "account_name": "播放室",
+      "published_at": "2026-06-03",
+      "event_id": "account_c32511ebe6:584999ad02f8a2e1"
+    },
+    "484e8d105c7c8d16": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/DEnbZVKTKCwpWV2Mb7ko7g",
+      "account_name": "ILLUM Shanghai",
+      "published_at": "2026-06-03",
+      "event_id": "illum_shanghai:484e8d105c7c8d16"
+    },
+    "aef439133de0c4be": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/p-kApbZctxHxkRJOL4HgRg",
+      "account_name": "DIRTY HOUSE 得体",
+      "published_at": "2026-06-03",
+      "event_id": "dirty_house:aef439133de0c4be"
+    },
+    "3a9da4cd705be49c": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/XecGmYYywXGtQBMmagI-3Q",
+      "account_name": "FLAT Club",
+      "published_at": "2026-06-03",
+      "event_id": "flat_club:a2155eede469b668",
+      "merged_into_event_id": "flat_club:a2155eede469b668",
+      "merged_into_source_hash": "a2155eede469b668",
+      "merge_reason": "duplicate_cluster"
+    },
+    "2ddc751322b6568f": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/e_cbpL2_eaAm_TfJr6UuWw",
+      "account_name": "Hum Club",
+      "published_at": "2026-06-03",
+      "event_id": "hum_club:2ddc751322b6568f"
+    },
+    "00ce94883472f9bb": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/Bc77Be25pBLdg0GYRbp3aA",
+      "account_name": "Heim Shanghai",
+      "published_at": "2026-06-03",
+      "event_id": "heim_shanghai:00ce94883472f9bb"
+    },
+    "05a000229b04bee7": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/UopH3MIhzxvei9teYc5Gkg",
+      "account_name": "POTENT",
+      "published_at": "2026-06-03",
+      "event_id": "potent:05a000229b04bee7"
+    },
+    "a642ac94ed4c0df0": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/PP4tzMcl4HUDtQWZl5irxg",
+      "account_name": "VERVO国际独立电音俱乐部",
+      "published_at": "2026-06-03",
+      "event_id": "vervo:a642ac94ed4c0df0"
+    },
+    "4703d12b57439042": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/womXJhSqYiOdmhJrbWcvbg",
+      "account_name": "Cs Bar",
+      "published_at": "2026-06-03",
+      "event_id": "cs_bar:4703d12b57439042"
+    },
+    "06b99725a526d911": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/A8PWqZcltoFwkjTPlDj1bw",
+      "account_name": "离岛唱片",
+      "published_at": "2026-06-03",
+      "event_id": "account_d186bcf5bc:06b99725a526d911"
+    },
+    "1ac1b5e897048841": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/ALZb9V0jzBeXFM4-DRZwvw",
+      "account_name": "Inward Street",
+      "published_at": "2026-06-03",
+      "event_id": "nuts:dbaf27293c8eb75d",
+      "merged_into_event_id": "nuts:dbaf27293c8eb75d",
+      "merged_into_source_hash": "dbaf27293c8eb75d",
+      "merge_reason": "duplicate_cluster"
+    },
+    "a25ceba42fe3265c": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/p8V8S6ecHu0g-WMbVSoW9A",
+      "account_name": "FOUNDATION俱乐部",
+      "published_at": "2026-06-03",
+      "event_id": "foundation:a25ceba42fe3265c"
+    },
+    "855d2fb1630e3b86": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/jjzmEgll9HSOGgM7kMiWOw",
+      "account_name": "POOLS",
+      "published_at": "2026-06-04",
+      "event_id": "pools:855d2fb1630e3b86"
+    },
+    "0f0b0d4c2e8f88b4": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/EE0CPaZg6pvGH5okwxyBCg",
+      "account_name": "Cedar Kitchen",
+      "published_at": "2026-06-01",
+      "event_id": "cedar_kitchen:0f0b0d4c2e8f88b4"
+    },
+    "7b119ab4657f752e": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/OITTvoLvZNNAUgtOz2cI1g",
+      "account_name": "Dada Bar Beijing",
+      "published_at": "2026-05-30",
+      "event_id": "dada_bar_beijing:2d96233af75419d9",
+      "merged_into_event_id": "dada_bar_beijing:2d96233af75419d9",
+      "merged_into_source_hash": "2d96233af75419d9",
+      "merge_reason": "duplicate_cluster"
+    },
+    "bd91e6311e3e3c77": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/SMusIQ1g_gJhvuPbKFG8xg",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-05-31",
+      "event_id": "nuts:bd91e6311e3e3c77"
+    },
+    "030867d1a5b9c944": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/zlcifd4xNgCCiakrxZf-WQ",
+      "account_name": "院吧 Hakka Bar",
+      "published_at": "2026-06-01",
+      "event_id": "hakka_bar:030867d1a5b9c944"
+    },
+    "bf2802ca888fe283": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/EVCpIRaVRnrPKHDloWumZQ",
+      "account_name": "TOMTWO通透现场",
+      "published_at": "2026-06-04",
+      "event_id": "tomtwo:bf2802ca888fe283"
+    },
+    "2c1a5f8841c19da3": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/Y4MYmn5aB-yqzfN8ut3CXQ",
+      "account_name": "OIL油",
+      "published_at": "2026-06-03",
+      "event_id": "oil:2c1a5f8841c19da3"
+    },
+    "4c56d5a25d0c091f": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/ZSG19iohfy1eUfCPChNzFA",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-05-21",
+      "event_id": "nuts:ba295258057c04d3",
+      "merged_into_event_id": "nuts:ba295258057c04d3",
+      "merged_into_source_hash": "ba295258057c04d3",
+      "merge_reason": "duplicate_cluster"
+    },
+    "2dd043f68343e465": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/SfMmPZ6mE-mujgawtrDieg",
+      "account_name": "OIL油",
+      "published_at": "2026-05-28",
+      "event_id": "oil:2dd043f68343e465"
+    },
+    "25e0b7c7abe5b276": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/TANqxd8X1Sq-GgMm068RPw",
+      "account_name": "DIRTY HOUSE 得体",
+      "published_at": "2026-06-02",
+      "event_id": "dirty_house:25e0b7c7abe5b276"
+    },
+    "42dee35df897ae44": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/0tE1yLuDMW3Y2vLX1iOUNw",
+      "account_name": "EXIT Shanghai",
+      "published_at": "2026-06-03",
+      "event_id": "exit_shanghai:42dee35df897ae44"
+    },
+    "9735340ff5c5a07a": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/n5RK9cEAg7Yp9wEc3Khp1g",
+      "account_name": "肆幺幺杭州",
+      "published_at": "2026-05-25",
+      "event_id": "fouroneone_hangzhou:9735340ff5c5a07a"
+    },
+    "d8ccdd77982aac06": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/YZ5MGZWt01qTR9FUzAs5-w",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-05-23",
+      "event_id": "nuts:4da37c16191f823f",
+      "merged_into_event_id": "nuts:4da37c16191f823f",
+      "merged_into_source_hash": "4da37c16191f823f",
+      "merge_reason": "duplicate_cluster"
+    },
+    "ca5535e940ae0465": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/dK36178UIJeq7Ka1xZ0VoA",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-06-02",
+      "event_id": "nuts:ca5535e940ae0465"
+    },
+    "4da37c16191f823f": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/iucED2mXDRrJaubHvm45Tw",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-06-02",
+      "event_id": "nuts:4da37c16191f823f"
+    },
+    "820a9716fd9973a2": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/yl_NOT_cjdiUZ77gX1O5OA",
+      "account_name": "REACTOR Shanghai",
+      "published_at": "2026-05-27",
+      "event_id": "reactor_shanghai:71ebab72a139abfe",
+      "merged_into_event_id": "reactor_shanghai:71ebab72a139abfe",
+      "merged_into_source_hash": "71ebab72a139abfe",
+      "merge_reason": "duplicate_cluster"
+    },
+    "c12861bbe543130f": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/RupGE3Ts-vF0RSfrP-b7Yw",
+      "account_name": "OIL油",
+      "published_at": "2026-05-27",
+      "event_id": "oil:c12861bbe543130f"
+    },
+    "17b2c1be7cb76fcc": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/hnaSlFifjESo84HtkWdZEw",
+      "account_name": "TOMTWO通透现场",
+      "published_at": "2026-06-01",
+      "event_id": "tomtwo:17b2c1be7cb76fcc"
+    },
+    "5b3d09797685195f": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/0r7p495Ku9oEwO1iN1ij8w",
+      "account_name": "TRUST 相信电音",
+      "published_at": "2026-06-02",
+      "event_id": "trust:5b3d09797685195f"
+    },
+    "2cf68dc3fb3b55d4": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/nL9nh3Ci9Rcrxb3xQoO4-g",
+      "account_name": "坚果NUTS",
+      "published_at": "2026-06-01",
+      "event_id": "nuts:2cf68dc3fb3b55d4"
+    },
+    "adc21d0813af3229": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/h8O57DL9A_CXF2y5DnIVqA",
+      "account_name": "Gas Nation氣厂",
+      "published_at": "2026-05-07",
+      "event_id": "gas_nation:adc21d0813af3229"
+    },
+    "a8e142f7e3276488": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/78m1xcAIIAFsuCCOYZpw9g",
+      "account_name": "肆幺幺杭州",
+      "published_at": "2026-06-07",
+      "event_id": "fouroneone_hangzhou:a8e142f7e3276488"
+    },
+    "2d96233af75419d9": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/IPqgAEg6-CZfCigg7KqiDg",
+      "account_name": "Dada Bar Beijing",
+      "published_at": "2026-06-07",
+      "event_id": "dada_bar_beijing:2d96233af75419d9"
+    },
+    "04310025cd8aa199": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/peu79nkEAvkUn-bGWMmZ9g",
+      "account_name": "Cedar Kitchen",
+      "published_at": "2026-06-05",
+      "event_id": "cedar_kitchen:04310025cd8aa199"
+    },
+    "0231000c813d6bb8": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/ZKBRTlTiNHnjD4NY4TeIOA",
+      "account_name": "loopy Club",
+      "published_at": "2026-06-04",
+      "event_id": "loopy_club:0231000c813d6bb8"
+    },
+    "15ca208f56ed2bca": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/mQHG4ha2iwCewQg2BVb1vw",
+      "account_name": "loopy Club",
+      "published_at": "2026-06-07",
+      "event_id": "loopy_club:0231000c813d6bb8",
+      "merged_into_event_id": "loopy_club:0231000c813d6bb8",
+      "merged_into_source_hash": "0231000c813d6bb8",
+      "merge_reason": "duplicate_cluster"
+    },
+    "01a5754ae510df68": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/J3UTyFEAJTv-LmJzEcM4Jw",
+      "account_name": "Dada Kunming",
+      "published_at": "2026-06-07",
+      "event_id": "dada_kunming:01a5754ae510df68"
+    },
+    "fcd7568608a510a4": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/87M5lNYPFd6bNNbL4Sywaw",
+      "account_name": "POOLS",
+      "published_at": "2026-06-06",
+      "event_id": "pools:fcd7568608a510a4"
+    },
+    "d32bcedf70d9b78e": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/00jmx2T1Fok35JamvuT8iw",
+      "account_name": "OONOO",
+      "published_at": "2026-06-05",
+      "event_id": "oonoo:d32bcedf70d9b78e"
+    },
+    "10fd2807b8a49225": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/ztXmmZQS4ElaYXT3ChnXIA",
+      "account_name": "DIRTY HOUSE 得体",
+      "published_at": "2026-06-06",
+      "event_id": "dirty_house:10fd2807b8a49225"
+    },
+    "e018208e9dd2370b": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/KZGiBKoJ0Bz03I_jIuvZnw",
+      "account_name": "离岛唱片",
+      "published_at": "2026-06-04",
+      "event_id": "account_d186bcf5bc:e018208e9dd2370b"
+    },
+    "71ebab72a139abfe": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/FiuSiAc1Wsi16y9fw4Efvw",
+      "account_name": "REACTOR Shanghai",
+      "published_at": "2026-06-03",
+      "event_id": "reactor_shanghai:71ebab72a139abfe"
+    },
+    "310d48b7c9a698e7": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/iUFwcmQIeECKlPYW4TrKUw",
+      "account_name": "ZhaoDai",
+      "published_at": "2026-06-04",
+      "event_id": "zhaodai:310d48b7c9a698e7"
+    },
+    "c67095ad53ead413": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/WQ9PWP2WYR6mwujTRjr7VA",
+      "account_name": "GiftSpaceDLC",
+      "published_at": "2026-06-05",
+      "event_id": "giftspacedlc:c67095ad53ead413"
+    },
+    "3727ed3187d676bc": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/is7FjKIENTmCAs07WPS4Jg",
+      "account_name": "陀地音乐TOTE MUSIC",
+      "published_at": "2026-06-06",
+      "event_id": "tote_music:3727ed3187d676bc"
+    },
+    "b62bef0f16e894aa": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/0fT25kyDXcrQjJ6oDVX8vA",
+      "account_name": "loopy Club",
+      "published_at": "2026-06-07",
+      "event_id": "loopy_club:b62bef0f16e894aa"
+    },
+    "b55a608fb8be4433": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/Rn3SEal-xG-bvdlV2VshDg",
+      "account_name": "Heim Shanghai",
+      "published_at": "2026-06-04",
+      "event_id": "heim_shanghai:b55a608fb8be4433"
+    },
+    "e46742cca431baaf": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/NpdW3jcI0CBdbH2mrgwAOg",
+      "account_name": "院吧 Hakka Bar",
+      "published_at": "2026-06-08",
+      "event_id": "hakka_bar:e46742cca431baaf"
+    },
+    "2642c9354a42a41e": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/bvc7IHfADNn_GGaUpeaj4A",
+      "account_name": "院吧 Hakka Bar",
+      "published_at": "2026-06-08",
+      "event_id": "hakka_bar:2642c9354a42a41e"
+    },
+    "3b16d6bc94d80656": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/X6mykjO8J2h8z1I06KfCyA",
+      "account_name": "光芒enlightening",
+      "published_at": "2026-06-08",
+      "event_id": "enlightening:3b16d6bc94d80656"
+    },
+    "f15fa3f5484beba9": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/P2TShLeHD1fIVHu4N03b6w",
+      "account_name": "院吧 Hakka Bar",
+      "published_at": "2026-06-08",
+      "event_id": "hakka_bar:f15fa3f5484beba9"
+    },
+    "ed1ce7907910496a": {
+      "type": "wechat_article",
+      "url": "https://mp.weixin.qq.com/s/2C_4nmTBtkLpvgQ7Lo9urg",
+      "account_name": "GUM Guangzhou",
+      "published_at": "2026-06-08",
+      "event_id": "gum_guangzhou:ed1ce7907910496a"
+    }
+  },
+  "repair_report": {
+    "repaired_at": "2026-06-08T20:41:44+08:00",
+    "kept_source_count": 188,
+    "removed_source_count": 1,
+    "redirected_duplicate_source_count": 1,
+    "canonicalized_current_source_count": 0
+  },
+  "incremental_merge": {
+    "schema_version": "weekly_incremental_api_merge.v1.source_map",
+    "base_source_count": 183,
+    "incremental_source_count": 19,
+    "merged_source_count": 189,
+    "added_source_keys": [
+      "2642c9354a42a41e",
+      "3b16d6bc94d80656",
+      "cec56c237f1d4145",
+      "e46742cca431baaf",
+      "ed1ce7907910496a",
+      "f15fa3f5484beba9"
+    ],
+    "replaced_source_keys": [
+      "2cf68dc3fb3b55d4",
+      "49e85f51a7693786",
+      "4b545528832d89db",
+      "4c56d5a25d0c091f",
+      "4da37c16191f823f",
+      "9735340ff5c5a07a",
+      "abfe3783bbf064bd",
+      "b55a608fb8be4433",
+      "ba295258057c04d3",
+      "ca5535e940ae0465",
+      "d8ccdd77982aac06",
+      "dc7f7768cfadd65f",
+      "eb92b38a938eca80"
+    ],
+    "base_source_map": "C:\\code\\githubstar\\wechathtmldownload\\services\\weekly_activity_cloudrun\\data\\current_release\\source_actions\\source_url_map.json",
+    "incremental_source_map": "D:\\downstream_results\\stage7_rewrite\\longrun\\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260608\\source_actions\\source_url_map.json"
+  }
+}

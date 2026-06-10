@@ -1,0 +1,132 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "calendar_preview",
+    "is_calendar_preview": true,
+    "id": "agg-child-ac6d19eefbe25321",
+    "event_id": "agg-child-ac6d19eefbe25321",
+    "article_id": "agg-child-ac6d19eefbe25321",
+    "queue_id": "agg-child-ac6d19eefbe25321",
+    "title": "Weekly Listening w/ kongbb",
+    "title_original": "Weekly Listening w/ kongbb",
+    "title_display": "Weekly Listening w/ kongbb",
+    "account": "wigwam",
+    "account_key": "wigwam",
+    "promoter": "wigwam",
+    "source_article": {
+      "url_hash": "",
+      "account_name": "wigwam",
+      "published_at": "2026-06-01"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": false,
+      "url_hash": "",
+      "disabled_reason": "aggregate_child_parent_article"
+    },
+    "post_date": "2026-06-01",
+    "source_account_name": "wigwam",
+    "source_published_at": "2026-06-01",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-ac6d19eefbe25321--5d9dde88b1292d13312497db.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-ac6d19eefbe25321--5d9dde88b1292d13312497db.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-ac6d19eefbe25321--5d9dde88b1292d13312497db.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "22:00 - Late",
+    "event_time_source": "source_text",
+    "time_start": "22:00",
+    "time_end": "Late",
+    "running_hours_text": "22:00 - Late",
+    "running_hours_source": "source_text",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [
+      "wigwam"
+    ],
+    "venue_id": "wigwam_shanghai",
+    "venue_name": "wigwam",
+    "address": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+    "address_full": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+    "address_source": "manual_registry",
+    "geo_lng": 121.419529,
+    "geo_lat": 31.210481,
+    "lineup": [
+      "kongbb"
+    ],
+    "lineup_artists": [
+      "kongbb"
+    ],
+    "genres": [],
+    "music_styles": [],
+    "price": [
+      "Free Entry"
+    ],
+    "price_text": "Free Entry",
+    "ticketing_text": "Free Entry",
+    "evidence": [
+      "06.06 SAT",
+      "22:00-Late Weekly Listening",
+      "w/kongbb",
+      "Free Entry",
+      "Weekly Listening wigwan JUNE06SAT kongbb FreeEntry LG Floor,C.PARK,No.658 Zhaohua Road"
+    ],
+    "description_original_lines": [
+      "06.06 SAT",
+      "22:00-Late Weekly Listening",
+      "w/kongbb",
+      "Free Entry"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "calendar_preview"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "上海|wigwam|2026-06-06|weeklylisteningwkongbb",
+    "detail_path": "by-id/agg-child-ac6d19eefbe25321.json",
+    "detail_url": "by-id/agg-child-ac6d19eefbe25321.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-ac6d19eefbe25321--5d9dde88b1292d13312497db.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-ac6d19eefbe25321--5d9dde88b1292d13312497db.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-ac6d19eefbe25321--5d9dde88b1292d13312497db.png",
+    "poster_cloud_path": "weekly-posters/20260604/agg-child-ac6d19eefbe25321--5d9dde88b1292d13312497db.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-ac6d19eefbe25321--5d9dde88b1292d13312497db.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-ac6d19eefbe25321--5d9dde88b1292d13312497db.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "aggregation_child": true,
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-ac6d19eefbe25321--5d9dde88b1292d13312497db.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-ac6d19eefbe25321--5d9dde88b1292d13312497db.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-ac6d19eefbe25321--5d9dde88b1292d13312497db.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-ac6d19eefbe25321--5d9dde88b1292d13312497db.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-ac6d19eefbe25321--5d9dde88b1292d13312497db.png",
+    "discovery_source": "wechat-aggregate-yuanbao",
+    "extraction_model": "yuanbao",
+    "aggregation_source_kind": "yuanbao_overview",
+    "metadata_enriched_at": "2026-06-08T20:05:38.918918"
+  }
+}

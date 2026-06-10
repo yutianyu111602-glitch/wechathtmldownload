@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "heim_shanghai:b55a608fb8be4433",
+  "sourceItemHash": "e33ee2e5c973898a985443d882f8a17108df440a8d8bb3d7ed6b97eb4b209471",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "「風雲 FENGYUN」第四卷回顾 | 声走千变",
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": null,
+      "city_name": "上海",
+      "venue_name": "Heim Shanghai",
+      "address_candidate": "上海市黄浦区长乐路462号M101",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.13 周六，「風雲 FENGYUN」第五卷即将展开",
+        "2025.12.19",
+        "Fri",
+        "Poster OCR date: 2025-12-19 / 2026-12-19 / 2026-06-13"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "「風雲 FENGYUN」第四卷回顾 | 声走千变",
+        "2026-06-13",
+        "上海",
+        "Heim Shanghai"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

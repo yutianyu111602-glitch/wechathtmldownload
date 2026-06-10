@@ -1,0 +1,1859 @@
+{
+  "schema_version": "weekly_activity_miniprogram_date.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "date": "2026-06-07",
+  "item_count": 14,
+  "items": [
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "tote_music:16d16ef92899aa2d",
+      "event_id": "tote_music:16d16ef92899aa2d",
+      "article_id": "tote_music:16d16ef92899aa2d",
+      "queue_id": "tote_music:16d16ef92899aa2d",
+      "title": "【6/7 周日】《黎明》刘彧豪木吉他指弹音乐专场",
+      "title_original": "【6/7 周日】《黎明》刘彧豪木吉他指弹音乐专场",
+      "title_display": "【6/7 周日】《黎明》刘彧豪木吉他指弹音乐专场",
+      "account": "陀地音乐TOTE MUSIC",
+      "account_key": "tote_music",
+      "promoter": "陀地音乐TOTE MUSIC",
+      "source_article": {
+        "url_hash": "16d16ef92899aa2d",
+        "account_name": "陀地音乐TOTE MUSIC",
+        "published_at": "2026-05-26"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "16d16ef92899aa2d",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-05-26",
+      "source_account_name": "陀地音乐TOTE MUSIC",
+      "source_published_at": "2026-05-26",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a16d16ef92899aa2d--f9ce58b1ae2ea23f09c5.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a16d16ef92899aa2d--f9ce58b1ae2ea23f09c5.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a16d16ef92899aa2d--f9ce58b1ae2ea23f09c5.jpg",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "22:00 - Late",
+      "event_time_source": "source_text",
+      "time_start": "22:00",
+      "time_end": "Late",
+      "running_hours_text": "22:00 - Late",
+      "running_hours_source": "source_text",
+      "city": [
+        "广州"
+      ],
+      "city_key": "guangzhou",
+      "city_name": "广州",
+      "city_keys": [
+        "guangzhou"
+      ],
+      "venue": [],
+      "venue_id": "tote_store_guangzhou",
+      "venue_name": "陀地士多 Tote Store",
+      "address": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+      "address_full": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+      "address_source": "venue_registry_verified",
+      "geo_lng": 113.262634,
+      "geo_lat": 23.097666,
+      "lineup": [
+        "刘彧豪"
+      ],
+      "lineup_artists": [
+        "刘彧豪"
+      ],
+      "genres": [
+        "fingerstyle guitar"
+      ],
+      "music_styles": [],
+      "price": [
+        "免票"
+      ],
+      "price_text": "免票",
+      "ticketing_text": "免票",
+      "evidence": [
+        "【6/7 周日】《黎明》刘彧豪木吉他指弹音乐专场",
+        "「 刘彧豪木吉他指弹音乐专场 」 6月7日 周日 Sun. 22:00 免票进场 一人一消 陀地士多 ↓↓↓交通指引点击下方链接↓↓↓ 如何找到我们!How to find us !",
+        "2026-06-07",
+        "22:00-late",
+        "一起来陀地士多，欣赏木吉他指弹现场！"
+      ],
+      "description_original_lines": [
+        "一起来陀地士多，欣赏木吉他指弹现场！",
+        "成都市出生，12岁有了第一把乐器吉他，13岁时通过吉他摸索出了钢琴并开始弹奏，一九年接触了指弹，无任何老师教导，纯自学",
+        "2021-2023，连续三年指弹比赛入围",
+        "2024年通过自己的用音乐制作软件写出的第一首原创音乐作品"
+      ],
+      "dj_bio_lines": [
+        "【6/7 周日】《黎明》刘彧豪木吉他指弹音乐专场"
+      ],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "广州|陀地士多totestore|2026-06-07|67周日《黎明》刘彧豪木吉他指弹音乐专场",
+      "detail_path": "by-id/tote_musicu3a16d16ef92899aa2d.json",
+      "detail_url": "by-id/tote_musicu3a16d16ef92899aa2d.json",
+      "venue_lat": 23.097666,
+      "venue_lng": 113.262634,
+      "geo_coord_system": "GCJ-02",
+      "geo_source": "tencent_map_picker_user_confirmed",
+      "geo_verified_at": "2026-06-01",
+      "geo_candidate_id": "tote_store_guangzhou",
+      "protected_field_merge": {
+        "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+        "preserved_fields": [
+          "address_source",
+          "geo_candidate_id",
+          "geo_coord_system",
+          "geo_source",
+          "geo_verified_at",
+          "venue_lat",
+          "venue_lng"
+        ],
+        "reason": "base row carried verified place fields; incremental row did not request explicit override"
+      },
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a16d16ef92899aa2d--f9ce58b1ae2ea23f09c5.jpg",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a16d16ef92899aa2d--f9ce58b1ae2ea23f09c5.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a16d16ef92899aa2d--f9ce58b1ae2ea23f09c5.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a16d16ef92899aa2d--f9ce58b1ae2ea23f09c5.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a16d16ef92899aa2d--f9ce58b1ae2ea23f09c5.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a16d16ef92899aa2d--f9ce58b1ae2ea23f09c5.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster_cloud_path": "weekly-posters/20260607/tote_musicu3a16d16ef92899aa2d--f9ce58b1ae2ea23f09c5.jpg",
+      "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+      "poster_public_source_hash": "f9ce58b1ae2ea23f",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a16d16ef92899aa2d--f9ce58b1ae2ea23f09c5.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a16d16ef92899aa2d--f9ce58b1ae2ea23f09c5.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a16d16ef92899aa2d--f9ce58b1ae2ea23f09c5.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a16d16ef92899aa2d--f9ce58b1ae2ea23f09c5.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "defun:f1e2998730e2823a",
+      "event_id": "defun:f1e2998730e2823a",
+      "article_id": "defun:f1e2998730e2823a",
+      "queue_id": "defun:f1e2998730e2823a",
+      "title": "6.7 | “小孩桌”2.0 HIPHOP NIGHT GUEST&RANGE&DEFUN",
+      "title_original": "6.7 | “小孩桌”2.0 HIPHOP NIGHT GUEST&RANGE&DEFUN",
+      "title_display": "“小孩桌”2.0 HIPHOP NIGHT GUEST&RANGE&DEFUN",
+      "account": "DEFUN",
+      "account_key": "defun",
+      "promoter": "DEFUN",
+      "source_article": {
+        "url_hash": "f1e2998730e2823a",
+        "account_name": "DEFUN",
+        "published_at": "2026-05-31"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "f1e2998730e2823a",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-05-31",
+      "source_account_name": "DEFUN",
+      "source_published_at": "2026-05-31",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "21:00 - Late",
+      "event_time_source": "source_text",
+      "time_start": "21:00",
+      "time_end": "Late",
+      "running_hours_text": "21:00 - Late",
+      "running_hours_source": "source_text",
+      "city": [
+        "上海"
+      ],
+      "city_key": "shanghai",
+      "city_name": "上海",
+      "city_keys": [
+        "shanghai"
+      ],
+      "venue": [],
+      "venue_id": "defun_shanghai",
+      "venue_name": "DEFUN",
+      "address": "上海市普陀区长寿路401号亚新生活广场",
+      "address_full": "上海市普陀区长寿路401号亚新生活广场",
+      "address_source": "venue_registry_verified",
+      "geo_lng": 121.437551,
+      "geo_lat": 31.239228,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [
+        "hip-hop"
+      ],
+      "music_styles": [
+        "hip-hop"
+      ],
+      "price": [
+        "FREE ENTRY"
+      ],
+      "price_text": "FREE ENTRY",
+      "ticketing_text": "FREE ENTRY",
+      "evidence": [
+        "6.7 | “小孩桌”2.0 HIPHOP NIGHT GUEST&RANGE&DEFUN",
+        "FREE ENTRY",
+        "2026-06-07",
+        "21:00-LATE",
+        "“小孩桌2.0” HIPHOP NIGHT GUEST&RANGE&DEFUN"
+      ],
+      "description_original_lines": [
+        "6.7 | “小孩桌”2.0 HIPHOP NIGHT GUEST&RANGE&DEFUN",
+        "FREE ENTRY",
+        "21:00-LATE",
+        "“小孩桌2.0” HIPHOP NIGHT GUEST&RANGE&DEFUN"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "上海|defun|2026-06-07|小孩桌20hiphopnightguest&range&defun",
+      "detail_path": "by-id/defunu3af1e2998730e2823a.json",
+      "detail_url": "by-id/defunu3af1e2998730e2823a.json",
+      "address_verification": {
+        "decision": "registry_over_poster_ocr_address",
+        "note": "poster OCR address conflicts with the verified venue registry; public release keeps the registry address instead of OCR-only override",
+        "rejected_source_address": "GUESTRANGE 普陀区长寿路401号亚新广场1楼中庭 Atrium, G/F, Yaxin Plaza, No.401, Changshou Road"
+      },
+      "venue_lat": 31.239228,
+      "venue_lng": 121.437551,
+      "geo_coord_system": "GCJ-02",
+      "geo_source": "frontend_verified_map_location_book",
+      "geo_verified_at": "2026-06-01",
+      "geo_candidate_id": "defun_shanghai",
+      "protected_field_merge": {
+        "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+        "preserved_fields": [
+          "address_source",
+          "geo_candidate_id",
+          "geo_coord_system",
+          "geo_source",
+          "geo_verified_at",
+          "venue_lat",
+          "venue_lng"
+        ],
+        "reason": "base row carried verified place fields; incremental row did not request explicit override"
+      },
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster_cloud_path": "weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+      "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+      "poster_public_source_hash": "01797ed84c4634ed",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/defunu3af1e2998730e2823a--01797ed84c4634ed8f16.png"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "nuts:bd91e6311e3e3c77",
+      "event_id": "nuts:bd91e6311e3e3c77",
+      "article_id": "nuts:bd91e6311e3e3c77",
+      "queue_id": "nuts:bd91e6311e3e3c77",
+      "title": "坚果即兴 NUTS JAM｜6月7日@STILL UP",
+      "title_original": "坚果即兴 NUTS JAM｜6月7日@STILL UP",
+      "title_display": "@STILL UP",
+      "account": "坚果NUTS",
+      "account_key": "nuts",
+      "promoter": "坚果NUTS",
+      "source_article": {
+        "url_hash": "bd91e6311e3e3c77",
+        "account_name": "坚果NUTS",
+        "published_at": "2026-05-31"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "bd91e6311e3e3c77",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-05-31",
+      "source_account_name": "坚果NUTS",
+      "source_published_at": "2026-05-31",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "20:00",
+      "event_time_source": "source_text",
+      "time_start": "20:00",
+      "time_end": "",
+      "running_hours_text": "20:00",
+      "running_hours_source": "source_text",
+      "city": [
+        "重庆"
+      ],
+      "city_key": "chongqing",
+      "city_name": "重庆",
+      "city_keys": [
+        "chongqing"
+      ],
+      "venue": [],
+      "venue_id": "nuts_chongqing",
+      "venue_name": "坚果NUTS",
+      "address": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_full": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_source": "manual_registry",
+      "geo_lng": 106.468644,
+      "geo_lat": 29.561095,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [
+        "Free Entry"
+      ],
+      "price_text": "Free Entry",
+      "ticketing_text": "Free Entry",
+      "evidence": [
+        "坚果即兴 NUTS JAM｜6月7日@STILL UP",
+        "Free Entry",
+        "2026-06-07",
+        "20:00",
+        "6/7 20:00 onwards"
+      ],
+      "description_original_lines": [
+        "坚果即兴 NUTS JAM｜6月7日@STILL UP",
+        "Free Entry",
+        "6/7 20:00 onwards",
+        "@STILL UP(NUTS)"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "重庆|坚果nuts|2026-06-07|stillup",
+      "detail_path": "by-id/nutsu3abd91e6311e3e3c77.json",
+      "detail_url": "by-id/nutsu3abd91e6311e3e3c77.json",
+      "address_verification": {
+        "decision": "registry_over_poster_ocr_address",
+        "note": "poster OCR address conflicts with the verified venue registry; public release keeps the registry address instead of OCR-only override",
+        "rejected_source_address": "ADD:重庆两江新区龙湖新壹街C馆1F"
+      },
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster_cloud_path": "weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+      "poster_public_source_hash": "e83aaa44acc8494f",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "hakka_bar:030867d1a5b9c944",
+      "event_id": "hakka_bar:030867d1a5b9c944",
+      "article_id": "hakka_bar:030867d1a5b9c944",
+      "queue_id": "hakka_bar:030867d1a5b9c944",
+      "title": "06.07 周日 |「OPEN DECKS」 ·   150XS",
+      "title_original": "06.07 周日 |「OPEN DECKS」 ·   150XS",
+      "title_display": "「OPEN DECKS」 ·   150XS",
+      "account": "院吧 Hakka Bar",
+      "account_key": "hakka_bar",
+      "promoter": "院吧 Hakka Bar",
+      "source_article": {
+        "url_hash": "030867d1a5b9c944",
+        "account_name": "院吧 Hakka Bar",
+        "published_at": "2026-06-01"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "030867d1a5b9c944",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-06-01",
+      "source_account_name": "院吧 Hakka Bar",
+      "source_published_at": "2026-06-01",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "成都"
+      ],
+      "city_key": "chengdu",
+      "city_name": "成都",
+      "city_keys": [
+        "chengdu"
+      ],
+      "venue": [],
+      "venue_id": "hakka_bar_chengdu",
+      "venue_name": "Hakkabar 院吧",
+      "address": "四川省成都市武侯区玉林街道科华北路60号科华沸城12楼1201",
+      "address_full": "四川省成都市武侯区玉林街道科华北路60号科华沸城12楼1201",
+      "address_source": "manual_registry",
+      "geo_lng": 104.076219,
+      "geo_lat": 30.624273,
+      "lineup": [
+        "150XS"
+      ],
+      "lineup_artists": [
+        "150XS"
+      ],
+      "genres": [],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "06.07 周日 |「OPEN DECKS」 · 150XS",
+        "2026-06-07",
+        "跃跃欲试的新手们，快来报名！",
+        "http://mmbiz.qpic.cn/sz_mmbiz_png/ogUhhaxnCtAZOodicx4PFlsMRTwic2icGjhB6prniaY8eMkGT6npovhNCURf2DQ3rf88k8jTINAkKLPScJicnONHU8hDe1yrSqc7ylEbPpT13dsw/0?wx_fmt=png",
+        "https://mmbiz.qpic.cn/mmbiz_jpg/ogUhhaxnCtAlV8f3CmZQnuKriaLW5ZEo4BMwle003TYm3tKf57ZVElVc0icDqhZHsYHzNhH5BnTyH1ol8R8gxiaTmbhpMnBmmCUT9AG0Y5Zzxc/640?wx_fmt=jpeg&from=appmsg"
+      ],
+      "description_original_lines": [
+        "06.07 周日 |「OPEN DECKS」 · 150XS",
+        "跃跃欲试的新手们，快来报名！",
+        "OPEN",
+        "06.07星期日"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "成都|hakkabar院吧|2026-06-07|「opendecks」150xs",
+      "detail_path": "by-id/hakka_baru3a030867d1a5b9c944.json",
+      "detail_url": "by-id/hakka_baru3a030867d1a5b9c944.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster_cloud_path": "weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+      "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+      "poster_public_source_hash": "74519612ea8c4708",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/hakka_baru3a030867d1a5b9c944--74519612ea8c4708375a.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "agg-child-6aa6ef765575e2f8",
+      "event_id": "agg-child-6aa6ef765575e2f8",
+      "article_id": "agg-child-6aa6ef765575e2f8",
+      "queue_id": "agg-child-6aa6ef765575e2f8",
+      "title": "TING外环绕PRES.",
+      "title_original": "TING外环绕PRES.",
+      "title_display": "TING外环绕PRES.",
+      "account": "Dada Bar Beijing",
+      "account_key": "dada_bar_beijing",
+      "promoter": "Dada Bar Beijing",
+      "source_article": {
+        "url_hash": "",
+        "account_name": "Dada Bar Beijing",
+        "published_at": "2026-06-01"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": false,
+        "url_hash": "",
+        "disabled_reason": "aggregate_child_parent_article"
+      },
+      "aggregation_child": true,
+      "post_date": "2026-06-01",
+      "source_account_name": "Dada Bar Beijing",
+      "source_published_at": "2026-06-01",
+      "cover_url": "",
+      "cover_image_url": "",
+      "poster_file_id": "",
+      "poster_source": "",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "北京"
+      ],
+      "city_key": "beijing",
+      "city_name": "北京",
+      "city_keys": [
+        "beijing"
+      ],
+      "venue": [
+        "DADA BEIJING"
+      ],
+      "venue_id": "dada_bar_beijing",
+      "venue_name": "dadabar(日坛国际贸易中心A座店)",
+      "address": "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+      "address_full": "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+      "address_source": "manual_registry",
+      "geo_lng": 116.441877,
+      "geo_lat": 39.920029,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "周日6月7日",
+        "TING外环绕PRES"
+      ],
+      "description_original_lines": [
+        "周日6月7日"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "北京|dadabar日坛国际贸易中心a座店|2026-06-07|ting外环绕pres",
+      "detail_path": "by-id/agg-child-6aa6ef765575e2f8.json",
+      "detail_url": "by-id/agg-child-6aa6ef765575e2f8.json",
+      "posterFileId": "",
+      "cloudFileId": "",
+      "cover_file_id": "",
+      "coverFileId": "",
+      "poster": "",
+      "poster_url": "",
+      "posterUrl": "",
+      "flyer_url": "",
+      "raw_cover_url": "",
+      "coverUrl": "",
+      "poster_storage": "",
+      "posterStorage": "",
+      "poster_cloud_path": "",
+      "discovery_source": "wechat-aggregate-yuanbao",
+      "extraction_model": "yuanbao",
+      "aggregation_source_kind": "yuanbao_overview",
+      "metadata_enriched_at": "2026-06-08T20:05:38.918922"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "calendar_preview",
+      "is_calendar_preview": true,
+      "id": "agg-child-bd5c71530dcdbcd1",
+      "event_id": "agg-child-bd5c71530dcdbcd1",
+      "article_id": "agg-child-bd5c71530dcdbcd1",
+      "queue_id": "agg-child-bd5c71530dcdbcd1",
+      "title": "Weekly Listening w/ chai",
+      "title_original": "Weekly Listening w/ chai",
+      "title_display": "Weekly Listening w/ chai",
+      "account": "wigwam",
+      "account_key": "wigwam",
+      "promoter": "wigwam",
+      "source_article": {
+        "url_hash": "",
+        "account_name": "wigwam",
+        "published_at": "2026-06-01"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": false,
+        "url_hash": "",
+        "disabled_reason": "aggregate_child_parent_article"
+      },
+      "post_date": "2026-06-01",
+      "source_account_name": "wigwam",
+      "source_published_at": "2026-06-01",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-bd5c71530dcdbcd1--5d9dde88b1292d13312497db.png",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-bd5c71530dcdbcd1--5d9dde88b1292d13312497db.png",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-bd5c71530dcdbcd1--5d9dde88b1292d13312497db.png",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "22:00 - Late",
+      "event_time_source": "source_text",
+      "time_start": "22:00",
+      "time_end": "Late",
+      "running_hours_text": "22:00 - Late",
+      "running_hours_source": "source_text",
+      "city": [
+        "上海"
+      ],
+      "city_key": "shanghai",
+      "city_name": "上海",
+      "city_keys": [
+        "shanghai"
+      ],
+      "venue": [
+        "wigwam"
+      ],
+      "venue_id": "wigwam_shanghai",
+      "venue_name": "wigwam",
+      "address": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+      "address_full": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+      "address_source": "manual_registry",
+      "geo_lng": 121.419529,
+      "geo_lat": 31.210481,
+      "lineup": [
+        "chai"
+      ],
+      "lineup_artists": [
+        "chai"
+      ],
+      "genres": [],
+      "music_styles": [],
+      "price": [
+        "Free Entry"
+      ],
+      "price_text": "Free Entry",
+      "ticketing_text": "Free Entry",
+      "evidence": [
+        "06.07 SUN",
+        "22:00-Late Weekly Listening",
+        "w/ chai",
+        "Free Entry",
+        "JUNE 07 wigwam SUN chai LISTENINGSESSION FREE ENTRY LG Floor,C.PARK, No.658 Zhaohua Road"
+      ],
+      "description_original_lines": [
+        "06.07 SUN",
+        "22:00-Late Weekly Listening",
+        "w/ chai",
+        "Free Entry"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "calendar_preview"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "上海|wigwam|2026-06-07|weeklylisteningwchai",
+      "detail_path": "by-id/agg-child-bd5c71530dcdbcd1.json",
+      "detail_url": "by-id/agg-child-bd5c71530dcdbcd1.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-bd5c71530dcdbcd1--5d9dde88b1292d13312497db.png",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-bd5c71530dcdbcd1--5d9dde88b1292d13312497db.png",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-bd5c71530dcdbcd1--5d9dde88b1292d13312497db.png",
+      "poster_cloud_path": "weekly-posters/20260604/agg-child-bd5c71530dcdbcd1--5d9dde88b1292d13312497db.png",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-bd5c71530dcdbcd1--5d9dde88b1292d13312497db.png",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-bd5c71530dcdbcd1--5d9dde88b1292d13312497db.png",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "aggregation_child": true,
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-bd5c71530dcdbcd1--5d9dde88b1292d13312497db.png",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-bd5c71530dcdbcd1--5d9dde88b1292d13312497db.png",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-bd5c71530dcdbcd1--5d9dde88b1292d13312497db.png",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-bd5c71530dcdbcd1--5d9dde88b1292d13312497db.png",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-bd5c71530dcdbcd1--5d9dde88b1292d13312497db.png",
+      "discovery_source": "wechat-aggregate-yuanbao",
+      "extraction_model": "yuanbao",
+      "aggregation_source_kind": "yuanbao_overview",
+      "metadata_enriched_at": "2026-06-08T20:05:38.918922"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "agg-child-2ca6c50f6844b3d0",
+      "event_id": "agg-child-2ca6c50f6844b3d0",
+      "article_id": "agg-child-2ca6c50f6844b3d0",
+      "queue_id": "agg-child-2ca6c50f6844b3d0",
+      "title": "摇摇乐",
+      "title_original": "摇摇乐",
+      "title_display": "摇摇乐",
+      "account": "Dada Bar Beijing",
+      "account_key": "dada_bar_beijing",
+      "promoter": "Dada Bar Beijing",
+      "source_article": {
+        "url_hash": "",
+        "account_name": "Dada Bar Beijing",
+        "published_at": "2026-06-01"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": false,
+        "url_hash": "",
+        "disabled_reason": "aggregate_child_parent_article"
+      },
+      "post_date": "2026-06-01",
+      "source_account_name": "Dada Bar Beijing",
+      "source_published_at": "2026-06-01",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2ca6c50f6844b3d0--d4ec4486486783e768a5b567.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2ca6c50f6844b3d0--d4ec4486486783e768a5b567.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2ca6c50f6844b3d0--d4ec4486486783e768a5b567.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "北京"
+      ],
+      "city_key": "beijing",
+      "city_name": "北京",
+      "city_keys": [
+        "beijing"
+      ],
+      "venue": [
+        "DADA BEIJING"
+      ],
+      "venue_id": "dada_bar_beijing",
+      "venue_name": "dadabar(日坛国际贸易中心A座店)",
+      "address": "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+      "address_full": "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+      "address_source": "manual_registry",
+      "geo_lng": 116.441877,
+      "geo_lat": 39.920029,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "周日6月7日",
+        "摇摇乐"
+      ],
+      "description_original_lines": [
+        "周日6月7日"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "北京|dadabar日坛国际贸易中心a座店|2026-06-07|摇摇乐",
+      "detail_path": "by-id/agg-child-2ca6c50f6844b3d0.json",
+      "detail_url": "by-id/agg-child-2ca6c50f6844b3d0.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2ca6c50f6844b3d0--d4ec4486486783e768a5b567.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2ca6c50f6844b3d0--d4ec4486486783e768a5b567.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2ca6c50f6844b3d0--d4ec4486486783e768a5b567.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/agg-child-2ca6c50f6844b3d0--d4ec4486486783e768a5b567.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2ca6c50f6844b3d0--d4ec4486486783e768a5b567.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2ca6c50f6844b3d0--d4ec4486486783e768a5b567.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "aggregation_child": true,
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2ca6c50f6844b3d0--d4ec4486486783e768a5b567.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2ca6c50f6844b3d0--d4ec4486486783e768a5b567.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2ca6c50f6844b3d0--d4ec4486486783e768a5b567.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2ca6c50f6844b3d0--d4ec4486486783e768a5b567.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-2ca6c50f6844b3d0--d4ec4486486783e768a5b567.jpg",
+      "discovery_source": "wechat-aggregate-yuanbao",
+      "extraction_model": "yuanbao",
+      "aggregation_source_kind": "yuanbao_overview",
+      "metadata_enriched_at": "2026-06-08T20:05:38.918923"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "agg-child-c010fea189cdfe84",
+      "event_id": "agg-child-c010fea189cdfe84",
+      "article_id": "agg-child-c010fea189cdfe84",
+      "queue_id": "agg-child-c010fea189cdfe84",
+      "title": "新面子Lxin mian kong Vol.46",
+      "title_original": "新面子Lxin mian kong Vol.46",
+      "title_display": "新面子Lxin mian kong Vol.46",
+      "account": "OIL油",
+      "account_key": "oil",
+      "promoter": "OIL油",
+      "source_article": {
+        "url_hash": "",
+        "account_name": "OIL油",
+        "published_at": "2026-06-01"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": false,
+        "url_hash": "",
+        "disabled_reason": "aggregate_child_parent_article"
+      },
+      "post_date": "2026-06-01",
+      "source_account_name": "OIL油",
+      "source_published_at": "2026-06-01",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "深圳"
+      ],
+      "city_key": "shenzhen",
+      "city_name": "深圳",
+      "city_keys": [
+        "shenzhen"
+      ],
+      "venue": [
+        "OIL"
+      ],
+      "venue_id": "oil_shenzhen",
+      "venue_name": "OIL CLUB",
+      "address": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_full": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "address_source": "manual_registry",
+      "geo_lng": 114.022385,
+      "geo_lat": 22.530283,
+      "lineup": [
+        "XS.iv",
+        "MAZA",
+        "c14"
+      ],
+      "lineup_artists": [
+        "XS.iv",
+        "MAZA",
+        "c14"
+      ],
+      "genres": [],
+      "music_styles": [
+        "disco"
+      ],
+      "price": [
+        "免票入场"
+      ],
+      "price_text": "免票入场",
+      "ticketing_text": "免票入场",
+      "evidence": [
+        "07",
+        "新面子Lxin mian kong Vol.46",
+        "XS.iv, MAZA, c14",
+        "Sun",
+        "凭2025年任意OIL购票记录可免票入场"
+      ],
+      "description_original_lines": [
+        "XS.iv, MAZA, c14",
+        "Sun",
+        "凭2025年任意OIL购票记录可免票入场",
+        "持有SEASONPASS油卡可享现场购票优惠"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "深圳|oilclub|2026-06-07|新面子lxinmiankongvol46",
+      "detail_path": "by-id/agg-child-c010fea189cdfe84.json",
+      "detail_url": "by-id/agg-child-c010fea189cdfe84.json",
+      "lineup_quality": {
+        "status": "verified",
+        "decision": "scoring_retained_lineup",
+        "note": "retained lineup artists with score >= 0.6: XS.iv, MAZA, c14"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "aggregation_child": true,
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-c010fea189cdfe84--72d22b29ef74f68f114d6fbe.jpg",
+      "merge_provenance": {
+        "schema_version": "weekly_merge_provenance.v1",
+        "reason": "duplicate_cluster",
+        "retained_id": "agg-child-c010fea189cdfe84",
+        "retained_source_hash": "23dfdfd311a756aa",
+        "merged_from": [],
+        "merged_source_hashes": [],
+        "source_count": 0,
+        "sources": []
+      },
+      "discovery_source": "wechat-aggregate-yuanbao",
+      "extraction_model": "yuanbao",
+      "aggregation_source_kind": "yuanbao_overview",
+      "metadata_enriched_at": "2026-06-08T20:05:38.918924"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "tomtwo:bf2802ca888fe283",
+      "event_id": "tomtwo:bf2802ca888fe283",
+      "article_id": "tomtwo:bf2802ca888fe283",
+      "queue_id": "tomtwo:bf2802ca888fe283",
+      "title": "06/07 无料入场！突如其来的偶像Live Vol.14",
+      "title_original": "06/07 无料入场！突如其来的偶像Live Vol.14",
+      "title_display": "无料入场！突如其来的偶像Live Vol.14",
+      "account": "TOMTWO通透现场",
+      "account_key": "tomtwo",
+      "promoter": "TOMTWO通透现场",
+      "source_article": {
+        "url_hash": "bf2802ca888fe283",
+        "account_name": "TOMTWO通透现场",
+        "published_at": "2026-06-04"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "bf2802ca888fe283",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-06-04",
+      "source_account_name": "TOMTWO通透现场",
+      "source_published_at": "2026-06-04",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tomtwou3abf2802ca888fe283--f7e2e9f3b45bfc876b88.png",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tomtwou3abf2802ca888fe283--f7e2e9f3b45bfc876b88.png",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tomtwou3abf2802ca888fe283--f7e2e9f3b45bfc876b88.png",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "14:30",
+      "event_time_source": "source_text",
+      "time_start": "14:30",
+      "time_end": "",
+      "running_hours_text": "14:30",
+      "running_hours_source": "source_text",
+      "city": [
+        "福州"
+      ],
+      "city_key": "fuzhou",
+      "city_name": "福州",
+      "city_keys": [
+        "fuzhou"
+      ],
+      "venue": [],
+      "venue_id": "tomtwo_livehouse_fuzhou_zuohai",
+      "venue_name": "TOMTWO通透现场",
+      "address": "福建省福州市台江区宁化街道长汀街39号福州滨江市民广场（左海光年PARK）项目一层L1-39商铺",
+      "address_full": "福建省福州市台江区宁化街道长汀街39号福州滨江市民广场（左海光年PARK）项目一层L1-39商铺",
+      "address_source": "manual_registry",
+      "geo_lng": 119.282436,
+      "geo_lat": 26.057019,
+      "lineup": [
+        "TrueMask",
+        "Rising Star",
+        "Rena&Kirin",
+        "EXIOM_界外法则"
+      ],
+      "lineup_artists": [
+        "TrueMask",
+        "Rising Star",
+        "Rena&Kirin",
+        "EXIOM_界外法则"
+      ],
+      "genres": [],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "06/07 无料入场！突如其来的偶像Live Vol.14",
+        "2026-06-07",
+        "TrueMask /Rising Star/Rena&Kirin/EXIOM_界外法则",
+        "OpEn 14:30/Start 15:00",
+        "(SUN)"
+      ],
+      "description_original_lines": [
+        "06/07 无料入场！突如其来的偶像Live Vol.14",
+        "TrueMask /Rising Star/Rena&Kirin/EXIOM_界外法则",
+        "OpEn 14:30/Start 15:00",
+        "(SUN)"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "福州|tomtwo通透现场|2026-06-07|无料入场！突如其来的偶像livevol14",
+      "detail_path": "by-id/tomtwou3abf2802ca888fe283.json",
+      "detail_url": "by-id/tomtwou3abf2802ca888fe283.json",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tomtwou3abf2802ca888fe283--f7e2e9f3b45bfc876b88.png",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tomtwou3abf2802ca888fe283--f7e2e9f3b45bfc876b88.png",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tomtwou3abf2802ca888fe283--f7e2e9f3b45bfc876b88.png",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tomtwou3abf2802ca888fe283--f7e2e9f3b45bfc876b88.png",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tomtwou3abf2802ca888fe283--f7e2e9f3b45bfc876b88.png",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tomtwou3abf2802ca888fe283--f7e2e9f3b45bfc876b88.png",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster_cloud_path": "weekly-posters/20260607/tomtwou3abf2802ca888fe283--f7e2e9f3b45bfc876b88.png",
+      "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+      "poster_public_source_hash": "f7e2e9f3b45bfc87",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tomtwou3abf2802ca888fe283--f7e2e9f3b45bfc876b88.png",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tomtwou3abf2802ca888fe283--f7e2e9f3b45bfc876b88.png",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tomtwou3abf2802ca888fe283--f7e2e9f3b45bfc876b88.png",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tomtwou3abf2802ca888fe283--f7e2e9f3b45bfc876b88.png"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "loopy_club:0231000c813d6bb8",
+      "event_id": "loopy_club:0231000c813d6bb8",
+      "article_id": "loopy_club:0231000c813d6bb8",
+      "queue_id": "loopy_club:0231000c813d6bb8",
+      "title": "6.07 周日｜贤者时间 KenjaTime - 沏壶高的",
+      "title_original": "6.07 周日｜贤者时间 KenjaTime - 沏壶高的",
+      "title_display": "贤者时间 KenjaTime - 沏壶高的",
+      "account": "loopy Club",
+      "account_key": "loopy_club",
+      "promoter": "loopy Club",
+      "source_article": {
+        "url_hash": "0231000c813d6bb8",
+        "account_name": "loopy Club",
+        "published_at": "2026-06-04"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "0231000c813d6bb8",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-06-04",
+      "source_account_name": "loopy Club",
+      "source_published_at": "2026-06-04",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "17:00-21:00",
+      "event_time_source": "source_text",
+      "time_start": "17:00",
+      "time_end": "21:00",
+      "running_hours_text": "17:00-21:00",
+      "running_hours_source": "source_text",
+      "city": [
+        "杭州"
+      ],
+      "city_key": "hangzhou",
+      "city_name": "杭州",
+      "city_keys": [
+        "hangzhou"
+      ],
+      "venue": [],
+      "venue_id": "loopy_hangzhou",
+      "venue_name": "loopy Club",
+      "address": "浙江省杭州市西湖区天目山路398号天目里7号楼负一层",
+      "address_full": "浙江省杭州市西湖区天目山路398号天目里7号楼负一层",
+      "address_source": "manual_registry",
+      "geo_lng": 120.098656,
+      "geo_lat": 30.267033,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "6.07 周日｜贤者时间 KenjaTime - 沏壶高的",
+        "2026-06-07",
+        "时间: 2026.06.07 17:00-21:00",
+        "Poster OCR time: 17:00-21:00",
+        "Poster OCR date: 2026-06-07"
+      ],
+      "description_original_lines": [
+        "6.07 周日｜贤者时间 KenjaTime - 沏壶高的",
+        "时间: 2026.06.07 17:00-21:00",
+        "Poster OCR time: 17:00-21:00",
+        "Poster OCR date: 2026-06-07"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "杭州|loopyclub|2026-06-07|贤者时间kenjatime沏壶高的",
+      "detail_path": "by-id/loopy_clubu3a0231000c813d6bb8.json",
+      "detail_url": "by-id/loopy_clubu3a0231000c813d6bb8.json",
+      "merge_provenance": {
+        "schema_version": "weekly_merge_provenance.v1",
+        "reason": "duplicate_cluster",
+        "retained_id": "loopy_club:0231000c813d6bb8",
+        "retained_source_hash": "0231000c813d6bb8",
+        "merged_from": [
+          "loopy_club:0231000c813d6bb8",
+          "loopy_club:15ca208f56ed2bca"
+        ],
+        "merged_source_hashes": [
+          "0231000c813d6bb8",
+          "15ca208f56ed2bca"
+        ],
+        "source_count": 2,
+        "sources": [
+          {
+            "event_id": "loopy_club:0231000c813d6bb8",
+            "source_hash": "0231000c813d6bb8",
+            "title": "贤者时间 KenjaTime - 沏壶高的",
+            "published_at": "2026-06-04",
+            "account_name": "loopy Club",
+            "source_type": "wechat_article",
+            "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+            "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+            "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+            "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+            "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+            "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+            "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+            "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+            "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+            "poster_storage": "cloudbase",
+            "posterStorage": "cloudbase",
+            "poster_cloud_path": "weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+            "poster_source": "cloudbase_storage_from_wechat_article",
+            "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+            "poster_public_source_hash": "8fd31bb427ac191f"
+          },
+          {
+            "event_id": "loopy_club:15ca208f56ed2bca",
+            "source_hash": "15ca208f56ed2bca",
+            "title": "今日，贤者时间 KenjaTime - 沏壶高的",
+            "published_at": "2026-06-07",
+            "account_name": "loopy Club",
+            "source_type": "wechat_article"
+          }
+        ]
+      },
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster_cloud_path": "weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+      "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+      "poster_public_source_hash": "8fd31bb427ac191f",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/loopy_clubu3a0231000c813d6bb8--8fd31bb427ac191f4278.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "cedar_kitchen:04310025cd8aa199",
+      "event_id": "cedar_kitchen:04310025cd8aa199",
+      "article_id": "cedar_kitchen:04310025cd8aa199",
+      "queue_id": "cedar_kitchen:04310025cd8aa199",
+      "title": "周日丨巨鹿路免费夜市回归 自由摆摊和放歌",
+      "title_original": "周日丨巨鹿路免费夜市回归 自由摆摊和放歌",
+      "title_display": "周日丨巨鹿路免费夜市回归 自由摆摊和放歌",
+      "account": "Cedar Kitchen",
+      "account_key": "cedar_kitchen",
+      "promoter": "Cedar Kitchen",
+      "source_article": {
+        "url_hash": "04310025cd8aa199",
+        "account_name": "Cedar Kitchen",
+        "published_at": "2026-06-05"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "04310025cd8aa199",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-06-05",
+      "source_account_name": "Cedar Kitchen",
+      "source_published_at": "2026-06-05",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "周日八点到深夜",
+      "event_time_source": "source_text",
+      "time_start": "周日八点到深夜",
+      "time_end": "",
+      "running_hours_text": "周日八点到深夜",
+      "running_hours_source": "source_text",
+      "city": [
+        "上海"
+      ],
+      "city_key": "shanghai",
+      "city_name": "上海",
+      "city_keys": [
+        "shanghai"
+      ],
+      "venue": [],
+      "venue_id": "",
+      "venue_name": "Cedar Kitchen",
+      "address": "周日丨巨鹿路免费夜市回归 自由摆摊和放歌",
+      "address_full": "周日丨巨鹿路免费夜市回归 自由摆摊和放歌",
+      "address_source": "source_text_normalized",
+      "geo_lng": null,
+      "geo_lat": null,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [
+        "免票入场"
+      ],
+      "price_text": "免票入场",
+      "ticketing_text": "免票入场",
+      "evidence": [
+        "周日丨巨鹿路免费夜市回归 自由摆摊和放歌",
+        "逛:免票入场,便宜好逛,珍奇异宝,旁边店里有阿拉伯卷饼和调酒",
+        "2026-06-07",
+        "周日八点到深夜！上海巨鹿路272号Cedar自由贸易市场",
+        "摆摊：汽修车库任意消费入场，自由摆摊，不用报名，自带毯子，一两件闲置也可以拿手上随缘出"
+      ],
+      "description_original_lines": [
+        "逛:免票入场,便宜好逛,珍奇异宝,旁边店里有阿拉伯卷饼和调酒",
+        "周日八点到深夜！上海巨鹿路272号Cedar自由贸易市场",
+        "摆摊：汽修车库任意消费入场，自由摆摊，不用报名，自带毯子，一两件闲置也可以拿手上随缘出",
+        "本次夜市有电视台来拍，多叫朋友来玩！"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "上海|cedarkitchen|2026-06-07|周日丨巨鹿路免费夜市回归自由摆摊和放歌",
+      "detail_path": "by-id/cedar_kitchenu3a04310025cd8aa199.json",
+      "detail_url": "by-id/cedar_kitchenu3a04310025cd8aa199.json",
+      "address_verification": {
+        "decision": "source_candidate_over_source_text",
+        "note": "source evidence contains a structured address; current source-text address looked like event metadata or a less app-friendly alias"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster_cloud_path": "weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+      "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+      "poster_public_source_hash": "5e525297b56b3f37",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "fouroneone_hangzhou:a8e142f7e3276488",
+      "event_id": "fouroneone_hangzhou:a8e142f7e3276488",
+      "article_id": "fouroneone_hangzhou:a8e142f7e3276488",
+      "queue_id": "fouroneone_hangzhou:a8e142f7e3276488",
+      "title": "今日 DJ Set @肆幺幺",
+      "title_original": "今日 DJ Set @肆幺幺",
+      "title_display": "今日 DJ Set @肆幺幺",
+      "account": "肆幺幺杭州",
+      "account_key": "fouroneone_hangzhou",
+      "promoter": "肆幺幺杭州",
+      "source_article": {
+        "url_hash": "a8e142f7e3276488",
+        "account_name": "肆幺幺杭州",
+        "published_at": "2026-06-07"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "a8e142f7e3276488",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-06-07",
+      "source_account_name": "肆幺幺杭州",
+      "source_published_at": "2026-06-07",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/fouroneone_hangzhouu3aa8e142f7e3276488--08e4f10ee2b4ebd2f3dd.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/fouroneone_hangzhouu3aa8e142f7e3276488--08e4f10ee2b4ebd2f3dd.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/fouroneone_hangzhouu3aa8e142f7e3276488--08e4f10ee2b4ebd2f3dd.jpg",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "16:00-18:00",
+      "event_time_source": "source_text",
+      "time_start": "16:00",
+      "time_end": "18:00",
+      "running_hours_text": "16:00-18:00",
+      "running_hours_source": "source_text",
+      "city": [
+        "杭州"
+      ],
+      "city_key": "hangzhou",
+      "city_name": "杭州",
+      "city_keys": [
+        "hangzhou"
+      ],
+      "venue": [
+        "肆幺幺"
+      ],
+      "venue_id": "fouroneone_hangzhou",
+      "venue_name": "肆幺幺",
+      "address": "浙江省杭州市上城区中山南路411号",
+      "address_full": "浙江省杭州市上城区中山南路411号",
+      "address_source": "manual_registry",
+      "geo_lng": 120.170683,
+      "geo_lat": 30.23502,
+      "lineup": [
+        "Shii"
+      ],
+      "lineup_artists": [
+        "Shii"
+      ],
+      "genres": [],
+      "music_styles": [],
+      "price": [
+        "免票入场"
+      ],
+      "price_text": "免票入场",
+      "ticketing_text": "免票入场",
+      "evidence": [
+        "今日 DJ Set @肆幺幺",
+        "点击上方定位,导航至肆幺幺即可抵达,免票入场!",
+        "2026-06-07",
+        "16:00-18:00",
+        "肆幺幺"
+      ],
+      "description_original_lines": [
+        "肆幺幺",
+        "🎛️💃🏻 艺人阵容：Shii",
+        "🎛️💃🏻 时间：16:00-18:00"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [
+        {
+          "artist_id": "dj_9c28232e",
+          "canonical_name": "Shii",
+          "matched_name": "Shii",
+          "verified": true,
+          "source": "dj_profiles",
+          "city": "",
+          "genres": [],
+          "bio": "",
+          "links": [
+            "https://www.instagram.com/hereyouareshii/",
+            "https://soundcloud.com/dope-shii",
+            "https://open.spotify.com/album/2XbQirgg6cr8EdTw5ihX6t?si=SW7JRQBPQK2purSCPi0DAQ"
+          ]
+        }
+      ],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "杭州|肆幺幺|2026-06-07|今日djset肆幺幺",
+      "detail_path": "by-id/fouroneone_hangzhouu3aa8e142f7e3276488.json",
+      "detail_url": "by-id/fouroneone_hangzhouu3aa8e142f7e3276488.json",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/fouroneone_hangzhouu3aa8e142f7e3276488--08e4f10ee2b4ebd2f3dd.jpg",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/fouroneone_hangzhouu3aa8e142f7e3276488--08e4f10ee2b4ebd2f3dd.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/fouroneone_hangzhouu3aa8e142f7e3276488--08e4f10ee2b4ebd2f3dd.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/fouroneone_hangzhouu3aa8e142f7e3276488--08e4f10ee2b4ebd2f3dd.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/fouroneone_hangzhouu3aa8e142f7e3276488--08e4f10ee2b4ebd2f3dd.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/fouroneone_hangzhouu3aa8e142f7e3276488--08e4f10ee2b4ebd2f3dd.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster_cloud_path": "weekly-posters/20260607/fouroneone_hangzhouu3aa8e142f7e3276488--08e4f10ee2b4ebd2f3dd.jpg",
+      "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+      "poster_public_source_hash": "08e4f10ee2b4ebd2",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/fouroneone_hangzhouu3aa8e142f7e3276488--08e4f10ee2b4ebd2f3dd.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/fouroneone_hangzhouu3aa8e142f7e3276488--08e4f10ee2b4ebd2f3dd.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/fouroneone_hangzhouu3aa8e142f7e3276488--08e4f10ee2b4ebd2f3dd.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/fouroneone_hangzhouu3aa8e142f7e3276488--08e4f10ee2b4ebd2f3dd.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "dada_bar_beijing:2d96233af75419d9",
+      "event_id": "dada_bar_beijing:2d96233af75419d9",
+      "article_id": "dada_bar_beijing:2d96233af75419d9",
+      "queue_id": "dada_bar_beijing:2d96233af75419d9",
+      "title": "今晚6月7日 - 声破天pres. Sounday Groove  w/Spectrxm",
+      "title_original": "今晚6月7日 - 声破天pres. Sounday Groove  w/Spectrxm",
+      "title_display": "今晚6月7日 - 声破天pres. Sounday Groove  w/Spectrxm",
+      "account": "Dada Bar Beijing",
+      "account_key": "dada_bar_beijing",
+      "promoter": "Dada Bar Beijing",
+      "source_article": {
+        "url_hash": "2d96233af75419d9",
+        "account_name": "Dada Bar Beijing",
+        "published_at": "2026-06-07"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "2d96233af75419d9",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-06-07",
+      "source_account_name": "Dada Bar Beijing",
+      "source_published_at": "2026-06-07",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_bar_beijingu3a2d96233af75419d9--ec8cdfcc4b60bd7d5cdc.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_bar_beijingu3a2d96233af75419d9--ec8cdfcc4b60bd7d5cdc.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_bar_beijingu3a2d96233af75419d9--ec8cdfcc4b60bd7d5cdc.jpg",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "21:00 - Late",
+      "event_time_source": "source_text",
+      "time_start": "21:00",
+      "time_end": "Late",
+      "running_hours_text": "21:00 - Late",
+      "running_hours_source": "source_text",
+      "city": [
+        "北京"
+      ],
+      "city_key": "beijing",
+      "city_name": "北京",
+      "city_keys": [
+        "beijing"
+      ],
+      "venue": [
+        "南营坊胡同日坛国际贸易中心"
+      ],
+      "venue_id": "",
+      "venue_name": "南营坊胡同日坛国际贸易中心",
+      "address": "北京朝阳区南营坊胡同日坛国际贸易中心A座北门B1",
+      "address_full": "北京朝阳区南营坊胡同日坛国际贸易中心A座北门B1",
+      "address_source": "source_text_over_registry",
+      "geo_lng": 116.441877,
+      "geo_lat": 39.920029,
+      "lineup": [
+        "Spectrxm"
+      ],
+      "lineup_artists": [
+        "Spectrxm"
+      ],
+      "genres": [
+        "hip-hop",
+        "house",
+        "electro",
+        "bass"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "house",
+        "electro",
+        "bass"
+      ],
+      "price": [
+        "免票"
+      ],
+      "price_text": "免票",
+      "ticketing_text": "免票",
+      "evidence": [
+        "今晚6月7日 - 声破天pres. Sounday Groove w/Spectrxm",
+        "免票FREE",
+        "2026-06-07",
+        "21:00-Late",
+        "北京朝阳区南营坊胡同日坛国际贸易中心A座北门B1"
+      ],
+      "description_original_lines": [
+        "免票FREE",
+        "北京朝阳区南营坊胡同日坛国际贸易中心A座北门B1",
+        "Spectrxm",
+        "6月7日｜Sun"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "北京|南营坊胡同日坛国际贸易中心|2026-06-07|6月7日声破天pressoundaygroovewspectrxm",
+      "detail_path": "by-id/dada_bar_beijingu3a2d96233af75419d9.json",
+      "detail_url": "by-id/dada_bar_beijingu3a2d96233af75419d9.json",
+      "merge_provenance": {
+        "schema_version": "weekly_merge_provenance.v1",
+        "reason": "duplicate_cluster",
+        "retained_id": "dada_bar_beijing:2d96233af75419d9",
+        "retained_source_hash": "2d96233af75419d9",
+        "merged_from": [
+          "dada_bar_beijing:7b119ab4657f752e",
+          "dada_bar_beijing:2d96233af75419d9"
+        ],
+        "merged_source_hashes": [
+          "2d96233af75419d9",
+          "7b119ab4657f752e"
+        ],
+        "source_count": 2,
+        "sources": [
+          {
+            "event_id": "dada_bar_beijing:7b119ab4657f752e",
+            "source_hash": "7b119ab4657f752e",
+            "title": "声破天pres. Sounday Groove  w/Spectrxm",
+            "published_at": "2026-05-30",
+            "account_name": "Dada Bar Beijing",
+            "source_type": "wechat_article"
+          },
+          {
+            "event_id": "dada_bar_beijing:2d96233af75419d9",
+            "source_hash": "2d96233af75419d9",
+            "title": "今晚6月7日 - 声破天pres. Sounday Groove  w/Spectrxm",
+            "published_at": "2026-06-07",
+            "account_name": "Dada Bar Beijing",
+            "source_type": "wechat_article"
+          }
+        ]
+      },
+      "address_verification": {
+        "decision": "source_candidate_over_registry",
+        "note": "source description contains an explicit address that conflicts with the venue registry; public release keeps the source-grounded address"
+      },
+      "venue_verification": {
+        "decision": "source_location_over_broad_registry_venue",
+        "note": "source text gives an explicit event location and does not support the registry venue matched only by account/alias"
+      },
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_bar_beijingu3a2d96233af75419d9--ec8cdfcc4b60bd7d5cdc.jpg",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_bar_beijingu3a2d96233af75419d9--ec8cdfcc4b60bd7d5cdc.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_bar_beijingu3a2d96233af75419d9--ec8cdfcc4b60bd7d5cdc.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_bar_beijingu3a2d96233af75419d9--ec8cdfcc4b60bd7d5cdc.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_bar_beijingu3a2d96233af75419d9--ec8cdfcc4b60bd7d5cdc.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_bar_beijingu3a2d96233af75419d9--ec8cdfcc4b60bd7d5cdc.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster_cloud_path": "weekly-posters/20260607/dada_bar_beijingu3a2d96233af75419d9--ec8cdfcc4b60bd7d5cdc.jpg",
+      "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+      "poster_public_source_hash": "ec8cdfcc4b60bd7d",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_bar_beijingu3a2d96233af75419d9--ec8cdfcc4b60bd7d5cdc.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_bar_beijingu3a2d96233af75419d9--ec8cdfcc4b60bd7d5cdc.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_bar_beijingu3a2d96233af75419d9--ec8cdfcc4b60bd7d5cdc.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_bar_beijingu3a2d96233af75419d9--ec8cdfcc4b60bd7d5cdc.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "dada_kunming:01a5754ae510df68",
+      "event_id": "dada_kunming:01a5754ae510df68",
+      "article_id": "dada_kunming:01a5754ae510df68",
+      "queue_id": "dada_kunming:01a5754ae510df68",
+      "title": "营业时间调整通知",
+      "title_original": "营业时间调整通知",
+      "title_display": "营业时间调整通知",
+      "account": "Dada Kunming",
+      "account_key": "dada_kunming",
+      "promoter": "Dada Kunming",
+      "source_article": {
+        "url_hash": "01a5754ae510df68",
+        "account_name": "Dada Kunming",
+        "published_at": "2026-06-07"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "01a5754ae510df68",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-06-07",
+      "source_account_name": "Dada Kunming",
+      "source_published_at": "2026-06-07",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "昆明"
+      ],
+      "city_key": "kunming",
+      "city_name": "昆明",
+      "city_keys": [
+        "kunming"
+      ],
+      "venue": [],
+      "venue_id": "dada_kunming",
+      "venue_name": "Dada Kunming",
+      "address": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+      "address_full": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+      "address_source": "manual_registry",
+      "geo_lng": 102.691192,
+      "geo_lat": 25.053387,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "营业时间调整通知",
+        "2026-06-07",
+        "2026年6月7日，店休",
+        "助力高考，下周再会！"
+      ],
+      "description_original_lines": [
+        "2026年6月7日，店休",
+        "助力高考，下周再会！"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "昆明|dadakunming|2026-06-07|营业时间调整通知",
+      "detail_path": "by-id/dada_kunmingu3a01a5754ae510df68.json",
+      "detail_url": "by-id/dada_kunmingu3a01a5754ae510df68.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster_cloud_path": "weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+      "poster_public_source_hash": "27ad1bebac3dadda",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg"
+    }
+  ]
+}

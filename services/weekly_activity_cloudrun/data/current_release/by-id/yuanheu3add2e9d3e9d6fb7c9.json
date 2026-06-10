@@ -1,0 +1,125 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "account": "yuanhe",
+    "account_key": "yuanhe",
+    "address": "北京市朝阳区西大望路27号E6-2号楼103",
+    "address_full": "北京市朝阳区西大望路27号E6-2号楼103",
+    "address_source": "venue_registry_verified",
+    "article_id": "yuanhe:dd2e9d3e9d6fb7c9",
+    "artist_profiles": [],
+    "city": [
+      "北京"
+    ],
+    "city_key": "beijing",
+    "city_keys": [
+      "beijing"
+    ],
+    "city_name": "北京",
+    "content_type": "event",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+    "dedupe_key": "北京|yuanhe|2026-06-03|周三yuanhe听点地下俱乐部听不到的",
+    "description_original_lines": [
+      "让我们把目光聚焦在泛电子音乐上，从地下说唱到各类舞曲Remix，当晚的舞池没有风格边界",
+      "从下酒出发，从音“乐”出发，周三小周末，跳在原核",
+      "Line up：",
+      "22:00-00:00:DJ rezenico"
+    ],
+    "detail_path": "by-id/yuanheu3add2e9d3e9d6fb7c9.json",
+    "detail_url": "by-id/yuanheu3add2e9d3e9d6fb7c9.json",
+    "dj_bio_lines": [],
+    "event_date_end": "2026-06-03",
+    "event_date_iso_guess": "2026-06-03",
+    "event_date_iso_guesses": [
+      "2026-06-03"
+    ],
+    "event_date_start": "2026-06-03",
+    "event_date_text": [
+      "2026-06-03"
+    ],
+    "event_id": "yuanhe:dd2e9d3e9d6fb7c9",
+    "event_time_source": "source_text",
+    "event_time_text": "04:00 - Late",
+    "evidence": [
+      "周三YuanHe 听点地下俱乐部听不到的",
+      "2026-06-03",
+      "04:00-late",
+      "让我们把目光聚焦在泛电子音乐上，从地下说唱到各类舞曲Remix，当晚的舞池没有风格边界",
+      "从下酒出发，从音“乐”出发，周三小周末，跳在原核"
+    ],
+    "genres": [
+      "hip-hop"
+    ],
+    "geo_candidate_id": "yuanhe_beijing",
+    "geo_coord_system": "GCJ-02",
+    "geo_lat": 39.885909,
+    "geo_lng": 116.481883,
+    "geo_source": "frontend_verified_map_location_book",
+    "geo_verified_at": "2026-06-01",
+    "id": "yuanhe:dd2e9d3e9d6fb7c9",
+    "is_calendar_preview": false,
+    "lineup": [],
+    "lineup_artists": [],
+    "music_styles": [
+      "hip-hop"
+    ],
+    "place_fields_locked": true,
+    "post_date": "2026-06-01",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+    "poster_source": "cloudbase_storage",
+    "price": [],
+    "price_text": "",
+    "promoter": "yuanhe",
+    "publish_status": "published",
+    "quality_flags": [],
+    "quality_status": "READY",
+    "queue_id": "yuanhe:dd2e9d3e9d6fb7c9",
+    "running_hours_source": "source_text",
+    "running_hours_text": "04:00 - Late",
+    "schema_version": "weekly_event_published.v1",
+    "source_account_name": "yuanhe",
+    "source_action": {
+      "available": true,
+      "label": "公众号",
+      "type": "wechat_article",
+      "url_hash": "dd2e9d3e9d6fb7c9"
+    },
+    "source_article": {
+      "account_name": "yuanhe",
+      "published_at": "2026-06-01",
+      "url_hash": "dd2e9d3e9d6fb7c9"
+    },
+    "source_published_at": "2026-06-01",
+    "ticketing_text": "",
+    "time_end": "Late",
+    "time_start": "04:00",
+    "title": "周三YuanHe 听点地下俱乐部听不到的",
+    "title_display": "周三YuanHe 听点地下俱乐部听不到的",
+    "title_original": "周三YuanHe 听点地下俱乐部听不到的",
+    "venue": [],
+    "venue_id": "yuanhe_beijing",
+    "venue_lat": 39.885909,
+    "venue_lng": 116.481883,
+    "venue_name": "yuanhe",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg"
+  }
+}

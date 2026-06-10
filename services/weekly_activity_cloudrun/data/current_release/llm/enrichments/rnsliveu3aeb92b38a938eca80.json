@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "rnslive:eb92b38a938eca80",
+  "sourceItemHash": "97b13551d0cbf0f77f7a8b7023e15814e72785367e389f39905b67d417b75578",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Ruins入灵寺 | “藏在阿尔卑斯山脚仙雾中的东欧科学怪人”  Daniel Maszkowicz",
+      "event_date_start": "2026-06-09",
+      "event_date_end": "2026-06-09",
+      "event_time_text": "2026.6.9 20:00",
+      "city_name": "重庆",
+      "venue_name": "Ruins入灵寺",
+      "address_candidate": "重庆市两江新区建新东路64号(轻轨9/10号线鲤鱼池站3A出口后行50米)",
+      "lineup_artists": [
+        "Daniel Maszkowicz",
+        "Daniel Maszkowicz"
+      ],
+      "music_styles": [
+        "techno",
+        "house",
+        "electro",
+        "techno",
+        "house",
+        "electro"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "Ruins入灵寺 ｜6.9 “藏在阿尔卑斯山脚仙雾中的东欧科学怪人” Daniel Maszkowicz",
+        "“藏在阿尔卑斯山脚仙雾中的东欧科学怪人” Daniel Maszkowicz 2026.6.9 20:00 免票入场 演出时长:30Min ADD:重庆Ruins入灵寺实验艺术空间",
+        "重庆市江北区建新东路与融景路交叉口西南160米/合作村国际青年社区A区13号楼",
+        "EMC:EMIbyDanielMaszkowiczCave12Genève,22.02.2026©Cave12 Olive"
+      ],
+      "ticketing_text": [
+        "免票入场"
+      ],
+      "dedupe_signals": [
+        "Ruins入灵寺 | “藏在阿尔卑斯山脚仙雾中的东欧科学怪人”  Daniel Maszkowicz",
+        "2026-06-09",
+        "重庆",
+        "Ruins入灵寺"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

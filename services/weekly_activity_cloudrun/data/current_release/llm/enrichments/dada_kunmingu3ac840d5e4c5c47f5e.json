@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "dada_kunming:c840d5e4c5c47f5e",
+  "sourceItemHash": "c80e8887446f89a144a46f77cc88ecdd4b5ed43ff1f8d879e118e6c9557ca57a",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "周五 6月5日-【DJ Ozone is Back】Stupid 80s Disco Party @Dada Kunming",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "昆明",
+      "venue_name": "Dada Kunming",
+      "address_candidate": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+      "lineup_artists": [
+        "Ozone",
+        "Ozone"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "techno",
+        "house",
+        "club trax",
+        "disco",
+        "funk",
+        "electro",
+        "pop",
+        "club trax",
+        "techno"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "周五 6月5日-【DJ Ozone is Back】Stupid 80s Disco Party @Dada Kunming",
+        "DJ Ozone is Back!!!",
+        "DJ Ozone's"
+      ],
+      "description_original_lines": [
+        "免票|FREE ENTRY",
+        "DJ Ozone is Back!!!",
+        "带来了好听的DISCO音乐",
+        "还有珍藏的黑胶唱片"
+      ],
+      "ticketing_text": [
+        "免票"
+      ],
+      "dedupe_signals": [
+        "周五 6月5日-【DJ Ozone is Back】Stupid 80s Disco Party @Dada Kunming",
+        "2026-06-05",
+        "昆明",
+        "Dada Kunming"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

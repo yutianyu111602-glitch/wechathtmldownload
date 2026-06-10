@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "account_f07ee3e4a5:02ed8ed1d6750095",
+  "sourceItemHash": "7bee9ddd3add4bde1b61c19694b3bf0248436f0380db2d5cb13ec3fbaf58d16c",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "免票！恭迎马来西亚 “财神” 驾到北京！GOEN pres. DJ KOTE LEMBU aka Mulan",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "北京",
+      "venue_name": "莫须有工厂(798新厂)Groundless Factory",
+      "address_candidate": "北京市朝阳区798艺术区706路B06-2",
+      "lineup_artists": [
+        "DJ KOTE LEMBU",
+        "DJ KOTE LEMBU"
+      ],
+      "music_styles": [
+        "techno",
+        "breaks",
+        "trance",
+        "techno",
+        "hard techno",
+        "trance",
+        "schranz",
+        "hardbounce",
+        "breaks"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "6.06｜免票！恭迎马来西亚 “财神” 驾到北京！GOEN pres. DJ KOTE LEMBU aka Mulan",
+        "6.06|免票!恭迎马来西亚 “财神” 驾到北京!GOEN pres. DJ KOTE LEMBU aka Mulan"
+      ],
+      "description_original_lines": [
+        "6.06｜免票！恭迎马来西亚 “财神” 驾到北京！GOEN pres. DJ KOTE LEMBU aka Mulan",
+        "6.06|免票!恭迎马来西亚 “财神” 驾到北京!GOEN pres. DJ KOTE LEMBU aka Mulan",
+        "½ of otakotak",
+        "propriatedistance;Whetheryouwanttostaysoberornot,makesureyourbehaviorisundercon-"
+      ],
+      "ticketing_text": [
+        "免票"
+      ],
+      "dedupe_signals": [
+        "免票！恭迎马来西亚 “财神” 驾到北京！GOEN pres. DJ KOTE LEMBU aka Mulan",
+        "2026-06-06",
+        "北京",
+        "莫须有工厂(798新厂)Groundless Factory"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

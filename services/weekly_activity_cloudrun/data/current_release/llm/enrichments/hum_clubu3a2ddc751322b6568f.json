@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "hum_club:2ddc751322b6568f",
+  "sourceItemHash": "dcb89678e73d86833105222983fb9232361d7315d7e6e272f91b2abdf591503e",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Sat. | 「请听科技舞曲」从底特律到芝加哥，从柏林到伦敦 @Hum",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "贵阳",
+      "venue_name": "贵阳市·HUMClub",
+      "address_candidate": "贵州省贵阳市云岩区普陀路街道普陀路黔达花园AB座负一层",
+      "lineup_artists": [],
+      "music_styles": [
+        "techno",
+        "trance",
+        "techno",
+        "trance"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.6 Sat.｜「请听科技舞曲」从底特律到芝加哥，从柏林到伦敦 @Hum",
+        "#Techno #Trance #4/4",
+        "Poster OCR date: 2026-05-02 / 2026-02-06 / 2026-04-06 / 2026-06-08"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "Sat. | 「请听科技舞曲」从底特律到芝加哥，从柏林到伦敦 @Hum",
+        "2026-06-06",
+        "贵阳",
+        "贵阳市·HUMClub"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

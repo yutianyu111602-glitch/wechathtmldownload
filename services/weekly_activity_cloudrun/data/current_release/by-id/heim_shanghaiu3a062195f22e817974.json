@@ -1,0 +1,141 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "heim_shanghai:062195f22e817974",
+    "event_id": "heim_shanghai:062195f22e817974",
+    "article_id": "heim_shanghai:062195f22e817974",
+    "queue_id": "heim_shanghai:062195f22e817974",
+    "title": "6.6 ✨ 𝑩𝒖𝒕𝒕𝒆𝒓𝒇𝒓𝒆𝒆闪亮姐妹乐园",
+    "title_original": "6.6 ✨ 𝑩𝒖𝒕𝒕𝒆𝒓𝒇𝒓𝒆𝒆闪亮姐妹乐园",
+    "title_display": "✨ 𝑩𝒖𝒕𝒕𝒆𝒓𝒇𝒓𝒆𝒆闪亮姐妹乐园",
+    "account": "Heim Shanghai",
+    "account_key": "heim_shanghai",
+    "promoter": "Heim Shanghai",
+    "source_article": {
+      "url_hash": "062195f22e817974",
+      "account_name": "Heim Shanghai",
+      "published_at": "2026-05-31"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "062195f22e817974"
+    },
+    "post_date": "2026-05-31",
+    "source_account_name": "Heim Shanghai",
+    "source_published_at": "2026-05-31",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_062195f22e817974--127088f95f112130291872d7.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_062195f22e817974--127088f95f112130291872d7.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_062195f22e817974--127088f95f112130291872d7.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [],
+    "venue_id": "heim_shanghai",
+    "venue_name": "Heim Shanghai",
+    "address": "上海市黄浦区长乐路462号M101",
+    "address_full": "上海市黄浦区长乐路462号M101",
+    "address_source": "venue_registry_verified",
+    "geo_lng": 121.457926,
+    "geo_lat": 31.220845,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "club trax"
+    ],
+    "music_styles": [
+      "club trax"
+    ],
+    "price": [
+      "早鸟¥66",
+      "预售¥88",
+      "现场¥120"
+    ],
+    "price_text": "早鸟¥66 / 预售¥88 / 现场¥120",
+    "ticketing_text": "早鸟¥66 / 预售¥88 / 现场¥120",
+    "evidence": [
+      "6.6 ✨ 𝑩𝒖𝒕𝒕𝒆𝒓𝒇𝒓𝒆𝒆闪亮姐妹乐园",
+      "早鸟 ¥66",
+      "预售 ¥88",
+      "现场 ¥120",
+      "2026-06-06"
+    ],
+    "description_original_lines": [
+      "6.6 ✨ 𝑩𝒖𝒕𝒕𝒆𝒓𝒇𝒓𝒆𝒆闪亮姐妹乐园",
+      "早鸟 ¥66",
+      "预售 ¥88",
+      "现场 ¥120"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "上海|heimshanghai|2026-06-06|✨闪亮姐妹乐园",
+    "detail_path": "by-id/heim_shanghaiu3a062195f22e817974.json",
+    "detail_url": "by-id/heim_shanghaiu3a062195f22e817974.json",
+    "venue_lat": 31.220845,
+    "venue_lng": 121.457926,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "frontend_verified_map_location_book",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "heim_shanghai",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_lat",
+        "geo_lng",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_062195f22e817974--127088f95f112130291872d7.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_062195f22e817974--127088f95f112130291872d7.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_062195f22e817974--127088f95f112130291872d7.png",
+    "poster_cloud_path": "weekly-posters/20260604/heim_shanghai_062195f22e817974--127088f95f112130291872d7.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_062195f22e817974--127088f95f112130291872d7.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_062195f22e817974--127088f95f112130291872d7.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_062195f22e817974--127088f95f112130291872d7.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_062195f22e817974--127088f95f112130291872d7.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_062195f22e817974--127088f95f112130291872d7.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_062195f22e817974--127088f95f112130291872d7.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/heim_shanghai_062195f22e817974--127088f95f112130291872d7.png"
+  }
+}

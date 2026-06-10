@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "illum_shanghai:959aeb6c66952794",
+  "sourceItemHash": "f124f85a8d971b5acde8f0de54f219e24b40ee1143fccd196a4d45e53c69b5be",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Fri. | 99God和BUZZin FC把天赋带到地下城",
+      "event_date_start": "2026-06-12",
+      "event_date_end": "2026-06-12",
+      "event_time_text": "10:00",
+      "city_name": "上海",
+      "venue_name": "ILLUM Shanghai",
+      "address_candidate": "上海市长宁区昭化路658号海粟文化广场D栋地下一层LG-16室",
+      "lineup_artists": [
+        "99God",
+        "BUZZin FC",
+        "99God",
+        "BUZZin FC"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "techno",
+        "house",
+        "bass",
+        "hip-hop",
+        "bass",
+        "breaks",
+        "breakbeat",
+        "house",
+        "techno"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06/12 Fri. | 99God和BUZZin FC把天赋带到地下城",
+        "用Hip-Hop 盘带，Breakbeat 变向，Bass 撞门",
+        "周五、周六"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "Fri. | 99God和BUZZin FC把天赋带到地下城",
+        "2026-06-12",
+        "上海",
+        "ILLUM Shanghai"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

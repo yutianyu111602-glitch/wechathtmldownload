@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "trust:5b3d09797685195f",
+  "sourceItemHash": "868c5d57a463c4b0693b4169a1cda6b524b90396edbdb665a63e35207a366e1d",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Wave Rave 🩴 泳池派对 06.13 ㈥ @ 阿派朗创造力星球 (朝阳公园店)",
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": null,
+      "city_name": "北京",
+      "venue_name": "TRUST 相信电音",
+      "address_candidate": null,
+      "lineup_artists": [],
+      "music_styles": [
+        "techno",
+        "house",
+        "House",
+        "Afro House",
+        "Melodic Techno",
+        "Melodic House",
+        "Tech House",
+        "Minimal House"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "TRUST × SURĀ｜Wave Rave 🩴 泳池派对 06.13 ㈥ @ 阿派朗创造力星球 (朝阳公园店)",
+        "下周六：北京的盛夏将至！澄澈池水裹挟夏日气息 “泳池派对” 来啦……",
+        "2026SURAXTRUST"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "Wave Rave 🩴 泳池派对 06.13 ㈥ @ 阿派朗创造力星球 (朝阳公园店)",
+        "2026-06-13",
+        "北京",
+        "TRUST 相信电音"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

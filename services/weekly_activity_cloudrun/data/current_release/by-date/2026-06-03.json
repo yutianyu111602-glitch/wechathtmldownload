@@ -1,0 +1,660 @@
+{
+  "schema_version": "weekly_activity_miniprogram_date.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "date": "2026-06-03",
+  "item_count": 5,
+  "items": [
+    {
+      "account": "hum_club",
+      "account_key": "hum_club",
+      "address": "贵州省贵阳市云岩区普陀路街道普陀路黔达花园AB座负一层",
+      "address_full": "贵州省贵阳市云岩区普陀路街道普陀路黔达花园AB座负一层",
+      "address_source": "venue_registry_verified",
+      "article_id": "hum_club:feb55ae3398ec107",
+      "artist_profiles": [],
+      "city": [
+        "贵阳"
+      ],
+      "city_key": "guiyang",
+      "city_keys": [
+        "guiyang"
+      ],
+      "city_name": "贵阳",
+      "content_type": "event",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+      "dedupe_key": "贵阳|humclub|2026-06-03|wedopendecksvol128dj台開放日hum",
+      "description_original_lines": [
+        "6.3 Wed.｜Open Decks Vol.128 DJ台開放日 @Hum",
+        "本周由哥叫哥提供教学"
+      ],
+      "detail_path": "by-id/hum_clubu3afeb55ae3398ec107.json",
+      "detail_url": "by-id/hum_clubu3afeb55ae3398ec107.json",
+      "dj_bio_lines": [],
+      "event_date_end": "2026-06-03",
+      "event_date_iso_guess": "2026-06-03",
+      "event_date_iso_guesses": [
+        "2026-06-03"
+      ],
+      "event_date_start": "2026-06-03",
+      "event_date_text": [
+        "2026-06-03"
+      ],
+      "event_id": "hum_club:feb55ae3398ec107",
+      "event_time_source": "",
+      "event_time_text": "",
+      "evidence": [
+        "6.3 Wed.｜Open Decks Vol.128 DJ台開放日 @Hum",
+        "2026-06-03",
+        "本周由哥叫哥提供教学"
+      ],
+      "genres": [],
+      "geo_candidate_id": "hum_guiyang",
+      "geo_coord_system": "GCJ-02",
+      "geo_lat": 26.589655,
+      "geo_lng": 106.713018,
+      "geo_source": "tencent_map_picker_user_confirmed",
+      "geo_verified_at": "2026-06-01",
+      "id": "hum_club:feb55ae3398ec107",
+      "is_calendar_preview": false,
+      "lineup": [],
+      "lineup_artists": [],
+      "music_styles": [],
+      "place_fields_locked": true,
+      "post_date": "2026-06-01",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+      "poster_source": "cloudbase_storage",
+      "price": [],
+      "price_text": "",
+      "promoter": "hum_club",
+      "publish_status": "published",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "quality_status": "READY",
+      "queue_id": "hum_club:feb55ae3398ec107",
+      "running_hours_source": "",
+      "running_hours_text": "",
+      "schema_version": "weekly_event_published.v1",
+      "source_account_name": "hum_club",
+      "source_action": {
+        "available": true,
+        "label": "公众号",
+        "type": "wechat_article",
+        "url_hash": "feb55ae3398ec107"
+      },
+      "source_article": {
+        "account_name": "hum_club",
+        "published_at": "2026-06-01",
+        "url_hash": "feb55ae3398ec107"
+      },
+      "source_published_at": "2026-06-01",
+      "ticketing_text": "",
+      "time_end": "",
+      "time_start": "",
+      "title": "6.3 Wed.｜Open Decks Vol.128 DJ台開放日 @Hum",
+      "title_display": "Wed. | Open Decks Vol.128 DJ台開放日 @Hum",
+      "title_original": "6.3 Wed.｜Open Decks Vol.128 DJ台開放日 @Hum",
+      "venue": [],
+      "venue_id": "hum_guiyang",
+      "venue_lat": 26.589655,
+      "venue_lng": 106.713018,
+      "venue_name": "hum_club",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg"
+    },
+    {
+      "account": "trust",
+      "account_key": "trust",
+      "address": "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+      "address_full": "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+      "address_source": "operator_map_picker_user_confirmed",
+      "article_id": "trust:23faaa29c19ad6eb",
+      "artist_profiles": [],
+      "city": [
+        "北京"
+      ],
+      "city_key": "beijing",
+      "city_keys": [
+        "beijing"
+      ],
+      "city_name": "北京",
+      "content_type": "event",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/trust_23faaa29c19ad6eb--3a9ecade7b96b50efa360e30.jpg",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/trust_23faaa29c19ad6eb--3a9ecade7b96b50efa360e30.jpg",
+      "dedupe_key": "北京|dadabar日坛国际贸易中心a座店|2026-06-03|clubtherapy电波疗愈0603㈢dadabeijing",
+      "description_original_lines": [
+        "TRUST｜Club Therapy 🧯 电波疗愈 06.03 ㈢ @ DADA Beijing",
+        "本周三：帮你治愈疲惫！让思绪和身体同步舒展回归轻盈的状态……"
+      ],
+      "detail_path": "by-id/trustu3a23faaa29c19ad6eb.json",
+      "detail_url": "by-id/trustu3a23faaa29c19ad6eb.json",
+      "dj_bio_lines": [],
+      "event_date_end": "2026-06-03",
+      "event_date_iso_guess": "2026-06-03",
+      "event_date_iso_guesses": [
+        "2026-06-03"
+      ],
+      "event_date_start": "2026-06-03",
+      "event_date_text": [
+        "2026-06-03"
+      ],
+      "event_id": "trust:23faaa29c19ad6eb",
+      "event_time_source": "",
+      "event_time_text": "",
+      "evidence": [
+        "TRUST｜Club Therapy 🧯 电波疗愈 06.03 ㈢ @ DADA Beijing",
+        "2026-06-03",
+        "本周三：帮你治愈疲惫！让思绪和身体同步舒展回归轻盈的状态……",
+        "dadabar(日坛国际贸易中心A座店)",
+        "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1"
+      ],
+      "genres": [
+        "hip-hop"
+      ],
+      "geo_lat": 39.920029,
+      "geo_lng": 116.441877,
+      "id": "trust:23faaa29c19ad6eb",
+      "is_calendar_preview": false,
+      "lineup": [],
+      "lineup_artists": [],
+      "music_styles": [
+        "hip-hop"
+      ],
+      "post_date": "2026-06-01",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/trust_23faaa29c19ad6eb--3a9ecade7b96b50efa360e30.jpg",
+      "poster_source": "cloudbase_storage",
+      "price": [],
+      "price_text": "",
+      "promoter": "trust",
+      "publish_status": "published",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "quality_status": "READY",
+      "queue_id": "trust:23faaa29c19ad6eb",
+      "running_hours_source": "",
+      "running_hours_text": "",
+      "schema_version": "weekly_event_published.v1",
+      "source_account_name": "trust",
+      "source_action": {
+        "available": true,
+        "label": "公众号",
+        "type": "wechat_article",
+        "url_hash": "23faaa29c19ad6eb"
+      },
+      "source_article": {
+        "account_name": "trust",
+        "published_at": "2026-06-01",
+        "url_hash": "23faaa29c19ad6eb"
+      },
+      "source_published_at": "2026-06-01",
+      "ticketing_text": "",
+      "time_end": "",
+      "time_start": "",
+      "title": "TRUST｜Club Therapy 🧯 电波疗愈 06.03 ㈢ @ DADA Beijing",
+      "title_display": "Club Therapy 🧯 电波疗愈 06.03 ㈢ @ DADA Beijing",
+      "title_original": "TRUST｜Club Therapy 🧯 电波疗愈 06.03 ㈢ @ DADA Beijing",
+      "venue": [
+        "dadabar(日坛国际贸易中心A座店)"
+      ],
+      "venue_id": "dada_bar_beijing",
+      "venue_name": "dadabar(日坛国际贸易中心A座店)",
+      "venue_lng": 116.441877,
+      "venue_lat": 39.920029,
+      "geo_coord_system": "GCJ-02",
+      "geo_source": "tencent_map_picker_user_confirmed",
+      "geo_provider": "tencent_map_picker",
+      "geo_reliability": "locked",
+      "geo_level": "poi",
+      "geo_verified_at": "2026-06-03",
+      "geo_candidate_id": "dada_bar_beijing",
+      "geo_provider_title": "dadabar(日坛国际贸易中心A座店)",
+      "geo_provider_address": "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+      "geo_reverse_address": "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+      "map_poi_name": "dadabar(日坛国际贸易中心A座店)",
+      "poi_id": "15168276600840356893",
+      "place_fields_locked": true,
+      "geo_locked": true,
+      "geo_override_reason": "2026-06-03 operator supplied map picker evidence; TRUST is label/promoter; venue is DADA Beijing.",
+      "map_search_aliases": [
+        "dadabar(日坛国际贸易中心A座店)",
+        "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1"
+      ],
+      "geo_search_aliases": [
+        "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+        "dadabar(日坛国际贸易中心A座店)"
+      ],
+      "poi_aliases": [
+        "dadabar(日坛国际贸易中心A座店)",
+        "15168276600840356893"
+      ],
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/trust_23faaa29c19ad6eb--3a9ecade7b96b50efa360e30.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/trust_23faaa29c19ad6eb--3a9ecade7b96b50efa360e30.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/trust_23faaa29c19ad6eb--3a9ecade7b96b50efa360e30.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/trust_23faaa29c19ad6eb--3a9ecade7b96b50efa360e30.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/trust_23faaa29c19ad6eb--3a9ecade7b96b50efa360e30.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/trust_23faaa29c19ad6eb--3a9ecade7b96b50efa360e30.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/trust_23faaa29c19ad6eb--3a9ecade7b96b50efa360e30.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/trust_23faaa29c19ad6eb--3a9ecade7b96b50efa360e30.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/trust_23faaa29c19ad6eb--3a9ecade7b96b50efa360e30.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/trust_23faaa29c19ad6eb--3a9ecade7b96b50efa360e30.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/trust_23faaa29c19ad6eb--3a9ecade7b96b50efa360e30.jpg"
+    },
+    {
+      "account": "yuanhe",
+      "account_key": "yuanhe",
+      "address": "北京市朝阳区西大望路27号E6-2号楼103",
+      "address_full": "北京市朝阳区西大望路27号E6-2号楼103",
+      "address_source": "venue_registry_verified",
+      "article_id": "yuanhe:dd2e9d3e9d6fb7c9",
+      "artist_profiles": [],
+      "city": [
+        "北京"
+      ],
+      "city_key": "beijing",
+      "city_keys": [
+        "beijing"
+      ],
+      "city_name": "北京",
+      "content_type": "event",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+      "dedupe_key": "北京|yuanhe|2026-06-03|周三yuanhe听点地下俱乐部听不到的",
+      "description_original_lines": [
+        "让我们把目光聚焦在泛电子音乐上，从地下说唱到各类舞曲Remix，当晚的舞池没有风格边界",
+        "从下酒出发，从音“乐”出发，周三小周末，跳在原核",
+        "Line up：",
+        "22:00-00:00:DJ rezenico"
+      ],
+      "detail_path": "by-id/yuanheu3add2e9d3e9d6fb7c9.json",
+      "detail_url": "by-id/yuanheu3add2e9d3e9d6fb7c9.json",
+      "dj_bio_lines": [],
+      "event_date_end": "2026-06-03",
+      "event_date_iso_guess": "2026-06-03",
+      "event_date_iso_guesses": [
+        "2026-06-03"
+      ],
+      "event_date_start": "2026-06-03",
+      "event_date_text": [
+        "2026-06-03"
+      ],
+      "event_id": "yuanhe:dd2e9d3e9d6fb7c9",
+      "event_time_source": "source_text",
+      "event_time_text": "04:00 - Late",
+      "evidence": [
+        "周三YuanHe 听点地下俱乐部听不到的",
+        "2026-06-03",
+        "04:00-late",
+        "让我们把目光聚焦在泛电子音乐上，从地下说唱到各类舞曲Remix，当晚的舞池没有风格边界",
+        "从下酒出发，从音“乐”出发，周三小周末，跳在原核"
+      ],
+      "genres": [
+        "hip-hop"
+      ],
+      "geo_candidate_id": "yuanhe_beijing",
+      "geo_coord_system": "GCJ-02",
+      "geo_lat": 39.885909,
+      "geo_lng": 116.481883,
+      "geo_source": "frontend_verified_map_location_book",
+      "geo_verified_at": "2026-06-01",
+      "id": "yuanhe:dd2e9d3e9d6fb7c9",
+      "is_calendar_preview": false,
+      "lineup": [],
+      "lineup_artists": [],
+      "music_styles": [
+        "hip-hop"
+      ],
+      "place_fields_locked": true,
+      "post_date": "2026-06-01",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+      "poster_source": "cloudbase_storage",
+      "price": [],
+      "price_text": "",
+      "promoter": "yuanhe",
+      "publish_status": "published",
+      "quality_flags": [],
+      "quality_status": "READY",
+      "queue_id": "yuanhe:dd2e9d3e9d6fb7c9",
+      "running_hours_source": "source_text",
+      "running_hours_text": "04:00 - Late",
+      "schema_version": "weekly_event_published.v1",
+      "source_account_name": "yuanhe",
+      "source_action": {
+        "available": true,
+        "label": "公众号",
+        "type": "wechat_article",
+        "url_hash": "dd2e9d3e9d6fb7c9"
+      },
+      "source_article": {
+        "account_name": "yuanhe",
+        "published_at": "2026-06-01",
+        "url_hash": "dd2e9d3e9d6fb7c9"
+      },
+      "source_published_at": "2026-06-01",
+      "ticketing_text": "",
+      "time_end": "Late",
+      "time_start": "04:00",
+      "title": "周三YuanHe 听点地下俱乐部听不到的",
+      "title_display": "周三YuanHe 听点地下俱乐部听不到的",
+      "title_original": "周三YuanHe 听点地下俱乐部听不到的",
+      "venue": [],
+      "venue_id": "yuanhe_beijing",
+      "venue_lat": 39.885909,
+      "venue_lng": 116.481883,
+      "venue_name": "yuanhe",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/yuanhe_dd2e9d3e9d6fb7c9--aaa5ab61b8198d9593e9945c.jpg"
+    },
+    {
+      "account": "cicipark",
+      "account_key": "cicipark",
+      "address": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+      "address_full": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+      "address_source": "operator_map_picker_user_confirmed",
+      "article_id": "cicipark:b1fac5fca263cde3",
+      "artist_profiles": [],
+      "city": [
+        "重庆"
+      ],
+      "city_key": "chongqing",
+      "city_keys": [
+        "chongqing"
+      ],
+      "city_name": "重庆",
+      "content_type": "event",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "dedupe_key": "重庆|重庆开埠遗址公园2号停车场|2026-06-03|opendeckcicipark",
+      "description_original_lines": [
+        "6.03周三｜Open Deck @cicipark",
+        "重庆开埠遗址公园2号停车场",
+        "音乐·唱片·美酒·波比球",
+        "好吃·好喝·好玩·好音乐"
+      ],
+      "detail_path": "by-id/ciciparku3ab1fac5fca263cde3.json",
+      "detail_url": "by-id/ciciparku3ab1fac5fca263cde3.json",
+      "dj_bio_lines": [],
+      "event_date_end": "2026-06-03",
+      "event_date_iso_guess": "2026-06-03",
+      "event_date_iso_guesses": [
+        "2026-06-03"
+      ],
+      "event_date_start": "2026-06-03",
+      "event_date_text": [
+        "2026-06-03"
+      ],
+      "event_id": "cicipark:b1fac5fca263cde3",
+      "event_time_source": "source_text",
+      "event_time_text": "22:00-23:00",
+      "evidence": [
+        "6.03周三｜Open Deck @cicipark",
+        "2026-06-03",
+        "22:00-23:00",
+        "重庆开埠遗址公园2号停车场",
+        "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右"
+      ],
+      "genres": [],
+      "geo_lat": 29.55206,
+      "geo_lng": 106.592744,
+      "id": "cicipark:b1fac5fca263cde3",
+      "is_calendar_preview": false,
+      "lineup": [],
+      "lineup_artists": [],
+      "music_styles": [],
+      "post_date": "2026-06-02",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "poster_source": "cloudbase_storage",
+      "price": [],
+      "price_text": "",
+      "promoter": "cicipark",
+      "publish_status": "published",
+      "quality_flags": [],
+      "quality_status": "READY",
+      "queue_id": "cicipark:b1fac5fca263cde3",
+      "running_hours_source": "source_text",
+      "running_hours_text": "22:00-23:00",
+      "schema_version": "weekly_event_published.v1",
+      "source_account_name": "cicipark",
+      "source_action": {
+        "available": true,
+        "label": "公众号",
+        "type": "wechat_article",
+        "url_hash": "b1fac5fca263cde3"
+      },
+      "source_article": {
+        "account_name": "cicipark",
+        "published_at": "2026-06-02",
+        "url_hash": "b1fac5fca263cde3"
+      },
+      "source_published_at": "2026-06-02",
+      "ticketing_text": "",
+      "time_end": "23:00",
+      "time_start": "22:00",
+      "title": "6.03周三｜Open Deck @cicipark",
+      "title_display": "Open Deck @cicipark",
+      "title_original": "6.03周三｜Open Deck @cicipark",
+      "venue": [
+        "重庆开埠遗址公园2号停车场"
+      ],
+      "venue_id": "cicipark_chongqing",
+      "venue_name": "重庆开埠遗址公园2号停车场",
+      "venue_lng": 106.592744,
+      "venue_lat": 29.55206,
+      "geo_coord_system": "GCJ-02",
+      "geo_source": "tencent_map_picker_user_confirmed",
+      "geo_provider": "tencent_map_picker",
+      "geo_reliability": "locked",
+      "geo_level": "poi",
+      "geo_verified_at": "2026-06-03",
+      "geo_candidate_id": "cicipark_chongqing",
+      "geo_provider_title": "cicipark",
+      "geo_provider_address": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+      "geo_reverse_address": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+      "map_poi_name": "cicipark",
+      "poi_id": "8135527839569863634",
+      "place_fields_locked": true,
+      "geo_locked": true,
+      "geo_override_reason": "2026-06-03 operator supplied cicipark POI/address/GCJ-02 coordinate; explicit override of prior cicipark registry/current address drift; POI ID 8135527839569863634.",
+      "map_search_aliases": [
+        "cicipark",
+        "重庆开埠遗址公园2号停车场",
+        "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右"
+      ],
+      "geo_search_aliases": [
+        "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+        "重庆开埠遗址公园2号停车场",
+        "cicipark"
+      ],
+      "poi_aliases": [
+        "cicipark",
+        "重庆开埠遗址公园2号停车场",
+        "8135527839569863634"
+      ],
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg"
+    },
+    {
+      "account": "crazy_track",
+      "account_key": "crazy_track",
+      "address": "北京市朝阳区751园区火车街区3号车厢",
+      "address_full": "北京市朝阳区751园区火车街区3号车厢",
+      "address_source": "operator_map_picker_user_confirmed",
+      "article_id": "crazy_track:4d88449f5439d261",
+      "artist_profiles": [],
+      "city": [
+        "北京"
+      ],
+      "city_key": "beijing",
+      "city_keys": [
+        "beijing"
+      ],
+      "city_name": "北京",
+      "content_type": "event",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/crazy_track_4d88449f5439d261--c554993f8db675fb103ce994.jpg",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/crazy_track_4d88449f5439d261--c554993f8db675fb103ce994.jpg",
+      "dedupe_key": "北京|track|2026-06-03|周三注意！旋律热浪扑面袭来",
+      "description_original_lines": [
+        "6月3日·周三：注意！旋律热浪扑面袭来"
+      ],
+      "detail_path": "by-id/crazy_tracku3a4d88449f5439d261.json",
+      "detail_url": "by-id/crazy_tracku3a4d88449f5439d261.json",
+      "dj_bio_lines": [],
+      "event_date_end": "2026-06-03",
+      "event_date_iso_guess": "2026-06-03",
+      "event_date_iso_guesses": [
+        "2026-06-03"
+      ],
+      "event_date_start": "2026-06-03",
+      "event_date_text": [
+        "2026-06-03"
+      ],
+      "event_id": "crazy_track:4d88449f5439d261",
+      "event_time_source": "",
+      "event_time_text": "",
+      "evidence": [
+        "6月3日·周三：注意！旋律热浪扑面袭来",
+        "2026-06-03",
+        "TRACK",
+        "北京市朝阳区751园区火车街区3号车厢"
+      ],
+      "genres": [],
+      "geo_lat": 39.983586,
+      "geo_lng": 116.497805,
+      "id": "crazy_track:4d88449f5439d261",
+      "is_calendar_preview": false,
+      "lineup": [],
+      "lineup_artists": [],
+      "music_styles": [],
+      "post_date": "2026-06-02",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/crazy_track_4d88449f5439d261--c554993f8db675fb103ce994.jpg",
+      "poster_source": "cloudbase_storage",
+      "price": [],
+      "price_text": "",
+      "promoter": "crazy_track",
+      "publish_status": "published",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "quality_status": "READY",
+      "queue_id": "crazy_track:4d88449f5439d261",
+      "running_hours_source": "",
+      "running_hours_text": "",
+      "schema_version": "weekly_event_published.v1",
+      "source_account_name": "crazy_track",
+      "source_action": {
+        "available": true,
+        "label": "公众号",
+        "type": "wechat_article",
+        "url_hash": "4d88449f5439d261"
+      },
+      "source_article": {
+        "account_name": "crazy_track",
+        "published_at": "2026-06-02",
+        "url_hash": "4d88449f5439d261"
+      },
+      "source_published_at": "2026-06-02",
+      "ticketing_text": "",
+      "time_end": "",
+      "time_start": "",
+      "title": "6月3日·周三：注意！旋律热浪扑面袭来",
+      "title_display": "周三：注意！旋律热浪扑面袭来",
+      "title_original": "6月3日·周三：注意！旋律热浪扑面袭来",
+      "venue": [
+        "TRACK"
+      ],
+      "venue_id": "track_beijing",
+      "venue_name": "TRACK",
+      "venue_lng": 116.497805,
+      "venue_lat": 39.983586,
+      "geo_coord_system": "GCJ-02",
+      "geo_source": "tencent_map_picker_user_confirmed",
+      "geo_provider": "tencent_map_picker",
+      "geo_reliability": "locked",
+      "geo_level": "poi",
+      "geo_verified_at": "2026-06-03",
+      "geo_candidate_id": "track_beijing",
+      "geo_provider_title": "TRACK",
+      "geo_provider_address": "北京市朝阳区751园区火车街区3号车厢",
+      "geo_reverse_address": "北京市朝阳区751园区火车街区3号车厢",
+      "map_poi_name": "TRACK",
+      "poi_id": "2743077798981180295",
+      "place_fields_locked": true,
+      "geo_locked": true,
+      "geo_override_reason": "2026-06-03 operator supplied map picker evidence; Venue resolved to TRACK; account/label is not venue.",
+      "map_search_aliases": [
+        "TRACK",
+        "北京市朝阳区751园区火车街区3号车厢"
+      ],
+      "geo_search_aliases": [
+        "北京市朝阳区751园区火车街区3号车厢",
+        "TRACK"
+      ],
+      "poi_aliases": [
+        "TRACK",
+        "2743077798981180295"
+      ],
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/crazy_track_4d88449f5439d261--c554993f8db675fb103ce994.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/crazy_track_4d88449f5439d261--c554993f8db675fb103ce994.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/crazy_track_4d88449f5439d261--c554993f8db675fb103ce994.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/crazy_track_4d88449f5439d261--c554993f8db675fb103ce994.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/crazy_track_4d88449f5439d261--c554993f8db675fb103ce994.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/crazy_track_4d88449f5439d261--c554993f8db675fb103ce994.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/crazy_track_4d88449f5439d261--c554993f8db675fb103ce994.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/crazy_track_4d88449f5439d261--c554993f8db675fb103ce994.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/crazy_track_4d88449f5439d261--c554993f8db675fb103ce994.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/crazy_track_4d88449f5439d261--c554993f8db675fb103ce994.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/crazy_track_4d88449f5439d261--c554993f8db675fb103ce994.jpg"
+    }
+  ]
+}

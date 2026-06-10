@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "nuts:ca5535e940ae0465",
+  "sourceItemHash": "c148fcdc2a44e0db9a6bcfca72b64021c831d86dee82b02c6b4020ebd333e81d",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "NO RUSH！慢热如何？ | STILL UP",
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": "22:30",
+      "city_name": "重庆",
+      "venue_name": "坚果NUTS",
+      "address_candidate": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "lineup_artists": [],
+      "music_styles": [
+        "techno",
+        "house",
+        "trance",
+        "disco",
+        "disco",
+        "house",
+        "tribal house",
+        "deep techno",
+        "psytrance"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6/13 22:30",
+        "@STILL UP",
+        "2026.6.13 22:30"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "NO RUSH！慢热如何？ | STILL UP",
+        "2026-06-13",
+        "重庆",
+        "坚果NUTS"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

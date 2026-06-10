@@ -1,0 +1,143 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "wigwam:ac93945f01f913b1",
+    "event_id": "wigwam:ac93945f01f913b1",
+    "article_id": "wigwam:ac93945f01f913b1",
+    "queue_id": "wigwam:ac93945f01f913b1",
+    "title": "今晚 Listening 🔮 w/ Notte Infinita",
+    "title_original": "今晚 Listening 🔮 w/ Notte Infinita",
+    "title_display": "Listening 🔮 w/ Notte Infinita",
+    "account": "wigwam",
+    "account_key": "wigwam",
+    "promoter": "wigwam",
+    "source_article": {
+      "url_hash": "ac93945f01f913b1",
+      "account_name": "wigwam",
+      "published_at": "2026-06-04"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "ac93945f01f913b1"
+    },
+    "post_date": "2026-06-04",
+    "source_account_name": "wigwam",
+    "source_published_at": "2026-06-04",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_ac93945f01f913b1--7d64ebe71023651365fe5d26.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_ac93945f01f913b1--7d64ebe71023651365fe5d26.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_ac93945f01f913b1--7d64ebe71023651365fe5d26.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-04"
+    ],
+    "event_date_iso_guess": "2026-06-04",
+    "event_date_iso_guesses": [
+      "2026-06-04"
+    ],
+    "event_date_start": "2026-06-04",
+    "event_date_end": "2026-06-04",
+    "event_time_text": "03:00",
+    "event_time_source": "source_text",
+    "time_start": "03:00",
+    "time_end": "",
+    "running_hours_text": "03:00",
+    "running_hours_source": "source_text",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [],
+    "venue_id": "wigwam_shanghai",
+    "venue_name": "wigwam",
+    "address": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+    "address_full": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+    "address_source": "manual_registry",
+    "geo_lng": 121.419529,
+    "geo_lat": 31.210481,
+    "lineup": [
+      "Notte Infinita"
+    ],
+    "lineup_artists": [
+      "Notte Infinita"
+    ],
+    "genres": [],
+    "music_styles": [],
+    "price": [
+      "免票入场"
+    ],
+    "price_text": "免票入场",
+    "ticketing_text": "免票入场",
+    "evidence": [
+      "今晚 Listening 🔮 w/ Notte Infinita",
+      "Free Entry",
+      "2026-06-04",
+      "Opening Hours",
+      "Poster OCR time: 03:00"
+    ],
+    "description_original_lines": [
+      "今晚 Listening 🔮 w/ Notte Infinita",
+      "Free Entry",
+      "Opening Hours",
+      "Poster OCR time: 03:00"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "上海|wigwam|2026-06-04|listeningwnotteinfinita",
+    "detail_path": "by-id/wigwamu3aac93945f01f913b1.json",
+    "detail_url": "by-id/wigwamu3aac93945f01f913b1.json",
+    "merge_provenance": {
+      "schema_version": "weekly_merge_provenance.v1",
+      "reason": "duplicate_cluster",
+      "retained_id": "wigwam:ac93945f01f913b1",
+      "retained_source_hash": "ac93945f01f913b1",
+      "merged_from": [
+        "wigwam:ac93945f01f913b1"
+      ],
+      "merged_source_hashes": [
+        "ac93945f01f913b1"
+      ],
+      "source_count": 1,
+      "sources": [
+        {
+          "event_id": "wigwam:ac93945f01f913b1",
+          "source_hash": "ac93945f01f913b1",
+          "title": "Listening 🔮 w/ Notte Infinita",
+          "published_at": "2026-06-04",
+          "account_name": "wigwam",
+          "source_type": "wechat_article"
+        }
+      ]
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_ac93945f01f913b1--7d64ebe71023651365fe5d26.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_ac93945f01f913b1--7d64ebe71023651365fe5d26.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_ac93945f01f913b1--7d64ebe71023651365fe5d26.png",
+    "poster_cloud_path": "weekly-posters/20260604/wigwam_ac93945f01f913b1--7d64ebe71023651365fe5d26.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_ac93945f01f913b1--7d64ebe71023651365fe5d26.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_ac93945f01f913b1--7d64ebe71023651365fe5d26.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_ac93945f01f913b1--7d64ebe71023651365fe5d26.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_ac93945f01f913b1--7d64ebe71023651365fe5d26.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_ac93945f01f913b1--7d64ebe71023651365fe5d26.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_ac93945f01f913b1--7d64ebe71023651365fe5d26.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/wigwam_ac93945f01f913b1--7d64ebe71023651365fe5d26.png"
+  }
+}

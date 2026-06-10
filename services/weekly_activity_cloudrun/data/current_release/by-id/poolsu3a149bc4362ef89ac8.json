@@ -1,0 +1,174 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "pools:149bc4362ef89ac8",
+    "event_id": "pools:149bc4362ef89ac8",
+    "article_id": "pools:149bc4362ef89ac8",
+    "queue_id": "pools:149bc4362ef89ac8",
+    "title": "06.05 周五｜Love Bang 16-Year Anniversary｜大理站",
+    "title_original": "06.05 周五｜Love Bang 16-Year Anniversary｜大理站",
+    "title_display": "Love Bang 16-Year Anniversary | 大理站",
+    "account": "POOLS",
+    "account_key": "pools",
+    "promoter": "POOLS",
+    "source_article": {
+      "url_hash": "149bc4362ef89ac8",
+      "account_name": "POOLS",
+      "published_at": "2026-06-04"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "149bc4362ef89ac8"
+    },
+    "post_date": "2026-06-04",
+    "source_account_name": "POOLS",
+    "source_published_at": "2026-06-04",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_149bc4362ef89ac8--33d1df0f14ce9684a64195da.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_149bc4362ef89ac8--33d1df0f14ce9684a64195da.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_149bc4362ef89ac8--33d1df0f14ce9684a64195da.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "大理"
+    ],
+    "city_key": "dali",
+    "city_name": "大理",
+    "city_keys": [
+      "dali"
+    ],
+    "venue": [],
+    "venue_id": "pools_dali",
+    "venue_name": "POOLS",
+    "address": "云南省大理白族自治州大理市下关街道洱河南路下关金港中民城市广场B幢1-58号",
+    "address_full": "云南省大理白族自治州大理市下关街道洱河南路下关金港中民城市广场B幢1-58号",
+    "address_source": "manual_user_confirmed_map_crosscheck",
+    "geo_lng": 100.227515,
+    "geo_lat": 25.596385,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "06.05 周五｜Love Bang 16-Year Anniversary｜大理站",
+      "2026-06-05",
+      "LOVE BANG十六岁了！！！"
+    ],
+    "description_original_lines": [
+      "06.05 周五｜Love Bang 16-Year Anniversary｜大理站",
+      "LOVE BANG十六岁了！！！"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "大理|pools|2026-06-05|lovebang16yearanniversary大理站",
+    "detail_path": "by-id/poolsu3a149bc4362ef89ac8.json",
+    "detail_url": "by-id/poolsu3a149bc4362ef89ac8.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_149bc4362ef89ac8--33d1df0f14ce9684a64195da.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_149bc4362ef89ac8--33d1df0f14ce9684a64195da.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_149bc4362ef89ac8--33d1df0f14ce9684a64195da.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/pools_149bc4362ef89ac8--33d1df0f14ce9684a64195da.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_149bc4362ef89ac8--33d1df0f14ce9684a64195da.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_149bc4362ef89ac8--33d1df0f14ce9684a64195da.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_149bc4362ef89ac8--33d1df0f14ce9684a64195da.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_149bc4362ef89ac8--33d1df0f14ce9684a64195da.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_149bc4362ef89ac8--33d1df0f14ce9684a64195da.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_149bc4362ef89ac8--33d1df0f14ce9684a64195da.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pools_149bc4362ef89ac8--33d1df0f14ce9684a64195da.jpg",
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "user_tencent_map_picker_confirmed",
+    "geo_provider": "user_tencent_map_picker",
+    "geo_provider_title": "Love POOLS",
+    "geo_provider_address": "云南省大理白族自治州大理市下关街道洱河南路下关金港中民城市广场B幢1-58号",
+    "geo_reverse_address": "云南省大理白族自治州大理市下关街道洱河南路下关金港中民城市广场B幢1-58号",
+    "place_fields_locked": true,
+    "geo_locked": true,
+    "geo_override_reason": "User confirmed POOLS exists in Dali; Shanghai POOLS is invalid for these POOLS rows.",
+    "poi_id": "1816199312489970978",
+    "map_poi_name": "Love POOLS",
+    "map_search_aliases": [
+      "POOLS 大理",
+      "Love POOLS",
+      "大理 POOLS",
+      "下关金港中民城市广场 POOLS"
+    ],
+    "geo_search_aliases": [
+      "POOLS 大理",
+      "Love POOLS",
+      "大理 POOLS",
+      "下关金港中民城市广场 POOLS"
+    ],
+    "poi_aliases": [
+      "POOLS 大理",
+      "Love POOLS",
+      "大理 POOLS",
+      "下关金港中民城市广场 POOLS"
+    ],
+    "venue_lat": 25.596385,
+    "venue_lng": 100.227515,
+    "geo_verified_at": "2026-06-06T15:28:01+0800",
+    "geo_candidate_id": "manual-20260606-pools-dali",
+    "merge_provenance": {
+      "schema_version": "weekly_merge_provenance.v1",
+      "reason": "duplicate_cluster",
+      "retained_id": "pools:149bc4362ef89ac8",
+      "retained_source_hash": "149bc4362ef89ac8",
+      "merged_from": [
+        "pools:715a430858ed5184",
+        "pools:149bc4362ef89ac8"
+      ],
+      "merged_source_hashes": [
+        "149bc4362ef89ac8",
+        "715a430858ed5184"
+      ],
+      "source_count": 2,
+      "sources": [
+        {
+          "event_id": "pools:715a430858ed5184",
+          "source_hash": "715a430858ed5184",
+          "title": "Love Bang 16-Year Anniversary | 大理站",
+          "published_at": "2026-06-02",
+          "account_name": "pools",
+          "source_type": "wechat_article"
+        },
+        {
+          "event_id": "pools:149bc4362ef89ac8",
+          "source_hash": "149bc4362ef89ac8",
+          "title": "Love Bang 16-Year Anniversary | 大理站",
+          "published_at": "2026-06-04",
+          "account_name": "POOLS",
+          "source_type": "wechat_article"
+        }
+      ]
+    }
+  }
+}

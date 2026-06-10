@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "loopy_club:e7da5a40f9fbbf2c:schedule:20260606:1",
+  "sourceItemHash": "3417d4c08a03e8f785273b3e8c279772af17e245efc35bcb2306fed69d80585a",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "loopy / 杭州 Hangzhou",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "22:30",
+      "city_name": "杭州",
+      "venue_name": "loopy Club",
+      "address_candidate": "浙江省杭州市西湖区天目山路398号天目里7号楼负一层",
+      "lineup_artists": [
+        "akkoii",
+        "akkoii"
+      ],
+      "music_styles": [
+        "techno",
+        "house",
+        "electro",
+        "disco",
+        "techno",
+        "electro",
+        "ambient",
+        "house",
+        "boogie",
+        "disco"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "akkoii 的工作在空间运营与 DJ 之间",
+        "DJ时，akkoii 偏向低调且自然的叙事，在 ambient、electro 与 techno 的节奏间寻找平衡",
+        "Tour Support DJ: Paradice Sinema",
+        "Paradice Sinema 是一位常驻北京的 DJ，也是 Fountain 派对主理人"
+      ],
+      "description_original_lines": [
+        "loopy Club｜06.06 — loopy / 杭州 Hangzhou",
+        "杭州市西湖区天目里B1-01",
+        "06.06 — loopy / 杭州 Hangzhou",
+        "with akkoii"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "loopy / 杭州 Hangzhou",
+        "2026-06-06",
+        "杭州",
+        "loopy Club"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

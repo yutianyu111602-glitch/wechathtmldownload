@@ -1,0 +1,845 @@
+{
+  "schema_version": "weekly_activity_miniprogram_city.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "city_key": "kunming",
+  "city": "昆明",
+  "item_count": 6,
+  "items": [
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "dada_kunming:184ee4194079c5c6",
+      "event_id": "dada_kunming:184ee4194079c5c6",
+      "article_id": "dada_kunming:184ee4194079c5c6",
+      "queue_id": "dada_kunming:184ee4194079c5c6",
+      "title": "周四 6月4日- 第二季【学打碟】DJ Training Workshop第十堂课@Dada Kunming",
+      "title_original": "周四 6月4日- 第二季【学打碟】DJ Training Workshop第十堂课@Dada Kunming",
+      "title_display": "周四 6月4日- 第二季【学打碟】DJ Training Workshop第十堂课@Dada Kunming",
+      "account": "Dada Kunming",
+      "account_key": "dada_kunming",
+      "promoter": "Dada Kunming",
+      "source_article": {
+        "url_hash": "184ee4194079c5c6",
+        "account_name": "Dada Kunming",
+        "published_at": "2026-06-03"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "184ee4194079c5c6"
+      },
+      "post_date": "2026-06-03",
+      "source_account_name": "Dada Kunming",
+      "source_published_at": "2026-06-03",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-04"
+      ],
+      "event_date_iso_guess": "2026-06-04",
+      "event_date_iso_guesses": [
+        "2026-06-04"
+      ],
+      "event_date_start": "2026-06-04",
+      "event_date_end": "2026-06-04",
+      "event_time_text": "21:00 - Late",
+      "event_time_source": "source_text",
+      "time_start": "21:00",
+      "time_end": "Late",
+      "running_hours_text": "21:00 - Late",
+      "running_hours_source": "source_text",
+      "city": [
+        "昆明"
+      ],
+      "city_key": "kunming",
+      "city_name": "昆明",
+      "city_keys": [
+        "kunming"
+      ],
+      "venue": [],
+      "venue_id": "dada_kunming",
+      "venue_name": "Dada Kunming",
+      "address": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+      "address_full": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+      "address_source": "manual_registry",
+      "geo_lng": 102.691192,
+      "geo_lat": 25.053387,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "周四 6月4日- 第二季【学打碟】DJ Training Workshop第十堂课@Dada Kunming",
+        "2026-06-04",
+        "一起实现一个音乐的小理想"
+      ],
+      "description_original_lines": [
+        "一起实现一个音乐的小理想",
+        "WED. - SUN. & National Holidays",
+        "Poster OCR time: 21:00 - Late",
+        "Poster OCR address: Eebarh Ase Qo Quarsskre Ror 2F, Block 9, No.4 East Hong Shan Lu"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "昆明|dadakunming|2026-06-04|周四6月4日第二季学打碟djtrainingworkshop第十堂课dadakunming",
+      "detail_path": "by-id/dada_kunmingu3a184ee4194079c5c6.json",
+      "detail_url": "by-id/dada_kunmingu3a184ee4194079c5c6.json",
+      "merge_provenance": {
+        "schema_version": "weekly_merge_provenance.v1",
+        "reason": "duplicate_cluster",
+        "retained_id": "dada_kunming:184ee4194079c5c6",
+        "retained_source_hash": "184ee4194079c5c6",
+        "merged_from": [
+          "dada_kunming:f96617a2a1a23f9d",
+          "dada_kunming:184ee4194079c5c6"
+        ],
+        "merged_source_hashes": [
+          "184ee4194079c5c6",
+          "f96617a2a1a23f9d"
+        ],
+        "source_count": 2,
+        "sources": [
+          {
+            "event_id": "dada_kunming:f96617a2a1a23f9d",
+            "source_hash": "f96617a2a1a23f9d",
+            "title": "周四 6月4日- 第二季【学打碟】DJ Training Workshop第十堂课@Dada Kunming",
+            "published_at": "2026-06-02",
+            "account_name": "dada_kunming",
+            "source_type": "wechat_article"
+          },
+          {
+            "event_id": "dada_kunming:184ee4194079c5c6",
+            "source_hash": "184ee4194079c5c6",
+            "title": "周四 6月4日- 第二季【学打碟】DJ Training Workshop第十堂课@Dada Kunming",
+            "published_at": "2026-06-03",
+            "account_name": "Dada Kunming",
+            "source_type": "wechat_article"
+          }
+        ]
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_184ee4194079c5c6--445653ab9298c1f6c055e399.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "vervo:c36953658ecace79",
+      "event_id": "vervo:c36953658ecace79",
+      "article_id": "vervo:c36953658ecace79",
+      "queue_id": "vervo:c36953658ecace79",
+      "title": "6.5·周五｜BassHead：低音先行，万物皆可重组",
+      "title_original": "6.5·周五｜BassHead：低音先行，万物皆可重组",
+      "title_display": "周五 | BassHead：低音先行，万物皆可重组",
+      "account": "VERVO国际独立电音俱乐部",
+      "account_key": "vervo",
+      "promoter": "VERVO国际独立电音俱乐部",
+      "source_article": {
+        "url_hash": "c36953658ecace79",
+        "account_name": "VERVO国际独立电音俱乐部",
+        "published_at": "2026-06-03"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "c36953658ecace79"
+      },
+      "post_date": "2026-06-03",
+      "source_account_name": "VERVO国际独立电音俱乐部",
+      "source_published_at": "2026-06-03",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-05"
+      ],
+      "event_date_iso_guess": "2026-06-05",
+      "event_date_iso_guesses": [
+        "2026-06-05"
+      ],
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "FridayAT 22:30-END",
+      "event_time_source": "source_text",
+      "time_start": "FridayAT 22:30-END",
+      "time_end": "",
+      "running_hours_text": "FridayAT 22:30-END",
+      "running_hours_source": "source_text",
+      "city": [
+        "昆明"
+      ],
+      "city_key": "kunming",
+      "city_name": "昆明",
+      "city_keys": [
+        "kunming"
+      ],
+      "venue": [],
+      "venue_id": "vervo_kunming",
+      "venue_name": "VERVO",
+      "address": "云南省昆明市五华区钱王街51号正义坊购物中心北馆",
+      "address_full": "云南省昆明市五华区钱王街51号正义坊购物中心北馆",
+      "address_source": "manual_registry",
+      "geo_lng": 102.709282,
+      "geo_lat": 25.040556,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [
+        "bass"
+      ],
+      "music_styles": [
+        "bass"
+      ],
+      "price": [
+        "Free Entry"
+      ],
+      "price_text": "Free Entry",
+      "ticketing_text": "Free Entry",
+      "evidence": [
+        "6.5·周五｜BassHead：低音先行，万物皆可重组",
+        "2026-06-05",
+        "如果声音有形状，那一定是 BassHead 现场不断扩张的波形"
+      ],
+      "description_original_lines": [
+        "6.5·周五｜BassHead：低音先行，万物皆可重组",
+        "如果声音有形状，那一定是 BassHead 现场不断扩张的波形",
+        "FridayAT 22:30-END Free Entry",
+        "Poster OCR date: 2026-06-05 / 2026-06-06 / 2026-06-08 / 2026-06-07"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "昆明|vervo|2026-06-05|周五basshead低音先行万物皆可重组",
+      "detail_path": "by-id/vervou3ac36953658ecace79.json",
+      "detail_url": "by-id/vervou3ac36953658ecace79.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+      "poster_cloud_path": "weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "dada_kunming:c840d5e4c5c47f5e",
+      "event_id": "dada_kunming:c840d5e4c5c47f5e",
+      "article_id": "dada_kunming:c840d5e4c5c47f5e",
+      "queue_id": "dada_kunming:c840d5e4c5c47f5e",
+      "title": "周五 6月5日-【DJ Ozone is Back】Stupid 80s Disco Party @Dada Kunming",
+      "title_original": "周五 6月5日-【DJ Ozone is Back】Stupid 80s Disco Party @Dada Kunming",
+      "title_display": "周五 6月5日-【DJ Ozone is Back】Stupid 80s Disco Party @Dada Kunming",
+      "account": "Dada Kunming",
+      "account_key": "dada_kunming",
+      "promoter": "Dada Kunming",
+      "source_article": {
+        "url_hash": "c840d5e4c5c47f5e",
+        "account_name": "Dada Kunming",
+        "published_at": "2026-06-03"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "c840d5e4c5c47f5e"
+      },
+      "post_date": "2026-06-03",
+      "source_account_name": "Dada Kunming",
+      "source_published_at": "2026-06-03",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_c840d5e4c5c47f5e--18726239ad61822310feea3b.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_c840d5e4c5c47f5e--18726239ad61822310feea3b.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_c840d5e4c5c47f5e--18726239ad61822310feea3b.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-05"
+      ],
+      "event_date_iso_guess": "2026-06-05",
+      "event_date_iso_guesses": [
+        "2026-06-05"
+      ],
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "昆明"
+      ],
+      "city_key": "kunming",
+      "city_name": "昆明",
+      "city_keys": [
+        "kunming"
+      ],
+      "venue": [],
+      "venue_id": "dada_kunming",
+      "venue_name": "Dada Kunming",
+      "address": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+      "address_full": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+      "address_source": "manual_registry",
+      "geo_lng": 102.691192,
+      "geo_lat": 25.053387,
+      "lineup": [
+        "Ozone"
+      ],
+      "lineup_artists": [
+        "Ozone"
+      ],
+      "genres": [
+        "disco",
+        "funk",
+        "electro",
+        "pop",
+        "club trax",
+        "techno"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "techno",
+        "house",
+        "club trax"
+      ],
+      "price": [
+        "免票"
+      ],
+      "price_text": "免票",
+      "ticketing_text": "免票",
+      "evidence": [
+        "周五 6月5日-【DJ Ozone is Back】Stupid 80s Disco Party @Dada Kunming",
+        "免票|FREE ENTRY",
+        "2026-06-05",
+        "DJ Ozone is Back!!!",
+        "带来了好听的DISCO音乐"
+      ],
+      "description_original_lines": [
+        "免票|FREE ENTRY",
+        "DJ Ozone is Back!!!",
+        "带来了好听的DISCO音乐",
+        "还有珍藏的黑胶唱片"
+      ],
+      "dj_bio_lines": [
+        "周五 6月5日-【DJ Ozone is Back】Stupid 80s Disco Party @Dada Kunming",
+        "DJ Ozone is Back!!!",
+        "DJ Ozone's"
+      ],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "昆明|dadakunming|2026-06-05|周五6月5日djozoneisbackstupid80sdiscopartydadakunming",
+      "detail_path": "by-id/dada_kunmingu3ac840d5e4c5c47f5e.json",
+      "detail_url": "by-id/dada_kunmingu3ac840d5e4c5c47f5e.json",
+      "merge_provenance": {
+        "schema_version": "weekly_merge_provenance.v1",
+        "reason": "duplicate_cluster",
+        "retained_id": "dada_kunming:c840d5e4c5c47f5e",
+        "retained_source_hash": "c840d5e4c5c47f5e",
+        "merged_from": [
+          "dada_kunming:3e582ca27409b058",
+          "dada_kunming:c840d5e4c5c47f5e"
+        ],
+        "merged_source_hashes": [
+          "3e582ca27409b058",
+          "c840d5e4c5c47f5e"
+        ],
+        "source_count": 2,
+        "sources": [
+          {
+            "event_id": "dada_kunming:3e582ca27409b058",
+            "source_hash": "3e582ca27409b058",
+            "title": "周五 6月5日-【DJ Ozone is Back】Stupid 80s Disco Party @Dada Kunming",
+            "published_at": "2026-06-02",
+            "account_name": "dada_kunming",
+            "source_type": "wechat_article"
+          },
+          {
+            "event_id": "dada_kunming:c840d5e4c5c47f5e",
+            "source_hash": "c840d5e4c5c47f5e",
+            "title": "周五 6月5日-【DJ Ozone is Back】Stupid 80s Disco Party @Dada Kunming",
+            "published_at": "2026-06-03",
+            "account_name": "Dada Kunming",
+            "source_type": "wechat_article"
+          }
+        ]
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_c840d5e4c5c47f5e--18726239ad61822310feea3b.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_c840d5e4c5c47f5e--18726239ad61822310feea3b.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_c840d5e4c5c47f5e--18726239ad61822310feea3b.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/dada_kunming_c840d5e4c5c47f5e--18726239ad61822310feea3b.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_c840d5e4c5c47f5e--18726239ad61822310feea3b.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_c840d5e4c5c47f5e--18726239ad61822310feea3b.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_c840d5e4c5c47f5e--18726239ad61822310feea3b.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_c840d5e4c5c47f5e--18726239ad61822310feea3b.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_c840d5e4c5c47f5e--18726239ad61822310feea3b.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_c840d5e4c5c47f5e--18726239ad61822310feea3b.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_c840d5e4c5c47f5e--18726239ad61822310feea3b.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "vervo:a642ac94ed4c0df0",
+      "event_id": "vervo:a642ac94ed4c0df0",
+      "article_id": "vervo:a642ac94ed4c0df0",
+      "queue_id": "vervo:a642ac94ed4c0df0",
+      "title": "6.6·周六｜冷调声场，向内漫游",
+      "title_original": "6.6·周六｜冷调声场，向内漫游",
+      "title_display": "周六 | 冷调声场，向内漫游",
+      "account": "VERVO国际独立电音俱乐部",
+      "account_key": "vervo",
+      "promoter": "VERVO国际独立电音俱乐部",
+      "source_article": {
+        "url_hash": "a642ac94ed4c0df0",
+        "account_name": "VERVO国际独立电音俱乐部",
+        "published_at": "2026-06-03"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "a642ac94ed4c0df0"
+      },
+      "post_date": "2026-06-03",
+      "source_account_name": "VERVO国际独立电音俱乐部",
+      "source_published_at": "2026-06-03",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_a642ac94ed4c0df0--948c995993f6812c5f9d2f09.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_a642ac94ed4c0df0--948c995993f6812c5f9d2f09.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_a642ac94ed4c0df0--948c995993f6812c5f9d2f09.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-06"
+      ],
+      "event_date_iso_guess": "2026-06-06",
+      "event_date_iso_guesses": [
+        "2026-06-06"
+      ],
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "昆明"
+      ],
+      "city_key": "kunming",
+      "city_name": "昆明",
+      "city_keys": [
+        "kunming"
+      ],
+      "venue": [],
+      "venue_id": "vervo_kunming",
+      "venue_name": "VERVO",
+      "address": "云南省昆明市五华区钱王街51号正义坊购物中心北馆",
+      "address_full": "云南省昆明市五华区钱王街51号正义坊购物中心北馆",
+      "address_source": "manual_registry",
+      "geo_lng": 102.709282,
+      "geo_lat": 25.040556,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [
+        "minimal techno",
+        "house"
+      ],
+      "music_styles": [
+        "techno",
+        "house"
+      ],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "6.6·周六｜冷调声场，向内漫游",
+        "2026-06-06",
+        "在极简冷调的声场里，完成一场与自我的深度对话"
+      ],
+      "description_original_lines": [
+        "6.6·周六｜冷调声场，向内漫游",
+        "在极简冷调的声场里，完成一场与自我的深度对话",
+        "@(2026)",
+        "Since(2013)"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "昆明|vervo|2026-06-06|周六冷调声场向内漫游",
+      "detail_path": "by-id/vervou3aa642ac94ed4c0df0.json",
+      "detail_url": "by-id/vervou3aa642ac94ed4c0df0.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_a642ac94ed4c0df0--948c995993f6812c5f9d2f09.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_a642ac94ed4c0df0--948c995993f6812c5f9d2f09.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_a642ac94ed4c0df0--948c995993f6812c5f9d2f09.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/vervo_a642ac94ed4c0df0--948c995993f6812c5f9d2f09.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_a642ac94ed4c0df0--948c995993f6812c5f9d2f09.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_a642ac94ed4c0df0--948c995993f6812c5f9d2f09.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_a642ac94ed4c0df0--948c995993f6812c5f9d2f09.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_a642ac94ed4c0df0--948c995993f6812c5f9d2f09.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_a642ac94ed4c0df0--948c995993f6812c5f9d2f09.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_a642ac94ed4c0df0--948c995993f6812c5f9d2f09.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_a642ac94ed4c0df0--948c995993f6812c5f9d2f09.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "dada_kunming:021576420824c676",
+      "event_id": "dada_kunming:021576420824c676",
+      "article_id": "dada_kunming:021576420824c676",
+      "queue_id": "dada_kunming:021576420824c676",
+      "title": "周六 6月6日-【Love Bang】成立16周年巡演派对-昆明站@Dada Kunming",
+      "title_original": "周六 6月6日-【Love Bang】成立16周年巡演派对-昆明站@Dada Kunming",
+      "title_display": "周六 6月6日-【Love Bang】成立16周年巡演派对-昆明站@Dada Kunming",
+      "account": "Dada Kunming",
+      "account_key": "dada_kunming",
+      "promoter": "Dada Kunming",
+      "source_article": {
+        "url_hash": "021576420824c676",
+        "account_name": "Dada Kunming",
+        "published_at": "2026-06-03"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "021576420824c676"
+      },
+      "post_date": "2026-06-03",
+      "source_account_name": "Dada Kunming",
+      "source_published_at": "2026-06-03",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-06"
+      ],
+      "event_date_iso_guess": "2026-06-06",
+      "event_date_iso_guesses": [
+        "2026-06-06"
+      ],
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "昆明"
+      ],
+      "city_key": "kunming",
+      "city_name": "昆明",
+      "city_keys": [
+        "kunming"
+      ],
+      "venue": [],
+      "venue_id": "dada_kunming",
+      "venue_name": "Dada Kunming",
+      "address": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+      "address_full": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+      "address_source": "manual_registry",
+      "geo_lng": 102.691192,
+      "geo_lat": 25.053387,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [
+        "hip-hop",
+        "house",
+        "techno",
+        "electro",
+        "club music",
+        "bass"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "techno",
+        "house",
+        "club trax"
+      ],
+      "price": [
+        "TICKETS 30RMB",
+        "免票"
+      ],
+      "price_text": "TICKETS 30RMB / 免票",
+      "ticketing_text": "TICKETS 30RMB / 免票",
+      "evidence": [
+        "周六 6月6日-【Love Bang】成立16周年巡演派对-昆明站@Dada Kunming",
+        "免票·免票·免票",
+        "00:00前购票可得30元酒卡 (仅限派对当晚使用)",
+        "2026-06-06",
+        "享受颠簸·享受Love Bang"
+      ],
+      "description_original_lines": [
+        "免票·免票·免票",
+        "00:00前购票可得30元酒卡 (仅限派对当晚使用)",
+        "享受颠簸·享受Love Bang",
+        "Love Bang"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [
+        {
+          "artist_id": "dj_0c0a37f4",
+          "canonical_name": "Heatwolves",
+          "matched_name": "Heatwolves",
+          "verified": true,
+          "source": "dj_profiles",
+          "city": "China",
+          "genres": [],
+          "bio": "",
+          "links": [
+            "https://soundcloud.com/heatwolves",
+            "https://app.chartmetric.com/artist/6840820",
+            "https://ra.co/dj/heatwolves",
+            "https://pl.ra.co/events/1873920",
+            "https://www.youtube.com/user/HeatWolves/videos"
+          ]
+        },
+        {
+          "artist_id": "dj_419a38f7",
+          "canonical_name": "Just Alexander",
+          "matched_name": "Just Alexander",
+          "verified": true,
+          "source": "dj_profiles",
+          "city": "Shanghai",
+          "genres": [],
+          "bio": "",
+          "links": [
+            "https://www.instagram.com/alexandermixes/",
+            "https://soundcloud.com/justalexander",
+            "https://ra.co/dj/justalexander",
+            "https://www.xiaohongshu.com/user/profile/6837035f000000001b01adcc"
+          ]
+        }
+      ],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "昆明|dadakunming|2026-06-06|周六6月6日lovebang成立16周年巡演派对昆明站dadakunming",
+      "detail_path": "by-id/dada_kunmingu3a021576420824c676.json",
+      "detail_url": "by-id/dada_kunmingu3a021576420824c676.json",
+      "merge_provenance": {
+        "schema_version": "weekly_merge_provenance.v1",
+        "reason": "duplicate_cluster",
+        "retained_id": "dada_kunming:021576420824c676",
+        "retained_source_hash": "021576420824c676",
+        "merged_from": [
+          "dada_kunming:682fcafb85842c99",
+          "dada_kunming:021576420824c676"
+        ],
+        "merged_source_hashes": [
+          "021576420824c676",
+          "682fcafb85842c99"
+        ],
+        "source_count": 2,
+        "sources": [
+          {
+            "event_id": "dada_kunming:682fcafb85842c99",
+            "source_hash": "682fcafb85842c99",
+            "title": "周六 6月6日-【Love Bang】成立16周年巡演派对-昆明站@Dada Kunming",
+            "published_at": "2026-06-02",
+            "account_name": "dada_kunming",
+            "source_type": "wechat_article"
+          },
+          {
+            "event_id": "dada_kunming:021576420824c676",
+            "source_hash": "021576420824c676",
+            "title": "周六 6月6日-【Love Bang】成立16周年巡演派对-昆明站@Dada Kunming",
+            "published_at": "2026-06-03",
+            "account_name": "Dada Kunming",
+            "source_type": "wechat_article"
+          }
+        ]
+      },
+      "lineup_display_hint": "点击海报跳转公众号原文查看",
+      "lineup_quality": {
+        "status": "uncertain",
+        "decision": "cleared_untrusted_lineup",
+        "note": "public mini-program policy: lineup was prose, aggregate text, bio-like text, or not source-grounded enough for display"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dada_kunming_021576420824c676--18726239ad61822310feea3b.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "dada_kunming:01a5754ae510df68",
+      "event_id": "dada_kunming:01a5754ae510df68",
+      "article_id": "dada_kunming:01a5754ae510df68",
+      "queue_id": "dada_kunming:01a5754ae510df68",
+      "title": "营业时间调整通知",
+      "title_original": "营业时间调整通知",
+      "title_display": "营业时间调整通知",
+      "account": "Dada Kunming",
+      "account_key": "dada_kunming",
+      "promoter": "Dada Kunming",
+      "source_article": {
+        "url_hash": "01a5754ae510df68",
+        "account_name": "Dada Kunming",
+        "published_at": "2026-06-07"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "01a5754ae510df68",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-06-07",
+      "source_account_name": "Dada Kunming",
+      "source_published_at": "2026-06-07",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "",
+      "event_time_source": "",
+      "time_start": "",
+      "time_end": "",
+      "running_hours_text": "",
+      "running_hours_source": "",
+      "city": [
+        "昆明"
+      ],
+      "city_key": "kunming",
+      "city_name": "昆明",
+      "city_keys": [
+        "kunming"
+      ],
+      "venue": [],
+      "venue_id": "dada_kunming",
+      "venue_name": "Dada Kunming",
+      "address": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+      "address_full": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+      "address_source": "manual_registry",
+      "geo_lng": 102.691192,
+      "geo_lat": 25.053387,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "营业时间调整通知",
+        "2026-06-07",
+        "2026年6月7日，店休",
+        "助力高考，下周再会！"
+      ],
+      "description_original_lines": [
+        "2026年6月7日，店休",
+        "助力高考，下周再会！"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [
+        "missing_time"
+      ],
+      "publish_status": "published",
+      "dedupe_key": "昆明|dadakunming|2026-06-07|营业时间调整通知",
+      "detail_path": "by-id/dada_kunmingu3a01a5754ae510df68.json",
+      "detail_url": "by-id/dada_kunmingu3a01a5754ae510df68.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster_cloud_path": "weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+      "poster_public_source_hash": "27ad1bebac3dadda",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/dada_kunmingu3a01a5754ae510df68--27ad1bebac3dadda0bb4.jpg"
+    }
+  ]
+}

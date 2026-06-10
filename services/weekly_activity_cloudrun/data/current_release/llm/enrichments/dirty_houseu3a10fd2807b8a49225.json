@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "dirty_house:10fd2807b8a49225",
+  "sourceItemHash": "811c3191c4a5e7bb5bb40be79005854db4d3f984128c18ff18021e4bc3c7776d",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "我们在寻找真正适合现场的人",
+      "event_date_start": "2026-06-12",
+      "event_date_end": "2026-06-12",
+      "event_time_text": null,
+      "city_name": "上海",
+      "venue_name": "INS新乐园·Dirty House",
+      "address_candidate": "上海市黄浦区雁荡路109号4楼2室",
+      "lineup_artists": [],
+      "music_styles": [
+        "house",
+        "house"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "DIRTY HOUSE 招聘｜我们在寻找真正适合现场的人",
+        "在 DIRTY HOUSE，我们招聘的从来不只是完成岗位工作的人",
+        "前台、检票、安保，看起来是不同岗位，但本质上都在共同维护一件事：一个夜晚如何开始，如何被感知，如何保持秩序，如何让来到这里的人感受到这个空间应有的气质与边界",
+        "所以相比单纯看经验，我们更在意你是否真正适合这里"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "我们在寻找真正适合现场的人",
+        "2026-06-12",
+        "上海",
+        "INS新乐园·Dirty House"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

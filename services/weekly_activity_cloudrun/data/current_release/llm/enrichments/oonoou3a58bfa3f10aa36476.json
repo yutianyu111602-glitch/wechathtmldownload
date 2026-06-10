@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "oonoo:58bfa3f10aa36476",
+  "sourceItemHash": "124a1127cc85929809e792208bf83970d232ba000d589890d679809dc57ad189",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "畅饮日",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "杭州",
+      "venue_name": "OONOO",
+      "address_candidate": "杭州市上城区延安路18号地下一层104室",
+      "lineup_artists": [
+        "STARBOY",
+        "STARBOY"
+      ],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "「06/05 周五」OONOO CLUB ｜畅饮日",
+        "我们的朋友STARBOY经过一段时间的修炼，已经达到了下一个LEVEL",
+        "Poster OCR date: 2026-06-05"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "畅饮日",
+        "2026-06-05",
+        "杭州",
+        "OONOO"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

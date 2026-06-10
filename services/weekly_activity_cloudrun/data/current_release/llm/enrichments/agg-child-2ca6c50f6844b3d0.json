@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "agg-child-2ca6c50f6844b3d0",
+  "sourceItemHash": "9d18bdb1f403f016454c5134afb44a8ec663187312f99360a13f0749050089d8",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "摇摇乐",
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": null,
+      "city_name": "北京",
+      "venue_name": "dadabar(日坛国际贸易中心A座店)",
+      "address_candidate": "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "周日6月7日"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "摇摇乐",
+        "2026-06-07",
+        "北京",
+        "dadabar(日坛国际贸易中心A座店)"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

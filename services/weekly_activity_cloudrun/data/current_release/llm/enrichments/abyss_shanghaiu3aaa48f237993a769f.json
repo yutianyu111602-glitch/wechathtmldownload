@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "abyss_shanghai:aa48f237993a769f",
+  "sourceItemHash": "e84ed794539db4e24b979d3c0e9553f63f28b6045a8e072378c952dd471b5272",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "6·5 | 速报：柏林地下鼠王THAM空降‼️亲自喂药🪳专治恋鼠癖",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "22:00-05:00",
+      "city_name": "上海",
+      "venue_name": "ABYSS Shanghai",
+      "address_candidate": "上海市黄浦区淮海中路523-527号B1层01商铺",
+      "lineup_artists": [
+        "THAM",
+        "SATURN [CULT]",
+        "Extreme John",
+        "SELFISH b2b NABEL",
+        "THAM",
+        "SATURN [CULT]",
+        "Extreme John",
+        "SELFISH b2b NABEL"
+      ],
+      "music_styles": [
+        "techno",
+        "techno",
+        "schranz",
+        "hard techno",
+        "industrial techno",
+        "hardstyle",
+        "rawstyle"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "𝙏𝙃𝘼𝙈 𝙎𝘼𝙏𝙐𝙍𝙉 [𝘾𝙐𝙇𝙏]",
+        "SELFISH b2b NABEL",
+        "Extreme John",
+        "OPENDECKS"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "6·5 | 速报：柏林地下鼠王THAM空降‼️亲自喂药🪳专治恋鼠癖",
+        "2026-06-05",
+        "上海",
+        "ABYSS Shanghai"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

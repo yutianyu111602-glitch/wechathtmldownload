@@ -1,0 +1,118 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "oonoo:58bfa3f10aa36476",
+    "event_id": "oonoo:58bfa3f10aa36476",
+    "article_id": "oonoo:58bfa3f10aa36476",
+    "queue_id": "oonoo:58bfa3f10aa36476",
+    "title": "「06/05 周五」OONOO CLUB ｜畅饮日",
+    "title_original": "「06/05 周五」OONOO CLUB ｜畅饮日",
+    "title_display": "畅饮日",
+    "account": "OONOO",
+    "account_key": "oonoo",
+    "promoter": "OONOO",
+    "source_article": {
+      "url_hash": "58bfa3f10aa36476",
+      "account_name": "OONOO",
+      "published_at": "2026-06-02"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "58bfa3f10aa36476"
+    },
+    "post_date": "2026-06-02",
+    "source_account_name": "OONOO",
+    "source_published_at": "2026-06-02",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_58bfa3f10aa36476--2d06f00dcf1fb9a6f49ed388.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_58bfa3f10aa36476--2d06f00dcf1fb9a6f49ed388.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_58bfa3f10aa36476--2d06f00dcf1fb9a6f49ed388.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "杭州"
+    ],
+    "city_key": "hangzhou",
+    "city_name": "杭州",
+    "city_keys": [
+      "hangzhou"
+    ],
+    "venue": [],
+    "venue_id": "oonoo_hangzhou",
+    "venue_name": "OONOO",
+    "address": "杭州市上城区延安路18号地下一层104室",
+    "address_full": "杭州市上城区延安路18号地下一层104室",
+    "address_source": "manual_registry",
+    "geo_lng": 120.16488,
+    "geo_lat": 30.24104,
+    "lineup": [
+      "STARBOY"
+    ],
+    "lineup_artists": [
+      "STARBOY"
+    ],
+    "genres": [],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "「06/05 周五」OONOO CLUB ｜畅饮日",
+      "2026-06-05",
+      "我们的朋友STARBOY经过一段时间的修炼，已经达到了下一个LEVEL"
+    ],
+    "description_original_lines": [
+      "「06/05 周五」OONOO CLUB ｜畅饮日",
+      "我们的朋友STARBOY经过一段时间的修炼，已经达到了下一个LEVEL",
+      "Poster OCR date: 2026-06-05"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "杭州|oonoo|2026-06-05|畅饮日",
+    "detail_path": "by-id/oonoou3a58bfa3f10aa36476.json",
+    "detail_url": "by-id/oonoou3a58bfa3f10aa36476.json",
+    "lineup_quality": {
+      "status": "verified",
+      "decision": "scoring_retained_lineup",
+      "note": "retained lineup artists with score >= 0.6: STARBOY"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_58bfa3f10aa36476--2d06f00dcf1fb9a6f49ed388.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_58bfa3f10aa36476--2d06f00dcf1fb9a6f49ed388.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_58bfa3f10aa36476--2d06f00dcf1fb9a6f49ed388.png",
+    "poster_cloud_path": "weekly-posters/20260604/oonoo_58bfa3f10aa36476--2d06f00dcf1fb9a6f49ed388.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_58bfa3f10aa36476--2d06f00dcf1fb9a6f49ed388.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_58bfa3f10aa36476--2d06f00dcf1fb9a6f49ed388.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_58bfa3f10aa36476--2d06f00dcf1fb9a6f49ed388.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_58bfa3f10aa36476--2d06f00dcf1fb9a6f49ed388.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_58bfa3f10aa36476--2d06f00dcf1fb9a6f49ed388.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_58bfa3f10aa36476--2d06f00dcf1fb9a6f49ed388.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/oonoo_58bfa3f10aa36476--2d06f00dcf1fb9a6f49ed388.png"
+  }
+}

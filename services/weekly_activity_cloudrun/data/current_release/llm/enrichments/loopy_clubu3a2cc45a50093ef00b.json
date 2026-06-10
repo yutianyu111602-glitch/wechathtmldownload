@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "loopy_club:2cc45a50093ef00b",
+  "sourceItemHash": "cddf8665e61b6577a405b03ce3c5adc89932cbbd3d50f49edd9efa5d2025051d",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Jeff Mills 厂牌旗下亚洲顶级 Techno 代表，弑伪神者归来",
+      "event_date_start": "2026-06-04",
+      "event_date_end": "2026-06-04",
+      "event_time_text": "03:00 - Late",
+      "city_name": "杭州",
+      "venue_name": "loopy Club",
+      "address_candidate": "浙江省杭州市西湖区天目山路398号天目里7号楼负一层",
+      "lineup_artists": [],
+      "music_styles": [
+        "hip-hop",
+        "techno",
+        "electro",
+        "techno"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.04 周四｜Jeff Mills 厂牌旗下亚洲顶级 Techno 代表，弑伪神者归来",
+        "纯粹 Techno，没有任何妥协",
+        "VACUUM，是一个强势崛起的 Techno 文化推手，因为对地下原创精神的信仰，他们只推广原创型电子音乐人",
+        "VACUUM 即将迎来厂牌周年庆，带来高度提纯的 Techno 派对，并开启全国巡演"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "Jeff Mills 厂牌旗下亚洲顶级 Techno 代表，弑伪神者归来",
+        "2026-06-04",
+        "杭州",
+        "loopy Club"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "oonoo:d32bcedf70d9b78e",
+    "event_id": "oonoo:d32bcedf70d9b78e",
+    "article_id": "oonoo:d32bcedf70d9b78e",
+    "queue_id": "oonoo:d32bcedf70d9b78e",
+    "title": "「06/12周五」OONOO CLUB ｜一只日本迷你猫冲进了懊恼的舞池",
+    "title_original": "「06/12周五」OONOO CLUB ｜一只日本迷你猫冲进了懊恼的舞池",
+    "title_display": "一只日本迷你猫冲进了懊恼的舞池",
+    "account": "OONOO",
+    "account_key": "oonoo",
+    "promoter": "OONOO",
+    "source_article": {
+      "url_hash": "d32bcedf70d9b78e",
+      "account_name": "OONOO",
+      "published_at": "2026-06-05"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "d32bcedf70d9b78e",
+      "disabled_reason": ""
+    },
+    "aggregation_child": false,
+    "post_date": "2026-06-05",
+    "source_account_name": "OONOO",
+    "source_published_at": "2026-06-05",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oonoou3ad32bcedf70d9b78e--7228b798ca2cb1dcade5.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oonoou3ad32bcedf70d9b78e--7228b798ca2cb1dcade5.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oonoou3ad32bcedf70d9b78e--7228b798ca2cb1dcade5.png",
+    "poster_source": "cloudbase_storage_from_wechat_article",
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "event_date_text": [
+      "2026-06-12"
+    ],
+    "event_date_iso_guess": "2026-06-12",
+    "event_date_iso_guesses": [
+      "2026-06-12"
+    ],
+    "event_date_start": "2026-06-12",
+    "event_date_end": "2026-06-12",
+    "event_time_text": "22:00 - Late",
+    "event_time_source": "source_text",
+    "time_start": "22:00",
+    "time_end": "Late",
+    "running_hours_text": "22:00 - Late",
+    "running_hours_source": "source_text",
+    "city": [
+      "杭州"
+    ],
+    "city_key": "hangzhou",
+    "city_name": "杭州",
+    "city_keys": [
+      "hangzhou"
+    ],
+    "venue": [],
+    "venue_id": "oonoo_hangzhou",
+    "venue_name": "OONOO",
+    "address": "杭州市上城区延安路18号地下一层104室",
+    "address_full": "杭州市上城区延安路18号地下一层104室",
+    "address_source": "manual_registry",
+    "geo_lng": 120.16488,
+    "geo_lat": 30.24104,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "minimal",
+      "house",
+      "techno",
+      "electro"
+    ],
+    "music_styles": [
+      "hip-hop",
+      "techno",
+      "house",
+      "electro"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "「06/12周五」OONOO CLUB ｜一只日本迷你猫冲进了懊恼的舞池",
+      "2026-06-12",
+      "一只日本迷你猫冲进了懊恼的舞池并在舞池中间发呆了一整晚",
+      "#minimal #house #groove",
+      "https://mmbiz.qpic.cn/sz_mmbiz_png/buxLRFbicOaHH1tFKJgDCicjnSGYYQpVLOgQKgNUyKg0P63KU1jdUNrerAptW42avYa2QfxBxoCWq11G8gic4TeXENC8dX1KibfofliaodtZVbtE/640?wx_fmt=png"
+    ],
+    "description_original_lines": [
+      "「06/12周五」OONOO CLUB ｜一只日本迷你猫冲进了懊恼的舞池",
+      "一只日本迷你猫冲进了懊恼的舞池并在舞池中间发呆了一整晚",
+      "#minimal #house #groove",
+      "Poster OCR time: 22:00-LATE"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "杭州|oonoo|2026-06-12|一只日本迷你猫冲进了懊恼的舞池",
+    "detail_path": "by-id/oonoou3ad32bcedf70d9b78e.json",
+    "detail_url": "by-id/oonoou3ad32bcedf70d9b78e.json",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oonoou3ad32bcedf70d9b78e--7228b798ca2cb1dcade5.png",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oonoou3ad32bcedf70d9b78e--7228b798ca2cb1dcade5.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oonoou3ad32bcedf70d9b78e--7228b798ca2cb1dcade5.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oonoou3ad32bcedf70d9b78e--7228b798ca2cb1dcade5.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oonoou3ad32bcedf70d9b78e--7228b798ca2cb1dcade5.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oonoou3ad32bcedf70d9b78e--7228b798ca2cb1dcade5.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster_cloud_path": "weekly-posters/20260607/oonoou3ad32bcedf70d9b78e--7228b798ca2cb1dcade5.png",
+    "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+    "poster_public_source_hash": "7228b798ca2cb1dc",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oonoou3ad32bcedf70d9b78e--7228b798ca2cb1dcade5.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oonoou3ad32bcedf70d9b78e--7228b798ca2cb1dcade5.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oonoou3ad32bcedf70d9b78e--7228b798ca2cb1dcade5.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/oonoou3ad32bcedf70d9b78e--7228b798ca2cb1dcade5.png"
+  }
+}

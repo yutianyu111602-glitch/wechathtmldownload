@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "oil:2c1a5f8841c19da3",
+  "sourceItemHash": "9e5ef6feeb10fc925ef6c171754983f0fa68606adb54b143a25b64c979cf24a0",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "次元壁彼端的劲爆派对！OTAKU SPEEDWAY 初夏特别场",
+      "event_date_start": "2026-06-11",
+      "event_date_end": "2026-06-11",
+      "event_time_text": null,
+      "city_name": "深圳",
+      "venue_name": "OIL CLUB",
+      "address_candidate": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "lineup_artists": [
+        "Babyching",
+        "Simon B",
+        "Babyching",
+        "Simon B"
+      ],
+      "music_styles": [
+        "techno",
+        "bass",
+        "trance",
+        "j-core",
+        "hardcore",
+        "breakcore",
+        "trance",
+        "techno",
+        "uk bass"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "DJs MarukcBabyching SimonB 塑月真白"
+      ],
+      "description_original_lines": [
+        "6/11 ｜次元壁彼端的劲爆派对！OTAKU SPEEDWAY 初夏特别场",
+        "将同人音乐、J-Core 以及各种小众二次元声音带到地下俱乐部舞池",
+        "DJs MarukcBabyching SimonB 塑月真白"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "次元壁彼端的劲爆派对！OTAKU SPEEDWAY 初夏特别场",
+        "2026-06-11",
+        "深圳",
+        "OIL CLUB"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

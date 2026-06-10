@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "defun:f1e2998730e2823a",
+  "sourceItemHash": "eff8708e6d5f81995f066e56c969fd5106afc4fa364bb10574d0b4331ebf64c1",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "“小孩桌”2.0 HIPHOP NIGHT GUEST&RANGE&DEFUN",
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "21:00 - Late",
+      "city_name": "上海",
+      "venue_name": "DEFUN",
+      "address_candidate": "上海市普陀区长寿路401号亚新生活广场",
+      "lineup_artists": [],
+      "music_styles": [
+        "hip-hop",
+        "hip-hop"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.7 | “小孩桌”2.0 HIPHOP NIGHT GUEST&RANGE&DEFUN",
+        "FREE ENTRY",
+        "21:00-LATE",
+        "“小孩桌2.0” HIPHOP NIGHT GUEST&RANGE&DEFUN"
+      ],
+      "ticketing_text": [
+        "FREE ENTRY"
+      ],
+      "dedupe_signals": [
+        "“小孩桌”2.0 HIPHOP NIGHT GUEST&RANGE&DEFUN",
+        "2026-06-07",
+        "上海",
+        "DEFUN"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

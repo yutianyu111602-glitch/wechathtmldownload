@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "twinklab:53636baac6ab99c2",
+  "sourceItemHash": "7bf7746b4e76801ab5b3d2bff18abc8084ac41055f0ccc5116a6ee24c88c2e6c",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Sat. TECHNO BEATS | 硬核工业锐舞",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "22:00 - Late",
+      "city_name": "厦门",
+      "venue_name": "蜕壳TwinKlab",
+      "address_candidate": "福建省厦门市湖里区湖里大道22号联发文创口岸ZT205-206单元",
+      "lineup_artists": [],
+      "music_styles": [
+        "techno",
+        "techno",
+        "IDM",
+        "industrial",
+        "hard techno",
+        "dark techno",
+        "deconstructed club"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06/06 Sat. TECHNO BEATS | 硬核工业锐舞",
+        "🎫 门票:Free Entry 免票入场",
+        "TECHNO BEATS | 纯粹硬核工业锐舞派对",
+        "📅 时间：06/06 周六 22:00 - Late"
+      ],
+      "ticketing_text": [
+        "Free Entry"
+      ],
+      "dedupe_signals": [
+        "Sat. TECHNO BEATS | 硬核工业锐舞",
+        "2026-06-06",
+        "厦门",
+        "蜕壳TwinKlab"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

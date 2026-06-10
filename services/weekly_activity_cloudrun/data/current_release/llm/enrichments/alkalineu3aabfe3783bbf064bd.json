@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "alkaline:abfe3783bbf064bd",
+  "sourceItemHash": "dd8c4d0d11585cee85c1c43e5541c55275fc347f2f7c1c8c3a176adf5a6e89e3",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "一鸣惊人 Unity Gathers Pres.",
+      "event_date_start": "2026-06-12",
+      "event_date_end": "2026-06-12",
+      "event_time_text": null,
+      "city_name": "广州",
+      "venue_name": "南碱alkaline酒吧",
+      "address_candidate": "广东省广州市海珠区南石头街道南泰路17号2-242",
+      "lineup_artists": [
+        "Madcuept_",
+        "Spiritual Wanderer",
+        "Bmd",
+        "Madcuept_",
+        "Spiritual Wanderer",
+        "Bmd"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "hip-hop"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "广东Hiphop传奇Bmd联手「合一族UnityGathers」厂牌成员Madcuept_ & Spiritual Wanderer一起来到南碱！"
+      ],
+      "description_original_lines": [
+        "6.12 周五｜一鸣惊人 Unity Gathers Pres",
+        "广东Hiphop传奇Bmd联手「合一族UnityGathers」厂牌成员Madcuept_ & Spiritual Wanderer一起来到南碱！",
+        "Poster OCR date: 2026-06-12 / 2026-02-05"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "一鸣惊人 Unity Gathers Pres.",
+        "2026-06-12",
+        "广州",
+        "南碱alkaline酒吧"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

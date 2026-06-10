@@ -1,0 +1,118 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "account_d186bcf5bc:06b99725a526d911",
+    "event_id": "account_d186bcf5bc:06b99725a526d911",
+    "article_id": "account_d186bcf5bc:06b99725a526d911",
+    "queue_id": "account_d186bcf5bc:06b99725a526d911",
+    "title": "本周六 | 88LIEN 愛莉恩《災愛》线下签售",
+    "title_original": "本周六 | 88LIEN 愛莉恩《災愛》线下签售",
+    "title_display": "本周六 | 88LIEN 愛莉恩《災愛》线下签售",
+    "account": "离岛唱片",
+    "account_key": "account_d186bcf5bc",
+    "promoter": "离岛唱片",
+    "source_article": {
+      "url_hash": "06b99725a526d911",
+      "account_name": "离岛唱片",
+      "published_at": "2026-06-03"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "06b99725a526d911"
+    },
+    "post_date": "2026-06-03",
+    "source_account_name": "离岛唱片",
+    "source_published_at": "2026-06-03",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_d186bcf5bc_06b99725a526d911--c4f57b2fb6e7faf923cd1b81.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_d186bcf5bc_06b99725a526d911--c4f57b2fb6e7faf923cd1b81.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_d186bcf5bc_06b99725a526d911--c4f57b2fb6e7faf923cd1b81.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "16:00",
+    "event_time_source": "source_text",
+    "time_start": "16:00",
+    "time_end": "",
+    "running_hours_text": "16:00",
+    "running_hours_source": "source_text",
+    "city": [
+      "厦门"
+    ],
+    "city_key": "xiamen",
+    "city_name": "厦门",
+    "city_keys": [
+      "xiamen"
+    ],
+    "venue": [],
+    "venue_id": "insular_records_xiamen",
+    "venue_name": "INSULAR RECORDS 离岛",
+    "address": "福建省厦门市思明区美湖路49-53号",
+    "address_full": "福建省厦门市思明区美湖路49-53号",
+    "address_source": "manual_registry",
+    "geo_lng": 118.089389,
+    "geo_lat": 24.466697,
+    "lineup": [
+      "88LIEN"
+    ],
+    "lineup_artists": [
+      "88LIEN"
+    ],
+    "genres": [],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "本周六 | 88LIEN 愛莉恩《災愛》线下签售",
+      "2026-06-06",
+      "💿88LIEN 愛莉恩 · 《災愛》实体CD 厦门线下签售活动",
+      "6 月 6 日（本周六）下午四点半，88LIEN 爱莉恩将会登陆厦门离岛，进行线下的《災‌爱》专辑签售活动，欢迎各位粉丝朋友前来",
+      "#离岛唱片 #88LIEN #爱莉恩 #暗夜社区 #CD签售"
+    ],
+    "description_original_lines": [
+      "💿88LIEN 愛莉恩 · 《災愛》实体CD 厦门线下签售活动",
+      "6 月 6 日（本周六）下午四点半，88LIEN 爱莉恩将会登陆厦门离岛，进行线下的《災‌爱》专辑签售活动，欢迎各位粉丝朋友前来",
+      "#离岛唱片 #88LIEN #爱莉恩 #暗夜社区 #CD签售",
+      "Date-"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "厦门|insularrecords离岛|2026-06-06|六88lien愛莉恩《災愛》线下签售",
+    "detail_path": "by-id/account_d186bcf5bcu3a06b99725a526d911.json",
+    "detail_url": "by-id/account_d186bcf5bcu3a06b99725a526d911.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_d186bcf5bc_06b99725a526d911--c4f57b2fb6e7faf923cd1b81.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_d186bcf5bc_06b99725a526d911--c4f57b2fb6e7faf923cd1b81.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_d186bcf5bc_06b99725a526d911--c4f57b2fb6e7faf923cd1b81.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/account_d186bcf5bc_06b99725a526d911--c4f57b2fb6e7faf923cd1b81.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_d186bcf5bc_06b99725a526d911--c4f57b2fb6e7faf923cd1b81.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_d186bcf5bc_06b99725a526d911--c4f57b2fb6e7faf923cd1b81.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_d186bcf5bc_06b99725a526d911--c4f57b2fb6e7faf923cd1b81.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_d186bcf5bc_06b99725a526d911--c4f57b2fb6e7faf923cd1b81.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_d186bcf5bc_06b99725a526d911--c4f57b2fb6e7faf923cd1b81.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_d186bcf5bc_06b99725a526d911--c4f57b2fb6e7faf923cd1b81.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/account_d186bcf5bc_06b99725a526d911--c4f57b2fb6e7faf923cd1b81.jpg"
+  }
+}

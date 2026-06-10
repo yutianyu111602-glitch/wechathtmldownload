@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "agg-child-ac6d19eefbe25321",
+  "sourceItemHash": "d9c3b09c2a28fafb26e7fc7c8260834c093b8b667a37a2d01449a78caddddcd3",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Weekly Listening w/ kongbb",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "22:00 - Late",
+      "city_name": "上海",
+      "venue_name": "wigwam",
+      "address_candidate": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+      "lineup_artists": [
+        "kongbb",
+        "kongbb"
+      ],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06.06 SAT",
+        "22:00-Late Weekly Listening",
+        "w/kongbb",
+        "Free Entry"
+      ],
+      "ticketing_text": [
+        "Free Entry"
+      ],
+      "dedupe_signals": [
+        "Weekly Listening w/ kongbb",
+        "2026-06-06",
+        "上海",
+        "wigwam"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

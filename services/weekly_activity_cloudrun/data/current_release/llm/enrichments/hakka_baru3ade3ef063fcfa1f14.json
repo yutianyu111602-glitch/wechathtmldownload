@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "hakka_bar:de3ef063fcfa1f14",
+  "sourceItemHash": "7757309b7ce8448208b3aca3a25af439b8f5f03ad1af237df7d728ec954b93f4",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "「HYBRID BEATS 」·  DRIVA",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "成都",
+      "venue_name": "Hakkabar 院吧",
+      "address_candidate": "四川省成都市武侯区玉林街道科华北路60号科华沸城12楼1201",
+      "lineup_artists": [
+        "DRIVA",
+        "DRIVA"
+      ],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06.06 周六 ｜「HYBRID BEATS 」· DRIVA",
+        "夜晚节奏渐进，DJ用不同的音乐风格碰撞出奇妙的化学反应",
+        "Poster OCR date: 2026-06-06 / 2026-12-01"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "「HYBRID BEATS 」·  DRIVA",
+        "2026-06-06",
+        "成都",
+        "Hakkabar 院吧"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

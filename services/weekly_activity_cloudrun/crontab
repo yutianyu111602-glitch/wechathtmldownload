@@ -1,0 +1,7 @@
+# HUAIDJ Weekly Pipeline — Crontab
+# Runs the weekly pipeline on schedule.
+# Default: every Monday at 02:00 UTC
+# Override: set WEEKLY_CRON_SCHEDULE env var
+${WEEKLY_CRON_SCHEDULE:-0 2 * * 1} /app/scripts/weekly_pipeline.sh >> /app/logs/cron.log 2>&1
+
+# Empty line required at end

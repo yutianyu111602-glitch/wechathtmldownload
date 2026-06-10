@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "foundation:a25ceba42fe3265c",
+  "sourceItemHash": "bd514f0d276c10a7dbaa5c985ecd6adf82b97f62ef3d8560ab3a59b31e89d0b3",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": ".周六 | 𝐉𝐚𝐧𝐞𝐢𝐧“结构、感知与运动之间”",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "南京",
+      "venue_name": "FOUNDATION",
+      "address_candidate": "江苏省南京市鼓楼区石头城路97号水木秦淮街区C12",
+      "lineup_artists": [
+        "Janein",
+        "Janein"
+      ],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "𝟎𝟔.𝟎𝟔.周六｜𝐉𝐚𝐧𝐞𝐢𝐧“结构、感知与运动之间”",
+        "持续推进的律动、精准控制的张力，以及那些缓慢展开的声音层次"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        ".周六 | 𝐉𝐚𝐧𝐞𝐢𝐧“结构、感知与运动之间”",
+        "2026-06-06",
+        "南京",
+        "FOUNDATION"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "pools:855d2fb1630e3b86",
+  "sourceItemHash": "da378a37c4d0d70e1bdbe7951b6d4982ae053fd55cc7500427d00d22c35ea8ed",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "浮动游泳池 FLOATING #106",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "大理",
+      "venue_name": "POOLS",
+      "address_candidate": "云南省大理白族自治州大理市下关街道洱河南路下关金港中民城市广场B幢1-58号",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06.06 周六｜浮动游泳池 FLOATING #106",
+        "六月进入最适合舞池生长的时节",
+        "白天的热度尚未散去，夜晚的空气开始变得柔软，低频在空间里获得更自然的回响",
+        "那些关于“六六顺”的美好寓意，或许最终都会落回音乐本身——让身体顺着节奏移动，让时间顺着律动流淌"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "浮动游泳池 FLOATING #106",
+        "2026-06-06",
+        "大理",
+        "POOLS"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "vervo:c36953658ecace79",
+    "event_id": "vervo:c36953658ecace79",
+    "article_id": "vervo:c36953658ecace79",
+    "queue_id": "vervo:c36953658ecace79",
+    "title": "6.5·周五｜BassHead：低音先行，万物皆可重组",
+    "title_original": "6.5·周五｜BassHead：低音先行，万物皆可重组",
+    "title_display": "周五 | BassHead：低音先行，万物皆可重组",
+    "account": "VERVO国际独立电音俱乐部",
+    "account_key": "vervo",
+    "promoter": "VERVO国际独立电音俱乐部",
+    "source_article": {
+      "url_hash": "c36953658ecace79",
+      "account_name": "VERVO国际独立电音俱乐部",
+      "published_at": "2026-06-03"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "c36953658ecace79"
+    },
+    "post_date": "2026-06-03",
+    "source_account_name": "VERVO国际独立电音俱乐部",
+    "source_published_at": "2026-06-03",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "FridayAT 22:30-END",
+    "event_time_source": "source_text",
+    "time_start": "FridayAT 22:30-END",
+    "time_end": "",
+    "running_hours_text": "FridayAT 22:30-END",
+    "running_hours_source": "source_text",
+    "city": [
+      "昆明"
+    ],
+    "city_key": "kunming",
+    "city_name": "昆明",
+    "city_keys": [
+      "kunming"
+    ],
+    "venue": [],
+    "venue_id": "vervo_kunming",
+    "venue_name": "VERVO",
+    "address": "云南省昆明市五华区钱王街51号正义坊购物中心北馆",
+    "address_full": "云南省昆明市五华区钱王街51号正义坊购物中心北馆",
+    "address_source": "manual_registry",
+    "geo_lng": 102.709282,
+    "geo_lat": 25.040556,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "bass"
+    ],
+    "music_styles": [
+      "bass"
+    ],
+    "price": [
+      "Free Entry"
+    ],
+    "price_text": "Free Entry",
+    "ticketing_text": "Free Entry",
+    "evidence": [
+      "6.5·周五｜BassHead：低音先行，万物皆可重组",
+      "2026-06-05",
+      "如果声音有形状，那一定是 BassHead 现场不断扩张的波形"
+    ],
+    "description_original_lines": [
+      "6.5·周五｜BassHead：低音先行，万物皆可重组",
+      "如果声音有形状，那一定是 BassHead 现场不断扩张的波形",
+      "FridayAT 22:30-END Free Entry",
+      "Poster OCR date: 2026-06-05 / 2026-06-06 / 2026-06-08 / 2026-06-07"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "昆明|vervo|2026-06-05|周五basshead低音先行万物皆可重组",
+    "detail_path": "by-id/vervou3ac36953658ecace79.json",
+    "detail_url": "by-id/vervou3ac36953658ecace79.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+    "poster_cloud_path": "weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/vervo_c36953658ecace79--d54da68fad298bca96866262.png"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "weekly_geocode_apply_report.v1",
+  "applied_at": "2026-06-06T16:20:02+0800",
+  "api_dir": "services\\weekly_activity_cloudrun\\data\\current_release",
+  "accepted_geocodes_path": "tools\\stage7_rewrite\\reports\\weekly_geocode_20260606_trust_venue\\accepted_geocodes.jsonl",
+  "backup_dir": "tools\\stage7_rewrite\\reports\\weekly_geocode_20260606_trust_venue\\apply_backup",
+  "accepted_place_count": 1,
+  "source_candidate_ids": [
+    "e653a38302c94c91"
+  ],
+  "updated_item_count": 1,
+  "updated_item_ids": [
+    "trust:5b3d09797685195f"
+  ],
+  "changed_by_file": {
+    "current.json": 1,
+    "by-id\\trustu3a5b3d09797685195f.json": 1,
+    "by-city\\beijing.json": 1,
+    "by-date\\2026-06-13.json": 1
+  },
+  "overwrite_existing": false
+}

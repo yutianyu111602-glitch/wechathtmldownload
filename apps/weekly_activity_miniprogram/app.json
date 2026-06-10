@@ -1,0 +1,68 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/detail/detail",
+    "pages/source/source",
+    "pages/artist/artist",
+    "pages/venue/venue",
+    "pages/city/city",
+    "pages/saved/saved",
+    "pages/about/about",
+    "pages/column/column",
+    "pages/map/map",
+    "pages/sound/sound",
+    "pages/interview/interview"
+  ],
+  "window": {
+    "navigationBarTitleText": "活动查询",
+    "navigationBarBackgroundColor": "#000000",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#050505"
+  },
+  "networkTimeout": {
+    "request": 8000,
+    "connectSocket": 10000,
+    "uploadFile": 10000,
+    "downloadFile": 10000
+  },
+  "tabBar": {
+    "color": "#7E7E7E",
+    "selectedColor": "#A7FF26",
+    "backgroundColor": "#000000",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "活动",
+        "iconPath": "assets/tabbar/tab_activity_10.png",
+        "selectedIconPath": "assets/tabbar/tab_activity_selected_10.png"
+      },
+      {
+        "pagePath": "pages/column/column",
+        "text": "专栏",
+        "iconPath": "assets/tabbar/tab_column.png",
+        "selectedIconPath": "assets/tabbar/tab_column_selected.png"
+      },
+      {
+        "pagePath": "pages/saved/saved",
+        "text": "ATLAS计划",
+        "iconPath": "assets/tabbar/tab_atlas.png",
+        "selectedIconPath": "assets/tabbar/tab_atlas_selected.png"
+      },
+      {
+        "pagePath": "pages/about/about",
+        "text": "关于",
+        "iconPath": "assets/tabbar/tab_about.png",
+        "selectedIconPath": "assets/tabbar/tab_about_selected.png"
+      }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于在地图上查看活动场地的位置与路线"
+    }
+  },
+  "requiredPrivateInfos": ["getLocation"],
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}

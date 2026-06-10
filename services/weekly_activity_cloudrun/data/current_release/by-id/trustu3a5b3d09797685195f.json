@@ -1,0 +1,155 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "trust:5b3d09797685195f",
+    "event_id": "trust:5b3d09797685195f",
+    "article_id": "trust:5b3d09797685195f",
+    "queue_id": "trust:5b3d09797685195f",
+    "title": "TRUST × SURĀ｜Wave Rave 🩴 泳池派对 06.13 ㈥ @ 阿派朗创造力星球 (朝阳公园店)",
+    "title_original": "TRUST × SURĀ｜Wave Rave 🩴 泳池派对 06.13 ㈥ @ 阿派朗创造力星球 (朝阳公园店)",
+    "title_display": "Wave Rave 🩴 泳池派对 06.13 ㈥ @ 阿派朗创造力星球 (朝阳公园店)",
+    "account": "TRUST 相信电音",
+    "account_key": "trust",
+    "promoter": "TRUST 相信电音",
+    "source_article": {
+      "url_hash": "5b3d09797685195f",
+      "account_name": "TRUST 相信电音",
+      "published_at": "2026-06-02"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "5b3d09797685195f",
+      "disabled_reason": ""
+    },
+    "aggregation_child": false,
+    "post_date": "2026-06-02",
+    "source_account_name": "TRUST 相信电音",
+    "source_published_at": "2026-06-02",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/trustu3a5b3d09797685195f--83db71a7dbdc8037ceeb.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/trustu3a5b3d09797685195f--83db71a7dbdc8037ceeb.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/trustu3a5b3d09797685195f--83db71a7dbdc8037ceeb.png",
+    "poster_source": "cloudbase_storage_from_wechat_article",
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "event_date_text": [
+      "2026-06-13"
+    ],
+    "event_date_iso_guess": "2026-06-13",
+    "event_date_iso_guesses": [
+      "2026-06-13"
+    ],
+    "event_date_start": "2026-06-13",
+    "event_date_end": "2026-06-13",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "北京"
+    ],
+    "city_key": "beijing",
+    "city_name": "北京",
+    "city_keys": [
+      "beijing"
+    ],
+    "venue": [],
+    "venue_id": "apailang_creativity_planet_chaoyang_park",
+    "venue_name": "TRUST 相信电音",
+    "address": "",
+    "address_full": "",
+    "address_source": "",
+    "geo_lng": 116.484822,
+    "geo_lat": 39.947645,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "House",
+      "Afro House",
+      "Melodic Techno",
+      "Melodic House",
+      "Tech House",
+      "Minimal House"
+    ],
+    "music_styles": [
+      "techno",
+      "house"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "TRUST × SURĀ｜Wave Rave 🩴 泳池派对 06.13 ㈥ @ 阿派朗创造力星球 (朝阳公园店)",
+      "2026-06-13",
+      "下周六：北京的盛夏将至！澄澈池水裹挟夏日气息 “泳池派对” 来啦……",
+      "https://mmbiz.qpic.cn/sz_mmbiz_jpg/PdiajNR5WOmdg8bOUBkL6dib9jYINeskwfDa3JBueYibTUTib6P2KMAwE84FOiavYGwZmPRacuRmZzlpyeicMBpuRTS0ZuVOGPSOPx2a8ypQdJibSI/640?wx_fmt=jpeg",
+      "https://mmbiz.qpic.cn/sz_mmbiz_gif/PdiajNR5WOmfkXibXU4b61HZ3icTsjlEHFUCL7dlAWVWNUs6YbC3hbWEGBiaF7yogk5Q6O7ORXtibm2C7hibw24t0lOiaMC3EVVIL9c8e9n4g9xk7U/640?wx_fmt=gif"
+    ],
+    "description_original_lines": [
+      "TRUST × SURĀ｜Wave Rave 🩴 泳池派对 06.13 ㈥ @ 阿派朗创造力星球 (朝阳公园店)",
+      "下周六：北京的盛夏将至！澄澈池水裹挟夏日气息 “泳池派对” 来啦……",
+      "2026SURAXTRUST"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "北京|trust相信电音|2026-06-13|waverave泳池派对0613㈥阿派朗创造力星球朝阳公园店",
+    "detail_path": "by-id/trustu3a5b3d09797685195f.json",
+    "detail_url": "by-id/trustu3a5b3d09797685195f.json",
+    "venue_lat": 39.947645,
+    "venue_lng": 116.484822,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "tencent_place_search",
+    "geo_provider": "tencent_place_search",
+    "geo_provider_title": "阿派朗创造力星球(朝阳公园店)",
+    "geo_provider_address": "北京市朝阳区东四环北路52号",
+    "geo_reverse_address": "北京市朝阳区朝阳公园步道",
+    "geo_verified_at": "2026-06-06T16:20:01+0800",
+    "geo_candidate_id": "e653a38302c94c91",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_lat",
+        "geo_lng",
+        "geo_provider",
+        "geo_provider_address",
+        "geo_provider_title",
+        "geo_reverse_address",
+        "geo_source",
+        "geo_verified_at",
+        "venue_id",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/trustu3a5b3d09797685195f--83db71a7dbdc8037ceeb.png",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/trustu3a5b3d09797685195f--83db71a7dbdc8037ceeb.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/trustu3a5b3d09797685195f--83db71a7dbdc8037ceeb.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/trustu3a5b3d09797685195f--83db71a7dbdc8037ceeb.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/trustu3a5b3d09797685195f--83db71a7dbdc8037ceeb.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/trustu3a5b3d09797685195f--83db71a7dbdc8037ceeb.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster_cloud_path": "weekly-posters/20260607/trustu3a5b3d09797685195f--83db71a7dbdc8037ceeb.png",
+    "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+    "poster_public_source_hash": "83db71a7dbdc8037",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/trustu3a5b3d09797685195f--83db71a7dbdc8037ceeb.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/trustu3a5b3d09797685195f--83db71a7dbdc8037ceeb.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/trustu3a5b3d09797685195f--83db71a7dbdc8037ceeb.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/trustu3a5b3d09797685195f--83db71a7dbdc8037ceeb.png"
+  }
+}

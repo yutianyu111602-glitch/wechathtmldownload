@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "pools:149bc4362ef89ac8",
+  "sourceItemHash": "164976a05baddbbab10e4af20da85384300eccd1dae80eacfd7410b0af6d9a9e",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Love Bang 16-Year Anniversary | 大理站",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "大理",
+      "venue_name": "POOLS",
+      "address_candidate": "云南省大理白族自治州大理市下关街道洱河南路下关金港中民城市广场B幢1-58号",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06.05 周五｜Love Bang 16-Year Anniversary｜大理站",
+        "LOVE BANG十六岁了！！！"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "Love Bang 16-Year Anniversary | 大理站",
+        "2026-06-05",
+        "大理",
+        "POOLS"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "yuanhe:dd2e9d3e9d6fb7c9",
+  "sourceItemHash": "e3cf88f791eeca9937b21795bdd35fa7da8241b22699735ef3f17625b712d308",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "周三YuanHe 听点地下俱乐部听不到的",
+      "event_date_start": "2026-06-03",
+      "event_date_end": "2026-06-03",
+      "event_time_text": "04:00 - Late",
+      "city_name": "北京",
+      "venue_name": "yuanhe",
+      "address_candidate": "北京市朝阳区西大望路27号E6-2号楼103",
+      "lineup_artists": [],
+      "music_styles": [
+        "hip-hop",
+        "hip-hop"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "让我们把目光聚焦在泛电子音乐上，从地下说唱到各类舞曲Remix，当晚的舞池没有风格边界",
+        "从下酒出发，从音“乐”出发，周三小周末，跳在原核",
+        "Line up：",
+        "22:00-00:00:DJ rezenico"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "周三YuanHe 听点地下俱乐部听不到的",
+        "2026-06-03",
+        "北京",
+        "yuanhe"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

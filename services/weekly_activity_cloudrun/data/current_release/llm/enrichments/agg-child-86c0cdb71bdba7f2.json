@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "agg-child-86c0cdb71bdba7f2",
+  "sourceItemHash": "3d03f2a69d47670dba884bfe4cb2c3f102603d807b395ad0d5e1d9d46158a2ae",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "千喜发廊夜 Millennium Salon Night",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "北京",
+      "venue_name": "dadabar(日坛国际贸易中心A座店)",
+      "address_candidate": "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+      "lineup_artists": [
+        "DJ江水平",
+        "Kosevic",
+        "TECHNEKO",
+        "DJ江水平",
+        "Kosevic",
+        "TECHNEKO"
+      ],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "DJ江水平Kosevic"
+      ],
+      "description_original_lines": [
+        "2026年6月5日",
+        "千喜发廊夜",
+        "Millennium Salon Night",
+        "DJ江水平Kosevic"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "千喜发廊夜 Millennium Salon Night",
+        "2026-06-05",
+        "北京",
+        "dadabar(日坛国际贸易中心A座店)"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

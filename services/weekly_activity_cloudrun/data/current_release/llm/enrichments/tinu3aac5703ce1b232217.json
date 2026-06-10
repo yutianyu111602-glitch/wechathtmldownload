@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "tin:ac5703ce1b232217",
+  "sourceItemHash": "d3086f1a9f0810046fee559d0d680d1496f23b8a780bb861bf4c3509f8841b66",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "「厅」本周五 | 成都超新星的震荡",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "22:00-23:30",
+      "city_name": "成都",
+      "venue_name": "厅Tin",
+      "address_candidate": "四川省成都市锦江区国华街",
+      "lineup_artists": [
+        "GOvernmentsLie",
+        "GOvernmentsLie"
+      ],
+      "music_styles": [
+        "bass",
+        "trance",
+        "bass",
+        "dub",
+        "trance",
+        "half-step",
+        "bass music"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "本周五，「厅」邀请来自不同坐标的三组声音，共同构建一场关于 Bass、Dub、实验电子与意识流舞池的星际漫游🌌",
+        "GOvernmentsLie 的声音则更像一次无目的地漂流",
+        "随机、碎片化、非线性的结构不断出现又消失，在快速转换的节奏与异质音景之间，敲击、噪音与低频交错生长",
+        "没有明确方向，也无需寻找答案，只需要跟随声音向前，无论最终抵达海面还是海底🌊"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "「厅」本周五 | 成都超新星的震荡",
+        "2026-06-05",
+        "成都",
+        "厅Tin"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "tilt:5ba2890a67c30746",
+    "event_id": "tilt:5ba2890a67c30746",
+    "article_id": "tilt:5ba2890a67c30746",
+    "queue_id": "tilt:5ba2890a67c30746",
+    "title": "6.5周五 類比自然 SIMULATE NATURE @TilT w/LILITH",
+    "title_original": "6.5周五 類比自然 SIMULATE NATURE @TilT w/LILITH",
+    "title_display": "類比自然 SIMULATE NATURE @TilT w/LILITH",
+    "account": "TilT地下室",
+    "account_key": "tilt",
+    "promoter": "TilT地下室",
+    "source_article": {
+      "url_hash": "5ba2890a67c30746",
+      "account_name": "TilT地下室",
+      "published_at": "2026-06-01"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "5ba2890a67c30746"
+    },
+    "post_date": "2026-06-01",
+    "source_account_name": "TilT地下室",
+    "source_published_at": "2026-06-01",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tilt_5ba2890a67c30746--30fe0a1bebef200c18027ff0.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tilt_5ba2890a67c30746--30fe0a1bebef200c18027ff0.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tilt_5ba2890a67c30746--30fe0a1bebef200c18027ff0.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "青岛"
+    ],
+    "city_key": "qingdao",
+    "city_name": "青岛",
+    "city_keys": [
+      "qingdao"
+    ],
+    "venue": [],
+    "venue_id": "tilt_qingdao",
+    "venue_name": "TilT地下室",
+    "address": "山东省青岛市市南区太平角一路17号",
+    "address_full": "山东省青岛市市南区太平角一路17号",
+    "address_source": "venue_registry_verified",
+    "geo_lng": 120.360203,
+    "geo_lat": 36.050469,
+    "lineup": [
+      "LILITH"
+    ],
+    "lineup_artists": [
+      "LILITH"
+    ],
+    "genres": [
+      "house",
+      "tribal",
+      "organic",
+      "bass",
+      "hypnotic",
+      "psychedelic"
+    ],
+    "music_styles": [
+      "house",
+      "bass"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "6.5周五 類比自然 SIMULATE NATURE @TilT w/LILITH",
+      "2026-06-05",
+      "Fri",
+      "Poster OCR date: 2026-06-05 / 2026-06-01 / 2026-06-07 / 2026-06-06"
+    ],
+    "description_original_lines": [
+      "6.5周五 類比自然 SIMULATE NATURE @TilT w/LILITH",
+      "Fri",
+      "Poster OCR date: 2026-06-05 / 2026-06-01 / 2026-06-07 / 2026-06-06"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [
+      {
+        "artist_id": "dj_29c56906",
+        "canonical_name": "LILITH",
+        "matched_name": "LILITH",
+        "verified": true,
+        "source": "dj_profiles",
+        "city": "Chongqing",
+        "genres": [
+          "Ambient|Electronic|Psychedelic"
+        ],
+        "bio": "DJ FROM SWITCH CREW AUSTRIA! 🇦🇹 (Switchrecordings) Jump up Drum and Bass #dnb #jumpup #femaledj #hardjumpup #lovednb❤️ #switchrecordings",
+        "links": [
+          "https://www.instagram.com/dj_lilith_/",
+          "https://soundcloud.com/lilithdj666",
+          "https://www.xiaohongshu.com/user/profile/663f6a13000000000d024561"
+        ]
+      }
+    ],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "青岛|tilt地下室|2026-06-05|類比自然simulatenaturetiltwlilith",
+    "detail_path": "by-id/tiltu3a5ba2890a67c30746.json",
+    "detail_url": "by-id/tiltu3a5ba2890a67c30746.json",
+    "venue_lat": 36.050469,
+    "venue_lng": 120.360203,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "frontend_verified_map_location_book",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "tilt_qingdao",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tilt_5ba2890a67c30746--30fe0a1bebef200c18027ff0.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tilt_5ba2890a67c30746--30fe0a1bebef200c18027ff0.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tilt_5ba2890a67c30746--30fe0a1bebef200c18027ff0.png",
+    "poster_cloud_path": "weekly-posters/20260604/tilt_5ba2890a67c30746--30fe0a1bebef200c18027ff0.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tilt_5ba2890a67c30746--30fe0a1bebef200c18027ff0.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tilt_5ba2890a67c30746--30fe0a1bebef200c18027ff0.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tilt_5ba2890a67c30746--30fe0a1bebef200c18027ff0.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tilt_5ba2890a67c30746--30fe0a1bebef200c18027ff0.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tilt_5ba2890a67c30746--30fe0a1bebef200c18027ff0.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tilt_5ba2890a67c30746--30fe0a1bebef200c18027ff0.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/tilt_5ba2890a67c30746--30fe0a1bebef200c18027ff0.png"
+  }
+}

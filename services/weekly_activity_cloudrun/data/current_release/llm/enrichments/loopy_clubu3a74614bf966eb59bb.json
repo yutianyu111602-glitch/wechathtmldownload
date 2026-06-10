@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "loopy_club:74614bf966eb59bb",
+  "sourceItemHash": "779d23920a057ead7b49e78d516f9f62e118228195a79febc7c961f92ffd7737",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "wigwam的居民",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "杭州",
+      "venue_name": "loopy Club",
+      "address_candidate": "浙江省杭州市西湖区天目山路398号天目里7号楼负一层",
+      "lineup_artists": [],
+      "music_styles": [
+        "drum & bass"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.05 周五｜wigwam的居民"
+      ],
+      "ticketing_text": [
+        "6cnY"
+      ],
+      "dedupe_signals": [
+        "wigwam的居民",
+        "2026-06-05",
+        "杭州",
+        "loopy Club"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

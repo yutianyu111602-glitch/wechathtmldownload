@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "deeproll:623236f1d53cf63a",
+  "sourceItemHash": "1610acdf7c44e6f7d53a4e5080092cb20599aedda93d231f89e0b5799699ffbc",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "高考界最严厉的母亲@Limbolimbs",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "22:00 - Late",
+      "city_name": "苏州",
+      "venue_name": "热情商店&电容Deep Roll",
+      "address_candidate": "江苏省苏州市姑苏区廖家巷28号唐寅故居文化区3栋102",
+      "lineup_artists": [
+        "LimboLimbs",
+        "LimboLimbs"
+      ],
+      "music_styles": [
+        "bass",
+        "footwork",
+        "bass",
+        "ukg",
+        "indie pop"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "LimboLimbs，来自 88rising 的唱作人、制作人、DJ、派对组织者"
+      ],
+      "description_original_lines": [
+        "06.06|高考界最严厉的母亲@Limbolimbs",
+        "LimboLimbs，来自 88rising 的唱作人、制作人、DJ、派对组织者",
+        "Poster OCR time: 22:00-LATE",
+        "Poster OCR date: 2026-06-06 / 2026-04-05 / 2026-04-07 / 2026-09-08"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "高考界最严厉的母亲@Limbolimbs",
+        "2026-06-06",
+        "苏州",
+        "热情商店&电容Deep Roll"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

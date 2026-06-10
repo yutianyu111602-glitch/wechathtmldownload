@@ -1,0 +1,1831 @@
+{
+  "schema_version": "weekly_activity_miniprogram_city.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "city_key": "chongqing",
+  "city": "重庆",
+  "item_count": 13,
+  "items": [
+    {
+      "account": "cicipark",
+      "account_key": "cicipark",
+      "address": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+      "address_full": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+      "address_source": "operator_map_picker_user_confirmed",
+      "article_id": "cicipark:b1fac5fca263cde3",
+      "artist_profiles": [],
+      "city": [
+        "重庆"
+      ],
+      "city_key": "chongqing",
+      "city_keys": [
+        "chongqing"
+      ],
+      "city_name": "重庆",
+      "content_type": "event",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "dedupe_key": "重庆|重庆开埠遗址公园2号停车场|2026-06-03|opendeckcicipark",
+      "description_original_lines": [
+        "6.03周三｜Open Deck @cicipark",
+        "重庆开埠遗址公园2号停车场",
+        "音乐·唱片·美酒·波比球",
+        "好吃·好喝·好玩·好音乐"
+      ],
+      "detail_path": "by-id/ciciparku3ab1fac5fca263cde3.json",
+      "detail_url": "by-id/ciciparku3ab1fac5fca263cde3.json",
+      "dj_bio_lines": [],
+      "event_date_end": "2026-06-03",
+      "event_date_iso_guess": "2026-06-03",
+      "event_date_iso_guesses": [
+        "2026-06-03"
+      ],
+      "event_date_start": "2026-06-03",
+      "event_date_text": [
+        "2026-06-03"
+      ],
+      "event_id": "cicipark:b1fac5fca263cde3",
+      "event_time_source": "source_text",
+      "event_time_text": "22:00-23:00",
+      "evidence": [
+        "6.03周三｜Open Deck @cicipark",
+        "2026-06-03",
+        "22:00-23:00",
+        "重庆开埠遗址公园2号停车场",
+        "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右"
+      ],
+      "genres": [],
+      "geo_lat": 29.55206,
+      "geo_lng": 106.592744,
+      "id": "cicipark:b1fac5fca263cde3",
+      "is_calendar_preview": false,
+      "lineup": [],
+      "lineup_artists": [],
+      "music_styles": [],
+      "post_date": "2026-06-02",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "poster_source": "cloudbase_storage",
+      "price": [],
+      "price_text": "",
+      "promoter": "cicipark",
+      "publish_status": "published",
+      "quality_flags": [],
+      "quality_status": "READY",
+      "queue_id": "cicipark:b1fac5fca263cde3",
+      "running_hours_source": "source_text",
+      "running_hours_text": "22:00-23:00",
+      "schema_version": "weekly_event_published.v1",
+      "source_account_name": "cicipark",
+      "source_action": {
+        "available": true,
+        "label": "公众号",
+        "type": "wechat_article",
+        "url_hash": "b1fac5fca263cde3"
+      },
+      "source_article": {
+        "account_name": "cicipark",
+        "published_at": "2026-06-02",
+        "url_hash": "b1fac5fca263cde3"
+      },
+      "source_published_at": "2026-06-02",
+      "ticketing_text": "",
+      "time_end": "23:00",
+      "time_start": "22:00",
+      "title": "6.03周三｜Open Deck @cicipark",
+      "title_display": "Open Deck @cicipark",
+      "title_original": "6.03周三｜Open Deck @cicipark",
+      "venue": [
+        "重庆开埠遗址公园2号停车场"
+      ],
+      "venue_id": "cicipark_chongqing",
+      "venue_name": "重庆开埠遗址公园2号停车场",
+      "venue_lng": 106.592744,
+      "venue_lat": 29.55206,
+      "geo_coord_system": "GCJ-02",
+      "geo_source": "tencent_map_picker_user_confirmed",
+      "geo_provider": "tencent_map_picker",
+      "geo_reliability": "locked",
+      "geo_level": "poi",
+      "geo_verified_at": "2026-06-03",
+      "geo_candidate_id": "cicipark_chongqing",
+      "geo_provider_title": "cicipark",
+      "geo_provider_address": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+      "geo_reverse_address": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+      "map_poi_name": "cicipark",
+      "poi_id": "8135527839569863634",
+      "place_fields_locked": true,
+      "geo_locked": true,
+      "geo_override_reason": "2026-06-03 operator supplied cicipark POI/address/GCJ-02 coordinate; explicit override of prior cicipark registry/current address drift; POI ID 8135527839569863634.",
+      "map_search_aliases": [
+        "cicipark",
+        "重庆开埠遗址公园2号停车场",
+        "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右"
+      ],
+      "geo_search_aliases": [
+        "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+        "重庆开埠遗址公园2号停车场",
+        "cicipark"
+      ],
+      "poi_aliases": [
+        "cicipark",
+        "重庆开埠遗址公园2号停车场",
+        "8135527839569863634"
+      ],
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_b1fac5fca263cde3--81bde5fa7df76eea52c3b4ad.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "nuts:9ccb6527e8932a7a",
+      "event_id": "nuts:9ccb6527e8932a7a",
+      "article_id": "nuts:9ccb6527e8932a7a",
+      "queue_id": "nuts:9ccb6527e8932a7a",
+      "title": "「荒野舞会」：拓荒乐队首次专场｜坚果NUTS",
+      "title_original": "「荒野舞会」：拓荒乐队首次专场｜坚果NUTS",
+      "title_display": "「荒野舞会」：拓荒乐队首次专场 | 坚果NUTS",
+      "account": "坚果NUTS",
+      "account_key": "nuts",
+      "promoter": "坚果NUTS",
+      "source_article": {
+        "url_hash": "9ccb6527e8932a7a",
+        "account_name": "坚果NUTS",
+        "published_at": "2026-05-13"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "9ccb6527e8932a7a",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-05-13",
+      "source_account_name": "坚果NUTS",
+      "source_published_at": "2026-05-13",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-05"
+      ],
+      "event_date_iso_guess": "2026-06-05",
+      "event_date_iso_guesses": [
+        "2026-06-05"
+      ],
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "20:00",
+      "event_time_source": "source_text",
+      "time_start": "20:00",
+      "time_end": "",
+      "running_hours_text": "20:00",
+      "running_hours_source": "source_text",
+      "city": [
+        "重庆"
+      ],
+      "city_key": "chongqing",
+      "city_name": "重庆",
+      "city_keys": [
+        "chongqing"
+      ],
+      "venue": [
+        "坚果NUTS"
+      ],
+      "venue_id": "nuts_chongqing_longhu",
+      "venue_name": "坚果NUTS",
+      "address": "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+      "address_full": "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+      "address_source": "source_text",
+      "geo_lng": 106.526277,
+      "geo_lat": 29.582209,
+      "lineup": [
+        "拓荒乐队"
+      ],
+      "lineup_artists": [
+        "拓荒乐队"
+      ],
+      "genres": [
+        "hard rock"
+      ],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "「荒野舞会」：拓荒乐队首次专场｜坚果NUTS",
+        "2026-06-05",
+        "2026-05-15",
+        "2026-05-16",
+        "2026-05-17"
+      ],
+      "description_original_lines": [
+        "坚果NUTS",
+        "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+        "6/5 20:00",
+        "6/5 20:00 @NUTS 「荒野舞会」 当钢筋森林的喧嚣褪去，当循规蹈矩的日常被撕裂，拓荒乐队携首次专场，以硬摇滚为火种，点燃一场「荒野舞会」"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "重庆|坚果nuts|2026-06-05|「荒野舞会」拓荒乐队首次专场坚果nuts",
+      "detail_path": "by-id/nutsu3a9ccb6527e8932a7a.json",
+      "detail_url": "by-id/nutsu3a9ccb6527e8932a7a.json",
+      "address_verification": {
+        "decision": "registry_over_poster_ocr_address",
+        "note": "poster OCR address conflicts with the verified venue registry; public release keeps the registry address instead of OCR-only override",
+        "rejected_source_address": "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F"
+      },
+      "venue_lat": 29.582209,
+      "venue_lng": 106.526277,
+      "geo_coord_system": "GCJ-02",
+      "geo_source": "tencent_map_picker_user_confirmed",
+      "geo_verified_at": "2026-06-01",
+      "geo_candidate_id": "nuts_chongqing_longhu",
+      "protected_field_merge": {
+        "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+        "preserved_fields": [
+          "address",
+          "address_full",
+          "address_source",
+          "geo_candidate_id",
+          "geo_coord_system",
+          "geo_lat",
+          "geo_lng",
+          "geo_source",
+          "geo_verified_at",
+          "venue_id",
+          "venue_lat",
+          "venue_lng"
+        ],
+        "reason": "base row carried verified place fields; incremental row did not request explicit override"
+      },
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+      "poster_cloud_path": "weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+      "poster_migrated_at": "2026-06-05T18:01:30+08:00",
+      "poster_public_source_hash": "795adce0b4f226e1",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260605/nutsu3a9ccb6527e8932a7a--795adce0b4f226e1997c.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "inward_street:4e9c840a60cc5175",
+      "event_id": "inward_street:4e9c840a60cc5175",
+      "article_id": "inward_street:4e9c840a60cc5175",
+      "queue_id": "inward_street:4e9c840a60cc5175",
+      "title": "6.5 Fri｜遁地机 INWARD CLUB",
+      "title_original": "6.5 Fri｜遁地机 INWARD CLUB",
+      "title_display": "Fri | 遁地机 INWARD CLUB",
+      "account": "Inward Street",
+      "account_key": "inward_street",
+      "promoter": "Inward Street",
+      "source_article": {
+        "url_hash": "4e9c840a60cc5175",
+        "account_name": "Inward Street",
+        "published_at": "2026-06-02"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "4e9c840a60cc5175"
+      },
+      "post_date": "2026-06-02",
+      "source_account_name": "Inward Street",
+      "source_published_at": "2026-06-02",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-05"
+      ],
+      "event_date_iso_guess": "2026-06-05",
+      "event_date_iso_guesses": [
+        "2026-06-05"
+      ],
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "22:30-03:00",
+      "event_time_source": "source_text",
+      "time_start": "22:30",
+      "time_end": "03:00",
+      "running_hours_text": "22:30-03:00",
+      "running_hours_source": "source_text",
+      "city": [
+        "重庆"
+      ],
+      "city_key": "chongqing",
+      "city_name": "重庆",
+      "city_keys": [
+        "chongqing"
+      ],
+      "venue": [],
+      "venue_id": "inward_club_chongqing",
+      "venue_name": "INWARD CLUB",
+      "address": "重庆市江北区龙湖新壹街C馆2楼 Inward Club",
+      "address_full": "重庆市江北区龙湖新壹街C馆2楼 Inward Club",
+      "address_source": "venue_registry_verified",
+      "geo_lng": 106.526237,
+      "geo_lat": 29.582444,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [
+        "acid electro",
+        "hard groove",
+        "industrial techno",
+        "breakbeat"
+      ],
+      "music_styles": [
+        "techno",
+        "electro",
+        "breaks"
+      ],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "6.5 Fri｜遁地机 INWARD CLUB",
+        "2026-06-05",
+        "低频在岩层中跳跃、反射，以深邃充能的Acid Electro、Hard Groove、Industrial Techno为锋利运转的刀盘"
+      ],
+      "description_original_lines": [
+        "6.5 Fri｜遁地机 INWARD CLUB",
+        "低频在岩层中跳跃、反射，以深邃充能的Acid Electro、Hard Groove、Industrial Techno为锋利运转的刀盘",
+        "2026.06.05 22:30-03:00 egy"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "重庆|inwardclub|2026-06-05|fri遁地机inwardclub",
+      "detail_path": "by-id/inward_streetu3a4e9c840a60cc5175.json",
+      "detail_url": "by-id/inward_streetu3a4e9c840a60cc5175.json",
+      "venue_lat": 29.582444,
+      "venue_lng": 106.526237,
+      "geo_coord_system": "GCJ-02",
+      "geo_source": "frontend_verified_map_location_book",
+      "geo_verified_at": "2026-06-01",
+      "geo_candidate_id": "inward_club_chongqing",
+      "protected_field_merge": {
+        "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+        "preserved_fields": [
+          "address",
+          "address_full",
+          "address_source",
+          "geo_candidate_id",
+          "geo_coord_system",
+          "geo_source",
+          "geo_verified_at",
+          "venue_lat",
+          "venue_lng"
+        ],
+        "reason": "base row carried verified place fields; incremental row did not request explicit override"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+      "poster_cloud_path": "weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/inward_street_4e9c840a60cc5175--eeb93badf892d561e2be1bf2.gif"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "cicipark:2d005a889516f59c",
+      "event_id": "cicipark:2d005a889516f59c",
+      "article_id": "cicipark:2d005a889516f59c",
+      "queue_id": "cicipark:2d005a889516f59c",
+      "title": "6.05周五｜潮汐CHAOXI pres.Cosmjn",
+      "title_original": "6.05周五｜潮汐CHAOXI pres.Cosmjn",
+      "title_display": "潮汐CHAOXI pres.Cosmjn",
+      "account": "cicipark",
+      "account_key": "cicipark",
+      "promoter": "cicipark",
+      "source_article": {
+        "url_hash": "2d005a889516f59c",
+        "account_name": "cicipark",
+        "published_at": "2026-06-03"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "2d005a889516f59c"
+      },
+      "post_date": "2026-06-03",
+      "source_account_name": "cicipark",
+      "source_published_at": "2026-06-03",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-05"
+      ],
+      "event_date_iso_guess": "2026-06-05",
+      "event_date_iso_guesses": [
+        "2026-06-05"
+      ],
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "22:00 - Late",
+      "event_time_source": "source_text",
+      "time_start": "22:00",
+      "time_end": "Late",
+      "running_hours_text": "22:00 - Late",
+      "running_hours_source": "source_text",
+      "city": [
+        "重庆"
+      ],
+      "city_key": "chongqing",
+      "city_name": "重庆",
+      "city_keys": [
+        "chongqing"
+      ],
+      "venue": [],
+      "venue_id": "cicipark_chongqing",
+      "venue_name": "Cici Park",
+      "address": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+      "address_full": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+      "address_source": "manual_registry",
+      "geo_lng": 106.592744,
+      "geo_lat": 29.55206,
+      "lineup": [
+        "Cosmjn"
+      ],
+      "lineup_artists": [
+        "Cosmjn"
+      ],
+      "genres": [
+        "techno",
+        "house",
+        "electro",
+        "breaks",
+        "minimal",
+        "deep tech"
+      ],
+      "music_styles": [
+        "techno",
+        "house",
+        "electro",
+        "breaks"
+      ],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "6.05周五｜潮汐CHAOXI pres.Cosmjn",
+        "2026-06-05",
+        "重庆开埠遗址公园2号停车场 观光电梯至2楼 青年文化空间",
+        "Youth Cultural Space, 2nd Floor, Opening Port Park Gate2, NanAn District, Chongqing",
+        "- 预售通道 -"
+      ],
+      "description_original_lines": [
+        "6.05周五｜潮汐CHAOXI pres.Cosmjn",
+        "重庆开埠遗址公园2号停车场 观光电梯至2楼 青年文化空间",
+        "Youth Cultural Space, 2nd Floor, Opening Port Park Gate2, NanAn District, Chongqing",
+        "- 预售通道 -"
+      ],
+      "dj_bio_lines": [
+        "跳舞活动「潮汐」是重庆电子俱乐部cicipark & EchoBay主理人 Sunyoung 发起了一项 Project，定期邀请心仪的 DJ / 音乐人朋友分享最新的音乐故事、声音品味与氛围体验，渴望着全方位与新朋老友发生舞池共鸣与思想交流～",
+        "六月「潮汐」，特别邀请到罗马尼亚才华横溢的DJ/制作人Cosmjn，他的音乐风格巧妙融合了"
+      ],
+      "artist_profiles": [
+        {
+          "artist_id": "dj_db24bce2",
+          "canonical_name": "Sunyoung",
+          "matched_name": "Sunyoung",
+          "verified": true,
+          "source": "dj_profiles",
+          "city": "Chongqing",
+          "genres": [
+            "Deep House|Dub|Electro|Electronic|Minimal|UK Garage"
+          ],
+          "bio": "",
+          "links": [
+            "https://www.instagram.com/cicipilot_sunyoung/",
+            "https://ra.co/dj/sunyoung-cn",
+            "https://www.xiaohongshu.com/user/profile/6927363f000000003702d11d"
+          ]
+        },
+        {
+          "artist_id": "dj_a74c8e1a",
+          "canonical_name": "Cosmjn",
+          "matched_name": "Cosmjn",
+          "verified": true,
+          "source": "dj_profiles",
+          "city": "BUCHAREST",
+          "genres": [
+            "Minimal"
+          ],
+          "bio": "▫️EUROPE • andreea@sunrise.ro\n▫️NORTH AMERICA • denis@nomadtalent.com\n▫️SOUTH AMERICA • bookings@kickclapagency.com\n🪄 @radial_records",
+          "links": [
+            "https://www.instagram.com/cosmjn/",
+            "https://soundcloud.com/cosmjn",
+            "https://ra.co/dj/cosmjn/biography",
+            "https://youtu.be/bTQRQHX0TIg"
+          ]
+        }
+      ],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "重庆|cicipark|2026-06-05|潮汐chaoxiprescosmjn",
+      "detail_path": "by-id/ciciparku3a2d005a889516f59c.json",
+      "detail_url": "by-id/ciciparku3a2d005a889516f59c.json",
+      "lineup_quality": {
+        "status": "verified",
+        "decision": "scoring_retained_lineup",
+        "note": "retained lineup artists with score >= 0.6: Cosmjn"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "nuts:dbaf27293c8eb75d",
+      "event_id": "nuts:dbaf27293c8eb75d",
+      "article_id": "nuts:dbaf27293c8eb75d",
+      "queue_id": "nuts:dbaf27293c8eb75d",
+      "title": "预告·ROUND2两周年｜坚果NUTS & INWARD",
+      "title_original": "预告·ROUND2两周年｜坚果NUTS & INWARD",
+      "title_display": "ROUND2两周年 | 坚果NUTS & INWARD",
+      "account": "坚果NUTS",
+      "account_key": "nuts",
+      "promoter": "坚果NUTS",
+      "source_article": {
+        "url_hash": "dbaf27293c8eb75d",
+        "account_name": "坚果NUTS",
+        "published_at": "2026-05-28"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "dbaf27293c8eb75d"
+      },
+      "post_date": "2026-05-28",
+      "source_account_name": "坚果NUTS",
+      "source_published_at": "2026-05-28",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-06"
+      ],
+      "event_date_iso_guess": "2026-06-06",
+      "event_date_iso_guesses": [
+        "2026-06-06"
+      ],
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "22:00-23:30",
+      "event_time_source": "source_text",
+      "time_start": "22:00",
+      "time_end": "23:30",
+      "running_hours_text": "22:00-23:30",
+      "running_hours_source": "source_text",
+      "city": [
+        "重庆"
+      ],
+      "city_key": "chongqing",
+      "city_name": "重庆",
+      "city_keys": [
+        "chongqing"
+      ],
+      "venue": [
+        "坚果NUTS"
+      ],
+      "venue_id": "nuts_chongqing",
+      "venue_name": "坚果NUTS",
+      "address": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_full": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_source": "manual_registry",
+      "geo_lng": 106.468644,
+      "geo_lat": 29.561095,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [
+        "早鸟 66¥",
+        "DOOR 89¥"
+      ],
+      "price_text": "早鸟 66¥ / DOOR 89¥",
+      "ticketing_text": "早鸟 66¥ / DOOR 89¥",
+      "evidence": [
+        "预告·ROUND2两周年｜坚果NUTS & INWARD",
+        "入场ENTRY丨早鸟 66¥(66张限量供应)",
+        "预售ADV 79¥/现场DOOR 89¥",
+        "2026-06-06",
+        "22:00 - 23:30"
+      ],
+      "description_original_lines": [
+        "预告·ROUND2两周年｜坚果NUTS & INWARD",
+        "入场ENTRY丨早鸟 66¥(66张限量供应)",
+        "预售ADV 79¥/现场DOOR 89¥",
+        "坚果NUTS"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "重庆|坚果nuts|2026-06-06|round2两周年坚果nuts&inward",
+      "detail_path": "by-id/nutsu3adbaf27293c8eb75d.json",
+      "detail_url": "by-id/nutsu3adbaf27293c8eb75d.json",
+      "merge_provenance": {
+        "schema_version": "weekly_merge_provenance.v1",
+        "reason": "duplicate_cluster",
+        "retained_id": "nuts:dbaf27293c8eb75d",
+        "retained_source_hash": "dbaf27293c8eb75d",
+        "merged_from": [
+          "inward_street:16fd95408e5942fc",
+          "nuts:dbaf27293c8eb75d"
+        ],
+        "merged_source_hashes": [
+          "16fd95408e5942fc",
+          "dbaf27293c8eb75d"
+        ],
+        "source_count": 2,
+        "sources": [
+          {
+            "event_id": "inward_street:16fd95408e5942fc",
+            "source_hash": "16fd95408e5942fc",
+            "title": "预告丨ROUND2两周年 @坚果NUTS&INWARD",
+            "published_at": "2026-05-28",
+            "account_name": "Inward Street",
+            "source_type": "wechat_article"
+          },
+          {
+            "event_id": "nuts:dbaf27293c8eb75d",
+            "source_hash": "dbaf27293c8eb75d",
+            "title": "ROUND2两周年 | 坚果NUTS & INWARD",
+            "published_at": "2026-05-28",
+            "account_name": "坚果NUTS",
+            "source_type": "wechat_article"
+          }
+        ]
+      },
+      "lineup_display_hint": "点击海报跳转公众号原文查看",
+      "lineup_quality": {
+        "status": "uncertain",
+        "decision": "cleared_untrusted_lineup",
+        "note": "public mini-program policy: lineup was prose, aggregate text, bio-like text, or not source-grounded enough for display"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_dbaf27293c8eb75d--31adaf63de73a7049f1a791f.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "nuts:9ef91206069cad25",
+      "event_id": "nuts:9ef91206069cad25",
+      "article_id": "nuts:9ef91206069cad25",
+      "queue_id": "nuts:9ef91206069cad25",
+      "title": "春山后潮「马上迷幻」｜6月6日@坚果NUTS",
+      "title_original": "春山后潮「马上迷幻」｜6月6日@坚果NUTS",
+      "title_display": "春山后潮「马上迷幻」 | @坚果NUTS",
+      "account": "坚果NUTS",
+      "account_key": "nuts",
+      "promoter": "坚果NUTS",
+      "source_article": {
+        "url_hash": "9ef91206069cad25",
+        "account_name": "坚果NUTS",
+        "published_at": "2026-06-01"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "9ef91206069cad25"
+      },
+      "post_date": "2026-06-01",
+      "source_account_name": "坚果NUTS",
+      "source_published_at": "2026-06-01",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-06"
+      ],
+      "event_date_iso_guess": "2026-06-06",
+      "event_date_iso_guesses": [
+        "2026-06-06"
+      ],
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "20:00",
+      "event_time_source": "source_text",
+      "time_start": "20:00",
+      "time_end": "",
+      "running_hours_text": "20:00",
+      "running_hours_source": "source_text",
+      "city": [
+        "重庆"
+      ],
+      "city_key": "chongqing",
+      "city_name": "重庆",
+      "city_keys": [
+        "chongqing"
+      ],
+      "venue": [],
+      "venue_id": "nuts_chongqing",
+      "venue_name": "坚果NUTS",
+      "address": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_full": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_source": "venue_registry_verified",
+      "geo_lng": 106.468644,
+      "geo_lat": 29.561095,
+      "lineup": [
+        "春山后潮"
+      ],
+      "lineup_artists": [
+        "春山后潮"
+      ],
+      "genres": [
+        "迷幻"
+      ],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "春山后潮「马上迷幻」｜6月6日@坚果NUTS",
+        "2026-06-06",
+        "20:00",
+        "6/6 20:00"
+      ],
+      "description_original_lines": [
+        "春山后潮「马上迷幻」｜6月6日@坚果NUTS",
+        "6/6 20:00",
+        "2026",
+        "春山后潮「马上迷幻]2026全国巡演"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "重庆|坚果nuts|2026-06-06|春山后潮「马上迷幻」坚果nuts",
+      "detail_path": "by-id/nutsu3a9ef91206069cad25.json",
+      "detail_url": "by-id/nutsu3a9ef91206069cad25.json",
+      "venue_lat": 29.561095,
+      "venue_lng": 106.468644,
+      "geo_coord_system": "GCJ-02",
+      "geo_source": "current_release_amap_geocoder_backfill_20260531",
+      "geo_verified_at": "2026-06-01",
+      "geo_candidate_id": "nuts_chongqing",
+      "protected_field_merge": {
+        "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+        "preserved_fields": [
+          "address_source",
+          "geo_candidate_id",
+          "geo_coord_system",
+          "geo_source",
+          "geo_verified_at",
+          "venue_lat",
+          "venue_lng"
+        ],
+        "reason": "base row carried verified place fields; incremental row did not request explicit override"
+      },
+      "merge_provenance": {
+        "schema_version": "weekly_merge_provenance.v1",
+        "reason": "duplicate_cluster",
+        "retained_id": "nuts:9ef91206069cad25",
+        "retained_source_hash": "9ef91206069cad25",
+        "merged_from": [
+          "nuts:555141c9cfa0d49c",
+          "nuts:b8a0a991fe8389bd",
+          "nuts:9ef91206069cad25"
+        ],
+        "merged_source_hashes": [
+          "555141c9cfa0d49c",
+          "9ef91206069cad25",
+          "b8a0a991fe8389bd"
+        ],
+        "source_count": 3,
+        "sources": [
+          {
+            "event_id": "nuts:555141c9cfa0d49c",
+            "source_hash": "555141c9cfa0d49c",
+            "title": "时代发展了，60块就可以去太空漫游了 | 春山后潮@坚果NUTS",
+            "published_at": "2026-05-18",
+            "account_name": "坚果NUTS",
+            "source_type": "wechat_article"
+          },
+          {
+            "event_id": "nuts:b8a0a991fe8389bd",
+            "source_hash": "b8a0a991fe8389bd",
+            "title": "春山后潮·马上迷幻 | @坚果NUTS",
+            "published_at": "2026-05-21",
+            "account_name": "坚果NUTS",
+            "source_type": "wechat_article"
+          },
+          {
+            "event_id": "nuts:9ef91206069cad25",
+            "source_hash": "9ef91206069cad25",
+            "title": "春山后潮「马上迷幻」 | @坚果NUTS",
+            "published_at": "2026-06-01",
+            "account_name": "坚果NUTS",
+            "source_type": "wechat_article"
+          }
+        ]
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_9ef91206069cad25--7b8ab2e46169b94cef56f436.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "nuts:bd91e6311e3e3c77",
+      "event_id": "nuts:bd91e6311e3e3c77",
+      "article_id": "nuts:bd91e6311e3e3c77",
+      "queue_id": "nuts:bd91e6311e3e3c77",
+      "title": "坚果即兴 NUTS JAM｜6月7日@STILL UP",
+      "title_original": "坚果即兴 NUTS JAM｜6月7日@STILL UP",
+      "title_display": "@STILL UP",
+      "account": "坚果NUTS",
+      "account_key": "nuts",
+      "promoter": "坚果NUTS",
+      "source_article": {
+        "url_hash": "bd91e6311e3e3c77",
+        "account_name": "坚果NUTS",
+        "published_at": "2026-05-31"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "bd91e6311e3e3c77",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-05-31",
+      "source_account_name": "坚果NUTS",
+      "source_published_at": "2026-05-31",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "poster_source": "cloudbase_storage_from_wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-07"
+      ],
+      "event_date_iso_guess": "2026-06-07",
+      "event_date_iso_guesses": [
+        "2026-06-07"
+      ],
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "20:00",
+      "event_time_source": "source_text",
+      "time_start": "20:00",
+      "time_end": "",
+      "running_hours_text": "20:00",
+      "running_hours_source": "source_text",
+      "city": [
+        "重庆"
+      ],
+      "city_key": "chongqing",
+      "city_name": "重庆",
+      "city_keys": [
+        "chongqing"
+      ],
+      "venue": [],
+      "venue_id": "nuts_chongqing",
+      "venue_name": "坚果NUTS",
+      "address": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_full": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_source": "manual_registry",
+      "geo_lng": 106.468644,
+      "geo_lat": 29.561095,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [
+        "Free Entry"
+      ],
+      "price_text": "Free Entry",
+      "ticketing_text": "Free Entry",
+      "evidence": [
+        "坚果即兴 NUTS JAM｜6月7日@STILL UP",
+        "Free Entry",
+        "2026-06-07",
+        "20:00",
+        "6/7 20:00 onwards"
+      ],
+      "description_original_lines": [
+        "坚果即兴 NUTS JAM｜6月7日@STILL UP",
+        "Free Entry",
+        "6/7 20:00 onwards",
+        "@STILL UP(NUTS)"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "重庆|坚果nuts|2026-06-07|stillup",
+      "detail_path": "by-id/nutsu3abd91e6311e3e3c77.json",
+      "detail_url": "by-id/nutsu3abd91e6311e3e3c77.json",
+      "address_verification": {
+        "decision": "registry_over_poster_ocr_address",
+        "note": "poster OCR address conflicts with the verified venue registry; public release keeps the registry address instead of OCR-only override",
+        "rejected_source_address": "ADD:重庆两江新区龙湖新壹街C馆1F"
+      },
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster_cloud_path": "weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+      "poster_public_source_hash": "e83aaa44acc8494f",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/nutsu3abd91e6311e3e3c77--e83aaa44acc8494f1801.jpg"
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "rnslive:eb92b38a938eca80",
+      "event_id": "rnslive:eb92b38a938eca80",
+      "article_id": "rnslive:eb92b38a938eca80",
+      "queue_id": "rnslive:eb92b38a938eca80",
+      "title": "Ruins入灵寺 ｜6.9 “藏在阿尔卑斯山脚仙雾中的东欧科学怪人”  Daniel Maszkowicz",
+      "title_original": "Ruins入灵寺 ｜6.9 “藏在阿尔卑斯山脚仙雾中的东欧科学怪人”  Daniel Maszkowicz",
+      "title_display": "Ruins入灵寺 | “藏在阿尔卑斯山脚仙雾中的东欧科学怪人”  Daniel Maszkowicz",
+      "account": "RNSLIVE",
+      "account_key": "rnslive",
+      "promoter": "RNSLIVE",
+      "source_article": {
+        "url_hash": "eb92b38a938eca80",
+        "account_name": "RNSLIVE",
+        "published_at": "2026-06-01"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "eb92b38a938eca80",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-06-01",
+      "source_account_name": "RNSLIVE",
+      "source_published_at": "2026-06-01",
+      "cover_url": "https://mmbiz.qpic.cn/mmbiz_png/JOhTxN9lalnLjTBPia6MaRFLxhiaYrpySH3pEyPw4Znj2tHc5kAzBkrk4jlKXnMe2M83xJkbCfia8BdCVabnJ2J9g/640?wx_fmt=png",
+      "cover_image_url": "https://mmbiz.qpic.cn/mmbiz_png/JOhTxN9lalnLjTBPia6MaRFLxhiaYrpySH3pEyPw4Znj2tHc5kAzBkrk4jlKXnMe2M83xJkbCfia8BdCVabnJ2J9g/640?wx_fmt=png",
+      "poster_file_id": "",
+      "poster_source": "wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-09"
+      ],
+      "event_date_iso_guess": "2026-06-09",
+      "event_date_iso_guesses": [
+        "2026-06-09"
+      ],
+      "event_date_start": "2026-06-09",
+      "event_date_end": "2026-06-09",
+      "event_time_text": "2026.6.9 20:00",
+      "event_time_source": "source_text",
+      "time_start": "2026.6.9 20:00",
+      "time_end": "",
+      "running_hours_text": "2026.6.9 20:00",
+      "running_hours_source": "source_text",
+      "city": [
+        "重庆"
+      ],
+      "city_key": "chongqing",
+      "city_name": "重庆",
+      "city_keys": [
+        "chongqing"
+      ],
+      "venue": [],
+      "venue_id": "ruinslive_chongqing",
+      "venue_name": "Ruins入灵寺",
+      "address": "重庆市两江新区建新东路64号(轻轨9/10号线鲤鱼池站3A出口后行50米)",
+      "address_full": "重庆市两江新区建新东路64号(轻轨9/10号线鲤鱼池站3A出口后行50米)",
+      "address_source": "venue_registry_verified",
+      "geo_lng": 106.551922,
+      "geo_lat": 29.574563,
+      "lineup": [
+        "Daniel Maszkowicz"
+      ],
+      "lineup_artists": [
+        "Daniel Maszkowicz"
+      ],
+      "genres": [
+        "techno",
+        "house",
+        "electro"
+      ],
+      "music_styles": [
+        "techno",
+        "house",
+        "electro"
+      ],
+      "price": [
+        "免票入场"
+      ],
+      "price_text": "免票入场",
+      "ticketing_text": "免票入场",
+      "evidence": [
+        "Ruins入灵寺 ｜6.9 “藏在阿尔卑斯山脚仙雾中的东欧科学怪人” Daniel Maszkowicz",
+        "“藏在阿尔卑斯山脚仙雾中的东欧科学怪人” Daniel Maszkowicz 2026.6.9 20:00 免票入场 演出时长:30Min ADD:重庆Ruins入灵寺实验艺术空间",
+        "2026-06-09",
+        "重庆市江北区建新东路与融景路交叉口西南160米/合作村国际青年社区A区13号楼",
+        "EMC:EMIbyDanielMaszkowiczCave12Genève,22.02.2026©Cave12 Olive"
+      ],
+      "description_original_lines": [
+        "Ruins入灵寺 ｜6.9 “藏在阿尔卑斯山脚仙雾中的东欧科学怪人” Daniel Maszkowicz",
+        "“藏在阿尔卑斯山脚仙雾中的东欧科学怪人” Daniel Maszkowicz 2026.6.9 20:00 免票入场 演出时长:30Min ADD:重庆Ruins入灵寺实验艺术空间",
+        "重庆市江北区建新东路与融景路交叉口西南160米/合作村国际青年社区A区13号楼",
+        "EMC:EMIbyDanielMaszkowiczCave12Genève,22.02.2026©Cave12 Olive"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "重庆|ruins入灵寺|2026-06-09|ruins入灵寺藏在阿尔卑斯山脚仙雾中的东欧科学怪人danielmaszkowicz",
+      "detail_path": "by-id/rnsliveu3aeb92b38a938eca80.json",
+      "detail_url": "by-id/rnsliveu3aeb92b38a938eca80.json",
+      "address_verification": {
+        "decision": "registry_over_poster_ocr_address",
+        "note": "poster OCR address conflicts with the verified venue registry; public release keeps the registry address instead of OCR-only override",
+        "rejected_source_address": "重庆市江北区建新东路与融景路交叉口西南160米/合作村国际青年社区A区13号楼"
+      },
+      "venue_lat": 29.574563,
+      "venue_lng": 106.551922,
+      "geo_coord_system": "GCJ-02",
+      "geo_source": "tencent_map_picker_user_confirmed",
+      "geo_verified_at": "2026-06-01",
+      "geo_candidate_id": "ruinslive_chongqing",
+      "protected_field_merge": {
+        "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+        "preserved_fields": [
+          "address_source",
+          "geo_candidate_id",
+          "geo_coord_system",
+          "geo_source",
+          "geo_verified_at",
+          "venue_lat",
+          "venue_lng"
+        ],
+        "reason": "base row carried verified place fields; incremental row did not request explicit override"
+      },
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      }
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "nuts:ba295258057c04d3",
+      "event_id": "nuts:ba295258057c04d3",
+      "article_id": "nuts:ba295258057c04d3",
+      "queue_id": "nuts:ba295258057c04d3",
+      "title": "毕业季听毕业歌——印尼emo乐队Murphy Radio｜坚果NUTS",
+      "title_original": "毕业季听毕业歌——印尼emo乐队Murphy Radio｜坚果NUTS",
+      "title_display": "毕业季听毕业歌——印尼emo乐队Murphy Radio | 坚果NUTS",
+      "account": "坚果NUTS",
+      "account_key": "nuts",
+      "promoter": "坚果NUTS",
+      "source_article": {
+        "url_hash": "ba295258057c04d3",
+        "account_name": "坚果NUTS",
+        "published_at": "2026-06-02"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "ba295258057c04d3",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-06-02",
+      "source_account_name": "坚果NUTS",
+      "source_published_at": "2026-06-02",
+      "cover_url": "https://mmbiz.qpic.cn/mmbiz_jpg/X2TFYhMElU76uBhGGXRXZuou88LWHv2bnstSKqXEdUgUicGqZPVOTJmU3vtwaEQIq12NmiczGgJZrCgicYh7yElvNfmVOTA0MYl1B2C63D4CBs/640?wx_fmt=jpeg&amp;from=appmsg",
+      "cover_image_url": "https://mmbiz.qpic.cn/mmbiz_jpg/X2TFYhMElU76uBhGGXRXZuou88LWHv2bnstSKqXEdUgUicGqZPVOTJmU3vtwaEQIq12NmiczGgJZrCgicYh7yElvNfmVOTA0MYl1B2C63D4CBs/640?wx_fmt=jpeg&amp;from=appmsg",
+      "poster_file_id": "",
+      "poster_source": "wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-12"
+      ],
+      "event_date_iso_guess": "2026-06-12",
+      "event_date_iso_guesses": [
+        "2026-06-12"
+      ],
+      "event_date_start": "2026-06-12",
+      "event_date_end": "2026-06-12",
+      "event_time_text": "20:00",
+      "event_time_source": "source_text",
+      "time_start": "20:00",
+      "time_end": "",
+      "running_hours_text": "20:00",
+      "running_hours_source": "source_text",
+      "city": [
+        "重庆"
+      ],
+      "city_key": "chongqing",
+      "city_name": "重庆",
+      "city_keys": [
+        "chongqing"
+      ],
+      "venue": [],
+      "venue_id": "nuts_chongqing",
+      "venue_name": "坚果NUTS",
+      "address": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_full": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_source": "venue_registry_verified",
+      "geo_lng": 106.468644,
+      "geo_lat": 29.561095,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "毕业季听毕业歌——印尼emo乐队Murphy Radio｜坚果NUTS",
+        "2026-06-12",
+        "20:00",
+        "6/12 20:00",
+        "2026新专辑预热巡演"
+      ],
+      "description_original_lines": [
+        "6/12 20:00",
+        "2026新专辑预热巡演",
+        "Poster OCR date: 2026-06-03 / 2026-06-05 / 2026-06-06 / 2026-06-07"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "重庆|坚果nuts|2026-06-12|毕业季听毕业歌——印尼emo乐队murphyradio坚果nuts",
+      "detail_path": "by-id/nutsu3aba295258057c04d3.json",
+      "detail_url": "by-id/nutsu3aba295258057c04d3.json",
+      "merge_provenance": {
+        "schema_version": "weekly_merge_provenance.v1",
+        "reason": "duplicate_cluster",
+        "retained_id": "nuts:ba295258057c04d3",
+        "retained_source_hash": "ba295258057c04d3",
+        "merged_from": [
+          "nuts:4c56d5a25d0c091f",
+          "nuts:ba295258057c04d3"
+        ],
+        "merged_source_hashes": [
+          "4c56d5a25d0c091f",
+          "ba295258057c04d3"
+        ],
+        "source_count": 2,
+        "sources": [
+          {
+            "event_id": "nuts:4c56d5a25d0c091f",
+            "source_hash": "4c56d5a25d0c091f",
+            "title": "印尼「Murphy Radio」 | @坚果NUTS",
+            "published_at": "2026-05-21",
+            "account_name": "坚果NUTS",
+            "source_type": "wechat_article"
+          },
+          {
+            "event_id": "nuts:ba295258057c04d3",
+            "source_hash": "ba295258057c04d3",
+            "title": "毕业季听毕业歌——印尼emo乐队Murphy Radio | 坚果NUTS",
+            "published_at": "2026-06-02",
+            "account_name": "坚果NUTS",
+            "source_type": "wechat_article"
+          }
+        ]
+      },
+      "venue_lat": 29.561095,
+      "venue_lng": 106.468644,
+      "geo_coord_system": "GCJ-02",
+      "geo_source": "current_release_amap_geocoder_backfill_20260531",
+      "geo_verified_at": "2026-06-01",
+      "geo_candidate_id": "nuts_chongqing",
+      "protected_field_merge": {
+        "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+        "preserved_fields": [
+          "address_source",
+          "geo_candidate_id",
+          "geo_coord_system",
+          "geo_source",
+          "geo_verified_at",
+          "venue_lat",
+          "venue_lng"
+        ],
+        "reason": "base row carried verified place fields; incremental row did not request explicit override"
+      },
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      }
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "nuts:ca5535e940ae0465",
+      "event_id": "nuts:ca5535e940ae0465",
+      "article_id": "nuts:ca5535e940ae0465",
+      "queue_id": "nuts:ca5535e940ae0465",
+      "title": "NO RUSH！慢热如何？｜STILL UP",
+      "title_original": "NO RUSH！慢热如何？｜STILL UP",
+      "title_display": "NO RUSH！慢热如何？ | STILL UP",
+      "account": "坚果NUTS",
+      "account_key": "nuts",
+      "promoter": "坚果NUTS",
+      "source_article": {
+        "url_hash": "ca5535e940ae0465",
+        "account_name": "坚果NUTS",
+        "published_at": "2026-06-02"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "ca5535e940ae0465",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-06-02",
+      "source_account_name": "坚果NUTS",
+      "source_published_at": "2026-06-02",
+      "cover_url": "https://mmbiz.qpic.cn/mmbiz_jpg/X2TFYhMElU4ZmkxLLiarWua9UicVsT0ck7cnlWPUoeGLibpJ0pQnAWPBs4xXESYQTCa0PkKyN2K70vlzkujibGLB9RepOQq2AvteyvSJfvu3EE4/640?wx_fmt=jpeg",
+      "cover_image_url": "https://mmbiz.qpic.cn/mmbiz_jpg/X2TFYhMElU4ZmkxLLiarWua9UicVsT0ck7cnlWPUoeGLibpJ0pQnAWPBs4xXESYQTCa0PkKyN2K70vlzkujibGLB9RepOQq2AvteyvSJfvu3EE4/640?wx_fmt=jpeg",
+      "poster_file_id": "",
+      "poster_source": "wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-13"
+      ],
+      "event_date_iso_guess": "2026-06-13",
+      "event_date_iso_guesses": [
+        "2026-06-13"
+      ],
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": "22:30",
+      "event_time_source": "source_text",
+      "time_start": "22:30",
+      "time_end": "",
+      "running_hours_text": "22:30",
+      "running_hours_source": "source_text",
+      "city": [
+        "重庆"
+      ],
+      "city_key": "chongqing",
+      "city_name": "重庆",
+      "city_keys": [
+        "chongqing"
+      ],
+      "venue": [],
+      "venue_id": "nuts_chongqing",
+      "venue_name": "坚果NUTS",
+      "address": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_full": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_source": "manual_registry",
+      "geo_lng": 106.468644,
+      "geo_lat": 29.561095,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [
+        "disco",
+        "house",
+        "tribal house",
+        "deep techno",
+        "psytrance"
+      ],
+      "music_styles": [
+        "techno",
+        "house",
+        "trance",
+        "disco"
+      ],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "NO RUSH！慢热如何？｜STILL UP",
+        "2026-06-13",
+        "22:30",
+        "6/13 22:30",
+        "@STILL UP"
+      ],
+      "description_original_lines": [
+        "6/13 22:30",
+        "@STILL UP",
+        "2026.6.13 22:30"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "重庆|坚果nuts|2026-06-13|norush！慢热如何？stillup",
+      "detail_path": "by-id/nutsu3aca5535e940ae0465.json",
+      "detail_url": "by-id/nutsu3aca5535e940ae0465.json",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      }
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "nuts:4da37c16191f823f",
+      "event_id": "nuts:4da37c16191f823f",
+      "article_id": "nuts:4da37c16191f823f",
+      "queue_id": "nuts:4da37c16191f823f",
+      "title": "持续蔓延！十九年硬摇乐队「丝绒公路」｜6月13日@坚果NUTS",
+      "title_original": "持续蔓延！十九年硬摇乐队「丝绒公路」｜6月13日@坚果NUTS",
+      "title_display": "持续蔓延！十九年硬摇乐队「丝绒公路」 | @坚果NUTS",
+      "account": "坚果NUTS",
+      "account_key": "nuts",
+      "promoter": "坚果NUTS",
+      "source_article": {
+        "url_hash": "4da37c16191f823f",
+        "account_name": "坚果NUTS",
+        "published_at": "2026-06-02"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "4da37c16191f823f",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-06-02",
+      "source_account_name": "坚果NUTS",
+      "source_published_at": "2026-06-02",
+      "cover_url": "https://mmbiz.qpic.cn/sz_mmbiz_jpg/X2TFYhMElU5x3xEF4CcVKXJUslia4BeXGmWKJmmoMU7HHYqghDmvZHuwZXiaQ0cznSflL6hDj6I4VxHKlHviaHicxTPOHoXLIGIWHkRvrwDeBMo/640?wx_fmt=jpeg",
+      "cover_image_url": "https://mmbiz.qpic.cn/sz_mmbiz_jpg/X2TFYhMElU5x3xEF4CcVKXJUslia4BeXGmWKJmmoMU7HHYqghDmvZHuwZXiaQ0cznSflL6hDj6I4VxHKlHviaHicxTPOHoXLIGIWHkRvrwDeBMo/640?wx_fmt=jpeg",
+      "poster_file_id": "",
+      "poster_source": "wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-13"
+      ],
+      "event_date_iso_guess": "2026-06-13",
+      "event_date_iso_guesses": [
+        "2026-06-13"
+      ],
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": "20:00",
+      "event_time_source": "source_text",
+      "time_start": "20:00",
+      "time_end": "",
+      "running_hours_text": "20:00",
+      "running_hours_source": "source_text",
+      "city": [
+        "重庆"
+      ],
+      "city_key": "chongqing",
+      "city_name": "重庆",
+      "city_keys": [
+        "chongqing"
+      ],
+      "venue": [],
+      "venue_id": "nuts_chongqing",
+      "venue_name": "坚果NUTS",
+      "address": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_full": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_source": "manual_registry",
+      "geo_lng": 106.468644,
+      "geo_lat": 29.561095,
+      "lineup": [
+        "丝绒公路"
+      ],
+      "lineup_artists": [
+        "丝绒公路"
+      ],
+      "genres": [
+        "hard rock"
+      ],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "持续蔓延！十九年硬摇乐队「丝绒公路」｜6月13日@坚果NUTS",
+        "2026-06-13",
+        "20:00",
+        "hard rock",
+        "6/13 20:00"
+      ],
+      "description_original_lines": [
+        "持续蔓延！十九年硬摇乐队「丝绒公路」｜6月13日@坚果NUTS",
+        "hard rock",
+        "6/13 20:00",
+        "丝绒公路2026全国巡演"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "重庆|坚果nuts|2026-06-13|持续蔓延！十九年硬摇乐队「丝绒公路」坚果nuts",
+      "detail_path": "by-id/nutsu3a4da37c16191f823f.json",
+      "detail_url": "by-id/nutsu3a4da37c16191f823f.json",
+      "merge_provenance": {
+        "schema_version": "weekly_merge_provenance.v1",
+        "reason": "duplicate_cluster",
+        "retained_id": "nuts:4da37c16191f823f",
+        "retained_source_hash": "4da37c16191f823f",
+        "merged_from": [
+          "nuts:dc7f7768cfadd65f",
+          "nuts:d8ccdd77982aac06",
+          "nuts:4da37c16191f823f"
+        ],
+        "merged_source_hashes": [
+          "4da37c16191f823f",
+          "d8ccdd77982aac06",
+          "dc7f7768cfadd65f"
+        ],
+        "source_count": 3,
+        "sources": [
+          {
+            "event_id": "nuts:dc7f7768cfadd65f",
+            "source_hash": "dc7f7768cfadd65f",
+            "title": "丝绒公路「持续蔓延」2026巡演",
+            "published_at": "2026-05-16",
+            "account_name": "坚果NUTS",
+            "source_type": "wechat_article"
+          },
+          {
+            "event_id": "nuts:d8ccdd77982aac06",
+            "source_hash": "d8ccdd77982aac06",
+            "title": "中国硬摇滚代表——丝绒公路「持续蔓延」 | 坚果NUTS",
+            "published_at": "2026-05-23",
+            "account_name": "坚果NUTS",
+            "source_type": "wechat_article"
+          },
+          {
+            "event_id": "nuts:4da37c16191f823f",
+            "source_hash": "4da37c16191f823f",
+            "title": "持续蔓延！十九年硬摇乐队「丝绒公路」 | @坚果NUTS",
+            "published_at": "2026-06-02",
+            "account_name": "坚果NUTS",
+            "source_type": "wechat_article"
+          }
+        ]
+      },
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      }
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "nuts:2cf68dc3fb3b55d4",
+      "event_id": "nuts:2cf68dc3fb3b55d4",
+      "article_id": "nuts:2cf68dc3fb3b55d4",
+      "queue_id": "nuts:2cf68dc3fb3b55d4",
+      "title": "「未颂之声」- C.S.B.Q乐队2026新巡演丨6月14日@坚果NUTS",
+      "title_original": "「未颂之声」- C.S.B.Q乐队2026新巡演丨6月14日@坚果NUTS",
+      "title_display": "「未颂之声」- C.S.B.Q乐队2026新巡演丨6月14日@坚果NUTS",
+      "account": "坚果NUTS",
+      "account_key": "nuts",
+      "promoter": "坚果NUTS",
+      "source_article": {
+        "url_hash": "2cf68dc3fb3b55d4",
+        "account_name": "坚果NUTS",
+        "published_at": "2026-06-01"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "2cf68dc3fb3b55d4",
+        "disabled_reason": ""
+      },
+      "aggregation_child": false,
+      "post_date": "2026-06-01",
+      "source_account_name": "坚果NUTS",
+      "source_published_at": "2026-06-01",
+      "cover_url": "https://mmbiz.qpic.cn/mmbiz_jpg/X2TFYhMElU7HQfpGzH8W2J3kJqqaoGH1nofjOoRxrtBNViacTrOqLMFMv1coMkGeFUtqn7tAxgFIO1R9emNUSFicbaWZZAvGADibl9HLYWYID8/640?wx_fmt=jpeg&amp;from=appmsg",
+      "cover_image_url": "https://mmbiz.qpic.cn/mmbiz_jpg/X2TFYhMElU7HQfpGzH8W2J3kJqqaoGH1nofjOoRxrtBNViacTrOqLMFMv1coMkGeFUtqn7tAxgFIO1R9emNUSFicbaWZZAvGADibl9HLYWYID8/640?wx_fmt=jpeg&amp;from=appmsg",
+      "poster_file_id": "",
+      "poster_source": "wechat_article",
+      "poster_suppressed": false,
+      "poster_suppressed_reason": "",
+      "event_date_text": [
+        "2026-06-14"
+      ],
+      "event_date_iso_guess": "2026-06-14",
+      "event_date_iso_guesses": [
+        "2026-06-14"
+      ],
+      "event_date_start": "2026-06-14",
+      "event_date_end": "2026-06-14",
+      "event_time_text": "20:00",
+      "event_time_source": "source_text",
+      "time_start": "20:00",
+      "time_end": "",
+      "running_hours_text": "20:00",
+      "running_hours_source": "source_text",
+      "city": [
+        "重庆"
+      ],
+      "city_key": "chongqing",
+      "city_name": "重庆",
+      "city_keys": [
+        "chongqing"
+      ],
+      "venue": [],
+      "venue_id": "nuts_chongqing",
+      "venue_name": "坚果NUTS",
+      "address": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_full": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "address_source": "manual_registry",
+      "geo_lng": 106.468644,
+      "geo_lat": 29.561095,
+      "lineup": [
+        "C.S.B.Q乐队"
+      ],
+      "lineup_artists": [
+        "C.S.B.Q乐队"
+      ],
+      "genres": [],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "「未颂之声」- C.S.B.Q乐队2026新巡演丨6月14日@坚果NUTS",
+        "2026-06-14",
+        "20:00",
+        "6/14 20:00",
+        "https://mmbiz.qpic.cn/mmbiz_png/StsKQTw8XPLIasPgkABZgdNaCCjGrrS1QXpyzLX1oXOE3YvIHIzOmfcLAa9aF1SicJ5docRvenImB8I8X7tR0Z9Duf6JsEl1ibEPNQRmkNAnY/640?wx_fmt=png&from=appmsg#imgIndex=1"
+      ],
+      "description_original_lines": [
+        "6/14 20:00",
+        "Poster OCR date: 2026-06-14"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "重庆|坚果nuts|2026-06-14|「未颂之声」csbq乐队2026新巡演丨6月14日坚果nuts",
+      "detail_path": "by-id/nutsu3a2cf68dc3fb3b55d4.json",
+      "detail_url": "by-id/nutsu3a2cf68dc3fb3b55d4.json",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      }
+    },
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "nuts:1962008ef98a62d3",
+      "event_id": "nuts:1962008ef98a62d3",
+      "article_id": "nuts:1962008ef98a62d3",
+      "queue_id": "nuts:1962008ef98a62d3",
+      "title": "FFF｜坚果波比友友联谊赛·第十弹［免费］",
+      "title_original": "FFF｜坚果波比友友联谊赛·第十弹［免费］",
+      "title_display": "FFF | 坚果波比友友联谊赛·第十弹［免费］",
+      "account": "坚果NUTS",
+      "account_key": "nuts",
+      "promoter": "坚果NUTS",
+      "source_article": {
+        "url_hash": "1962008ef98a62d3",
+        "account_name": "坚果NUTS",
+        "published_at": "2026-06-02"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "1962008ef98a62d3"
+      },
+      "post_date": "2026-06-02",
+      "source_account_name": "坚果NUTS",
+      "source_published_at": "2026-06-02",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-14"
+      ],
+      "event_date_iso_guess": "2026-06-14",
+      "event_date_iso_guesses": [
+        "2026-06-14"
+      ],
+      "event_date_start": "2026-06-14",
+      "event_date_end": "2026-06-14",
+      "event_time_text": "20:00",
+      "event_time_source": "source_text",
+      "time_start": "20:00",
+      "time_end": "",
+      "running_hours_text": "20:00",
+      "running_hours_source": "source_text",
+      "city": [
+        "重庆"
+      ],
+      "city_key": "chongqing",
+      "city_name": "重庆",
+      "city_keys": [
+        "chongqing"
+      ],
+      "venue": [
+        "坚果NUTS"
+      ],
+      "venue_id": "nuts_chongqing",
+      "venue_name": "坚果NUTS",
+      "address": "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+      "address_full": "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+      "address_source": "source_text_over_registry",
+      "geo_lng": 106.468644,
+      "geo_lat": 29.561095,
+      "lineup": [],
+      "lineup_artists": [],
+      "genres": [],
+      "music_styles": [],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "FFF｜坚果波比友友联谊赛·第十弹［免费］",
+        "2026-06-05",
+        "2026-06-06",
+        "2026-06-07",
+        "2026-06-12"
+      ],
+      "description_original_lines": [
+        "坚果NUTS",
+        "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+        "FOOSBALL·FRIENDS·FUN",
+        "▁▁▁▁▁▁▁▁▁▁▁"
+      ],
+      "dj_bio_lines": [],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "重庆|坚果nuts|2026-06-14|fff坚果波比友友联谊赛第十弹［免费］",
+      "detail_path": "by-id/nutsu3a1962008ef98a62d3.json",
+      "detail_url": "by-id/nutsu3a1962008ef98a62d3.json",
+      "address_verification": {
+        "decision": "source_candidate_over_registry",
+        "note": "source description contains an explicit address that conflicts with the venue registry; public release keeps the source-grounded address"
+      },
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nuts_1962008ef98a62d3--c8a55956e34ca4a0e7331650.jpg"
+    }
+  ]
+}

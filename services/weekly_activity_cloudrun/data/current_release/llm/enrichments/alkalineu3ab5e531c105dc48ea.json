@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "alkaline:b5e531c105dc48ea",
+  "sourceItemHash": "47001afca2f762f11c08aab792a818d50892f99754515eb58f288829865381a4",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "法国音乐人Toco Vervisch & Valentine Branca 中国巡演 广州站",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "广州",
+      "venue_name": "南碱alkaline酒吧",
+      "address_candidate": "广东省广州市海珠区南石头街道南泰路17号2-242",
+      "lineup_artists": [
+        "Toco Vervisch",
+        "Valentine Branca",
+        "Toco Vervisch",
+        "Valentine Branca"
+      ],
+      "music_styles": [
+        "ambient",
+        "experimental",
+        "drone",
+        "ambient"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "06.05 周五｜法国音乐人Toco Vervisch & Valentine Branca 中国巡演 广州站",
+        "来自法国的两位实验即兴音乐人 —— Toco Vervisch 与 Valentine Branca —— 将共同带来一场围绕声音空间、语言碎片与感知边界展开的现场演出"
+      ],
+      "description_original_lines": [
+        "06.05 周五｜法国音乐人Toco Vervisch & Valentine Branca 中国巡演 广州站",
+        "来自法国的两位实验即兴音乐人 —— Toco Vervisch 与 Valentine Branca —— 将共同带来一场围绕声音空间、语言碎片与感知边界展开的现场演出"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "法国音乐人Toco Vervisch & Valentine Branca 中国巡演 广州站",
+        "2026-06-05",
+        "广州",
+        "南碱alkaline酒吧"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

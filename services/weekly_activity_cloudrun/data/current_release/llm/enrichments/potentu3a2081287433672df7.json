@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "potent:2081287433672df7",
+  "sourceItemHash": "4d636cf2aca64c6eb70928e3a910f33d4342f5862c67d5a1feedd1d611bec138",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "• I'll make it lemonade🤗",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "上海",
+      "venue_name": "POTENT",
+      "address_candidate": "上海市黄浦区淮海中路523号",
+      "lineup_artists": [
+        "JANEIN",
+        "JANEIN"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "techno",
+        "house",
+        "electro",
+        "techno",
+        "house",
+        "electro",
+        "hip-hop"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "本周五，POTENT小厅舞池将迎来德国莱比锡的DJ 和制作人JANEIN"
+      ],
+      "description_original_lines": [
+        "6.5 周五 • I'll make it lemonade🤗",
+        "本周五，POTENT小厅舞池将迎来德国莱比锡的DJ 和制作人JANEIN",
+        "sat ee ae ae A ~~ tee erent \\ ie"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "• I'll make it lemonade🤗",
+        "2026-06-05",
+        "上海",
+        "POTENT"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

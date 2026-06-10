@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "gas_nation:adc21d0813af3229",
+  "sourceItemHash": "b9905754b6f376a41132d9d44a5e55f94d9e658f36ce33dab46baa48bc8f7035",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "GAS 嘉宾专访 | Ma Haiping·未来去哪里 技术就会去哪里",
+      "event_date_start": "2026-06-16",
+      "event_date_end": "2026-06-16",
+      "event_time_text": null,
+      "city_name": "天津",
+      "venue_name": "Gas Nation氣厂",
+      "address_candidate": "天津市河西区广东路60号万科广场商场一层22号",
+      "lineup_artists": [
+        "Techn",
+        "Ma Haiping",
+        "Techn",
+        "Ma Haiping"
+      ],
+      "music_styles": [
+        "techno",
+        "electro",
+        "disco",
+        "ambient",
+        "techno",
+        "electro",
+        "disco",
+        "ambient"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "他是中国最具影响力的电子音乐制作人/DJ之一，作品发布于 AXIS，SOMA，Molecular 等世界顶级 Techno 厂牌",
+        "除了创作出自己独特、精确的底特律风格的Techno外，他一直参与上海传奇派对VOID，并揭开了中国地下Techno场景的帷幕",
+        "他的 EP《The Chinese Connection》通过底特律传奇厂牌 Cratesaves International（由底特律 Techno 团体 Scan 7 创立）正式发行",
+        "2015 年，马海平在荷兰 Techno 传奇人物 Orlando Voorn 创立的 Nightvision 厂牌发行了《Crepuscular Rays》"
+      ],
+      "description_original_lines": [
+        "喜家德虾仁水饺(万科广场人民公园店)",
+        "天津市河西区广东路60号万科广场商场一层22号",
+        "马海平 aka MHP，参与了中国地下音乐的每一个重要时刻",
+        "他是中国最具影响力的电子音乐制作人/DJ之一，作品发布于 AXIS，SOMA，Molecular 等世界顶级 Techno 厂牌"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "GAS 嘉宾专访 | Ma Haiping·未来去哪里 技术就会去哪里",
+        "2026-06-16",
+        "天津",
+        "Gas Nation氣厂"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

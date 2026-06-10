@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "404:4b545528832d89db",
+  "sourceItemHash": "45ed76e7b158341f9dd411c19b47b22eba2a7303f01811e6549e8619c9a527df",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "原定本周六的蛋丝派对将延期至6.12",
+      "event_date_start": "2026-06-12",
+      "event_date_end": "2026-06-12",
+      "event_time_text": "23:00",
+      "city_name": "大理",
+      "venue_name": "阿干镇404号",
+      "address_candidate": "云南省大理白族自治州大理市大理镇东门村洪武路蔬菜批发市场",
+      "lineup_artists": [
+        "DJ小山",
+        "DJ小山"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "house",
+        "disco",
+        "disco",
+        "boombap",
+        "funk",
+        "jazz hiphop",
+        "house"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "00:30的disco派对取消，期待DJ小山下次演出分享的精彩歌曲 图三"
+      ],
+      "description_original_lines": [
+        "为了给考生们一个安静的学习环境",
+        "原定5.30（本周六）的活动顺延到6.12",
+        "5.31（本周日）晚23:00的404午夜欢乐实验室脱口秀将照常进行 图二",
+        "00:30的disco派对取消，期待DJ小山下次演出分享的精彩歌曲 图三"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "原定本周六的蛋丝派对将延期至6.12",
+        "2026-06-12",
+        "大理",
+        "阿干镇404号"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "dada_bar_beijing:25dac8f4ef04d3df",
+  "sourceItemHash": "1459272e79e594f41b6c3ddd2e06df981248ce15dacd2bb71bf82b9fbc2278a6",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "shelter茧把发廊搬进了DADA，带你体面的锐舞",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "北京",
+      "venue_name": "dadabar(日坛国际贸易中心A座店)",
+      "address_candidate": "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+      "lineup_artists": [],
+      "music_styles": [
+        "techno",
+        "ambient",
+        "techno",
+        "ambient",
+        "minimal",
+        "deep",
+        "dub",
+        "hypnotic"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6月5日 - shelter茧把发廊搬进了DADA，带你体面的锐舞",
+        "草根DJ 江水平线下乱入，千禧发廊一夜店长限定营业",
+        "2026年6月5日"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "shelter茧把发廊搬进了DADA，带你体面的锐舞",
+        "2026-06-05",
+        "北京",
+        "dadabar(日坛国际贸易中心A座店)"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

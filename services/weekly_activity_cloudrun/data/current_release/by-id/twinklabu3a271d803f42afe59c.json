@@ -1,0 +1,130 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "twinklab:271d803f42afe59c",
+    "event_id": "twinklab:271d803f42afe59c",
+    "article_id": "twinklab:271d803f42afe59c",
+    "queue_id": "twinklab:271d803f42afe59c",
+    "title": "06/05 Fri. HOUSE IT 纯粹律动浩室",
+    "title_original": "06/05 Fri. HOUSE IT 纯粹律动浩室",
+    "title_display": "Fri. HOUSE IT 纯粹律动浩室",
+    "account": "蜕壳TwinKlab",
+    "account_key": "twinklab",
+    "promoter": "蜕壳TwinKlab",
+    "source_article": {
+      "url_hash": "271d803f42afe59c",
+      "account_name": "蜕壳TwinKlab",
+      "published_at": "2026-06-03"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "271d803f42afe59c"
+    },
+    "post_date": "2026-06-03",
+    "source_account_name": "蜕壳TwinKlab",
+    "source_published_at": "2026-06-03",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/twinklab_271d803f42afe59c--171174bb961798cd0def8d83.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/twinklab_271d803f42afe59c--171174bb961798cd0def8d83.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/twinklab_271d803f42afe59c--171174bb961798cd0def8d83.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "22:00 - Late",
+    "event_time_source": "source_text",
+    "time_start": "22:00",
+    "time_end": "Late",
+    "running_hours_text": "22:00 - Late",
+    "running_hours_source": "source_text",
+    "city": [
+      "厦门"
+    ],
+    "city_key": "xiamen",
+    "city_name": "厦门",
+    "city_keys": [
+      "xiamen"
+    ],
+    "venue": [],
+    "venue_id": "twinklab_xiamen",
+    "venue_name": "蜕壳TwinKlab",
+    "address": "福建省厦门市湖里区湖里大道22号联发文创口岸ZT205-206单元",
+    "address_full": "福建省厦门市湖里区湖里大道22号联发文创口岸ZT205-206单元",
+    "address_source": "manual_registry",
+    "geo_lng": 118.098064,
+    "geo_lat": 24.510564,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "minimal house",
+      "tech house",
+      "deep house",
+      "indie dance",
+      "Latin tribal"
+    ],
+    "music_styles": [
+      "house"
+    ],
+    "price": [
+      "Free Entry"
+    ],
+    "price_text": "Free Entry",
+    "ticketing_text": "Free Entry",
+    "evidence": [
+      "06/05 Fri. HOUSE IT 纯粹律动浩室",
+      "🎫 票务:Free Entry 全程免票入场",
+      "6月5日周五22:00起,HOUSE IT免票专场如约开演,连绵4/4拍消解一周倦意",
+      "2026-06-05",
+      "22:00 - Late"
+    ],
+    "description_original_lines": [
+      "06/05 Fri. HOUSE IT 纯粹律动浩室",
+      "🎫 票务:Free Entry 全程免票入场",
+      "6月5日周五22:00起,HOUSE IT免票专场如约开演,连绵4/4拍消解一周倦意",
+      "HOUSE IT | 纯粹律动，整夜沉溺浩室节拍"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "厦门|蜕壳twinklab|2026-06-05|frihouseit纯粹律动浩室",
+    "detail_path": "by-id/twinklabu3a271d803f42afe59c.json",
+    "detail_url": "by-id/twinklabu3a271d803f42afe59c.json",
+    "lineup_display_hint": "点击海报跳转公众号原文查看",
+    "lineup_quality": {
+      "status": "uncertain",
+      "decision": "cleared_untrusted_lineup",
+      "note": "public mini-program policy: lineup was prose, aggregate text, bio-like text, or not source-grounded enough for display"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/twinklab_271d803f42afe59c--171174bb961798cd0def8d83.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/twinklab_271d803f42afe59c--171174bb961798cd0def8d83.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/twinklab_271d803f42afe59c--171174bb961798cd0def8d83.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/twinklab_271d803f42afe59c--171174bb961798cd0def8d83.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/twinklab_271d803f42afe59c--171174bb961798cd0def8d83.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/twinklab_271d803f42afe59c--171174bb961798cd0def8d83.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/twinklab_271d803f42afe59c--171174bb961798cd0def8d83.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/twinklab_271d803f42afe59c--171174bb961798cd0def8d83.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/twinklab_271d803f42afe59c--171174bb961798cd0def8d83.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/twinklab_271d803f42afe59c--171174bb961798cd0def8d83.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/twinklab_271d803f42afe59c--171174bb961798cd0def8d83.jpg"
+  }
+}

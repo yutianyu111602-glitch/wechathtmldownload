@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "stereo52:19c1d786ece038aa",
+  "sourceItemHash": "9f790059b0edc4146a08a762a32558ab69237d252be98ade1f4820d023413eec",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "52/F 呈现：Notte Infinita 中国Tour最终站",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "广州",
+      "venue_name": "Stereo.52",
+      "address_candidate": "广州市越秀区中华商务中心",
+      "lineup_artists": [
+        "Notte Infinita",
+        "Notte Infinita"
+      ],
+      "music_styles": [
+        "techno",
+        "bass",
+        "ambient",
+        "techno",
+        "broken beat",
+        "bass music",
+        "ambient techno",
+        "UK bass"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06.06｜52/F 呈现：Notte Infinita 中国Tour最终站",
+        "06.06｜52/F 呈现：NOTTE INFINITA 中国巡演最终站",
+        "sat6/6",
+        "Poster OCR date: 2026-06-06"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "52/F 呈现：Notte Infinita 中国Tour最终站",
+        "2026-06-06",
+        "广州",
+        "Stereo.52"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

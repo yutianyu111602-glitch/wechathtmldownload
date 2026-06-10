@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "flat_club:d8dc7622be1b0eb2",
+  "sourceItemHash": "ea8ffbb7e7245f2d3966591a55e7406d9ecf83cb156f1f1819ca320e93cc1664",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "FLAT: WAREHOUSE SESSIONS / PILLBOX PRES. “硬核战神” W.X.M",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "成都",
+      "venue_name": "FLAT Club",
+      "address_candidate": "四川省成都市成华区猛追湾街94号339购物中心A栋2层(海伦司旁)",
+      "lineup_artists": [
+        "W.X.M",
+        "W.X.M"
+      ],
+      "music_styles": [
+        "techno",
+        "house",
+        "electro",
+        "breaks",
+        "Hard Techno",
+        "Electro",
+        "Hard Groove",
+        "Modern Tech",
+        "Indie Dance",
+        "Breaks"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "6.5 FLAT: WAREHOUSE SESSIONS / PILLBOX PRES. “硬核战神” W.X.M"
+      ],
+      "description_original_lines": [
+        "6.5 FLAT: WAREHOUSE SESSIONS / PILLBOX PRES. “硬核战神” W.X.M",
+        "以最原始的声压级，重塑舞池的野蛮秩序",
+        "Poster OCR date: 2026-06-05",
+        "Poster OCR address: 2F,Buildinga, 339Shoppingmall Chenghuadistrict,Chengdu"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "FLAT: WAREHOUSE SESSIONS / PILLBOX PRES. “硬核战神” W.X.M",
+        "2026-06-05",
+        "成都",
+        "FLAT Club"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

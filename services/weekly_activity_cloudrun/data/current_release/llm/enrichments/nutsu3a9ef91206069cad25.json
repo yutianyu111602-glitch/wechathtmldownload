@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "nuts:9ef91206069cad25",
+  "sourceItemHash": "3d35792e9b956826349b588d754bd63d1e676bd52e453bc888d9964e456c8446",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "春山后潮「马上迷幻」 | @坚果NUTS",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "20:00",
+      "city_name": "重庆",
+      "venue_name": "坚果NUTS",
+      "address_candidate": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "lineup_artists": [
+        "春山后潮",
+        "春山后潮"
+      ],
+      "music_styles": [
+        "迷幻"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "春山后潮「马上迷幻」｜6月6日@坚果NUTS",
+        "6/6 20:00",
+        "2026",
+        "春山后潮「马上迷幻]2026全国巡演"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "春山后潮「马上迷幻」 | @坚果NUTS",
+        "2026-06-06",
+        "重庆",
+        "坚果NUTS"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

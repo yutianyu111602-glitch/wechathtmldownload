@@ -1,0 +1,140 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "gum_guangzhou:77ae233df5f7783a",
+    "event_id": "gum_guangzhou:77ae233df5f7783a",
+    "article_id": "gum_guangzhou:77ae233df5f7783a",
+    "queue_id": "gum_guangzhou:77ae233df5f7783a",
+    "title": "0605 Fri. | BT*坏品味  ωǒ们破解ㄋňǐ②○○⑦ηián隱藏の非炷蓅涳簡密碼，幷妑ťā莋荿周㈤派怼のBGM",
+    "title_original": "0605 Fri. | BT*坏品味  ωǒ们破解ㄋňǐ②○○⑦ηián隱藏の非炷蓅涳簡密碼，幷妑ťā莋荿周㈤派怼のBGM",
+    "title_display": "0605 Fri. | BT*坏品味  ωǒ们破解ㄋňǐ②○○⑦ηián隱藏の非炷蓅涳簡密碼，幷妑ťā莋荿周㈤派怼のBGM",
+    "account": "GUM Guangzhou",
+    "account_key": "gum_guangzhou",
+    "promoter": "GUM Guangzhou",
+    "source_article": {
+      "url_hash": "77ae233df5f7783a",
+      "account_name": "GUM Guangzhou",
+      "published_at": "2026-05-30"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "77ae233df5f7783a"
+    },
+    "post_date": "2026-05-30",
+    "source_account_name": "GUM Guangzhou",
+    "source_published_at": "2026-05-30",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/gum_guangzhou_77ae233df5f7783a--df8bddebd28fbbdb984771da.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/gum_guangzhou_77ae233df5f7783a--df8bddebd28fbbdb984771da.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/gum_guangzhou_77ae233df5f7783a--df8bddebd28fbbdb984771da.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "23:00-00:00",
+    "event_time_source": "source_text",
+    "time_start": "23:00",
+    "time_end": "00:00",
+    "running_hours_text": "23:00-00:00",
+    "running_hours_source": "source_text",
+    "city": [
+      "广州"
+    ],
+    "city_key": "guangzhou",
+    "city_name": "广州",
+    "city_keys": [
+      "guangzhou"
+    ],
+    "venue": [],
+    "venue_id": "gum_guangzhou",
+    "venue_name": "GUM Guangzhou",
+    "address": "广东省广州市海珠区工业大道北路132号自编45号102室",
+    "address_full": "广东省广州市海珠区工业大道北路132号自编45号102室",
+    "address_source": "venue_registry_verified",
+    "geo_lng": 113.262581,
+    "geo_lat": 23.083889,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "ambient",
+      "trance",
+      "deconstructed club",
+      "hard techno",
+      "UK dubstep",
+      "speed garage"
+    ],
+    "music_styles": [
+      "techno",
+      "trance",
+      "ambient"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "0605 Fri. | BT*坏品味 ωǒ们破解ㄋňǐ②○○⑦ηián隱藏の非炷蓅涳簡密碼，幷妑ťā莋荿周㈤派怼のBGM",
+      "2026-06-05",
+      "埖⑥⑧块ゑ聽①整琬①②⑧kbpsの電孒包槳 廣州λ終亐疯ㄋ？"
+    ],
+    "description_original_lines": [
+      "埖⑥⑧块ゑ聽①整琬①②⑧kbpsの電孒包槳 廣州λ終亐疯ㄋ？",
+      "PostedonMay06,2026|23:00PMEST"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "广州|gumguangzhou|2026-06-05|0605fribt*坏品味ωǒ们破解ㄋňǐ②○○⑦ηián隱藏の非炷蓅涳簡密碼幷妑ťā莋荿周㈤派怼のbgm",
+    "detail_path": "by-id/gum_guangzhouu3a77ae233df5f7783a.json",
+    "detail_url": "by-id/gum_guangzhouu3a77ae233df5f7783a.json",
+    "venue_lat": 23.083889,
+    "venue_lng": 113.262581,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "tencent_map_picker_user_confirmed",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "gum_guangzhou",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/gum_guangzhou_77ae233df5f7783a--df8bddebd28fbbdb984771da.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/gum_guangzhou_77ae233df5f7783a--df8bddebd28fbbdb984771da.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/gum_guangzhou_77ae233df5f7783a--df8bddebd28fbbdb984771da.png",
+    "poster_cloud_path": "weekly-posters/20260604/gum_guangzhou_77ae233df5f7783a--df8bddebd28fbbdb984771da.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/gum_guangzhou_77ae233df5f7783a--df8bddebd28fbbdb984771da.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/gum_guangzhou_77ae233df5f7783a--df8bddebd28fbbdb984771da.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/gum_guangzhou_77ae233df5f7783a--df8bddebd28fbbdb984771da.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/gum_guangzhou_77ae233df5f7783a--df8bddebd28fbbdb984771da.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/gum_guangzhou_77ae233df5f7783a--df8bddebd28fbbdb984771da.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/gum_guangzhou_77ae233df5f7783a--df8bddebd28fbbdb984771da.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/gum_guangzhou_77ae233df5f7783a--df8bddebd28fbbdb984771da.png"
+  }
+}

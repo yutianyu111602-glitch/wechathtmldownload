@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "nuts:bd91e6311e3e3c77",
+  "sourceItemHash": "764ff69909efb9b67d994fc0d6d6456edea24e2f1a7b970acc9ff84984bf4230",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "@STILL UP",
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "20:00",
+      "city_name": "重庆",
+      "venue_name": "坚果NUTS",
+      "address_candidate": "重庆市沙坪坝区沙中路重庆大学国家大学科技园一楼",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "坚果即兴 NUTS JAM｜6月7日@STILL UP",
+        "Free Entry",
+        "6/7 20:00 onwards",
+        "@STILL UP(NUTS)"
+      ],
+      "ticketing_text": [
+        "Free Entry"
+      ],
+      "dedupe_signals": [
+        "@STILL UP",
+        "2026-06-07",
+        "重庆",
+        "坚果NUTS"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

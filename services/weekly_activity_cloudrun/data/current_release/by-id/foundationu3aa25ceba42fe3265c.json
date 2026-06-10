@@ -1,0 +1,112 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "foundation:a25ceba42fe3265c",
+    "event_id": "foundation:a25ceba42fe3265c",
+    "article_id": "foundation:a25ceba42fe3265c",
+    "queue_id": "foundation:a25ceba42fe3265c",
+    "title": "𝟎𝟔.𝟎𝟔.周六｜𝐉𝐚𝐧𝐞𝐢𝐧“结构、感知与运动之间”",
+    "title_original": "𝟎𝟔.𝟎𝟔.周六｜𝐉𝐚𝐧𝐞𝐢𝐧“结构、感知与运动之间”",
+    "title_display": ".周六 | 𝐉𝐚𝐧𝐞𝐢𝐧“结构、感知与运动之间”",
+    "account": "FOUNDATION俱乐部",
+    "account_key": "foundation",
+    "promoter": "FOUNDATION俱乐部",
+    "source_article": {
+      "url_hash": "a25ceba42fe3265c",
+      "account_name": "FOUNDATION俱乐部",
+      "published_at": "2026-06-03"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "a25ceba42fe3265c"
+    },
+    "post_date": "2026-06-03",
+    "source_account_name": "FOUNDATION俱乐部",
+    "source_published_at": "2026-06-03",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a25ceba42fe3265c--257166bf173c72e050c1c777.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a25ceba42fe3265c--257166bf173c72e050c1c777.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a25ceba42fe3265c--257166bf173c72e050c1c777.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "南京"
+    ],
+    "city_key": "nanjing",
+    "city_name": "南京",
+    "city_keys": [
+      "nanjing"
+    ],
+    "venue": [],
+    "venue_id": "foundation_nanjing",
+    "venue_name": "FOUNDATION",
+    "address": "江苏省南京市鼓楼区石头城路97号水木秦淮街区C12",
+    "address_full": "江苏省南京市鼓楼区石头城路97号水木秦淮街区C12",
+    "address_source": "manual_registry",
+    "geo_lng": 118.750235,
+    "geo_lat": 32.061451,
+    "lineup": [
+      "Janein"
+    ],
+    "lineup_artists": [
+      "Janein"
+    ],
+    "genres": [],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "𝟎𝟔.𝟎𝟔.周六｜𝐉𝐚𝐧𝐞𝐢𝐧“结构、感知与运动之间”",
+      "2026-06-06",
+      "持续推进的律动、精准控制的张力，以及那些缓慢展开的声音层次"
+    ],
+    "description_original_lines": [
+      "𝟎𝟔.𝟎𝟔.周六｜𝐉𝐚𝐧𝐞𝐢𝐧“结构、感知与运动之间”",
+      "持续推进的律动、精准控制的张力，以及那些缓慢展开的声音层次"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "南京|foundation|2026-06-06|周六结构、感知与运动之间",
+    "detail_path": "by-id/foundationu3aa25ceba42fe3265c.json",
+    "detail_url": "by-id/foundationu3aa25ceba42fe3265c.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a25ceba42fe3265c--257166bf173c72e050c1c777.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a25ceba42fe3265c--257166bf173c72e050c1c777.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a25ceba42fe3265c--257166bf173c72e050c1c777.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/foundation_a25ceba42fe3265c--257166bf173c72e050c1c777.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a25ceba42fe3265c--257166bf173c72e050c1c777.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a25ceba42fe3265c--257166bf173c72e050c1c777.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a25ceba42fe3265c--257166bf173c72e050c1c777.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a25ceba42fe3265c--257166bf173c72e050c1c777.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a25ceba42fe3265c--257166bf173c72e050c1c777.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a25ceba42fe3265c--257166bf173c72e050c1c777.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/foundation_a25ceba42fe3265c--257166bf173c72e050c1c777.jpg"
+  }
+}

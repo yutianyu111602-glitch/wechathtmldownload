@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "oil:21a2e0c277155a8b",
+  "sourceItemHash": "9a5c36c21bd64d9155168d778448e00903b1c37e908ac311be0ecb53c065b1d8",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "在 ROOMTOO 复刻香港 宀Club 王牌黑胶派对夜 VG+",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "深圳",
+      "venue_name": "OIL CLUB",
+      "address_candidate": "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号",
+      "lineup_artists": [],
+      "music_styles": [
+        "techno",
+        "house",
+        "electro",
+        "techno",
+        "acid house",
+        "electro"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6/06｜在 ROOMTOO 复刻香港 宀Club 王牌黑胶派对夜 VG+",
+        "数字时代的黑胶乌托邦：Vinyl Session 联手香港知名派对 VG+",
+        "Poster OCR date: 2026-06-06 / 2026-05-02 / 2026-11-08 / 2026-12-05",
+        "Poster OCR address: ADD OIL ROOMTOO *广东省深圳市福田区车公庙"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "在 ROOMTOO 复刻香港 宀Club 王牌黑胶派对夜 VG+",
+        "2026-06-06",
+        "深圳",
+        "OIL CLUB"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

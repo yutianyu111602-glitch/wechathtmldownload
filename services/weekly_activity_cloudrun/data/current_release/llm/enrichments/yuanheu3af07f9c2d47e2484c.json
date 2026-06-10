@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "yuanhe:f07f9c2d47e2484c",
+  "sourceItemHash": "6a3e1bed5fabaaf4788f8b2c1c28d4e04e1d297d7e50aeb29918a734a73a7814",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "今晚YuanHe 魔丸降世",
+      "event_date_start": "2026-06-04",
+      "event_date_end": "2026-06-04",
+      "event_time_text": "22:00-23:30",
+      "city_name": "北京",
+      "venue_name": "YUANHE 原核",
+      "address_candidate": "北京市朝阳区西大望路27号E6-2号楼103",
+      "lineup_artists": [
+        "Layzzz",
+        "HU211GH71i",
+        "Layzzz",
+        "HU211GH71i"
+      ],
+      "music_styles": [
+        "club trax",
+        "electro",
+        "club music",
+        "electronic pop"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "今晚，你能听到三组",
+        "富含坚强的柔软的情绪的暴力的愤怒的恐惧的悲伤的欢愉的善变的沉默的平凡的孤单的不堪的艰难的可敬的可畏的可怕的生长的凋败的热烈的冷酷的连续的断裂的饱满的疯狂的绝望的无助的无力的疲惫的笨拙情绪Set！",
+        "22:00-23:30:Layzzz",
+        "23:30-01:00:HU211GH71i"
+      ],
+      "ticketing_text": [
+        "FreeEntry"
+      ],
+      "dedupe_signals": [
+        "今晚YuanHe 魔丸降世",
+        "2026-06-04",
+        "北京",
+        "YUANHE 原核"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

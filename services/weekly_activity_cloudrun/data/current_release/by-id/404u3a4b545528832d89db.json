@@ -1,0 +1,175 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "404:4b545528832d89db",
+    "event_id": "404:4b545528832d89db",
+    "article_id": "404:4b545528832d89db",
+    "queue_id": "404:4b545528832d89db",
+    "title": "原定本周六的蛋丝派对将延期至6.12",
+    "title_original": "原定本周六的蛋丝派对将延期至6.12",
+    "title_display": "原定本周六的蛋丝派对将延期至6.12",
+    "account": "阿干镇404号",
+    "account_key": "404",
+    "promoter": "阿干镇404号",
+    "source_article": {
+      "url_hash": "4b545528832d89db",
+      "account_name": "阿干镇404号",
+      "published_at": "2026-05-29"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "4b545528832d89db",
+      "disabled_reason": ""
+    },
+    "aggregation_child": false,
+    "post_date": "2026-05-29",
+    "source_account_name": "阿干镇404号",
+    "source_published_at": "2026-05-29",
+    "cover_url": "https://mmbiz.qpic.cn/sz_mmbiz_jpg/VgrnTZ0AXkjPCgruvfiamBYhCa66PdlD23cFqG8g1AooKevNnIKicxIj4FO2s52VTnfoYEiamUcyMpicb2DnAVSL55Y2QTxxYXKA5sHYOGXKHfk/0?wx_fmt=jpeg",
+    "cover_image_url": "https://mmbiz.qpic.cn/sz_mmbiz_jpg/VgrnTZ0AXkjPCgruvfiamBYhCa66PdlD23cFqG8g1AooKevNnIKicxIj4FO2s52VTnfoYEiamUcyMpicb2DnAVSL55Y2QTxxYXKA5sHYOGXKHfk/0?wx_fmt=jpeg",
+    "poster_file_id": "",
+    "poster_source": "wechat_article",
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "event_date_text": [
+      "2026-06-12"
+    ],
+    "event_date_iso_guess": "2026-06-12",
+    "event_date_iso_guesses": [
+      "2026-06-12"
+    ],
+    "event_date_start": "2026-06-12",
+    "event_date_end": "2026-06-12",
+    "event_time_text": "23:00",
+    "event_time_source": "source_text",
+    "time_start": "23:00",
+    "time_end": "",
+    "running_hours_text": "23:00",
+    "running_hours_source": "source_text",
+    "city": [
+      "大理"
+    ],
+    "city_key": "dali",
+    "city_name": "大理",
+    "city_keys": [
+      "dali"
+    ],
+    "venue": [],
+    "venue_id": "agan404_dali",
+    "venue_name": "阿干镇404号",
+    "address": "云南省大理白族自治州大理市大理镇东门村洪武路蔬菜批发市场",
+    "address_full": "云南省大理白族自治州大理市大理镇东门村洪武路蔬菜批发市场",
+    "address_source": "operator_map_picker_user_confirmed",
+    "geo_lng": 100.172207,
+    "geo_lat": 25.694946,
+    "lineup": [
+      "DJ小山"
+    ],
+    "lineup_artists": [
+      "DJ小山"
+    ],
+    "genres": [
+      "disco",
+      "boombap",
+      "funk",
+      "jazz hiphop",
+      "house"
+    ],
+    "music_styles": [
+      "hip-hop",
+      "house",
+      "disco"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "原定本周六的蛋丝派对将延期至6.12",
+      "2026-06-12",
+      "23:00",
+      "为了给考生们一个安静的学习环境",
+      "原定5.30（本周六）的活动顺延到6.12"
+    ],
+    "description_original_lines": [
+      "为了给考生们一个安静的学习环境",
+      "原定5.30（本周六）的活动顺延到6.12",
+      "5.31（本周日）晚23:00的404午夜欢乐实验室脱口秀将照常进行 图二",
+      "00:30的disco派对取消，期待DJ小山下次演出分享的精彩歌曲 图三"
+    ],
+    "dj_bio_lines": [
+      "00:30的disco派对取消，期待DJ小山下次演出分享的精彩歌曲 图三"
+    ],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "大理|阿干镇404号|2026-06-12|原定本周六的蛋丝派对将延期至612",
+    "detail_path": "by-id/404u3a4b545528832d89db.json",
+    "detail_url": "by-id/404u3a4b545528832d89db.json",
+    "lineup_quality": {
+      "status": "verified",
+      "decision": "scoring_retained_lineup",
+      "note": "retained lineup artists with score >= 0.6: DJ小山"
+    },
+    "venue_lat": 25.694946,
+    "venue_lng": 100.172207,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "tencent_map_picker_user_confirmed",
+    "geo_provider": "tencent_map_picker",
+    "geo_reliability": "locked",
+    "geo_level": "poi",
+    "geo_provider_title": "阿干镇404号",
+    "geo_provider_address": "云南省大理白族自治州大理市大理镇东门村洪武路蔬菜批发市场",
+    "geo_reverse_address": "云南省大理白族自治州大理市大理镇东门村洪武路蔬菜批发市场",
+    "geo_verified_at": "2026-06-03",
+    "geo_candidate_id": "agan404_dali",
+    "map_search_aliases": [
+      "阿干镇404号",
+      "云南省大理白族自治州大理市大理镇东门村洪武路蔬菜批发市场"
+    ],
+    "geo_search_aliases": [
+      "云南省大理白族自治州大理市大理镇东门村洪武路蔬菜批发市场",
+      "阿干镇404号"
+    ],
+    "poi_aliases": [
+      "阿干镇404号",
+      "4471300307130750168"
+    ],
+    "map_poi_name": "阿干镇404号",
+    "poi_id": "4471300307130750168",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_level",
+        "geo_provider",
+        "geo_provider_address",
+        "geo_provider_title",
+        "geo_reliability",
+        "geo_reverse_address",
+        "geo_search_aliases",
+        "geo_source",
+        "geo_verified_at",
+        "map_poi_name",
+        "map_search_aliases",
+        "poi_aliases",
+        "poi_id",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    }
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "account": "hum_club",
+    "account_key": "hum_club",
+    "address": "贵州省贵阳市云岩区普陀路街道普陀路黔达花园AB座负一层",
+    "address_full": "贵州省贵阳市云岩区普陀路街道普陀路黔达花园AB座负一层",
+    "address_source": "venue_registry_verified",
+    "article_id": "hum_club:feb55ae3398ec107",
+    "artist_profiles": [],
+    "city": [
+      "贵阳"
+    ],
+    "city_key": "guiyang",
+    "city_keys": [
+      "guiyang"
+    ],
+    "city_name": "贵阳",
+    "content_type": "event",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+    "dedupe_key": "贵阳|humclub|2026-06-03|wedopendecksvol128dj台開放日hum",
+    "description_original_lines": [
+      "6.3 Wed.｜Open Decks Vol.128 DJ台開放日 @Hum",
+      "本周由哥叫哥提供教学"
+    ],
+    "detail_path": "by-id/hum_clubu3afeb55ae3398ec107.json",
+    "detail_url": "by-id/hum_clubu3afeb55ae3398ec107.json",
+    "dj_bio_lines": [],
+    "event_date_end": "2026-06-03",
+    "event_date_iso_guess": "2026-06-03",
+    "event_date_iso_guesses": [
+      "2026-06-03"
+    ],
+    "event_date_start": "2026-06-03",
+    "event_date_text": [
+      "2026-06-03"
+    ],
+    "event_id": "hum_club:feb55ae3398ec107",
+    "event_time_source": "",
+    "event_time_text": "",
+    "evidence": [
+      "6.3 Wed.｜Open Decks Vol.128 DJ台開放日 @Hum",
+      "2026-06-03",
+      "本周由哥叫哥提供教学"
+    ],
+    "genres": [],
+    "geo_candidate_id": "hum_guiyang",
+    "geo_coord_system": "GCJ-02",
+    "geo_lat": 26.589655,
+    "geo_lng": 106.713018,
+    "geo_source": "tencent_map_picker_user_confirmed",
+    "geo_verified_at": "2026-06-01",
+    "id": "hum_club:feb55ae3398ec107",
+    "is_calendar_preview": false,
+    "lineup": [],
+    "lineup_artists": [],
+    "music_styles": [],
+    "place_fields_locked": true,
+    "post_date": "2026-06-01",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+    "poster_source": "cloudbase_storage",
+    "price": [],
+    "price_text": "",
+    "promoter": "hum_club",
+    "publish_status": "published",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "quality_status": "READY",
+    "queue_id": "hum_club:feb55ae3398ec107",
+    "running_hours_source": "",
+    "running_hours_text": "",
+    "schema_version": "weekly_event_published.v1",
+    "source_account_name": "hum_club",
+    "source_action": {
+      "available": true,
+      "label": "公众号",
+      "type": "wechat_article",
+      "url_hash": "feb55ae3398ec107"
+    },
+    "source_article": {
+      "account_name": "hum_club",
+      "published_at": "2026-06-01",
+      "url_hash": "feb55ae3398ec107"
+    },
+    "source_published_at": "2026-06-01",
+    "ticketing_text": "",
+    "time_end": "",
+    "time_start": "",
+    "title": "6.3 Wed.｜Open Decks Vol.128 DJ台開放日 @Hum",
+    "title_display": "Wed. | Open Decks Vol.128 DJ台開放日 @Hum",
+    "title_original": "6.3 Wed.｜Open Decks Vol.128 DJ台開放日 @Hum",
+    "venue": [],
+    "venue_id": "hum_guiyang",
+    "venue_lat": 26.589655,
+    "venue_lng": 106.713018,
+    "venue_name": "hum_club",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/hum_club_feb55ae3398ec107--74fe5e8a8179c4152b8fdbfb.jpg"
+  }
+}

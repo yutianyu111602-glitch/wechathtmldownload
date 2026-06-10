@@ -1,0 +1,128 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "defun:952721472e31fd00:schedule:20260606:1",
+    "event_id": "defun:952721472e31fd00:schedule:20260606:1",
+    "article_id": "defun:952721472e31fd00",
+    "queue_id": "defun:952721472e31fd00:schedule:20260606:1",
+    "title": "DEFUN｜6.6 周六",
+    "title_original": "DEFUN｜6.6 周六",
+    "title_display": "DEFUN｜6.6 周六",
+    "account": "DEFUN",
+    "account_key": "defun",
+    "promoter": "DEFUN",
+    "source_article": {
+      "url_hash": "952721472e31fd00",
+      "account_name": "DEFUN",
+      "published_at": "2026-06-04"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "952721472e31fd00"
+    },
+    "post_date": "2026-06-04",
+    "source_account_name": "DEFUN",
+    "source_published_at": "2026-06-04",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/defun_952721472e31fd00_schedule_20260606_1--abd5c2fc6f573a14b3f0d4a6.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/defun_952721472e31fd00_schedule_20260606_1--abd5c2fc6f573a14b3f0d4a6.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/defun_952721472e31fd00_schedule_20260606_1--abd5c2fc6f573a14b3f0d4a6.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "21:30 - Late",
+    "event_time_source": "source_text",
+    "time_start": "21:30",
+    "time_end": "Late",
+    "running_hours_text": "21:30 - Late",
+    "running_hours_source": "source_text",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [],
+    "venue_id": "defun_shanghai",
+    "venue_name": "DEFUN",
+    "address": "上海市普陀区长寿路401号亚新生活广场",
+    "address_full": "上海市普陀区长寿路401号亚新生活广场",
+    "address_source": "manual_registry",
+    "geo_lng": 121.437551,
+    "geo_lat": 31.239228,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "techno",
+      "house",
+      "electro",
+      "hip-hop",
+      "deep tech",
+      "dub techno"
+    ],
+    "music_styles": [
+      "hip-hop",
+      "techno",
+      "house",
+      "electro"
+    ],
+    "price": [
+      "FREE ENTRY"
+    ],
+    "price_text": "FREE ENTRY",
+    "ticketing_text": "FREE ENTRY",
+    "evidence": [
+      "DEFUN｜6.6 周六",
+      "FREE ENTRY",
+      "2026-06-06",
+      "21:30-LATE",
+      "PRGRM 021 x DEFUN"
+    ],
+    "description_original_lines": [
+      "FREE ENTRY",
+      "21:30-LATE",
+      "PRGRM 021 x DEFUN",
+      "2026"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "上海|defun|2026-06-06|defun66周六",
+    "detail_path": "by-id/defunu3a952721472e31fd00u3ascheduleu3a20260606u3a1.json",
+    "detail_url": "by-id/defunu3a952721472e31fd00u3ascheduleu3a20260606u3a1.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/defun_952721472e31fd00_schedule_20260606_1--abd5c2fc6f573a14b3f0d4a6.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/defun_952721472e31fd00_schedule_20260606_1--abd5c2fc6f573a14b3f0d4a6.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/defun_952721472e31fd00_schedule_20260606_1--abd5c2fc6f573a14b3f0d4a6.png",
+    "poster_cloud_path": "weekly-posters/20260604/defun_952721472e31fd00_schedule_20260606_1--abd5c2fc6f573a14b3f0d4a6.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/defun_952721472e31fd00_schedule_20260606_1--abd5c2fc6f573a14b3f0d4a6.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/defun_952721472e31fd00_schedule_20260606_1--abd5c2fc6f573a14b3f0d4a6.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/defun_952721472e31fd00_schedule_20260606_1--abd5c2fc6f573a14b3f0d4a6.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/defun_952721472e31fd00_schedule_20260606_1--abd5c2fc6f573a14b3f0d4a6.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/defun_952721472e31fd00_schedule_20260606_1--abd5c2fc6f573a14b3f0d4a6.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/defun_952721472e31fd00_schedule_20260606_1--abd5c2fc6f573a14b3f0d4a6.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/defun_952721472e31fd00_schedule_20260606_1--abd5c2fc6f573a14b3f0d4a6.png"
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "schema_version": "weekly_activity_miniprogram_city.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "city_key": "nanning",
+  "city": "南宁",
+  "item_count": 1,
+  "items": [
+    {
+      "schema_version": "weekly_event_published.v1",
+      "content_type": "event",
+      "is_calendar_preview": false,
+      "id": "deepcool:9aba3c881843e3ea:schedule:20260605:1",
+      "event_id": "deepcool:9aba3c881843e3ea:schedule:20260605:1",
+      "article_id": "deepcool:9aba3c881843e3ea",
+      "queue_id": "deepcool:9aba3c881843e3ea:schedule:20260605:1",
+      "title": "DeepCool地库｜6/5（周五）BIRD鸟人｜南宁声音文化综合实践者：在阳光与深夜之间，找到 groove 的本体",
+      "title_original": "DeepCool地库｜6/5（周五）BIRD鸟人｜南宁声音文化综合实践者：在阳光与深夜之间，找到 groove 的本体",
+      "title_display": "（周五）BIRD鸟人 | 南宁声音文化综合实践者：在阳光与深夜之间，找到 groove 的本体",
+      "account": "DeepCool地库",
+      "account_key": "deepcool",
+      "promoter": "DeepCool地库",
+      "source_article": {
+        "url_hash": "9aba3c881843e3ea",
+        "account_name": "DeepCool地库",
+        "published_at": "2026-06-02"
+      },
+      "source_action": {
+        "type": "wechat_article",
+        "label": "公众号",
+        "available": true,
+        "url_hash": "9aba3c881843e3ea"
+      },
+      "post_date": "2026-06-02",
+      "source_account_name": "DeepCool地库",
+      "source_published_at": "2026-06-02",
+      "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deepcool_9aba3c881843e3ea_schedule_20260605_1--0e76cbe92a6ed972719eefb4.jpg",
+      "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deepcool_9aba3c881843e3ea_schedule_20260605_1--0e76cbe92a6ed972719eefb4.jpg",
+      "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deepcool_9aba3c881843e3ea_schedule_20260605_1--0e76cbe92a6ed972719eefb4.jpg",
+      "poster_source": "cloudbase_storage",
+      "event_date_text": [
+        "2026-06-05"
+      ],
+      "event_date_iso_guess": "2026-06-05",
+      "event_date_iso_guesses": [
+        "2026-06-05"
+      ],
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "00:00-01:30",
+      "event_time_source": "source_text",
+      "time_start": "00:00",
+      "time_end": "01:30",
+      "running_hours_text": "00:00-01:30",
+      "running_hours_source": "source_text",
+      "city": [
+        "南宁"
+      ],
+      "city_key": "nanning",
+      "city_name": "南宁",
+      "city_keys": [
+        "nanning"
+      ],
+      "venue": [],
+      "venue_id": "deepcool_nanning",
+      "venue_name": "DEEPCOOL地库酒吧",
+      "address": "广西壮族自治区南宁市青秀区桂花路9号君耀香港园B1006",
+      "address_full": "广西壮族自治区南宁市青秀区桂花路9号君耀香港园B1006",
+      "address_source": "manual_registry",
+      "geo_lng": 108.402567,
+      "geo_lat": 22.8036,
+      "lineup": [
+        "BIRD鸟人"
+      ],
+      "lineup_artists": [
+        "BIRD鸟人"
+      ],
+      "genres": [
+        "hip-hop"
+      ],
+      "music_styles": [
+        "hip-hop"
+      ],
+      "price": [],
+      "price_text": "",
+      "ticketing_text": "",
+      "evidence": [
+        "DeepCool地库｜6/5（周五）BIRD鸟人｜南宁声音文化综合实践者：在阳光与深夜之间，找到 groove 的本体",
+        "2026-06-05",
+        "00:00 - 01:30",
+        "6/5（周五）BIRD鸟人｜南宁声音文化综合实践者：在阳光与深夜之间，找到 groove 的本体",
+        "他是音乐人、Beatmaker、说唱创作者、DJ，也是一位声音文化观察者——BIRD鸟人，一个从南宁本土场景中生长出来的 多面体节奏生命体"
+      ],
+      "description_original_lines": [
+        "DeepCool地库｜6/5（周五）BIRD鸟人｜南宁声音文化综合实践者：在阳光与深夜之间，找到 groove 的本体",
+        "6/5（周五）BIRD鸟人｜南宁声音文化综合实践者：在阳光与深夜之间，找到 groove 的本体",
+        "他是音乐人、Beatmaker、说唱创作者、DJ，也是一位声音文化观察者——BIRD鸟人，一个从南宁本土场景中生长出来的 多面体节奏生命体",
+        "从早期中文 Hip-Hop 场景中颇具影响力的说唱乐团 PNC，到 精气神 CheeProduction 厂牌的创作经历，再到 Beat 制作、DJ Set、电台节目 《流派大乱斗 StyleWar》，以及黑胶文化与听感实践的长期深耕——BIRD 鸟人的创作路径从未被单一身份框定，却始终绕不开三个关键词：groove、城市气候，以及人与人之间逐渐氧化的情绪"
+      ],
+      "dj_bio_lines": [
+        "他是音乐人、Beatmaker、说唱创作者、DJ，也是一位声音文化观察者——BIRD鸟人，一个从南宁本土场景中生长出来的 多面体节奏生命体",
+        "从早期中文 Hip-Hop 场景中颇具影响力的说唱乐团 PNC，到 精气神 CheeProduction 厂牌的创作经历，再到 Beat 制作、DJ Set、电台节目 《流派大乱斗 StyleWar》，以及黑胶文化与听感实践的长期深耕——BIRD 鸟人的创作路径从未被单一身份框定，却始终绕不开三个关键词：groove、城市气候，以及人与人之间逐渐氧化的情绪",
+        "这一夜，BIRD鸟人会把他在 PNC 的街头叙事、精气神的厂牌审美、流派大乱斗的混音玩法，以及黑胶唱片的颗粒温度，全部装进他的 Set 里——从阳光下的南宁街头，到深夜地库的舞池中央，他用 groove 为时间染色"
+      ],
+      "artist_profiles": [],
+      "quality_status": "READY",
+      "quality_flags": [],
+      "publish_status": "published",
+      "dedupe_key": "南宁|deepcool地库酒吧|2026-06-05|周五bird鸟人南宁声音文化综合实践者在阳光与深夜之间找到groove的本体",
+      "detail_path": "by-id/deepcoolu3a9aba3c881843e3eau3ascheduleu3a20260605u3a1.json",
+      "detail_url": "by-id/deepcoolu3a9aba3c881843e3eau3ascheduleu3a20260605u3a1.json",
+      "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deepcool_9aba3c881843e3ea_schedule_20260605_1--0e76cbe92a6ed972719eefb4.jpg",
+      "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deepcool_9aba3c881843e3ea_schedule_20260605_1--0e76cbe92a6ed972719eefb4.jpg",
+      "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deepcool_9aba3c881843e3ea_schedule_20260605_1--0e76cbe92a6ed972719eefb4.jpg",
+      "poster_cloud_path": "weekly-posters/20260604/deepcool_9aba3c881843e3ea_schedule_20260605_1--0e76cbe92a6ed972719eefb4.jpg",
+      "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deepcool_9aba3c881843e3ea_schedule_20260605_1--0e76cbe92a6ed972719eefb4.jpg",
+      "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deepcool_9aba3c881843e3ea_schedule_20260605_1--0e76cbe92a6ed972719eefb4.jpg",
+      "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+      "time_verification": {
+        "decision": "source_candidate_over_llm",
+        "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+      },
+      "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deepcool_9aba3c881843e3ea_schedule_20260605_1--0e76cbe92a6ed972719eefb4.jpg",
+      "poster_storage": "cloudbase",
+      "posterStorage": "cloudbase",
+      "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deepcool_9aba3c881843e3ea_schedule_20260605_1--0e76cbe92a6ed972719eefb4.jpg",
+      "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deepcool_9aba3c881843e3ea_schedule_20260605_1--0e76cbe92a6ed972719eefb4.jpg",
+      "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deepcool_9aba3c881843e3ea_schedule_20260605_1--0e76cbe92a6ed972719eefb4.jpg",
+      "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/deepcool_9aba3c881843e3ea_schedule_20260605_1--0e76cbe92a6ed972719eefb4.jpg"
+    }
+  ]
+}

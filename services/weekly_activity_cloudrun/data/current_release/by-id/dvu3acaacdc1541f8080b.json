@@ -1,0 +1,112 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "dv:caacdc1541f8080b",
+    "event_id": "dv:caacdc1541f8080b",
+    "article_id": "dv:caacdc1541f8080b",
+    "queue_id": "dv:caacdc1541f8080b",
+    "title": "6.6 周六 免票｜Young Kids Rock",
+    "title_original": "6.6 周六 免票｜Young Kids Rock",
+    "title_display": "免票 | Young Kids Rock",
+    "account": "dv 苏州",
+    "account_key": "dv",
+    "promoter": "dv 苏州",
+    "source_article": {
+      "url_hash": "caacdc1541f8080b",
+      "account_name": "dv 苏州",
+      "published_at": "2026-05-31"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "caacdc1541f8080b"
+    },
+    "post_date": "2026-05-31",
+    "source_account_name": "dv 苏州",
+    "source_published_at": "2026-05-31",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "苏州"
+    ],
+    "city_key": "suzhou",
+    "city_name": "苏州",
+    "city_keys": [
+      "suzhou"
+    ],
+    "venue": [],
+    "venue_id": "dv_suzhou",
+    "venue_name": "dv 苏州",
+    "address": "江苏省苏州市姑苏区平桥直街120号2-3楼",
+    "address_full": "江苏省苏州市姑苏区平桥直街120号2-3楼",
+    "address_source": "manual_registry",
+    "geo_lng": 120.62715,
+    "geo_lat": 31.301155,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [],
+    "music_styles": [],
+    "price": [
+      "免票"
+    ],
+    "price_text": "免票",
+    "ticketing_text": "免票",
+    "evidence": [
+      "6.6 周六 免票｜Young Kids Rock",
+      "2026-06-06",
+      "2026年4月组建",
+      "Poster OCR date: 2026-06-06 / 2026-02-03"
+    ],
+    "description_original_lines": [
+      "6.6 周六 免票｜Young Kids Rock",
+      "2026年4月组建",
+      "Poster OCR date: 2026-06-06 / 2026-02-03"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "苏州|dv苏州|2026-06-06|免票youngkidsrock",
+    "detail_path": "by-id/dvu3acaacdc1541f8080b.json",
+    "detail_url": "by-id/dvu3acaacdc1541f8080b.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+    "poster_cloud_path": "weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/dv_caacdc1541f8080b--76ce02415cda1a9d781c0448.png"
+  }
+}

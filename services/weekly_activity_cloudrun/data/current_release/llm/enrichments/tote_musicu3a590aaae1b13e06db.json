@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "tote_music:590aaae1b13e06db",
+  "sourceItemHash": "d0e6b273a0c7b34a2d9bc165a679d19e037db739364a9f7b9e05e9ed09790520",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "【6/6 周六】Falling For You：一场蓄谋已久的坠落 | 安娜万千·2026全国巡演广州站",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "22:00 - Late",
+      "city_name": "广州",
+      "venue_name": "陀地士多 Tote Store",
+      "address_candidate": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+      "lineup_artists": [
+        "安娜万千",
+        "安娜万千"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "house",
+        "electro",
+        "disco",
+        "trip hop",
+        "hip-hop",
+        "house",
+        "electro",
+        "disco"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "来陀地士多，共同迎接她的音乐与故事！",
+        "来陀地士多，共同迎接她的音乐与故事！ 她是一位难以被定义的女性唱作人，也是包揽词曲、编曲与制作的独立制作人、 Beat maker",
+        "她把电子乐的冷峻光泽、 Hip Hop 的律动呼吸，悉数揉进 Trip Hop 的幽暗梦境里，锻造出一种只属于她的音乐语言——迷离中带着韧性，慵懒里藏着锋芒",
+        "三张个人创作全长专辑，从第一个音符到最后一秒混音，全部由她亲手构筑"
+      ],
+      "ticketing_text": [
+        "免票"
+      ],
+      "dedupe_signals": [
+        "【6/6 周六】Falling For You：一场蓄谋已久的坠落 | 安娜万千·2026全国巡演广州站",
+        "2026-06-06",
+        "广州",
+        "陀地士多 Tote Store"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

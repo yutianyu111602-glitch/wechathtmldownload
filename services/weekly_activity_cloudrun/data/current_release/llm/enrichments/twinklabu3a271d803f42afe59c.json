@@ -1,0 +1,59 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "twinklab:271d803f42afe59c",
+  "sourceItemHash": "58bba59568efe73dda4bba3fae58d7778b705ea19ec7bec4d7e3104328c5e15c",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Fri. HOUSE IT 纯粹律动浩室",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "22:00 - Late",
+      "city_name": "厦门",
+      "venue_name": "蜕壳TwinKlab",
+      "address_candidate": "福建省厦门市湖里区湖里大道22号联发文创口岸ZT205-206单元",
+      "lineup_artists": [],
+      "music_styles": [
+        "house",
+        "minimal house",
+        "tech house",
+        "deep house",
+        "indie dance",
+        "Latin tribal"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06/05 Fri. HOUSE IT 纯粹律动浩室",
+        "🎫 票务:Free Entry 全程免票入场",
+        "6月5日周五22:00起,HOUSE IT免票专场如约开演,连绵4/4拍消解一周倦意",
+        "HOUSE IT | 纯粹律动，整夜沉溺浩室节拍"
+      ],
+      "ticketing_text": [
+        "Free Entry"
+      ],
+      "dedupe_signals": [
+        "Fri. HOUSE IT 纯粹律动浩室",
+        "2026-06-05",
+        "厦门",
+        "蜕壳TwinKlab"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

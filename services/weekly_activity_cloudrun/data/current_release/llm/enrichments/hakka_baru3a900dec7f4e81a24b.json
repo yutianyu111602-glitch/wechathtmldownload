@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "hakka_bar:900dec7f4e81a24b",
+  "sourceItemHash": "ea3e907fa265bf0f6e057aa77fb1cb7464e28af7d699ddeac824d99e6b4aab6e",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "「OPEN DECKS」 ·   KROMI",
+      "event_date_start": "2026-06-04",
+      "event_date_end": "2026-06-04",
+      "event_time_text": null,
+      "city_name": "成都",
+      "venue_name": "Hakkabar 院吧",
+      "address_candidate": "四川省成都市武侯区玉林街道科华北路60号科华沸城12楼1201",
+      "lineup_artists": [
+        "KROMI",
+        "KROMI"
+      ],
+      "music_styles": [
+        "techno",
+        "house",
+        "bass",
+        "house",
+        "bass",
+        "techno"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06.04 周四 |「OPEN DECKS」 · KROMI",
+        "跃跃欲试的新手们，快来报名！",
+        "OPEN DECKS",
+        "星期四"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "「OPEN DECKS」 ·   KROMI",
+        "2026-06-04",
+        "成都",
+        "Hakkabar 院吧"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

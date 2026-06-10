@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "agg-child-af75dcca2de5ee59",
+  "sourceItemHash": "3f11a1ff48ea98cd528d4e90c3cbfa87a813b000fe896b540e52a92b16cbb52b",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "EAR pres. Darker than wax 15 year Anniversary China Tour",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "杭州",
+      "venue_name": "loopy Club",
+      "address_candidate": "浙江省杭州市西湖区天目山路398号天目里7号楼负一层",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "Sat",
+        "EAR",
+        "Darker than wax 15 year Anniversary",
+        "China Tour"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "EAR pres. Darker than wax 15 year Anniversary China Tour",
+        "2026-06-06",
+        "杭州",
+        "loopy Club"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

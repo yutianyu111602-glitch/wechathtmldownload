@@ -1,0 +1,147 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "tote_music:627e53fbadcab4e1",
+    "event_id": "tote_music:627e53fbadcab4e1",
+    "article_id": "tote_music:627e53fbadcab4e1",
+    "queue_id": "tote_music:627e53fbadcab4e1",
+    "title": "【6/12 周五】节奏探险 Funky Wonderland｜DJ set 跳舞派对",
+    "title_original": "【6/12 周五】节奏探险 Funky Wonderland｜DJ set 跳舞派对",
+    "title_display": "【6/12 周五】节奏探险 Funky Wonderland | DJ set 跳舞派对",
+    "account": "陀地音乐TOTE MUSIC",
+    "account_key": "tote_music",
+    "promoter": "陀地音乐TOTE MUSIC",
+    "source_article": {
+      "url_hash": "627e53fbadcab4e1",
+      "account_name": "陀地音乐TOTE MUSIC",
+      "published_at": "2026-05-28"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "627e53fbadcab4e1",
+      "disabled_reason": ""
+    },
+    "aggregation_child": false,
+    "post_date": "2026-05-28",
+    "source_account_name": "陀地音乐TOTE MUSIC",
+    "source_published_at": "2026-05-28",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a627e53fbadcab4e1--7f1039fee2ef4d68d7d2.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a627e53fbadcab4e1--7f1039fee2ef4d68d7d2.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a627e53fbadcab4e1--7f1039fee2ef4d68d7d2.jpg",
+    "poster_source": "cloudbase_storage_from_wechat_article",
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "event_date_text": [
+      "2026-06-12"
+    ],
+    "event_date_iso_guess": "2026-06-12",
+    "event_date_iso_guesses": [
+      "2026-06-12"
+    ],
+    "event_date_start": "2026-06-12",
+    "event_date_end": "2026-06-12",
+    "event_time_text": "22:00 - Late",
+    "event_time_source": "source_text",
+    "time_start": "22:00",
+    "time_end": "Late",
+    "running_hours_text": "22:00 - Late",
+    "running_hours_source": "source_text",
+    "city": [
+      "广州"
+    ],
+    "city_key": "guangzhou",
+    "city_name": "广州",
+    "city_keys": [
+      "guangzhou"
+    ],
+    "venue": [],
+    "venue_id": "tote_store_guangzhou",
+    "venue_name": "陀地士多 Tote Store",
+    "address": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+    "address_full": "广东省广州市海珠区南田路与松漱前交叉口正东方向100米左右",
+    "address_source": "venue_registry_verified",
+    "geo_lng": 113.262634,
+    "geo_lat": 23.097666,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "R&B",
+      "Reggae",
+      "Hiphop",
+      "Funk",
+      "Disco"
+    ],
+    "music_styles": [
+      "hip-hop",
+      "disco"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "【6/12 周五】节奏探险 Funky Wonderland｜DJ set 跳舞派对",
+      "2026-06-12",
+      "陀地士多出发，与3位DJs 共赴一场节奏探险，让我们尽情舞动！",
+      "6/12周五Fri",
+      "Poster OCR time: 22:00-late"
+    ],
+    "description_original_lines": [
+      "陀地士多出发，与3位DJs 共赴一场节奏探险，让我们尽情舞动！",
+      "6/12周五Fri",
+      "Poster OCR time: 22:00-late",
+      "Poster OCR date: 2026-06-12 / 2026-01-09"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "广州|陀地士多totestore|2026-06-12|612周五节奏探险funkywonderlanddjset跳舞派对",
+    "detail_path": "by-id/tote_musicu3a627e53fbadcab4e1.json",
+    "detail_url": "by-id/tote_musicu3a627e53fbadcab4e1.json",
+    "venue_lat": 23.097666,
+    "venue_lng": 113.262634,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "tencent_map_picker_user_confirmed",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "tote_store_guangzhou",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a627e53fbadcab4e1--7f1039fee2ef4d68d7d2.jpg",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a627e53fbadcab4e1--7f1039fee2ef4d68d7d2.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a627e53fbadcab4e1--7f1039fee2ef4d68d7d2.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a627e53fbadcab4e1--7f1039fee2ef4d68d7d2.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a627e53fbadcab4e1--7f1039fee2ef4d68d7d2.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a627e53fbadcab4e1--7f1039fee2ef4d68d7d2.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster_cloud_path": "weekly-posters/20260607/tote_musicu3a627e53fbadcab4e1--7f1039fee2ef4d68d7d2.jpg",
+    "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+    "poster_public_source_hash": "7f1039fee2ef4d68",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a627e53fbadcab4e1--7f1039fee2ef4d68d7d2.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a627e53fbadcab4e1--7f1039fee2ef4d68d7d2.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a627e53fbadcab4e1--7f1039fee2ef4d68d7d2.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/tote_musicu3a627e53fbadcab4e1--7f1039fee2ef4d68d7d2.jpg"
+  }
+}

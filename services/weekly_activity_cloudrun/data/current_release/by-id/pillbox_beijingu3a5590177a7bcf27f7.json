@@ -1,0 +1,144 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "pillbox_beijing:5590177a7bcf27f7",
+    "event_id": "pillbox_beijing:5590177a7bcf27f7",
+    "article_id": "pillbox_beijing:5590177a7bcf27f7",
+    "queue_id": "pillbox_beijing:5590177a7bcf27f7",
+    "title": "6·5｜Jeff Mills 厂牌旗下亚洲双雄 Ma Haiping & ECILO",
+    "title_original": "6·5｜Jeff Mills 厂牌旗下亚洲双雄 Ma Haiping & ECILO",
+    "title_display": "6·5 | Jeff Mills 厂牌旗下亚洲双雄 Ma Haiping & ECILO",
+    "account": "PILLBOX Beijing",
+    "account_key": "pillbox_beijing",
+    "promoter": "PILLBOX Beijing",
+    "source_article": {
+      "url_hash": "5590177a7bcf27f7",
+      "account_name": "PILLBOX Beijing",
+      "published_at": "2026-06-01"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "5590177a7bcf27f7"
+    },
+    "post_date": "2026-06-01",
+    "source_account_name": "PILLBOX Beijing",
+    "source_published_at": "2026-06-01",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pillbox_beijing_5590177a7bcf27f7--8d8d4405948524a519b56dac.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pillbox_beijing_5590177a7bcf27f7--8d8d4405948524a519b56dac.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pillbox_beijing_5590177a7bcf27f7--8d8d4405948524a519b56dac.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "北京"
+    ],
+    "city_key": "beijing",
+    "city_name": "北京",
+    "city_keys": [
+      "beijing"
+    ],
+    "venue": [],
+    "venue_id": "pillbox_beijing",
+    "venue_name": "PILLBOX碉堡",
+    "address": "北京市朝阳区东坝地区半截塔路539号首创郎园stationC9栋底商",
+    "address_full": "北京市朝阳区东坝地区半截塔路539号首创郎园stationC9栋底商",
+    "address_source": "venue_registry_verified",
+    "geo_lng": 116.517031,
+    "geo_lat": 39.97006,
+    "lineup": [
+      "Ma Haiping",
+      "ECILO"
+    ],
+    "lineup_artists": [
+      "Ma Haiping",
+      "ECILO"
+    ],
+    "genres": [
+      "techno"
+    ],
+    "music_styles": [
+      "techno"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "6·5｜Jeff Mills 厂牌旗下亚洲双雄 Ma Haiping & ECILO",
+      "2026-06-05",
+      "VACUUM pres",
+      "逃逸外太空的传送门已开启，6月5日，北京 PILLBOX 将化身为一座未知的科幻神殿，迎接地下电子音乐界的轴心双煞 —— Ecilo 和 Ma Haiping",
+      "他们都在 Jeff Mills 的厂牌 AXIS Records 发布过作品，并参与了 The Escape Velocity 发行计划"
+    ],
+    "description_original_lines": [
+      "VACUUM pres",
+      "逃逸外太空的传送门已开启，6月5日，北京 PILLBOX 将化身为一座未知的科幻神殿，迎接地下电子音乐界的轴心双煞 —— Ecilo 和 Ma Haiping",
+      "他们都在 Jeff Mills 的厂牌 AXIS Records 发布过作品，并参与了 The Escape Velocity 发行计划",
+      "On June 5th, the portal to outer space will open on the mainland—let’s meet freely on the dance flo or"
+    ],
+    "dj_bio_lines": [
+      "6·5｜Jeff Mills 厂牌旗下亚洲双雄 Ma Haiping & ECILO",
+      "逃逸外太空的传送门已开启，6月5日，北京 PILLBOX 将化身为一座未知的科幻神殿，迎接地下电子音乐界的轴心双煞 —— Ecilo 和 Ma Haiping"
+    ],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "北京|pillbox碉堡|2026-06-05|65jeffmills厂牌旗下亚洲双雄mahaiping&ecilo",
+    "detail_path": "by-id/pillbox_beijingu3a5590177a7bcf27f7.json",
+    "detail_url": "by-id/pillbox_beijingu3a5590177a7bcf27f7.json",
+    "venue_lat": 39.97006,
+    "venue_lng": 116.517031,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "tencent_map_picker_user_confirmed",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "pillbox_beijing",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pillbox_beijing_5590177a7bcf27f7--8d8d4405948524a519b56dac.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pillbox_beijing_5590177a7bcf27f7--8d8d4405948524a519b56dac.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pillbox_beijing_5590177a7bcf27f7--8d8d4405948524a519b56dac.png",
+    "poster_cloud_path": "weekly-posters/20260604/pillbox_beijing_5590177a7bcf27f7--8d8d4405948524a519b56dac.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pillbox_beijing_5590177a7bcf27f7--8d8d4405948524a519b56dac.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pillbox_beijing_5590177a7bcf27f7--8d8d4405948524a519b56dac.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pillbox_beijing_5590177a7bcf27f7--8d8d4405948524a519b56dac.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pillbox_beijing_5590177a7bcf27f7--8d8d4405948524a519b56dac.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pillbox_beijing_5590177a7bcf27f7--8d8d4405948524a519b56dac.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pillbox_beijing_5590177a7bcf27f7--8d8d4405948524a519b56dac.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/pillbox_beijing_5590177a7bcf27f7--8d8d4405948524a519b56dac.png"
+  }
+}

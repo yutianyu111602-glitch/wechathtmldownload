@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "reactor_shanghai:2f7f6375bf4767a8",
+  "sourceItemHash": "1f86a10b3363442a265892d11e4416190947a9fc14a2f72442e88758d52514d7",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "本周六 DOME | Antigen Pres. LUDU+Sandy’s Trace：一根横跨三十年、充满生命力的变迁之线",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "上海",
+      "venue_name": "REACTOR Shanghai",
+      "address_candidate": "上海市长宁区昭化路658号海粟文化广场D栋",
+      "lineup_artists": [
+        "LUDU",
+        "LUDU"
+      ],
+      "music_styles": [
+        "hip-hop",
+        "techno",
+        "electro",
+        "bass",
+        "techno",
+        "hip-hop",
+        "electro",
+        "bass",
+        "experimental",
+        "industrial"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "台湾前卫电子乐的代表之声",
+        "Approx.4678 words",
+        "International readers",
+        "please use the \"Translate\" function for the full article"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "本周六 DOME | Antigen Pres. LUDU+Sandy’s Trace：一根横跨三十年、充满生命力的变迁之线",
+        "2026-06-06",
+        "上海",
+        "REACTOR Shanghai"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

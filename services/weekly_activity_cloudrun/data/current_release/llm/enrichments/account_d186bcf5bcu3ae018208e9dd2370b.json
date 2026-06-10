@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "account_d186bcf5bc:e018208e9dd2370b",
+  "sourceItemHash": "5077ca28be7aaf5aae030febc6d2aa133c4302b09cdd4634bc03e277f4be4554",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "RebeL Hiphop专场",
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": "18:00-24:00",
+      "city_name": "厦门",
+      "venue_name": "INSULAR RECORDS 离岛",
+      "address_candidate": "福建省厦门市思明区美湖路49-53号",
+      "lineup_artists": [],
+      "music_styles": [
+        "hip-hop",
+        "hip-hop"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.13 周六｜RebeL Hiphop专场",
+        "票价:45(附赠: 1shot)",
+        "6 月 13 日下周六夜晚，RebeL 选择了 6 张专辑，从 Kanye 到 Westwood，跟大家一起用六个小时重新梳理属于这一代人的音乐记忆",
+        "无论你从哪一首歌开始认识 Hip-Hop，在这个夜晚，我们都将被音乐链接在一起"
+      ],
+      "ticketing_text": [
+        "票价:45"
+      ],
+      "dedupe_signals": [
+        "RebeL Hiphop专场",
+        "2026-06-13",
+        "厦门",
+        "INSULAR RECORDS 离岛"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

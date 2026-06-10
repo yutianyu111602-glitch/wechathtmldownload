@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "vervo:c36953658ecace79",
+  "sourceItemHash": "25d86435f5fa79a028770be8f61abb890192c33d9012d0a62e712c2ce5d12454",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "周五 | BassHead：低音先行，万物皆可重组",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "FridayAT 22:30-END",
+      "city_name": "昆明",
+      "venue_name": "VERVO",
+      "address_candidate": "云南省昆明市五华区钱王街51号正义坊购物中心北馆",
+      "lineup_artists": [],
+      "music_styles": [
+        "bass",
+        "bass"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.5·周五｜BassHead：低音先行，万物皆可重组",
+        "如果声音有形状，那一定是 BassHead 现场不断扩张的波形",
+        "FridayAT 22:30-END Free Entry",
+        "Poster OCR date: 2026-06-05 / 2026-06-06 / 2026-06-08 / 2026-06-07"
+      ],
+      "ticketing_text": [
+        "Free Entry"
+      ],
+      "dedupe_signals": [
+        "周五 | BassHead：低音先行，万物皆可重组",
+        "2026-06-05",
+        "昆明",
+        "VERVO"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

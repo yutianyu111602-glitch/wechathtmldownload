@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "gas_nation:34be3c40e71370cf",
+  "sourceItemHash": "344fd4d19b42006aaf4f7edcfec16de4f6be68351cbe87b358b64dc5012abe1c",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "本周六·免票入场 | HOUSE ABOUT LOVE爱之舞",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "21:30 - Late",
+      "city_name": "天津",
+      "venue_name": "Gas Nation氣厂",
+      "address_candidate": "天津市河西区万科广场（人民公园店）4楼露台",
+      "lineup_artists": [],
+      "music_styles": [
+        "house",
+        "house"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [
+        "本周六来自南非的 Josh.dlm，做客 GAS他将和茶座，Zendaya，Leah 一起用轻盈而富有张力的节奏，缓慢地拉近我们的距离，让连接自然发生"
+      ],
+      "description_original_lines": [
+        "🆓 免票入场!",
+        "“HOUSE ABOUT LOVE” 是GAS俱乐部2025年起，每月例行的HOUSE系列派对",
+        "旨在推介更多优秀的HOUSE DJ及制作人带来的跳舞音乐，滋养天津城电子乐场景",
+        "通过传播爱之能量，拉近人和人之间的距离，分享善意"
+      ],
+      "ticketing_text": [
+        "免票入场"
+      ],
+      "dedupe_signals": [
+        "本周六·免票入场 | HOUSE ABOUT LOVE爱之舞",
+        "2026-06-06",
+        "天津",
+        "Gas Nation氣厂"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

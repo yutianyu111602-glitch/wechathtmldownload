@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "dv:3879c24ffa94b78d",
+  "sourceItemHash": "9ab831fe1605530a20dd5b4568de52c2982db1769854ad9c3f248cf8a637348e",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "极简主义二重奏",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "20:30",
+      "city_name": "苏州",
+      "venue_name": "dv 苏州",
+      "address_candidate": "江苏省苏州市姑苏区平桥直街120号2-3楼",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.5 周五｜极简主义二重奏",
+        "Poster OCR date: 2026-06-05 / 2026-06-06 / 2026-06-02"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "极简主义二重奏",
+        "2026-06-05",
+        "苏州",
+        "dv 苏州"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

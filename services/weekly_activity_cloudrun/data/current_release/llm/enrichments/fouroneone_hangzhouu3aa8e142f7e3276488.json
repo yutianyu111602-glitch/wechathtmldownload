@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "fouroneone_hangzhou:a8e142f7e3276488",
+  "sourceItemHash": "06f05e62e8499fd548bb5a2536e6a786e0f799cc309c1e12f63c402c5078df82",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "今日 DJ Set @肆幺幺",
+      "event_date_start": "2026-06-07",
+      "event_date_end": "2026-06-07",
+      "event_time_text": "16:00-18:00",
+      "city_name": "杭州",
+      "venue_name": "肆幺幺",
+      "address_candidate": "浙江省杭州市上城区中山南路411号",
+      "lineup_artists": [
+        "Shii",
+        "Shii"
+      ],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "肆幺幺",
+        "🎛️💃🏻 艺人阵容：Shii",
+        "🎛️💃🏻 时间：16:00-18:00"
+      ],
+      "ticketing_text": [
+        "免票入场"
+      ],
+      "dedupe_signals": [
+        "今日 DJ Set @肆幺幺",
+        "2026-06-07",
+        "杭州",
+        "肆幺幺"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

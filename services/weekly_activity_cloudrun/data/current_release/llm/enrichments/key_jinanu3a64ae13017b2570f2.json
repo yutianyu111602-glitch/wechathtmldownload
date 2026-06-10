@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "key_jinan:64ae13017b2570f2",
+  "sourceItemHash": "243049c8a2edd8b90d347ccf5520ff8a420f91715c86d7efcaa0d0a821eec580",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "本周五 | 满格输出🫵 斯洛文尼亚低音狂人 w/Fujita Pinnacle",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": null,
+      "city_name": "济南",
+      "venue_name": "KEY JINAN",
+      "address_candidate": "山东省济南市历下区县西巷泉乐坊224室",
+      "lineup_artists": [
+        "Fujita Pinnacle",
+        "Fujita Pinnacle"
+      ],
+      "music_styles": [
+        "techno",
+        "bass",
+        "breaks",
+        "bass",
+        "breakbeat",
+        "jungle",
+        "techno"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.5 本周五｜满格输出🫵 斯洛文尼亚低音狂人 w/Fujita Pinnacle",
+        "BASS/BREAKBEAT/JUNGLE/TECHNO",
+        "FRIDAY"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "本周五 | 满格输出🫵 斯洛文尼亚低音狂人 w/Fujita Pinnacle",
+        "2026-06-05",
+        "济南",
+        "KEY JINAN"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

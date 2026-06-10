@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "tomtwo:17b2c1be7cb76fcc",
+  "sourceItemHash": "b1951e2d91ec3150cb94d9de8f7307896c1dbda7b736bc8c976d9521b2f986f0",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "“迷噪盯”乐队whetherday 是否日再次入侵南方！",
+      "event_date_start": "2026-06-13",
+      "event_date_end": "2026-06-13",
+      "event_time_text": null,
+      "city_name": "福州",
+      "venue_name": "TOMTWO通透现场",
+      "address_candidate": "福建省福州市台江区宁化街道长汀街39号福州滨江市民广场（左海光年PARK）项目一层L1-39商铺",
+      "lineup_artists": [],
+      "music_styles": [],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "06/13 “迷噪盯”乐队whetherday 是否日再次入侵南方！",
+        "“世界上所有的一切不曾飞向我们，而是我们主动飞向它们",
+        "LIVE TOURIN2026",
+        "Poster OCR date: 2026-05-15 / 2026-05-01 / 2026-05-16 / 2026-05-17"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "“迷噪盯”乐队whetherday 是否日再次入侵南方！",
+        "2026-06-13",
+        "福州",
+        "TOMTWO通透现场"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

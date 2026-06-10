@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "allowJs": true,
+    "checkJs": false,
+    "strict": false,
+    "baseUrl": ".",
+    "typeRoots": ["./node_modules"],
+    "types": ["miniprogram-api-typings"]
+  },
+  "include": ["./**/*.js"],
+  "exclude": ["node_modules", "miniprogram_npm", "tests"]
+}

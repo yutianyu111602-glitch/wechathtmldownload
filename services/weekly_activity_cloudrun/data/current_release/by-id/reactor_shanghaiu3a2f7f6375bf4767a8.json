@@ -1,0 +1,180 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "reactor_shanghai:2f7f6375bf4767a8",
+    "event_id": "reactor_shanghai:2f7f6375bf4767a8",
+    "article_id": "reactor_shanghai:2f7f6375bf4767a8",
+    "queue_id": "reactor_shanghai:2f7f6375bf4767a8",
+    "title": "本周六 DOME | Antigen Pres. LUDU+Sandy’s Trace：一根横跨三十年、充满生命力的变迁之线",
+    "title_original": "本周六 DOME | Antigen Pres. LUDU+Sandy’s Trace：一根横跨三十年、充满生命力的变迁之线",
+    "title_display": "本周六 DOME | Antigen Pres. LUDU+Sandy’s Trace：一根横跨三十年、充满生命力的变迁之线",
+    "account": "REACTOR Shanghai",
+    "account_key": "reactor_shanghai",
+    "promoter": "REACTOR Shanghai",
+    "source_article": {
+      "url_hash": "2f7f6375bf4767a8",
+      "account_name": "REACTOR Shanghai",
+      "published_at": "2026-06-01"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "2f7f6375bf4767a8"
+    },
+    "post_date": "2026-06-01",
+    "source_account_name": "REACTOR Shanghai",
+    "source_published_at": "2026-06-01",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/reactor_shanghai_2f7f6375bf4767a8--f5edde8c34387f8c3f9ee8ab.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/reactor_shanghai_2f7f6375bf4767a8--f5edde8c34387f8c3f9ee8ab.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/reactor_shanghai_2f7f6375bf4767a8--f5edde8c34387f8c3f9ee8ab.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [],
+    "venue_id": "reactor_shanghai",
+    "venue_name": "REACTOR Shanghai",
+    "address": "上海市长宁区昭化路658号海粟文化广场D栋",
+    "address_full": "上海市长宁区昭化路658号海粟文化广场D栋",
+    "address_source": "venue_registry_verified",
+    "geo_lng": 121.419529,
+    "geo_lat": 31.210481,
+    "lineup": [
+      "LUDU"
+    ],
+    "lineup_artists": [
+      "LUDU"
+    ],
+    "genres": [
+      "techno",
+      "hip-hop",
+      "electro",
+      "bass",
+      "experimental",
+      "industrial"
+    ],
+    "music_styles": [
+      "hip-hop",
+      "techno",
+      "electro",
+      "bass"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "本周六 DOME | Antigen Pres. LUDU+Sandy’s Trace：一根横跨三十年、充满生命力的变迁之线",
+      "2026-06-06",
+      "台湾前卫电子乐的代表之声",
+      "Approx.4678 words",
+      "International readers"
+    ],
+    "description_original_lines": [
+      "台湾前卫电子乐的代表之声",
+      "Approx.4678 words",
+      "International readers",
+      "please use the \"Translate\" function for the full article"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "上海|reactorshanghai|2026-06-06|六domeantigenpresludu+sandystrace一根横跨三十年、充满生命力的变迁之线",
+    "detail_path": "by-id/reactor_shanghaiu3a2f7f6375bf4767a8.json",
+    "detail_url": "by-id/reactor_shanghaiu3a2f7f6375bf4767a8.json",
+    "venue_lat": 31.210481,
+    "venue_lng": 121.419529,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "frontend_verified_map_location_book",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "reactor_shanghai",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "merge_provenance": {
+      "schema_version": "weekly_merge_provenance.v1",
+      "reason": "duplicate_cluster",
+      "retained_id": "reactor_shanghai:2f7f6375bf4767a8",
+      "retained_source_hash": "2f7f6375bf4767a8",
+      "merged_from": [
+        "reactor_shanghai:305605c9b1b310ba",
+        "reactor_shanghai:2f7f6375bf4767a8"
+      ],
+      "merged_source_hashes": [
+        "2f7f6375bf4767a8",
+        "305605c9b1b310ba"
+      ],
+      "source_count": 2,
+      "sources": [
+        {
+          "event_id": "reactor_shanghai:305605c9b1b310ba",
+          "source_hash": "305605c9b1b310ba",
+          "title": "DOME | Antigen Pres. LUDU+Sandy’s Trace：一根横跨三十年、充满生命力的变迁之线",
+          "published_at": "2026-05-29",
+          "account_name": "REACTOR Shanghai",
+          "source_type": "wechat_article"
+        },
+        {
+          "event_id": "reactor_shanghai:2f7f6375bf4767a8",
+          "source_hash": "2f7f6375bf4767a8",
+          "title": "本周六 DOME | Antigen Pres. LUDU+Sandy’s Trace：一根横跨三十年、充满生命力的变迁之线",
+          "published_at": "2026-06-01",
+          "account_name": "REACTOR Shanghai",
+          "source_type": "wechat_article"
+        }
+      ]
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/reactor_shanghai_2f7f6375bf4767a8--f5edde8c34387f8c3f9ee8ab.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/reactor_shanghai_2f7f6375bf4767a8--f5edde8c34387f8c3f9ee8ab.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/reactor_shanghai_2f7f6375bf4767a8--f5edde8c34387f8c3f9ee8ab.png",
+    "poster_cloud_path": "weekly-posters/20260604/reactor_shanghai_2f7f6375bf4767a8--f5edde8c34387f8c3f9ee8ab.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/reactor_shanghai_2f7f6375bf4767a8--f5edde8c34387f8c3f9ee8ab.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/reactor_shanghai_2f7f6375bf4767a8--f5edde8c34387f8c3f9ee8ab.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/reactor_shanghai_2f7f6375bf4767a8--f5edde8c34387f8c3f9ee8ab.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/reactor_shanghai_2f7f6375bf4767a8--f5edde8c34387f8c3f9ee8ab.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/reactor_shanghai_2f7f6375bf4767a8--f5edde8c34387f8c3f9ee8ab.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/reactor_shanghai_2f7f6375bf4767a8--f5edde8c34387f8c3f9ee8ab.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/reactor_shanghai_2f7f6375bf4767a8--f5edde8c34387f8c3f9ee8ab.png"
+  }
+}

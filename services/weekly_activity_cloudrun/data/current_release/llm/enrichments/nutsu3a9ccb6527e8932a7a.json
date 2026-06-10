@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "nuts:9ccb6527e8932a7a",
+  "sourceItemHash": "f87ac55a52939cc211854a8c68cc4d3ccff715f2226e2525fa0426a105b543b0",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "「荒野舞会」：拓荒乐队首次专场 | 坚果NUTS",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "20:00",
+      "city_name": "重庆",
+      "venue_name": "坚果NUTS",
+      "address_candidate": "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+      "lineup_artists": [
+        "拓荒乐队",
+        "拓荒乐队"
+      ],
+      "music_styles": [
+        "hard rock"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "坚果NUTS",
+        "重庆市两江新区红黄路重庆两江新区龙湖新壹街C馆1F",
+        "6/5 20:00",
+        "6/5 20:00 @NUTS 「荒野舞会」 当钢筋森林的喧嚣褪去，当循规蹈矩的日常被撕裂，拓荒乐队携首次专场，以硬摇滚为火种，点燃一场「荒野舞会」"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "「荒野舞会」：拓荒乐队首次专场 | 坚果NUTS",
+        "2026-06-05",
+        "重庆",
+        "坚果NUTS"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

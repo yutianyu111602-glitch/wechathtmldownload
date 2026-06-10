@@ -1,0 +1,174 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "cicipark:2d005a889516f59c",
+    "event_id": "cicipark:2d005a889516f59c",
+    "article_id": "cicipark:2d005a889516f59c",
+    "queue_id": "cicipark:2d005a889516f59c",
+    "title": "6.05周五｜潮汐CHAOXI pres.Cosmjn",
+    "title_original": "6.05周五｜潮汐CHAOXI pres.Cosmjn",
+    "title_display": "潮汐CHAOXI pres.Cosmjn",
+    "account": "cicipark",
+    "account_key": "cicipark",
+    "promoter": "cicipark",
+    "source_article": {
+      "url_hash": "2d005a889516f59c",
+      "account_name": "cicipark",
+      "published_at": "2026-06-03"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "2d005a889516f59c"
+    },
+    "post_date": "2026-06-03",
+    "source_account_name": "cicipark",
+    "source_published_at": "2026-06-03",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "22:00 - Late",
+    "event_time_source": "source_text",
+    "time_start": "22:00",
+    "time_end": "Late",
+    "running_hours_text": "22:00 - Late",
+    "running_hours_source": "source_text",
+    "city": [
+      "重庆"
+    ],
+    "city_key": "chongqing",
+    "city_name": "重庆",
+    "city_keys": [
+      "chongqing"
+    ],
+    "venue": [],
+    "venue_id": "cicipark_chongqing",
+    "venue_name": "Cici Park",
+    "address": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+    "address_full": "重庆市南岸区龙门浩与龙门路交叉口正西方向135米左右",
+    "address_source": "manual_registry",
+    "geo_lng": 106.592744,
+    "geo_lat": 29.55206,
+    "lineup": [
+      "Cosmjn"
+    ],
+    "lineup_artists": [
+      "Cosmjn"
+    ],
+    "genres": [
+      "techno",
+      "house",
+      "electro",
+      "breaks",
+      "minimal",
+      "deep tech"
+    ],
+    "music_styles": [
+      "techno",
+      "house",
+      "electro",
+      "breaks"
+    ],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "6.05周五｜潮汐CHAOXI pres.Cosmjn",
+      "2026-06-05",
+      "重庆开埠遗址公园2号停车场 观光电梯至2楼 青年文化空间",
+      "Youth Cultural Space, 2nd Floor, Opening Port Park Gate2, NanAn District, Chongqing",
+      "- 预售通道 -"
+    ],
+    "description_original_lines": [
+      "6.05周五｜潮汐CHAOXI pres.Cosmjn",
+      "重庆开埠遗址公园2号停车场 观光电梯至2楼 青年文化空间",
+      "Youth Cultural Space, 2nd Floor, Opening Port Park Gate2, NanAn District, Chongqing",
+      "- 预售通道 -"
+    ],
+    "dj_bio_lines": [
+      "跳舞活动「潮汐」是重庆电子俱乐部cicipark & EchoBay主理人 Sunyoung 发起了一项 Project，定期邀请心仪的 DJ / 音乐人朋友分享最新的音乐故事、声音品味与氛围体验，渴望着全方位与新朋老友发生舞池共鸣与思想交流～",
+      "六月「潮汐」，特别邀请到罗马尼亚才华横溢的DJ/制作人Cosmjn，他的音乐风格巧妙融合了"
+    ],
+    "artist_profiles": [
+      {
+        "artist_id": "dj_db24bce2",
+        "canonical_name": "Sunyoung",
+        "matched_name": "Sunyoung",
+        "verified": true,
+        "source": "dj_profiles",
+        "city": "Chongqing",
+        "genres": [
+          "Deep House|Dub|Electro|Electronic|Minimal|UK Garage"
+        ],
+        "bio": "",
+        "links": [
+          "https://www.instagram.com/cicipilot_sunyoung/",
+          "https://ra.co/dj/sunyoung-cn",
+          "https://www.xiaohongshu.com/user/profile/6927363f000000003702d11d"
+        ]
+      },
+      {
+        "artist_id": "dj_a74c8e1a",
+        "canonical_name": "Cosmjn",
+        "matched_name": "Cosmjn",
+        "verified": true,
+        "source": "dj_profiles",
+        "city": "BUCHAREST",
+        "genres": [
+          "Minimal"
+        ],
+        "bio": "▫️EUROPE • andreea@sunrise.ro\n▫️NORTH AMERICA • denis@nomadtalent.com\n▫️SOUTH AMERICA • bookings@kickclapagency.com\n🪄 @radial_records",
+        "links": [
+          "https://www.instagram.com/cosmjn/",
+          "https://soundcloud.com/cosmjn",
+          "https://ra.co/dj/cosmjn/biography",
+          "https://youtu.be/bTQRQHX0TIg"
+        ]
+      }
+    ],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "重庆|cicipark|2026-06-05|潮汐chaoxiprescosmjn",
+    "detail_path": "by-id/ciciparku3a2d005a889516f59c.json",
+    "detail_url": "by-id/ciciparku3a2d005a889516f59c.json",
+    "lineup_quality": {
+      "status": "verified",
+      "decision": "scoring_retained_lineup",
+      "note": "retained lineup artists with score >= 0.6: Cosmjn"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "time_verification": {
+      "decision": "source_candidate_over_llm",
+      "note": "current release keeps the fuller source-text event window while DeepSeek Pro extracted only a partial or conflicting end time"
+    },
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cicipark_2d005a889516f59c--6634bd4a5908448867eba13e.jpg"
+  }
+}

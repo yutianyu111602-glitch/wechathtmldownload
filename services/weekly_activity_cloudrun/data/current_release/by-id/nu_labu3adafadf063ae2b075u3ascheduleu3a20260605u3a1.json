@@ -1,0 +1,133 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "nu_lab:dafadf063ae2b075:schedule:20260605:1",
+    "event_id": "nu_lab:dafadf063ae2b075:schedule:20260605:1",
+    "article_id": "nu_lab:dafadf063ae2b075",
+    "queue_id": "nu_lab:dafadf063ae2b075:schedule:20260605:1",
+    "title": "NU Lab｜6.5丨Clinic Out with TOMO",
+    "title_original": "NU Lab｜6.5丨Clinic Out with TOMO",
+    "title_display": "丨Clinic Out with TOMO",
+    "account": "NU Lab",
+    "account_key": "nu_lab",
+    "promoter": "NU Lab",
+    "source_article": {
+      "url_hash": "dafadf063ae2b075",
+      "account_name": "NU Lab",
+      "published_at": "2026-06-02"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "dafadf063ae2b075"
+    },
+    "post_date": "2026-06-02",
+    "source_account_name": "NU Lab",
+    "source_published_at": "2026-06-02",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nu_lab_dafadf063ae2b075_schedule_20260605_1--9b73207646c505b2ef67488b.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nu_lab_dafadf063ae2b075_schedule_20260605_1--9b73207646c505b2ef67488b.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nu_lab_dafadf063ae2b075_schedule_20260605_1--9b73207646c505b2ef67488b.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "成都"
+    ],
+    "city_key": "chengdu",
+    "city_name": "成都",
+    "city_keys": [
+      "chengdu"
+    ],
+    "venue": [
+      "NU Lab"
+    ],
+    "venue_id": "nu_lab_chengdu",
+    "venue_name": "NU Lab",
+    "address": "四川省成都市锦江区永安路666号NUART锦江5楼",
+    "address_full": "四川省成都市锦江区永安路666号NUART锦江5楼",
+    "address_source": "source_text",
+    "geo_lng": 104.080562,
+    "geo_lat": 30.588497,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "NU Lab｜6.5丨Clinic Out with TOMO",
+      "2026-06-05",
+      "四川省成都市锦江区永安路666号NUART锦江5楼",
+      "6.5丨Clinic Out with TOMO",
+      "LeFrit(live)"
+    ],
+    "description_original_lines": [
+      "NU Lab｜6.5丨Clinic Out with TOMO",
+      "6.5丨Clinic Out with TOMO",
+      "LeFrit(live)",
+      "Frit"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "成都|nulab|2026-06-05|丨clinicoutwithtomo",
+    "detail_path": "by-id/nu_labu3adafadf063ae2b075u3ascheduleu3a20260605u3a1.json",
+    "detail_url": "by-id/nu_labu3adafadf063ae2b075u3ascheduleu3a20260605u3a1.json",
+    "venue_lat": 30.588497,
+    "venue_lng": 104.080562,
+    "geo_coord_system": "GCJ-02",
+    "geo_source": "tencent_map_picker_user_confirmed",
+    "geo_verified_at": "2026-06-01",
+    "geo_candidate_id": "nu_lab_chengdu",
+    "protected_field_merge": {
+      "schema_version": "weekly_incremental_api_merge.v1.protected_fields",
+      "preserved_fields": [
+        "address_source",
+        "geo_candidate_id",
+        "geo_coord_system",
+        "geo_source",
+        "geo_verified_at",
+        "venue_lat",
+        "venue_lng"
+      ],
+      "reason": "base row carried verified place fields; incremental row did not request explicit override"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nu_lab_dafadf063ae2b075_schedule_20260605_1--9b73207646c505b2ef67488b.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nu_lab_dafadf063ae2b075_schedule_20260605_1--9b73207646c505b2ef67488b.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nu_lab_dafadf063ae2b075_schedule_20260605_1--9b73207646c505b2ef67488b.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/nu_lab_dafadf063ae2b075_schedule_20260605_1--9b73207646c505b2ef67488b.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nu_lab_dafadf063ae2b075_schedule_20260605_1--9b73207646c505b2ef67488b.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nu_lab_dafadf063ae2b075_schedule_20260605_1--9b73207646c505b2ef67488b.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nu_lab_dafadf063ae2b075_schedule_20260605_1--9b73207646c505b2ef67488b.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nu_lab_dafadf063ae2b075_schedule_20260605_1--9b73207646c505b2ef67488b.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nu_lab_dafadf063ae2b075_schedule_20260605_1--9b73207646c505b2ef67488b.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nu_lab_dafadf063ae2b075_schedule_20260605_1--9b73207646c505b2ef67488b.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/nu_lab_dafadf063ae2b075_schedule_20260605_1--9b73207646c505b2ef67488b.jpg"
+  }
+}

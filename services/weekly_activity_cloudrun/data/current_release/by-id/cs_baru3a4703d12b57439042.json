@@ -1,0 +1,113 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "cs_bar:4703d12b57439042",
+    "event_id": "cs_bar:4703d12b57439042",
+    "article_id": "cs_bar:4703d12b57439042",
+    "queue_id": "cs_bar:4703d12b57439042",
+    "title": "6月6日 周六 ｜back to the roots!",
+    "title_original": "6月6日 周六 ｜back to the roots!",
+    "title_display": "back to the roots!",
+    "account": "Cs Bar",
+    "account_key": "cs_bar",
+    "promoter": "Cs Bar",
+    "source_article": {
+      "url_hash": "4703d12b57439042",
+      "account_name": "Cs Bar",
+      "published_at": "2026-06-03"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "4703d12b57439042"
+    },
+    "post_date": "2026-06-03",
+    "source_account_name": "Cs Bar",
+    "source_published_at": "2026-06-03",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cs_bar_4703d12b57439042--a67c4d9cb054242af91a152a.png",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cs_bar_4703d12b57439042--a67c4d9cb054242af91a152a.png",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cs_bar_4703d12b57439042--a67c4d9cb054242af91a152a.png",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-06"
+    ],
+    "event_date_iso_guess": "2026-06-06",
+    "event_date_iso_guesses": [
+      "2026-06-06"
+    ],
+    "event_date_start": "2026-06-06",
+    "event_date_end": "2026-06-06",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [],
+    "venue_id": "cs_bar_shanghai",
+    "venue_name": "Cs Bar",
+    "address": "上海市长宁区定西路685号新华大厦B1楼",
+    "address_full": "上海市长宁区定西路685号新华大厦B1楼",
+    "address_source": "manual_registry",
+    "geo_lng": 121.423511,
+    "geo_lat": 31.20678,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [
+      "underground",
+      "hardcore",
+      "nu-metal",
+      "cyber metal"
+    ],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "6月6日 周六 ｜back to the roots!",
+      "2026-06-06",
+      "Poster OCR date: 2026-06-06"
+    ],
+    "description_original_lines": [
+      "6月6日 周六 ｜back to the roots!",
+      "Poster OCR date: 2026-06-06"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "上海|csbar|2026-06-06|backtotheroots!",
+    "detail_path": "by-id/cs_baru3a4703d12b57439042.json",
+    "detail_url": "by-id/cs_baru3a4703d12b57439042.json",
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cs_bar_4703d12b57439042--a67c4d9cb054242af91a152a.png",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cs_bar_4703d12b57439042--a67c4d9cb054242af91a152a.png",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cs_bar_4703d12b57439042--a67c4d9cb054242af91a152a.png",
+    "poster_cloud_path": "weekly-posters/20260604/cs_bar_4703d12b57439042--a67c4d9cb054242af91a152a.png",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cs_bar_4703d12b57439042--a67c4d9cb054242af91a152a.png",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cs_bar_4703d12b57439042--a67c4d9cb054242af91a152a.png",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cs_bar_4703d12b57439042--a67c4d9cb054242af91a152a.png",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cs_bar_4703d12b57439042--a67c4d9cb054242af91a152a.png",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cs_bar_4703d12b57439042--a67c4d9cb054242af91a152a.png",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cs_bar_4703d12b57439042--a67c4d9cb054242af91a152a.png",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/cs_bar_4703d12b57439042--a67c4d9cb054242af91a152a.png"
+  }
+}

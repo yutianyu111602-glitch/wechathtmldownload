@@ -1,0 +1,55 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "cs_bar:4703d12b57439042",
+  "sourceItemHash": "ac2c0963b42436202771543f4c4b109e6b1c8257b7d28106c00300ecae57b5b8",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "back to the roots!",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "上海",
+      "venue_name": "Cs Bar",
+      "address_candidate": "上海市长宁区定西路685号新华大厦B1楼",
+      "lineup_artists": [],
+      "music_styles": [
+        "underground",
+        "hardcore",
+        "nu-metal",
+        "cyber metal"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6月6日 周六 ｜back to the roots!",
+        "Poster OCR date: 2026-06-06"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "back to the roots!",
+        "2026-06-06",
+        "上海",
+        "Cs Bar"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

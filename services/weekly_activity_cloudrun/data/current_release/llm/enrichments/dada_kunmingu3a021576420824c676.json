@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "dada_kunming:021576420824c676",
+  "sourceItemHash": "4f23224d29300e49588486ee3c74c3581b3bd2d02eebc8dfcf37654d314c981a",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "周六 6月6日-【Love Bang】成立16周年巡演派对-昆明站@Dada Kunming",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "昆明",
+      "venue_name": "Dada Kunming",
+      "address_candidate": "云南省昆明市五华区虹山东路4号版筑翠园9栋2层",
+      "lineup_artists": [],
+      "music_styles": [
+        "hip-hop",
+        "techno",
+        "house",
+        "club trax",
+        "hip-hop",
+        "house",
+        "techno",
+        "electro",
+        "club music",
+        "bass"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "免票·免票·免票",
+        "00:00前购票可得30元酒卡 (仅限派对当晚使用)",
+        "享受颠簸·享受Love Bang",
+        "Love Bang"
+      ],
+      "ticketing_text": [
+        "TICKETS 30RMB / 免票"
+      ],
+      "dedupe_signals": [
+        "周六 6月6日-【Love Bang】成立16周年巡演派对-昆明站@Dada Kunming",
+        "2026-06-06",
+        "昆明",
+        "Dada Kunming"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

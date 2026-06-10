@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "pillbox_beijing:36a42fe36b736a10",
+  "sourceItemHash": "bbf6eea1278bdc0f46cb6465b916c19bd03c365493ca10b05f679cd47b027349",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "6·6 | Radiohead同门师弟 伦敦最令人兴奋的俱乐部制作人MssingNo带你穿越互联网梦境",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "北京",
+      "venue_name": "PILLBOX碉堡",
+      "address_candidate": "北京市朝阳区东坝地区半截塔路539号首创郎园stationC9栋底商",
+      "lineup_artists": [
+        "MssingNo",
+        "MssingNo"
+      ],
+      "music_styles": [
+        "electro",
+        "bass",
+        "grime",
+        "R&B",
+        "electronic",
+        "bass"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "UK人速来舞池集合准备好Gun Finger🔥 Knot pres",
+        "6th JUNE2026"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "6·6 | Radiohead同门师弟 伦敦最令人兴奋的俱乐部制作人MssingNo带你穿越互联网梦境",
+        "2026-06-06",
+        "北京",
+        "PILLBOX碉堡"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

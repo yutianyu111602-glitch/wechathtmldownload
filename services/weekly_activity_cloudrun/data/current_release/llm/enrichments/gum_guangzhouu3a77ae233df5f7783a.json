@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "gum_guangzhou:77ae233df5f7783a",
+  "sourceItemHash": "2eeb23ddc526e65795274b7ba97898c2e8060935da7e7cabda3101fdbb25203e",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "0605 Fri. | BT*坏品味  ωǒ们破解ㄋňǐ②○○⑦ηián隱藏の非炷蓅涳簡密碼，幷妑ťā莋荿周㈤派怼のBGM",
+      "event_date_start": "2026-06-05",
+      "event_date_end": "2026-06-05",
+      "event_time_text": "23:00-00:00",
+      "city_name": "广州",
+      "venue_name": "GUM Guangzhou",
+      "address_candidate": "广东省广州市海珠区工业大道北路132号自编45号102室",
+      "lineup_artists": [],
+      "music_styles": [
+        "techno",
+        "trance",
+        "ambient",
+        "ambient",
+        "trance",
+        "deconstructed club",
+        "hard techno",
+        "UK dubstep",
+        "speed garage"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "埖⑥⑧块ゑ聽①整琬①②⑧kbpsの電孒包槳 廣州λ終亐疯ㄋ？",
+        "PostedonMay06,2026|23:00PMEST"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "0605 Fri. | BT*坏品味  ωǒ们破解ㄋňǐ②○○⑦ηián隱藏の非炷蓅涳簡密碼，幷妑ťā莋荿周㈤派怼のBGM",
+        "2026-06-05",
+        "广州",
+        "GUM Guangzhou"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

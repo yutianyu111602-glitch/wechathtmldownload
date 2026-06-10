@@ -1,0 +1,182 @@
+{
+  "schema_version": "weekly_activity_miniprogram_city_index.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "city_count": 25,
+  "cities": [
+    {
+      "city_key": "beijing",
+      "city": "北京",
+      "count": 24,
+      "path": "by-city/beijing.json",
+      "url": "by-city/beijing.json"
+    },
+    {
+      "city_key": "changchun",
+      "city": "长春",
+      "count": 3,
+      "path": "by-city/changchun.json",
+      "url": "by-city/changchun.json"
+    },
+    {
+      "city_key": "chengdu",
+      "city": "成都",
+      "count": 12,
+      "path": "by-city/chengdu.json",
+      "url": "by-city/chengdu.json"
+    },
+    {
+      "city_key": "chongqing",
+      "city": "重庆",
+      "count": 13,
+      "path": "by-city/chongqing.json",
+      "url": "by-city/chongqing.json"
+    },
+    {
+      "city_key": "dali",
+      "city": "大理",
+      "count": 3,
+      "path": "by-city/dali.json",
+      "url": "by-city/dali.json"
+    },
+    {
+      "city_key": "dalian",
+      "city": "大连",
+      "count": 2,
+      "path": "by-city/dalian.json",
+      "url": "by-city/dalian.json"
+    },
+    {
+      "city_key": "daqing",
+      "city": "大庆",
+      "count": 1,
+      "path": "by-city/daqing.json",
+      "url": "by-city/daqing.json"
+    },
+    {
+      "city_key": "fuzhou",
+      "city": "福州",
+      "count": 2,
+      "path": "by-city/fuzhou.json",
+      "url": "by-city/fuzhou.json"
+    },
+    {
+      "city_key": "guangzhou",
+      "city": "广州",
+      "count": 17,
+      "path": "by-city/guangzhou.json",
+      "url": "by-city/guangzhou.json"
+    },
+    {
+      "city_key": "guiyang",
+      "city": "贵阳",
+      "count": 3,
+      "path": "by-city/guiyang.json",
+      "url": "by-city/guiyang.json"
+    },
+    {
+      "city_key": "hangzhou",
+      "city": "杭州",
+      "count": 16,
+      "path": "by-city/hangzhou.json",
+      "url": "by-city/hangzhou.json"
+    },
+    {
+      "city_key": "jinan",
+      "city": "济南",
+      "count": 2,
+      "path": "by-city/jinan.json",
+      "url": "by-city/jinan.json"
+    },
+    {
+      "city_key": "kunming",
+      "city": "昆明",
+      "count": 6,
+      "path": "by-city/kunming.json",
+      "url": "by-city/kunming.json"
+    },
+    {
+      "city_key": "nanjing",
+      "city": "南京",
+      "count": 2,
+      "path": "by-city/nanjing.json",
+      "url": "by-city/nanjing.json"
+    },
+    {
+      "city_key": "nanning",
+      "city": "南宁",
+      "count": 1,
+      "path": "by-city/nanning.json",
+      "url": "by-city/nanning.json"
+    },
+    {
+      "city_key": "qingdao",
+      "city": "青岛",
+      "count": 1,
+      "path": "by-city/qingdao.json",
+      "url": "by-city/qingdao.json"
+    },
+    {
+      "city_key": "sanya",
+      "city": "三亚",
+      "count": 1,
+      "path": "by-city/sanya.json",
+      "url": "by-city/sanya.json"
+    },
+    {
+      "city_key": "shanghai",
+      "city": "上海",
+      "count": 36,
+      "path": "by-city/shanghai.json",
+      "url": "by-city/shanghai.json"
+    },
+    {
+      "city_key": "shenyang",
+      "city": "沈阳",
+      "count": 1,
+      "path": "by-city/shenyang.json",
+      "url": "by-city/shenyang.json"
+    },
+    {
+      "city_key": "shenzhen",
+      "city": "深圳",
+      "count": 10,
+      "path": "by-city/shenzhen.json",
+      "url": "by-city/shenzhen.json"
+    },
+    {
+      "city_key": "suzhou",
+      "city": "苏州",
+      "count": 6,
+      "path": "by-city/suzhou.json",
+      "url": "by-city/suzhou.json"
+    },
+    {
+      "city_key": "tianjin",
+      "city": "天津",
+      "count": 3,
+      "path": "by-city/tianjin.json",
+      "url": "by-city/tianjin.json"
+    },
+    {
+      "city_key": "xiamen",
+      "city": "厦门",
+      "count": 4,
+      "path": "by-city/xiamen.json",
+      "url": "by-city/xiamen.json"
+    },
+    {
+      "city_key": "xian",
+      "city": "西安",
+      "count": 2,
+      "path": "by-city/xian.json",
+      "url": "by-city/xian.json"
+    },
+    {
+      "city_key": "zhengzhou",
+      "city": "郑州",
+      "count": 1,
+      "path": "by-city/zhengzhou.json",
+      "url": "by-city/zhengzhou.json"
+    }
+  ]
+}

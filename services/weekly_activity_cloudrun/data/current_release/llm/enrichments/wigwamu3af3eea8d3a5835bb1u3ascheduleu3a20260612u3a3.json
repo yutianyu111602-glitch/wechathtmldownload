@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "wigwam:f3eea8d3a5835bb1:schedule:20260612:3",
+  "sourceItemHash": "58dbc44c534e7478921f3d9e50af5d9dc0ddfd519525afc04b320df531e86870",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "Dada / 北京 Beijing",
+      "event_date_start": "2026-06-12",
+      "event_date_end": "2026-06-12",
+      "event_time_text": "03:00",
+      "city_name": "上海",
+      "venue_name": "wigwam",
+      "address_candidate": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+      "lineup_artists": [],
+      "music_styles": [
+        "hip-hop",
+        "house",
+        "electro",
+        "disco",
+        "hip-hop",
+        "house",
+        "electro",
+        "disco"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "wigwam｜06.12 — Dada / 北京 Beijing",
+        "06.12 — Dada / 北京 Beijing",
+        "Opening Hours",
+        "Poster OCR time: 03:00"
+      ],
+      "ticketing_text": [
+        "¥100"
+      ],
+      "dedupe_signals": [
+        "Dada / 北京 Beijing",
+        "2026-06-12",
+        "上海",
+        "wigwam"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

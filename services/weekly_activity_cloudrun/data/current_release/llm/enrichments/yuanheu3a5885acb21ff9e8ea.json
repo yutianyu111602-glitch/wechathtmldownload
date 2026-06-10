@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "yuanhe:5885acb21ff9e8ea",
+  "sourceItemHash": "14bb45e9a95c482c76ccf2557325308883a8a2484e4f4fa5fb3f12a0c3dbbeda",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "666日！认真的聆听一下Techno音乐",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": null,
+      "city_name": "北京",
+      "venue_name": "YUANHE 原核",
+      "address_candidate": "北京市朝阳区西大望路27号E6-2号楼103",
+      "lineup_artists": [],
+      "music_styles": [
+        "techno",
+        "house",
+        "techno"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "6.06 666日！认真的聆听一下Techno音乐",
+        "2026.6.06 听点6的Techno",
+        "以下 来自英国力士AI：",
+        "Techno音乐听起来是什么感觉？"
+      ],
+      "ticketing_text": [],
+      "dedupe_signals": [
+        "666日！认真的聆听一下Techno音乐",
+        "2026-06-06",
+        "北京",
+        "YUANHE 原核"
+      ],
+      "review_flags": [
+        "missing_time"
+      ],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

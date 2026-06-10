@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "weekly_activity_api.materialized_enrichment.v1",
+  "generatedAt": "2026-06-08T13:43:29.423Z",
+  "id": "exit_shanghai:c463790f486461f1",
+  "sourceItemHash": "d2446c4ee2471966d3687b9395c0c9af49d4feefda85bcbdf30b66fa22d9cf2d",
+  "enriched": {
+    "provider": "source-grounded",
+    "model": "deterministic-release-fields",
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "enrichment": {
+      "schema_version": "weekly_event_extract.v1",
+      "is_event": true,
+      "title_display": "开票！6.6 Techno Worlds x VACUUM | FINAL SAMPLING : ESCAPE VELOCITY 逃逸速度",
+      "event_date_start": "2026-06-06",
+      "event_date_end": "2026-06-06",
+      "event_time_text": "22:00-05:30",
+      "city_name": "上海",
+      "venue_name": "EXIT Club",
+      "address_candidate": "上海市长宁区新华路街道幸福路298号",
+      "lineup_artists": [
+        "Ma Haiping",
+        "Ecilo",
+        "NAXIN",
+        "RÖ",
+        "IXWELE",
+        "Ma Haiping",
+        "Ecilo",
+        "NAXIN",
+        "RÖ",
+        "IXWELE"
+      ],
+      "music_styles": [
+        "techno",
+        "ambient",
+        "techno"
+      ],
+      "sound_system": [],
+      "sound_system_evidence": [],
+      "sound_system_confidence": null,
+      "dj_bio_lines": [],
+      "description_original_lines": [
+        "科幻、深沉、催眠的压迫感,原始而直接的驱动力,没有任何让步...” 时间:2026年6月6日 22:00-5:30 地址:EXIT上海市长宁区幸福路298号 主办:VACUUM 联合主办:德国驻上海总领事馆文化教育处 项目合作:E-fRUITY、EXIT Shanghai 艺术家:MA HAIPING/ ECILO/ NAXIN/ RÖ/ IXWELE EN",
+        "EXIT Club",
+        "科幻、深沉、催眠的压迫感，原始而直接的驱动力，没有任何让步",
+        "他们作为 2020 年代亚洲 TECHNO 的顶尖代表，将把 EXIT 的舞池带入一片黑暗沼泽，从底特律到柏林延展至欧洲大陆，直至宇宙"
+      ],
+      "ticketing_text": [
+        "早鸟 80¥ / 预售 100¥ / 双人 198¥ / 现场 120¥ / 4am 后免费入场"
+      ],
+      "dedupe_signals": [
+        "开票！6.6 Techno Worlds x VACUUM | FINAL SAMPLING : ESCAPE VELOCITY 逃逸速度",
+        "2026-06-06",
+        "上海",
+        "EXIT Club"
+      ],
+      "review_flags": [],
+      "notes": [
+        "source-grounded deterministic materialization; no model call executed",
+        "fields are copied from the release package to prevent stale LLM output reuse"
+      ]
+    }
+  }
+}

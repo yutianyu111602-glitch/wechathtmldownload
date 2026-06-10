@@ -1,0 +1,137 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "agg-child-86c0cdb71bdba7f2",
+    "event_id": "agg-child-86c0cdb71bdba7f2",
+    "article_id": "agg-child-86c0cdb71bdba7f2",
+    "queue_id": "agg-child-86c0cdb71bdba7f2",
+    "title": "千喜发廊夜 Millennium Salon Night",
+    "title_original": "千喜发廊夜 Millennium Salon Night",
+    "title_display": "千喜发廊夜 Millennium Salon Night",
+    "account": "Dada Bar Beijing",
+    "account_key": "dada_bar_beijing",
+    "promoter": "Dada Bar Beijing",
+    "source_article": {
+      "url_hash": "",
+      "account_name": "Dada Bar Beijing",
+      "published_at": "2026-06-01"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": false,
+      "url_hash": "",
+      "disabled_reason": "aggregate_child_parent_article"
+    },
+    "post_date": "2026-06-01",
+    "source_account_name": "Dada Bar Beijing",
+    "source_published_at": "2026-06-01",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-86c0cdb71bdba7f2--d4ec4486486783e768a5b567.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-86c0cdb71bdba7f2--d4ec4486486783e768a5b567.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-86c0cdb71bdba7f2--d4ec4486486783e768a5b567.jpg",
+    "poster_source": "cloudbase_storage",
+    "event_date_text": [
+      "2026-06-05"
+    ],
+    "event_date_iso_guess": "2026-06-05",
+    "event_date_iso_guesses": [
+      "2026-06-05"
+    ],
+    "event_date_start": "2026-06-05",
+    "event_date_end": "2026-06-05",
+    "event_time_text": "",
+    "event_time_source": "",
+    "time_start": "",
+    "time_end": "",
+    "running_hours_text": "",
+    "running_hours_source": "",
+    "city": [
+      "北京"
+    ],
+    "city_key": "beijing",
+    "city_name": "北京",
+    "city_keys": [
+      "beijing"
+    ],
+    "venue": [
+      "DADA BEIJING"
+    ],
+    "venue_id": "dada_bar_beijing",
+    "venue_name": "dadabar(日坛国际贸易中心A座店)",
+    "address": "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+    "address_full": "北京市朝阳区朝外街道南营房胡同日坛国际贸易中心A座北门B1",
+    "address_source": "manual_registry",
+    "geo_lng": 116.441877,
+    "geo_lat": 39.920029,
+    "lineup": [
+      "DJ江水平",
+      "Kosevic",
+      "TECHNEKO"
+    ],
+    "lineup_artists": [
+      "DJ江水平",
+      "Kosevic",
+      "TECHNEKO"
+    ],
+    "genres": [],
+    "music_styles": [],
+    "price": [],
+    "price_text": "",
+    "ticketing_text": "",
+    "evidence": [
+      "2026年6月5日",
+      "千喜发廊夜",
+      "Millennium Salon Night",
+      "DJ江水平Kosevic",
+      "TECHNEKO"
+    ],
+    "description_original_lines": [
+      "2026年6月5日",
+      "千喜发廊夜",
+      "Millennium Salon Night",
+      "DJ江水平Kosevic"
+    ],
+    "dj_bio_lines": [
+      "DJ江水平Kosevic"
+    ],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [
+      "missing_time"
+    ],
+    "publish_status": "published",
+    "dedupe_key": "北京|dadabar日坛国际贸易中心a座店|2026-06-05|千喜发廊夜millenniumsalonnight",
+    "detail_path": "by-id/agg-child-86c0cdb71bdba7f2.json",
+    "detail_url": "by-id/agg-child-86c0cdb71bdba7f2.json",
+    "lineup_quality": {
+      "status": "verified",
+      "decision": "scoring_retained_lineup",
+      "note": "retained lineup artists with score >= 0.6: DJ江水平, Kosevic, TECHNEKO"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-86c0cdb71bdba7f2--d4ec4486486783e768a5b567.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-86c0cdb71bdba7f2--d4ec4486486783e768a5b567.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-86c0cdb71bdba7f2--d4ec4486486783e768a5b567.jpg",
+    "poster_cloud_path": "weekly-posters/20260604/agg-child-86c0cdb71bdba7f2--d4ec4486486783e768a5b567.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-86c0cdb71bdba7f2--d4ec4486486783e768a5b567.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-86c0cdb71bdba7f2--d4ec4486486783e768a5b567.jpg",
+    "poster_migrated_at": "2026-06-04T21:45:00+08:00",
+    "aggregation_child": true,
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-86c0cdb71bdba7f2--d4ec4486486783e768a5b567.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-86c0cdb71bdba7f2--d4ec4486486783e768a5b567.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-86c0cdb71bdba7f2--d4ec4486486783e768a5b567.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-86c0cdb71bdba7f2--d4ec4486486783e768a5b567.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260604/agg-child-86c0cdb71bdba7f2--d4ec4486486783e768a5b567.jpg",
+    "discovery_source": "wechat-aggregate-yuanbao",
+    "extraction_model": "yuanbao",
+    "aggregation_source_kind": "yuanbao_overview",
+    "metadata_enriched_at": "2026-06-08T20:05:38.918908"
+  }
+}

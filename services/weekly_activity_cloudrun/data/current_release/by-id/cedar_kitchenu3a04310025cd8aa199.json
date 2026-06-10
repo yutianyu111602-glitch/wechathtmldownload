@@ -1,0 +1,121 @@
+{
+  "schema_version": "weekly_activity_miniprogram_detail.v1",
+  "generated_at": "2026-06-08T20:41:45+08:00",
+  "item": {
+    "schema_version": "weekly_event_published.v1",
+    "content_type": "event",
+    "is_calendar_preview": false,
+    "id": "cedar_kitchen:04310025cd8aa199",
+    "event_id": "cedar_kitchen:04310025cd8aa199",
+    "article_id": "cedar_kitchen:04310025cd8aa199",
+    "queue_id": "cedar_kitchen:04310025cd8aa199",
+    "title": "周日丨巨鹿路免费夜市回归 自由摆摊和放歌",
+    "title_original": "周日丨巨鹿路免费夜市回归 自由摆摊和放歌",
+    "title_display": "周日丨巨鹿路免费夜市回归 自由摆摊和放歌",
+    "account": "Cedar Kitchen",
+    "account_key": "cedar_kitchen",
+    "promoter": "Cedar Kitchen",
+    "source_article": {
+      "url_hash": "04310025cd8aa199",
+      "account_name": "Cedar Kitchen",
+      "published_at": "2026-06-05"
+    },
+    "source_action": {
+      "type": "wechat_article",
+      "label": "公众号",
+      "available": true,
+      "url_hash": "04310025cd8aa199",
+      "disabled_reason": ""
+    },
+    "aggregation_child": false,
+    "post_date": "2026-06-05",
+    "source_account_name": "Cedar Kitchen",
+    "source_published_at": "2026-06-05",
+    "cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+    "cover_image_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+    "poster_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+    "poster_source": "cloudbase_storage_from_wechat_article",
+    "poster_suppressed": false,
+    "poster_suppressed_reason": "",
+    "event_date_text": [
+      "2026-06-07"
+    ],
+    "event_date_iso_guess": "2026-06-07",
+    "event_date_iso_guesses": [
+      "2026-06-07"
+    ],
+    "event_date_start": "2026-06-07",
+    "event_date_end": "2026-06-07",
+    "event_time_text": "周日八点到深夜",
+    "event_time_source": "source_text",
+    "time_start": "周日八点到深夜",
+    "time_end": "",
+    "running_hours_text": "周日八点到深夜",
+    "running_hours_source": "source_text",
+    "city": [
+      "上海"
+    ],
+    "city_key": "shanghai",
+    "city_name": "上海",
+    "city_keys": [
+      "shanghai"
+    ],
+    "venue": [],
+    "venue_id": "",
+    "venue_name": "Cedar Kitchen",
+    "address": "周日丨巨鹿路免费夜市回归 自由摆摊和放歌",
+    "address_full": "周日丨巨鹿路免费夜市回归 自由摆摊和放歌",
+    "address_source": "source_text_normalized",
+    "geo_lng": null,
+    "geo_lat": null,
+    "lineup": [],
+    "lineup_artists": [],
+    "genres": [],
+    "music_styles": [],
+    "price": [
+      "免票入场"
+    ],
+    "price_text": "免票入场",
+    "ticketing_text": "免票入场",
+    "evidence": [
+      "周日丨巨鹿路免费夜市回归 自由摆摊和放歌",
+      "逛:免票入场,便宜好逛,珍奇异宝,旁边店里有阿拉伯卷饼和调酒",
+      "2026-06-07",
+      "周日八点到深夜！上海巨鹿路272号Cedar自由贸易市场",
+      "摆摊：汽修车库任意消费入场，自由摆摊，不用报名，自带毯子，一两件闲置也可以拿手上随缘出"
+    ],
+    "description_original_lines": [
+      "逛:免票入场,便宜好逛,珍奇异宝,旁边店里有阿拉伯卷饼和调酒",
+      "周日八点到深夜！上海巨鹿路272号Cedar自由贸易市场",
+      "摆摊：汽修车库任意消费入场，自由摆摊，不用报名，自带毯子，一两件闲置也可以拿手上随缘出",
+      "本次夜市有电视台来拍，多叫朋友来玩！"
+    ],
+    "dj_bio_lines": [],
+    "artist_profiles": [],
+    "quality_status": "READY",
+    "quality_flags": [],
+    "publish_status": "published",
+    "dedupe_key": "上海|cedarkitchen|2026-06-07|周日丨巨鹿路免费夜市回归自由摆摊和放歌",
+    "detail_path": "by-id/cedar_kitchenu3a04310025cd8aa199.json",
+    "detail_url": "by-id/cedar_kitchenu3a04310025cd8aa199.json",
+    "address_verification": {
+      "decision": "source_candidate_over_source_text",
+      "note": "source evidence contains a structured address; current source-text address looked like event metadata or a less app-friendly alias"
+    },
+    "posterFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+    "cloudFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+    "cover_file_id": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+    "coverFileId": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+    "poster_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+    "coverUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+    "poster_storage": "cloudbase",
+    "posterStorage": "cloudbase",
+    "poster_cloud_path": "weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+    "poster_migrated_at": "2026-06-07T15:30:34+08:00",
+    "poster_public_source_hash": "5e525297b56b3f37",
+    "poster": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+    "posterUrl": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+    "flyer_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg",
+    "raw_cover_url": "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/weekly-posters/20260607/cedar_kitchenu3a04310025cd8aa199--5e525297b56b3f372614.jpg"
+  }
+}
