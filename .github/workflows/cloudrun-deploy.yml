@@ -22,7 +22,7 @@ jobs:
     environment: cloudrun-prod
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.git_ref }}
           fetch-depth: 0

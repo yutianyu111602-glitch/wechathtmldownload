@@ -22,7 +22,7 @@ jobs:
     environment: miniprogram-upload
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: DevTools smoke (rendered)
         run: pwsh ./scripts/miniprogram/devtools-smoke.ps1 -Mode rendered
