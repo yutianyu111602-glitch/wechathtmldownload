@@ -79,9 +79,12 @@ Verify: `--selftest` (extend the synthetic with a serving fixture), then real ru
 
 ## Run / refresh
 ```
-python tools/atlas_rebuild/build_atlas_serving_v2.py            # Phase 1 (+Phase 2 once --serving wired)
-python tools/atlas_rebuild/export_starmap_layout.py --source v2 # Phase 4 (once wired) -> copy to apps/atlas_starmap_web/public/
-npm --prefix apps/atlas_starmap_web run build                   # verify
+npm run atlas:v2:selftest   # selftests (build_atlas_serving_v2 + export_starmap_layout)
+npm run atlas:v2            # build atlas_serving_v2.sqlite — subjects + relations (Phase 1+2 DONE)
+npm run atlas:starmap       # regenerate star map layout into the web app + validate
+npm run atlas:web           # build the atlas_starmap_web app
+npm run atlas:rebuild       # all of the above, in order
+# Phase 4 will repoint export_starmap_layout.py at atlas_serving_v2 (--source v2).
 ```
 When G6 / daily delta land, repoint `--stage3`/`--serving` to the newest accepted `merged/` and
 re-run the chain; `meta.generation` should track which ramp produced the data.
