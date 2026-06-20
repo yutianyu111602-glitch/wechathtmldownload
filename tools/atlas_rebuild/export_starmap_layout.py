@@ -18,7 +18,7 @@ Read-only on the serving DB. numpy-only (no networkx/scipy).
 Runnable check: `python export_starmap_layout.py --selftest`.
 """
 from __future__ import annotations
-import argparse, colorsys, json, math, sqlite3, sys
+import argparse, colorsys, json, math, re, sqlite3, sys
 from pathlib import Path
 import numpy as np
 
@@ -28,6 +28,39 @@ DEFAULT_DB = "_fleet_14w_g4_40k_increment_20260620/merged/atlas_serving_candidat
 def _hsl_hex(h, s, l):
     r, g, b = colorsys.hls_to_rgb(h % 1.0, l, s)
     return "#%02x%02x%02x" % (int(r * 255), int(g * 255), int(b * 255))
+
+
+_VENUE_PUNCT = re.compile(r"[\s·・|｜@＠:：,，.。、_/\\()（）\[\]【】-]")
+
+
+def _norm_venue(name):
+    """Collapse venue name variants of one physical club (Dada Beijing / Dada Bar Beijing)."""
+    s = str(name or "").strip().lower().replace("&", "and")
+    s = re.sub(r"(club|俱乐部|bar|酒吧|livehouse|live house|studio|space|空间)", "", s)
+    return _VENUE_PUNCT.sub("", s)
+
+
+def load_venues(db_path, kept_dj_ids):
+    """DJ->venue rollup rows restricted to the kept DJ set. Tolerates a missing table."""
+    db = None
+    try:
+        db = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+        db.row_factory = sqlite3.Row
+        keep = set(kept_dj_ids)
+        return [
+            {"dj_id": r["dj_id"], "venue_name": r["venue_name"], "city": r["city"],
+             "event_count": r["event_count"]}
+            for r in db.execute("SELECT dj_id, venue_name, city, event_count FROM dj_venue_rollup")
+            if r["dj_id"] in keep and (r["venue_name"] or "").strip()
+        ]
+    except Exception:
+        return []
+    finally:
+        if db is not None:
+            try:
+                db.close()
+            except Exception:
+                pass
 
 
 def load_graph(db_path, min_score, max_nodes, max_edges):
@@ -146,7 +179,7 @@ def layout(comm, n_comm, sizes, seed=7):
     return pos
 
 
-def build(db_path, out_path, min_score, max_nodes, max_edges):
+def build(db_path, out_path, min_score, max_nodes, max_edges, include_venues=True, max_venues=250, venue_dj_cap=12):
     profiles, node_ids, edges = load_graph(db_path, min_score, max_nodes, max_edges)
     idx = {d: i for i, d in enumerate(node_ids)}
 
@@ -201,10 +234,54 @@ def build(db_path, out_path, min_score, max_nodes, max_edges):
             "evidence": evd,
         })
 
-    edge_type_counts = {
-        "b2b": sum(1 for e in out_edges if e["type"] == "b2b"),
-        "collab": sum(1 for e in out_edges if e["type"] == "collab"),
-    }
+    # Venue anchors: merge DJ->venue rollup (dedup name variants) into venue nodes
+    # placed at the centroid of the DJs who play there, so a club sits inside its scene.
+    venue_count = 0
+    if include_venues:
+        vmap = {}
+        for r in load_venues(db_path, node_ids):
+            di = idx.get(r["dj_id"])
+            if di is None:
+                continue
+            name = str(r["venue_name"]).strip()
+            nkey = _norm_venue(name) or name.lower()
+            ec = int(r.get("event_count") or 0)
+            g = vmap.setdefault(nkey, {"names": {}, "events": 0, "djs": {}, "city": ""})
+            g["names"][name] = g["names"].get(name, 0) + ec
+            g["events"] += ec
+            g["djs"][di] = g["djs"].get(di, 0) + ec
+            if not g["city"]:
+                g["city"] = r.get("city") or ""
+        ranked = sorted(vmap.values(), key=lambda g: -g["events"])[:max_venues]
+        if ranked:
+            v_ev = np.sqrt(np.array([g["events"] for g in ranked], dtype=float) + 1.0)
+            vsizes = 0.9 + 3.0 * (v_ev / v_ev.max())
+            base = len(node_ids)
+            vrng = np.random.default_rng(99)
+            for k, g in enumerate(ranked):
+                djs = sorted(g["djs"].items(), key=lambda kv: -kv[1])
+                cen = pos[[di for di, _ in djs]].mean(axis=0) + vrng.normal(0, 4.0, size=3)
+                canon = max(g["names"].items(), key=lambda kv: kv[1])[0]
+                out_nodes.append({
+                    "id": base + k,
+                    "x": round(float(cen[0]), 3), "y": round(float(cen[1]), 3), "z": round(float(cen[2]), 3),
+                    "label": "venue",
+                    "name": canon,
+                    "file_path": f"场地/{canon}",
+                    "size": round(float(vsizes[k]), 3),
+                    "color": "#ffcf6b",  # warm amber anchors, distinct from DJ community hues
+                    "city": g["city"],
+                    "event_count": int(g["events"]),
+                    "community": -1,
+                })
+                for di, w in djs[:venue_dj_cap]:
+                    out_edges.append({"source": di, "target": base + k, "type": "resident_at",
+                                      "score": float(w), "same_event": int(w), "label_zh": "驻场/常演", "evidence": []})
+            venue_count = len(ranked)
+
+    edge_type_counts = {}
+    for e in out_edges:
+        edge_type_counts[e["type"]] = edge_type_counts.get(e["type"], 0) + 1
     data = {
         "version": "atlas_starmap.layout.v1",
         "project": "atlas-underground-cn",
@@ -219,6 +296,7 @@ def build(db_path, out_path, min_score, max_nodes, max_edges):
             "edge_count": len(out_edges),
             "edge_type_counts": edge_type_counts,
             "communities": n_comm,
+            "venue_count": venue_count,
             "generated_by": "export_starmap_layout.py",
         },
     }
@@ -349,12 +427,15 @@ def main():
     ap.add_argument("--max-edges", type=int, default=8000)
     ap.add_argument("--selftest", action="store_true")
     ap.add_argument("--validate", help="validate an existing atlas_layout.json and print P1 contract summary")
+    ap.add_argument("--no-venues", action="store_true", help="exclude venue anchor nodes (DJ-only B2B lens)")
+    ap.add_argument("--max-venues", type=int, default=250)
     a = ap.parse_args()
     if a.selftest:
         _selftest(); return
     if a.validate:
         validate_file(a.validate); return
-    data = build(a.db, a.out, a.min_score, a.max_nodes, a.max_edges)
+    data = build(a.db, a.out, a.min_score, a.max_nodes, a.max_edges,
+                 include_venues=not a.no_venues, max_venues=a.max_venues)
     comms = {}
     for n in data["nodes"]:
         comms[n["community"]] = comms.get(n["community"], 0) + 1

@@ -23,6 +23,7 @@ function getClusterKey(fp?: string): string {
 const EDGE_TYPE_COLORS: Record<string, string> = {
   b2b: "#f8c56a",
   collab: "#38bdf8",
+  resident_at: "#caa45a",
   CALLS: "#1DA27E",
   IMPORTS: "#3b82f6",
   DEFINES: "#a855f7",

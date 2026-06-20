@@ -25,6 +25,7 @@ interface NodeDetailPanelProps {
 function edgeTypeLabel(type: string): string {
   if (type === "b2b") return "B2B 深度合作";
   if (type === "collab") return "高频同台";
+  if (type === "resident_at") return "驻场 / 常演";
   return type.replace(/_/g, " ").toLowerCase();
 }
 
@@ -93,7 +94,7 @@ export function NodeDetailPanel({ node, allNodes, allEdges, onClose, onNavigate 
                 className="inline-block px-2 py-0.5 rounded text-[10px] font-medium"
                 style={{ backgroundColor: colorForLabel(node.label) + "18", color: colorForLabel(node.label) }}
               >
-                DJ
+                {node.label === "venue" ? "场地" : "DJ"}
               </span>
               <span className="inline-block px-2 py-0.5 rounded border border-white/[0.06] bg-white/[0.03] text-[10px] text-foreground/55">
                 {node.city || "城市未知"}
@@ -104,11 +105,18 @@ export function NodeDetailPanel({ node, allNodes, allEdges, onClose, onNavigate 
         </div>
 
         <div className="grid grid-cols-3 gap-3 mt-3">
-          {[
-            { label: "演出", value: node.event_count ?? 0, color: "text-primary" },
-            { label: "B2B", value: b2bCount, color: "text-[#f8c56a]" },
-            { label: "同台", value: collabCount, color: "text-accent" },
-          ].map((s) => (
+          {(node.label === "venue"
+            ? [
+                { label: "演出", value: node.event_count ?? 0, color: "text-primary" },
+                { label: "驻场DJ", value: connections.length, color: "text-[#ffcf6b]" },
+                { label: "城市", value: node.city || "未知", color: "text-accent" },
+              ]
+            : [
+                { label: "演出", value: node.event_count ?? 0, color: "text-primary" },
+                { label: "B2B", value: b2bCount, color: "text-[#f8c56a]" },
+                { label: "同台", value: collabCount, color: "text-accent" },
+              ]
+          ).map((s) => (
             <div key={s.label} className="rounded border border-white/[0.05] bg-white/[0.025] px-2 py-1.5">
               <p className="text-[9px] text-foreground/30 uppercase tracking-widest">{s.label}</p>
               <p className={`text-[18px] font-semibold tabular-nums ${s.color}`}>{s.value}</p>
