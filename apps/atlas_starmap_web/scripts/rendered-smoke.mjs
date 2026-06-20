@@ -180,7 +180,7 @@ async function runViewport(browser, baseUrl, viewport, name, firstNodeName) {
   const result = { name, viewport };
   await page.goto(baseUrl, { waitUntil: "domcontentloaded", timeout: 45_000 });
   await page.waitForSelector("canvas", { timeout: 20_000 });
-  await page.getByText(/DJs\s*\//).waitFor({ timeout: 20_000 });
+  await page.getByText(/(DJs|节点)\s*\//).waitFor({ timeout: 20_000 });
   await page.waitForTimeout(1200);
   const canvas = page.locator("canvas").first();
   const canvasPng = await canvas.screenshot({ path: path.join(outDir, `${name}-canvas.png`) });

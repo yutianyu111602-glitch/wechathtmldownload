@@ -13,14 +13,14 @@ export function App() {
               ATLAS 地下电子音乐星图
             </h1>
             <p className="text-[10px] text-foreground/35 truncate">
-              B2B / 高频同台合作网络
+              多镜头 / 一等实体 / 证据关系
             </p>
           </div>
         </div>
 
         <div className="hidden sm:flex items-center gap-2 text-[10px] text-foreground/45">
           <span className="px-2 py-1 rounded border border-white/[0.06] bg-white/[0.03]">
-            P1 镜头
+            atlas.starmap.v2
           </span>
           <span className="px-2 py-1 rounded border border-white/[0.06] bg-white/[0.03]">
             证据驱动

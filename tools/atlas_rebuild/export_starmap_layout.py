@@ -23,11 +23,55 @@ from pathlib import Path
 import numpy as np
 
 DEFAULT_DB = "_fleet_14w_g4_40k_increment_20260620/merged/atlas_serving_candidate.sqlite"
+DEFAULT_V2_DB = "_fleet_14w_g5_80k_increment_20260620/merged/atlas_serving_v2.sqlite"
+V2_LENSES = ("b2b_universe", "residency_map", "label_roster", "series", "city", "style")
+V2_LENS_LABELS = {
+    "b2b_universe": "B2B宇宙",
+    "residency_map": "驻场地图",
+    "label_roster": "厂牌花名册",
+    "series": "系列宇宙",
+    "city": "城市场景",
+    "style": "曲风光谱",
+}
+TYPE_COLORS = {"dj": "#38bdf8", "venue": "#ffcf6b", "org": "#b794f6", "series": "#2dd4bf"}
 
 
 def _hsl_hex(h, s, l):
     r, g, b = colorsys.hls_to_rgb(h % 1.0, l, s)
     return "#%02x%02x%02x" % (int(r * 255), int(g * 255), int(b * 255))
+
+
+def _hash_hue(value):
+    h = int(__import__("hashlib").sha1(str(value or "").encode("utf-8")).hexdigest()[:8], 16)
+    return (h % 10000) / 10000.0
+
+
+def _json_list(value):
+    if not value:
+        return []
+    try:
+        data = json.loads(value)
+    except Exception:
+        return []
+    return data if isinstance(data, list) else []
+
+
+def _edge_evidence(value, limit=2):
+    out = []
+    for item in _json_list(value)[:limit]:
+        if not isinstance(item, dict):
+            continue
+        out.append({
+            "title": item.get("event_title") or item.get("title") or "",
+            "date": item.get("starts_at") or item.get("date") or "",
+            "source_ref_id": item.get("source_ref_id") or "",
+        })
+    return out
+
+
+def _dominant_style(subject):
+    styles = subject.get("styles") or []
+    return str(styles[0]).strip() if styles else (subject.get("genre") or "unknown")
 
 
 _VENUE_PUNCT = re.compile(r"[\s·・|｜@＠:：,，.。、_/\\()（）\[\]【】-]")
@@ -200,6 +244,353 @@ def load_orgs(db_path, kept_dj_ids):
                 db.close()
             except Exception:
                 pass
+
+
+def load_v2_subjects(db):
+    subjects = {}
+    for r in db.execute("SELECT * FROM subject"):
+        subjects[r["subject_id"]] = {
+            "subject_id": r["subject_id"],
+            "subject_type": r["subject_type"],
+            "display_name": r["display_name"] or r["subject_id"],
+            "city": r["city_primary"] or "",
+            "event_count": int(r["event_count"] or 0),
+            "relation_count": int(r["relation_count"] or 0),
+            "source_count": int(r["source_count"] or 0),
+            "confidence": float(r["confidence"] or 0),
+            "first_seen_at": r["first_seen_at"] or "",
+            "last_seen_at": r["last_seen_at"] or "",
+            "aliases": _json_list(r["aliases_json"]),
+            "styles": [],
+            "geo": None,
+        }
+    for r in db.execute("SELECT subject_id,styles_json,genre FROM dj_profile"):
+        if r["subject_id"] in subjects:
+            subjects[r["subject_id"]]["styles"] = [str(s) for s in _json_list(r["styles_json"]) if str(s).strip()][:8]
+            subjects[r["subject_id"]]["genre"] = r["genre"] or ""
+    for r in db.execute("SELECT subject_id,geo_lat,geo_lng,venue_type,resident_dj_count FROM venue_profile"):
+        if r["subject_id"] in subjects:
+            lat, lng = r["geo_lat"], r["geo_lng"]
+            subjects[r["subject_id"]]["geo"] = {"lat": float(lat), "lng": float(lng)} if lat is not None and lng is not None else None
+            subjects[r["subject_id"]]["venue_type"] = r["venue_type"] or ""
+            subjects[r["subject_id"]]["resident_dj_count"] = int(r["resident_dj_count"] or 0)
+    for r in db.execute("SELECT subject_id,org_type,roster_count FROM org_profile"):
+        if r["subject_id"] in subjects:
+            subjects[r["subject_id"]]["org_type"] = r["org_type"] or ""
+            subjects[r["subject_id"]]["roster_count"] = int(r["roster_count"] or 0)
+    for r in db.execute("SELECT subject_id,venue_subject_id,organizer_subject_id,concept,edition_count FROM series_profile"):
+        if r["subject_id"] in subjects:
+            subjects[r["subject_id"]]["venue_subject_id"] = r["venue_subject_id"] or ""
+            subjects[r["subject_id"]]["organizer_subject_id"] = r["organizer_subject_id"] or ""
+            subjects[r["subject_id"]]["concept"] = r["concept"] or ""
+            subjects[r["subject_id"]]["edition_count"] = int(r["edition_count"] or 0)
+    return subjects
+
+
+def label_propagation_pairs(n, weighted_edges, iters=18, seed=7):
+    if n == 0:
+        return np.array([], dtype=int), 0
+    labels = np.arange(n)
+    nbrs = [[] for _ in range(n)]
+    for a, b, w in weighted_edges:
+        if a == b:
+            continue
+        nbrs[a].append((b, float(w)))
+        nbrs[b].append((a, float(w)))
+    rng = np.random.default_rng(seed)
+    order = np.arange(n)
+    for _ in range(iters):
+        rng.shuffle(order)
+        changed = 0
+        for i in order:
+            if not nbrs[i]:
+                continue
+            tally = {}
+            for j, w in nbrs[i]:
+                tally[labels[j]] = tally.get(labels[j], 0.0) + w
+            best = max(tally.items(), key=lambda kv: (kv[1], -kv[0]))[0]
+            if best != labels[i]:
+                labels[i] = best
+                changed += 1
+        if changed == 0:
+            break
+    uniq, counts = np.unique(labels, return_counts=True)
+    order = uniq[np.argsort(-counts)]
+    remap = {old: new for new, old in enumerate(order)}
+    return np.array([remap[l] for l in labels]), len(order)
+
+
+def _relation_rows(db, relation_types):
+    q = ",".join("?" for _ in relation_types)
+    return [dict(r) for r in db.execute(
+        f"SELECT src_subject_id,dst_subject_id,relation_type,weight,same_event_count,b2b_count,"
+        f"label_zh,first_seen_at,last_seen_at,sample_evidence_json FROM relation "
+        f"WHERE relation_type IN ({q}) ORDER BY weight DESC",
+        tuple(relation_types),
+    )]
+
+
+def _select_v2_lens(db, subjects, lens, max_nodes, max_edges, max_venues, max_orgs, anchor_cap):
+    if lens == "b2b_universe":
+        rows = _relation_rows(db, ("b2b", "collab"))
+        deg = {}
+        for r in rows:
+            w = float(r.get("weight") or 0)
+            deg[r["src_subject_id"]] = deg.get(r["src_subject_id"], 0.0) + w
+            deg[r["dst_subject_id"]] = deg.get(r["dst_subject_id"], 0.0) + w
+        selected = set(sorted(deg, key=lambda sid: deg[sid], reverse=True)[:max_nodes])
+        edges = [r for r in rows if r["src_subject_id"] in selected and r["dst_subject_id"] in selected][:max_edges]
+        connected = {sid for r in edges for sid in (r["src_subject_id"], r["dst_subject_id"])}
+        return [sid for sid in sorted(connected, key=lambda sid: deg.get(sid, 0), reverse=True)], edges
+
+    if lens == "label_roster":
+        rows = _relation_rows(db, ("signed_to",))
+        org_score = {}
+        for r in rows:
+            org = r["dst_subject_id"] if subjects.get(r["dst_subject_id"], {}).get("subject_type") == "org" else r["src_subject_id"]
+            if subjects.get(org, {}).get("subject_type") == "org":
+                org_score[org] = org_score.get(org, 0.0) + float(r.get("weight") or 0)
+        anchors = set(sorted(org_score, key=lambda sid: org_score[sid], reverse=True)[:max_orgs])
+        selected, per_anchor, edges = set(anchors), {}, []
+        for r in rows:
+            anchor = r["dst_subject_id"] if r["dst_subject_id"] in anchors else r["src_subject_id"] if r["src_subject_id"] in anchors else None
+            if not anchor or per_anchor.get(anchor, 0) >= anchor_cap:
+                continue
+            other = r["src_subject_id"] if anchor == r["dst_subject_id"] else r["dst_subject_id"]
+            if len(selected) >= max_nodes and other not in selected:
+                continue
+            selected.add(other)
+            per_anchor[anchor] = per_anchor.get(anchor, 0) + 1
+            edges.append(r)
+            if len(edges) >= max_edges:
+                break
+        return sorted(selected, key=lambda sid: (subjects[sid]["subject_type"] != "org", -subjects[sid]["event_count"], subjects[sid]["display_name"])), edges
+
+    if lens == "residency_map":
+        rows = _relation_rows(db, ("resident_at",))
+        venue_score = {}
+        for r in rows:
+            venue = r["dst_subject_id"] if subjects.get(r["dst_subject_id"], {}).get("subject_type") == "venue" else r["src_subject_id"]
+            if subjects.get(venue, {}).get("subject_type") == "venue":
+                venue_score[venue] = venue_score.get(venue, 0.0) + float(r.get("weight") or 0)
+        anchors = set(sorted(venue_score, key=lambda sid: venue_score[sid], reverse=True)[:max_venues])
+        selected, per_anchor, edges = set(anchors), {}, []
+        for r in rows:
+            anchor = r["dst_subject_id"] if r["dst_subject_id"] in anchors else r["src_subject_id"] if r["src_subject_id"] in anchors else None
+            if not anchor or per_anchor.get(anchor, 0) >= anchor_cap:
+                continue
+            other = r["src_subject_id"] if anchor == r["dst_subject_id"] else r["dst_subject_id"]
+            if len(selected) >= max_nodes and other not in selected:
+                continue
+            selected.add(other)
+            per_anchor[anchor] = per_anchor.get(anchor, 0) + 1
+            edges.append(r)
+            if len(edges) >= max_edges:
+                break
+        return sorted(selected, key=lambda sid: (subjects[sid]["subject_type"] != "venue", -subjects[sid]["event_count"], subjects[sid]["display_name"])), edges
+
+    if lens == "series":
+        rows = _relation_rows(db, ("held_at", "presented_by"))
+        series_score = {}
+        for r in rows:
+            sid = r["src_subject_id"] if subjects.get(r["src_subject_id"], {}).get("subject_type") == "series" else r["dst_subject_id"]
+            if subjects.get(sid, {}).get("subject_type") == "series":
+                series_score[sid] = series_score.get(sid, 0.0) + float(r.get("weight") or 0)
+        anchors = set(sorted(series_score, key=lambda sid: series_score[sid], reverse=True)[:max(1, max_nodes // 3)])
+        selected, edges = set(anchors), []
+        for r in rows:
+            if r["src_subject_id"] not in anchors and r["dst_subject_id"] not in anchors:
+                continue
+            selected.add(r["src_subject_id"]); selected.add(r["dst_subject_id"])
+            edges.append(r)
+            if len(selected) >= max_nodes or len(edges) >= max_edges:
+                break
+        return sorted(selected, key=lambda sid: (subjects[sid]["subject_type"] != "series", -subjects[sid]["event_count"], subjects[sid]["display_name"])), edges
+
+    if lens == "style":
+        ranked = sorted(
+            [s for s in subjects.values() if s["subject_type"] == "dj" and s.get("styles")],
+            key=lambda s: (s["relation_count"], s["event_count"]),
+            reverse=True,
+        )[:max_nodes]
+        selected = {s["subject_id"] for s in ranked}
+        rows = [r for r in _relation_rows(db, ("b2b", "collab")) if r["src_subject_id"] in selected and r["dst_subject_id"] in selected][:max_edges]
+        connected = {sid for r in rows for sid in (r["src_subject_id"], r["dst_subject_id"])}
+        selected = [s["subject_id"] for s in ranked if s["subject_id"] in connected]
+        return selected, rows
+
+    if lens == "city":
+        ranked = sorted(
+            [s for s in subjects.values() if s.get("city")],
+            key=lambda s: (s["event_count"], s["relation_count"]),
+            reverse=True,
+        )[:max_nodes]
+        selected = {s["subject_id"] for s in ranked}
+        rows = [
+            r for r in _relation_rows(db, ("b2b", "collab", "resident_at", "signed_to", "held_at", "presented_by"))
+            if r["src_subject_id"] in selected and r["dst_subject_id"] in selected
+        ][:max_edges]
+        connected = {sid for r in rows for sid in (r["src_subject_id"], r["dst_subject_id"])}
+        keep = connected or selected
+        return [s["subject_id"] for s in ranked if s["subject_id"] in keep], rows
+
+    raise ValueError(f"unknown v2 lens: {lens}")
+
+
+def _layout_v2(subject_ids, relation_rows, subjects, lens, sizes):
+    n = len(subject_ids)
+    rng = np.random.default_rng(20260620)
+    idx = {sid: i for i, sid in enumerate(subject_ids)}
+    pairs = [(idx[r["src_subject_id"]], idx[r["dst_subject_id"]], float(r.get("weight") or 1.0))
+             for r in relation_rows if r["src_subject_id"] in idx and r["dst_subject_id"] in idx]
+    groups = [""] * n
+
+    anchor_type = {"label_roster": "org", "residency_map": "venue", "series": "series"}.get(lens)
+    if anchor_type:
+        anchors = [sid for sid in subject_ids if subjects[sid]["subject_type"] == anchor_type]
+        centers = fibonacci_sphere(max(1, len(anchors)), radius=115.0)
+        anchor_pos = {sid: centers[i] for i, sid in enumerate(anchors)}
+        pos = np.zeros((n, 3), dtype=float)
+        for sid in anchors:
+            pos[idx[sid]] = anchor_pos[sid]
+            groups[idx[sid]] = subjects[sid]["display_name"]
+        for sid in subject_ids:
+            if sid in anchor_pos:
+                continue
+            linked = []
+            for r in relation_rows:
+                other = None
+                if r["src_subject_id"] == sid and r["dst_subject_id"] in anchor_pos:
+                    other = r["dst_subject_id"]
+                elif r["dst_subject_id"] == sid and r["src_subject_id"] in anchor_pos:
+                    other = r["src_subject_id"]
+                if other:
+                    linked.append(anchor_pos[other])
+            base = np.mean(linked, axis=0) if linked else rng.normal(0, 55.0, size=3)
+            pos[idx[sid]] = base + rng.normal(0, 12.0, size=3)
+            groups[idx[sid]] = subjects[sid]["city"] or subjects[sid]["subject_type"]
+        return pos, groups, max(1, len(anchors))
+
+    if lens in ("city", "style"):
+        keys = []
+        for sid in subject_ids:
+            keys.append(subjects[sid]["city"] if lens == "city" else _dominant_style(subjects[sid]))
+        ordered = sorted(set(k or "unknown" for k in keys))
+        centers = fibonacci_sphere(max(1, len(ordered)), radius=120.0)
+        cmap = {k: centers[i] for i, k in enumerate(ordered)}
+        pos = np.zeros((n, 3), dtype=float)
+        for i, key in enumerate(keys):
+            key = key or "unknown"
+            pos[i] = cmap[key] + rng.normal(0, 16.0, size=3)
+            groups[i] = key
+        return pos, groups, len(ordered)
+
+    comm, n_comm = label_propagation_pairs(n, pairs)
+    pos = layout(comm, n_comm, sizes)
+    groups = [str(int(c)) for c in comm]
+    return pos, groups, n_comm
+
+
+def build_v2(db_path, out_path, lens, min_score, max_nodes, max_edges, max_venues=250, max_orgs=200,
+             anchor_cap=24):
+    db = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    db.row_factory = sqlite3.Row
+    subjects = load_v2_subjects(db)
+    subject_ids, rows = _select_v2_lens(db, subjects, lens, max_nodes, max_edges, max_venues, max_orgs, anchor_cap)
+    db.close()
+    if not subject_ids:
+        raise RuntimeError(f"v2 lens {lens} selected no subjects")
+
+    idx = {sid: i for i, sid in enumerate(subject_ids)}
+    if lens in ("label_roster", "residency_map", "series"):
+        # Anchor lenses can use weak but meaningful star edges.
+        rows = [r for r in rows if r["src_subject_id"] in idx and r["dst_subject_id"] in idx]
+    else:
+        rows = [r for r in rows if r["src_subject_id"] in idx and r["dst_subject_id"] in idx and float(r.get("weight") or 0) >= min_score]
+    ev = np.array([float(subjects[sid].get("event_count") or 0) for sid in subject_ids])
+    rel = np.array([float(subjects[sid].get("relation_count") or 0) for sid in subject_ids])
+    sizes_raw = np.sqrt(ev + rel + 1.0)
+    sizes = 0.7 + 4.0 * (sizes_raw / sizes_raw.max() if sizes_raw.max() else sizes_raw)
+    pos, groups, group_count = _layout_v2(subject_ids, rows, subjects, lens, sizes)
+
+    out_nodes = []
+    for i, sid in enumerate(subject_ids):
+        s = subjects[sid]
+        group_key = groups[i] or s["subject_type"]
+        color = TYPE_COLORS.get(s["subject_type"], "#8fb6d9")
+        if lens in ("city", "style") and group_key:
+            color = _hsl_hex(_hash_hue(group_key), 0.62, 0.58)
+        out_nodes.append({
+            "id": i,
+            "urn": f"urn:atlas:{s['subject_type']}:{sid}",
+            "subject_id": sid,
+            "type": s["subject_type"],
+            "label": s["subject_type"],
+            "name": s["display_name"],
+            "file_path": f"{V2_LENS_LABELS[lens]}/{group_key}/{s['display_name']}",
+            "x": round(float(pos[i, 0]), 3),
+            "y": round(float(pos[i, 1]), 3),
+            "z": round(float(pos[i, 2]), 3),
+            "size": round(float(sizes[i]), 3),
+            "color": color,
+            "city": s["city"],
+            "event_count": s["event_count"],
+            "relation_count": s["relation_count"],
+            "community": groups[i],
+            "first_seen_at": s["first_seen_at"],
+            "last_seen_at": s["last_seen_at"],
+            "geo": s.get("geo"),
+            "styles": s.get("styles") or [],
+            "org_type": s.get("org_type", ""),
+            "concept": s.get("concept", ""),
+        })
+
+    out_edges = []
+    for r in rows[:max_edges]:
+        out_edges.append({
+            "source": idx[r["src_subject_id"]],
+            "target": idx[r["dst_subject_id"]],
+            "type": r["relation_type"],
+            "weight": round(float(r.get("weight") or 0), 3),
+            "score": round(float(r.get("weight") or 0), 3),
+            "same_event": int(r.get("same_event_count") or 0),
+            "b2b_count": int(r.get("b2b_count") or 0),
+            "label_zh": r.get("label_zh") or "",
+            "first_seen_at": r.get("first_seen_at") or "",
+            "last_seen_at": r.get("last_seen_at") or "",
+            "evidence": _edge_evidence(r.get("sample_evidence_json")),
+        })
+
+    edge_type_counts = {}
+    for e in out_edges:
+        edge_type_counts[e["type"]] = edge_type_counts.get(e["type"], 0) + 1
+    facets = {
+        "cities": sorted({n["city"] for n in out_nodes if n.get("city")}),
+        "styles": sorted({style for n in out_nodes for style in (n.get("styles") or [])})[:80],
+        "types": sorted({n["type"] for n in out_nodes}),
+    }
+    data = {
+        "schemaVersion": "atlas.starmap.v2",
+        "version": "atlas_starmap.layout.v2",
+        "project": "atlas-underground-cn",
+        "lens": lens,
+        "nodes": out_nodes,
+        "edges": out_edges,
+        "total_nodes": len(out_nodes),
+        "facets": facets,
+        "meta": {
+            "source_db": str(db_path),
+            "node_count": len(out_nodes),
+            "edge_count": len(out_edges),
+            "edge_type_counts": edge_type_counts,
+            "group_count": group_count,
+            "generated_by": "export_starmap_layout.py",
+        },
+    }
+    _validate(data)
+    Path(out_path).parent.mkdir(parents=True, exist_ok=True)
+    Path(out_path).write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    return data
 
 
 def build(db_path, out_path, min_score, max_nodes, max_edges, include_venues=True, max_venues=250,
@@ -390,9 +781,11 @@ def _is_finite_number(value):
 
 def _validate(data):
     assert isinstance(data, dict), "layout must be a JSON object"
-    assert data.get("version") == "atlas_starmap.layout.v1", "bad or missing layout version"
+    assert data.get("version") in ("atlas_starmap.layout.v1", "atlas_starmap.layout.v2"), "bad or missing layout version"
+    if data.get("version") == "atlas_starmap.layout.v2":
+        assert data.get("schemaVersion") == "atlas.starmap.v2", "bad or missing v2 schemaVersion"
     assert data.get("project") == "atlas-underground-cn", "bad or missing project"
-    assert data.get("lens") == "b2b_universe", "bad or missing P1 lens"
+    assert isinstance(data.get("lens"), str) and data.get("lens"), "bad or missing lens"
 
     nodes, edges = data.get("nodes"), data.get("edges")
     assert isinstance(nodes, list) and nodes, "no nodes"
@@ -441,11 +834,12 @@ def _validate(data):
         assert meta["node_count"] == len(nodes), "meta.node_count must match nodes length"
     if "edge_count" in meta:
         assert meta["edge_count"] == len(edges), "meta.edge_count must match edges length"
-    if "edge_type_counts" in meta:
-        assert meta["edge_type_counts"] == edge_type_counts, "meta.edge_type_counts must match edges"
+        if "edge_type_counts" in meta:
+            assert meta["edge_type_counts"] == edge_type_counts, "meta.edge_type_counts must match edges"
 
     return {
         "version": data["version"],
+        "schemaVersion": data.get("schemaVersion"),
         "project": data["project"],
         "lens": data["lens"],
         "total_nodes": len(nodes),
@@ -498,7 +892,13 @@ def _selftest():
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--source", choices=("stage4", "v2"), default="stage4")
     ap.add_argument("--db", default=DEFAULT_DB)
+    ap.add_argument("--serving-v2", default=DEFAULT_V2_DB)
+    ap.add_argument("--lens", choices=V2_LENSES, default="b2b_universe")
+    ap.add_argument("--all-lenses", action="store_true", help="with --source v2, emit atlas_layout.<lens>.json for every v2 lens")
+    ap.add_argument("--out-dir", default=None, help="directory used by --all-lenses")
+    ap.add_argument("--legacy-out", default=None, help="optional atlas_layout.json copy of the default b2b lens")
     ap.add_argument("--out", default="_starmap_out/atlas_layout.json")
     ap.add_argument("--min-score", type=float, default=20.0)
     ap.add_argument("--max-nodes", type=int, default=1500)
@@ -514,25 +914,50 @@ def main():
         _selftest(); return
     if a.validate:
         validate_file(a.validate); return
-    data = build(a.db, a.out, a.min_score, a.max_nodes, a.max_edges,
-                 include_venues=not a.no_venues, max_venues=a.max_venues,
-                 include_orgs=not a.no_orgs, max_orgs=a.max_orgs)
+    if a.all_lenses:
+        if a.source != "v2":
+            raise SystemExit("--all-lenses requires --source v2")
+        out_dir = Path(a.out_dir or Path(a.out).parent)
+        summaries = []
+        for lens in V2_LENSES:
+            out_path = out_dir / f"atlas_layout.{lens}.json"
+            data = build_v2(a.serving_v2, out_path, lens, a.min_score, a.max_nodes, a.max_edges,
+                            max_venues=a.max_venues, max_orgs=a.max_orgs)
+            summaries.append((lens, data["total_nodes"], len(data["edges"])))
+            print(f"wrote {out_path} nodes={data['total_nodes']} edges={len(data['edges'])}")
+        if a.legacy_out:
+            src = out_dir / "atlas_layout.b2b_universe.json"
+            Path(a.legacy_out).write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+            print(f"wrote {a.legacy_out} (b2b default copy)")
+        print("all lens summaries:", summaries)
+        return
+    if a.source == "v2":
+        data = build_v2(a.serving_v2, a.out, a.lens, a.min_score, a.max_nodes, a.max_edges,
+                        max_venues=a.max_venues, max_orgs=a.max_orgs)
+    else:
+        data = build(a.db, a.out, a.min_score, a.max_nodes, a.max_edges,
+                     include_venues=not a.no_venues, max_venues=a.max_venues,
+                     include_orgs=not a.no_orgs, max_orgs=a.max_orgs)
     comms = {}
     for n in data["nodes"]:
         comms[n["community"]] = comms.get(n["community"], 0) + 1
     xs = [n["x"] for n in data["nodes"]]
     print(f"wrote {a.out}")
-    print(f"  nodes={data['total_nodes']} edges={len(data['edges'])} communities={data['meta']['communities']}")
+    group_metric = data["meta"].get("communities", data["meta"].get("group_count", 0))
+    print(f"  nodes={data['total_nodes']} edges={len(data['edges'])} groups={group_metric}")
     print(f"  coord x range [{min(xs):.1f},{max(xs):.1f}]  size range "
           f"[{min(n['size'] for n in data['nodes']):.2f},{max(n['size'] for n in data['nodes']):.2f}]")
     top = sorted(comms.items(), key=lambda kv: -kv[1])[:6]
-    print("  top communities (size):", top)
+    print("  top groups (size):", top)
     b2b = sum(1 for e in data["edges"] if e["type"] == "b2b")
-    print(f"  edges: b2b={b2b} collab={len(data['edges'])-b2b}")
-    # name a few hubs per top community for a sanity sniff
+    edge_types = {}
+    for e in data["edges"]:
+        edge_types[e["type"]] = edge_types.get(e["type"], 0) + 1
+    print("  edges:", edge_types, f"b2b={b2b}")
+    # name a few hubs per top group for a sanity sniff
     for c, _ in top[:3]:
         names = [n["name"] for n in sorted(data["nodes"], key=lambda n: -n["event_count"]) if n["community"] == c][:5]
-        print(f"  community {c} top DJs:", names)
+        print(f"  group {c} top nodes:", names)
 
 
 if __name__ == "__main__":

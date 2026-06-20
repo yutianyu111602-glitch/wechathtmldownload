@@ -81,13 +81,15 @@ presented_by 5109 / b2b 2216. `_validate`: 0 dangling endpoints, 0 self-relation
 **Verify:** `--selftest` + in-build `_validate` on real data green.
 
 ## Remaining (next agent — see CODEX_HANDOFF_ATLAS_NEXTGEN_EXECUTION_20260620.md)
-0. **Phase 4 — point the star map at v2**: `export_starmap_layout.py --source v2` reads `subject`+`relation`,
-   emits `atlas.starmap.v2` per-lens layouts (b2b_universe done; residency_map/label_roster/series/city/style);
-   add a lens switcher in `apps/atlas_starmap_web`.
-1. **Phase 3 — dimensions**: venue geo backfill (sparse; from weekly venue registry), styles taxonomy
+0. **Phase 4 first slice DONE by Codex (2026-06-20)**: `export_starmap_layout.py --source v2`
+   reads `subject`+`relation`, emits `atlas.starmap.v2` per-lens layouts, and `apps/atlas_starmap_web`
+   has a compact lens switcher loading `atlas_layout.<lens>.json`. Generated lenses:
+   b2b_universe 1298/8000, residency_map 1500/4259, label_roster 1500/3711,
+   series 867/995, city 1126/4273, style 1308/8000. Web build green.
+1. **Phase 3 — dimensions**: venue geo backfill (G5 v2 currently has 0 venue geo rows; from weekly venue registry), styles taxonomy
    (`subject_style`), bio atoms into the contract/DJ panel.
-- **Lens switcher** in the web app (B2B / 驻场地图(geo, schema has lat/lng) / 厂牌花名册 / 城市场景),
-  with per-lens node/edge filtering (FilterPanel already toggles label/edge types).
+- **Lens switcher polish**: current switcher loads B2B / 驻场 / 厂牌 / 系列 / 城市 / 曲风.
+  Next polish is URL-state persistence, keyboard focus, and geo-projected residency once geo backfill lands.
 - **Per-pair evidence**: clicking a connection shows that specific edge's events (now node-level aggregate).
 - **Refresh off newer data** once G5 completes (`fleet_merge` → serving), then re-run the projection;
   bump `--max-nodes/--max-edges/--max-venues/--max-orgs` for density.

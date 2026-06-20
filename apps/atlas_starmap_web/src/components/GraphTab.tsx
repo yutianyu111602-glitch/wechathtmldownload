@@ -13,6 +13,15 @@ import { ResizeHandle } from "./ResizeHandle";
 import { ErrorBoundary } from "./ErrorBoundary";
 import type { GraphNode, GraphData } from "../lib/types";
 
+const ATLAS_LENSES = [
+  { id: "b2b_universe", label: "B2B" },
+  { id: "residency_map", label: "驻场" },
+  { id: "label_roster", label: "厂牌" },
+  { id: "series", label: "系列" },
+  { id: "city", label: "城市" },
+  { id: "style", label: "曲风" },
+];
+
 /* Persist panel widths */
 function loadWidth(key: string, fallback: number): number {
   try {
@@ -48,6 +57,7 @@ interface GraphTabProps {
 
 export function GraphTab({ project }: GraphTabProps) {
   const { data, loading, error, fetchOverview } = useGraphData();
+  const [selectedLens, setSelectedLens] = useState("b2b_universe");
   const [highlightedIds, setHighlightedIds] = useState<Set<number> | null>(null);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
@@ -108,12 +118,12 @@ export function GraphTab({ project }: GraphTabProps) {
 
   useEffect(() => {
     if (project) {
-      fetchOverview(project);
+      fetchOverview(project, selectedLens);
       setHighlightedIds(null);
       setSelectedPath(null);
       setSelectedNode(null);
     }
-  }, [project, fetchOverview]);
+  }, [project, selectedLens, fetchOverview]);
 
   const handleSelectPath = useCallback(
     (path: string, nodeIds: Set<number>) => {
@@ -284,9 +294,12 @@ export function GraphTab({ project }: GraphTabProps) {
         )}
         <FilterPanel
           data={data}
+          lenses={ATLAS_LENSES}
+          selectedLens={selectedLens}
           enabledLabels={enabledLabels}
           enabledEdgeTypes={enabledEdgeTypes}
           showLabels={showLabels}
+          onLensChange={setSelectedLens}
           onToggleLabel={toggleLabel}
           onToggleEdgeType={toggleEdgeType}
           onToggleShowLabels={() => setShowLabels((v) => !v)}
@@ -342,12 +355,12 @@ export function GraphTab({ project }: GraphTabProps) {
         {/* HUD */}
         <div className="absolute top-14 left-3 sm:top-4 sm:left-4 text-[10px] sm:text-[11px] text-white/30 pointer-events-none font-mono">
           <p>
-            {filteredData.nodes.length.toLocaleString()} DJs /{" "}
-            {filteredData.edges.length.toLocaleString()} relations
+            {filteredData.nodes.length.toLocaleString()} 节点 /{" "}
+            {filteredData.edges.length.toLocaleString()} 关系
           </p>
           {data.nodes.length > filteredData.nodes.length && (
             <p className="text-white/25 mt-0.5">
-              筛选自 {data.nodes.length.toLocaleString()} DJs
+              筛选自 {data.nodes.length.toLocaleString()} 节点
             </p>
           )}
           {highlightedIds && highlightedIds.size > 0 && (
@@ -379,7 +392,7 @@ export function GraphTab({ project }: GraphTabProps) {
               setSelectedPath(null);
               setSelectedNode(null);
               setCameraTarget(null);
-              fetchOverview(project);
+              fetchOverview(project, selectedLens);
             }}
           >
               刷新

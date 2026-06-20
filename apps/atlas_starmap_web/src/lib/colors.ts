@@ -3,6 +3,9 @@
 const LABEL_COLORS: Record<string, string> = {
   DJ: "#38bdf8",
   dj: "#38bdf8",
+  venue: "#ffcf6b",
+  org: "#b794f6",
+  series: "#2dd4bf",
   Artist: "#a7f3d0",
   Project: "#e11d48",
   Package: "#f97316",

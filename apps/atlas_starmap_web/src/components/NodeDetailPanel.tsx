@@ -27,7 +27,16 @@ function edgeTypeLabel(type: string): string {
   if (type === "collab") return "高频同台";
   if (type === "resident_at") return "驻场 / 常演";
   if (type === "signed_to") return "厂牌 / 主办";
+  if (type === "held_at") return "系列场地";
+  if (type === "presented_by") return "系列主办";
   return type.replace(/_/g, " ").toLowerCase();
+}
+
+function nodeTypeLabel(type: string): string {
+  if (type === "venue") return "场地";
+  if (type === "org") return "厂牌";
+  if (type === "series") return "系列";
+  return "DJ";
 }
 
 function formatDate(value?: string): string {
@@ -36,7 +45,7 @@ function formatDate(value?: string): string {
 }
 
 function edgeWeight(edge: GraphEdge): number {
-  return edge.same_event ?? edge.score ?? 0;
+  return edge.same_event ?? edge.weight ?? edge.score ?? 0;
 }
 
 export function NodeDetailPanel({ node, allNodes, allEdges, onClose, onNavigate }: NodeDetailPanelProps) {
@@ -95,7 +104,7 @@ export function NodeDetailPanel({ node, allNodes, allEdges, onClose, onNavigate 
                 className="inline-block px-2 py-0.5 rounded text-[10px] font-medium"
                 style={{ backgroundColor: colorForLabel(node.label) + "18", color: colorForLabel(node.label) }}
               >
-                {node.label === "venue" ? "场地" : node.label === "org" ? "厂牌" : "DJ"}
+                {nodeTypeLabel(node.label)}
               </span>
               <span className="inline-block px-2 py-0.5 rounded border border-white/[0.06] bg-white/[0.03] text-[10px] text-foreground/55">
                 {node.city || "城市未知"}
@@ -118,6 +127,12 @@ export function NodeDetailPanel({ node, allNodes, allEdges, onClose, onNavigate 
                 { label: "类型", value: node.org_type || "厂牌", color: "text-accent" },
                 { label: "证据", value: evidence.length, color: "text-primary" },
               ]
+            : node.label === "series"
+            ? [
+                { label: "期数", value: node.event_count ?? 0, color: "text-[#2dd4bf]" },
+                { label: "连接", value: connections.length, color: "text-accent" },
+                { label: "概念", value: node.concept || "系列", color: "text-primary" },
+              ]
             : [
                 { label: "演出", value: node.event_count ?? 0, color: "text-primary" },
                 { label: "B2B", value: b2bCount, color: "text-[#f8c56a]" },
@@ -136,9 +151,18 @@ export function NodeDetailPanel({ node, allNodes, allEdges, onClose, onNavigate 
           <span className="mx-1.5 text-foreground/20">→</span>
           <span>{formatDate(node.last_seen_at)}</span>
           {node.community !== undefined && (
-            <span className="ml-2 text-foreground/25">星座 {node.community}</span>
+            <span className="ml-2 text-foreground/25">分组 {node.community}</span>
           )}
         </div>
+        {node.styles && node.styles.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1">
+            {node.styles.slice(0, 6).map((style) => (
+              <span key={style} className="px-1.5 py-0.5 rounded border border-white/[0.05] bg-white/[0.025] text-[10px] text-foreground/40">
+                {style}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <ScrollArea className="flex-1 min-h-0">

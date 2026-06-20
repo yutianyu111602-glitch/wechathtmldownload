@@ -4,9 +4,12 @@ import type { GraphData } from "../lib/types";
 
 interface FilterPanelProps {
   data: GraphData;
+  lenses: Array<{ id: string; label: string }>;
+  selectedLens: string;
   enabledLabels: Set<string>;
   enabledEdgeTypes: Set<string>;
   showLabels: boolean;
+  onLensChange: (lens: string) => void;
   onToggleLabel: (label: string) => void;
   onToggleEdgeType: (type: string) => void;
   onToggleShowLabels: () => void;
@@ -17,14 +20,29 @@ interface FilterPanelProps {
 function edgeTypeLabel(type: string): string {
   if (type === "b2b") return "B2B 深度合作";
   if (type === "collab") return "高频同台";
+  if (type === "resident_at") return "驻场 / 常演";
+  if (type === "signed_to") return "厂牌 / 主办";
+  if (type === "held_at") return "系列场地";
+  if (type === "presented_by") return "系列主办";
   return type.replace(/_/g, " ").toLowerCase();
+}
+
+function nodeLabel(label: string): string {
+  if (label === "dj") return "DJ";
+  if (label === "venue") return "场地";
+  if (label === "org") return "厂牌";
+  if (label === "series") return "系列";
+  return label;
 }
 
 export function FilterPanel({
   data,
+  lenses,
+  selectedLens,
   enabledLabels,
   enabledEdgeTypes,
   showLabels,
+  onLensChange,
   onToggleLabel,
   onToggleEdgeType,
   onToggleShowLabels,
@@ -44,6 +62,28 @@ export function FilterPanel({
 
   return (
     <div className="px-4 py-3 border-b border-border/40 space-y-3">
+      <div>
+        <p className="text-[10px] text-foreground/35 mb-1.5">镜头</p>
+        <div className="grid grid-cols-2 gap-1">
+          {lenses.map((lens) => {
+            const active = lens.id === selectedLens;
+            return (
+              <button
+                key={lens.id}
+                onClick={() => onLensChange(lens.id)}
+                className={`px-2 py-1.5 rounded border text-[10px] font-medium transition-colors ${
+                  active
+                    ? "border-primary/35 bg-primary/12 text-primary"
+                    : "border-white/[0.06] bg-white/[0.025] text-foreground/45 hover:text-foreground/70 hover:bg-white/[0.045]"
+                }`}
+              >
+                {lens.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="flex items-center justify-between">
         <span className="text-[11px] font-medium text-foreground/55 uppercase tracking-widest">
           筛选
@@ -74,7 +114,7 @@ export function FilterPanel({
                 }`}
               >
                 <span className="w-[5px] h-[5px] rounded-full" style={{ backgroundColor: on ? c : "#444" }} />
-                <span style={{ color: on ? c : "#555" }}>{label === "dj" ? "DJ" : label}</span>
+                <span style={{ color: on ? c : "#555" }}>{nodeLabel(label)}</span>
                 <span className="text-foreground/25 tabular-nums">{count.toLocaleString()}</span>
               </button>
             );

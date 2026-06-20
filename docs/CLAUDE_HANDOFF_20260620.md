@@ -116,17 +116,23 @@ weekly API 114/114 ✓ · `git diff --check` ✓.
   and `feat(atlas): underground EDM 3D star map (graph-ui fork + B2B layout projection)`.
 
 ## Next steps
-1. **Multi-entity graph (P2)** — VENUES DONE (commit `53566fc`): `export_starmap_layout.py`
+1. **Star map v2 first slice DONE by Codex (2026-06-20)**: `export_starmap_layout.py --source v2`
+   now reads `atlas_serving_v2.sqlite` (`subject` + `relation`) and emits six
+   `atlas.starmap.v2` lens files; the web app loads them through the left-panel lens switcher.
+   Keep `atlas_layout.json` as the B2B compatibility copy. Verified: `npm run atlas:starmap`
+   and `npm --prefix apps/atlas_starmap_web run build` green.
+2. **Multi-entity graph history (P2)** — VENUES DONE (commit `53566fc`): `export_starmap_layout.py`
    now merges `dj_venue_rollup` into 250 venue anchor nodes (centroid of their DJs) +
    `resident_at` edges; `NodeDetailPanel`/`EdgeLines` are venue-aware. Layout is now
    1546 nodes / 10450 edges. **Org/label (厂牌) is the quick repeat**: same pattern on
    `dj_org_rollup` → org nodes + `signed_to` edges + a 厂牌 chip in the detail panel.
-2. **Lens switcher** in the web app (B2B / 驻场(geo) / 厂牌 / 城市场景). geo exists in schema.
-3. **Per-pair evidence**: clicking a connection shows that edge's events (now aggregated at
+3. **Geo backfill remains the next data blocker**: G5 v2 currently has `0` venue rows with
+   `geo_lat/geo_lng`, so `residency_map` is relation-anchor layout, not true map projection yet.
+4. **Per-pair evidence**: clicking a connection shows that edge's events (now aggregated at
    node level).
-4. **Refresh data off newer generation** once G5 completes (`fleet_merge`→serving), then
+5. **Refresh data off newer generation** once G6/delta completes (`fleet_merge`→serving), then
    re-run the projection. Bump `--max-nodes/--max-edges` for richer fields.
-5. Time scrubber (first_seen→last_seen), search-to-focus, neighborhood paging for perf.
+6. Time scrubber (first_seen→last_seen), search-to-focus, neighborhood paging for perf.
 
 ## Using cbm (codebase-memory-mcp) for navigation
 Its MCP server is NOT wired into this Claude Code session's tool registry (ToolSearch finds

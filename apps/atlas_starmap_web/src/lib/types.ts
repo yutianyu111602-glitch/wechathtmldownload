@@ -2,6 +2,9 @@
 
 export interface GraphNode {
   id: number;
+  urn?: string;
+  subject_id?: string;
+  type?: string;
   x: number;
   y: number;
   z: number;
@@ -13,8 +16,12 @@ export interface GraphNode {
   dj_id?: string;
   city?: string;
   event_count?: number;
-  community?: number;
+  relation_count?: number;
+  community?: number | string;
   org_type?: string;
+  concept?: string;
+  styles?: string[];
+  geo?: { lat: number; lng: number } | null;
   first_seen_at?: string;
   last_seen_at?: string;
 }
@@ -24,8 +31,12 @@ export interface GraphEdge {
   target: number;
   type: string;
   score?: number;
+  weight?: number;
   same_event?: number;
+  b2b_count?: number;
   label_zh?: string;
+  first_seen_at?: string;
+  last_seen_at?: string;
   evidence?: Array<{
     title?: string;
     date?: string;
@@ -42,17 +53,25 @@ export interface LinkedProject {
 }
 
 export interface GraphData {
-  version?: number;
+  version?: number | string;
+  schemaVersion?: string;
   project?: string;
   lens?: string;
   nodes: GraphNode[];
   edges: GraphEdge[];
   total_nodes: number;
+  facets?: {
+    cities?: string[];
+    styles?: string[];
+    types?: string[];
+  };
   meta?: {
     generated_at?: string;
     source_db?: string;
     node_count?: number;
     edge_count?: number;
+    edge_type_counts?: Record<string, number>;
+    group_count?: number;
     b2b_edges?: number;
     collab_edges?: number;
   };

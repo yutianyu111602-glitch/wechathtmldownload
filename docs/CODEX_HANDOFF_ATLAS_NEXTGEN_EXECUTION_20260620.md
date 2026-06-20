@@ -23,6 +23,13 @@ Pickup: [CLAUDE_HANDOFF_20260620.md](CLAUDE_HANDOFF_20260620.md).
 - Boundary: candidate-only — no prod DB write / CloudRun deploy / mini-program upload.
   `same_label` withdrawn; `b2b` preserved. G6 + daily delta still running; refresh off the
   newest accepted `merged/` when they land (`meta.generation`).
+- **Codex Phase 4 slice DONE** (2026-06-20): `export_starmap_layout.py --source v2`
+  now reads `atlas_serving_v2.sqlite` and emits `atlas.starmap.v2` layouts for six lenses:
+  `b2b_universe`, `residency_map`, `label_roster`, `series`, `city`, `style`.
+  `apps/atlas_starmap_web` loads `atlas_layout.<lens>.json` through a compact lens switcher.
+  Verified outputs: B2B 1298/8000, residency 1500/4259, label 1500/3711, series 867/995,
+  city 1126/4273, style 1308/8000. Web build green. Venue geo remains 0 in G5 v2, so
+  `residency_map` is anchor-layout only until Phase 3 geo backfill.
 
 ## Phase 2 — unify relations (do this next)
 Extend `build_atlas_serving_v2.py`: add `--serving <atlas_serving_candidate.sqlite>` and build a
@@ -63,28 +70,28 @@ Verify: `--selftest` (extend the synthetic with a serving fixture), then real ru
 - **Bio:** `dj_bio_atom` already in the serving candidate (52671 atoms, verbatim, EN+ZH). Carry it
   into the contract `subject/{urn}/bio` and the DJ detail panel (group by language, show source).
 
-## Phase 4 — star map v2 (the visible payoff)
-- `export_starmap_layout.py`: add `--source v2 --serving-v2 <atlas_serving_v2.sqlite>` and a
-  `--lens` arg. Read `subject` (all types) + `relation`; emit `atlas.starmap.v2` layout (design §4.5,
-  has `urn/type/facets/geo`). Lenses = node/relation filter + layout:
-  - `b2b_universe` (current; dj + b2b/collab; Louvain constellations)
-  - `residency_map` (dj+venue; resident_at; venue by `venue_profile.geo` projection — needs Phase 3 geo)
-  - `label_roster` (org+dj; signed_to; org-radial)
-  - `series` (series+venue+org+dj; held_at/presented_by/part_of_series)
-  - `city` (city super-clusters), `style` (color/cluster by dominant style)
-- graph-ui (`apps/atlas_starmap_web`): add a lens dropdown (load `atlas_layout.<lens>.json` or one
-  multi-lens file + client filter). Node detail panel already type-aware (dj/venue/org). Add series
-  panel + bio atoms (DJ) + per-edge evidence drill (edge.evidence already in layout).
+## Phase 4 — star map v2 (first slice done)
+- `export_starmap_layout.py`: supports `--source v2 --serving-v2 <atlas_serving_v2.sqlite>`,
+  `--lens`, and `--all-lenses`. It reads `subject` + `relation` and emits `atlas.starmap.v2`
+  with `urn/type/facets/geo/styles`.
+- Implemented lenses: `b2b_universe`, `residency_map`, `label_roster`, `series`, `city`, `style`.
+  The geo lens is currently not map-projected because G5 v2 has `0` venues with geo; it still
+  renders venue anchors from `resident_at` relations.
+- graph-ui (`apps/atlas_starmap_web`): compact lens switcher in the left workbench panel,
+  static `atlas_layout.<lens>.json` loading with b2b fallback, v2 type fields, series detail,
+  and edge colors for `held_at` / `presented_by`.
+- Still pending inside Phase 4: richer per-edge event drill UI, time scrubber, search-to-focus,
+  and optional real geo projection after Phase 3.
 - Keep v1 (`atlas_starmap.layout.v1`, 1746 nodes) valid until v2 lands; app loads by `schemaVersion`.
 
 ## Run / refresh
 ```
 npm run atlas:v2:selftest   # selftests (build_atlas_serving_v2 + export_starmap_layout)
 npm run atlas:v2            # build atlas_serving_v2.sqlite — subjects + relations (Phase 1+2 DONE)
-npm run atlas:starmap       # regenerate star map layout into the web app + validate
+npm run atlas:starmap       # regenerate all v2 lens layouts into the web app
 npm run atlas:web           # build the atlas_starmap_web app
 npm run atlas:rebuild       # all of the above, in order
-# Phase 4 will repoint export_starmap_layout.py at atlas_serving_v2 (--source v2).
+# atlas_layout.json is kept as a b2b_universe compatibility copy.
 ```
 When G6 / daily delta land, repoint `--stage3`/`--serving` to the newest accepted `merged/` and
 re-run the chain; `meta.generation` should track which ramp produced the data.

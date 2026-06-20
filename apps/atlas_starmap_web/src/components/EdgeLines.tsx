@@ -25,6 +25,8 @@ const EDGE_TYPE_COLORS: Record<string, string> = {
   collab: "#38bdf8",
   resident_at: "#caa45a",
   signed_to: "#9b7fd0",
+  held_at: "#2dd4bf",
+  presented_by: "#8bd7c7",
   CALLS: "#1DA27E",
   IMPORTS: "#3b82f6",
   DEFINES: "#a855f7",

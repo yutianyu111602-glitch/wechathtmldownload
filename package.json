@@ -243,7 +243,7 @@
     "atlas:graph:selftest": "node services/weekly_activity_cloudrun/scripts/atlasGraphSearchSelfTest.mjs",
     "atlas:v2:selftest": "cd tools/atlas_rebuild && python build_atlas_serving_v2.py --selftest && python export_starmap_layout.py --selftest",
     "atlas:v2": "cd tools/atlas_rebuild && python build_atlas_serving_v2.py",
-    "atlas:starmap": "cd tools/atlas_rebuild && python export_starmap_layout.py --db _fleet_14w_g5_80k_increment_20260620/merged/atlas_serving_candidate.sqlite --out ../../apps/atlas_starmap_web/public/atlas_layout.json && python export_starmap_layout.py --validate ../../apps/atlas_starmap_web/public/atlas_layout.json",
+    "atlas:starmap": "cd tools/atlas_rebuild && python export_starmap_layout.py --source v2 --serving-v2 _fleet_14w_g5_80k_increment_20260620/merged/atlas_serving_v2.sqlite --all-lenses --out-dir ../../apps/atlas_starmap_web/public --legacy-out ../../apps/atlas_starmap_web/public/atlas_layout.json",
     "atlas:web": "npm --prefix apps/atlas_starmap_web run build",
     "atlas:rebuild": "npm run atlas:v2:selftest && npm run atlas:v2 && npm run atlas:starmap && npm run atlas:web",
     "stage:runtime": "node tools/stageMarkitdownRuntime.mjs",
