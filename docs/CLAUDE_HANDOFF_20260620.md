@@ -115,10 +115,12 @@ weekly API 114/114 ✓ · `git diff --check` ✓.
   `feat(mp): atlas frontend contract + venue past/upcoming split + source open fix`
   and `feat(atlas): underground EDM 3D star map (graph-ui fork + B2B layout projection)`.
 
-## Next steps (not started)
-1. **Multi-entity graph (P2)**: extend `export_starmap_layout.py` to add Venue (`dj_venue_rollup`)
-   + Org/label (`dj_org_rollup`) nodes and DJ→Venue (驻场) / DJ→Org (厂牌) edges; make
-   `NodeDetailPanel` render non-DJ node types. Unlocks the 驻场地图 / 厂牌花名册 lenses.
+## Next steps
+1. **Multi-entity graph (P2)** — VENUES DONE (commit `53566fc`): `export_starmap_layout.py`
+   now merges `dj_venue_rollup` into 250 venue anchor nodes (centroid of their DJs) +
+   `resident_at` edges; `NodeDetailPanel`/`EdgeLines` are venue-aware. Layout is now
+   1546 nodes / 10450 edges. **Org/label (厂牌) is the quick repeat**: same pattern on
+   `dj_org_rollup` → org nodes + `signed_to` edges + a 厂牌 chip in the detail panel.
 2. **Lens switcher** in the web app (B2B / 驻场(geo) / 厂牌 / 城市场景). geo exists in schema.
 3. **Per-pair evidence**: clicking a connection shows that edge's events (now aggregated at
    node level).
