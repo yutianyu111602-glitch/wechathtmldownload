@@ -28,8 +28,12 @@ Pickup: [CLAUDE_HANDOFF_20260620.md](CLAUDE_HANDOFF_20260620.md).
   `b2b_universe`, `residency_map`, `label_roster`, `series`, `city`, `style`.
   `apps/atlas_starmap_web` loads `atlas_layout.<lens>.json` through a compact lens switcher.
   Verified outputs: B2B 1298/8000, residency 1500/4259, label 1500/3711, series 867/995,
-  city 1126/4273, style 1308/8000. Web build green. Venue geo remains 0 in G5 v2, so
-  `residency_map` is anchor-layout only until Phase 3 geo backfill.
+  city 1126/4273, style 1308/8000. Web build green.
+- **Codex Phase 3 geo slice DONE** (2026-06-20): `backfill_venue_geo.py` is wired into
+  `npm run atlas:rebuild` as `atlas:v2:geo`. It reads only confirmed local geo sources
+  (`current_release/current.json` + `mapLocationBook.js`) and fills null `venue_profile.geo_*`
+  values. Current G5 v2 run: 68/1562 venues backfilled; `residency_map` contains 39 selected
+  venue geo anchors and now projects those anchors from lat/lng.
 
 ## Phase 2 — unify relations (do this next)
 Extend `build_atlas_serving_v2.py`: add `--serving <atlas_serving_candidate.sqlite>` and build a
@@ -60,11 +64,11 @@ Verify: `--selftest` (extend the synthetic with a serving fixture), then real ru
 `relation` non-empty + no dangling endpoints.
 
 ## Phase 3 — dimensions
-- **Geo backfill (venues):** `venue_profile.geo_*` is sparse (attrs rarely carries geo). Backfill by
-  (name, city) match from the weekly venue registry — `services/weekly_activity_cloudrun/data/current_release/`
-  geocode/place data and `apps/weekly_activity_miniprogram/utils/mapLocationBook.js` /
-  `tools/stage7_rewrite` geocode tables. Write a `backfill_venue_geo.py` that matches normalized
-  venue name+city → lat/lng; leave nulls when unmatched. Needed for the residency-map lens.
+- **Geo backfill (venues) DONE first slice:** `backfill_venue_geo.py` conservatively matches
+  normalized venue name+city/address against `services/weekly_activity_cloudrun/data/current_release/current.json`
+  and `apps/weekly_activity_miniprogram/utils/mapLocationBook.js`. It leaves nulls when unmatched,
+  writes a report to `tools/atlas_rebuild/_starmap_out/venue_geo_backfill_report.json`, and is
+  part of `atlas:rebuild`. Current run backfilled 68 venues; do not claim complete venue geo.
 - **Styles:** build `style` + `subject_style` from `dj_profile.styles_json` (and event `genre`) —
   normalize the long noisy style lists (cap, dedup synonyms). Enables the 曲风光谱 lens / coloring.
 - **Bio:** `dj_bio_atom` already in the serving candidate (52671 atoms, verbatim, EN+ZH). Carry it
@@ -75,8 +79,8 @@ Verify: `--selftest` (extend the synthetic with a serving fixture), then real ru
   `--lens`, and `--all-lenses`. It reads `subject` + `relation` and emits `atlas.starmap.v2`
   with `urn/type/facets/geo/styles`.
 - Implemented lenses: `b2b_universe`, `residency_map`, `label_roster`, `series`, `city`, `style`.
-  The geo lens is currently not map-projected because G5 v2 has `0` venues with geo; it still
-  renders venue anchors from `resident_at` relations.
+  `residency_map` now projects venue anchors that have `geo` via lat/lng and keeps missing-geo
+  anchors on a deterministic fallback shell.
 - graph-ui (`apps/atlas_starmap_web`): compact lens switcher in the left workbench panel,
   static `atlas_layout.<lens>.json` loading with b2b fallback, v2 type fields, series detail,
   and edge colors for `held_at` / `presented_by`.
@@ -88,6 +92,7 @@ Verify: `--selftest` (extend the synthetic with a serving fixture), then real ru
 ```
 npm run atlas:v2:selftest   # selftests (build_atlas_serving_v2 + export_starmap_layout)
 npm run atlas:v2            # build atlas_serving_v2.sqlite — subjects + relations (Phase 1+2 DONE)
+npm run atlas:v2:geo        # backfill vetted venue geo into the candidate v2 DB
 npm run atlas:starmap       # regenerate all v2 lens layouts into the web app
 npm run atlas:web           # build the atlas_starmap_web app
 npm run atlas:rebuild       # all of the above, in order
@@ -98,7 +103,8 @@ re-run the chain; `meta.generation` should track which ramp produced the data.
 
 ## Gotchas
 - IDs already aligned — do NOT add a remap layer. Use rollup ids as subject ids directly.
-- Geo sparse → residency-map lens needs Phase 3 backfill first.
+- Geo is still sparse: current G5 v2 backfills 68/1562 venues, and only 39 of the selected
+  residency-map venue anchors have real geo. Missing venues intentionally remain null/fallback.
 - `relation` for DJ↔DJ is ~199k rows; the star map must threshold (top by weight) per the existing
   `--min-score/--max-nodes/--max-edges` caps — don't dump all into the 3D scene.
 - cbm MCP isn't wired into the Claude Code session; use its CLI:

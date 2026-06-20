@@ -80,16 +80,31 @@ DJ→org `signed_to`, series→venue `held_at`, series→org `presented_by`; `su
 presented_by 5109 / b2b 2216. `_validate`: 0 dangling endpoints, 0 self-relations.
 **Verify:** `--selftest` + in-build `_validate` on real data green.
 
+## Step 8 — Serving v2 Phase 3 geo first slice + residency projection — commit `<this>`
+**What:** `tools/atlas_rebuild/backfill_venue_geo.py` backfills null `venue_profile.geo_lat/geo_lng`
+from confirmed local sources only: `services/weekly_activity_cloudrun/data/current_release/current.json`
+and `apps/weekly_activity_miniprogram/utils/mapLocationBook.js`. `package.json` wires it into
+`npm run atlas:rebuild` as `atlas:v2:geo`. `export_starmap_layout.py` now projects `residency_map`
+venue anchors with real lat/lng when available and uses the previous deterministic fallback for
+missing-geo anchors.
+**Result:** current G5 v2 candidate backfills **68/1562** venue rows. The exported
+`atlas_layout.residency_map.json` has 1500 nodes / 4259 `resident_at` edges / 39 selected venue
+geo anchors (`meta.geo_anchor_count=39`).
+**Verify:** `npm run atlas:rebuild` green; `npm --prefix apps/atlas_starmap_web run test:rendered`
+green. Vite still reports only the existing large-chunk warning.
+
 ## Remaining (next agent — see CODEX_HANDOFF_ATLAS_NEXTGEN_EXECUTION_20260620.md)
 0. **Phase 4 first slice DONE by Codex (2026-06-20)**: `export_starmap_layout.py --source v2`
    reads `subject`+`relation`, emits `atlas.starmap.v2` per-lens layouts, and `apps/atlas_starmap_web`
    has a compact lens switcher loading `atlas_layout.<lens>.json`. Generated lenses:
    b2b_universe 1298/8000, residency_map 1500/4259, label_roster 1500/3711,
    series 867/995, city 1126/4273, style 1308/8000. Web build green.
-1. **Phase 3 — dimensions**: venue geo backfill (G5 v2 currently has 0 venue geo rows; from weekly venue registry), styles taxonomy
-   (`subject_style`), bio atoms into the contract/DJ panel.
+1. **Phase 3 — dimensions remaining**: styles taxonomy (`subject_style`) and bio atoms into the
+   contract/DJ panel. Venue geo is first-slice complete but still sparse, so future accepted geo
+   sources can extend `backfill_venue_geo.py` rather than replacing it.
 - **Lens switcher polish**: current switcher loads B2B / 驻场 / 厂牌 / 系列 / 城市 / 曲风.
-  Next polish is URL-state persistence, keyboard focus, and geo-projected residency once geo backfill lands.
+  Next polish is URL-state persistence, keyboard focus, and better visual treatment for fallback
+  missing-geo residency anchors.
 - **Per-pair evidence**: clicking a connection shows that specific edge's events (now node-level aggregate).
 - **Refresh off newer data** once G5 completes (`fleet_merge` → serving), then re-run the projection;
   bump `--max-nodes/--max-edges/--max-venues/--max-orgs` for density.

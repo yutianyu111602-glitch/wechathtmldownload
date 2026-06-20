@@ -183,7 +183,8 @@ search-to-focus; time scrubber (first_seen→last_seen) to animate scene growth.
   "meta": { "generation", "counts": {...} } }
 ```
 `export_starmap_layout.py` evolves to read `atlas_serving.v2` and emit **per-lens**
-layouts (geo lens uses `venue_profile.geo_*`; style lens colors by `subject_style`).
+layouts. Current implementation reads `venue_profile.geo_*` for the residency lens and
+projects matched venues from lat/lng; style taxonomy remains a pending dimension.
 The current v1 (`atlas_starmap.layout.v1`, DJ+venue+org, 1746 nodes) stays valid until
 v2 lands — the web app loads whichever `schemaVersion` is present.
 
@@ -195,7 +196,8 @@ v2 lands — the web app loads whichever `schemaVersion` is present.
    profiles from existing Stage3 entities + rollups (data already there: 1562 venues,
    2888 orgs, 5666 series). Biggest unlock.
 2. **Unify relations** — collapse the 3 rollups into `relation` + `observation`.
-3. **Dimensions** — styles taxonomy, geo onto venues, bio atoms + social into contract.
+3. **Dimensions** — geo onto venues first slice is done via confirmed local registries;
+   styles taxonomy and bio atoms + social into contract remain.
 4. **Star map lenses** — per-lens layouts + lens switcher + geo/style/time.
 
 Each phase: regenerate candidate v2, run the existing gate/field/artifact audits,

@@ -206,6 +206,35 @@ def fibonacci_sphere(n, radius):
     return np.stack([np.cos(theta) * r, y, np.sin(theta) * r], axis=1) * radius
 
 
+def _residency_geo_positions(anchors, subjects, radius=118.0):
+    geo_rows = []
+    for sid in anchors:
+        geo = subjects[sid].get("geo") or {}
+        try:
+            lat, lng = float(geo.get("lat")), float(geo.get("lng"))
+        except (TypeError, ValueError):
+            continue
+        if -90 <= lat <= 90 and -180 <= lng <= 180:
+            geo_rows.append((sid, lat, lng))
+    if len(geo_rows) < 2:
+        return {}
+
+    lats = np.array([r[1] for r in geo_rows], dtype=float)
+    lngs = np.array([r[2] for r in geo_rows], dtype=float)
+    mid_lat = float(np.median(lats))
+    mid_lng = float(np.median(lngs))
+    km_per_lng = max(20.0, 111.320 * math.cos(math.radians(mid_lat)))
+    x = (lngs - mid_lng) * km_per_lng
+    z = -(lats - mid_lat) * 110.574
+    coords = np.stack([x, np.zeros_like(x), z], axis=1)
+    coords -= coords.mean(axis=0)
+    span = float(np.max(np.linalg.norm(coords[:, [0, 2]], axis=1)))
+    if span <= 0:
+        return {}
+    coords *= radius / span
+    return {sid: coords[i] for i, (sid, _, _) in enumerate(geo_rows)}
+
+
 def layout(comm, n_comm, sizes, seed=7):
     """Constellation layout: communities spread on a big sphere, members clustered
     around their community center, jittered. Cheap, deterministic, star-map-like."""
@@ -448,8 +477,15 @@ def _layout_v2(subject_ids, relation_rows, subjects, lens, sizes):
     anchor_type = {"label_roster": "org", "residency_map": "venue", "series": "series"}.get(lens)
     if anchor_type:
         anchors = [sid for sid in subject_ids if subjects[sid]["subject_type"] == anchor_type]
-        centers = fibonacci_sphere(max(1, len(anchors)), radius=115.0)
-        anchor_pos = {sid: centers[i] for i, sid in enumerate(anchors)}
+        anchor_pos = _residency_geo_positions(anchors, subjects) if lens == "residency_map" else {}
+        if anchor_pos:
+            missing = [sid for sid in anchors if sid not in anchor_pos]
+            fallback = fibonacci_sphere(max(1, len(missing)), radius=155.0)
+            for i, sid in enumerate(missing):
+                anchor_pos[sid] = fallback[i] + np.array([0.0, -42.0, 0.0])
+        else:
+            centers = fibonacci_sphere(max(1, len(anchors)), radius=115.0)
+            anchor_pos = {sid: centers[i] for i, sid in enumerate(anchors)}
         pos = np.zeros((n, 3), dtype=float)
         for sid in anchors:
             pos[idx[sid]] = anchor_pos[sid]
@@ -569,6 +605,8 @@ def build_v2(db_path, out_path, lens, min_score, max_nodes, max_edges, max_venue
         "styles": sorted({style for n in out_nodes for style in (n.get("styles") or [])})[:80],
         "types": sorted({n["type"] for n in out_nodes}),
     }
+    geo_node_count = sum(1 for n in out_nodes if n.get("geo"))
+    geo_anchor_count = sum(1 for n in out_nodes if n["type"] == "venue" and n.get("geo"))
     data = {
         "schemaVersion": "atlas.starmap.v2",
         "version": "atlas_starmap.layout.v2",
@@ -584,6 +622,8 @@ def build_v2(db_path, out_path, lens, min_score, max_nodes, max_edges, max_venue
             "edge_count": len(out_edges),
             "edge_type_counts": edge_type_counts,
             "group_count": group_count,
+            "geo_node_count": geo_node_count,
+            "geo_anchor_count": geo_anchor_count,
             "generated_by": "export_starmap_layout.py",
         },
     }
