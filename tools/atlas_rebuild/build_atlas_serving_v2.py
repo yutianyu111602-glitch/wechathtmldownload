@@ -16,7 +16,7 @@ See docs/ATLAS_NEXTGEN_DESIGN_20260620.md. Read-only on the source DB.
 Runnable check: `python build_atlas_serving_v2.py --selftest`.
 """
 from __future__ import annotations
-import argparse, json, sqlite3, time
+import argparse, hashlib, json, sqlite3, time
 from pathlib import Path
 
 SCHEMA_VERSION = "atlas_serving.v2"
@@ -45,6 +45,13 @@ CREATE TABLE org_profile (
 CREATE TABLE series_profile (
   subject_id TEXT PRIMARY KEY, venue_subject_id TEXT, organizer_subject_id TEXT,
   concept TEXT, edition_count INTEGER DEFAULT 0);
+CREATE TABLE relation (
+  relation_id TEXT PRIMARY KEY, src_subject_id TEXT, dst_subject_id TEXT, relation_type TEXT,
+  weight REAL, same_event_count INTEGER, b2b_count INTEGER, label_zh TEXT,
+  first_seen_at TEXT, last_seen_at TEXT, public_state TEXT DEFAULT 'public_rollup', sample_evidence_json TEXT);
+CREATE INDEX ix_relation_src ON relation(src_subject_id);
+CREATE INDEX ix_relation_dst ON relation(dst_subject_id);
+CREATE INDEX ix_relation_type ON relation(relation_type);
 CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT);
 """
 
@@ -77,7 +84,66 @@ def _distinct(cur, sql):
     return {k: n for k, n in cur.execute(sql) if k}
 
 
-def build(stage3_path, out_path):
+def _build_relations(out, serving_path):
+    """Unify Stage4 DJ rollups + series FKs into one typed `relation` table. Returns degree dict.
+    IDs are already aligned (rollup ids == v2 subject_ids), so endpoints link directly."""
+    o = out.cursor()
+    subj = set(r[0] for r in o.execute("SELECT subject_id FROM subject"))
+    deg, seen = {}, set()
+
+    def emit(src, dst, rtype, weight, same_ev, b2b, label, first, last, evidence):
+        if not src or not dst or src == dst or src not in subj or dst not in subj:
+            return
+        if rtype in ("b2b", "collab") and src > dst:  # undirected -> canonical order
+            src, dst = dst, src
+        rid = hashlib.sha1(f"{src}|{rtype}|{dst}".encode("utf-8")).hexdigest()[:16]
+        if rid in seen:
+            return
+        seen.add(rid)
+        o.execute("INSERT OR IGNORE INTO relation (relation_id, src_subject_id, dst_subject_id, "
+                  "relation_type, weight, same_event_count, b2b_count, label_zh, first_seen_at, "
+                  "last_seen_at, sample_evidence_json) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                  (rid, src, dst, rtype, weight, same_ev, b2b, label, first, last, evidence))
+        deg[src] = deg.get(src, 0) + 1
+        deg[dst] = deg.get(dst, 0) + 1
+
+    s = sqlite3.connect(f"file:{serving_path}?mode=ro", uri=True)
+    s.row_factory = sqlite3.Row
+    try:
+        for r in s.execute("SELECT src_dj_id,dst_dj_id,relation_score,b2b_count,same_event_count,"
+                           "relation_label_zh,sample_evidence_json,first_seen_at,last_seen_at FROM dj_relation_rollup"):
+            b = int(r["b2b_count"] or 0)
+            emit(r["src_dj_id"], r["dst_dj_id"], "b2b" if b > 0 else "collab", float(r["relation_score"] or 0),
+                 int(r["same_event_count"] or 0), b, r["relation_label_zh"], r["first_seen_at"], r["last_seen_at"],
+                 r["sample_evidence_json"])
+    except Exception:
+        pass
+    try:
+        for r in s.execute("SELECT dj_id,venue_id,score,event_count,first_seen_at,last_seen_at FROM dj_venue_rollup"):
+            emit(r["dj_id"], r["venue_id"], "resident_at", float(r["score"] or 0), int(r["event_count"] or 0), 0,
+                 "驻场/常演", r["first_seen_at"], r["last_seen_at"], None)
+    except Exception:
+        pass
+    try:
+        for r in s.execute("SELECT dj_id,org_id,org_type,score,sample_evidence_json FROM dj_org_rollup"):
+            emit(r["dj_id"], r["org_id"], "signed_to", float(r["score"] or 0), 0, 0,
+                 f"厂牌/{r['org_type']}" if r["org_type"] else "厂牌/主办", None, None, r["sample_evidence_json"])
+    except Exception:
+        pass
+    s.close()
+
+    for sid, vid, oid, ed in o.execute("SELECT subject_id,venue_subject_id,organizer_subject_id,edition_count "
+                                       "FROM series_profile").fetchall():
+        if vid:
+            emit(sid, vid, "held_at", float(ed or 0), 0, 0, "系列场地", None, None, None)
+        if oid:
+            emit(sid, oid, "presented_by", float(ed or 0), 0, 0, "系列主办", None, None, None)
+
+    o.executemany("UPDATE subject SET relation_count=? WHERE subject_id=?", [(n, sid) for sid, n in deg.items()])
+    return deg
+
+
+def build(stage3_path, out_path, serving_path=None):
     s = sqlite3.connect(f"file:{stage3_path}?mode=ro", uri=True)
     s.row_factory = sqlite3.Row
     c = s.cursor()
@@ -190,7 +256,13 @@ def build(stage3_path, out_path):
         else:
             counts["other"] += 1
 
+    rel_total = 0
+    if serving_path:
+        _build_relations(out, serving_path)
+        rel_total = out.execute("SELECT COUNT(*) FROM relation").fetchone()[0]
+
     meta = {"schema_version": SCHEMA_VERSION, "source": str(stage3_path),
+            "serving_source": str(serving_path or ""), "relation_count": str(rel_total),
             "built_at": time.strftime("%Y-%m-%dT%H:%M:%S"), "counts": json.dumps(counts, ensure_ascii=False)}
     for k, v in meta.items():
         o.execute("INSERT INTO meta VALUES (?,?)", (k, str(v)))
@@ -216,6 +288,13 @@ def _validate(conn):
     bad = c.execute("SELECT COUNT(*) FROM series_profile sp WHERE sp.venue_subject_id IS NOT NULL "
                     "AND sp.venue_subject_id NOT IN (SELECT subject_id FROM subject)").fetchone()[0]
     assert bad == 0, f"{bad} series venue FKs dangling"
+    rels = c.execute("SELECT COUNT(*) FROM relation").fetchone()[0]
+    if rels:
+        bad_rel = c.execute("SELECT COUNT(*) FROM relation r WHERE r.src_subject_id NOT IN "
+                            "(SELECT subject_id FROM subject) OR r.dst_subject_id NOT IN "
+                            "(SELECT subject_id FROM subject)").fetchone()[0]
+        assert bad_rel == 0, f"{bad_rel} relation endpoints not in subject"
+        assert c.execute("SELECT COUNT(*) FROM relation WHERE src_subject_id=dst_subject_id").fetchone()[0] == 0, "self-relation"
     return by_type
 
 
@@ -259,13 +338,19 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stage3", default="_fleet_14w_g5_80k_increment_20260620/merged/entities_resolved.sqlite")
     ap.add_argument("--out", default="_fleet_14w_g5_80k_increment_20260620/merged/atlas_serving_v2.sqlite")
+    ap.add_argument("--serving", default="_fleet_14w_g5_80k_increment_20260620/merged/atlas_serving_candidate.sqlite",
+                    help="Stage4 candidate for relation unification; pass '' to skip (subjects only)")
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args()
     if a.selftest:
         _selftest(); return
-    counts = build(a.stage3, a.out)
+    counts = build(a.stage3, a.out, serving_path=a.serving or None)
     print(f"wrote {a.out}")
     print("  subjects by type:", counts)
+    conn = sqlite3.connect(f"file:{a.out}?mode=ro", uri=True)
+    rels = conn.execute("SELECT relation_type, COUNT(*) FROM relation GROUP BY relation_type ORDER BY 2 DESC").fetchall()
+    print("  relations by type:", dict(rels), "total", sum(n for _, n in rels))
+    conn.close()
 
 
 if __name__ == "__main__":

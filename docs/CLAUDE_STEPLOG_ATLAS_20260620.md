@@ -72,10 +72,20 @@ series SOLO Rhythms (124 editions @ SOLO Beijing).
 
 ---
 
-## Remaining (next agent)
-0. **Serving v2 Phase 2** — unify the 3 DJ rollups into one typed `relation` table + `observation`
-   provenance (design §2.3); then point the star-map projection at `atlas_serving_v2.sqlite`
-   (geo lens uses `venue_profile.geo_*`, but geo is sparse — backfill from the weekly venue registry).
+## Step 7 — Serving v2 Phase 2: unified typed relation table — commit `<this>`
+**What:** `build_atlas_serving_v2.py` gains `--serving` + a `relation` table unifying the 3 DJ
+rollups + series FKs: DJ↔DJ b2b/collab (undirected, canonical-ordered), DJ→venue `resident_at`,
+DJ→org `signed_to`, series→venue `held_at`, series→org `presented_by`; `subject.relation_count` filled.
+**Result:** **205592 relations** — collab 97526 / signed_to 65528 / resident_at 29843 / held_at 5370 /
+presented_by 5109 / b2b 2216. `_validate`: 0 dangling endpoints, 0 self-relations.
+**Verify:** `--selftest` + in-build `_validate` on real data green.
+
+## Remaining (next agent — see CODEX_HANDOFF_ATLAS_NEXTGEN_EXECUTION_20260620.md)
+0. **Phase 4 — point the star map at v2**: `export_starmap_layout.py --source v2` reads `subject`+`relation`,
+   emits `atlas.starmap.v2` per-lens layouts (b2b_universe done; residency_map/label_roster/series/city/style);
+   add a lens switcher in `apps/atlas_starmap_web`.
+1. **Phase 3 — dimensions**: venue geo backfill (sparse; from weekly venue registry), styles taxonomy
+   (`subject_style`), bio atoms into the contract/DJ panel.
 - **Lens switcher** in the web app (B2B / 驻场地图(geo, schema has lat/lng) / 厂牌花名册 / 城市场景),
   with per-lens node/edge filtering (FilterPanel already toggles label/edge types).
 - **Per-pair evidence**: clicking a connection shows that specific edge's events (now node-level aggregate).
