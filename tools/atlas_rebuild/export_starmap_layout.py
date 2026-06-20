@@ -179,7 +179,31 @@ def layout(comm, n_comm, sizes, seed=7):
     return pos
 
 
-def build(db_path, out_path, min_score, max_nodes, max_edges, include_venues=True, max_venues=250, venue_dj_cap=12):
+def load_orgs(db_path, kept_dj_ids):
+    """DJ->org (label/crew/promoter) rollup rows for the kept DJs. Tolerates a missing table."""
+    db = None
+    try:
+        db = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+        db.row_factory = sqlite3.Row
+        keep = set(kept_dj_ids)
+        return [
+            {"dj_id": r["dj_id"], "org_name": r["org_name"], "org_type": r["org_type"],
+             "score": r["score"], "sample_evidence_json": r["sample_evidence_json"]}
+            for r in db.execute("SELECT dj_id, org_name, org_type, score, sample_evidence_json FROM dj_org_rollup")
+            if r["dj_id"] in keep and (r["org_name"] or "").strip()
+        ]
+    except Exception:
+        return []
+    finally:
+        if db is not None:
+            try:
+                db.close()
+            except Exception:
+                pass
+
+
+def build(db_path, out_path, min_score, max_nodes, max_edges, include_venues=True, max_venues=250,
+          venue_dj_cap=12, include_orgs=True, max_orgs=200):
     profiles, node_ids, edges = load_graph(db_path, min_score, max_nodes, max_edges)
     idx = {d: i for i, d in enumerate(node_ids)}
 
@@ -279,6 +303,59 @@ def build(db_path, out_path, min_score, max_nodes, max_edges, include_venues=Tru
                                       "score": float(w), "same_event": int(w), "label_zh": "驻场/常演", "evidence": []})
             venue_count = len(ranked)
 
+    # Label / crew / promoter (厂牌) anchors: same pattern as venues, with per-edge
+    # evidence from the org rollup. Placed at the centroid of their roster DJs.
+    org_count = 0
+    if include_orgs:
+        omap = {}
+        for r in load_orgs(db_path, node_ids):
+            di = idx.get(r["dj_id"])
+            if di is None:
+                continue
+            name = str(r["org_name"]).strip()
+            nkey = _norm_venue(name) or name.lower()
+            sc = float(r.get("score") or 0)
+            g = omap.setdefault(nkey, {"names": {}, "score": 0.0, "djs": {}, "otype": r.get("org_type") or "", "ev": []})
+            g["names"][name] = g["names"].get(name, 0) + 1
+            g["score"] += sc
+            g["djs"][di] = max(g["djs"].get(di, 0.0), sc)
+            if not g["otype"]:
+                g["otype"] = r.get("org_type") or ""
+            if len(g["ev"]) < 2 and r.get("sample_evidence_json"):
+                try:
+                    for e in json.loads(r["sample_evidence_json"])[:2]:
+                        g["ev"].append({"title": e.get("event_title"), "date": e.get("starts_at"),
+                                        "source_ref_id": e.get("source_ref_id")})
+                except Exception:
+                    pass
+        ranked = sorted(omap.values(), key=lambda g: -g["score"])[:max_orgs]
+        if ranked:
+            o_sc = np.sqrt(np.array([g["score"] for g in ranked], dtype=float) + 1.0)
+            osizes = 0.9 + 2.6 * (o_sc / o_sc.max())
+            base2 = len(out_nodes)
+            orng = np.random.default_rng(123)
+            for k, g in enumerate(ranked):
+                djs = sorted(g["djs"].items(), key=lambda kv: -kv[1])
+                cen = pos[[di for di, _ in djs]].mean(axis=0) + orng.normal(0, 5.0, size=3)
+                canon = max(g["names"].items(), key=lambda kv: kv[1])[0]
+                out_nodes.append({
+                    "id": base2 + k,
+                    "x": round(float(cen[0]), 3), "y": round(float(cen[1]), 3), "z": round(float(cen[2]), 3),
+                    "label": "org",
+                    "name": canon,
+                    "file_path": f"厂牌/{canon}",
+                    "size": round(float(osizes[k]), 3),
+                    "color": "#b794f6",  # violet anchors for labels/crews/promoters
+                    "city": "",
+                    "event_count": 0,
+                    "org_type": g["otype"],
+                    "community": -1,
+                })
+                for di, w in djs[:venue_dj_cap]:
+                    out_edges.append({"source": di, "target": base2 + k, "type": "signed_to",
+                                      "score": float(w), "same_event": 0, "label_zh": "厂牌/主办", "evidence": list(g["ev"])})
+            org_count = len(ranked)
+
     edge_type_counts = {}
     for e in out_edges:
         edge_type_counts[e["type"]] = edge_type_counts.get(e["type"], 0) + 1
@@ -297,6 +374,7 @@ def build(db_path, out_path, min_score, max_nodes, max_edges, include_venues=Tru
             "edge_type_counts": edge_type_counts,
             "communities": n_comm,
             "venue_count": venue_count,
+            "org_count": org_count,
             "generated_by": "export_starmap_layout.py",
         },
     }
@@ -429,13 +507,16 @@ def main():
     ap.add_argument("--validate", help="validate an existing atlas_layout.json and print P1 contract summary")
     ap.add_argument("--no-venues", action="store_true", help="exclude venue anchor nodes (DJ-only B2B lens)")
     ap.add_argument("--max-venues", type=int, default=250)
+    ap.add_argument("--no-orgs", action="store_true", help="exclude label/crew/promoter (厂牌) anchor nodes")
+    ap.add_argument("--max-orgs", type=int, default=200)
     a = ap.parse_args()
     if a.selftest:
         _selftest(); return
     if a.validate:
         validate_file(a.validate); return
     data = build(a.db, a.out, a.min_score, a.max_nodes, a.max_edges,
-                 include_venues=not a.no_venues, max_venues=a.max_venues)
+                 include_venues=not a.no_venues, max_venues=a.max_venues,
+                 include_orgs=not a.no_orgs, max_orgs=a.max_orgs)
     comms = {}
     for n in data["nodes"]:
         comms[n["community"]] = comms.get(n["community"], 0) + 1

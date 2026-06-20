@@ -26,6 +26,7 @@ function edgeTypeLabel(type: string): string {
   if (type === "b2b") return "B2B 深度合作";
   if (type === "collab") return "高频同台";
   if (type === "resident_at") return "驻场 / 常演";
+  if (type === "signed_to") return "厂牌 / 主办";
   return type.replace(/_/g, " ").toLowerCase();
 }
 
@@ -94,7 +95,7 @@ export function NodeDetailPanel({ node, allNodes, allEdges, onClose, onNavigate 
                 className="inline-block px-2 py-0.5 rounded text-[10px] font-medium"
                 style={{ backgroundColor: colorForLabel(node.label) + "18", color: colorForLabel(node.label) }}
               >
-                {node.label === "venue" ? "场地" : "DJ"}
+                {node.label === "venue" ? "场地" : node.label === "org" ? "厂牌" : "DJ"}
               </span>
               <span className="inline-block px-2 py-0.5 rounded border border-white/[0.06] bg-white/[0.03] text-[10px] text-foreground/55">
                 {node.city || "城市未知"}
@@ -110,6 +111,12 @@ export function NodeDetailPanel({ node, allNodes, allEdges, onClose, onNavigate 
                 { label: "演出", value: node.event_count ?? 0, color: "text-primary" },
                 { label: "驻场DJ", value: connections.length, color: "text-[#ffcf6b]" },
                 { label: "城市", value: node.city || "未知", color: "text-accent" },
+              ]
+            : node.label === "org"
+            ? [
+                { label: "关联DJ", value: connections.length, color: "text-[#b794f6]" },
+                { label: "类型", value: node.org_type || "厂牌", color: "text-accent" },
+                { label: "证据", value: evidence.length, color: "text-primary" },
               ]
             : [
                 { label: "演出", value: node.event_count ?? 0, color: "text-primary" },

@@ -14,6 +14,7 @@ export interface GraphNode {
   city?: string;
   event_count?: number;
   community?: number;
+  org_type?: string;
   first_seen_at?: string;
   last_seen_at?: string;
 }
