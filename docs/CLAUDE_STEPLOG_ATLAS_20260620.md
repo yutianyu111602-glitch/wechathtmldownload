@@ -55,9 +55,27 @@ carrying org evidence; org-aware UI (厂牌 chip, 关联DJ/类型/证据). `--no
 (b2b 586 / collab 7414 / resident_at 2450 / signed_to 2283).
 **Verify:** selftest + validate + web build green.
 
+## Step 6 — Next-gen serving v2 Phase 1: promote venue/org/series to first-class — commit `<this>`
+**What:** `tools/atlas_rebuild/build_atlas_serving_v2.py` reads Stage3 `entities_resolved.sqlite`
+(unified `canonical_entity` + `resolved_event` + `event_participant`) → `atlas_serving_v2.sqlite`
+with a unified `subject` (dj/venue/org/series) + per-type profiles (dj/venue/org/series),
+computed event_count, activity span (first/last seen), resident-DJ / roster / edition counts,
+series→venue/organizer FKs, and aliases.
+**Why:** Stage4 served DJ-only; venues/orgs were denormalized in DJ rollups, series unserved.
+This is the biggest unlock (design doc Phase 1) for the multi-entity star map + contract.
+**Key files:** `build_atlas_serving_v2.py` (the `.sqlite` is a regenerable artifact, not committed).
+**Result:** 22378 subjects — dj 12262 / venue 1562 / org 2888 / series 5666. Real data e.g.
+RIVER (长沙, 707 events, 489 resident DJs), SOLO Beijing (label, 525 roster),
+series SOLO Rhythms (124 editions @ SOLO Beijing).
+**Verify:** `--selftest` + in-build `_validate` (profile↔subject parity + FK integrity) green.
+**Run:** `python tools/atlas_rebuild/build_atlas_serving_v2.py` (defaults: G5 Stage3 → merged/atlas_serving_v2.sqlite).
+
 ---
 
 ## Remaining (next agent)
+0. **Serving v2 Phase 2** — unify the 3 DJ rollups into one typed `relation` table + `observation`
+   provenance (design §2.3); then point the star-map projection at `atlas_serving_v2.sqlite`
+   (geo lens uses `venue_profile.geo_*`, but geo is sparse — backfill from the weekly venue registry).
 - **Lens switcher** in the web app (B2B / 驻场地图(geo, schema has lat/lng) / 厂牌花名册 / 城市场景),
   with per-lens node/edge filtering (FilterPanel already toggles label/edge types).
 - **Per-pair evidence**: clicking a connection shows that specific edge's events (now node-level aggregate).
