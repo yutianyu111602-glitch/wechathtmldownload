@@ -1,6 +1,7 @@
 const { requestApi } = require("../../utils/api");
 const { compactItem } = require("../../utils/format");
 const { applyLanguageChrome, localizeItems, normalizeLang, text } = require("../../utils/i18n");
+const { mergeVenues, mergeCollaborators } = require("../../utils/atlasContract");
 const { openSourceByHash } = require("../../utils/sourceAction");
 const { buildNamedPageShare, buildNamedPageTimeline, enableShareMenu } = require("../../utils/share");
 
@@ -25,6 +26,23 @@ function includesArtist(item, name) {
   return [...(item.lineupItems || []), ...(item.atlasArtistItems || []).map(a => a.name || a.raw || "")].some(a => artistNameMatches(a, name));
 }
 
+function normalizeEventToken(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s·・|｜@＠:：,，.。()（）\[\]【】\-_/\\]/g, "");
+}
+
+function eventDedupeKey(item = {}) {
+  const title = normalizeEventToken(item.displayTitle || item.title || item.titleDisplay || "");
+  const date = String(item.eventDateStart || item.date || item.dateLabel || item.dateCompact || "").slice(0, 10);
+  const venue = normalizeEventToken(item.venueLabel || item.venueName || item.venue || item.promoter || "");
+  const sourceHash = String(item.sourceHash || item.sourceRefId || item.source_ref_id || item.hash || "").trim();
+  if (title && date && venue) return `${date}|${venue}|${title}`;
+  if (sourceHash) return `source|${sourceHash}`;
+  return String(item.id || item.eventId || [title, date, venue].join("|"));
+}
+
 async function fetchAllCurrentItems(options = {}) {
   const all = [];
   let cursor = 0;
@@ -46,7 +64,7 @@ function dedupeEvents(items) {
   const out = [];
   const seen = new Set();
   for (const item of items) {
-    const k = String(item.id || item.eventId || [item.displayTitle, item.dateLabel, item.venueLabel].join("|"));
+    const k = eventDedupeKey(item);
     if (!k || seen.has(k)) continue;
     seen.add(k);
     out.push(item);
@@ -79,40 +97,64 @@ Page({
 
   async loadArtist() {
     try {
-      const [historyItems, atlasResult] = await Promise.all([
+      const [profileResult, historyItems] = await Promise.all([
+        this.fetchDjProfile(),
         fetchAllCurrentItems({ lookbackDays: 45 }),
-        this.fetchAtlasArtist(),
       ]);
-      const compactEvents = dedupeEvents(historyItems.map(compactItem))
-        .filter(item => includesArtist(item, this.name));
-      const events = localizeItems(compactEvents, this.lang);
 
-      // Dedupe atlas events against weekly events by venue+date
-      const weeklyKeys = new Set(events.map(e => [e.venueLabel, e.dateLabel].join("|")));
-      const dedupedAtlasEvents = (atlasResult?.events || []).filter(
-        e => !weeklyKeys.has([e.venueName, (e.date || "").slice(0, 10)].join("|"))
-      );
-      // Dedupe atlas events internally
-      const seenAtlas = new Set();
-      const uniqueAtlasEvents = dedupedAtlasEvents.filter(e => {
-        const k = [e.title, e.date, e.venueName].join("|");
-        if (seenAtlas.has(k)) return false;
-        seenAtlas.add(k);
-        return true;
-      });
+      // Process full DJ profile response
+      const events = [];
+      const bioLines = [];
 
-      // Dedupe venues and collaborators
-      const dedupeById = (arr, key) => {
-        const seen = new Set();
-        return (arr || []).filter(item => { const k = item[key]; if (seen.has(k)) return false; seen.add(k); return true; });
-      };
+      if (profileResult) {
+        // Atlas events from the profile. Keep sourceRefId (the `src:` atlas ref)
+        // so a tap routes to the atlas-evidence page; preferring the bare hash
+        // sent it to the weekly source resolver, which 404s — every history row
+        // looked "un-openable".
+        const atlasEvts = dedupeEvents((profileResult.events || []).map(e => ({
+          eventId: e.eventId, title: e.title, date: e.date,
+          venueName: e.venueName, city: e.city,
+          sourceRefId: e.sourceRefId || e.sourceHash,
+          sourceHash: e.sourceHash || e.sourceRefId,
+        })));
+
+        // Merge name/identity variants of the same venue/DJ (old fragmented DB)
+        // and recompute counts from the deduped lists.
+        const mergedVenues = mergeVenues(profileResult.venues || []);
+        const mergedCollaborators = mergeCollaborators(profileResult.collaborators || []);
+        const profile = profileResult.profile ? { ...profileResult.profile } : null;
+        if (profile) {
+          if (mergedVenues.length) profile.venueCount = mergedVenues.length;
+          if (mergedCollaborators.length) profile.collaboratorCount = mergedCollaborators.length;
+        }
+
+        this.setData({
+          atlasProfile: profile,
+          atlasEvents: atlasEvts || [],
+          atlasCollaborators: mergedCollaborators,
+          atlasVenues: mergedVenues,
+        });
+      }
+
+      // Legacy: filter history items by artist name
+      const atlasEventKeys = new Set((this.data.atlasEvents || []).map(eventDedupeKey));
+      const compactEvents = dedupeEvents((historyItems || []).map(compactItem))
+        .filter(item => includesArtist(item, this.name))
+        .filter(item => !atlasEventKeys.has(eventDedupeKey(item)));
+      const localizedEvents = localizeItems(compactEvents, this.lang);
+
+      // Merge yuanbao bios from compact events
+      for (const e of localizedEvents) {
+        if (e.bioLines?.length) {
+          for (const b of e.bioLines) {
+            if (!bioLines.includes(b)) bioLines.push(b);
+          }
+        }
+      }
 
       this.setData({
-        events, bioLines: events.find(item => item.hasBio)?.bioLines || [],
-        atlasProfile: atlasResult?.profile || null,
-        atlasEvents: uniqueAtlasEvents || [],
-        atlasCollaborators: dedupeById(atlasResult?.collaborators, 'djId') || [],
-        atlasVenues: dedupeById(atlasResult?.venues, 'venueName') || [],
+        events: localizedEvents,
+        bioLines,
         loading: false,
       });
     } catch (error) {
@@ -121,12 +163,23 @@ Page({
     }
   },
 
-  async fetchAtlasArtist() {
+  async fetchDjProfile() {
+    // /atlas/artist honours query limits; the /dj-profile route hard-caps venues
+    // at 15 / collaborators at 20, which makes a deduped count impossible. Pull
+    // the full lists here, fall back to dj-profile by name only if this fails.
     try {
-      const r = await requestApi("/api/v1/weekly/atlas/artist", { name: this.name, eventLimit: 50, collaboratorLimit: 15, venueLimit: 10 });
-      return r.found ? r : null;
+      const r = await requestApi("/api/v1/weekly/atlas/artist", {
+        name: this.name, eventLimit: 100, collaboratorLimit: 1500, venueLimit: 500,
+      });
+      if (r && r.found) return r;
     } catch (err) {
-      console.warn("[artist] Atlas API unavailable", err);
+      console.warn("[artist] atlas/artist unavailable, trying dj-profile", err);
+    }
+    try {
+      const r = await requestApi("/api/v1/weekly/atlas/dj-profile/" + encodeURIComponent(this.name));
+      return r && r.found ? r : null;
+    } catch (err) {
+      console.warn("[artist] DJ profile API unavailable", err);
       return null;
     }
   },

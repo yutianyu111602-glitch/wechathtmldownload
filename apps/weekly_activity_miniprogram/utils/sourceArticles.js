@@ -10,13 +10,14 @@ function sourceActionDisabled(item) {
   return item && item.source_action && item.source_action.available === false;
 }
 
-function isAggregateLikeItem(item) {
-  return Boolean(item && (item.aggregation_child === true || item.aggregationChild === true))
-    || safeText(item && (item.id || item.event_id || item.article_id)).startsWith("agg-child-");
+function isAggregateLike(value) {
+  if (!value) return false;
+  if (value.aggregation_child === true || value.aggregationChild === true) return true;
+  return safeText(value.id || value.event_id || value.article_id || value.source_event_id).startsWith("agg-child-");
 }
 
 function sourceHashOf(item) {
-  if (sourceActionDisabled(item) || isAggregateLikeItem(item)) return "";
+  if (sourceActionDisabled(item) || isAggregateLike(item)) return "";
   const sourceRefId = safeText(item && (item.sourceRefId || item.source_ref_id));
   if (isAtlasEvidenceRef(sourceRefId)) return sourceRefId;
   return safeText(item && (item.sourceHash || sourceRefId || item.source_action?.url_hash || item.source_article?.url_hash));
@@ -28,11 +29,6 @@ function sourceHashOfRef(ref) {
   return safeText(ref && (ref.source_hash || ref.hash || ref.url_hash || sourceRefId));
 }
 
-function isAggregateLikeRef(ref) {
-  return Boolean(ref && ref.aggregation_child === true)
-    || safeText(ref && (ref.event_id || ref.id || ref.source_event_id)).startsWith("agg-child-");
-}
-
 function compactDate(value) {
   const text = safeText(value);
   return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text.slice(5).replace("-", ".") : text;
@@ -41,12 +37,12 @@ function compactDate(value) {
 function sourceArticleTitle(events) {
   const first = events[0] || {};
   const account = safeText(first.source_account_name || first.account || first.promoter || "公众号");
-  const aggregate = events.some(isAggregateLikeItem);
+  const aggregate = events.some(isAggregateLike);
   return aggregate ? `${account} 排期原文` : `${account} 原文`;
 }
 
 function primarySourceRef(item) {
-  if (isAggregateLikeItem(item)) return null;
+  if (isAggregateLike(item)) return null;
   const sourceArticle = item && typeof item.source_article === "object" ? item.source_article : {};
   const hash = sourceHashOf(item);
   if (!hash) return null;
@@ -65,7 +61,7 @@ function mergedSourceRefs(item) {
   const provenance = item && typeof item.merge_provenance === "object" ? item.merge_provenance : null;
   if (!provenance || provenance.schema_version !== "weekly_merge_provenance.v1") return [];
   return (Array.isArray(provenance.sources) ? provenance.sources : [])
-    .filter((ref) => !isAggregateLikeRef(ref))
+    .filter((ref) => !isAggregateLike(ref))
     .map((ref) => ({
       source_hash: sourceHashOfRef(ref),
       title: safeText(ref && ref.title),
@@ -100,14 +96,23 @@ function sourceRefsForItem(item) {
 
 function titleFromRef(ref, events) {
   if (safeText(ref && ref.title)) return safeText(ref.title);
-  if ((Array.isArray(events) ? events : []).some(isAggregateLikeItem)) return sourceArticleTitle(events);
+  const list = Array.isArray(events) ? events : [];
+  if (list.some(isAggregateLike)) return sourceArticleTitle(events);
+  // Backend gave no source-article title: use the article's own title (for a
+  // single-event article the event title IS the article title) instead of the
+  // generic "<账号> 原文" placeholder that made every row read "原文".
+  const first = list[0] || {};
+  const eventTitle = safeText(
+    first.source_title || first.sourceTitle || first.title_original || first.title || first.title_display || first.displayTitle,
+  );
+  if (eventTitle) return eventTitle;
   const account = safeText(ref && ref.account_name);
   if (account) return `${account} 原文`;
   return sourceArticleTitle(events);
 }
 
 function sourceArticleSubtitle(events) {
-  const dates = [...new Set(events.map((item) => safeText(item.dateCompact || compactDate(item.event_date_start || item.dateLabel))).filter(Boolean))];
+  const dates = [...new Set(events.map((item) => safeText(item.dateCompact || compactDate(item.event_date_start || item.dateLabel))).filter(Boolean))].sort();
   const first = events[0] || {};
   const published = compactDate(first.source_published_at || first.source_article?.published_at);
   const count = `${events.length}场`;
@@ -119,7 +124,7 @@ function sourceArticleSubtitle(events) {
 }
 
 function sourceArticleSubtitleFromRef(ref, events) {
-  const dates = [...new Set(events.map((item) => safeText(item.dateCompact || compactDate(item.event_date_start || item.dateLabel))).filter(Boolean))];
+  const dates = [...new Set(events.map((item) => safeText(item.dateCompact || compactDate(item.event_date_start || item.dateLabel))).filter(Boolean))].sort();
   const published = compactDate(ref && ref.published_at);
   const count = `${events.length}场`;
   const parts = [];
@@ -142,7 +147,7 @@ function buildDetailSourceArticles(item) {
       title: titleFromRef(ref, [event]),
       subtitle: sourceArticleSubtitleFromRef(ref, [event]),
       eventCount: 1,
-      isAggregate: isAggregateLikeItem(event),
+      isAggregate: isAggregateLike(event),
       isMergedSource: true,
       isPrimary: ref.is_primary === true,
     };
@@ -177,7 +182,7 @@ function buildVenueSourceArticles(events, options = {}) {
   }
   return [...groups.entries()]
     .map(([hash, group]) => ({ hash, group }))
-    .filter(({ group }) => includeSingles || group.events.length > 1 || group.events.some(isAggregateLikeItem) || group.isMergedSource)
+    .filter(({ group }) => includeSingles || group.events.length > 1 || group.events.some(isAggregateLike) || group.isMergedSource)
     .map(({ hash, group }) => ({
       id: `source-${hash}`,
       hash,
@@ -187,7 +192,7 @@ function buildVenueSourceArticles(events, options = {}) {
         ? sourceArticleSubtitleFromRef(group.refs[0], group.events)
         : sourceArticleSubtitle(group.events),
       eventCount: group.events.length,
-      isAggregate: group.events.some(isAggregateLikeItem),
+      isAggregate: group.events.some(isAggregateLike),
       isMergedSource: group.isMergedSource,
     }))
     .slice(0, maxArticles || undefined);
@@ -197,8 +202,7 @@ module.exports = {
   buildDetailSourceArticles,
   buildVenueSourceArticles,
   isAtlasEvidenceRef,
-  isAggregateLikeItem,
-  isAggregateLikeRef,
+  isAggregateLike,
   sourceHashOf,
   sourceRefsForItem,
 };

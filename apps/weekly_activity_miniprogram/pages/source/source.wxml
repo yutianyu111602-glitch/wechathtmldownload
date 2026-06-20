@@ -1,0 +1,28 @@
+<view class="source-state">
+  <view class="sub-nav">
+    <view class="nav-back" bindtap="goBack" hover-class="option-hover">←</view>
+  </view>
+  <view class="source-card">
+    <view class="source-kicker">坏DJclub</view>
+    <view wx:if="{{loading}}" class="source-title">
+      <view>{{t.loading}}</view>
+      <view class="source-progress">
+        <view class="source-progress-fill" style="width: {{loadingProgress}}%;"></view>
+      </view>
+    </view>
+    <view wx:elif="{{externalUrl}}" class="source-title">{{t.externalTitle}}</view>
+    <view wx:elif="{{error}}" class="source-title source-error">{{error}}</view>
+    <view wx:else class="source-title">{{t.hint}}</view>
+    <view wx:if="{{externalUrl}}" class="source-hint">{{t.externalHint}}</view>
+    <view wx:if="{{externalUrl}}" class="source-url-label">{{sourceUrl}}</view>
+    <view wx:if="{{evidenceTitle}}" class="source-evidence">
+      <view class="source-evidence-title">{{evidenceTitle}}</view>
+      <view wx:if="{{evidenceMeta}}" class="source-evidence-meta">{{evidenceMeta}}</view>
+      <view wx:if="{{evidenceSnippet}}" class="source-evidence-snippet">{{evidenceSnippet}}</view>
+    </view>
+    <view wx:if="{{sourceNotice}}" class="source-hint">{{sourceNotice}}</view>
+    <view wx:if="{{sourceUrl}}" class="source-actions">
+      <button class="primary-action" bindtap="openSource">{{externalUrl ? t.copyLink : t.open}}</button>
+    </view>
+  </view>
+</view>

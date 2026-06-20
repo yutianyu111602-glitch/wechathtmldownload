@@ -11,8 +11,42 @@
         <view wx:if="{{address}}" class="sub-address" bindtap="handleAddressTap">{{address}}</view>
         <view class="sub-count">{{events.length}} {{t.clubUpcoming}}</view>
       </view>
-    <view class="section" wx:if="{{events.length}}">
-      <view wx:if="{{sourceArticles.length}}" class="source-article-list">
+    <view class="section" wx:if="{{clubOverviews.length}}">
+      <view class="sub-heading">{{t.clubOverviews}}</view>
+      <view class="club-overview-list">
+        <view
+          wx:for="{{clubOverviews}}"
+          wx:key="id"
+          class="club-overview-card"
+          data-url="{{item.originalUrl}}"
+          bindtap="openClubOverview"
+        >
+          <image
+            wx:if="{{item.coverUrl && !item.posterLoadFailed}}"
+            class="club-overview-poster"
+            src="{{item.coverUrl}}"
+            mode="aspectFill"
+            lazy-load="true"
+            data-id="{{item.id}}"
+            binderror="onClubOverviewPosterError"
+          ></image>
+          <view wx:else class="club-overview-poster club-overview-poster-fallback">
+            <text>{{item.kindLabel}}</text>
+          </view>
+          <view class="club-overview-body">
+            <view class="club-overview-kicker">
+              <text class="club-overview-tag kind-{{item.windowKind}}">{{item.kindLabel}}</text>
+              <text class="club-overview-window">{{item.windowLabel}}</text>
+            </view>
+            <view class="club-overview-title">{{item.title}}</view>
+            <view class="club-overview-meta">{{item.publishDate}} · {{t.openOriginal}}</view>
+          </view>
+          <text class="chevron">›</text>
+        </view>
+      </view>
+    </view>
+    <view class="section" wx:if="{{sourceArticles.length}}">
+      <view class="source-article-list">
         <view class="sub-heading">{{t.sourceArticles}}</view>
         <view
           wx:for="{{sourceArticles}}"
@@ -29,9 +63,31 @@
           <text class="chevron">›</text>
         </view>
       </view>
+    </view>
+    <view class="section" wx:if="{{events.length}}">
       <view class="sub-heading">{{t.clubSchedule}}</view>
       <view
         wx:for="{{events}}"
+        wx:key="id"
+        class="event-row"
+        data-id="{{item.id}}"
+        data-is-atlas="{{item.isAtlasEvent}}"
+        data-source-hash="{{item.sourceRefId || item.sourceHash || item.source_ref_id || item.source_hash}}"
+        bindtap="openDetail"
+      >
+        <view>
+          <view class="event-title">{{item.displayTitle}}</view>
+          <view wx:if="{{!item.isSourceOverview}}" class="event-meta">
+            <text wx:if="{{item.isCalendarPreview}}">{{item.calendarPreviewLabel}} · </text>{{item.dateRangeLabel || item.dateLabel}} · {{item.lineupLabel}}
+          </view>
+        </view>
+        <text class="chevron">›</text>
+      </view>
+    </view>
+    <view class="section" wx:if="{{pastEvents.length}}">
+      <view class="sub-heading">{{t.clubPastEvents}}</view>
+      <view
+        wx:for="{{pastEvents}}"
         wx:key="id"
         class="event-row"
         data-id="{{item.id}}"
