@@ -45,17 +45,19 @@ export function NodeCloud({
     return arr;
   }, [nodes, highlightedIds, tempColor, opacity]);
 
-  useFrame(() => {
+  useFrame((state) => {
     const mesh = meshRef.current;
     if (!mesh) return;
-
+    const t = state.clock.elapsedTime;
     const hasHighlight = highlightedIds && highlightedIds.size > 0;
 
     for (let i = 0; i < nodes.length; i++) {
       const n = nodes[i];
       tempObj.position.set(n.x, n.y, n.z);
       const isHighlighted = !hasHighlight || highlightedIds.has(n.id);
-      const s = n.size * (isHighlighted ? 0.5 : 0.2);
+      /* per-star twinkle + larger glowing bodies so bloom reads as a star, not a dot */
+      const twinkle = 1 + 0.12 * Math.sin(t * 1.8 + i * 1.7);
+      const s = n.size * (isHighlighted ? 1.15 : 0.4) * twinkle;
       tempObj.scale.set(s, s, s);
       tempObj.updateMatrix();
       mesh.setMatrixAt(i, tempObj.matrix);
@@ -83,8 +85,14 @@ export function NodeCloud({
         }
       }}
     >
-      <sphereGeometry args={[1, 32, 24]} />
-      <meshBasicMaterial vertexColors toneMapped={false} />
+      <sphereGeometry args={[1, 16, 12]} />
+      <meshBasicMaterial
+        vertexColors
+        toneMapped={false}
+        transparent
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
       <instancedBufferAttribute
         attach="geometry-attributes-color"
         args={[colors, 3]}

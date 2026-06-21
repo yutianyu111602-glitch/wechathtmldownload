@@ -8,6 +8,7 @@ import { NodeCloud } from "./NodeCloud";
 import { EdgeLines } from "./EdgeLines";
 import { NodeLabels } from "./NodeLabels";
 import { NodeTooltip } from "./NodeTooltip";
+import { Starfield } from "./Starfield";
 import type { GraphData, GraphNode, LinkedProject } from "../lib/types";
 
 /* ── Camera fly-to animation ────────────────────────────── */
@@ -44,7 +45,7 @@ function CameraAnimator({ target }: { target: CameraTarget | null }) {
 
 /* ── Idle auto-rotation ──────────────────────────────────── */
 
-const IDLE_TIMEOUT_MS = 60_000;
+const IDLE_TIMEOUT_MS = 3_500;
 
 function IdleAutoRotate({
   controlsRef,
@@ -111,7 +112,8 @@ export function GraphScene({
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: false }}
     >
-      <color attach="background" args={["#06090f"]} />
+      <color attach="background" args={["#05070d"]} />
+      <Starfield />
       <ambientLight intensity={0.5} />
       <pointLight position={[500, 500, 500]} intensity={0.6} />
       <pointLight
@@ -178,11 +180,11 @@ export function GraphScene({
 
       <EffectComposer>
         <Bloom
-          luminanceThreshold={0.3}
-          luminanceSmoothing={0.7}
-          intensity={1.2}
+          luminanceThreshold={0.18}
+          luminanceSmoothing={0.75}
+          intensity={1.9}
           mipmapBlur
-          radius={0.6}
+          radius={0.85}
         />
       </EffectComposer>
 
