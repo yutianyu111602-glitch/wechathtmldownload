@@ -23,7 +23,7 @@ from pathlib import Path
 import numpy as np
 
 DEFAULT_DB = "_fleet_14w_g4_40k_increment_20260620/merged/atlas_serving_candidate.sqlite"
-DEFAULT_V2_DB = "_fleet_14w_g5_80k_increment_20260620/merged/atlas_serving_v2.sqlite"
+DEFAULT_V2_DB = "_fleet_14w_g1_g7_full_union_fast2_retry_20260621/merged/atlas_serving_v2.sqlite"
 V2_LENSES = ("b2b_universe", "residency_map", "label_roster", "series", "city", "style")
 V2_LENS_LABELS = {
     "b2b_universe": "B2B宇宙",
@@ -293,10 +293,16 @@ def load_v2_subjects(db):
             "styles": [],
             "geo": None,
         }
-    for r in db.execute("SELECT subject_id,styles_json,genre FROM dj_profile"):
+    for r in db.execute("SELECT subject_id,styles_json,genre,social_json,bio_snippet FROM dj_profile"):
         if r["subject_id"] in subjects:
             subjects[r["subject_id"]]["styles"] = [str(s) for s in _json_list(r["styles_json"]) if str(s).strip()][:8]
             subjects[r["subject_id"]]["genre"] = r["genre"] or ""
+            try:
+                soc = json.loads(r["social_json"]) if r["social_json"] else {}
+            except Exception:
+                soc = {}
+            subjects[r["subject_id"]]["social"] = soc if isinstance(soc, dict) else {}
+            subjects[r["subject_id"]]["bio"] = r["bio_snippet"] or ""
     for r in db.execute("SELECT subject_id,geo_lat,geo_lng,venue_type,resident_dj_count FROM venue_profile"):
         if r["subject_id"] in subjects:
             lat, lng = r["geo_lat"], r["geo_lng"]
@@ -579,6 +585,8 @@ def build_v2(db_path, out_path, lens, min_score, max_nodes, max_edges, max_venue
             "styles": s.get("styles") or [],
             "org_type": s.get("org_type", ""),
             "concept": s.get("concept", ""),
+            "social": s.get("social") or {},
+            "bio": s.get("bio") or "",
         })
 
     out_edges = []

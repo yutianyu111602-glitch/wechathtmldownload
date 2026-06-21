@@ -21,6 +21,8 @@ export interface GraphNode {
   org_type?: string;
   concept?: string;
   styles?: string[];
+  social?: Record<string, string>;
+  bio?: string;
   geo?: { lat: number; lng: number } | null;
   first_seen_at?: string;
   last_seen_at?: string;
