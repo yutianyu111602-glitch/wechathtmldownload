@@ -197,6 +197,18 @@ def build(stage3_path, out_path, serving_path=None):
     out = sqlite3.connect(out_path)
     o = out.cursor()
     o.executescript(DDL)
+    # F-01 reconcile: align the DJ set to the accepted Stage4 canonical_subject (so v2 == accepted
+    # candidate, not the looser Stage3 set), and drop eventless venue/org/series noise. Keeps v2
+    # consistent with 61/62. If no serving_path, the DJ filter is inert (e.g. --selftest).
+    accepted_dj = set()
+    if serving_path:
+        try:
+            sv = sqlite3.connect(f"file:{serving_path}?mode=ro", uri=True)
+            accepted_dj = {r[0] for r in sv.execute("SELECT subject_id FROM canonical_subject")}
+            sv.close()
+        except Exception:
+            accepted_dj = set()
+    dropped = {"dj": 0, "venue": 0, "org": 0, "series": 0}
     counts = {"dj": 0, "venue": 0, "org": 0, "series": 0, "other": 0}
 
     for e in ents:
@@ -212,6 +224,14 @@ def build(stage3_path, out_path, serving_path=None):
         ec = span[0] if span else 0
         first_seen = span[1] if span else None
         last_seen = span[2] if span else None
+        # F-01: keep only accepted DJs; drop eventless venue/org/series (noise)
+        if t == "dj":
+            if accepted_dj and eid not in accepted_dj:
+                dropped["dj"] += 1
+                continue
+        elif t in ("venue", "org", "series") and ec == 0:
+            dropped[t] += 1
+            continue
         al = sorted(aliases.get(eid, []))
         o.execute(
             "INSERT INTO subject (subject_id, subject_type, display_name, normalized_name, name_en, "
@@ -259,11 +279,18 @@ def build(stage3_path, out_path, serving_path=None):
     rel_total = 0
     if serving_path:
         _build_relations(out, serving_path)
+        # F-01: prune edges whose endpoints were filtered out of subject
+        out.execute("DELETE FROM relation WHERE src_subject_id NOT IN (SELECT subject_id FROM subject) "
+                    "OR dst_subject_id NOT IN (SELECT subject_id FROM subject)")
         rel_total = out.execute("SELECT COUNT(*) FROM relation").fetchone()[0]
 
     meta = {"schema_version": SCHEMA_VERSION, "source": str(stage3_path),
             "serving_source": str(serving_path or ""), "relation_count": str(rel_total),
+            "generation": "g1_g7_full",
+            "dropped": json.dumps(dropped, ensure_ascii=False),
             "built_at": time.strftime("%Y-%m-%dT%H:%M:%S"), "counts": json.dumps(counts, ensure_ascii=False)}
+    if any(dropped.values()):
+        print("  F-01 reconcile dropped:", dropped)
     for k, v in meta.items():
         o.execute("INSERT INTO meta VALUES (?,?)", (k, str(v)))
     out.commit()
