@@ -18,6 +18,11 @@ var CATEGORY_BY_KEY = {
   // wechat intentionally omitted — not an openable external web link.
 };
 
+var SOCIAL_PLACEHOLDERS = {
+  "未提及": 1, "未提供": 1, "无": 1, "暂无": 1, "没有": 1, "未知": 1, "待定": 1,
+  "n/a": 1, "na": 1, "none": 1, "null": 1, "-": 1, "—": 1, "/": 1,
+};
+
 function ensureHttps(value) {
   var v = String(value || "").trim();
   if (!v) return "";
@@ -27,7 +32,8 @@ function ensureHttps(value) {
 
 function urlForKey(key, value) {
   var v = String(value || "").trim();
-  if (!v) return "";
+  // Real handles/URLs are latin; drop empty, placeholders, and Chinese-only placeholder phrasings.
+  if (!v || SOCIAL_PLACEHOLDERS[v.toLowerCase()] || !/[A-Za-z0-9]/.test(v)) return "";
   if (/^https?:\/\//i.test(v)) return v.replace(/^http:\/\//i, "https://");
   var handle = v.replace(/^@/, "").replace(/\s+/g, "");
   if (key === "instagram") return handle ? "https://instagram.com/" + handle : "";

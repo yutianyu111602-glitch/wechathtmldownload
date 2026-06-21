@@ -69,6 +69,25 @@ def _edge_evidence(value, limit=2):
     return out
 
 
+_SOCIAL_PLACEHOLDERS = {"未提及", "未提供", "无", "暂无", "没有", "未知", "待定",
+                        "n/a", "na", "none", "null", "-", "—", "/", ""}
+
+
+def _clean_social(soc):
+    """Drop VL placeholder values (未提及 / 无 / N/A …) so only real links/handles survive."""
+    if not isinstance(soc, dict):
+        return {}
+    out = {}
+    for k, v in soc.items():
+        s = str(v or "").strip()
+        # Real handles/URLs are latin; drop empty, known placeholders, and
+        # Chinese-only placeholder phrasings (未提及 / 未明确说明 / …) that have no ascii token.
+        if not s or s.lower() in _SOCIAL_PLACEHOLDERS or not re.search(r"[A-Za-z0-9]", s):
+            continue
+        out[str(k)] = s
+    return out
+
+
 def _dominant_style(subject):
     styles = subject.get("styles") or []
     return str(styles[0]).strip() if styles else (subject.get("genre") or "unknown")
@@ -301,7 +320,7 @@ def load_v2_subjects(db):
                 soc = json.loads(r["social_json"]) if r["social_json"] else {}
             except Exception:
                 soc = {}
-            subjects[r["subject_id"]]["social"] = soc if isinstance(soc, dict) else {}
+            subjects[r["subject_id"]]["social"] = _clean_social(soc)
             subjects[r["subject_id"]]["bio"] = r["bio_snippet"] or ""
     for r in db.execute("SELECT subject_id,geo_lat,geo_lng,venue_type,resident_dj_count FROM venue_profile"):
         if r["subject_id"] in subjects:
