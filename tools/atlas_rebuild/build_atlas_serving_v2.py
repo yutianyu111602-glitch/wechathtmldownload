@@ -84,6 +84,48 @@ def _distinct(cur, sql):
     return {k: n for k, n in cur.execute(sql) if k}
 
 
+def _deduped_event_counts(c, EV, EP):
+    """Event dedup: the same event is often promoted by multiple articles -> multiple
+    resolved_event rows (~7.4k redundant in 14w), inflating event_count. Collapse by
+    (date|venue|norm-title) — the same key the mp frontend uses (eventDedupeKey) — and
+    count DISTINCT canonical events per dj/venue/org/series with activity span."""
+    evs = {}
+    for r in c.execute(f"SELECT event_id, title, date_start, venue_id, organizer_id, series_id FROM {EV}"):
+        ds = r["date_start"] or ""
+        v = r["venue_id"] or ""
+        tt = _norm(r["title"] or "")
+        canon = (ds[:10] + "|" + v + "|" + tt) if (ds and v and tt) else ("e:" + str(r["event_id"]))
+        evs[r["event_id"]] = (canon, ds, v, r["organizer_id"] or "", r["series_id"] or "")
+    groups = {"dj": {}, "venue": {}, "org": {}, "series": {}}
+
+    def add(kind, key, canon, ds):
+        if not key:
+            return
+        g = groups[kind].get(key)
+        if g is None:
+            groups[kind][key] = [set([canon]), ds or None, ds or None]
+        else:
+            g[0].add(canon)
+            if ds:
+                if not g[1] or ds < g[1]:
+                    g[1] = ds
+                if not g[2] or ds > g[2]:
+                    g[2] = ds
+
+    for canon, ds, v, o, sr in evs.values():
+        add("venue", v, canon, ds)
+        add("org", o, canon, ds)
+        add("series", sr, canon, ds)
+    for r in c.execute(f"SELECT dj_id, event_id FROM {EP}"):
+        ev = evs.get(r["event_id"])
+        if ev:
+            add("dj", r["dj_id"], ev[0], ev[1])
+
+    def fin(g):
+        return {k: (len(v[0]), v[1], v[2]) for k, v in g.items()}
+    return fin(groups["dj"]), fin(groups["venue"]), fin(groups["org"]), fin(groups["series"])
+
+
 def _build_relations(out, serving_path):
     """Unify Stage4 DJ rollups + series FKs into one typed `relation` table. Returns degree dict.
     IDs are already aligned (rollup ids == v2 subject_ids), so endpoints link directly."""
@@ -150,14 +192,9 @@ def build(stage3_path, out_path, serving_path=None):
 
     EV = "resolved_event"
     EP = "event_participant"
-    dj_ev = _count_span(c, f"SELECT ep.dj_id, COUNT(DISTINCT ep.event_id), MIN(re.date_start), MAX(re.date_start) "
-                           f"FROM {EP} ep JOIN {EV} re ON re.event_id=ep.event_id GROUP BY ep.dj_id")
-    ven_ev = _count_span(c, f"SELECT venue_id, COUNT(*), MIN(date_start), MAX(date_start) FROM {EV} "
-                            f"WHERE venue_id IS NOT NULL AND venue_id!='' GROUP BY venue_id")
-    org_ev = _count_span(c, f"SELECT organizer_id, COUNT(*), MIN(date_start), MAX(date_start) FROM {EV} "
-                            f"WHERE organizer_id IS NOT NULL AND organizer_id!='' GROUP BY organizer_id")
-    ser_ev = _count_span(c, f"SELECT series_id, COUNT(*), MIN(date_start), MAX(date_start) FROM {EV} "
-                            f"WHERE series_id IS NOT NULL AND series_id!='' GROUP BY series_id")
+    # Event dedup at source: collapse the same event promoted multiple times so event_count
+    # is not inflated (the mp frontend currently dedups defensively — this fixes it upstream).
+    dj_ev, ven_ev, org_ev, ser_ev = _deduped_event_counts(c, EV, EP)
     ven_dj = _distinct(c, f"SELECT re.venue_id, COUNT(DISTINCT ep.dj_id) FROM {EV} re JOIN {EP} ep "
                           f"ON ep.event_id=re.event_id WHERE re.venue_id IS NOT NULL AND re.venue_id!='' GROUP BY re.venue_id")
     org_dj = _distinct(c, f"SELECT re.organizer_id, COUNT(DISTINCT ep.dj_id) FROM {EV} re JOIN {EP} ep "
