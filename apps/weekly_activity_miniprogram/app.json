@@ -11,7 +11,8 @@
     "pages/column/column",
     "pages/map/map",
     "pages/sound/sound",
-    "pages/interview/interview"
+    "pages/interview/interview",
+    "pages/atlas-starmap/atlas-starmap"
   ],
   "window": {
     "navigationBarTitleText": "活动查询",

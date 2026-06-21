@@ -1,20 +1,115 @@
-<view class="page saved-page">
-  <view class="saved-head">
-    <image lazy-load class="brand-logo" src="/assets/brand/huaidj-logo-nav-512x128.png" mode="aspectFit" ></image>
-    <view class="section-title">{{t.title}}</view>
+<view class="page atlas-page">
+  <view class="starfield">
+    <view class="star-dot s1"></view>
+    <view class="star-dot s2"></view>
+    <view class="star-dot s3"></view>
+    <view class="star-dot s4"></view>
+    <view class="star-dot s5"></view>
+    <view class="star-dot s6"></view>
+    <view class="star-dot s7"></view>
+    <view class="star-dot s8"></view>
   </view>
-  <view wx:if="{{loading}}" class="state">{{t.loading}}</view>
-  <view wx:elif="{{error}}" class="state error">{{error}}</view>
-  <view wx:elif="{{ids.length === 0}}" class="muted empty">{{t.empty}}</view>
-  <view wx:elif="{{items.length === 0}}" class="muted empty">{{t.outOfWindow}}</view>
-  <view wx:else class="saved-list">
-    <view wx:for="{{items}}" wx:key="id" class="saved-card" data-id="{{item.id}}" bindtap="openDetail">
-      <view class="saved-date">{{item.dateCompact}}</view>
-      <view class="saved-main">
-        <view class="saved-title">{{item.displayTitle}}</view>
-        <view class="saved-meta">{{item.cardLocationLabel}}</view>
-      </view>
-      <text class="chevron">›</text>
+
+  <view class="atlas-head">
+    <view class="atlas-title-row">
+      <view class="atlas-title">{{t.title}}</view>
+      <view wx:if="{{visitedCount}}" class="atlas-collected">{{t.collected}} {{visitedCount}} {{t.starUnit}}</view>
     </view>
+    <view class="atlas-sub">{{t.subtitle}}</view>
+    <view class="atlas-intro">{{t.intro}}</view>
+    <view class="atlas-starmap-entry" bindtap="openStarmap" hover-class="chip-hover"
+      style="margin-top:18rpx;display:inline-block;padding:12rpx 26rpx;border-radius:28rpx;background:rgba(167,255,38,0.12);border:1rpx solid rgba(167,255,38,0.30);color:#A7FF26;font-size:24rpx;">🌌 全景星图 · 实体关系图鉴 ›</view>
   </view>
+
+  <scroll-view wx:if="{{seedList.length}}" class="seed-bar" scroll-x="true">
+    <view class="seed-track">
+      <view
+        wx:for="{{seedList}}"
+        wx:key="name"
+        class="seed-chip {{center && center.label === item.name ? 'seed-chip-on' : ''}} {{item.visited ? 'seed-chip-lit' : ''}}"
+        data-name="{{item.name}}"
+        bindtap="selectSeed"
+        hover-class="chip-hover"
+      >{{item.name}}</view>
+    </view>
+  </scroll-view>
+  <view wx:if="{{seedList.length}}" class="seed-hint">{{t.seedHint}}</view>
+
+  <scroll-view wx:if="{{trail.length > 1}}" class="trail-bar" scroll-x="true">
+    <view class="trail-track">
+      <block wx:for="{{trail}}" wx:key="index">
+        <view
+          class="trail-chip {{item.current ? 'trail-chip-on' : ''}}"
+          data-index="{{item.index}}"
+          bindtap="jumpTo"
+          hover-class="chip-hover"
+        >{{item.label}}</view>
+        <view wx:if="{{!item.current}}" class="trail-arrow">›</view>
+      </block>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{loading && !center}}" class="atlas-state">{{t.loading}}</view>
+  <view wx:elif="{{error && !center}}" class="atlas-state error">{{error}}</view>
+
+  <block wx:if="{{center}}">
+    <view class="graph-stage {{loading ? 'graph-loading' : ''}}">
+      <view class="center-halo"></view>
+
+      <view
+        wx:for="{{nodes}}"
+        wx:key="id"
+        class="graph-link"
+        style="width:{{item.lineLength}}%;transform:rotate({{item.lineAngle}}deg);opacity:{{item.lineOpacity}};"
+      ></view>
+
+      <view class="graph-center center-{{center.kind}}">
+        <view class="center-label">{{center.label}}</view>
+        <view wx:if="{{center.city}}" class="center-city">{{center.city}}</view>
+      </view>
+
+      <view
+        wx:for="{{nodes}}"
+        wx:key="id"
+        class="graph-node node-{{item.kind}} tier-{{item.tier}} {{item.visited ? 'node-lit' : ''}}"
+        style="left:{{item.x}}%;top:{{item.y}}%;"
+        data-name="{{item.label}}"
+        data-id="{{item.id}}"
+        bindtap="exploreNode"
+        hover-class="node-hover"
+      >
+        <view class="node-dot" style="width:{{item.dotSize}}rpx;height:{{item.dotSize}}rpx;"></view>
+        <view class="node-label">{{item.label}}</view>
+        <view wx:if="{{item.meta}}" class="node-meta">{{item.meta}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{!nodes.length && !loading}}" class="dead-end-hint">{{t.deadEnd}}</view>
+
+    <view class="center-panel">
+      <view class="center-stats">{{center.statsLine}}</view>
+      <view class="center-actions">
+        <view
+          wx:if="{{nodes.length}}"
+          class="ctl-btn ctl-random"
+          bindtap="exploreRandom"
+          hover-class="chip-hover"
+        >{{t.randomHop}}</view>
+        <view
+          wx:if="{{center.detailId}}"
+          class="ctl-btn ctl-link"
+          data-id="{{center.detailId}}"
+          bindtap="openDetail"
+        >{{t.detailLink}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{events.length}}" class="events-panel">
+      <view class="panel-title">{{t.historyTitle}}</view>
+      <view wx:for="{{events}}" wx:key="title" class="event-row">
+        <view class="event-title">{{item.title}}</view>
+        <view wx:if="{{item.subtitle}}" class="event-sub">{{item.subtitle}}</view>
+      </view>
+    </view>
+  </block>
 </view>

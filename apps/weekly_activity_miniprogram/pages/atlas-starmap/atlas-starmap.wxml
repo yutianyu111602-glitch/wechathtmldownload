@@ -1,0 +1,35 @@
+<view class="sm-root">
+  <canvas type="2d" id="sm" class="sm-canvas"
+    bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd"></canvas>
+
+  <view class="sm-top">
+    <view class="sm-lenses">
+      <view class="sm-lens {{lens==='entity'?'on':''}}" data-lens="entity" bindtap="onLens">实体关系</view>
+      <view class="sm-lens {{lens==='future'?'on':''}}" data-lens="future" bindtap="onLens">未来活动</view>
+      <view class="sm-lens {{lens==='dj_traj'?'on':''}}" data-lens="dj_traj" bindtap="onLens">DJ轨迹</view>
+    </view>
+    <input class="sm-search" placeholder="搜索 DJ / 场地 / 厂牌" placeholder-class="sm-ph"
+      value="{{query}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" confirm-type="search" />
+  </view>
+
+  <view class="sm-hud">{{nodeCount}} 节点 · 图鉴概览</view>
+
+  <view wx:if="{{loading}}" class="sm-loading">星图载入中…</view>
+
+  <view wx:if="{{serverLens}}" class="sm-notice">
+    「{{lens==='future'?'未来活动':'DJ轨迹'}}」需服务端数据，即将上线。当前可用：实体关系概览（点节点下钻 / 搜索聚焦）。
+  </view>
+
+  <view wx:if="{{selected}}" class="sm-card">
+    <view class="sm-card-top">
+      <text class="sm-card-name">{{selected.name}}</text>
+      <text class="sm-card-x" bindtap="clearSel">×</text>
+    </view>
+    <view class="sm-card-meta">
+      <text class="sm-tag">{{selected.type}}</text>
+      <text class="sm-tag">{{selected.city}}</text>
+      <text class="sm-tag">关系 {{selected.degree}}</text>
+    </view>
+    <view class="sm-card-act" bindtap="openArtist">查看 DJ 详情 ›</view>
+  </view>
+</view>
