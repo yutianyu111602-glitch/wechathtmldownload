@@ -2,6 +2,12 @@ import { useMemo } from "react";
 import { Billboard, Text } from "@react-three/drei";
 import type { GraphNode } from "../lib/types";
 
+/* Bundled CJK font so Chinese DJ/venue names render (drei <Text>/troika defaults to a
+ * latin-only font → Chinese would be tofu). Subset of common CJK; resolves under the
+ * app's Vite base. ponytail: SIMHEI subset for now — swap public/fonts/atlas-cjk.woff2
+ * for Noto Sans SC (OFL) before public production to clear font licensing. */
+const CJK_FONT = `${import.meta.env.BASE_URL}fonts/atlas-cjk.woff`;
+
 interface NodeLabelsProps {
   nodes: GraphNode[];
   highlightedIds: Set<number> | null;
@@ -37,6 +43,7 @@ export function NodeLabels({
           follow
         >
           <Text
+            font={CJK_FONT}
             fontSize={Math.max(16, node.size * 1.2)}
             color="#e8f0f8"
             anchorX="center"
