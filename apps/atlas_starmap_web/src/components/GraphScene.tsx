@@ -107,7 +107,7 @@ export function GraphScene({
 
   return (
     <Canvas
-      camera={{ position: [0, 0, 800], fov: 50, near: 0.1, far: 100000 }}
+      camera={{ position: [0, 0, 1050], fov: 50, near: 0.1, far: 100000 }}
       style={{ background: "#06090f" }}
       dpr={[1, 2]}
       gl={{ antialias: true, alpha: false }}
@@ -180,11 +180,11 @@ export function GraphScene({
 
       <EffectComposer>
         <Bloom
-          luminanceThreshold={0.18}
-          luminanceSmoothing={0.75}
-          intensity={1.9}
+          luminanceThreshold={0.28}
+          luminanceSmoothing={0.7}
+          intensity={1.05}
           mipmapBlur
-          radius={0.85}
+          radius={0.65}
         />
       </EffectComposer>
 

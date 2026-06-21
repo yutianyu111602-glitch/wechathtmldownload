@@ -35,7 +35,7 @@ export function NodeCloud({
         /* Boost above 1.0 so bloom picks up the excess as glow corona.
          * Hotter stars (white/blue) get a stronger boost = brighter halo. */
         const brightness = (tempColor.r + tempColor.g + tempColor.b) / 3;
-        const boost = 1.2 + brightness * 0.8; /* 1.2x for red, 2.0x for white */
+        const boost = 1.1 + brightness * 0.7; /* clusters are spread now, so brighter is safe */
         tempColor.multiplyScalar(boost);
       }
       arr[i * 3] = tempColor.r * opacity;
@@ -45,19 +45,17 @@ export function NodeCloud({
     return arr;
   }, [nodes, highlightedIds, tempColor, opacity]);
 
-  useFrame((state) => {
+  useFrame(() => {
     const mesh = meshRef.current;
     if (!mesh) return;
-    const t = state.clock.elapsedTime;
     const hasHighlight = highlightedIds && highlightedIds.size > 0;
 
     for (let i = 0; i < nodes.length; i++) {
       const n = nodes[i];
       tempObj.position.set(n.x, n.y, n.z);
       const isHighlighted = !hasHighlight || highlightedIds.has(n.id);
-      /* per-star twinkle + larger glowing bodies so bloom reads as a star, not a dot */
-      const twinkle = 1 + 0.12 * Math.sin(t * 1.8 + i * 1.7);
-      const s = n.size * (isHighlighted ? 1.15 : 0.4) * twinkle;
+      /* steady glowing bodies, sized by significance — no twinkle (reference atlas, not a game) */
+      const s = n.size * (isHighlighted ? 0.95 : 0.32);
       tempObj.scale.set(s, s, s);
       tempObj.updateMatrix();
       mesh.setMatrixAt(i, tempObj.matrix);

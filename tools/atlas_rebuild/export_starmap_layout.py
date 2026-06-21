@@ -258,12 +258,12 @@ def layout(comm, n_comm, sizes, seed=7):
     """Constellation layout: communities spread on a big sphere, members clustered
     around their community center, jittered. Cheap, deterministic, star-map-like."""
     rng = np.random.default_rng(seed)
-    centers = fibonacci_sphere(n_comm, radius=120.0)
+    centers = fibonacci_sphere(n_comm, radius=340.0)
     pos = np.zeros((len(comm), 3), dtype=float)
     for c in range(n_comm):
         members = np.where(comm == c)[0]
         m = len(members)
-        spread = 8.0 + 5.0 * math.sqrt(m)
+        spread = 6.0 + 3.2 * math.sqrt(m)
         local = rng.normal(0, spread, size=(m, 3))
         # bigger nodes drift toward the cluster core
         pull = (sizes[members] / sizes.max()).reshape(-1, 1)

@@ -11,7 +11,7 @@ interface NodeLabelsProps {
 export function NodeLabels({
   nodes,
   highlightedIds,
-  maxLabels = 80,
+  maxLabels = 55,
 }: NodeLabelsProps) {
   const labeled = useMemo(() => {
     const hasHighlight = highlightedIds && highlightedIds.size > 0;
@@ -33,17 +33,17 @@ export function NodeLabels({
       {labeled.map((node) => (
         <Billboard
           key={node.id}
-          position={[node.x, node.y + node.size * 0.7, node.z]}
+          position={[node.x, node.y + node.size * 0.9 + 4, node.z]}
           follow
         >
           <Text
-            fontSize={Math.max(1.8, node.size * 0.4)}
-            color={node.color}
+            fontSize={Math.max(16, node.size * 1.2)}
+            color="#e8f0f8"
             anchorX="center"
             anchorY="bottom"
-            outlineWidth={0.2}
-            outlineColor="#000000"
-            fillOpacity={0.95}
+            outlineWidth={0.6}
+            outlineColor="#05070d"
+            fillOpacity={0.96}
           >
             {node.name}
           </Text>
