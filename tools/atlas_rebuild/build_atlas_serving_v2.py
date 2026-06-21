@@ -336,9 +336,9 @@ def _selftest():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--stage3", default="_fleet_14w_g5_80k_increment_20260620/merged/entities_resolved.sqlite")
-    ap.add_argument("--out", default="_fleet_14w_g5_80k_increment_20260620/merged/atlas_serving_v2.sqlite")
-    ap.add_argument("--serving", default="_fleet_14w_g5_80k_increment_20260620/merged/atlas_serving_candidate.sqlite",
+    ap.add_argument("--stage3", default="_fleet_14w_g1_g7_full_union_fast2_retry_20260621/merged/entities_resolved.sqlite")
+    ap.add_argument("--out", default="_fleet_14w_g1_g7_full_union_fast2_retry_20260621/merged/atlas_serving_v2.sqlite")
+    ap.add_argument("--serving", default="_fleet_14w_g1_g7_full_union_fast2_retry_20260621/merged/atlas_serving_candidate.sqlite",
                     help="Stage4 candidate for relation unification; pass '' to skip (subjects only)")
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args()
