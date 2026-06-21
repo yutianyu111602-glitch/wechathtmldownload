@@ -7,6 +7,7 @@ const { openSourceByHash } = require("../../utils/sourceAction");
 const { withListLocationLabels } = require("../../utils/listDisplay");
 const { filterItemsByPreviewRange, itemDateBounds, itemMatchesDateKey, normalizeRange } = require("../../utils/datePreview");
 const { filterItemsByActiveFilters, filterItemsByCityKey, filterItemsByDateKey, dateKeysForFilter, itemMatchesCityKey, normalizeIsoDate, keyFromDate } = require("../../services/homeFilters");
+const { filterItemsByElectronic } = require("../../utils/genreFilter");
 const { buildIndexShare, buildIndexTimeline, enableShareMenu } = require("../../utils/share");
 const { posterFallbackState, posterImageErrorFallback, resolvePosterUrlsForItems } = require("../../utils/cloudPosterUrls");
 
@@ -36,6 +37,7 @@ const BUSY_TOAST_COOLDOWN_MS = 2200;
 const MIN_BACKGROUND_REFRESH_INTERVAL_MS = 120000;
 const FILTER_META_TIMEOUT_MS = 5000;
 const POSTER_WARM_LIMIT = 6;
+const POSTER_RESOLVE_TIMEOUT_MS = 300;
 
 function toIndexListItem(item) {
   if (!item || typeof item !== "object") return item;
@@ -75,6 +77,7 @@ function toIndexListItem(item) {
     hasAddress: Boolean(item.hasAddress),
     hasDescription: Boolean(item.hasDescription),
     hasPrice: Boolean(item.hasPrice),
+    priceLabel: item.priceLabel || "",
   };
 }
 
@@ -252,7 +255,14 @@ function viewItemsForTab(items, tab) {
       .map((entry) => entry.item);
     return scored.length ? scored : items;
   }
-  return items;
+  // Default tab: stable sort by event date so day groups render in order
+  // even when the package/cache order is not date-sorted.
+  return [...items].sort((a, b) => {
+    if (a.isSourceOverview || b.isSourceOverview) return 0;
+    const aKey = String(a.dateLabel || "9999-12-31");
+    const bKey = String(b.dateLabel || "9999-12-31");
+    return aKey < bKey ? -1 : aKey > bKey ? 1 : 0;
+  });
 }
 
 function viewStateForItems(items, tab, posterSourceItems, selectedCity, lang, previewRange, selectedDate = "") {
@@ -306,6 +316,27 @@ function applyPosterErrorMask(viewData, failedPosterIds) {
       };
     }),
   };
+}
+
+function mergeResolvedPopularItems(currentItems, resolvedItems) {
+  const resolvedById = new Map();
+  (Array.isArray(resolvedItems) ? resolvedItems : []).forEach((item) => {
+    const id = String(item?.id || "");
+    if (id) resolvedById.set(id, item);
+  });
+  let changed = false;
+  const merged = (Array.isArray(currentItems) ? currentItems : []).map((item) => {
+    const id = String(item?.id || "");
+    const resolved = id ? resolvedById.get(id) : null;
+    if (!resolved || !resolved.coverUrl || resolved.coverUrl === item.coverUrl) return item;
+    changed = true;
+    return {
+      ...item,
+      ...resolved,
+      posterLoadFailed: false,
+    };
+  });
+  return { changed, items: merged };
 }
 
 Page({
@@ -584,7 +615,10 @@ Page({
       const filterMetadataSlow = citiesResult.status !== "fulfilled" || datesResult.status !== "fulfilled";
       const usedCache = Boolean(current.fromCache);
       const usedSnapshot = Boolean(current.fromSnapshot);
-      const items = localizeItems(dedupeItems((current.items || []).map(compactItem)), lang);
+      // Drop confidently non-electronic items (comedy / jazz / cocktail festivals) at the
+      // source so they never reach the feed, posters, or city/date facets. genreFilter keeps
+      // "electronic" and "unknown"; only "non_electronic" is removed.
+      const items = filterItemsByElectronic(localizeItems(dedupeItems((current.items || []).map(compactItem)), lang));
       this.posterSourceItems = items;
       const filterSourceItems = this.posterSourceItems.length ? this.posterSourceItems : items;
       const cacheNotice = usedCache
@@ -619,7 +653,7 @@ Page({
       var resolvedViewData = nextViewData;
       try {
         var posterTimeout = new Promise(function (_, reject) {
-          setTimeout(function () { reject(new Error("POSTER_RESOLVE_TIMEOUT")); }, 3000);
+          setTimeout(function () { reject(new Error("POSTER_RESOLVE_TIMEOUT")); }, POSTER_RESOLVE_TIMEOUT_MS);
         });
         resolvedViewData = await Promise.race([resolveIndexViewPosters(nextViewData), posterTimeout]);
       } catch (e) {
@@ -653,6 +687,7 @@ Page({
         posterImageErrorUrls: [],
         posterImageFailedIds: [],
       });
+      this.retryResolvePosters(nextViewData, loadSeq);
       warmPosterImages(resolvedViewData.popularItems);
       if (usedCache || usedSnapshot) {
         this.scheduleBackgroundRefresh();
@@ -724,6 +759,30 @@ Page({
     }, delay);
   },
 
+  retryResolvePosters(viewData, loadSeq) {
+    if (!viewData || !Array.isArray(viewData.popularItems) || !viewData.popularItems.length) return;
+    resolveIndexViewPosters(viewData)
+      .then((resolvedViewData) => {
+        if (loadSeq && loadSeq !== this.loadSeq) return;
+        const merged = mergeResolvedPopularItems(this.data.popularItems, resolvedViewData.popularItems);
+        if (!merged.changed) return;
+        const resolvedIds = new Set(
+          merged.items
+            .filter((item) => item && item.coverUrl && !item.posterLoadFailed)
+            .map((item) => String(item.id || ""))
+            .filter(Boolean)
+        );
+        const posterImageFailedIds = (this.data.posterImageFailedIds || [])
+          .filter((id) => !resolvedIds.has(String(id || "")));
+        this.setData({
+          popularItems: merged.items,
+          posterImageFailedIds,
+        });
+        warmPosterImages(merged.items);
+      })
+      .catch(() => {});
+  },
+
   clearBackgroundRefreshTimer() {
     if (this.backgroundRefreshTimer) {
       clearTimeout(this.backgroundRefreshTimer);
@@ -756,6 +815,7 @@ Page({
     resolveIndexViewPosters(nextViewData)
       .then((resolvedViewData) => this.setData(resolvedViewData))
       .catch(() => this.setData(nextViewData));
+    this.retryResolvePosters(nextViewData, this.loadSeq);
   },
 
   setLoadingProgress(progress, step, loadSeq, hint) {
@@ -827,6 +887,7 @@ Page({
         if (this.data.activeTab === activeTab) this.setData(resolvedViewData);
       })
       .catch(() => {});
+    this.retryResolvePosters(nextViewData, this.loadSeq);
   },
 
   onTabItemTap() {
@@ -862,9 +923,11 @@ Page({
     this.setData({
       draftCity: key,
       selectedCity: key,
+      draftDate: "",
+      selectedDate: "",
       showLocationModal: false,
     });
-    this.loadData({ haptic: true, cityKey: key });
+    this.loadData({ haptic: true, cityKey: key, date: "" });
   },
 
   resetDate() {
@@ -918,9 +981,11 @@ Page({
     const key = this.data.draftCity || "";
     this.setData({
       selectedCity: key,
+      draftDate: "",
+      selectedDate: "",
       showLocationModal: false,
     });
-    this.loadData({ haptic: true, cityKey: key });
+    this.loadData({ haptic: true, cityKey: key, date: "" });
   },
 
   openDetail(event) {
