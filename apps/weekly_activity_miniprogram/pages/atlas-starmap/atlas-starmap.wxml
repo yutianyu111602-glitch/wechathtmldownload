@@ -10,14 +10,25 @@
     </view>
     <input class="sm-search" placeholder="搜索 DJ / 场地 / 厂牌" placeholder-class="sm-ph"
       value="{{query}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" confirm-type="search" />
+    <view class="sm-legend">
+      <view wx:for="{{legend}}" wx:key="k" class="sm-leg {{item.on?'':'sm-leg-off'}}"
+        data-k="{{item.k}}" bindtap="onToggleType">
+        <view class="sm-leg-dot" style="background:{{item.col}};"></view>{{item.label}}
+      </view>
+    </view>
   </view>
 
   <view class="sm-hud">{{nodeCount}} 节点 · 图鉴概览</view>
 
+  <view class="sm-ctrls">
+    <view class="sm-ctrl" bindtap="randomHop">🎲 随机漫游</view>
+    <view class="sm-ctrl" bindtap="fitAll">⤢ 复位</view>
+  </view>
+
   <view wx:if="{{loading}}" class="sm-loading">星图载入中…</view>
 
   <view wx:if="{{serverLens}}" class="sm-notice">
-    「{{lens==='future'?'未来活动':'DJ轨迹'}}」需服务端数据，即将上线。当前可用：实体关系概览（点节点下钻 / 搜索聚焦）。
+    「{{lens==='future'?'未来活动':'DJ轨迹'}}」需服务端数据，即将上线。当前可用：实体关系概览（点节点下钻 / 搜索聚焦 / 图例筛选）。
   </view>
 
   <view wx:if="{{selected}}" class="sm-card">
@@ -30,6 +41,7 @@
       <text class="sm-tag">{{selected.city}}</text>
       <text class="sm-tag">关系 {{selected.degree}}</text>
     </view>
-    <view class="sm-card-act" bindtap="openArtist">查看 DJ 详情 ›</view>
+    <view wx:if="{{selected.breakdown}}" class="sm-card-brk">邻接：{{selected.breakdown}}</view>
+    <view wx:if="{{selected.isDj}}" class="sm-card-act" bindtap="openArtist">查看 DJ 详情 ›</view>
   </view>
 </view>
