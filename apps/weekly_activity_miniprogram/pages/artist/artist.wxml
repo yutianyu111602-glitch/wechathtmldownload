@@ -2,7 +2,11 @@
   <view class="sub-nav">
     <button bindtap="goBack">{{t.back}}</button>
   </view>
-  <view wx:if="{{loading}}" class="state">{{t.loading}}</view>
+  <view wx:if="{{loading}}" class="loading-state">
+    <view class="loading-spinner"></view>
+    <view class="loading-text">{{t.loading}}</view>
+    <view class="loading-hint">正在搜索演出记录，请稍候...</view>
+  </view>
   <view wx:elif="{{error}}" class="state error">{{error}}</view>
   <view wx:else>
     <!-- Header -->
@@ -39,7 +43,31 @@
       <view wx:if="{{atlasProfile.bioSource}}" class="bio-source">via {{atlasProfile.bioSource}}</view>
     </view>
 
-    <!-- Atlas History (deduped against weekly events) -->
+    <!-- External media / sources (外媒 · 资料来源) -->
+    <view class="section" wx:if="{{djDiscovery.length}}">
+      <view class="sub-heading">{{t.externalMedia}}</view>
+      <block wx:for="{{djDiscovery}}" wx:key="nameKey" wx:for-item="sec">
+        <view
+          wx:for="{{sec.links}}"
+          wx:key="url"
+          wx:for-item="lnk"
+          class="event-row"
+          data-url="{{lnk.url}}"
+          bindtap="openExternalLink"
+        >
+          <view>
+            <view class="event-title">{{lnk.displayLabel}}</view>
+            <view class="event-meta">{{lnk.platform}}</view>
+          </view>
+          <text class="chevron">›</text>
+        </view>
+        <view wx:if="{{sec.bioAtoms.length}}" class="ext-sources">
+          <view wx:for="{{sec.bioAtoms}}" wx:key="text" wx:for-item="atom" class="body-line">{{atom.text}}</view>
+        </view>
+      </block>
+    </view>
+
+    <!-- Atlas History -->
     <view class="section" wx:if="{{atlasEvents.length}}">
       <view class="sub-heading">演出历史</view>
       <view

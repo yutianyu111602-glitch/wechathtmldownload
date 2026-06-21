@@ -80,6 +80,9 @@ function pageHarness(filename, requestApi, options = {}) {
       }
       if (request.endsWith("/sourceArticles")) return require(path.join(root, "utils", "sourceArticles.js"));
       if (request.endsWith("/atlasContract")) return require(path.join(root, "utils", "atlasContract.js"));
+      if (request.endsWith("/publicExternalLinks")) return require(path.join(root, "utils", "publicExternalLinks.js"));
+      if (request.endsWith("/externalLinkAction")) return require(path.join(root, "utils", "externalLinkAction.js"));
+      if (request.endsWith("/djLinks")) return require(path.join(root, "utils", "djLinks.js"));
       if (request.endsWith("/share")) {
         return {
           buildNamedPageShare: () => ({}),

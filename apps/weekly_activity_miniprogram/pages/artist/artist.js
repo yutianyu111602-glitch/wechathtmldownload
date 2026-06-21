@@ -3,6 +3,9 @@ const { compactItem } = require("../../utils/format");
 const { applyLanguageChrome, localizeItems, normalizeLang, text } = require("../../utils/i18n");
 const { mergeVenues, mergeCollaborators } = require("../../utils/atlasContract");
 const { openSourceByHash } = require("../../utils/sourceAction");
+const { normalizeDjDiscoverySectionsForDisplay } = require("../../utils/publicExternalLinks");
+const { copyOriginalExternalLink } = require("../../utils/externalLinkAction");
+const { socialToLinkItems } = require("../../utils/djLinks");
 const { buildNamedPageShare, buildNamedPageTimeline, enableShareMenu } = require("../../utils/share");
 
 function safeVibrate(type = "light") {
@@ -75,7 +78,7 @@ function dedupeEvents(items) {
 Page({
   data: {
     lang: "zh", t: text("sub", "zh"), name: "", loading: true, error: "",
-    events: [], bioLines: [],
+    events: [], bioLines: [], djDiscovery: [],
     atlasProfile: null, atlasEvents: [], atlasCollaborators: [], atlasVenues: [],
   },
 
@@ -128,11 +131,22 @@ Page({
           if (mergedCollaborators.length) profile.collaboratorCount = mergedCollaborators.length;
         }
 
+        // Rich card: external media (RA/SoundCloud/Mixcloud/Instagram/…) + verbatim
+        // bio atoms (资料来源), reusing the column feature's discovery renderer. Renders
+        // only when the API supplies profile.social / profile.bioAtoms (handoff B3).
+        const displayName = (profile && profile.displayName) || this.name;
+        const djDiscovery = normalizeDjDiscoverySectionsForDisplay([{
+          name: displayName,
+          links: socialToLinkItems((profile && profile.social) || profileResult.social || {}, { entityName: displayName }),
+          bioAtoms: (profile && profile.bioAtoms) || profileResult.bioAtoms || [],
+        }], this.lang);
+
         this.setData({
           atlasProfile: profile,
           atlasEvents: atlasEvts || [],
           atlasCollaborators: mergedCollaborators,
           atlasVenues: mergedVenues,
+          djDiscovery,
         });
       }
 
@@ -222,5 +236,12 @@ Page({
     safeVibrate("light");
     const hash = e.currentTarget.dataset.sourceHash || "";
     if (hash) openSourceByHash(hash, this.lang || "zh");
+  },
+
+  openExternalLink(e) {
+    safeVibrate("light");
+    const url = e.currentTarget.dataset.url || "";
+    // Mini-program can't open arbitrary external links -> copy to clipboard.
+    if (url) copyOriginalExternalLink(url, this.lang || "zh");
   },
 });
