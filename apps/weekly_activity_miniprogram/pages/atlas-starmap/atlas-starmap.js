@@ -50,7 +50,7 @@ Page({
 
   onReady: function () {
     var that = this;
-    wx.createSelectorQuery().in(this).select("#sm")
+    wx.createSelectorQuery().select("#sm")
       .fields({ node: true, size: true }).exec(function (res) {
         if (!res || !res[0] || !res[0].node) return;
         var canvas = res[0].node, w = res[0].width, h = res[0].height;
