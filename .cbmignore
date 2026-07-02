@@ -1,0 +1,24 @@
+# codebase-memory-mcp: skip generated/data-heavy roots.
+# Keep source code indexed; exclude artifacts that explode Variable nodes.
+
+artifacts/
+reports/
+runs/
+vendor/
+.understand-anything/
+.codegraph/
+.omc/
+tmp-cli-llm-artifacts/
+
+lora_checkpoints/
+lora_checkpoints_v2_ocr/
+lora_training_data/
+lora_training_data_v2/
+unsloth_compiled_cache/
+
+genericagent-chinese/
+genericagent-chinese-clean/
+genericagent-chinese-upstream-*/
+genericagent-upstream-current-*/
+
+services/weekly_activity_cloudrun/data/
