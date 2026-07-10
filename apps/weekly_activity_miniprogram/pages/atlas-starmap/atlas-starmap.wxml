@@ -120,6 +120,7 @@
         可见邻接 {{selected.degree}}
       </view>
     </view>
+    <view wx:if="{{selected.hasTimeRange}}" class="sm-time-range">活跃跨度 {{selected.timeRange}}</view>
 
     <view wx:if="{{sheetState==='peek'}}" class="sm-peek-line">
       <text wx:if="{{selected.expandHint}}">{{selected.expandHint}}</text>

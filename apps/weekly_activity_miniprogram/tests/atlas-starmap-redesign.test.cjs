@@ -168,3 +168,79 @@ test("page shell is a full-screen command surface with a 45vh exploration sheet"
   assert.doesNotMatch(wxml, /data-lens="dj_traj"/);
   assert.match(wxss, /\.sm-sheet-explore\s*\{[^}]*max-height:\s*45vh/s);
 });
+
+test("view lenses normalize to structure, city, or time", () => {
+  const page = loadPage();
+  assert.equal(page._normalizeViewLens("structure"), "structure");
+  assert.equal(page._normalizeViewLens("city"), "city");
+  assert.equal(page._normalizeViewLens("time"), "time");
+  assert.equal(page._normalizeViewLens("entity"), "structure");
+  assert.equal(page._normalizeViewLens("future"), "structure");
+
+  page.setViewLens({ currentTarget: { dataset: { lens: "city" } } });
+  assert.equal(page.data.viewLens, "city");
+  page.setViewLens({ currentTarget: { dataset: { lens: "invalid" } } });
+  assert.equal(page.data.viewLens, "structure");
+});
+
+test("city lens never treats missing or placeholder cities as evidence", () => {
+  const page = loadPage();
+  page.data.viewLens = "city";
+  assert.equal(page._cityHaloVisible({ c: "上海" }), true);
+  assert.equal(page._cityHaloVisible({ c: "" }), false);
+  assert.equal(page._cityHaloVisible({ c: "未知" }), false);
+  assert.equal(page._cityHaloVisible({ c: "unknown" }), false);
+  page.data.viewLens = "structure";
+  assert.equal(page._cityHaloVisible({ c: "上海" }), false);
+});
+
+test("time lens returns bounded opacity and evidence-backed year ranges", () => {
+  const page = loadPage();
+  assert.equal(page._timeRangeLabel({ fs: "", ls: "" }), "");
+  assert.equal(page._timeRangeLabel({ fs: "2016-01-01", ls: "2026-06-20" }), "2016—2026");
+  assert.equal(page._timeRangeLabel({ fs: "2024-02-03", ls: "2024-02-03" }), "2024");
+  page.data.viewLens = "time";
+  for (const node of [{ ls: "2026-06-20" }, { ls: "2016-01-01" }, { ls: "" }]) {
+    const alpha = page._nodeAlphaForLens(node);
+    assert.ok(Number.isFinite(alpha));
+    assert.ok(alpha >= 0.25 && alpha <= 1);
+  }
+});
+
+test("share query keeps the lens URL key while reading internal viewLens", () => {
+  const page = loadPage();
+  page.data = {
+    viewLens: "time",
+    lens: "entity",
+    query: "",
+    selected: { id: "dj:knopha", name: "Knopha" },
+  };
+  const query = page._shareQueryParts().join("&");
+  assert.match(query, /lens=time/);
+  assert.match(query, /q=Knopha/);
+  assert.match(query, /focusId=dj%3Aknopha/);
+  assert.doesNotMatch(query, /lens=entity/);
+});
+
+test("onLoad restores current and legacy shared lens values", () => {
+  const cityPage = loadPage();
+  cityPage.onLoad({ lens: "city" });
+  cityPage._stopLoadingCycle();
+  assert.equal(cityPage.data.viewLens, "city");
+
+  const legacyPage = loadPage();
+  legacyPage.onLoad({ lens: "entity" });
+  legacyPage._stopLoadingCycle();
+  assert.equal(legacyPage.data.viewLens, "structure");
+});
+
+test("lens rendering is static and omits missing city or time metadata", () => {
+  const source = fs.readFileSync(path.join(root, "pages/atlas-starmap/atlas-starmap.js"), "utf8");
+  const wxml = fs.readFileSync(path.join(root, "pages/atlas-starmap/atlas-starmap.wxml"), "utf8");
+  const selectNodeBlock = source.slice(source.indexOf("selectNode: function"), source.indexOf("clearSel: function"));
+  assert.doesNotMatch(selectNodeBlock, /_startAnim\(/);
+  assert.match(source, /this\._nodeAlphaForLens\(node\)/);
+  assert.match(wxml, /wx:if="\{\{selected\.city\}\}"/);
+  assert.match(wxml, /wx:if="\{\{selected\.hasTimeRange\}\}"/);
+  assert.doesNotMatch(wxml, /未知城市/);
+});

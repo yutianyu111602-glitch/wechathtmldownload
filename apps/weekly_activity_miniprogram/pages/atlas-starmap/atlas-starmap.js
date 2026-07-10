@@ -250,6 +250,58 @@ Page({
       : name;
   },
 
+  _normalizeViewLens: function (value) {
+    var lens = String(value || "").toLowerCase();
+    return lens === "city" || lens === "time" ? lens : "structure";
+  },
+
+  setViewLens: function (event) {
+    var value = typeof event === "string"
+      ? event
+      : (event && event.currentTarget && event.currentTarget.dataset && event.currentTarget.dataset.lens);
+    var lens = this._normalizeViewLens(value);
+    this.setData({ viewLens: lens, lens: lens, toolPanel: "", serverLens: false });
+    this.draw();
+  },
+
+  _knownCityName: function (value) {
+    var city = compactText(value);
+    var key = city.toLowerCase();
+    if (!city || key === "未知" || key === "unknown" || key === "未标注" ||
+        key === "n/a" || key === "中国" || key === "china" || key === "south china") return "";
+    return city;
+  },
+
+  _cityHaloVisible: function (node) {
+    return this.data.viewLens === "city" && !!this._knownCityName(node && node.c);
+  },
+
+  _timeYear: function (value) {
+    var match = String(value || "").match(/^(19|20)\d{2}/);
+    return match ? Number(match[0]) : 0;
+  },
+
+  _timeRangeLabel: function (node) {
+    node = node || {};
+    var first = this._timeYear(node.fs);
+    var last = this._timeYear(node.ls);
+    if (!first && !last) return "";
+    if (!first) return String(last);
+    if (!last || first === last) return String(first);
+    return first + "—" + last;
+  },
+
+  _nodeAlphaForLens: function (node) {
+    var lens = this._normalizeViewLens(this.data.viewLens);
+    if (lens === "city") return this._knownCityName(node && node.c) ? 1 : 0.28;
+    if (lens !== "time") return 1;
+    var last = this._timeYear(node && node.ls);
+    if (!last) return 0.25;
+    var currentYear = new Date().getFullYear();
+    var age = Math.max(0, currentYear - last);
+    return Math.max(0.35, Math.min(1, 1 - age * 0.055));
+  },
+
   setSheetState: function (state) {
     var next = state === "peek" || state === "explore" ? state : "hidden";
     this.setData({ sheetState: next });
@@ -274,6 +326,7 @@ Page({
   onLoad: function (query) {
     this._initialQuery = query && query.q ? decodeURIComponent(query.q) : "";
     this._initialFocusId = query && query.focusId ? decodeURIComponent(query.focusId) : "";
+    this._initialViewLens = this._normalizeViewLens(query && query.lens);
     this._nodes = ((bundle && bundle.nodes) || []).map(function (n) {
       var copy = {};
       for (var k in n) copy[k] = n[k];
@@ -310,6 +363,8 @@ Page({
     this.setData({
       nodeCount: this._visibleCount(),
       query: this._initialQuery || "",
+      lens: this._initialViewLens,
+      viewLens: this._initialViewLens,
       sheetState: "hidden",
       zoomTier: this._zoomTierForScale(this._scale),
       toolPanel: "",
@@ -786,15 +841,16 @@ Page({
     var hasSourceCount = Object.prototype.hasOwnProperty.call(n, "sc") && n.sc !== null;
     var firstSeen = compactText(n.fs);
     var lastSeen = compactText(n.ls);
+    var timeRange = this._timeRangeLabel(n);
     this.setData({
-      selected: { id: n.u || "", name: n.n, type: TYPE_LABEL[n.t] || n.t, city: n.c || "",
+      selected: { id: n.u || "", name: n.n, type: TYPE_LABEL[n.t] || n.t, city: this._knownCityName(n.c),
         degree: nb.length, breakdown: parts.join(" · "), isDj: n.t === "dj",
         eventCount: hasEventCount ? Math.max(0, Number(n.ec) || 0) : null,
         relationCount: hasRelationCount ? Math.max(0, Number(n.rc) || 0) : null,
         sourceCount: hasSourceCount ? Math.max(0, Number(n.sc) || 0) : null,
-        firstSeen: firstSeen, lastSeen: lastSeen,
+        firstSeen: firstSeen, lastSeen: lastSeen, timeRange: timeRange,
         hasEventCount: hasEventCount, hasRelationCount: hasRelationCount,
-        hasSourceCount: hasSourceCount, hasTimeRange: !!(firstSeen || lastSeen),
+        hasSourceCount: hasSourceCount, hasTimeRange: !!timeRange,
         neighborhoodStatus: this._neighborhoodStatus(n.u),
         expandHint: hint, relatedFilter: activeFilter, relatedFilters: this._relatedFilters(relatedItems, activeFilter),
         relatedPreview: this._relatedPreview(i, rows, activeFilter), inspector: inspector },
@@ -991,8 +1047,14 @@ Page({
     ctx.globalAlpha = 1;
 
     if (lens === "city") {
+      var visibleCities = {};
+      for (var cityIndex = 0; cityIndex < nodes.length; cityIndex++) {
+        if (!this._vis(nodes[cityIndex]) || !this._cityHaloVisible(nodes[cityIndex])) continue;
+        visibleCities[this._knownCityName(nodes[cityIndex].c)] = true;
+      }
       for (var h = 0; h < CITY_HALOS.length; h++) {
         var halo = CITY_HALOS[h];
+        if (!visibleCities[halo.name]) continue;
         var hx = this._sx(halo.x), hy = this._sy(halo.y);
         var hr = halo.r * this._base * this._scale;
         if (hr < 6) continue;
@@ -1016,6 +1078,7 @@ Page({
       if (!ea || !eb || !this._vis(ea) || !this._vis(eb)) continue;
       var edgeOn = !!(hl && hl[edge[0]] && hl[edge[1]]);
       var edgeVisual = this._edgeVisual(edge, edgeOn);
+      ctx.globalAlpha = Math.min(this._nodeAlphaForLens(ea), this._nodeAlphaForLens(eb));
       ctx.strokeStyle = edgeVisual.color;
       ctx.lineWidth = edgeVisual.lineWidth;
       if (ctx.setLineDash) ctx.setLineDash(edgeVisual.dash);
@@ -1025,6 +1088,7 @@ Page({
       ctx.stroke();
     }
     if (ctx.setLineDash) ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
 
     var zoomFactor = Math.max(0.72, Math.min(1.65, Math.sqrt(this._scale)));
     var labels = [];
@@ -1032,6 +1096,7 @@ Page({
       var node = nodes[nIndex]; if (!this._vis(node)) continue;
       var nodeOn = !hl || !!hl[nIndex];
       var visual = this._nodeVisual(node);
+      var lensAlpha = this._nodeAlphaForLens(node);
       var radius = visual.radius * zoomFactor;
       var sx = this._sx(node.x), sy = this._sy(node.y);
       var outer = radius + visual.haloGap;
@@ -1039,13 +1104,13 @@ Page({
       ctx.strokeStyle = visual.color;
       ctx.lineWidth = 0.8;
       for (var ring = 0; ring < visual.haloRings; ring++) {
-        ctx.globalAlpha = nodeOn ? Math.max(0.06, 0.18 - ring * 0.045) : 0.025;
+        ctx.globalAlpha = (nodeOn ? Math.max(0.06, 0.18 - ring * 0.045) : 0.025) * lensAlpha;
         ctx.beginPath();
         ctx.arc(sx, sy, outer + ring * 3.5, 0, 6.2832);
         ctx.stroke();
       }
 
-      ctx.globalAlpha = nodeOn ? 0.96 : 0.16;
+      ctx.globalAlpha = (nodeOn ? 0.96 : 0.16) * lensAlpha;
       ctx.fillStyle = visual.color;
       ctx.strokeStyle = visual.color;
       ctx.lineWidth = visual.shape === "ring" ? 1.8 : 1;
@@ -1055,7 +1120,7 @@ Page({
       if (visual.evidenceTicks && (nIndex === this._sel || tier === "detail")) {
         this._drawEvidenceTicks(
           ctx, sx, sy, outer + (visual.haloRings - 1) * 3.5 + 2,
-          visual.evidenceTicks, visual.color, nodeOn ? 0.72 : 0.16
+          visual.evidenceTicks, visual.color, (nodeOn ? 0.72 : 0.16) * lensAlpha
         );
       }
       if (nIndex === this._sel) {
@@ -1067,10 +1132,16 @@ Page({
 
       var labelAllowed = nIndex === this._sel || tier === "detail" || (tier === "neighborhood" && nodeOn) || tier === "overview";
       if (labelAllowed) {
+        var labelText = this._nodeLabel(node);
+        if (tier === "detail" && lens === "city" && this._knownCityName(node.c)) {
+          labelText += " · " + this._knownCityName(node.c);
+        } else if (tier === "detail" && lens === "time" && this._timeRangeLabel(node)) {
+          labelText += " · " + this._timeRangeLabel(node);
+        }
         labels.push({
           color: visual.color,
           index: nIndex,
-          label: this._nodeLabel(node),
+          label: labelText,
           rank: this._labelRank(node),
           x: sx,
           y: sy - radius - 10,
@@ -1224,7 +1295,6 @@ Page({
     this._syncTrail(i, options.trailMode || "replace");
     this._flyToNode(i);
     this.draw();
-    this._startAnim();
     this._loadSelectedInspector(n);
     if (n.n) this._markVisited(n.n);
   },
@@ -1309,10 +1379,7 @@ Page({
   },
 
   onLens: function (e) {
-    var lens = e.currentTarget.dataset.lens;
-    if (lens !== "city" && lens !== "time") lens = "structure";
-    this.setData({ lens: lens, viewLens: lens, serverLens: false, toolPanel: "" });
-    this.draw();
+    this.setViewLens(e);
   },
   onSearchInput: function (e) { this.setData({ query: e.detail.value }); },
   onSearchConfirm: function () {
@@ -1394,7 +1461,7 @@ Page({
 
   _shareQueryParts: function () {
     var q = [];
-    if (this.data.lens) q.push("lens=" + encodeURIComponent(this.data.lens));
+    q.push("lens=" + encodeURIComponent(this._normalizeViewLens(this.data.viewLens || this.data.lens)));
     var selected = this.data.selected || null;
     var queryText = this.data.query || "";
     if (!queryText && selected && selected.name) queryText = selected.name;

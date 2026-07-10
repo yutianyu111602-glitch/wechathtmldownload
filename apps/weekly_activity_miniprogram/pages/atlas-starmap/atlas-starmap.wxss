@@ -516,12 +516,18 @@ page {
 }
 
 .sm-peek-line,
-.sm-context-line {
+.sm-context-line,
+.sm-time-range {
   min-height: 42rpx;
   padding: 0 16rpx 12rpx;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.sm-time-range {
+  color: #8296a5;
+  font-size: 19rpx;
 }
 
 .sm-sheet-body {
