@@ -15,9 +15,25 @@ page {
 
 .sm-canvas {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: calc(env(safe-area-inset-top) + 258rpx);
+  right: 102rpx;
+  bottom: calc(env(safe-area-inset-bottom) + 12rpx);
+  left: 0;
+  width: auto;
+  height: auto;
+}
+
+.sm-canvas-peek {
+  bottom: calc(env(safe-area-inset-bottom) + 274rpx);
+}
+
+.sm-canvas-explore {
+  bottom: calc(45vh + env(safe-area-inset-bottom) + 12rpx);
+}
+
+.sm-canvas-panel-lenses,
+.sm-canvas-panel-filters {
+  right: 420rpx;
 }
 
 .sm-command {
@@ -406,7 +422,7 @@ page {
 }
 
 .sm-sheet-peek {
-  max-height: 224rpx;
+  max-height: 274rpx;
 }
 
 .sm-sheet-explore {

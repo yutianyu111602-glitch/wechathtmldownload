@@ -1,5 +1,5 @@
 <view class="sm-root">
-  <canvas type="2d" id="sm" class="sm-canvas"
+  <canvas type="2d" id="sm" class="sm-canvas sm-canvas-{{sheetState}} sm-canvas-panel-{{toolPanel}}"
     bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd"></canvas>
 
   <view class="sm-command">

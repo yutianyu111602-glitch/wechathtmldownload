@@ -160,6 +160,7 @@ test("selected view model exposes V2 metrics only when the node carries them", (
 test("page shell is a full-screen command surface with a 45vh exploration sheet", () => {
   const wxml = fs.readFileSync(path.join(root, "pages/atlas-starmap/atlas-starmap.wxml"), "utf8");
   const wxss = fs.readFileSync(path.join(root, "pages/atlas-starmap/atlas-starmap.wxss"), "utf8");
+  const source = fs.readFileSync(path.join(root, "pages/atlas-starmap/atlas-starmap.js"), "utf8");
   assert.match(wxml, /class="sm-command/);
   assert.match(wxml, /class="sm-tool-rail/);
   assert.match(wxml, /class="sm-hud/);
@@ -243,4 +244,17 @@ test("lens rendering is static and omits missing city or time metadata", () => {
   assert.match(wxml, /wx:if="\{\{selected\.city\}\}"/);
   assert.match(wxml, /wx:if="\{\{selected\.hasTimeRange\}\}"/);
   assert.doesNotMatch(wxml, /未知城市/);
+});
+
+test("native canvas reserves real geometry for command, rail, panels, and sheets", () => {
+  const wxml = fs.readFileSync(path.join(root, "pages/atlas-starmap/atlas-starmap.wxml"), "utf8");
+  const wxss = fs.readFileSync(path.join(root, "pages/atlas-starmap/atlas-starmap.wxss"), "utf8");
+  const source = fs.readFileSync(path.join(root, "pages/atlas-starmap/atlas-starmap.js"), "utf8");
+  assert.match(wxml, /class="sm-canvas sm-canvas-\{\{sheetState\}\} sm-canvas-panel-\{\{toolPanel\}\}"/);
+  assert.match(wxss, /\.sm-canvas\s*\{[^}]*top:\s*calc\(env\(safe-area-inset-top\)\s*\+\s*258rpx\)/s);
+  assert.match(wxss, /\.sm-canvas\s*\{[^}]*right:\s*102rpx/s);
+  assert.match(wxss, /\.sm-canvas-peek\s*\{[^}]*bottom:\s*calc\(env\(safe-area-inset-bottom\)\s*\+\s*274rpx\)/s);
+  assert.match(wxss, /\.sm-canvas-explore\s*\{[^}]*bottom:\s*calc\(45vh\s*\+\s*env\(safe-area-inset-bottom\)\s*\+\s*12rpx\)/s);
+  assert.match(wxss, /\.sm-canvas-panel-(?:lenses|filters)/);
+  assert.match(source, /_scheduleCanvasResize/);
 });

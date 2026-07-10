@@ -261,6 +261,7 @@ Page({
       : (event && event.currentTarget && event.currentTarget.dataset && event.currentTarget.dataset.lens);
     var lens = this._normalizeViewLens(value);
     this.setData({ viewLens: lens, lens: lens, toolPanel: "", serverLens: false });
+    this._scheduleCanvasResize();
     this.draw();
   },
 
@@ -305,6 +306,7 @@ Page({
   setSheetState: function (state) {
     var next = state === "peek" || state === "explore" ? state : "hidden";
     this.setData({ sheetState: next });
+    this._scheduleCanvasResize();
   },
 
   toggleExploreSheet: function () {
@@ -316,6 +318,7 @@ Page({
       ? (event.currentTarget.dataset.panel || "")
       : "";
     this.setData({ toolPanel: this.data.toolPanel === panel ? "" : panel });
+    this._scheduleCanvasResize();
   },
 
   _syncZoomTier: function () {
@@ -1030,6 +1033,48 @@ Page({
     });
   },
 
+  _scheduleCanvasResize: function () {
+    if (!this._canvas) return;
+    if (this._canvasResizeTimer) clearTimeout(this._canvasResizeTimer);
+    var that = this;
+    this._canvasResizeTimer = setTimeout(function () {
+      that._canvasResizeTimer = null;
+      that._resizeCanvasToLayout();
+    }, 80);
+  },
+
+  _resizeCanvasToLayout: function () {
+    if (!this._canvas || !wx.createSelectorQuery) return;
+    var that = this;
+    wx.createSelectorQuery().select("#sm").fields({ node: true, size: true }).exec(function (res) {
+      if (!res || !res[0] || !res[0].width || !res[0].height) return;
+      var oldW = that._cw || res[0].width;
+      var oldH = that._ch || res[0].height;
+      var width = res[0].width;
+      var height = res[0].height;
+      var canvas = res[0].node || that._canvas;
+      var dpr = (wx.getSystemInfoSync && wx.getSystemInfoSync().pixelRatio) || 2;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      var ctx = canvas.getContext("2d");
+      ctx.scale(dpr, dpr);
+      if (that._stars && oldW > 0 && oldH > 0) {
+        for (var i = 0; i < that._stars.length; i++) {
+          that._stars[i].x *= width / oldW;
+          that._stars[i].y *= height / oldH;
+        }
+      }
+      that._ox += (width - oldW) / 2;
+      that._oy += (height - oldH) / 2;
+      that._canvas = canvas;
+      that._ctx = ctx;
+      that._cw = width;
+      that._ch = height;
+      that._base = Math.min(width, height) * 0.42;
+      that.draw();
+    });
+  },
+
   draw: function () {
     var ctx = this._ctx; if (!ctx) return;
     var W = this._cw, H = this._ch, nodes = this._nodes, edges = this._edges, hl = this._highlight;
@@ -1438,8 +1483,14 @@ Page({
     wx.navigateTo({ url: "/pages/artist/artist?" + q });
   },
 
-  onHide: function () { this._stopLoadingCycle(); this._stopAnim(); },
-  onUnload: function () { this._stopLoadingCycle(); this._stopAnim(); },
+  onHide: function () {
+    this._stopLoadingCycle(); this._stopAnim();
+    if (this._canvasResizeTimer) clearTimeout(this._canvasResizeTimer);
+  },
+  onUnload: function () {
+    this._stopLoadingCycle(); this._stopAnim();
+    if (this._canvasResizeTimer) clearTimeout(this._canvasResizeTimer);
+  },
 
   _startLoadingCycle: function () {
     var that = this;
