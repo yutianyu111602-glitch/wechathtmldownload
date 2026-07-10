@@ -1,7 +1,9 @@
 # ATLAS 星图重设计规格
 
-日期：2026-07-10  
-状态：设计已确认，等待书面规格复核  
+日期：2026-07-10
+
+状态：设计已确认，等待书面规格复核
+
 目标页面：`apps/weekly_activity_miniprogram/pages/atlas-starmap/atlas-starmap`
 
 ## 1. 目标
