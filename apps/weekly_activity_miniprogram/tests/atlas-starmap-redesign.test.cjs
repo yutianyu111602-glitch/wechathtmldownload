@@ -104,3 +104,67 @@ test("canvas runtime preserves weighted edges and uses the visual helpers", () =
   assert.match(source, /_drawLabel/);
   assert.match(source, /_scheduleDraw/);
 });
+
+test("progressive exploration state starts hidden and has bounded transitions", () => {
+  const page = loadPage();
+  assert.equal(page.data.sheetState, "hidden");
+  assert.equal(page.data.viewLens, "structure");
+  assert.equal(page.data.zoomTier, "overview");
+  assert.equal(page.data.toolPanel, "");
+
+  page.setSheetState("peek");
+  assert.equal(page.data.sheetState, "peek");
+  page.toggleExploreSheet();
+  assert.equal(page.data.sheetState, "explore");
+  page.toggleExploreSheet();
+  assert.equal(page.data.sheetState, "peek");
+  page.setSheetState("invalid");
+  assert.equal(page.data.sheetState, "hidden");
+});
+
+test("selected view model exposes V2 metrics only when the node carries them", () => {
+  const page = loadPage();
+  page._hidden = {};
+  page._hiddenDynamic = {};
+  page._expanded = {};
+  page._expansionChildren = {};
+  page._remoteRows = {};
+  page._remoteLoading = {};
+  page._remoteError = {};
+  page._inspectorCache = {};
+  page._inspectorLoading = {};
+  page._adj = { 0: [] };
+  page._nodes = [{
+    u: "dj:knopha", n: "Knopha", t: "dj", c: "上海",
+    ec: 619, rc: 1780, sc: 826, fs: "2016-01-01", ls: "2026-06-20",
+  }];
+  page._updateSelected(0);
+  assert.equal(page.data.selected.eventCount, 619);
+  assert.equal(page.data.selected.relationCount, 1780);
+  assert.equal(page.data.selected.sourceCount, 826);
+  assert.equal(page.data.selected.firstSeen, "2016-01-01");
+  assert.equal(page.data.selected.lastSeen, "2026-06-20");
+  assert.equal(page.data.selected.hasEventCount, true);
+  assert.equal(page.data.selected.hasRelationCount, true);
+  assert.equal(page.data.selected.hasSourceCount, true);
+  assert.equal(page.data.selected.hasTimeRange, true);
+
+  page._nodes = [{ u: "dj:dynamic", n: "Dynamic", t: "dj", c: "", s: 1 }];
+  page._updateSelected(0);
+  assert.equal(page.data.selected.hasEventCount, false);
+  assert.equal(page.data.selected.hasRelationCount, false);
+  assert.equal(page.data.selected.hasSourceCount, false);
+  assert.equal(page.data.selected.hasTimeRange, false);
+});
+
+test("page shell is a full-screen command surface with a 45vh exploration sheet", () => {
+  const wxml = fs.readFileSync(path.join(root, "pages/atlas-starmap/atlas-starmap.wxml"), "utf8");
+  const wxss = fs.readFileSync(path.join(root, "pages/atlas-starmap/atlas-starmap.wxss"), "utf8");
+  assert.match(wxml, /class="sm-command/);
+  assert.match(wxml, /class="sm-tool-rail/);
+  assert.match(wxml, /class="sm-hud/);
+  assert.match(wxml, /sm-sheet-\{\{sheetState\}\}/);
+  assert.doesNotMatch(wxml, /data-lens="future"/);
+  assert.doesNotMatch(wxml, /data-lens="dj_traj"/);
+  assert.match(wxss, /\.sm-sheet-explore\s*\{[^}]*max-height:\s*45vh/s);
+});

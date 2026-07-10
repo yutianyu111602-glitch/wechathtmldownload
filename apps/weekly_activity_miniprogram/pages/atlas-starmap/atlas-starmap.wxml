@@ -2,46 +2,193 @@
   <canvas type="2d" id="sm" class="sm-canvas"
     bindtouchstart="onTouchStart" bindtouchmove="onTouchMove" bindtouchend="onTouchEnd"></canvas>
 
-  <view class="sm-top">
-    <view class="sm-lenses">
-      <view class="sm-lens {{lens==='entity'?'on':''}}" data-lens="entity" bindtap="onLens">实体关系</view>
-      <view class="sm-lens {{lens==='future'?'on':''}}" data-lens="future" bindtap="onLens">未来活动</view>
-      <view class="sm-lens {{lens==='dj_traj'?'on':''}}" data-lens="dj_traj" bindtap="onLens">DJ轨迹</view>
-    </view>
-    <input class="sm-search" placeholder="搜索 DJ / 场地 / 厂牌" placeholder-class="sm-ph"
-      value="{{query}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" confirm-type="search" />
-    <view class="sm-legend">
-      <view wx:for="{{legend}}" wx:key="k" class="sm-leg {{item.on?'':'sm-leg-off'}}"
-        data-k="{{item.k}}" bindtap="onToggleType">
-        <view class="sm-leg-dot" style="background:{{item.col}};"></view>{{item.label}}
+  <view class="sm-command">
+    <view class="sm-command-head">
+      <view class="sm-brand">
+        <text class="sm-brand-title">ATLAS</text>
+        <text class="sm-brand-sub">关系星图</text>
+      </view>
+      <view class="sm-command-status">
+        <text>{{nodeCount}} 星体</text>
+        <text wx:if="{{visitedCount}}">· 已点亮 {{visitedCount}}</text>
       </view>
     </view>
-  </view>
-
-  <view class="sm-hud">{{nodeCount}} 节点 · 图鉴概览</view>
-
-  <view class="sm-ctrls">
-    <view class="sm-ctrl" bindtap="randomHop">🎲 随机漫游</view>
-    <view class="sm-ctrl" bindtap="fitAll">⤢ 复位</view>
-  </view>
-
-  <view wx:if="{{loading}}" class="sm-loading">星图载入中…</view>
-
-  <view wx:if="{{serverLens}}" class="sm-notice">
-    「{{lens==='future'?'未来活动':'DJ轨迹'}}」需服务端数据，即将上线。当前可用：实体关系概览（点节点下钻 / 搜索聚焦 / 图例筛选）。
-  </view>
-
-  <view wx:if="{{selected}}" class="sm-card">
-    <view class="sm-card-top">
-      <text class="sm-card-name">{{selected.name}}</text>
-      <text class="sm-card-x" bindtap="clearSel">×</text>
+    <view class="sm-search-row">
+      <input class="sm-search" placeholder="搜索 DJ / 场地 / 厂牌" placeholder-class="sm-ph"
+        value="{{query}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" confirm-type="search" />
+      <view class="sm-command-btn sm-search-btn" bindtap="onSearchConfirm">定位</view>
+      <view wx:if="{{selected}}" class="sm-command-btn sm-clear-btn" bindtap="clearSel">清除</view>
+      <view wx:else class="sm-command-btn" bindtap="openAtlasSearch">全库</view>
     </view>
-    <view class="sm-card-meta">
-      <text class="sm-tag">{{selected.type}}</text>
-      <text class="sm-tag">{{selected.city}}</text>
-      <text class="sm-tag">关系 {{selected.degree}}</text>
+  </view>
+
+  <view class="sm-tool-rail">
+    <view class="sm-tool-btn {{toolPanel==='lenses'?'on':''}}" data-panel="lenses" bindtap="toggleToolPanel">
+      <text class="sm-tool-key">镜</text><text class="sm-tool-label">镜头</text>
     </view>
-    <view wx:if="{{selected.breakdown}}" class="sm-card-brk">邻接：{{selected.breakdown}}</view>
-    <view wx:if="{{selected.isDj}}" class="sm-card-act" bindtap="openArtist">查看 DJ 详情 ›</view>
+    <view class="sm-tool-btn {{toolPanel==='filters'?'on':''}}" data-panel="filters" bindtap="toggleToolPanel">
+      <text class="sm-tool-key">筛</text><text class="sm-tool-label">实体</text>
+    </view>
+    <view class="sm-tool-btn" bindtap="randomHop">
+      <text class="sm-tool-key">游</text><text class="sm-tool-label">漫游</text>
+    </view>
+    <view class="sm-tool-btn" bindtap="fitAll">
+      <text class="sm-tool-key">全</text><text class="sm-tool-label">总览</text>
+    </view>
+  </view>
+
+  <view wx:if="{{toolPanel==='lenses'}}" class="sm-tool-panel sm-lens-panel">
+    <view class="sm-panel-title">阅读镜头</view>
+    <view class="sm-panel-row {{viewLens==='structure'?'on':''}}" data-lens="structure" bindtap="onLens">
+      <text class="sm-panel-key">结构</text><text class="sm-panel-desc">实体与关系强度</text>
+    </view>
+    <view class="sm-panel-row {{viewLens==='city'?'on':''}}" data-lens="city" bindtap="onLens">
+      <text class="sm-panel-key">城市</text><text class="sm-panel-desc">仅显示已知城市</text>
+    </view>
+    <view class="sm-panel-row {{viewLens==='time'?'on':''}}" data-lens="time" bindtap="onLens">
+      <text class="sm-panel-key">时间</text><text class="sm-panel-desc">按最后出现时间明暗</text>
+    </view>
+  </view>
+
+  <view wx:if="{{toolPanel==='filters'}}" class="sm-tool-panel sm-filter-panel">
+    <view class="sm-panel-title">实体筛选</view>
+    <view class="sm-filter-grid">
+      <view wx:for="{{legend}}" wx:key="k" class="sm-filter-chip {{item.on?'on':'off'}}"
+        data-k="{{item.k}}" bindtap="onToggleType">
+        <view class="sm-filter-mark" style="border-color:{{item.col}};background:{{item.on?item.col:'transparent'}};"></view>
+        <text>{{item.label}}</text>
+      </view>
+    </view>
+    <scroll-view wx:if="{{seedList.length}}" class="sm-seed-list" scroll-y="true">
+      <view wx:for="{{seedList}}" wx:key="name" class="sm-seed-row {{item.visited?'lit':''}}"
+        data-name="{{item.name}}" bindtap="onSeedTap">
+        <text>{{item.name}}</text><text>{{item.visited?'已点亮':'定位'}}</text>
+      </view>
+    </scroll-view>
+    <view class="sm-footprint-link" bindtap="openFootprint">查看我的星图足迹</view>
+  </view>
+
+  <view class="sm-hud">
+    <text>{{viewLens==='city'?'城市':viewLens==='time'?'时间':'结构'}}镜头</text>
+    <text class="sm-hud-sep">/</text>
+    <text>{{zoomTier==='detail'?'近景':zoomTier==='neighborhood'?'邻域':'总览'}}</text>
+    <text wx:if="{{pathMode}}" class="sm-hud-path">路径选点中</text>
+  </view>
+
+  <view wx:if="{{pathMode}}" class="sm-path-hint" catchtap="clearPath">{{pathHint}} · 点此取消</view>
+
+  <view wx:if="{{loading}}" class="sm-loading-overlay">
+    <view class="sm-ld-field">
+      <view wx:for="{{ldDots}}" wx:for-item="ld" wx:key="i" class="sm-ld-dot"
+        style="left:{{ld.x}}%;top:{{ld.y}}%;animation-delay:{{ld.d}}s;background:{{ld.c}};"></view>
+      <view class="sm-ld-line sm-ld-line-a"></view>
+      <view class="sm-ld-line sm-ld-line-b"></view>
+    </view>
+    <text class="sm-ld-msg">{{loadingMsg}}</text>
+  </view>
+  <view wx:if="{{canvasError}}" class="sm-canvas-error">星图画布初始化失败，请返回后重试</view>
+
+  <view wx:if="{{selected && sheetState!=='hidden'}}" class="sm-sheet sm-sheet-{{sheetState}}">
+    <view class="sm-sheet-grip" bindtap="toggleExploreSheet"><view></view></view>
+    <view class="sm-sheet-head">
+      <view class="sm-sheet-identity" bindtap="toggleExploreSheet">
+        <view class="sm-sheet-title-row">
+          <text class="sm-sheet-name">{{selected.name}}</text>
+          <text class="sm-sheet-type">{{selected.type}}</text>
+        </view>
+        <view class="sm-sheet-subline">
+          <text wx:if="{{selected.city}}">{{selected.city}}</text>
+          <text wx:if="{{selected.city && selected.neighborhoodStatus}}"> · </text>
+          <text wx:if="{{selected.neighborhoodStatus}}">{{selected.neighborhoodStatus}}</text>
+        </view>
+      </view>
+      <view class="sm-sheet-toggle" bindtap="toggleExploreSheet">{{sheetState==='explore'?'收起':'探索'}}</view>
+      <view class="sm-sheet-close" catchtap="clearSel">×</view>
+    </view>
+
+    <view class="sm-metric-row">
+      <view wx:if="{{selected.hasEventCount}}" class="sm-metric">
+        <text class="sm-metric-value">{{selected.eventCount}}</text><text class="sm-metric-label">活动</text>
+      </view>
+      <view wx:if="{{selected.hasRelationCount}}" class="sm-metric">
+        <text class="sm-metric-value">{{selected.relationCount}}</text><text class="sm-metric-label">关系</text>
+      </view>
+      <view wx:if="{{selected.hasSourceCount}}" class="sm-metric">
+        <text class="sm-metric-value">{{selected.sourceCount}}</text><text class="sm-metric-label">证据</text>
+      </view>
+      <view wx:if="{{!selected.hasEventCount && !selected.hasRelationCount && !selected.hasSourceCount}}" class="sm-metric-fallback">
+        可见邻接 {{selected.degree}}
+      </view>
+    </view>
+
+    <view wx:if="{{sheetState==='peek'}}" class="sm-peek-line">
+      <text wx:if="{{selected.expandHint}}">{{selected.expandHint}}</text>
+      <text wx:if="{{explorationTrail && explorationTrail.length>1}}"> · 已探索 {{explorationTrail.length}} 跳</text>
+    </view>
+
+    <scroll-view wx:if="{{sheetState==='explore'}}" class="sm-sheet-body" scroll-y="true" enhanced="true" show-scrollbar="false">
+      <view wx:if="{{explorationTrail && explorationTrail.length>1}}" class="sm-trail">
+        <view class="sm-trail-back" bindtap="backTrail">‹ 上一跳</view>
+        <view class="sm-trail-chain">
+          <block wx:for="{{explorationTrail}}" wx:key="id">
+            <text wx:if="{{index>0}}" class="sm-trail-sep">›</text>
+            <text class="sm-trail-node {{index===explorationTrail.length-1?'current':''}}">{{item.name}}</text>
+          </block>
+        </view>
+      </view>
+
+      <view wx:if="{{selected.breakdown || selected.expandHint}}" class="sm-context-line">
+        <text wx:if="{{selected.breakdown}}">邻接 {{selected.breakdown}}</text>
+        <text wx:if="{{selected.breakdown && selected.expandHint}}"> · </text>
+        <text wx:if="{{selected.expandHint}}">{{selected.expandHint}}</text>
+      </view>
+
+      <view wx:if="{{selected.relatedPreview && selected.relatedPreview.length}}" class="sm-related">
+        <view class="sm-section-head"><text>探索下一跳</text><text>点一行聚焦</text></view>
+        <view wx:if="{{selected.relatedFilters && selected.relatedFilters.length>1}}" class="sm-related-filters">
+          <view wx:for="{{selected.relatedFilters}}" wx:key="k" class="sm-related-filter sm-path-filter {{item.on?'on':''}}"
+            data-k="{{item.k}}" catchtap="onRelatedFilter">{{item.label}} {{item.count}}</view>
+        </view>
+        <view wx:for="{{selected.relatedPreview}}" wx:key="id" class="sm-related-row"
+          data-id="{{item.id}}" bindtap="focusRelatedNode">
+          <view class="sm-related-mark" style="background:{{item.color}};"></view>
+          <view class="sm-related-main">
+            <text class="sm-related-name">{{item.name}}</text>
+            <text class="sm-related-meta">{{item.meta}}</text>
+          </view>
+          <text class="sm-related-go">›</text>
+        </view>
+      </view>
+
+      <view wx:if="{{selected.isDj && selected.inspector}}" class="sm-inspector">
+        <view class="sm-section-head"><text>ATLAS 速览</text><text>{{selected.inspector.summary}}</text></view>
+        <view wx:if="{{selected.inspector.status==='ready'}}" class="sm-inspector-grid">
+          <view wx:if="{{selected.inspector.cityLine}}" class="sm-inspector-row"><text>轨迹</text><text>{{selected.inspector.cityLine}}</text></view>
+          <view wx:if="{{selected.inspector.venueLine}}" class="sm-inspector-row"><text>场地</text><text>{{selected.inspector.venueLine}}</text></view>
+          <view wx:if="{{selected.inspector.collaboratorLine}}" class="sm-inspector-row"><text>相关</text><text>{{selected.inspector.collaboratorLine}}</text></view>
+          <view wx:if="{{selected.inspector.eventLine}}" class="sm-inspector-row"><text>近况</text><text>{{selected.inspector.eventLine}}</text></view>
+        </view>
+      </view>
+
+      <view class="sm-sheet-actions">
+        <button class="sm-card-act sm-card-share" open-type="share">分享节点</button>
+        <view class="sm-action" catchtap="startPathMode">查关系路径</view>
+        <view wx:if="{{selected.isDj}}" class="sm-action sm-action-primary" bindtap="openArtist">DJ 详情</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view wx:if="{{pathResult}}" class="sm-pathpanel">
+    <view class="sm-pathpanel-head"><text>关系路径</text><text catchtap="clearPath">×</text></view>
+    <view wx:if="{{pathResult.status==='ready'}}">
+      <view class="sm-pathpanel-summary">{{pathResult.fromName}} → {{pathResult.toName}} · {{pathResult.hops}} 跳</view>
+      <view class="sm-pathchain">
+        <block wx:for="{{pathResult.chain}}" wx:key="id">
+          <view class="sm-pathnode"><text>{{item.name}}</text><text> · {{item.type}}</text></view>
+          <view wx:if="{{item.rel}}" class="sm-pathrel">→ {{item.rel}}</view>
+        </block>
+      </view>
+    </view>
+    <view wx:else class="sm-pathpanel-summary">{{pathResult.summary}}</view>
   </view>
 </view>

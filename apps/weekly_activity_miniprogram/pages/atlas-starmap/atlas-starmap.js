@@ -140,7 +140,11 @@ Page({
     loadingMsg: atlasLoading.LOADING_MSGS[0],
     ldDots: atlasLoading.buildLdDots(),
     canvasError: false,
-    lens: "entity",
+    lens: "structure",
+    viewLens: "structure",
+    sheetState: "hidden",
+    zoomTier: "overview",
+    toolPanel: "",
     query: "",
     selected: null,
     relatedFilter: "all",
@@ -246,6 +250,27 @@ Page({
       : name;
   },
 
+  setSheetState: function (state) {
+    var next = state === "peek" || state === "explore" ? state : "hidden";
+    this.setData({ sheetState: next });
+  },
+
+  toggleExploreSheet: function () {
+    this.setSheetState(this.data.sheetState === "explore" ? "peek" : "explore");
+  },
+
+  toggleToolPanel: function (event) {
+    var panel = event && event.currentTarget && event.currentTarget.dataset
+      ? (event.currentTarget.dataset.panel || "")
+      : "";
+    this.setData({ toolPanel: this.data.toolPanel === panel ? "" : panel });
+  },
+
+  _syncZoomTier: function () {
+    var next = this._zoomTierForScale(this._scale);
+    if (this.data.zoomTier !== next) this.setData({ zoomTier: next });
+  },
+
   onLoad: function (query) {
     this._initialQuery = query && query.q ? decodeURIComponent(query.q) : "";
     this._initialFocusId = query && query.focusId ? decodeURIComponent(query.focusId) : "";
@@ -282,7 +307,13 @@ Page({
     this._hidden = {};            // type -> true when filtered out
     this._visited = {};
     this._anim = null;
-    this.setData({ nodeCount: this._visibleCount(), query: this._initialQuery || "" });
+    this.setData({
+      nodeCount: this._visibleCount(),
+      query: this._initialQuery || "",
+      sheetState: "hidden",
+      zoomTier: this._zoomTierForScale(this._scale),
+      toolPanel: "",
+    });
     this._startLoadingCycle();
   },
 
@@ -750,9 +781,20 @@ Page({
     if (n.t === "dj" && n.u) {
       inspector = this._inspectorCache[n.u] || (this._inspectorLoading[n.u] ? { status: "loading", summary: "读取 ATLAS 速览…" } : null);
     }
+    var hasEventCount = Object.prototype.hasOwnProperty.call(n, "ec") && n.ec !== null;
+    var hasRelationCount = Object.prototype.hasOwnProperty.call(n, "rc") && n.rc !== null;
+    var hasSourceCount = Object.prototype.hasOwnProperty.call(n, "sc") && n.sc !== null;
+    var firstSeen = compactText(n.fs);
+    var lastSeen = compactText(n.ls);
     this.setData({
-      selected: { id: n.u || "", name: n.n, type: TYPE_LABEL[n.t] || n.t, city: n.c || "未知",
+      selected: { id: n.u || "", name: n.n, type: TYPE_LABEL[n.t] || n.t, city: n.c || "",
         degree: nb.length, breakdown: parts.join(" · "), isDj: n.t === "dj",
+        eventCount: hasEventCount ? Math.max(0, Number(n.ec) || 0) : null,
+        relationCount: hasRelationCount ? Math.max(0, Number(n.rc) || 0) : null,
+        sourceCount: hasSourceCount ? Math.max(0, Number(n.sc) || 0) : null,
+        firstSeen: firstSeen, lastSeen: lastSeen,
+        hasEventCount: hasEventCount, hasRelationCount: hasRelationCount,
+        hasSourceCount: hasSourceCount, hasTimeRange: !!(firstSeen || lastSeen),
         neighborhoodStatus: this._neighborhoodStatus(n.u),
         expandHint: hint, relatedFilter: activeFilter, relatedFilters: this._relatedFilters(relatedItems, activeFilter),
         relatedPreview: this._relatedPreview(i, rows, activeFilter), inspector: inspector },
@@ -1059,6 +1101,7 @@ Page({
     this._ox += (a.ox - this._ox) * 0.20;
     this._oy += (a.oy - this._oy) * 0.20;
     this._scale += (a.sc - this._scale) * 0.20;
+    this._syncZoomTier();
     this.draw();
     if (Math.abs(a.ox - this._ox) < 0.5 && Math.abs(a.oy - this._oy) < 0.5 && Math.abs(a.sc - this._scale) < 0.01) {
       this._ox = a.ox; this._oy = a.oy; this._scale = a.sc; this._anim = null; this.draw(); return;
@@ -1109,6 +1152,7 @@ Page({
     var t = ev.touches, st = this._touch; if (!st) return;
     if (st.pinch && t.length === 2) {
       this._scale = Math.max(0.4, Math.min(6, st.sc * (this._dist(t) / (st.d || 1))));
+      this._syncZoomTier();
     } else if (t.length === 1) {
       this._ox += t[0].x - st.x; this._oy += t[0].y - st.y;
       st.x = t[0].x; st.y = t[0].y;
@@ -1176,6 +1220,7 @@ Page({
       this._expandNode(i);
     }
     this._updateSelected(i, same ? undefined : "all");
+    this.setSheetState("peek");
     this._syncTrail(i, options.trailMode || "replace");
     this._flyToNode(i);
     this.draw();
@@ -1187,7 +1232,7 @@ Page({
     this._sel = -1; this._highlight = null;
     this._trail = [];
     this._stopAnim();
-    this.setData({ selected: null, relatedFilter: "all", explorationTrail: [] });
+    this.setData({ selected: null, relatedFilter: "all", explorationTrail: [], sheetState: "hidden" });
     this.draw();
   },
 
@@ -1197,7 +1242,7 @@ Page({
     var sel = this.data.selected; if (!sel || !sel.id) return;
     this._pathFrom = sel.id; this._pathFromName = sel.name;
     this._pathMode = true;
-    this.setData({ pathMode: true, pathHint: "点一个节点，查看与「" + sel.name + "」的关系路径", pathResult: null });
+    this.setData({ pathMode: true, pathHint: "点一个节点，查看与「" + sel.name + "」的关系路径", pathResult: null, sheetState: "hidden" });
     wx.showToast({ title: "选择目标节点", icon: "none" });
   },
   _pickPathTarget: function (i) {
@@ -1213,6 +1258,7 @@ Page({
     requestApi("/api/v1/weekly/atlas/path", { from: from, to: to }).then(function (r) {
       if (!r || !r.found) {
         that.setData({ pathResult: { status: "empty", summary: fromName + " 与 " + toName + " 暂无可见关系路径" } });
+        if (that.data.selected) that.setSheetState("peek");
         return;
       }
       var chain = [];
@@ -1227,14 +1273,16 @@ Page({
         });
       }
       that.setData({ pathResult: { status: "ready", hops: r.hops, fromName: fromName, toName: toName, chain: chain, summary: r.hops + " 跳连接" } });
+      if (that.data.selected) that.setSheetState("peek");
     }).catch(function (e) {
       console.warn("[atlas-starmap] path fetch failed", e);
       that.setData({ pathResult: { status: "error", summary: "关系路径查询失败" } });
+      if (that.data.selected) that.setSheetState("peek");
     });
   },
   clearPath: function () {
     this._pathMode = false;
-    this.setData({ pathMode: false, pathHint: "", pathResult: null });
+    this.setData({ pathMode: false, pathHint: "", pathResult: null, sheetState: this.data.selected ? "peek" : "hidden" });
   },
 
   onToggleType: function (e) {
@@ -1262,8 +1310,9 @@ Page({
 
   onLens: function (e) {
     var lens = e.currentTarget.dataset.lens;
-    this.setData({ lens: lens, serverLens: lens !== "entity" });
-    if (lens === "entity") this.draw();
+    if (lens !== "city" && lens !== "time") lens = "structure";
+    this.setData({ lens: lens, viewLens: lens, serverLens: false, toolPanel: "" });
+    this.draw();
   },
   onSearchInput: function (e) { this.setData({ query: e.detail.value }); },
   onSearchConfirm: function () {
