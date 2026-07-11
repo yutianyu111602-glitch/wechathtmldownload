@@ -715,7 +715,7 @@ def audit_sanji_hermes_static(checks: list[Check], repo_root: Path) -> None:
             "$script:SanjiRunQueuePath",
             "sanji_source_contract",
             "direct_rss_feed_fetch must stay false",
-            "--max-missing 5",
+            "--max-missing 0",
             "if ($DeployBackend)",
             "if ($UploadFrontend)",
             "$script:CloudRunDeployExecuted = $false",

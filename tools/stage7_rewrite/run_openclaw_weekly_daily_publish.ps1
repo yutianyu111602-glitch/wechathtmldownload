@@ -25,6 +25,8 @@ param(
     [string]$PosterVlFallback = "mimo",
     [int]$PosterVlTimeoutSec = 90,
     [int]$PosterVlConcurrency = 4,
+    [string]$ResumeVlDir = "",
+    [string]$ResumeVlEvidenceDir = "",
     [int]$DeepSeekConcurrency = 4,
     [int]$PrefetchArticlesPerAccount = 0,
     [int]$PrefetchExporterTimeoutSec = 20,
@@ -1267,6 +1269,27 @@ if (-not $SkipBuild) {
             ApiDir = $ApiDir
             PublishedApiDir = $IncrementalBaseApiDir
         }
+        # Auto-resume VL enrichment from complete package first; otherwise reuse partial evidence.
+        $vlDir = Join-Path $Longrun "WEEKLY_ACTIVITY_RECOMMENDATION_PACK_VL_$WeekTag"
+        $vlEvidenceDir = Join-Path $vlDir "source_evidence"
+        $vlCompleteOutput = (
+            (Test-Path (Join-Path $vlDir "weekly_activity_recommendation_candidates.jsonl")) -and
+            (Test-Path (Join-Path $vlDir "weekly_activity_recommendation_review_candidates.jsonl")) -and
+            (Test-Path (Join-Path $vlDir "summary.json"))
+        )
+        if (-not [string]::IsNullOrWhiteSpace($ResumeVlDir)) {
+            $pipelineArgs.ResumeVlDir = $ResumeVlDir
+            Write-Host "  Resume VL from explicit complete package: $ResumeVlDir" -ForegroundColor Cyan
+        } elseif (-not [string]::IsNullOrWhiteSpace($ResumeVlEvidenceDir)) {
+            $pipelineArgs.ResumeVlEvidenceDir = $ResumeVlEvidenceDir
+            Write-Host "  Resume VL from explicit evidence dir: $ResumeVlEvidenceDir" -ForegroundColor Cyan
+        } elseif ($vlCompleteOutput) {
+            $pipelineArgs.ResumeVlDir = $vlDir
+            Write-Host "  Auto-resume downstream pipeline from complete VL package: $vlDir" -ForegroundColor Cyan
+        } elseif ((Test-Path $vlEvidenceDir) -and ((Get-ChildItem $vlEvidenceDir -File -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0)) {
+            $pipelineArgs.ResumeVlEvidenceDir = $vlEvidenceDir
+            Write-Host "  Auto-resume VL enrichment from evidence $vlEvidenceDir ($((Get-ChildItem $vlEvidenceDir -File -ErrorAction SilentlyContinue | Measure-Object).Count) existing evidence files)" -ForegroundColor Cyan
+        }
         if ($SourceMode -eq "sanji_desktop_rss") {
             $sanjiQueueForPipeline = if (-not [string]::IsNullOrWhiteSpace($script:SanjiRunQueuePath)) {
                 $script:SanjiRunQueuePath
@@ -1939,7 +1962,7 @@ if ($SourceMode -eq "sanji_desktop_rss") {
         --report $sanjiGapAuditReportPath `
         --week-start $WeekStart `
         --window-days $WindowDays `
-        --max-missing 5 `
+        --max-missing 0 `
         --min-candidate-event-like $SanjiGapMinCandidateEventLike `
         --max-queue-staleness-hours $SanjiGapMaxQueueStalenessHours
     $sanjiGapExitCode = $LASTEXITCODE

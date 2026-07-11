@@ -17,6 +17,7 @@ def test_weekly_pipeline_resume_vl_dir_skips_upstream_reset_but_keeps_downstream
     script = (ROOT / "weekly_activity_next_week_pipeline.ps1").read_text(encoding="utf-8")
 
     assert '[string]$ResumeVlDir = ""' in script
+    assert '[string]$ResumeVlEvidenceDir = ""' in script
     assert '$ResumeFromVl = -not [string]::IsNullOrWhiteSpace($ResumeVlDir)' in script
     assert 'Resume from existing VL package' in script
     assert '$PACK_OCR_DIR = (Resolve-Path -LiteralPath $ResumeVlDir).Path' in script
@@ -24,6 +25,39 @@ def test_weekly_pipeline_resume_vl_dir_skips_upstream_reset_but_keeps_downstream
     assert '$PACK_DIR = $PACK_OCR_DIR' in script
     assert 'Step 3.5: Entity Enrichment (dj-dataset)' in script
     assert 'Step 4: Build Mini-Program API JSON' in script
+
+
+def test_weekly_pipeline_resumes_partial_vl_evidence_without_deleting_it():
+    weekly = (ROOT / "weekly_activity_next_week_pipeline.ps1").read_text(encoding="utf-8")
+    runner = (ROOT / "run_openclaw_weekly_daily_publish.ps1").read_text(encoding="utf-8")
+
+    assert "function Complete-VlEnrichmentOutput" in weekly
+    assert "vl_enrichment_exit_override.json" in weekly
+    assert "--resume-from-evidence-dir" in weekly
+    assert "$ResumeVlEvidenceDir" in weekly
+    assert "Preserving VL output dir for evidence resume" in weekly
+    assert "Complete-VlEnrichmentOutput -InputDir $PACK_DIR -OutputDir $PACK_OCR_DIR" in weekly
+
+    build_block = runner[runner.index('Invoke-RunStep "Build daily source package from selected source queue"') :]
+    build_block = build_block.split('if (-not $DisableIncrementalMerge)', 1)[0]
+    assert '[string]$ResumeVlDir = ""' in runner
+    assert '[string]$ResumeVlEvidenceDir = ""' in runner
+    assert "$vlCompleteOutput" in build_block
+    assert "$pipelineArgs.ResumeVlDir = $vlDir" in build_block
+    assert "$pipelineArgs.ResumeVlEvidenceDir = $vlEvidenceDir" in build_block
+    assert build_block.index("$pipelineArgs.ResumeVlDir = $vlDir") < build_block.index(
+        "$pipelineArgs.ResumeVlEvidenceDir = $vlEvidenceDir"
+    )
+
+
+def test_weekly_pipeline_step_log_is_written_from_finally_on_failure():
+    script = (ROOT / "weekly_activity_next_week_pipeline.ps1").read_text(encoding="utf-8")
+    invoke_step = script[script.index("function Invoke-Step") : script.index("function Reset-OutputDir")]
+
+    assert "finally {" in invoke_step
+    assert "PIPELINE_STEP_LOG_$WEEK_TAG.jsonl" in invoke_step
+    assert "status = if ($stepExit -eq 0)" in invoke_step
+    assert "error = $stepError" in invoke_step
 
 
 def test_weekly_pipeline_repair_step_enforces_window_and_explicit_source_maps():
@@ -358,8 +392,7 @@ def test_openclaw_publish_wrapper_requires_small_sanji_gap_missing_rows():
     gap_block = runner[runner.index("▶ Run Sanji source coverage gate") :]
     gap_block = gap_block.split("$sanjiGapExitCode = $LASTEXITCODE", 1)[0]
     assert "audit_weekly_sanji_queue_package_gap.py" in runner
-    assert "--max-missing 5" in gap_block
-    assert "--max-missing 0" not in gap_block
+    assert "--max-missing 0" in gap_block
 
 
 def test_openclaw_publish_wrapper_uses_frozen_sanji_snapshot_for_build_and_gap_audit():
