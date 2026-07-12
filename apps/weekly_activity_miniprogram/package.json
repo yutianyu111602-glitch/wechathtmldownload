@@ -1,0 +1,15 @@
+{
+  "name": "weekly-activity-miniprogram",
+  "version": "1.0.0",
+  "description": "HUAIDJ Weekly Activity Miniprogram",
+  "private": true,
+  "scripts": {
+    "patch:automator-devtools": "node scripts/patch_miniprogram_automator_devtools_cli.cjs",
+    "debug:cloud-ai": "node scripts/debug_cloud_ai_automator.cjs",
+    "sync:cloud-db": "node scripts/sync_cloudbase_database.cjs",
+    "sync:cloud-db:admin": "node scripts/run_cloudbase_hot_sync_admin.cjs"
+  },
+  "devDependencies": {
+    "miniprogram-api-typings": "^5.2.0"
+  }
+}

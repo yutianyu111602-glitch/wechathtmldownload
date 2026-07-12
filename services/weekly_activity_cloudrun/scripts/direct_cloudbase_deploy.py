@@ -33,6 +33,7 @@ TCB_CMD = [shutil.which("npm") or "npm", "exec", "--yes", "--package", "@cloudba
 SECRETISH_KEYS = ("url", "header", "token", "secret", "authorization", "credential", "key")
 TCB_API_TIMEOUT_SECONDS: int | None = 240
 UPLOAD_TIMEOUT_SECONDS: int | None = 600
+UPLOAD_MAX_ATTEMPTS = 3
 
 
 def now_iso() -> str:
@@ -128,20 +129,31 @@ def zip_context(context_dir: Path, zip_path: Path) -> dict[str, Any]:
 
 def upload_package(upload_url: str, zip_path: Path) -> None:
     data = zip_path.read_bytes()
-    req = urllib.request.Request(
-        upload_url,
-        data=data,
-        method="PUT",
-        headers={
-            "Accept": "*/*",
-            "Accept-Encoding": "gzip, deflate, br",
-            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7,en-US;q=0.6",
-            "Content-Type": "application/x-zip-compressed",
-        },
-    )
-    with urllib.request.urlopen(req, timeout=UPLOAD_TIMEOUT_SECONDS) as response:
-        if response.status >= 400:
-            raise RuntimeError(f"upload failed with HTTP {response.status}")
+    # Signed COS uploads are large, idempotent PUTs.  Bypass workstation proxy
+    # settings here because local HTTP proxies can reset long uploads while the
+    # Tencent endpoint itself is directly reachable.
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    for attempt in range(1, UPLOAD_MAX_ATTEMPTS + 1):
+        req = urllib.request.Request(
+            upload_url,
+            data=data,
+            method="PUT",
+            headers={
+                "Accept": "*/*",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7,en-US;q=0.6",
+                "Content-Type": "application/x-zip-compressed",
+            },
+        )
+        try:
+            with opener.open(req, timeout=UPLOAD_TIMEOUT_SECONDS) as response:
+                if response.status >= 400:
+                    raise RuntimeError(f"upload failed with HTTP {response.status}")
+            return
+        except (OSError, RuntimeError):
+            if attempt >= UPLOAD_MAX_ATTEMPTS:
+                raise
+            time.sleep(2 * attempt)
 
 
 def update_cloudrun_server(env_id: str, service_name: str, package_name: str, package_version: str, remark: str) -> dict[str, Any]:
@@ -161,7 +173,7 @@ def update_cloudrun_server(env_id: str, service_name: str, package_name: str, pa
             {"Key": "Port", "IntValue": 8787},
             {"Key": "CpuSpecs", "FloatValue": 1},
             {"Key": "MemSpecs", "FloatValue": 2},
-            {"Key": "MinNum", "IntValue": 0},
+            {"Key": "MinNum", "IntValue": 1},
             {"Key": "MaxNum", "IntValue": 2},
             {"Key": "PolicyDetails", "PolicyDetails": [{"PolicyType": "cpu", "PolicyThreshold": 60}]},
             {"Key": "LogPath", "Value": "stdout"},

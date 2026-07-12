@@ -331,6 +331,10 @@ Page({
     wx.navigateTo({ url: "/pages/atlas-starmap/atlas-starmap" });
   },
 
+  openAtlasSearch() {
+    wx.navigateTo({ url: "/pages/atlas-search/atlas-search" });
+  },
+
   onPullDownRefresh() {
     this.setData({ history: [], trail: [], center: null, error: "" });
     this.loadSeeds().then(

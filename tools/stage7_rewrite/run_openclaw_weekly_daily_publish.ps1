@@ -17,7 +17,7 @@ param(
     [ValidateSet("docker_exporter", "sanji_desktop_rss")]
     [string]$SourceMode = "sanji_desktop_rss",
     [ValidateSet("legacy_ocr", "vl_direct_qwen")]
-    [string]$PosterExtractionMode = "vl_direct_qwen",
+    [string]$PosterExtractionMode = "legacy_ocr",
     [int]$PosterVlMaxImages = 0,
     [int]$PosterVlLimit = 0,
     [string]$PosterVlProvider = "qwen3_vl",

@@ -6,14 +6,17 @@ param(
 $ErrorActionPreference = "Stop"
 Write-Host "=== Weekly Package Predeploy Validation ==="
 
+$resolvedApiDir = (Resolve-Path -LiteralPath $ApiDir).Path
+$consistencyScript = Join-Path $PSScriptRoot "check-current-release-consistency.mjs"
 $steps = @()
 $allOk = $true
 
 # Step 1: Consistency check
 Write-Host "[1/4] Checking item count consistency..."
 try {
-  $result = node scripts\release\check-current-release-consistency.mjs $ApiDir 2>&1
-  $json = $result | ConvertFrom-Json
+  $result = & node $consistencyScript $resolvedApiDir 2>&1
+  if ($LASTEXITCODE -ne 0) { throw ($result -join [Environment]::NewLine) }
+  $json = ($result -join [Environment]::NewLine) | ConvertFrom-Json
   if ($json.ok) {
     Write-Host "[OK] item_count=$($json.expected) by-id=$($json.byIdCount) llm=$($json.llmCount)"
     $steps += @{ step = "consistency"; ok = $true; detail = $json }
@@ -30,7 +33,7 @@ try {
 
 # Step 2: Manifest window check
 Write-Host "[2/4] Checking manifest window..."
-$manifest = Get-Content -LiteralPath "$ApiDir\manifest.json" -Raw | ConvertFrom-Json
+$manifest = Get-Content -LiteralPath (Join-Path $resolvedApiDir "manifest.json") -Raw | ConvertFrom-Json
 $today = (Get-Date).ToString("yyyy-MM-dd")
 if ($manifest.window_start -le $today -and $manifest.window_end -ge $today) {
   Write-Host "[OK] Window $($manifest.window_start) ~ $($manifest.window_end) covers today"
@@ -42,14 +45,14 @@ if ($manifest.window_start -le $today -and $manifest.window_end -ge $today) {
 
 # Step 3: by-city index check
 Write-Host "[3/4] Checking by-city index..."
-$cityIndex = Get-Content -LiteralPath "$ApiDir\by-city\index.json" -Raw | ConvertFrom-Json
+$cityIndex = Get-Content -LiteralPath (Join-Path $resolvedApiDir "by-city" "index.json") -Raw | ConvertFrom-Json
 $cityCount = $cityIndex.cities.Count
 Write-Host "[OK] City index has $cityCount cities"
 $steps += @{ step = "by-city-index"; ok = $true; detail = @{ city_count = $cityCount } }
 
 # Step 4: by-date index check
 Write-Host "[4/4] Checking by-date index..."
-$dateIndex = Get-Content -LiteralPath "$ApiDir\by-date\index.json" -Raw | ConvertFrom-Json
+$dateIndex = Get-Content -LiteralPath (Join-Path $resolvedApiDir "by-date" "index.json") -Raw | ConvertFrom-Json
 $dateCount = $dateIndex.dates.Count
 Write-Host "[OK] Date index has $dateCount dates"
 $steps += @{ step = "by-date-index"; ok = $true; detail = @{ date_count = $dateCount } }

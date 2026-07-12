@@ -1,0 +1,41 @@
+<view class="page map-page">
+  <view class="map-nav">
+    <view class="nav-back" bindtap="goBack" hover-class="option-hover">← {{t.back}}</view>
+    <view class="map-title">{{t.title}}</view>
+    <view class="map-club-count">{{clubs.length}} {{t.clubs}}</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="state loading-state">{{t.loading}}</view>
+  <view wx:elif="{{error}}" class="state error">{{error}}</view>
+
+  <map
+    wx:else
+    class="club-map"
+    latitude="{{latitude}}"
+    longitude="{{longitude}}"
+    scale="{{scale}}"
+    markers="{{markers}}"
+    bindmarkertap="onMarkerTap"
+    show-location
+    enable-zoom
+    enable-scroll
+    enable-dark
+    subkey="3QOBZ-B64W4-KVNUL-KAQQM-TQRFT-3VFMU"
+  >
+  </map>
+
+  <view wx:if="{{selectedClub}}" class="club-sheet">
+    <view class="club-sheet-head">
+      <view class="club-sheet-name">{{selectedClub.name}}</view>
+      <view class="club-sheet-close" bindtap="closeClubSheet">×</view>
+    </view>
+    <view wx:if="{{selectedClub.cityLabel}}" class="club-sheet-meta">{{selectedClub.cityLabel}}</view>
+    <view wx:if="{{selectedClub.addressLabel}}" class="club-sheet-address">{{selectedClub.addressLabel}}</view>
+    <view wx:if="{{selectedClub.styleLabel}}" class="club-sheet-style">{{selectedClub.styleLabel}}</view>
+    <view class="club-sheet-count">{{selectedClub.count}} {{t.eventsThisWeek}}</view>
+    <view class="club-sheet-actions">
+      <button class="primary-action" bindtap="openClubDetail">{{t.viewDetail}}</button>
+      <button class="secondary-action" bindtap="navigateToClub">{{t.navigate}}</button>
+    </view>
+  </view>
+</view>

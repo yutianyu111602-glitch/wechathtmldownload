@@ -890,6 +890,13 @@ Page({
     this.retryResolvePosters(nextViewData, this.loadSeq);
   },
 
+  setPreviewRange(event) {
+    const previewRange = normalizeRange(event.currentTarget.dataset.range);
+    if (previewRange === this.data.previewRange) return;
+    this.lightHaptic(HAPTIC.tabInterval);
+    this.setData({ previewRange }, () => this.refreshViewItems());
+  },
+
   onTabItemTap() {
     this.lightHaptic(HAPTIC.tabInterval);
   },

@@ -1,0 +1,63 @@
+<view class="page sound-page">
+  <view class="sound-nav">
+    <view class="nav-back" bindtap="goBack" hover-class="option-hover">← {{t.back}}</view>
+    <view class="sound-nav-title">{{t.title}}</view>
+  </view>
+
+  <scroll-view class="sound-body" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="sound-intro">
+      <view class="sound-intro-title">{{t.introTitle}}</view>
+      <view class="sound-intro-copy">{{t.introBody}}</view>
+    </view>
+
+    <view class="form-section">
+      <view class="section-label">{{t.clubName}} <text class="required">*</text></view>
+      <input class="sound-input" value="{{form.clubName}}" data-key="clubName" bindinput="onFieldInput" placeholder="{{t.clubNamePlaceholder}}" maxlength="60"/>
+    </view>
+
+    <view class="form-section">
+      <view class="section-label">{{t.images}} <text class="required">*</text></view>
+      <view class="image-grid">
+        <view wx:for="{{form.images}}" wx:key="*this" class="image-cell" data-index="{{index}}" bindtap="previewImage">
+          <image lazy-load src="{{item}}" mode="aspectFill" class="image-thumb" ></image>
+          <view class="image-remove" data-index="{{index}}" catchtap="removeImage">×</view>
+        </view>
+        <view wx:if="{{form.images.length < 9}}" class="image-cell image-add" bindtap="chooseImages" hover-class="option-hover">
+          <text class="add-icon">+</text>
+          <text class="add-label">{{t.addImage}}</text>
+        </view>
+      </view>
+      <view class="field-hint">{{t.imageHint}}</view>
+    </view>
+
+    <view class="form-section">
+      <view class="section-label">{{t.paymentImages}} <text class="required">*</text></view>
+      <view class="image-grid">
+        <view wx:for="{{form.paymentImages}}" wx:key="*this" class="image-cell" data-index="{{index}}" bindtap="previewPaymentImage">
+          <image lazy-load src="{{item}}" mode="aspectFill" class="image-thumb" ></image>
+          <view class="image-remove" data-index="{{index}}" catchtap="removePaymentImage">×</view>
+        </view>
+        <view wx:if="{{form.paymentImages.length < 9}}" class="image-cell image-add" bindtap="choosePaymentImages" hover-class="option-hover">
+          <text class="add-icon">+</text>
+          <text class="add-label">{{t.addPaymentImage}}</text>
+        </view>
+      </view>
+      <view class="field-hint">{{t.paymentImageHint}}</view>
+    </view>
+
+    <button class="submit-btn" bindtap="submitForm" disabled="{{submitting}}" hover-class="option-hover">
+      {{submitting ? t.uploading : t.submit}}
+    </button>
+
+    <view wx:if="{{submissions.length}}" class="history-section">
+      <view class="section-label">{{t.history}} ({{submissions.length}})</view>
+      <view wx:for="{{submissions}}" wx:key="submittedAt" class="history-card">
+        <view class="history-head">
+          <view class="history-club">{{item.clubName}}</view>
+          <view class="history-remove" data-index="{{index}}" catchtap="removeSubmission">{{t.remove}}</view>
+        </view>
+        <view wx:if="{{item.imageCount}}" class="history-meta">{{item.imageCount}} {{t.imagesSubmitted}} · {{item.paymentImageCount || 0}} {{t.paymentImagesSubmitted}}</view>
+      </view>
+    </view>
+  </scroll-view>
+</view>

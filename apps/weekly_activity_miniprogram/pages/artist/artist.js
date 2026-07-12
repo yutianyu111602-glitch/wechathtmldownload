@@ -78,6 +78,7 @@ function dedupeEvents(items) {
 Page({
   data: {
     lang: "zh", t: text("sub", "zh"), name: "", loading: true, error: "",
+    subjectId: "",
     events: [], bioLines: [], djDiscovery: [],
     atlasProfile: null, atlasEvents: [], atlasCollaborators: [], atlasVenues: [],
   },
@@ -85,17 +86,22 @@ Page({
   onLoad(query) {
     enableShareMenu();
     this.name = decodeURIComponent(query.name || "");
+    this.subjectId = decodeURIComponent(query.subjectId || "");
     this.lang = normalizeLang(query.lang || wx.getStorageSync("weeklyActivityLang"));
     applyLanguageChrome("artist", this.lang);
-    this.setData({ lang: this.lang, t: text("sub", this.lang), name: this.name });
+    this.setData({ lang: this.lang, t: text("sub", this.lang), name: this.name, subjectId: this.subjectId });
     this.loadArtist();
   },
 
   onShareAppMessage() {
-    return buildNamedPageShare("/pages/artist/artist", this.data.name || this.name, this.lang, this.data.t.relatedEvents);
+    return buildNamedPageShare("/pages/artist/artist", this.data.name || this.name, this.lang, this.data.t.relatedEvents, {
+      subjectId: this.data.subjectId || this.subjectId || "",
+    });
   },
   onShareTimeline() {
-    return buildNamedPageTimeline(this.data.name || this.name, this.lang, this.data.t.relatedEvents);
+    return buildNamedPageTimeline(this.data.name || this.name, this.lang, this.data.t.relatedEvents, {
+      subjectId: this.data.subjectId || this.subjectId || "",
+    });
   },
 
   async loadArtist() {
@@ -126,6 +132,8 @@ Page({
         const mergedVenues = mergeVenues(profileResult.venues || []);
         const mergedCollaborators = mergeCollaborators(profileResult.collaborators || []);
         const profile = profileResult.profile ? { ...profileResult.profile } : null;
+        const resolvedSubjectId = this.subjectId || profile?.subjectId || profile?.djId || profileResult.subjectId || "";
+        if (resolvedSubjectId && !this.subjectId) this.subjectId = resolvedSubjectId;
         if (profile) {
           if (mergedVenues.length) profile.venueCount = mergedVenues.length;
           if (mergedCollaborators.length) profile.collaboratorCount = mergedCollaborators.length;
@@ -143,6 +151,7 @@ Page({
 
         this.setData({
           atlasProfile: profile,
+          subjectId: resolvedSubjectId,
           atlasEvents: atlasEvts || [],
           atlasCollaborators: mergedCollaborators,
           atlasVenues: mergedVenues,
@@ -181,10 +190,11 @@ Page({
     // /atlas/artist honours query limits; the /dj-profile route hard-caps venues
     // at 15 / collaborators at 20, which makes a deduped count impossible. Pull
     // the full lists here, fall back to dj-profile by name only if this fails.
+    const atlasQuery = { eventLimit: 100, collaboratorLimit: 1500, venueLimit: 500 };
+    if (this.subjectId) atlasQuery.subjectId = this.subjectId;
+    else atlasQuery.name = this.name;
     try {
-      const r = await requestApi("/api/v1/weekly/atlas/artist", {
-        name: this.name, eventLimit: 100, collaboratorLimit: 1500, venueLimit: 500,
-      });
+      const r = await requestApi("/api/v1/weekly/atlas/artist", atlasQuery);
       if (r && r.found) return r;
     } catch (err) {
       console.warn("[artist] atlas/artist unavailable, trying dj-profile", err);

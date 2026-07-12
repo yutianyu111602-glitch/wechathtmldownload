@@ -1,0 +1,27 @@
+.map-page { background:#050505; min-height:100vh; display:flex; flex-direction:column; }
+.map-nav { display:flex; align-items:center; padding:12rpx 24rpx; gap:16rpx; background:#0a0a0a; }
+.nav-back { color:#999; font-size:28rpx; padding:8rpx 12rpx; }
+.map-title { color:#fff; font-size:30rpx; font-weight:600; flex:1; }
+.map-club-count { color:#666; font-size:24rpx; }
+
+.club-map { flex:1; width:100%; }
+
+.club-sheet {
+  position:fixed; bottom:0; left:0; right:0;
+  background:#111; border-top:1rpx solid #222;
+  padding:32rpx 32rpx 48rpx;
+  z-index:100;
+}
+.club-sheet-head { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:12rpx; }
+.club-sheet-name { color:#fff; font-size:32rpx; font-weight:700; flex:1; }
+.club-sheet-close { color:#666; font-size:40rpx; padding:0 8rpx; }
+.club-sheet-meta { color:#999; font-size:24rpx; margin-bottom:4rpx; }
+.club-sheet-address { color:#aaa; font-size:24rpx; margin-bottom:8rpx; }
+.club-sheet-style { color:#ff6b35; font-size:24rpx; margin-bottom:4rpx; }
+.club-sheet-count { color:#666; font-size:24rpx; margin-bottom:20rpx; }
+.club-sheet-actions { display:flex; gap:16rpx; }
+.primary-action { flex:1; background:#ff6b35; color:#fff; border:none; border-radius:16rpx; padding:20rpx; font-size:28rpx; font-weight:600; }
+.secondary-action { flex:1; background:#222; color:#ccc; border:none; border-radius:16rpx; padding:20rpx; font-size:28rpx; }
+
+.state { color:#999; text-align:center; padding:80rpx 32rpx; font-size:28rpx; }
+.error { color:#ff4444; }

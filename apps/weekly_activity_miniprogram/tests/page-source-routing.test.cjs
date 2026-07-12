@@ -80,7 +80,9 @@ test("detail page has a dedicated merged source article section", () => {
 test("detail poster tap previews the poster and does not open source article", () => {
   const detailScript = fs.readFileSync(path.join(root, "pages", "detail", "detail.js"), "utf8");
   const detailWxml = fs.readFileSync(path.join(root, "pages", "detail", "detail.wxml"), "utf8");
-  const openPosterMatch = detailScript.match(/openPoster\(\) \{([\s\S]*?)\n  \},\n\n  onPosterImageLoad/);
+  const openPosterMatch = detailScript.match(
+    /openPoster\(\) \{([\s\S]*?)\r?\n  \},\r?\n\r?\n  onPosterImageLoad/
+  );
 
   assert.ok(openPosterMatch, "openPoster body must stay directly testable");
   assert.match(openPosterMatch[1], /wx\.previewImage/);
