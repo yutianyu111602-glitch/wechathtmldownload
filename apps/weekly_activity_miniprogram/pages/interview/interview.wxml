@@ -1,0 +1,90 @@
+<view class="page interview-page">
+  <view class="interview-nav">
+    <view class="nav-back" bindtap="goBack" hover-class="option-hover">← {{t.back}}</view>
+    <view class="interview-nav-title">{{t.title}}</view>
+  </view>
+
+  <scroll-view class="interview-body" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="interview-panel">
+      <view class="panel-kicker">{{t.kicker}}</view>
+      <view class="panel-title">{{t.introTitle}}</view>
+      <view class="panel-copy">{{t.introBody}}</view>
+      <view class="dev-notice">{{t.devNotice || '功能开发中'}}</view>
+    </view>
+
+    <view class="form-section">
+      <view class="section-label">{{t.djName}} <text class="required">*</text></view>
+      <input class="interview-input" value="{{form.djName}}" data-key="djName" bindinput="onFieldInput" placeholder="{{t.djNamePlaceholder}}" maxlength="80"/>
+    </view>
+
+    <view class="form-section">
+      <view class="section-label">{{t.city}}</view>
+      <input class="interview-input" value="{{form.city}}" data-key="city" bindinput="onFieldInput" placeholder="{{t.cityPlaceholder}}" maxlength="60"/>
+    </view>
+
+    <view class="form-section">
+      <view class="section-label">{{t.contact}}</view>
+      <input class="interview-input" value="{{form.contact}}" data-key="contact" bindinput="onFieldInput" placeholder="{{t.contactPlaceholder}}" maxlength="180"/>
+      <view class="field-hint">{{t.contactHint}}</view>
+    </view>
+
+    <view class="form-section compact-stack">
+      <view class="section-label">{{t.links}}</view>
+      <input class="interview-input" value="{{form.instagramUrl}}" data-key="instagramUrl" bindinput="onFieldInput" placeholder="{{t.instagramPlaceholder}}" maxlength="300"/>
+      <input class="interview-input" value="{{form.mixtapeUrl}}" data-key="mixtapeUrl" bindinput="onFieldInput" placeholder="{{t.mixtapePlaceholder}}" maxlength="300"/>
+      <input class="interview-input" value="{{form.sourceUrl}}" data-key="sourceUrl" bindinput="onFieldInput" placeholder="{{t.sourcePlaceholder}}" maxlength="300"/>
+      <view class="link-action-row">
+        <button class="link-action" data-key="mixtapeUrl" bindtap="openOriginalLink" hover-class="option-hover">{{t.listenOriginal}}</button>
+        <button class="link-action" data-key="instagramUrl" bindtap="openOriginalLink" hover-class="option-hover">{{t.copyInstagram}}</button>
+      </view>
+      <view class="field-hint">{{t.linkHint}}</view>
+    </view>
+
+    <view class="form-section">
+      <view class="section-label">{{t.answer}}</view>
+      <textarea class="interview-textarea" value="{{form.answerText}}" data-key="answerText" bindinput="onFieldInput" placeholder="{{t.answerPlaceholder}}" maxlength="900" auto-height="{{true}}"></textarea>
+    </view>
+
+    <view class="form-section consent-section">
+      <view class="section-label">{{t.consentTitle}} <text class="required">*</text></view>
+      <checkbox-group bindchange="onConsentChange">
+        <label class="consent-row">
+          <checkbox value="internal" checked="{{form.consentInternal}}" color="#b6ff3b"/>
+          <text>{{t.consentInternal}}</text>
+        </label>
+        <label class="consent-row">
+          <checkbox value="public" checked="{{form.consentPublic}}" color="#b6ff3b"/>
+          <text>{{t.consentPublic}}</text>
+        </label>
+        <label class="consent-row">
+          <checkbox value="graph" checked="{{form.consentGraph}}" color="#b6ff3b"/>
+          <text>{{t.consentGraph}}</text>
+        </label>
+      </checkbox-group>
+      <view class="field-hint">{{t.consentHint}}</view>
+    </view>
+
+    <button class="submit-btn" bindtap="submitForm" disabled="{{submitting}}" hover-class="option-hover">
+      {{submitting ? t.submitting : t.submit}}
+    </button>
+
+    <view wx:if="{{submissions.length}}" class="history-section">
+      <view class="section-label">{{t.history}} ({{submissions.length}})</view>
+      <view wx:for="{{submissions}}" wx:key="submittedAt" class="history-card">
+        <view class="history-head">
+          <view class="history-dj">{{item.djName}}</view>
+          <view class="history-remove" data-index="{{index}}" catchtap="removeSubmission">{{t.remove}}</view>
+        </view>
+        <view class="history-meta">
+          <text wx:if="{{item.city}}">{{item.city}} · </text>
+          <text>{{item.submittedAt}}</text>
+        </view>
+        <view class="history-flags">
+          <text wx:if="{{item.hasMixtapeUrl}}" class="flag">mixtape</text>
+          <text wx:if="{{item.hasInstagramUrl}}" class="flag">ins</text>
+          <text wx:if="{{item.consentGraph}}" class="flag">{{t.graphFlag}}</text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>

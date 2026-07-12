@@ -1,18 +1,18 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import vm from "node:vm";
+
+const require = createRequire(import.meta.url);
 
 function loadMiniProgramFormat() {
   const testDir = path.dirname(fileURLToPath(import.meta.url));
   const repoRoot = path.resolve(testDir, "../../..");
   const filePath = path.resolve(repoRoot, "apps/weekly_activity_miniprogram/utils/format.js");
-  const code = fs.readFileSync(filePath, "utf8");
-  const sandbox = { module: { exports: {} }, exports: {} };
-  vm.runInNewContext(code, sandbox, { filename: filePath });
-  return sandbox.module.exports;
+  const resolved = require.resolve(filePath);
+  delete require.cache[resolved];
+  return require(resolved);
 }
 
 test("cleans listing titles and does not render venue lines as DJ bio", () => {

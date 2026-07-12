@@ -5,6 +5,7 @@
     "pages/source/source",
     "pages/artist/artist",
     "pages/venue/venue",
+    "pages/atlas-search/atlas-search",
     "pages/city/city",
     "pages/saved/saved",
     "pages/about/about",

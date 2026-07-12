@@ -62,7 +62,7 @@ test.before(async () => {
     })),
   });
 
-  const store = new WeeklyActivityDataStore({ baseDir: fixtureDir });
+  const store = new WeeklyActivityDataStore({ baseDir: fixtureDir, today: "2026-06-01" });
   const env = { ...process.env };
   server = createServer({ store, env });
   await new Promise((resolve) => server.listen(0, resolve));

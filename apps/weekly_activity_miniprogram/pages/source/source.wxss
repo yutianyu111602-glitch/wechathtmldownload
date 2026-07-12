@@ -1,0 +1,138 @@
+.sub-nav {
+  display: flex;
+  align-items: center;
+  min-height: 56rpx;
+  margin-bottom: 12rpx;
+}
+.nav-back {
+  font-size: 32rpx;
+  color: #7eb8da;
+  padding: 8rpx 16rpx;
+  line-height: 1;
+}
+
+.source-state {
+  min-height: 100vh;
+  padding: 72rpx 40rpx;
+  box-sizing: border-box;
+  background:
+    linear-gradient(rgba(255,255,255,.018) 1rpx, transparent 1rpx),
+    linear-gradient(90deg, rgba(255,255,255,.018) 1rpx, transparent 1rpx),
+    #0a0a0a;
+  background-size: 56rpx 56rpx, 56rpx 56rpx, auto;
+  color: #e8e8e8;
+}
+
+.source-card {
+  min-height: 420rpx;
+  border-top: 1rpx solid #2a2a2a;
+  border-bottom: 1rpx solid #2a2a2a;
+  padding: 56rpx 0;
+}
+
+.source-kicker {
+  margin-bottom: 48rpx;
+  color: #7eb8da;
+  font-size: 24rpx;
+  line-height: 1.2;
+  letter-spacing: .16em;
+  font-weight: 700;
+}
+
+.source-title {
+  max-width: 560rpx;
+  color: #e8e8e8;
+  font-size: 42rpx;
+  line-height: 1.18;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.source-progress {
+  width: 100%;
+  height: 6rpx;
+  margin-top: 30rpx;
+  background: rgba(255,255,255,.07);
+  overflow: hidden;
+}
+
+.source-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #b6ff3b 0%, #7b4bd8 100%);
+  transition: width .18s ease;
+}
+
+.source-error {
+  color: #ff8a8a;
+}
+
+.source-hint {
+  max-width: 620rpx;
+  margin-top: 28rpx;
+  color: #9b9b9b;
+  font-size: 26rpx;
+  line-height: 1.58;
+}
+
+.source-url-label {
+  max-width: 620rpx;
+  margin-top: 18rpx;
+  color: #b6ff3b;
+  font-size: 24rpx;
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.source-evidence {
+  max-width: 640rpx;
+  margin-top: 34rpx;
+  padding-top: 28rpx;
+  border-top: 1rpx solid #262626;
+}
+
+.source-evidence-title {
+  color: #f0f0f0;
+  font-size: 30rpx;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.source-evidence-meta {
+  margin-top: 14rpx;
+  color: #7eb8da;
+  font-size: 23rpx;
+  line-height: 1.4;
+}
+
+.source-evidence-snippet {
+  margin-top: 18rpx;
+  color: #a9a9a9;
+  font-size: 25rpx;
+  line-height: 1.58;
+}
+
+.source-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20rpx;
+  margin-top: 64rpx;
+}
+
+.source-actions button {
+  min-height: 88rpx;
+  border-radius: 0;
+  font-size: 26rpx;
+  line-height: 88rpx;
+  letter-spacing: .04em;
+}
+
+.primary-action {
+  color: #050505;
+  background: #b6ff3b;
+}
+
+.secondary-action {
+  color: #d8d8d8;
+  background: #141414;
+  border: 1rpx solid #2f2f2f;
+}

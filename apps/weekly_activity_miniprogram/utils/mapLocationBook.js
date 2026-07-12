@@ -11,6 +11,8 @@ const VERIFIED_MAP_LOCATION_BOOK = [
   { keys: ["浙江省杭州市西湖区象山路131号"], latitude: 30.150851, longitude: 120.075248, name: "Ping常BAC艺术社区", address: "浙江省杭州市西湖区象山路131号" },
   { keys: ["浙江省杭州市上城区中山南路411号"], latitude: 30.23502, longitude: 120.170683, name: "肆幺幺", address: "浙江省杭州市上城区中山南路411号" },
   { keys: ["广东省广州市海珠区工业大道北路132号自编45号102室"], latitude: 23.083889, longitude: 113.262581, name: "GUM Guangzhou", address: "广东省广州市海珠区工业大道北路132号自编45号102室" },
+  { keys: ["广东省广州市越秀区289艺术园区生产综合楼101", "广州|Droowning Club|广东省广州市越秀区289艺术园区生产综合楼101", "广州|Droowning Club", "Droowning Club|广州", "广州|CLUB DROOWNING", "CLUB DROOWNING|广州"], latitude: 23.128, longitude: 113.299, name: "Droowning Club", address: "广东省广州市越秀区289艺术园区生产综合楼101" },
+  { keys: ["河南省郑州市中原区华山路与颍河路交叉口二砂文化创意园", "郑州|SYSTEM 系统", "SYSTEM 系统|郑州", "郑州|郑州二砂文化创意园", "郑州二砂文化创意园|郑州", "郑州|二砂文化创意园", "二砂文化创意园|郑州", "郑州|二砂创意园区", "二砂创意园区|郑州"], latitude: 34.743255, longitude: 113.593681, name: "SYSTEM 系统", address: "河南省郑州市中原区华山路与颍河路交叉口二砂文化创意园" },
   { keys: ["贵州省贵阳市云岩区普陀路街道普陀路黔达花园AB座负一层"], latitude: 26.589655, longitude: 106.713018, name: "贵阳市·HUMClub", address: "贵州省贵阳市云岩区普陀路街道普陀路黔达花园AB座负一层" },
   { keys: ["广东省广州市海珠区工业大道北路132号自编45号104", "广东省广州市海珠区工业大道北132号T.I.T文创园45栋104号", "海珠区工业大道北132号T.I.T文创园45栋104号", "导航搜索：创味园私厨餐厅", "广州|创味园私厨餐厅", "创味园私厨餐厅|广州", "广州|GUM Guangzhou", "GUM Guangzhou|广州", "广州|GUM", "GUM|广州"], latitude: 23.083889, longitude: 113.262581, name: "创味园私厨餐厅", address: "广东省广州市海珠区工业大道北路132号自编45号104" },
   { keys: ["黑龙江省大庆市龙凤区黎明街道黎明湖酒吧一条街3号集装箱", "黑龙江省大庆市龙凤区黎明街道黎明湖酒吧一条街三号集装箱", "大庆市黎明湖酒吧一条街三号集装箱", "大庆市黎明湖酒吧一条街3号集装箱", "大庆|Rust Club 锈蚀俱乐部", "Rust Club 锈蚀俱乐部|大庆", "大庆|Rust Club", "Rust Club|大庆", "大庆|锈蚀俱乐部", "锈蚀俱乐部|大庆"], latitude: 46.593972, longitude: 125.129893, name: "Rust Club 锈蚀俱乐部", address: "黑龙江省大庆市龙凤区黎明街道黎明湖酒吧一条街3号集装箱" },
@@ -19,6 +21,8 @@ const VERIFIED_MAP_LOCATION_BOOK = [
   { keys: ["广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号", "深圳|OIL油", "OIL油|深圳"], latitude: 22.530364, longitude: 114.021871, name: "OIL油", address: "广东省深圳市福田区车公庙泰然八路深业泰然大厦01层L1-11A号" },
   { keys: ["北京市朝阳区酒仙桥路2号798艺术区706路B06-2", "北京|莫须有工厂", "莫须有工厂|北京"], latitude: 39.986721, longitude: 116.496218, name: "莫须有工厂", address: "北京市朝阳区酒仙桥路2号798艺术区706路B06-2" },
   { keys: ["成都市锦江区永安路666号1号楼NUART锦江6F", "成都|厅", "厅|成都"], latitude: 30.589297, longitude: 104.082517, name: "厅", address: "成都市锦江区永安路666号1号楼NUART锦江6F" },
+  { keys: ["四川省成都市锦江区国华街", "成都|厅Tin", "厅Tin|成都", "成都|Tin", "Tin|成都", "锦江区国华街 厅Tin"], latitude: 30.588569, longitude: 104.080481, name: "厅Tin", address: "四川省成都市锦江区国华街" },
+  { keys: ["上海市黄浦区瑞金二路街道巨鹿路272号", "上海|Cedar Kitchen(茂名南路店)", "Cedar Kitchen(茂名南路店)|上海", "上海|Cedar Kitchen", "Cedar Kitchen|上海", "上海|Cedar自由贸易市场", "Cedar自由贸易市场|上海"], latitude: 31.223088, longitude: 121.461366, name: "Cedar Kitchen(茂名南路店)", address: "上海市黄浦区瑞金二路街道巨鹿路272号" },
   { keys: ["广东省广州市海珠区龙新一路37号合拍空间5楼501室", "广州|陀地士多", "陀地士多|广州"], latitude: 23.097666, longitude: 113.262634, name: "陀地士多", address: "广东省广州市海珠区龙新一路37号合拍空间5楼501室" },
   { keys: ["浙江省杭州市西湖区天目山路398号天目里7号楼负一层", "杭州|loopy Club", "loopy Club|杭州"], latitude: 30.267023, longitude: 120.098623, name: "loopy Club", address: "浙江省杭州市西湖区天目山路398号天目里7号楼负一层" },
   { keys: ["杭州市拱墅区湖墅南路439号氧气公寓1楼", "杭州|门洞商店", "门洞商店|杭州", "杭州|Mendong", "Mendong|杭州"], latitude: 30.2853, longitude: 120.1539, name: "门洞商店", address: "杭州市拱墅区湖墅南路439号氧气公寓1楼" },
@@ -121,6 +125,7 @@ const VERIFIED_MAP_LOCATION_BOOK = [
   { keys: ["杭州|肆幺幺杭州", "肆幺幺杭州|杭州", "fouroneone hangzhou", "411 hangzhou"], latitude: 30.270, longitude: 120.150, name: "肆幺幺杭州", address: "杭州市" },
   { keys: ["广州|Stereo.52", "Stereo.52|广州", "stereo52", "sertro.52", "杭州|Stereo.52", "Stereo.52|杭州"], latitude: 23.130, longitude: 113.275, name: "Stereo.52", address: "广东省广州市越秀区中华国际中心（秘密地址，加微信了解）" },
   { keys: ["黑龙江省大庆市龙凤区黎明街道黎明湖酒吧一条街3号集装箱", "黑龙江省大庆市龙凤区黎明湖酒吧一条街3号集装箱", "大庆市黎明湖酒吧一条街三号集装箱", "大庆市黎明湖酒吧一条街3号集装箱", "大庆|Rust Club 锈蚀俱乐部", "Rust Club 锈蚀俱乐部|大庆", "大庆|Rust Club", "Rust Club|大庆", "大庆|锈蚀俱乐部", "锈蚀俱乐部|大庆"], latitude: 46.593972, longitude: 125.129893, name: "Rust Club 锈蚀俱乐部", address: "大庆市黎明湖酒吧一条街三号集装箱" },
+  { keys: ["内蒙古自治区呼和浩特市新城区新华大街15号天鹅坊d1栋东座", "呼和浩特|WAKEYWAKEY Bar Club", "WAKEYWAKEY Bar Club|呼和浩特", "呼和浩特|WAKEYWAKEY", "WAKEYWAKEY|呼和浩特", "呼和浩特|WAKEYWAKEY Bar", "WAKEYWAKEY Bar|呼和浩特"], latitude: 40.827079, longitude: 111.689982, name: "WAKEYWAKEY Bar Club", address: "内蒙古自治区呼和浩特市新城区新华大街15号天鹅坊d1栋东座" },
 ];
 
 module.exports = { VERIFIED_MAP_LOCATION_BOOK };

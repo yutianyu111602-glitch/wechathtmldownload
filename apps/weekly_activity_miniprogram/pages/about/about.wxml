@@ -1,0 +1,52 @@
+<view class="page about-page">
+  <image lazy-load class="brand-logo" src="/assets/brand/huaidj-logo-nav-512x128.png" mode="aspectFit" bindlongpress="onLogoLongpress"></image>
+  <view class="section-title">{{t.title}}</view>
+  <view class="copy">{{t.copy1}}</view>
+  <view class="copy">{{t.copy2}}</view>
+  <view class="section-title">{{t.sourceTitle}}</view>
+  <view class="copy">{{t.source1}}</view>
+  <view class="copy">{{t.source2}}</view>
+  <view class="atlas-panel" bindtap="openAtlasBeta" hover-class="atlas-panel-hover">
+    <view class="atlas-panel-head">
+      <view>
+        <view class="atlas-title">{{t.atlasTitle}}</view>
+      </view>
+      <view class="atlas-status">
+        <text>{{t.atlasStatus}}</text>
+        <text class="atlas-arrow">↗</text>
+      </view>
+    </view>
+    <view class="atlas-copy">{{t.atlasBody}}</view>
+    <view class="atlas-meta">{{t.atlasMeta}}</view>
+    <view class="atlas-disclaimer">{{t.atlasDisclaimer}}</view>
+    <view class="atlas-link-row">
+      <text>{{t.atlasAction}}</text>
+      <text class="atlas-url">{{t.atlasUrlLabel}}</text>
+    </view>
+  </view>
+  <view class="interview-panel" bindtap="openInterview" hover-class="interview-panel-hover">
+    <view class="interview-panel-head">
+      <view>
+        <view class="interview-kicker">ATLAS</view>
+        <view class="interview-title">提交 Mixtape / 采访线索</view>
+      </view>
+      <view class="interview-arrow">›</view>
+    </view>
+    <view class="interview-copy">补充 ins、mixtape 或采访笔记，进入人工审核队列</view>
+  </view>
+  <view class="meta-block">
+    <view class="meta-line">
+      <text class="mono-label">{{t.version}}</text>
+      <text>{{version}}</text>
+    </view>
+    <view class="meta-line">
+      <text class="mono-label">{{t.build}}</text>
+      <text>{{buildDate}}</text>
+    </view>
+    <view class="meta-line">
+      <text class="mono-label">CloudBase</text>
+      <text class="env-link" bindtap="copyEnvId">huaidjweekly-d8…</text>
+    </view>
+  </view>
+  <view class="copy muted">© {{year}} HUAIDJ. {{t.footer}}</view>
+</view>

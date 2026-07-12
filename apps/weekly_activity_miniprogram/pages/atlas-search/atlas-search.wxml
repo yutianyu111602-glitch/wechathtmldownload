@@ -1,0 +1,62 @@
+<view class="search-page">
+  <view class="search-nav">
+    <button bindtap="openStarmap">全景星图</button>
+  </view>
+
+  <view class="search-head">
+    <view class="search-kicker">ATLAS V2</view>
+    <view class="search-title">搜索图鉴</view>
+    <view class="search-sub">DJ / 场地 / 厂牌 / 系列</view>
+  </view>
+
+  <view class="search-box">
+    <input
+      class="search-input"
+      placeholder="输入 DJ、俱乐部、厂牌或系列"
+      placeholder-class="search-ph"
+      value="{{query}}"
+      bindinput="onInput"
+      bindconfirm="onSearchConfirm"
+      confirm-type="search"
+    />
+    <view wx:if="{{query}}" class="search-clear" bindtap="clearSearch">×</view>
+    <view class="search-submit" bindtap="onSearchConfirm">搜索</view>
+  </view>
+
+  <scroll-view class="type-bar" scroll-x="true">
+    <view class="type-track">
+      <view
+        wx:for="{{tabs}}"
+        wx:key="key"
+        class="type-tab {{activeType === item.key ? 'on' : ''}}"
+        data-type="{{item.key}}"
+        bindtap="onTypeTap"
+      >{{item.label}}</view>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{loading}}" class="state">正在搜索…</view>
+  <view wx:elif="{{error}}" class="state muted">{{error}}</view>
+  <view wx:elif="{{!searched}}" class="state muted">搜索全量图鉴中的 75k 实体。</view>
+
+  <view wx:if="{{results.length}}" class="result-list">
+    <view
+      wx:for="{{results}}"
+      wx:key="id"
+      class="result-row"
+      data-index="{{index}}"
+      bindtap="openResult"
+      hover-class="row-hover"
+    >
+      <view class="result-main">
+        <view class="result-top">
+          <text class="type-chip type-{{item.type}}">{{item.typeLabel}}</text>
+          <text class="result-name">{{item.name}}</text>
+        </view>
+        <view wx:if="{{item.meta}}" class="result-meta">{{item.meta}}</view>
+        <view wx:if="{{item.aliasLine}}" class="result-alias">{{item.aliasLine}}</view>
+      </view>
+      <text class="result-arrow">›</text>
+    </view>
+  </view>
+</view>

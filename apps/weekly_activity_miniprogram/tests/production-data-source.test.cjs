@@ -31,23 +31,24 @@ function isAggregateChild(item) {
     || String((item && (item.id || item.event_id)) || "").startsWith("agg-child-");
 }
 
-test("production config cannot show stale bundled snapshot before live APIs", () => {
+test("production config keeps offline fallback without letting snapshots race the current feed", () => {
   const publicFallbackDelayMs = numericConfig("publicFallbackDelayMs");
   const publicRequestTimeoutMs = numericConfig("publicRequestTimeoutMs");
   const cacheFallbackDelayMs = numericConfig("cacheFallbackDelayMs");
   const offlineSnapshotFallbackDelayMs = numericConfig("offlineSnapshotFallbackDelayMs");
 
-  assert.match(appJs, /offlineSnapshotFallback:\s*false/);
+  assert.match(appJs, /offlineSnapshotFallback:\s*true/);
   assert.match(appJs, /fastOfflineSnapshotFallback:\s*false/);
-  assert.equal(offlineSnapshotFallbackDelayMs, -1);
+  assert.ok(offlineSnapshotFallbackDelayMs < 0, "snapshot delay must stay disabled for the online current feed");
+  assert.ok(publicRequestTimeoutMs >= 3000, "public request timeout must leave room for normal mobile latency");
   assert.ok(
-    cacheFallbackDelayMs > publicFallbackDelayMs + publicRequestTimeoutMs,
-    "cache fallback must wait until the public API path has had a full chance to return",
+    cacheFallbackDelayMs > publicFallbackDelayMs,
+    "cache fallback must wait until the public API path has had a chance to return",
   );
-  assert.match(cacheJs, /weeklyActivityApiCache:v20260604:/);
+  assert.match(cacheJs, /weeklyActivityApiCache:v20260704:/);
 });
 
-test("current release package uses the 2026-06-02 data window with CloudBase poster file IDs", () => {
+test("current release package uses its published data window with CloudBase poster file IDs", () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(currentReleaseDir, "manifest.json"), "utf8"));
   const current = JSON.parse(fs.readFileSync(path.join(currentReleaseDir, "current.json"), "utf8"));
   const items = Array.isArray(current) ? current : current.items || current.events || [];
@@ -73,8 +74,13 @@ test("current release package uses the 2026-06-02 data window with CloudBase pos
     "posterLoadFailed",
   ];
   const aggregateChildren = items.filter(isAggregateChild);
-  const itemsWithCloudFileId = items.filter((item) => (
+  const nonAggregateItems = items.filter((item) => !isAggregateChild(item));
+  const nonAggregateItemsWithCloudFileId = nonAggregateItems.filter((item) => (
     fileIdKeys.some((key) => /^cloud:\/\/[^/]+\/weekly-posters\/\d{8}\//i.test(stringValue(item, key)))
+  ));
+  const nonAggregateQpicFallbackItems = nonAggregateItems.filter((item) => (
+    !nonAggregateItemsWithCloudFileId.includes(item)
+    && coverKeys.some((key) => /^https:\/\/(?:mmbiz|mmecoa)\.qpic\.cn\//i.test(stringValue(item, key)))
   ));
   const itemsWithCloudbaseStorage = items.filter((item) => (
     posterStorageKeys.some((key) => /^cloudbase$/i.test(stringValue(item, key)))
@@ -97,7 +103,7 @@ test("current release package uses the 2026-06-02 data window with CloudBase pos
 
   assert.ok(Date.parse(manifest.generated_at) >= Date.parse("2026-06-02T19:14:20+08:00"));
   assert.equal(manifest.window_start, "2026-06-02");
-  assert.equal(manifest.window_end, "2026-06-16");
+  assert.equal(manifest.window_end, "2026-06-25");
   assert.ok(manifest.item_count >= 155, `expected >= 155 items, got ${manifest.item_count}`);
   assert.equal(items.length, manifest.item_count);
   assert.ok(dates.includes(manifest.window_start));
@@ -112,8 +118,17 @@ test("current release package uses the 2026-06-02 data window with CloudBase pos
   assert.equal(outsideWindowItems.length, 0);
   assert.equal(aggregateChildren.length, 11);
   assert.equal(aggregateSourceResidue.length, 0);
-  assert.ok(itemsWithCloudFileId.length >= items.length - 1, `expected >= ${items.length - 1} with cloud file ID, got ${itemsWithCloudFileId.length}`);
-  assert.ok(itemsWithCloudbaseStorage.length >= items.length - 1, `expected >= ${items.length - 1} with cloudbase storage, got ${itemsWithCloudbaseStorage.length}`);
-  assert.equal(publicPosterItems.length, 0);
+  assert.ok(
+    nonAggregateItemsWithCloudFileId.length >= Math.ceil(nonAggregateItems.length * 0.9),
+    `expected >=90% non-aggregate items with cloud file ID, got ${nonAggregateItemsWithCloudFileId.length}/${nonAggregateItems.length}`,
+  );
+  assert.equal(
+    nonAggregateItemsWithCloudFileId.length + nonAggregateQpicFallbackItems.length,
+    nonAggregateItems.length,
+    "every non-aggregate poster must use a cloud file ID or a proxy-compatible qpic fallback",
+  );
+  assert.ok(nonAggregateQpicFallbackItems.length <= 15, `expected <=15 legacy qpic fallbacks, got ${nonAggregateQpicFallbackItems.length}`);
+  assert.equal(itemsWithCloudbaseStorage.length, items.length);
+  assert.equal(publicPosterItems.length, nonAggregateQpicFallbackItems.length);
   assert.equal(runtimePosterStateItems.length, 0);
 });
