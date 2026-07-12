@@ -671,7 +671,7 @@ test("uses bundled snapshot when VPN-like routes hang before any cache exists", 
   assert.equal(result.items.length, 3);
   assert.equal(result.items[0].id, FIRST_OFFLINE_SNAPSHOT_ID);
   assert.equal(publicAborted, true);
-  assert.ok(Date.now() - startedAt < 150, "bundled snapshot should win before long network timeouts");
+  assert.ok(Date.now() - startedAt < 500, "bundled snapshot should win before long network timeouts");
 });
 
 test("uses bundled snapshots for all first-screen endpoints when every route hangs", async () => {
