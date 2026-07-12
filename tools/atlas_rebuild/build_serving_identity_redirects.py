@@ -10,12 +10,16 @@ import re
 import sqlite3
 import tempfile
 import unicodedata
+from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
 
 SCHEMA_VERSION = "atlas_serving_identity_redirect.v1"
 HASH_DJ_ID = re.compile(r"^dj:[0-9a-f]{16}$", re.IGNORECASE)
+ROLE_LABEL_RE = re.compile(r"^(?:dj|aka)(?:\s+|[:/_.-]+)(.+)$", re.IGNORECASE)
+SELF_ANNOTATION_RE = re.compile(r"^(.+?)\s*\((.+)\)\s*$")
+IDENTITY_NOISE_CORES = {"artist", "dj", "music", "艺人", "嘉宾", "音乐人"}
 
 
 def _open_read_only(path: Path) -> sqlite3.Connection:
@@ -40,6 +44,158 @@ def _city_key(value: str | None) -> str:
 
 def _is_synthetic_dj_id(value: str) -> bool:
     return value.startswith("dj:") and len(value) > 3 and HASH_DJ_ID.fullmatch(value) is None
+
+
+def _identity_name(value: str | None) -> str:
+    return unicodedata.normalize("NFKC", str(value or "")).strip().casefold()
+
+
+def _role_label_core(value: str | None) -> tuple[str, str] | None:
+    normalized = _identity_name(value)
+    match = ROLE_LABEL_RE.fullmatch(normalized)
+    if match:
+        core = match.group(1).strip()
+        if core and core not in IDENTITY_NOISE_CORES:
+            return core, "role_label_exact"
+    annotation = SELF_ANNOTATION_RE.fullmatch(normalized)
+    if not annotation:
+        return None
+    outer = annotation.group(1).strip()
+    inner = annotation.group(2).strip()
+    inner_role = ROLE_LABEL_RE.fullmatch(inner)
+    inner_core = inner_role.group(1).strip() if inner_role else inner
+    if outer and outer == inner_core and outer not in IDENTITY_NOISE_CORES:
+        return outer, "self_annotation_exact"
+    return None
+
+
+def _load_dj_evidence(
+    source_path: Path,
+    dj_ids: set[str],
+) -> tuple[dict[str, set[str]], dict[str, set[str]]]:
+    sources: dict[str, set[str]] = defaultdict(set)
+    timeline: dict[str, set[str]] = defaultdict(set)
+    if not dj_ids:
+        return sources, timeline
+    source = _open_read_only(source_path)
+    try:
+        if not _table_exists(source, "dj_event"):
+            return sources, timeline
+        ordered = sorted(dj_ids)
+        for offset in range(0, len(ordered), 400):
+            chunk = ordered[offset : offset + 400]
+            placeholders = ",".join("?" for _ in chunk)
+            for row in source.execute(
+                f"""SELECT dj_id,event_id,starts_at,venue_id,source_ref_id
+                      FROM dj_event WHERE dj_id IN ({placeholders})""",
+                chunk,
+            ):
+                dj_id = str(row["dj_id"])
+                event_id = str(row["event_id"] or "").strip()
+                starts_at = str(row["starts_at"] or "").strip()
+                venue_id = str(row["venue_id"] or "").strip()
+                source_ref_id = str(row["source_ref_id"] or "").strip()
+                if source_ref_id:
+                    sources[dj_id].add(source_ref_id)
+                if event_id:
+                    timeline[dj_id].add(f"event:{event_id}")
+                if starts_at and venue_id:
+                    timeline[dj_id].add(f"timeline:{starts_at}|{venue_id}")
+    finally:
+        source.close()
+    return sources, timeline
+
+
+def _canonical_role_label_redirects(
+    source_path: Path,
+    canonical: list[dict],
+    profiles_by_id: dict[str, dict],
+    canonical_by_name: dict[str, list[dict]],
+    decisions: dict[str, dict],
+    decided_at: str,
+) -> list[dict]:
+    proposed: list[tuple[str, str, str]] = []
+    for row in canonical:
+        source_id = row["subject_id"]
+        if source_id in decisions:
+            continue
+        parsed = _role_label_core(row["normalized_name"])
+        if not parsed:
+            continue
+        core, rule = parsed
+        candidates = canonical_by_name.get(core, [])
+        if len(candidates) != 1 or candidates[0]["subject_id"] == source_id:
+            continue
+        proposed.append((source_id, candidates[0]["subject_id"], rule))
+
+    evidence_ids = {dj_id for source_id, target_id, _ in proposed for dj_id in (source_id, target_id)}
+    sources, timeline = _load_dj_evidence(source_path, evidence_ids)
+    accepted: list[tuple[str, str, str, int, int]] = []
+    for source_id, target_id, rule in proposed:
+        shared_sources = len(sources[source_id] & sources[target_id])
+        shared_timeline = len(timeline[source_id] & timeline[target_id])
+        if shared_sources or shared_timeline:
+            accepted.append((source_id, target_id, rule, shared_sources, shared_timeline))
+
+    parent: dict[str, str] = {}
+
+    def find(value: str) -> str:
+        parent.setdefault(value, value)
+        if parent[value] != value:
+            parent[value] = find(parent[value])
+        return parent[value]
+
+    def union(left: str, right: str) -> None:
+        left_root, right_root = find(left), find(right)
+        if left_root != right_root:
+            parent[max(left_root, right_root)] = min(left_root, right_root)
+
+    for source_id, target_id, *_ in accepted:
+        union(source_id, target_id)
+
+    components: dict[str, set[str]] = defaultdict(set)
+    for dj_id in parent:
+        components[find(dj_id)].add(dj_id)
+
+    def rank(dj_id: str) -> tuple[int, int, int, int, str]:
+        normalized_name = profiles_by_id[dj_id]["normalized_name"]
+        undecorated = int(_role_label_core(normalized_name) is None)
+        return (
+            len(sources[dj_id]),
+            len(timeline[dj_id]),
+            undecorated,
+            -len(_identity_name(normalized_name)),
+            dj_id,
+        )
+
+    redirects: list[dict] = []
+    for members in components.values():
+        root = max(members, key=rank)
+        component_edges = [edge for edge in accepted if edge[0] in members and edge[1] in members]
+        for source_id in sorted(members - {root}):
+            direct_edges = [
+                edge
+                for edge in component_edges
+                if {edge[0], edge[1]} == {source_id, root}
+            ]
+            evidence_edges = direct_edges or component_edges
+            shared_sources = max((edge[3] for edge in evidence_edges), default=0)
+            shared_timeline = max((edge[4] for edge in evidence_edges), default=0)
+            rules = sorted({edge[2] for edge in evidence_edges})
+            redirects.append(
+                {
+                    "source_dj_id": source_id,
+                    "canonical_dj_id": root,
+                    "decision_method": "role_label_evidence",
+                    "decision_reason": (
+                        f"{'/'.join(rules)}; shared_sources={shared_sources}; "
+                        f"shared_timeline_keys={shared_timeline}"
+                    ),
+                    "confidence": 0.98,
+                    "decided_at": decided_at,
+                }
+            )
+    return redirects
 
 
 def _digest(rows: list[dict]) -> str:
@@ -133,7 +289,7 @@ def _create_output(
             CREATE TABLE dj_identity_redirect (
               source_dj_id TEXT PRIMARY KEY,
               canonical_dj_id TEXT NOT NULL,
-              decision_method TEXT NOT NULL CHECK(decision_method IN ('identity','synthetic_exact','accepted_plan','human')),
+              decision_method TEXT NOT NULL CHECK(decision_method IN ('identity','synthetic_exact','role_label_evidence','accepted_plan','human')),
               decision_reason TEXT NOT NULL,
               confidence REAL NOT NULL,
               decided_at TEXT NOT NULL
@@ -249,7 +405,33 @@ def build_redirects(
         raise ValueError(f"Accepted plan references unknown source DJs: {unknown_decisions[:5]}")
 
     decided_at = _deterministic_timestamp(source_path, accepted_path)
-    redirects: list[dict] = []
+    redirects = _canonical_role_label_redirects(
+        source_path,
+        canonical,
+        profiles_by_id,
+        canonical_by_name,
+        decisions,
+        decided_at,
+    )
+    canonical_role_label_redirects = len(redirects)
+    for source_id, accepted in sorted(decisions.items()):
+        if source_id not in canonical_by_id or accepted["action"] != "redirect":
+            continue
+        target_id = accepted["canonical_dj_id"]
+        if target_id not in canonical_by_id:
+            raise ValueError(f"Accepted redirect target is not canonical: {source_id} -> {target_id}")
+        if source_id == target_id:
+            raise ValueError(f"Accepted redirect cannot target itself: {source_id}")
+        redirects.append(
+            {
+                "source_dj_id": source_id,
+                "canonical_dj_id": target_id,
+                "decision_method": "accepted_plan",
+                "decision_reason": accepted["reason"],
+                "confidence": 1.0,
+                "decided_at": decided_at,
+            }
+        )
     reviews: list[dict] = []
     non_canonical = [row for row in profiles if row["dj_id"] not in canonical_by_id]
     for profile in non_canonical:
@@ -333,7 +515,8 @@ def build_redirects(
     review_candidates = sum(row["review_state"] != "new_canonical" for row in reviews)
     new_canonical = sum(row["review_state"] == "new_canonical" for row in reviews)
     keep_separate = sum(row["review_state"] == "keep_separate" for row in reviews)
-    classified_profiles = len(redirects) + len(reviews)
+    non_canonical_ids = {row["dj_id"] for row in non_canonical}
+    classified_profiles = sum(row["source_dj_id"] in non_canonical_ids for row in redirects) + len(reviews)
     if classified_profiles != len(non_canonical):
         raise RuntimeError(
             f"Identity classification coverage mismatch: {classified_profiles} != {len(non_canonical)}"
@@ -362,6 +545,7 @@ def build_redirects(
         "canonical_djs": len(canonical),
         "non_canonical_profiles": len(non_canonical),
         "auto_redirects": len(redirects),
+        "canonical_role_label_redirects": canonical_role_label_redirects,
         "synthetic_exact_redirects": sum(row["decision_method"] == "synthetic_exact" for row in redirects),
         "accepted_plan_redirects": sum(row["decision_method"] == "accepted_plan" for row in redirects),
         "review_candidates": review_candidates,
@@ -388,6 +572,7 @@ def build_redirects(
                 "dj_profiles": len(profiles),
                 "canonical_djs": len(canonical),
                 "non_canonical_profiles": len(non_canonical),
+                "canonical_role_label_redirects": canonical_role_label_redirects,
                 "redirects": len(redirects),
                 "reviews": len(reviews),
             },

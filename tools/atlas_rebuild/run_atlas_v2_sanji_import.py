@@ -59,6 +59,7 @@ DEFAULT_SEEN_TOKENS = Path(r"E:\atlas_manifest_exports\sanji_pipeline_seen_token
 DEFAULT_RUN_ROOT = Path(r"E:\atlas_v2_import_runs")
 DEFAULT_CUMULATIVE_STATE = DEFAULT_RUN_ROOT / "latest_cumulative_candidate.json"
 DEFAULT_WEAK_DECISIONS = DEFAULT_RUN_ROOT / "weak_key_decisions.sqlite"
+DEFAULT_ACCEPTED_IDENTITY_PLAN = HERE / "accepted_identity_decisions.jsonl"
 DEFAULT_HISTORICAL_VENUE_GEO = Path(
     os.environ.get(
         "ATLAS_HISTORICAL_VENUE_GEO",
@@ -286,6 +287,11 @@ def main() -> int:
     ap.add_argument("--run-root", type=Path, default=DEFAULT_RUN_ROOT)
     ap.add_argument("--weak-decisions-db", type=Path, default=DEFAULT_WEAK_DECISIONS)
     ap.add_argument(
+        "--accepted-identity-plan",
+        type=Path,
+        default=optional_existing_path(DEFAULT_ACCEPTED_IDENTITY_PLAN),
+    )
+    ap.add_argument(
         "--historical-venue-geo",
         type=Path,
         default=optional_existing_path(DEFAULT_HISTORICAL_VENUE_GEO),
@@ -310,6 +316,8 @@ def main() -> int:
 
     if args.historical_venue_geo is not None and not args.historical_venue_geo.is_file():
         ap.error(f"--historical-venue-geo not found: {args.historical_venue_geo}")
+    if args.accepted_identity_plan is not None and not args.accepted_identity_plan.is_file():
+        ap.error(f"--accepted-identity-plan not found: {args.accepted_identity_plan}")
 
     base_serving_db = resolve_base_serving_db(
         args.base_serving_db,
@@ -464,19 +472,22 @@ def main() -> int:
     identity_dir.mkdir(parents=True, exist_ok=True)
     identity_db = identity_dir / "identity_redirects.sqlite"
     venue_redirect_db = identity_dir / "venue_redirects.sqlite"
+    dj_identity_cmd = [
+        sys.executable,
+        str(HERE / "build_serving_identity_redirects.py"),
+        "--source-serving-db",
+        str(merged_db),
+        "--out",
+        str(identity_db),
+        "--report",
+        str(identity_dir / "identity_report.json"),
+    ]
+    if args.accepted_identity_plan is not None:
+        dj_identity_cmd += ["--accepted-entity-plan", str(args.accepted_identity_plan)]
     steps.append(
         run_step(
             "build_dj_identity",
-            [
-                sys.executable,
-                str(HERE / "build_serving_identity_redirects.py"),
-                "--source-serving-db",
-                str(merged_db),
-                "--out",
-                str(identity_db),
-                "--report",
-                str(identity_dir / "identity_report.json"),
-            ],
+            dj_identity_cmd,
             env,
             log_dir,
         )

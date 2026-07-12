@@ -41,6 +41,7 @@ def test_canonical_pipeline_order_contract() -> None:
 
 def test_canonical_llm_batch_size_preserves_complete_verdicts() -> None:
     assert orchestrator.CANONICAL_LLM_BATCH_SIZE == 10
+    assert orchestrator.DEFAULT_ACCEPTED_IDENTITY_PLAN.is_file()
 
 
 def test_optional_historical_geo_does_not_block_clean_clone() -> None:
