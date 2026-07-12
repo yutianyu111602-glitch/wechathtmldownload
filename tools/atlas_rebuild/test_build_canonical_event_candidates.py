@@ -181,6 +181,23 @@ def test_venue_redirect_does_not_escape_city_scope(root: Path) -> None:
     assert venue_id == "venue:alias", venue_id
 
 
+def test_unicode_identifier_is_not_nfkc_normalized(root: Path) -> None:
+    source = root / "unicode_id_source.sqlite"
+    create_source(
+        source,
+        [
+            ("event:unicode", "Unicode ID", "2026-05-02", "venue:unicode", "Unicode", "上海", "source:unicode", 0.9),
+        ],
+        [("dj:dan²", "event:unicode", "2026-05-02", "source:unicode", 0.9)],
+    )
+    out = root / "unicode_id_out"
+    run(source, out, limit_events=0, top_groups=20, sample_multi_event=10)
+    con = sqlite3.connect(out / "canonical_event_candidates.sqlite")
+    dj_id = con.execute("SELECT dj_id FROM canonical_dj_event").fetchone()[0]
+    con.close()
+    assert dj_id == "dj:dan²", repr(dj_id)
+
+
 def test_redirect_cycle_fails(root: Path) -> None:
     cycle = root / "cycle.sqlite"
     con = sqlite3.connect(cycle)
@@ -218,6 +235,7 @@ def main() -> None:
         test_identity_and_venue_redirects_collapse_timeline(root)
         test_cross_city_venue_reuse_stays_separate(root)
         test_venue_redirect_does_not_escape_city_scope(root)
+        test_unicode_identifier_is_not_nfkc_normalized(root)
         test_redirect_cycle_fails(root)
     print(result.stdout)
 

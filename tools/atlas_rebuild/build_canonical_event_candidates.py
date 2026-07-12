@@ -147,6 +147,10 @@ def city_scope_key(value: Any) -> str:
     return "" if city in UNKNOWN_CITY_KEYS else city
 
 
+def id_text(value: Any) -> str:
+    return str(value or "").strip()
+
+
 def _resolve_redirect_mapping(mapping: dict[str, str], label: str) -> dict[str, str]:
     resolved: dict[str, str] = {}
     for source in mapping:
@@ -177,7 +181,7 @@ def load_dj_redirects(identity_db: Path | None) -> dict[str, str]:
         if not exists:
             raise ValueError(f"identity DB has no dj_identity_redirect table: {identity_db}")
         mapping = {
-            norm_text(row["source_dj_id"]): norm_text(row["canonical_dj_id"])
+            id_text(row["source_dj_id"]): id_text(row["canonical_dj_id"])
             for row in conn.execute(
                 "SELECT source_dj_id,canonical_dj_id FROM dj_identity_redirect ORDER BY source_dj_id"
             )
@@ -214,16 +218,16 @@ def load_venue_redirects(venue_redirect_db: Path | None) -> dict[str, tuple[str,
     finally:
         conn.close()
     raw_mapping = {
-        norm_text(row["source_venue_id"]): norm_text(row["canonical_venue_id"])
+        id_text(row["source_venue_id"]): id_text(row["canonical_venue_id"])
         for row in rows
     }
     if any(not source or not target for source, target in raw_mapping.items()):
         raise ValueError("venue redirect contains an empty source or target")
     resolved = _resolve_redirect_mapping(raw_mapping, "venue")
     return {
-        norm_text(row["source_venue_id"]): (
+        id_text(row["source_venue_id"]): (
             city_scope_key(row["source_city_key"]),
-            resolved[norm_text(row["source_venue_id"])],
+            resolved[id_text(row["source_venue_id"])],
         )
         for row in rows
     }
@@ -239,7 +243,7 @@ def effective_venue_id(
     venue_repairs: dict[str, str],
     venue_redirects: dict[str, tuple[str, str]] | None = None,
 ) -> str:
-    own = norm_text(row["venue_id"])
+    own = id_text(row["venue_id"])
     venue_id = own or venue_repairs.get(row["event_id"], "")
     redirect = (venue_redirects or {}).get(venue_id)
     if redirect and city_scope_key(row["city"]) == redirect[0]:
@@ -299,7 +303,7 @@ def build_canonical_events(
         if eligibility == "eligible":
             if not norm_text(row["starts_at"]):
                 reason_counts["eligible_via_date_repair"] += 1
-            if not norm_text(row["venue_id"]):
+            if not id_text(row["venue_id"]):
                 reason_counts["eligible_via_venue_repair"] += 1
             title_norm = norm_key(row["event_title"])
             raw_venue_id = effective_venue_id(row, venue_repairs)
@@ -341,7 +345,7 @@ def build_canonical_events(
     member_rows: list[dict[str, Any]] = []
 
     def add_members(canonical_id: str, members: list[sqlite3.Row], match_rule: str) -> None:
-        ranked = sorted(members, key=lambda r: (-confidence(r["confidence"]), norm_text(r["event_id"])))
+        ranked = sorted(members, key=lambda r: (-confidence(r["confidence"]), id_text(r["event_id"])))
         for rank, row in enumerate(ranked, start=1):
             event_id_to_canonical[row["event_id"]] = canonical_id
             member_rows.append(
@@ -349,7 +353,7 @@ def build_canonical_events(
                     "canonical_event_id": canonical_id,
                     "mention_id": row["event_id"],
                     "legacy_event_id": row["event_id"],
-                    "source_article_id": norm_text(row["source_ref_id"]),
+                    "source_article_id": id_text(row["source_ref_id"]),
                     "match_rule": match_rule,
                     "match_confidence": confidence(row["confidence"]),
                     "is_primary": 1 if rank == 1 else 0,
@@ -453,7 +457,7 @@ def build_canonical_dj_events(
             break
         for row in batch:
             raw_count += 1
-            raw_dj_id = norm_text(row["dj_id"])
+            raw_dj_id = id_text(row["dj_id"])
             dj_id = dj_redirects.get(raw_dj_id, raw_dj_id)
             redirect_count += int(dj_id != raw_dj_id)
             canonical_id = event_id_to_canonical.get(row["event_id"])
@@ -463,7 +467,7 @@ def build_canonical_dj_events(
             key = (dj_id, canonical_id, "dj")
             entry = groups.get(key)
             starts_at = norm_text(row["starts_at"])
-            source_ref = norm_text(row["source_ref_id"])
+            source_ref = id_text(row["source_ref_id"])
             conf = confidence(row["confidence"])
             if entry is None:
                 groups[key] = {
@@ -809,7 +813,7 @@ def build_dj_profile_recount(
     if limit:
         query += f" LIMIT {int(limit)}"
     for row in conn.execute(query):
-        raw_dj_id = norm_text(row["dj_id"])
+        raw_dj_id = id_text(row["dj_id"])
         raw_counts[dj_redirects.get(raw_dj_id, raw_dj_id)] += 1
 
     canonical_counts: Counter[str] = Counter(r["dj_id"] for r in dj_event_rows)
