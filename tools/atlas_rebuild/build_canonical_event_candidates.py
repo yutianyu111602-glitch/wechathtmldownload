@@ -620,11 +620,22 @@ def build_weak_key_review_candidates(
     canonical_events: dict[str, dict[str, Any]],
     max_bucket: int,
     similarity_threshold: float,
+    member_rows: list[dict[str, Any]] | None = None,
+    dj_event_rows: list[dict[str, Any]] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, int]]:
     """Never merges anything. Flags pairs of DISTINCT canonical events that already share
-    (event_date, city_norm, venue_id) but have suspiciously similar titles -- a human/future-review
-    signal that they might be the same real event under two slightly different titles.
+    (event_date, city_norm, venue_id) and have either suspiciously similar titles or strong
+    shared-source/lineup evidence. Evidence-only pairs remain review candidates; they never
+    auto-merge because roundup articles can describe multiple real events in one bucket.
     """
+    sources_by_event: dict[str, set[str]] = defaultdict(set)
+    for row in member_rows or []:
+        if row.get("source_article_id"):
+            sources_by_event[row["canonical_event_id"]].add(row["source_article_id"])
+    djs_by_event: dict[str, set[str]] = defaultdict(set)
+    for row in dj_event_rows or []:
+        djs_by_event[row["canonical_event_id"]].add(row["dj_id"])
+
     buckets: dict[tuple[str, str, str], list[dict[str, Any]]] = defaultdict(list)
     for event in canonical_events.values():
         if event["event_date"] and event["venue_id"]:
@@ -633,6 +644,8 @@ def build_weak_key_review_candidates(
     candidates: list[dict[str, Any]] = []
     skipped_large_buckets = 0
     compared_pairs = 0
+    title_supported_count = 0
+    evidence_supported_count = 0
     for members in buckets.values():
         if len(members) < 2:
             continue
@@ -646,7 +659,33 @@ def build_weak_key_review_candidates(
                 if a["title_norm"] == b["title_norm"]:
                     continue  # already the same title_norm would have strong-key-merged already
                 ratio = difflib.SequenceMatcher(None, a["title_norm"], b["title_norm"]).ratio()
-                if ratio >= similarity_threshold:
+                sources_a = sources_by_event.get(a["canonical_event_id"], set())
+                sources_b = sources_by_event.get(b["canonical_event_id"], set())
+                djs_a = djs_by_event.get(a["canonical_event_id"], set())
+                djs_b = djs_by_event.get(b["canonical_event_id"], set())
+                shared_source_count = len(sources_a & sources_b)
+                shared_dj_count = len(djs_a & djs_b)
+                dj_union_count = len(djs_a | djs_b)
+                dj_jaccard = shared_dj_count / dj_union_count if dj_union_count else 0.0
+                exact_lineup = len(djs_a) >= 2 and djs_a == djs_b
+                evidence_supported = (
+                    shared_source_count >= 1
+                    and shared_dj_count >= 2
+                    and (exact_lineup or (shared_source_count >= 2 and dj_jaccard >= 0.75))
+                )
+                title_supported = ratio >= similarity_threshold
+                if title_supported or evidence_supported:
+                    if title_supported:
+                        title_supported_count += 1
+                    if evidence_supported:
+                        evidence_supported_count += 1
+                    candidate_reason = (
+                        "title_similarity+shared_source_lineup"
+                        if title_supported and evidence_supported
+                        else "title_similarity"
+                        if title_supported
+                        else "shared_source_lineup"
+                    )
                     candidates.append(
                         {
                             "canonical_event_id_a": a["canonical_event_id"],
@@ -657,12 +696,18 @@ def build_weak_key_review_candidates(
                             "title_display_b": b["title_display"],
                             "title_similarity": round(ratio, 4),
                             "review_state": "needs_review",
+                            "shared_source_count": shared_source_count,
+                            "shared_dj_count": shared_dj_count,
+                            "dj_jaccard": round(dj_jaccard, 4),
+                            "candidate_reason": candidate_reason,
                         }
                     )
     return candidates, {
         "weak_key_review_candidate_count": len(candidates),
         "weak_key_compared_pairs": compared_pairs,
         "weak_key_skipped_large_buckets": skipped_large_buckets,
+        "title_supported_candidate_count": title_supported_count,
+        "evidence_supported_candidate_count": evidence_supported_count,
     }
 
 
@@ -724,7 +769,11 @@ def write_candidate_db(
           title_display_a TEXT,
           title_display_b TEXT,
           title_similarity REAL,
-          review_state TEXT
+          review_state TEXT,
+          shared_source_count INTEGER,
+          shared_dj_count INTEGER,
+          dj_jaccard REAL,
+          candidate_reason TEXT
         );
         CREATE TABLE build_metadata (key TEXT PRIMARY KEY, value TEXT);
         CREATE INDEX idx_cem_event ON canonical_event_member(canonical_event_id);
@@ -753,7 +802,8 @@ def write_candidate_db(
     )
     conn.executemany(
         "INSERT INTO canonical_event_merge_review_candidate VALUES (:canonical_event_id_a,:canonical_event_id_b,"
-        ":event_date,:venue_id,:title_display_a,:title_display_b,:title_similarity,:review_state)",
+        ":event_date,:venue_id,:title_display_a,:title_display_b,:title_similarity,:review_state,"
+        ":shared_source_count,:shared_dj_count,:dj_jaccard,:candidate_reason)",
         review_candidates,
     )
     conn.executemany("INSERT INTO build_metadata VALUES (?, ?)", metadata.items())
@@ -1005,7 +1055,11 @@ def run(
         conn, event_id_to_canonical, limit_events, dj_redirects
     )
     review_candidates, weak_key_counts = build_weak_key_review_candidates(
-        canonical_events, weak_key_max_bucket, weak_title_similarity
+        canonical_events,
+        weak_key_max_bucket,
+        weak_title_similarity,
+        member_rows,
+        dj_event_rows,
     )
 
     report = build_report(

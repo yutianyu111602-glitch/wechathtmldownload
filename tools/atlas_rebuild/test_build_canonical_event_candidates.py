@@ -218,6 +218,39 @@ def test_redirect_cycle_fails(root: Path) -> None:
         raise AssertionError("redirect cycle must fail")
 
 
+def test_shared_source_and_lineup_expand_review_without_auto_merge(root: Path) -> None:
+    source = root / "evidence_review_source.sqlite"
+    titles = ["无形之夜", "无形有形派对"]
+    create_source(
+        source,
+        [
+            (f"event:{index}", title, "2026-05-02", "venue:vervo", "VERVO", "昆明", "source:shared", 0.9)
+            for index, title in enumerate(titles)
+        ],
+        [
+            (dj_id, f"event:{index}", "2026-05-02", "source:shared", 0.9)
+            for index in range(len(titles))
+            for dj_id in ("dj:maxxi", "dj:sunny", "dj:zeming")
+        ],
+    )
+    out = root / "evidence_review_out"
+    report = run(source, out, limit_events=0, top_groups=20, sample_multi_event=10)
+
+    con = sqlite3.connect(out / "canonical_event_candidates.sqlite")
+    try:
+        event_count = con.execute("SELECT COUNT(*) FROM canonical_event").fetchone()[0]
+        candidate = con.execute(
+            "SELECT shared_source_count,shared_dj_count,dj_jaccard,candidate_reason "
+            "FROM canonical_event_merge_review_candidate"
+        ).fetchone()
+    finally:
+        con.close()
+
+    assert event_count == 2, "evidence signals expand review but never auto-merge"
+    assert candidate == (1, 3, 1.0, "shared_source_lineup"), candidate
+    assert report["weak_key_review"]["evidence_supported_candidate_count"] == 1
+
+
 def main() -> None:
     env = os.environ.copy()
     env["PYTHONUTF8"] = "1"
@@ -237,6 +270,7 @@ def main() -> None:
         test_venue_redirect_does_not_escape_city_scope(root)
         test_unicode_identifier_is_not_nfkc_normalized(root)
         test_redirect_cycle_fails(root)
+        test_shared_source_and_lineup_expand_review_without_auto_merge(root)
     print(result.stdout)
 
 

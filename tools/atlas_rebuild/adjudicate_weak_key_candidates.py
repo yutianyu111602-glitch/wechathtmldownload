@@ -189,12 +189,26 @@ def ensure_store(conn: sqlite3.Connection) -> None:
           confidence REAL,
           reason TEXT,
           llm_verdict_raw TEXT,
-          decided_at TEXT
+          decided_at TEXT,
+          shared_source_count INTEGER NOT NULL DEFAULT 0,
+          shared_dj_count INTEGER NOT NULL DEFAULT 0,
+          dj_jaccard REAL NOT NULL DEFAULT 0,
+          candidate_reason TEXT NOT NULL DEFAULT ''
         );
         CREATE INDEX IF NOT EXISTS idx_wkd_decision ON weak_key_merge_decision(decision);
         CREATE INDEX IF NOT EXISTS idx_wkd_tier ON weak_key_merge_decision(tier);
         """
     )
+    columns = {row[1] for row in conn.execute("PRAGMA table_info(weak_key_merge_decision)")}
+    migrations = {
+        "shared_source_count": "INTEGER NOT NULL DEFAULT 0",
+        "shared_dj_count": "INTEGER NOT NULL DEFAULT 0",
+        "dj_jaccard": "REAL NOT NULL DEFAULT 0",
+        "candidate_reason": "TEXT NOT NULL DEFAULT ''",
+    }
+    for column, definition in migrations.items():
+        if column not in columns:
+            conn.execute(f"ALTER TABLE weak_key_merge_decision ADD COLUMN {column} {definition}")
 
 
 def make_pair_key(event_date: str, venue_id: str, title_norm_a: str, title_norm_b: str) -> str:
@@ -245,11 +259,20 @@ def adjudicate(candidates_db: Path, decisions_db: Path, report_path: Path | None
                 r["title_display_a"], r["title_display_b"], r["title_similarity"],
                 tier, decision, "deterministic" if decision != "pending_llm" else "",
                 confidence, reason, "", now_iso() if decision != "pending_llm" else "",
+                int(r["shared_source_count"]) if "shared_source_count" in r.keys() else 0,
+                int(r["shared_dj_count"]) if "shared_dj_count" in r.keys() else 0,
+                float(r["dj_jaccard"]) if "dj_jaccard" in r.keys() else 0.0,
+                str(r["candidate_reason"]) if "candidate_reason" in r.keys() else "title_similarity",
             )
         )
 
     store.executemany(
-        "INSERT INTO weak_key_merge_decision VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", inserted
+        """INSERT INTO weak_key_merge_decision (
+          pair_key,event_date,venue_id,title_norm_a,title_norm_b,title_display_a,title_display_b,
+          title_similarity,tier,decision,method,confidence,reason,llm_verdict_raw,decided_at,
+          shared_source_count,shared_dj_count,dj_jaccard,candidate_reason
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+        inserted,
     )
     store.commit()
     counts["newly_inserted"] = len(inserted)
@@ -354,6 +377,7 @@ LLM_SYSTEM_PROMPT = """你是中国电子音乐活动数据的审核员。每对
 - 同一活动的不同写法（缩写、日期/星期装饰、场地名后缀、别称、标点差异、翻译）→ "same"
 - 不同场次（早场/午夜场）、不同活动名、主角艺人不同、Vol/期数/编号不同 → "diff"
 - 信息不足无法确定 → "unsure"
+输入中的 shared_source_count / shared_dj_count / dj_jaccard 是辅助证据。同源且阵容高度重合会增强同一活动的可能性，但周预览、合集文章可能污染这些指标；标题明确指向不同活动时仍判 "diff"。
 只输出 JSON 对象：{"verdicts":[{"id":<int>,"v":"same"|"diff"|"unsure"}]}，不要解释。"""
 
 # conservative per-token guard prices (RMB per 1k tokens); real spend is typically lower
@@ -383,7 +407,16 @@ def make_llm_client():
 def llm_judge_batch(client, model: str, batch: list[sqlite3.Row]) -> tuple[dict[str, str], str, int, int]:
     """Returns (pair_key -> verdict, raw_response_text, prompt_tokens, completion_tokens)."""
     payload = [
-        {"id": i, "date": r["event_date"], "title_a": r["title_display_a"], "title_b": r["title_display_b"]}
+        {
+            "id": i,
+            "date": r["event_date"],
+            "title_a": r["title_display_a"],
+            "title_b": r["title_display_b"],
+            "shared_source_count": r["shared_source_count"],
+            "shared_dj_count": r["shared_dj_count"],
+            "dj_jaccard": r["dj_jaccard"],
+            "candidate_reason": r["candidate_reason"],
+        }
         for i, r in enumerate(batch)
     ]
     resp = client.chat.completions.create(
@@ -425,7 +458,10 @@ def llm_adjudicate(
 
     store = sqlite3.connect(str(decisions_db))
     store.row_factory = sqlite3.Row
-    query = "SELECT * FROM weak_key_merge_decision WHERE decision = 'pending_llm' ORDER BY pair_key"
+    ensure_store(store)
+    query = """SELECT * FROM weak_key_merge_decision WHERE decision = 'pending_llm'
+      ORDER BY CASE WHEN candidate_reason LIKE '%shared_source_lineup%' THEN 0 ELSE 1 END,
+               shared_source_count DESC,dj_jaccard DESC,title_similarity DESC,pair_key"""
     if limit:
         query += f" LIMIT {int(limit)}"
     pending = store.execute(query).fetchall()

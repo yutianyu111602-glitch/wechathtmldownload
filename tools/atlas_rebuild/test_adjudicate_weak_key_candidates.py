@@ -17,13 +17,35 @@ from adjudicate_weak_key_candidates import ensure_store, llm_adjudicate
 HERE = Path(__file__).resolve().parent
 
 
+def test_existing_store_migrates_evidence_columns() -> None:
+    with tempfile.TemporaryDirectory(prefix="atlas_adjudicate_store_migration_") as tmp:
+        decisions = Path(tmp) / "decisions.sqlite"
+        con = sqlite3.connect(decisions)
+        con.execute(
+            """
+            CREATE TABLE weak_key_merge_decision (
+              pair_key TEXT PRIMARY KEY,event_date TEXT,venue_id TEXT,title_norm_a TEXT,title_norm_b TEXT,
+              title_display_a TEXT,title_display_b TEXT,title_similarity REAL,tier TEXT,decision TEXT,
+              method TEXT,confidence REAL,reason TEXT,llm_verdict_raw TEXT,decided_at TEXT
+            )
+            """
+        )
+        ensure_store(con)
+        columns = {row[1] for row in con.execute("PRAGMA table_info(weak_key_merge_decision)")}
+        con.close()
+        assert {"shared_source_count", "shared_dj_count", "dj_jaccard", "candidate_reason"} <= columns
+
+
 def test_zero_budget_never_creates_a_cloud_client() -> None:
     with tempfile.TemporaryDirectory(prefix="atlas_adjudicate_zero_budget_") as tmp:
         decisions = Path(tmp) / "decisions.sqlite"
         con = sqlite3.connect(decisions)
         ensure_store(con)
         con.execute(
-            "INSERT INTO weak_key_merge_decision VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            """INSERT INTO weak_key_merge_decision (
+              pair_key,event_date,venue_id,title_norm_a,title_norm_b,title_display_a,title_display_b,
+              title_similarity,tier,decision,method,confidence,reason,llm_verdict_raw,decided_at
+            ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             (
                 "pair",
                 "2026-01-01",
@@ -54,6 +76,7 @@ def test_zero_budget_never_creates_a_cloud_client() -> None:
 
 
 def main() -> None:
+    test_existing_store_migrates_evidence_columns()
     test_zero_budget_never_creates_a_cloud_client()
     env = os.environ.copy()
     env["PYTHONUTF8"] = "1"
