@@ -103,6 +103,10 @@ def canonical_pipeline_ready(steps: list[dict[str, Any]], gate_report: dict[str,
     )
 
 
+def optional_existing_path(path: Path | None) -> Path | None:
+    return path if path is not None and path.is_file() else None
+
+
 def promote_seen_tokens_checkpoint(candidate: Path, target: Path) -> None:
     """Atomically copy a verified run checkpoint into the shared delta cursor."""
     if not candidate.is_file():
@@ -280,7 +284,11 @@ def main() -> int:
     ap.add_argument("--candidate-state-file", type=Path, default=DEFAULT_CUMULATIVE_STATE)
     ap.add_argument("--run-root", type=Path, default=DEFAULT_RUN_ROOT)
     ap.add_argument("--weak-decisions-db", type=Path, default=DEFAULT_WEAK_DECISIONS)
-    ap.add_argument("--historical-venue-geo", type=Path, default=DEFAULT_HISTORICAL_VENUE_GEO)
+    ap.add_argument(
+        "--historical-venue-geo",
+        type=Path,
+        default=optional_existing_path(DEFAULT_HISTORICAL_VENUE_GEO),
+    )
     ap.add_argument("--limit", type=int, default=20, help="max NEW articles this run (0 = all delta)")
     ap.add_argument("--max-cost-rmb", type=float, default=1.0, help="budget cap PER stage2 backend invocation")
     ap.add_argument(
@@ -299,7 +307,7 @@ def main() -> int:
     )
     args = ap.parse_args()
 
-    if not args.historical_venue_geo.is_file():
+    if args.historical_venue_geo is not None and not args.historical_venue_geo.is_file():
         ap.error(f"--historical-venue-geo not found: {args.historical_venue_geo}")
 
     base_serving_db = resolve_base_serving_db(
@@ -475,21 +483,22 @@ def main() -> int:
     if steps[-1]["returncode"] != 0:
         return finish(run_dir, steps, "build_dj_identity_failed")
 
+    venue_identity_cmd = [
+        sys.executable,
+        str(HERE / "build_serving_venue_redirects.py"),
+        "--source-serving-db",
+        str(merged_db),
+        "--out",
+        str(venue_redirect_db),
+        "--report",
+        str(identity_dir / "venue_report.json"),
+    ]
+    if args.historical_venue_geo is not None:
+        venue_identity_cmd += ["--historical-geo", str(args.historical_venue_geo)]
     steps.append(
         run_step(
             "build_venue_identity",
-            [
-                sys.executable,
-                str(HERE / "build_serving_venue_redirects.py"),
-                "--source-serving-db",
-                str(merged_db),
-                "--out",
-                str(venue_redirect_db),
-                "--historical-geo",
-                str(args.historical_venue_geo),
-                "--report",
-                str(identity_dir / "venue_report.json"),
-            ],
+            venue_identity_cmd,
             env,
             log_dir,
         )

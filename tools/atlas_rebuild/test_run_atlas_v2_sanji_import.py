@@ -39,6 +39,16 @@ def test_canonical_pipeline_order_contract() -> None:
     assert orchestrator.ordered_subset(orchestrator.CANONICAL_PIPELINE_ORDER, expected)
 
 
+def test_optional_historical_geo_does_not_block_clean_clone() -> None:
+    with tempfile.TemporaryDirectory(prefix="atlas_missing_geo_") as td:
+        missing = Path(td) / "historical_venue_geo.json"
+        assert orchestrator.optional_existing_path(missing) is None
+
+        present = Path(td) / "historical_venue_geo.json"
+        present.write_text("{}", encoding="utf-8")
+        assert orchestrator.optional_existing_path(present) == present
+
+
 def test_checkpoint_readiness_fails_closed_on_materialize_or_gate_failure() -> None:
     successful_steps = [
         {"name": name, "returncode": 0}
