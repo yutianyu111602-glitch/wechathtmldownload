@@ -22,3 +22,10 @@ def test_deploy_reuses_only_sha_verified_next_upload() -> None:
     assert "sha256sum $REMOTE_NEXT | awk" not in source
     assert 'existing .next SHA matches candidate; reusing completed upload.' in source
     assert 'FATAL: uploaded .next SHA mismatch' in source
+
+
+def test_deploy_default_website_repo_matches_wsl_mount() -> None:
+    source = SCRIPT.read_text(encoding="utf-8")
+
+    assert 'WEBSITE_REPO="${WEBSITE_REPO:-/mnt/c/code/mavelpoint-cn-v2}"' in source
+    assert 'WEBSITE_REPO="${WEBSITE_REPO:-/c/code/mavelpoint-cn-v2}"' not in source

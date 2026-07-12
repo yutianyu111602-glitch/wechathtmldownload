@@ -30,7 +30,7 @@ REMOTE_NEXT="$REMOTE_DIR/atlas_serving.next.sqlite"
 REMOTE_PREV="$REMOTE_DIR/atlas_serving.prev.sqlite"
 REMOTE_VERIFY="$REMOTE_DIR/verify-atlas-db.mjs"
 REMOTE_NODE="/opt/node-v24.15.0-linux-x64/bin/node"   # PATH node is v20, too old for node:sqlite
-WEBSITE_REPO="${WEBSITE_REPO:-/c/code/mavelpoint-cn-v2}"
+WEBSITE_REPO="${WEBSITE_REPO:-/mnt/c/code/mavelpoint-cn-v2}"
 LOCAL_VERIFY="$WEBSITE_REPO/scripts/infra/verify-atlas-db.mjs"
 PROFILE_CHECK_PATH="/artists"   # listing page exercises the atlas DB read path
 
