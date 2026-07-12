@@ -6,6 +6,7 @@ site_dir: ../../docs/projects/wechathtmldownload
 use_directory_urls: false
 exclude_docs: |
   vendor/**
+  **/*.html
 theme:
   name: material
   language: zh
