@@ -64,7 +64,7 @@
     "atlas:starmap:bake": "node services/weekly_activity_cloudrun/scripts/bake_atlas_starmap.mjs",
     "bootstrap": "npm ci",
     "test:cloudrun": "node --test --test-concurrency=1 services/weekly_activity_cloudrun/tests/*.test.mjs",
-    "test:miniprogram": "node --test apps/weekly_activity_miniprogram/tests/*.test.cjs",
+    "test:miniprogram": "node scripts/test/run-miniprogram-tests.mjs",
     "validate:weekly-package": "pwsh -File scripts/release/validate-weekly-package.ps1",
     "check:current-release": "node scripts/release/check-current-release-consistency.mjs services/weekly_activity_cloudrun/data/current_release",
     "smoke:cloudrun:local": "pwsh -File docs/runtime-state-probes-20260610/probe-cloudrun-local.ps1",
