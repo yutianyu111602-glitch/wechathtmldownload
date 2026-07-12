@@ -302,12 +302,31 @@ def _copy_identity_tables(
     target: sqlite3.Connection,
 ) -> dict[str, int]:
     copied = {}
-    copied["dj_identity_redirect"] = _copy_rows(
-        identity,
-        target,
-        "SELECT source_dj_id,canonical_dj_id,decision_method,decision_reason,confidence,decided_at FROM dj_identity_redirect",
-        "INSERT INTO dj_identity_redirect VALUES (?,?,?,?,?,?)",
+    redirect_rows = list(
+        identity.execute(
+            "SELECT source_dj_id,canonical_dj_id,decision_method,decision_reason,"
+            "confidence,decided_at FROM dj_identity_redirect ORDER BY source_dj_id"
+        )
     )
+    terminal_targets = _resolve_mapping(
+        {row["source_dj_id"]: row["canonical_dj_id"] for row in redirect_rows},
+        "DJ",
+    )
+    target.executemany(
+        "INSERT INTO dj_identity_redirect VALUES (?,?,?,?,?,?)",
+        [
+            (
+                row["source_dj_id"],
+                terminal_targets[row["source_dj_id"]],
+                row["decision_method"],
+                row["decision_reason"],
+                row["confidence"],
+                row["decided_at"],
+            )
+            for row in redirect_rows
+        ],
+    )
+    copied["dj_identity_redirect"] = len(redirect_rows)
     copied["dj_identity_review_candidate"] = _copy_rows(
         identity,
         target,
@@ -737,6 +756,11 @@ def verify_materialized_candidate(candidate_db: Path | str) -> dict:
                 "SELECT COUNT(*) FROM dj_identity_redirect redirect "
                 "JOIN canonical_dj_profile profile ON profile.dj_id=redirect.source_dj_id"
             ).fetchone()[0],
+            "redirect_target_dangling": con.execute(
+                "SELECT COUNT(*) FROM dj_identity_redirect redirect "
+                "LEFT JOIN canonical_dj_profile profile ON profile.dj_id=redirect.canonical_dj_id "
+                "WHERE profile.dj_id IS NULL"
+            ).fetchone()[0],
             "canonical_dj_event_profile_dangling": con.execute(
                 "SELECT COUNT(*) FROM canonical_dj_event link "
                 "LEFT JOIN canonical_dj_profile profile ON profile.dj_id=link.dj_id "
@@ -746,6 +770,14 @@ def verify_materialized_candidate(candidate_db: Path | str) -> dict:
                 "SELECT COUNT(*) FROM canonical_dj_event link "
                 "LEFT JOIN canonical_event event USING(canonical_event_id) "
                 "WHERE event.canonical_event_id IS NULL"
+            ).fetchone()[0],
+            "canonical_profile_event_count_mismatch": con.execute(
+                "SELECT COUNT(*) FROM canonical_dj_profile profile "
+                "LEFT JOIN ("
+                "SELECT dj_id,COUNT(DISTINCT canonical_event_id) AS event_count "
+                "FROM canonical_dj_event GROUP BY dj_id"
+                ") counts ON counts.dj_id=profile.dj_id "
+                "WHERE profile.event_count<>COALESCE(counts.event_count,0)"
             ).fetchone()[0],
             "canonical_member_event_dangling": con.execute(
                 "SELECT COUNT(*) FROM canonical_event_member member "
@@ -764,8 +796,10 @@ def verify_materialized_candidate(candidate_db: Path | str) -> dict:
             "raw_events_fully_mapped": checks["canonical_member_count"] == checks["raw_event_count"],
             "normalized_names_unique": checks["duplicate_normalized_names"] == 0,
             "redirect_sources_hidden": checks["redirect_sources_visible"] == 0,
+            "redirect_targets_resolve": checks["redirect_target_dangling"] == 0,
             "canonical_dj_event_profiles_resolve": checks["canonical_dj_event_profile_dangling"] == 0,
             "canonical_dj_events_resolve": checks["canonical_dj_event_event_dangling"] == 0,
+            "canonical_profile_event_counts_match": checks["canonical_profile_event_count_mismatch"] == 0,
             "canonical_members_resolve": checks["canonical_member_event_dangling"] == 0,
         }
         report["conditions"] = conditions

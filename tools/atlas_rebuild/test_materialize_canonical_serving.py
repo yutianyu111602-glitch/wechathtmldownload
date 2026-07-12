@@ -41,6 +41,7 @@ def build_fixture(root: Path) -> tuple[Path, Path, Path, Path]:
     )
     profiles = [
         ("dj:canonical", "MAXXI", "maxxi", '["Maxxi"]', "昆明", None, 3, 20, 4, 2, 1, 1, "2020-01-01", "2026-01-01", 0.9),
+        ("dj:intermediate", "MAXXI Intermediate", "maxxi", "[]", "", None, 1, 0, 0, 0, 0, 0, "2021-01-01", "2025-01-01", 0.6),
         ("dj:maxxi", "maxxi", "maxxi", '["MAXXI Legacy"]', "", None, 1, 3, 1, 1, 0, 0, "2021-01-01", "2025-01-01", 0.7),
         ("dj:solo", "Solo", "solo", "[]", "北京", None, 1, 5, 2, 0, 1, 0, "2022-01-01", "2026-02-01", 0.8),
     ]
@@ -130,9 +131,9 @@ def build_fixture(root: Path) -> tuple[Path, Path, Path, Path]:
           candidate_dj_id TEXT,candidate_city TEXT,reason TEXT,review_state TEXT
         );
         CREATE TABLE identity_build_metadata (key TEXT PRIMARY KEY,value TEXT);
-        INSERT INTO dj_identity_redirect VALUES (
-          'dj:maxxi','dj:canonical','synthetic_exact','fixture',0.99,'2026-07-12'
-        );
+        INSERT INTO dj_identity_redirect VALUES
+          ('dj:maxxi','dj:intermediate','synthetic_exact','fixture',0.99,'2026-07-12'),
+          ('dj:intermediate','dj:canonical','role_label_evidence','fixture',0.98,'2026-07-12');
         """
     )
     con.commit()
@@ -172,7 +173,7 @@ class MaterializeCanonicalServingTests(unittest.TestCase):
             report = materialize(candidate, events, identity, venue)
 
             con = sqlite3.connect(candidate)
-            self.assertEqual(con.execute("SELECT COUNT(*) FROM dj_profile").fetchone()[0], 3)
+            self.assertEqual(con.execute("SELECT COUNT(*) FROM dj_profile").fetchone()[0], 4)
             self.assertEqual(con.execute("SELECT COUNT(*) FROM dj_event").fetchone()[0], 3)
             self.assertEqual(con.execute("SELECT COUNT(*) FROM performance_event").fetchone()[0], 2)
             self.assertEqual(con.execute("SELECT COUNT(*) FROM canonical_dj_profile").fetchone()[0], 2)
@@ -182,14 +183,52 @@ class MaterializeCanonicalServingTests(unittest.TestCase):
                 "SELECT aliases_json,event_count,venue_count,collaborator_count,organization_count "
                 "FROM canonical_dj_profile WHERE dj_id='dj:canonical'"
             ).fetchone()
+            redirect_targets = con.execute(
+                "SELECT source_dj_id,canonical_dj_id FROM dj_identity_redirect ORDER BY source_dj_id"
+            ).fetchall()
+            dangling_redirect_targets = con.execute(
+                "SELECT COUNT(*) FROM dj_identity_redirect redirect "
+                "LEFT JOIN canonical_dj_profile profile ON profile.dj_id=redirect.canonical_dj_id "
+                "WHERE profile.dj_id IS NULL"
+            ).fetchone()[0]
             con.close()
             self.assertIn("MAXXI Legacy", json.loads(maxxi[0]))
+            self.assertIn("MAXXI Intermediate", json.loads(maxxi[0]))
             self.assertEqual(maxxi[1:], (1, 1, 1, 1))
+            self.assertEqual(
+                redirect_targets,
+                [("dj:intermediate", "dj:canonical"), ("dj:maxxi", "dj:canonical")],
+            )
+            self.assertEqual(dangling_redirect_targets, 0)
             self.assertTrue(report["raw_counts_unchanged"])
             self.assertNotEqual(candidate.read_bytes(), before)
 
             gate = verify_materialized_candidate(candidate)
             self.assertTrue(gate["pass"], gate)
+            self.assertEqual(gate["checks"]["redirect_target_dangling"], 0)
+            self.assertEqual(gate["checks"]["canonical_profile_event_count_mismatch"], 0)
+
+            con = sqlite3.connect(candidate)
+            con.execute(
+                "UPDATE canonical_dj_profile SET event_count=event_count+1 "
+                "WHERE dj_id='dj:canonical'"
+            )
+            con.commit()
+            con.close()
+            failed_count_gate = verify_materialized_candidate(candidate)
+            self.assertFalse(failed_count_gate["pass"])
+            self.assertEqual(
+                failed_count_gate["checks"]["canonical_profile_event_count_mismatch"],
+                1,
+            )
+
+            con = sqlite3.connect(candidate)
+            con.execute(
+                "UPDATE canonical_dj_profile SET event_count=event_count-1 "
+                "WHERE dj_id='dj:canonical'"
+            )
+            con.commit()
+            con.close()
 
             con = sqlite3.connect(candidate)
             con.execute("DELETE FROM canonical_event WHERE canonical_event_id='canonical:event:1'")
