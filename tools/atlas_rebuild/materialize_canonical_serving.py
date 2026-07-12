@@ -695,6 +695,91 @@ def materialize(
         venue.close()
 
 
+def verify_materialized_candidate(candidate_db: Path | str) -> dict:
+    """Run the promotion gate against one fully materialized serving candidate."""
+    candidate_path = Path(candidate_db).resolve()
+    report = {
+        "schema_version": f"{SCHEMA_VERSION}.gate.v1",
+        "candidate": str(candidate_path),
+        "pass": False,
+        "checks": {},
+        "conditions": {},
+        "failures": [],
+    }
+    if not candidate_path.is_file():
+        report["failures"] = ["candidate_exists"]
+        return report
+
+    con = _connect_read_only(candidate_path)
+    try:
+        required_tables = (*RAW_TABLES, *MATERIALIZED_TABLES)
+        missing_tables = [table for table in required_tables if not _table_exists(con, table)]
+        report["checks"]["missing_tables"] = missing_tables
+        report["conditions"]["required_tables_present"] = not missing_tables
+        if missing_tables:
+            report["failures"] = ["required_tables_present"]
+            return report
+
+        checks = {
+            "quick_check": con.execute("PRAGMA quick_check").fetchone()[0],
+            "raw_profile_count": con.execute("SELECT COUNT(*) FROM dj_profile").fetchone()[0],
+            "raw_event_count": con.execute("SELECT COUNT(*) FROM performance_event").fetchone()[0],
+            "redirect_count": con.execute("SELECT COUNT(*) FROM dj_identity_redirect").fetchone()[0],
+            "canonical_profile_count": con.execute("SELECT COUNT(*) FROM canonical_dj_profile").fetchone()[0],
+            "canonical_event_count": con.execute("SELECT COUNT(*) FROM canonical_event").fetchone()[0],
+            "canonical_member_count": con.execute("SELECT COUNT(*) FROM canonical_event_member").fetchone()[0],
+            "duplicate_normalized_names": con.execute(
+                "SELECT COUNT(*) FROM ("
+                "SELECT normalized_name FROM canonical_dj_profile "
+                "GROUP BY normalized_name HAVING COUNT(*) > 1)"
+            ).fetchone()[0],
+            "redirect_sources_visible": con.execute(
+                "SELECT COUNT(*) FROM dj_identity_redirect redirect "
+                "JOIN canonical_dj_profile profile ON profile.dj_id=redirect.source_dj_id"
+            ).fetchone()[0],
+            "canonical_dj_event_profile_dangling": con.execute(
+                "SELECT COUNT(*) FROM canonical_dj_event link "
+                "LEFT JOIN canonical_dj_profile profile ON profile.dj_id=link.dj_id "
+                "WHERE profile.dj_id IS NULL"
+            ).fetchone()[0],
+            "canonical_dj_event_event_dangling": con.execute(
+                "SELECT COUNT(*) FROM canonical_dj_event link "
+                "LEFT JOIN canonical_event event USING(canonical_event_id) "
+                "WHERE event.canonical_event_id IS NULL"
+            ).fetchone()[0],
+            "canonical_member_event_dangling": con.execute(
+                "SELECT COUNT(*) FROM canonical_event_member member "
+                "LEFT JOIN canonical_event event USING(canonical_event_id) "
+                "WHERE event.canonical_event_id IS NULL"
+            ).fetchone()[0],
+        }
+        report["checks"].update(checks)
+        expected_profiles = checks["raw_profile_count"] - checks["redirect_count"]
+        report["checks"]["expected_canonical_profile_count"] = expected_profiles
+        conditions = {
+            "required_tables_present": True,
+            "quick_check_ok": checks["quick_check"] == "ok",
+            "canonical_profiles_complete": checks["canonical_profile_count"] == expected_profiles,
+            "canonical_events_present": checks["canonical_event_count"] > 0,
+            "raw_events_fully_mapped": checks["canonical_member_count"] == checks["raw_event_count"],
+            "normalized_names_unique": checks["duplicate_normalized_names"] == 0,
+            "redirect_sources_hidden": checks["redirect_sources_visible"] == 0,
+            "canonical_dj_event_profiles_resolve": checks["canonical_dj_event_profile_dangling"] == 0,
+            "canonical_dj_events_resolve": checks["canonical_dj_event_event_dangling"] == 0,
+            "canonical_members_resolve": checks["canonical_member_event_dangling"] == 0,
+        }
+        report["conditions"] = conditions
+        report["failures"] = [name for name, passed in conditions.items() if not passed]
+        report["pass"] = not report["failures"]
+        return report
+    except sqlite3.Error as exc:
+        report["failures"] = ["sqlite_error"]
+        report["error"] = str(exc)
+        return report
+    finally:
+        con.close()
+
+
 def _self_check() -> None:
     from test_materialize_canonical_serving import build_fixture
     import tempfile
@@ -720,11 +805,21 @@ def main() -> None:
     parser.add_argument("--venue-redirect-db", type=Path)
     parser.add_argument("--out", type=Path)
     parser.add_argument("--report", type=Path)
+    parser.add_argument("--verify-candidate", type=Path)
     parser.add_argument("--replace", action="store_true")
     parser.add_argument("--self-check", action="store_true")
     args = parser.parse_args()
     if args.self_check:
         _self_check()
+        return
+    if args.verify_candidate:
+        report = verify_materialized_candidate(args.verify_candidate)
+        if args.report:
+            args.report.parent.mkdir(parents=True, exist_ok=True)
+            args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        if not report["pass"]:
+            raise SystemExit(2)
         return
     required = (
         args.candidate_serving_db,

@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from materialize_canonical_serving import materialize
+from materialize_canonical_serving import materialize, verify_materialized_candidate
 
 
 def build_fixture(root: Path) -> tuple[Path, Path, Path, Path]:
@@ -187,6 +187,17 @@ class MaterializeCanonicalServingTests(unittest.TestCase):
             self.assertEqual(maxxi[1:], (1, 1, 1, 1))
             self.assertTrue(report["raw_counts_unchanged"])
             self.assertNotEqual(candidate.read_bytes(), before)
+
+            gate = verify_materialized_candidate(candidate)
+            self.assertTrue(gate["pass"], gate)
+
+            con = sqlite3.connect(candidate)
+            con.execute("DELETE FROM canonical_event WHERE canonical_event_id='canonical:event:1'")
+            con.commit()
+            con.close()
+            failed_gate = verify_materialized_candidate(candidate)
+            self.assertFalse(failed_gate["pass"])
+            self.assertEqual(failed_gate["checks"]["canonical_dj_event_event_dangling"], 1)
 
 
 if __name__ == "__main__":
