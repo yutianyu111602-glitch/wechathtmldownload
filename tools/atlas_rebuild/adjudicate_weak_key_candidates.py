@@ -233,7 +233,19 @@ def adjudicate(candidates_db: Path, decisions_db: Path, report_path: Path | None
     decisions_db.parent.mkdir(parents=True, exist_ok=True)
     store = sqlite3.connect(str(decisions_db))
     ensure_store(store)
-    existing = {r[0] for r in store.execute("SELECT pair_key FROM weak_key_merge_decision")}
+    existing = {
+        row[0]: {
+            "decision": row[1],
+            "shared_source_count": row[2],
+            "shared_dj_count": row[3],
+            "dj_jaccard": row[4],
+            "candidate_reason": row[5],
+        }
+        for row in store.execute(
+            """SELECT pair_key,decision,shared_source_count,shared_dj_count,dj_jaccard,candidate_reason
+               FROM weak_key_merge_decision"""
+        )
+    }
 
     counts: Counter[str] = Counter()
     counts["input_pairs"] = len(rows)
@@ -242,7 +254,44 @@ def adjudicate(candidates_db: Path, decisions_db: Path, report_path: Path | None
 
     for r in rows:
         pair_key = make_pair_key(r["event_date"], r["venue_id"], r["title_norm_a"], r["title_norm_b"])
-        if pair_key in existing or pair_key in seen_this_run:
+        shared_source_count = int(r["shared_source_count"]) if "shared_source_count" in r.keys() else 0
+        shared_dj_count = int(r["shared_dj_count"]) if "shared_dj_count" in r.keys() else 0
+        dj_jaccard = float(r["dj_jaccard"]) if "dj_jaccard" in r.keys() else 0.0
+        candidate_reason = str(r["candidate_reason"]) if "candidate_reason" in r.keys() else "title_similarity"
+        prior = existing.get(pair_key)
+        if prior:
+            stronger_evidence = "shared_source_lineup" in candidate_reason and (
+                shared_source_count > int(prior["shared_source_count"] or 0)
+                or shared_dj_count > int(prior["shared_dj_count"] or 0)
+                or dj_jaccard > float(prior["dj_jaccard"] or 0.0)
+                or "shared_source_lineup" not in str(prior["candidate_reason"] or "")
+            )
+            if stronger_evidence:
+                requeue = prior["decision"] in ("needs_human", "pending_llm")
+                store.execute(
+                    """UPDATE weak_key_merge_decision
+                       SET shared_source_count=?,shared_dj_count=?,dj_jaccard=?,candidate_reason=?,
+                           decision=CASE WHEN ? THEN 'pending_llm' ELSE decision END,
+                           method=CASE WHEN ? THEN 'evidence_requeue' ELSE method END,
+                           confidence=CASE WHEN ? THEN 0 ELSE confidence END,
+                           reason=CASE WHEN ? THEN 'new shared source and lineup evidence' ELSE reason END,
+                           llm_verdict_raw=CASE WHEN ? THEN '' ELSE llm_verdict_raw END,
+                           decided_at=CASE WHEN ? THEN '' ELSE decided_at END
+                       WHERE pair_key=?""",
+                    (
+                        max(shared_source_count, int(prior["shared_source_count"] or 0)),
+                        max(shared_dj_count, int(prior["shared_dj_count"] or 0)),
+                        max(dj_jaccard, float(prior["dj_jaccard"] or 0.0)),
+                        candidate_reason,
+                        requeue,requeue,requeue,requeue,requeue,requeue,pair_key,
+                    ),
+                )
+                counts["evidence_backfilled"] += 1
+                if requeue:
+                    counts["evidence_requeued"] += 1
+            counts["already_decided_or_duplicate"] += 1
+            continue
+        if pair_key in seen_this_run:
             counts["already_decided_or_duplicate"] += 1
             continue
         seen_this_run.add(pair_key)
@@ -259,10 +308,10 @@ def adjudicate(candidates_db: Path, decisions_db: Path, report_path: Path | None
                 r["title_display_a"], r["title_display_b"], r["title_similarity"],
                 tier, decision, "deterministic" if decision != "pending_llm" else "",
                 confidence, reason, "", now_iso() if decision != "pending_llm" else "",
-                int(r["shared_source_count"]) if "shared_source_count" in r.keys() else 0,
-                int(r["shared_dj_count"]) if "shared_dj_count" in r.keys() else 0,
-                float(r["dj_jaccard"]) if "dj_jaccard" in r.keys() else 0.0,
-                str(r["candidate_reason"]) if "candidate_reason" in r.keys() else "title_similarity",
+                shared_source_count,
+                shared_dj_count,
+                dj_jaccard,
+                candidate_reason,
             )
         )
 
@@ -541,7 +590,7 @@ def main() -> int:
     ap.add_argument("--decisions-db", type=Path, default=DEFAULT_DECISIONS_DB)
     ap.add_argument("--report", type=Path, default=None)
     ap.add_argument("--limit", type=int, default=0, help="llm mode: max pending pairs this run (0 = all)")
-    ap.add_argument("--batch-size", type=int, default=20)
+    ap.add_argument("--batch-size", type=int, default=10)
     ap.add_argument("--max-cost-rmb", type=float, default=25.0)
     ap.add_argument("--self-check", action="store_true")
     args = ap.parse_args()

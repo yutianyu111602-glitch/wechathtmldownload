@@ -39,6 +39,10 @@ def test_canonical_pipeline_order_contract() -> None:
     assert orchestrator.ordered_subset(orchestrator.CANONICAL_PIPELINE_ORDER, expected)
 
 
+def test_canonical_llm_batch_size_preserves_complete_verdicts() -> None:
+    assert orchestrator.CANONICAL_LLM_BATCH_SIZE == 10
+
+
 def test_optional_historical_geo_does_not_block_clean_clone() -> None:
     with tempfile.TemporaryDirectory(prefix="atlas_missing_geo_") as td:
         missing = Path(td) / "historical_venue_geo.json"
@@ -395,6 +399,7 @@ def test_extraction_completion_gate_accepts_valid_terminal_rows() -> None:
 
 if __name__ == "__main__":
     test_canonical_pipeline_order_contract()
+    test_canonical_llm_batch_size_preserves_complete_verdicts()
     test_checkpoint_readiness_fails_closed_on_materialize_or_gate_failure()
     test_default_base_fails_closed_without_cumulative_state()
     test_default_base_loads_candidate_bound_to_current_checkpoint()

@@ -66,6 +66,7 @@ DEFAULT_HISTORICAL_VENUE_GEO = Path(
     )
 )
 CUMULATIVE_STATE_SCHEMA = "atlas_v2.cumulative_candidate_state.v1"
+CANONICAL_LLM_BATCH_SIZE = 10
 CANONICAL_PIPELINE_ORDER = [
     "merge_shard",
     "build_dj_identity",
@@ -579,6 +580,8 @@ def main() -> int:
                 "llm",
                 "--decisions-db",
                 str(decisions_db),
+                "--batch-size",
+                str(CANONICAL_LLM_BATCH_SIZE),
                 "--max-cost-rmb",
                 str(0 if args.dry_run_backend else args.canonical_llm_budget_rmb),
                 "--report",
