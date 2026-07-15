@@ -1,46 +1,109 @@
+[CmdletBinding()]
 param(
   [string]$ProjectPath = "apps\weekly_activity_miniprogram",
-  [ValidateSet("rendered","firstload")]
+  [ValidateSet("rendered", "firstload")]
   [string]$Mode = "rendered",
-  [string]$ReportDir = "reports"
+  [string]$ReportDir = "reports",
+  [string]$CliPath = "",
+  [ValidateRange(1, 65535)]
+  [int]$IdePort = 14183,
+  [ValidateRange(1, 65535)]
+  [int]$AutoPort = 9430
 )
 
-Write-Host "=== Mini-program DevTools Smoke ($Mode) ==="
+$ErrorActionPreference = "Stop"
+$repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "..\.."))
 
-$cliPath = "C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat"
-if (!(Test-Path -LiteralPath $cliPath)) {
-  Write-Host "[WARN] DevTools CLI not found at $cliPath"
-  Write-Host "Skipping DevTools smoke - manual verification required"
-  $ts = (Get-Date).ToString("yyyyMMdd-HHmmss")
-  if (!(Test-Path -LiteralPath $ReportDir)) { New-Item -ItemType Directory -Path $ReportDir -Force | Out-Null }
-  @{ generated_at = (Get-Date).ToString("o"); mode = $Mode; status = "SKIPPED_CLI_NOT_FOUND"; results = @() } | ConvertTo-Json | Set-Content -LiteralPath "$ReportDir\miniprogram_${Mode}_smoke_$ts.json" -Encoding UTF8
-  exit 0
+function Resolve-RepoPath([string]$Path) {
+  if ([IO.Path]::IsPathRooted($Path)) {
+    return [IO.Path]::GetFullPath($Path)
+  }
+  return [IO.Path]::GetFullPath((Join-Path $repoRoot $Path))
 }
 
-# Start DevTools automator
-Write-Host "[1/3] Starting DevTools automator on port 9421..."
-& $cliPath auto --project $ProjectPath --auto-port 9421
+function Resolve-DevToolsCli([string]$ExplicitPath) {
+  $pathCommand = Get-Command "wechat-devtools-cli.cmd" -ErrorAction SilentlyContinue | Select-Object -First 1
+  $candidates = @(
+    $ExplicitPath,
+    $env:MINIPROGRAM_DEVTOOLS_CLI,
+    $(if ($pathCommand) { $pathCommand.Source } else { $null }),
+    "F:\DevTools\bin\wechat-devtools-cli.cmd",
+    "C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat"
+  )
+  foreach ($candidate in $candidates) {
+    if (![string]::IsNullOrWhiteSpace($candidate) -and (Test-Path -LiteralPath $candidate -PathType Leaf)) {
+      return [IO.Path]::GetFullPath($candidate)
+    }
+  }
+  return $null
+}
 
-Start-Sleep -Seconds 10
+function Write-SmokeReport([hashtable]$Report) {
+  $resolvedReportDir = Resolve-RepoPath $ReportDir
+  if (!(Test-Path -LiteralPath $resolvedReportDir)) {
+    New-Item -ItemType Directory -Path $resolvedReportDir -Force | Out-Null
+  }
+  $ts = (Get-Date).ToString("yyyyMMdd-HHmmss")
+  $Report | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $resolvedReportDir "miniprogram_${Mode}_smoke_$ts.json") -Encoding UTF8
+}
+
+$ProjectPath = Resolve-RepoPath $ProjectPath
+$resolvedCli = Resolve-DevToolsCli $CliPath
+
+Write-Host "=== Mini-program DevTools Smoke ($Mode) ==="
+if (!$resolvedCli) {
+  Write-Host "[FAIL] WeChat DevTools CLI was not found."
+  Write-SmokeReport @{
+    generated_at = (Get-Date).ToString("o")
+    mode = $Mode
+    all_ok = $false
+    status = "FAILED_CLI_NOT_FOUND"
+    results = @(@{ check = "devtools_cli_present"; ok = $false })
+  }
+  exit 2
+}
+if (!(Test-Path -LiteralPath $ProjectPath -PathType Container)) {
+  Write-Host "[FAIL] Mini-program project was not found at $ProjectPath"
+  Write-SmokeReport @{
+    generated_at = (Get-Date).ToString("o")
+    mode = $Mode
+    all_ok = $false
+    status = "FAILED_PROJECT_NOT_FOUND"
+    results = @(@{ check = "project_present"; ok = $false; path = $ProjectPath })
+  }
+  exit 2
+}
 
 $results = @()
 $allOk = $true
 
-# Check: project opens
+Write-Host "[1/3] Starting DevTools automator on port $AutoPort (IDE port $IdePort)..."
+& $resolvedCli auto --project $ProjectPath --auto-port $AutoPort --port $IdePort
+$launchExit = $LASTEXITCODE
+if ($launchExit -ne 0) {
+  Write-Host "[FAIL] DevTools automator launch failed with exit code $launchExit"
+  $results += @{ check = "automator_launch"; ok = $false; exit_code = $launchExit }
+  $allOk = $false
+} else {
+  $results += @{ check = "automator_launch"; ok = $true; exit_code = 0 }
+}
+
+Start-Sleep -Seconds 10
+
 Write-Host "[2/3] Checking project loads..."
 try {
-  $r = Invoke-WebRequest -Uri "http://127.0.0.1:9421" -TimeoutSec 5 -UseBasicParsing -ErrorAction Stop
+  $null = Invoke-WebRequest -Uri "http://127.0.0.1:$AutoPort" -TimeoutSec 5 -UseBasicParsing -ErrorAction Stop
   Write-Host "[OK] DevTools automator responding"
-  $results += @{ check = "automator_responding"; ok = $true }
+  $results += @{ check = "automator_responding"; ok = $true; port = $AutoPort }
 } catch {
-  Write-Host "[WARN] DevTools automator not responding - may need manual start"
-  $results += @{ check = "automator_responding"; ok = $false; detail = $_.Exception.Message }
+  Write-Host "[FAIL] DevTools automator is not responding"
+  $results += @{ check = "automator_responding"; ok = $false; port = $AutoPort; detail = $_.Exception.Message }
   $allOk = $false
 }
 
-# Check: app.js config
 Write-Host "[3/3] Checking app.js config..."
-$appJs = Get-Content -LiteralPath "$ProjectPath\app.js" -Raw
+$appJsPath = Join-Path $ProjectPath "app.js"
+$appJs = Get-Content -LiteralPath $appJsPath -Raw
 if ($appJs -match "offlineSnapshotFallback:\s*true" -and $appJs -match "publicRequestTimeoutMs:\s*([3-9]\d{3,}|\d{5,})") {
   Write-Host "[OK] app.js config correct"
   $results += @{ check = "app_js_config"; ok = $true }
@@ -50,9 +113,22 @@ if ($appJs -match "offlineSnapshotFallback:\s*true" -and $appJs -match "publicRe
   $allOk = $false
 }
 
-$ts = (Get-Date).ToString("yyyyMMdd-HHmmss")
-if (!(Test-Path -LiteralPath $ReportDir)) { New-Item -ItemType Directory -Path $ReportDir -Force | Out-Null }
-@{ generated_at = (Get-Date).ToString("o"); mode = $Mode; all_ok = $allOk; results = $results } | ConvertTo-Json -Depth 3 | Set-Content -LiteralPath "$ReportDir\miniprogram_${Mode}_smoke_$ts.json" -Encoding UTF8
+Write-SmokeReport @{
+  generated_at = (Get-Date).ToString("o")
+  mode = $Mode
+  all_ok = $allOk
+  status = $(if ($allOk) { "PASSED" } else { "FAILED" })
+  cli_path = $resolvedCli
+  project_path = $ProjectPath
+  ide_port = $IdePort
+  auto_port = $AutoPort
+  results = $results
+}
 
-if ($allOk) { Write-Host "`nSMOKE_OK=true"; exit 0 }
-else { Write-Host "`nSMOKE_OK=false"; exit 1 }
+if ($allOk) {
+  Write-Host "`nSMOKE_OK=true"
+  exit 0
+}
+
+Write-Host "`nSMOKE_OK=false"
+exit 1
