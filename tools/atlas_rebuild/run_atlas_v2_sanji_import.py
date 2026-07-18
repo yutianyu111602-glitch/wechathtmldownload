@@ -10,6 +10,7 @@ Chains, in order, everything verified manually this session:
   3. stage1_clean.py                                                     (deterministic routing, no LLM)
   4. stage2_extract.py --route text_complete --backend deepseek          (text-only articles)
      stage2_extract.py --route needs_vision  --backend ocr_deepseek      (local OCR + text-only DeepSeek)
+     unresolved vision failures only -> online Qwen-VL direct fallback
   5. stage3_resolve.py
   6. stage4_rollup.py                                                    -> shard candidate (new articles only)
   7. merge_stage4_shard_into_base.py                                     -> copy of base + shard, base untouched
@@ -59,15 +60,17 @@ DEFAULT_SEEN_TOKENS = Path(r"E:\atlas_manifest_exports\sanji_pipeline_seen_token
 DEFAULT_RUN_ROOT = Path(r"E:\atlas_v2_import_runs")
 DEFAULT_CUMULATIVE_STATE = DEFAULT_RUN_ROOT / "latest_cumulative_candidate.json"
 DEFAULT_WEAK_DECISIONS = DEFAULT_RUN_ROOT / "weak_key_decisions.sqlite"
-DEFAULT_ACCEPTED_IDENTITY_PLAN = HERE / "accepted_identity_decisions.jsonl"
+DEFAULT_SANJI_ROOT = Path(os.environ.get("SANJI_ROOT", str(Path(os.environ.get("APPDATA", "")) / "sanji")))
+DEFAULT_SANJI_ARTICLES_ROOT = Path(
+    os.environ.get("SANJI_HOT_ARTICLES_ROOT", r"E:\sanji_hot\articles")
+)
 DEFAULT_HISTORICAL_VENUE_GEO = Path(
     os.environ.get(
         "ATLAS_HISTORICAL_VENUE_GEO",
-        r"C:\code\githubstar\wechathtmldownload\tools\atlas_rebuild\_serve_20260623\historical_venue_geo.json",
+        str(REPO_ROOT / "tools" / "atlas_rebuild" / "_serve_20260623" / "historical_venue_geo.json"),
     )
 )
 CUMULATIVE_STATE_SCHEMA = "atlas_v2.cumulative_candidate_state.v1"
-CANONICAL_LLM_BATCH_SIZE = 10
 CANONICAL_PIPELINE_ORDER = [
     "merge_shard",
     "build_dj_identity",
@@ -286,11 +289,8 @@ def main() -> int:
     ap.add_argument("--candidate-state-file", type=Path, default=DEFAULT_CUMULATIVE_STATE)
     ap.add_argument("--run-root", type=Path, default=DEFAULT_RUN_ROOT)
     ap.add_argument("--weak-decisions-db", type=Path, default=DEFAULT_WEAK_DECISIONS)
-    ap.add_argument(
-        "--accepted-identity-plan",
-        type=Path,
-        default=optional_existing_path(DEFAULT_ACCEPTED_IDENTITY_PLAN),
-    )
+    ap.add_argument("--sanji-root", type=Path, default=DEFAULT_SANJI_ROOT)
+    ap.add_argument("--articles-root", type=Path, default=DEFAULT_SANJI_ARTICLES_ROOT)
     ap.add_argument(
         "--historical-venue-geo",
         type=Path,
@@ -305,6 +305,17 @@ def main() -> int:
     )
     ap.add_argument("--advance-checkpoint", action="store_true", help="on full success, write a new seen-tokens file")
     ap.add_argument("--vision-workers", type=int, default=1, help="parallel workers for the needs_vision stage2 pass")
+    ap.add_argument(
+        "--vision-fallback-backend",
+        default="vl_direct_router",
+        choices=("none", "vl_direct_router", "router_no_glm", "mimo"),
+        help="online vision backend used only for rows still invalid after local OCR + DeepSeek",
+    )
+    ap.add_argument(
+        "--vision-fallback-model",
+        default="qwen3.6-plus",
+        help="DashScope Qwen-VL model for the failure-only direct-vision fallback",
+    )
     ap.add_argument("--canonical-llm-budget-rmb", type=float, default=5.0)
     ap.add_argument(
         "--run-id",
@@ -316,8 +327,10 @@ def main() -> int:
 
     if args.historical_venue_geo is not None and not args.historical_venue_geo.is_file():
         ap.error(f"--historical-venue-geo not found: {args.historical_venue_geo}")
-    if args.accepted_identity_plan is not None and not args.accepted_identity_plan.is_file():
-        ap.error(f"--accepted-identity-plan not found: {args.accepted_identity_plan}")
+    if not args.sanji_root.joinpath("sanji.db").is_file():
+        ap.error(f"Sanji DB not found: {args.sanji_root / 'sanji.db'}")
+    if not args.articles_root.is_dir():
+        ap.error(f"Sanji articles root not found: {args.articles_root}")
 
     base_serving_db = resolve_base_serving_db(
         args.base_serving_db,
@@ -332,6 +345,8 @@ def main() -> int:
     work_dir = run_dir / "_work"
     env = os.environ.copy()
     env["ATLAS_WORK_DIR"] = str(work_dir)
+    env["PYTHONUTF8"] = "1"
+    env["PYTHONIOENCODING"] = "utf-8"
 
     steps: list[dict[str, Any]] = []
 
@@ -342,6 +357,10 @@ def main() -> int:
             [
                 sys.executable,
                 str(HERE / "export_sanji_appdata_manifest.py"),
+                "--sanji-root",
+                str(args.sanji_root),
+                "--articles-root",
+                str(args.articles_root),
                 "--exclude-token-file",
                 str(args.seen_tokens_file),
                 "--limit",
@@ -422,6 +441,60 @@ def main() -> int:
         work_dir / "clean.sqlite",
         work_dir / "extractions.sqlite",
     )
+    if not extraction_gate["gate_pass"] and not args.dry_run_backend:
+        # Retry text-only transient failures first. stage2 is token-idempotent and
+        # skips valid rows, so this never re-pays successful extractions.
+        steps.append(
+            run_step(
+                "stage2_extract_text_retry",
+                [
+                    sys.executable,
+                    str(HERE / "stage2_extract.py"),
+                    "--backend",
+                    text_backend,
+                    "--route",
+                    "text_complete",
+                    "--max-cost-rmb",
+                    str(args.max_cost_rmb),
+                ],
+                env,
+                log_dir,
+            )
+        )
+        if steps[-1]["returncode"] != 0:
+            return finish(run_dir, steps, "stage2_text_retry_failed")
+
+        if args.vision_fallback_backend != "none":
+            fallback_env = env.copy()
+            fallback_env["ATLAS_QWEN_VL_MODEL"] = args.vision_fallback_model
+            steps.append(
+                run_step(
+                    "stage2_extract_vision_fallback",
+                    [
+                        sys.executable,
+                        str(HERE / "stage2_extract.py"),
+                        "--backend",
+                        args.vision_fallback_backend,
+                        "--route",
+                        "needs_vision",
+                        "--max-cost-rmb",
+                        str(args.max_cost_rmb),
+                        "--workers",
+                        str(args.vision_workers),
+                        "--poster-candidate-fallback-count",
+                        "8",
+                    ],
+                    fallback_env,
+                    log_dir,
+                )
+            )
+            if steps[-1]["returncode"] != 0:
+                return finish(run_dir, steps, "stage2_vision_fallback_failed")
+
+        extraction_gate = extraction_completion_report(
+            work_dir / "clean.sqlite",
+            work_dir / "extractions.sqlite",
+        )
     if not extraction_gate["gate_pass"]:
         return finish(
             run_dir,
@@ -472,22 +545,19 @@ def main() -> int:
     identity_dir.mkdir(parents=True, exist_ok=True)
     identity_db = identity_dir / "identity_redirects.sqlite"
     venue_redirect_db = identity_dir / "venue_redirects.sqlite"
-    dj_identity_cmd = [
-        sys.executable,
-        str(HERE / "build_serving_identity_redirects.py"),
-        "--source-serving-db",
-        str(merged_db),
-        "--out",
-        str(identity_db),
-        "--report",
-        str(identity_dir / "identity_report.json"),
-    ]
-    if args.accepted_identity_plan is not None:
-        dj_identity_cmd += ["--accepted-entity-plan", str(args.accepted_identity_plan)]
     steps.append(
         run_step(
             "build_dj_identity",
-            dj_identity_cmd,
+            [
+                sys.executable,
+                str(HERE / "build_serving_identity_redirects.py"),
+                "--source-serving-db",
+                str(merged_db),
+                "--out",
+                str(identity_db),
+                "--report",
+                str(identity_dir / "identity_report.json"),
+            ],
             env,
             log_dir,
         )
@@ -591,8 +661,6 @@ def main() -> int:
                 "llm",
                 "--decisions-db",
                 str(decisions_db),
-                "--batch-size",
-                str(CANONICAL_LLM_BATCH_SIZE),
                 "--max-cost-rmb",
                 str(0 if args.dry_run_backend else args.canonical_llm_budget_rmb),
                 "--report",

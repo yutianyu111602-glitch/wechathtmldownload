@@ -33,7 +33,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 ROOT = SCRIPT_DIR.parents[2]
 DEFAULT_API_DIR = ROOT / "services" / "weekly_activity_cloudrun" / "data" / "current_release"
 DEFAULT_REGISTRY = ROOT / "tools" / "stage7_rewrite" / "registries" / "weekly_venues_seed.json"
-DEFAULT_FORMAT_JS = ROOT / "apps" / "weekly_activity_miniprogram" / "utils" / "format.js"
+DEFAULT_FORMAT_JS = ROOT / "apps" / "weekly_activity_miniprogram" / "utils" / "mapLocationBook.js"
 DEFAULT_REPORT_ROOT = ROOT / "tools" / "stage7_rewrite" / "reports"
 
 if str(SCRIPT_DIR) not in sys.path:
@@ -543,6 +543,10 @@ def event_location_correction(item: dict[str, Any]) -> dict[str, Any] | None:
         return KNOWN_VENUE_CORRECTIONS["belo_park_beijing"]
     if ("rust club" in text or "锈蚀俱乐部" in text) and ("daqing" in text or "大庆" in text):
         return KNOWN_VENUE_CORRECTIONS["rust_club_daqing"]
+    if ("黑胶咖啡" in text or "vinyl cafe" in text or "vinylcoffee" in text) and (
+        "七里河" in text or "万辉国际" in text or "lanzhou" in text or "兰州" in text
+    ):
+        return KNOWN_VENUE_CORRECTIONS["vinylcoffee_lanzhou"]
     venue_id = first(item.get("venue_id"))
     city_key = first(item.get("city_key"))
     mismatch_map = {
@@ -970,6 +974,8 @@ def apply_item_repair(
             "city": event_correction.get("city_name") or item.get("city"),
             "city_key": event_correction.get("city_key") or item.get("city_key"),
             "city_name": event_correction.get("city_name") or item.get("city_name"),
+            "city_keys": [event_correction["city_key"]] if event_correction.get("city_key") else item.get("city_keys"),
+            "city_labels": [event_correction["city_name"]] if event_correction.get("city_name") else item.get("city_labels"),
             "address": event_correction["address_full"],
             "address_full": event_correction["address_full"],
         }
@@ -978,6 +984,10 @@ def apply_item_repair(
         item["city"] = event_correction.get("city_name") or item.get("city")
         item["city_key"] = event_correction.get("city_key") or item.get("city_key")
         item["city_name"] = event_correction.get("city_name") or item.get("city_name")
+        if event_correction.get("city_key"):
+            item["city_keys"] = [event_correction["city_key"]]
+        if event_correction.get("city_name"):
+            item["city_labels"] = [event_correction["city_name"]]
         item["address"] = event_correction["address_full"]
         item["address_full"] = event_correction["address_full"]
         item["address_source"] = "event_title_venue_crosscheck"
@@ -1166,6 +1176,7 @@ def repair_package(
     report_dir: Path,
     dry_run: bool,
     update_registry: bool,
+    only_item_ids: set[str] | None = None,
 ) -> dict[str, Any]:
     api_dir = api_dir.resolve()
     registry_path = registry_path.resolve()
@@ -1188,6 +1199,8 @@ def repair_package(
     counters: Counter[str] = Counter()
     for item in items:
         ident = first(item.get("id"), first(item.get("event_id")))
+        if only_item_ids and ident not in only_item_ids:
+            continue
         reg_entry = find_registry_entry(item, registry_entries)
         map_entry = find_map_entry(item, map_by_key, map_by_address)
         historical_geo_entry = find_historical_geo_entry(item, historical_geo_index)
@@ -1216,6 +1229,7 @@ def repair_package(
         "format_js": str(format_js),
         "history_paths": [str(path) for path in history_paths],
         "source_pack_paths": [str(path) for path in source_pack_paths(current)],
+        "only_item_ids": sorted(only_item_ids or []),
         "map_book_entry_count": len(map_entries),
         "historical_item_count": len(history_items),
         "historical_geo_candidate_count": sum(len(bucket) for bucket in historical_geo_index.values()),
@@ -1262,6 +1276,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--report-dir", type=Path, default=None)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--no-registry-update", action="store_true")
+    parser.add_argument("--only-item-id", action="append", default=[])
     return parser.parse_args(argv)
 
 
@@ -1279,6 +1294,7 @@ def main(argv: list[str] | None = None) -> int:
         report_dir=report_dir,
         dry_run=args.dry_run,
         update_registry=not args.no_registry_update,
+        only_item_ids=set(args.only_item_id or []),
     )
     print(
         json.dumps(

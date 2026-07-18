@@ -242,11 +242,23 @@ class LocalOcrDeepSeekBackend:
 
     @staticmethod
     def _has_text_event_signal(user_text: str) -> bool:
-        return bool(
-            re.search(
-                r"20\d{2}|\d{1,2}[./月-]\d{1,2}|周[一二三四五六日天]|星期|[0-2]?\d[:：][0-5]\d",
-                user_text or "",
-            )
+        text = user_text or ""
+        source_has_date = bool(re.search(r"^文章来源时间：\s*20\d{2}", text, re.M))
+        # Source-time metadata and its instructions are context, not event
+        # evidence. Excluding them prevents every image-only article from being
+        # accepted as text-complete merely because its publication date exists.
+        article_text = "\n".join(
+            line
+            for line in text.splitlines()
+            if not line.startswith(("文章来源时间：", "时间解释规则："))
+        )
+        if re.search(
+            r"20\d{2}|\d{1,2}[./月-]\d{1,2}|周[一二三四五六日天]|星期|[0-2]?\d[:：][0-5]\d",
+            article_text,
+        ):
+            return True
+        return source_has_date and bool(
+            re.search(r"今天|今晚|今夜|明天|明晚|明夜|本周|这周|周末", article_text)
         )
 
     def extract(self, system_prompt, user_text, image_paths, schema) -> dict:

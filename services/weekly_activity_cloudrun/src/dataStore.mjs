@@ -1,6 +1,7 @@
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { isElectronicMusicRelevantItem } from "./electronicRelevance.mjs";
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_API_DIR = path.resolve(moduleDir, "../data/current_release");
@@ -15,10 +16,22 @@ const TRUSTED_TIME_SOURCES = new Set([
   "manual_verified",
 ]);
 const TITLE_STOP_TOKENS = new Set([
+  "ambient",
+  "anniversary",
+  "bass",
+  "bird",
   "club",
+  "disco",
+  "early",
+  "electro",
   "event",
   "events",
+  "hip",
+  "hiphop",
+  "hop",
+  "house",
   "lineup",
+  "official",
   "party",
   "pres",
   "presented",
@@ -26,7 +39,14 @@ const TITLE_STOP_TOKENS = new Set([
   "preview",
   "room",
   "support",
+  "techno",
+  "ticket",
+  "tickets",
+  "tonight",
+  "trance",
   "weekly",
+  "year",
+  "years",
 ]);
 const CHINESE_TITLE_STOP_TOKENS = new Set(["活动", "派对", "预告", "阵容", "周末", "本周", "今晚", "今夜"]);
 
@@ -58,6 +78,45 @@ function normalizeCursor(value) {
 
 function first(value, fallback = "") {
   return Array.isArray(value) ? value[0] || fallback : value || fallback;
+}
+
+function boolOrNull(value) {
+  if (value === true || value === false) return value;
+  const text = String(value ?? "").trim().toLowerCase();
+  if (text === "true") return true;
+  if (text === "false") return false;
+  return null;
+}
+
+function stringOrNull(value) {
+  const text = String(value ?? "").trim();
+  return text || null;
+}
+
+function safeSanjiSourceContract(raw) {
+  const contract = raw && typeof raw.sanji_source_contract === "object" && raw.sanji_source_contract
+    ? raw.sanji_source_contract
+    : {};
+  const sourceMode = stringOrNull(raw?.source_mode || contract.source_mode);
+  const directRssFeedFetch = boolOrNull(raw?.direct_rss_feed_fetch ?? contract.direct_rss_feed_fetch);
+  const sanjiDbSnapshotExport = boolOrNull(raw?.sanji_db_snapshot_export ?? contract.sanji_db_snapshot_export);
+  const sanjiDesktopRefreshInvoked = boolOrNull(
+    raw?.sanji_desktop_refresh_invoked ?? contract.sanji_desktop_refresh_invoked,
+  );
+  if (!sourceMode && directRssFeedFetch === null && sanjiDbSnapshotExport === null && sanjiDesktopRefreshInvoked === null) {
+    return null;
+  }
+  return {
+    schema_version: stringOrNull(contract.schema_version) || "weekly_sanji_source_contract.public.v1",
+    source_mode: sourceMode,
+    source: stringOrNull(contract.source),
+    generated_at: stringOrNull(contract.generated_at),
+    exported_rows: Number(contract.exported_rows || 0),
+    prefetch_queue_rows: Number(contract.prefetch_queue_rows || 0),
+    direct_rss_feed_fetch: directRssFeedFetch,
+    sanji_db_snapshot_export: sanjiDbSnapshotExport,
+    sanji_desktop_refresh_invoked: sanjiDesktopRefreshInvoked,
+  };
 }
 
 function isoDate(value) {
@@ -141,8 +200,9 @@ function addDays(dateKey, days) {
 }
 
 function normalizeLateNightCutoffHour(value) {
-  const parsed = Number.parseInt(value ?? "6", 10);
-  if (!Number.isFinite(parsed)) return 6;
+  // Product rule: last night's events stay current until 07:00 next morning.
+  const parsed = Number.parseInt(value ?? "7", 10);
+  if (!Number.isFinite(parsed)) return 7;
   return Math.max(0, Math.min(12, parsed));
 }
 
@@ -154,7 +214,7 @@ function normalizeLookbackDays(value, fallback = 0) {
   return Math.max(0, Math.min(45, parsed));
 }
 
-function currentShanghaiBusinessDateKey(now = new Date(), cutoffHour = 6) {
+function currentShanghaiBusinessDateKey(now = new Date(), cutoffHour = 7) {
   const parts = currentShanghaiDateParts(now);
   if (cutoffHour > 0 && Number.isFinite(parts.hour) && parts.hour < cutoffHour) {
     return addDays(parts.date, -1);
@@ -185,6 +245,52 @@ function hasValue(value) {
 
 function isPlainObject(value) {
   return Boolean(value && typeof value === "object" && !Array.isArray(value));
+}
+
+function normalizeClubOverviews(raw) {
+  const byClub = {};
+  const kindCounts = {};
+  let overviewCount = 0;
+  const rawByClub = isPlainObject(raw?.by_club) ? raw.by_club : {};
+
+  for (const [rawClub, rawItems] of Object.entries(rawByClub)) {
+    const club = String(rawClub || "").trim();
+    if (!club || !Array.isArray(rawItems)) continue;
+    const items = rawItems
+      .filter(isPlainObject)
+      .map((item) => ({
+        record_type: stringOrNull(item.record_type) || "club_overview_parent",
+        parent_aggregate: item.parent_aggregate !== false,
+        include_in_activity_feed: item.include_in_activity_feed === true,
+        club: stringOrNull(item.club) || club,
+        title: stringOrNull(item.title) || "",
+        publish_date: isoDate(item.publish_date) || null,
+        original_url: stringOrNull(item.original_url) || "",
+        cover_url: stringOrNull(item.cover_url) || "",
+        window_kind: stringOrNull(item.window_kind) || "other",
+        window_label: stringOrNull(item.window_label) || "",
+        window_start: isoDate(item.window_start) || null,
+        window_end: isoDate(item.window_end) || null,
+      }))
+      .filter((item) => item.original_url && item.cover_url);
+    if (!items.length) continue;
+    byClub[club] = items;
+    overviewCount += items.length;
+    for (const item of items) {
+      kindCounts[item.window_kind] = (kindCounts[item.window_kind] || 0) + 1;
+    }
+  }
+
+  return {
+    schema_version: "club_overviews.v1",
+    generated_at: stringOrNull(raw?.generated_at),
+    as_of_date: isoDate(raw?.as_of_date) || null,
+    source: stringOrNull(raw?.source),
+    club_count: Object.keys(byClub).length,
+    overview_count: overviewCount,
+    kind_counts: kindCounts,
+    by_club: byClub,
+  };
 }
 
 function isMeaningfulValue(value) {
@@ -729,6 +835,14 @@ function dedupeItems(items) {
   return Array.from(seen.values());
 }
 
+// mtime-validated in-memory cache for the static release JSON package.
+// current.json is 1.27MB and was re-read+parsed on every request before.
+// The release dir only changes on deploy (new container) or test fixture edits,
+// both of which change mtime, so the cache stays correct and never serves stale data.
+// readJson results are never mutated by callers (verified: dedupe/sort/map build
+// new arrays/objects), so returning the cached reference is safe.
+const _jsonCache = new Map(); // fullPath -> { mtimeMs, data }
+
 async function readJson(baseDir, relativePath) {
   const fullPath = path.resolve(baseDir, relativePath);
   // Prevent path traversal: resolved path must stay within baseDir
@@ -736,8 +850,22 @@ async function readJson(baseDir, relativePath) {
   if (!fullPath.startsWith(normalizedBase + path.sep) && fullPath !== normalizedBase) {
     throw Object.assign(new Error(`Path traversal blocked: ${relativePath}`), { code: "PATH_TRAVERSAL" });
   }
+  let mtimeMs = 0;
+  try {
+    mtimeMs = (await stat(fullPath)).mtimeMs;
+    const cached = _jsonCache.get(fullPath);
+    if (cached && cached.mtimeMs === mtimeMs) {
+      return cached.data;
+    }
+  } catch {
+    // stat failed (missing file etc.) — fall through so readFile throws the real error
+  }
   const raw = await readFile(fullPath, "utf8");
-  return JSON.parse(raw);
+  const data = JSON.parse(raw);
+  if (mtimeMs) {
+    _jsonCache.set(fullPath, { mtimeMs, data });
+  }
+  return data;
 }
 
 export class WeeklyActivityDataStore {
@@ -768,11 +896,19 @@ export class WeeklyActivityDataStore {
           `[dataStore] manifest schema drift: got "${raw.schema_version}", expected "${expectedSchema}"`,
         );
       }
+      const sourceContract = safeSanjiSourceContract(raw);
       return {
         schema_version: raw.schema_version || expectedSchema,
         generated_at: raw.generated_at || raw.generatedAt || null,
         item_count: raw.item_count ?? raw.items_total ?? 0,
+        window_start: raw.window_start || raw.windowStart || null,
+        window_end: raw.window_end || raw.windowEnd || null,
         pipeline: raw.pipeline,
+        source_mode: sourceContract?.source_mode || null,
+        direct_rss_feed_fetch: sourceContract?.direct_rss_feed_fetch ?? null,
+        sanji_db_snapshot_export: sourceContract?.sanji_db_snapshot_export ?? null,
+        sanji_desktop_refresh_invoked: sourceContract?.sanji_desktop_refresh_invoked ?? null,
+        sanji_source_contract: sourceContract,
         field_resource_repair: raw.field_resource_repair || null,
         geocode_enrichment: raw.geocode_enrichment || null,
         id_consistency_repair: raw.id_consistency_repair || null,
@@ -784,6 +920,21 @@ export class WeeklyActivityDataStore {
         generated_at: null,
         item_count: 0,
       };
+    }
+  }
+
+  async getClubOverviews() {
+    try {
+      const raw = await readJson(this.baseDir, "club_overviews.json");
+      if (raw?.schema_version && raw.schema_version !== "club_overviews.v1") {
+        console.warn(
+          `[dataStore] club_overviews.json schema drift: got "${raw.schema_version}", expected "club_overviews.v1"`,
+        );
+      }
+      return normalizeClubOverviews(raw);
+    } catch (err) {
+      console.warn("[dataStore] club_overviews.json unavailable:", err.message);
+      return normalizeClubOverviews(null);
     }
   }
 
@@ -852,9 +1003,14 @@ export class WeeklyActivityDataStore {
       if (!date && !itemIsCurrentOrFuture(item, currentThreshold)) {
         return false;
       }
-      return item.quality_status === "READY";
+      return item.quality_status === "READY" && isElectronicMusicRelevantItem(item);
     });
     const deduped = dedupeItems(filtered);
+    deduped.sort((a, b) => {
+      const aKey = isoDate(a.event_date_start) || itemDateKeys(a)[0] || "9999-12-31";
+      const bKey = isoDate(b.event_date_start) || itemDateKeys(b)[0] || "9999-12-31";
+      return aKey < bKey ? -1 : aKey > bKey ? 1 : 0;
+    });
     const items = deduped.slice(pageCursor, pageCursor + pageLimit).map(withListCompatItem);
     const nextOffset = pageCursor + items.length;
 
@@ -886,6 +1042,7 @@ export class WeeklyActivityDataStore {
       for (const item of current.items) {
         if (!itemIsCurrentOrFuture(item, today)) continue;
         if (item.quality_status !== "READY") continue;
+        if (!isElectronicMusicRelevantItem(item)) continue;
         const key = item.city_key || "unknown";
         const label = (item.city || [])[0] || key;
         cities.set(key, {
@@ -923,6 +1080,8 @@ export class WeeklyActivityDataStore {
       const today = this.todayDateKey();
       const dates = new Map();
       for (const item of current.items) {
+        if (item.quality_status !== "READY") continue;
+        if (!isElectronicMusicRelevantItem(item)) continue;
         const itemDates = itemDateKeys(item);
         for (const date of itemDates.length ? itemDates : ["unknown"]) {
           const dateValue = isoDate(date);

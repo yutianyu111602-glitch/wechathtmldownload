@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +20,15 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SCHEMA_VERSION = "openclaw_weekly_darwin_scorecard.v1"
+
+
+def default_openclaw_skill_path(skill_name: str) -> Path:
+    candidates = [Path.home() / ".openclaw" / "skills" / skill_name / "SKILL.md"]
+    hermes_home = os.environ.get("HERMES_HOME", "").strip()
+    if hermes_home:
+        candidates.append(Path(hermes_home) / "skills" / skill_name / "SKILL.md")
+    candidates.append(Path(r"F:\DevData\Hermes") / "skills" / skill_name / "SKILL.md")
+    return next((path for path in candidates if path.is_file()), candidates[0])
 DEFAULT_READINESS = (
     REPO_ROOT
     / "tools"
@@ -1116,8 +1126,8 @@ def render_markdown(report: dict[str, Any]) -> str:
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--daily-skill", type=Path, default=Path(r"C:\Users\pc\.openclaw\skills\openclaw-weekly-daily-run\SKILL.md"))
-    parser.add_argument("--docker-skill", type=Path, default=Path(r"C:\Users\pc\.openclaw\skills\openclaw-docker-arsenal\SKILL.md"))
+    parser.add_argument("--daily-skill", type=Path, default=default_openclaw_skill_path("openclaw-weekly-daily-run"))
+    parser.add_argument("--docker-skill", type=Path, default=default_openclaw_skill_path("openclaw-docker-arsenal"))
     parser.add_argument("--readiness", type=Path, default=DEFAULT_READINESS)
     parser.add_argument("--exporter-freshness", type=Path, default=DEFAULT_EXPORTER_FRESHNESS)
     parser.add_argument("--exporter-auth-recovery", type=Path, default=DEFAULT_EXPORTER_AUTH_RECOVERY)

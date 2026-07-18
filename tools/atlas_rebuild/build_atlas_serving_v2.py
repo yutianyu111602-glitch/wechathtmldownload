@@ -19,6 +19,8 @@ from __future__ import annotations
 import argparse, hashlib, json, sqlite3, time
 from pathlib import Path
 
+from audit_atlas_semantic_gate import is_placeholder_subject
+
 SCHEMA_VERSION = "atlas_serving.v2"
 DDL = """
 CREATE TABLE subject (
@@ -246,6 +248,7 @@ def build(stage3_path, out_path, serving_path=None):
         except Exception:
             accepted_dj = set()
     dropped = {"dj": 0, "venue": 0, "org": 0, "series": 0}
+    dropped_semantic = {}
     counts = {"dj": 0, "venue": 0, "org": 0, "series": 0, "other": 0}
 
     for e in ents:
@@ -261,6 +264,10 @@ def build(stage3_path, out_path, serving_path=None):
         ec = span[0] if span else 0
         first_seen = span[1] if span else None
         last_seen = span[2] if span else None
+        semantic_code = is_placeholder_subject(eid, t, e["canonical_name"])
+        if semantic_code:
+            dropped_semantic[semantic_code] = dropped_semantic.get(semantic_code, 0) + 1
+            continue
         # F-01: keep only accepted DJs; drop eventless venue/org/series (noise)
         if t == "dj":
             if accepted_dj and eid not in accepted_dj:
@@ -321,13 +328,22 @@ def build(stage3_path, out_path, serving_path=None):
                     "OR dst_subject_id NOT IN (SELECT subject_id FROM subject)")
         rel_total = out.execute("SELECT COUNT(*) FROM relation").fetchone()[0]
 
+    # Semantic/F-01 filters can remove dominant venue/org targets after a series row was written.
+    out.execute("UPDATE series_profile SET venue_subject_id=NULL WHERE venue_subject_id IS NOT NULL "
+                "AND venue_subject_id NOT IN (SELECT subject_id FROM subject)")
+    out.execute("UPDATE series_profile SET organizer_subject_id=NULL WHERE organizer_subject_id IS NOT NULL "
+                "AND organizer_subject_id NOT IN (SELECT subject_id FROM subject)")
+
     meta = {"schema_version": SCHEMA_VERSION, "source": str(stage3_path),
             "serving_source": str(serving_path or ""), "relation_count": str(rel_total),
             "generation": "g1_g7_full",
             "dropped": json.dumps(dropped, ensure_ascii=False),
+            "dropped_semantic": json.dumps(dropped_semantic, ensure_ascii=False),
             "built_at": time.strftime("%Y-%m-%dT%H:%M:%S"), "counts": json.dumps(counts, ensure_ascii=False)}
     if any(dropped.values()):
         print("  F-01 reconcile dropped:", dropped)
+    if dropped_semantic:
+        print("  semantic filter dropped:", dropped_semantic)
     for k, v in meta.items():
         o.execute("INSERT INTO meta VALUES (?,?)", (k, str(v)))
     out.commit()
@@ -372,21 +388,33 @@ def _selftest():
     c.execute("CREATE TABLE alias(entity_id TEXT,alias TEXT)")
     rows = [
         ("dj:1", "dj", "NORA", "NORA", "上海", '{"roles":["dj"],"styles":["techno"],"social":{"instagram":"nora"}}', "active", 5, 1.0),
+        ("dj:b2b", "dj", "B2B", None, "上海", "{}", "active", 1, 1.0),
+        ("dj:compound", "dj", "Alpha b2b Beta", None, "上海", "{}", "active", 1, 1.0),
         ("ven:1", "venue", "ALL Club", "ALL", "上海", '{"district":"黄浦","venue_type":"club","geo":{"lat":31.2,"lng":121.4},"capacity":"300"}', "active", 8, 1.0),
+        ("ven:tba", "venue", "TBA", None, "上海", "{}", "active", 1, 1.0),
         ("org:1", "org", "FLAT", None, "上海", '{"org_type":"label"}', "active", 3, 1.0),
         ("ser:1", "series", "DEEP", None, "上海", '{"concept":"deep nights"}', "active", 2, 1.0),
     ]
     c.executemany("INSERT INTO canonical_entity VALUES(?,?,?,?,?,?,?,?,?)", rows)
     c.execute("INSERT INTO resolved_event VALUES('e1','t','Night','2025-03-01','','','上海','ven:1','ser:1','org:1',1.0,'{}','techno')")
     c.execute("INSERT INTO resolved_event VALUES('e2','t','Night2','2025-06-01','','','上海','ven:1','ser:1','org:1',1.0,'{}','techno')")
+    c.execute("INSERT INTO resolved_event VALUES('e3','t','Bad Venue','2025-04-01','','','上海','ven:tba',NULL,'org:1',1.0,'{}','techno')")
+    c.execute("INSERT INTO resolved_event VALUES('e4','t','Bad DJ','2025-04-02','','','上海',NULL,NULL,'org:1',1.0,'{}','techno')")
+    c.execute("INSERT INTO resolved_event VALUES('e5','t','Compound DJ','2025-04-03','','','上海',NULL,NULL,'org:1',1.0,'{}','techno')")
     c.execute("INSERT INTO event_participant VALUES('e1','dj:1','headliner','dj_set')")
     c.execute("INSERT INTO event_participant VALUES('e2','dj:1','headliner','dj_set')")
+    c.execute("INSERT INTO event_participant VALUES('e3','dj:1','headliner','dj_set')")
+    c.execute("INSERT INTO event_participant VALUES('e4','dj:b2b','headliner','dj_set')")
+    c.execute("INSERT INTO event_participant VALUES('e5','dj:compound','headliner','dj_set')")
     c.execute("INSERT INTO alias VALUES('ven:1','ALL 俱乐部')")
     s.commit(); s.close()
     outp = p + ".v2.sqlite"
     counts = build(p, outp)
     v = sqlite3.connect(outp); vc = v.cursor()
     assert counts == {"dj": 1, "venue": 1, "org": 1, "series": 1, "other": 0}, counts
+    assert vc.execute("SELECT COUNT(*) FROM subject WHERE subject_id IN ('dj:b2b','dj:compound','ven:tba')").fetchone()[0] == 0
+    semantic = json.loads(vc.execute("SELECT value FROM meta WHERE key='dropped_semantic'").fetchone()[0])
+    assert semantic == {"fake_b2b_dj_subject": 1, "compound_b2b_dj_subject": 1, "placeholder_subject": 1}, semantic
     assert vc.execute("SELECT event_count FROM venue_profile WHERE subject_id='ven:1'").fetchone()[0] == 2
     assert vc.execute("SELECT resident_dj_count FROM venue_profile WHERE subject_id='ven:1'").fetchone()[0] == 1
     assert vc.execute("SELECT geo_lat FROM venue_profile WHERE subject_id='ven:1'").fetchone()[0] == 31.2

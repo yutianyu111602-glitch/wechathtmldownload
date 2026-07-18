@@ -10,12 +10,16 @@ Workflow
 4. Wait ROUTE_PROPAGATION_DELAY seconds for CloudRun route propagation.
 5. Generate a dated preview QR via WeChat DevTools CLI.
 
+This backend workflow never rewrites mini-program offlineSnapshot.js and never
+uploads a mini-program version. Activity updates reach clients through the
+online API and the persisted last-good response cache.
+
 Usage examples
 --------------
 # Bake the latest named release and deploy:
 python scripts/bake_and_deploy.py \
-    --release-dir "D:\\downstream_results\\stage7_rewrite\\longrun\\WEEKLY_ACTIVITY_MINIPROGRAM_RELEASE_ENTITY_POSTEROCR6_20260509" \
-    --source-url-map "D:\\downstream_results\\stage7_rewrite\\longrun\\source_actions\\source_url_map.json"
+    --release-dir "E:\\weekly_activity_pipeline\\longrun\\WEEKLY_ACTIVITY_MINIPROGRAM_API_YYYYMMDD" \
+    --source-url-map "E:\\weekly_activity_pipeline\\longrun\\source_actions\\source_url_map.json"
 
 # Dry-run (show what would be copied/run, make no changes):
 python scripts/bake_and_deploy.py --release-dir ... --dry-run
@@ -30,7 +34,7 @@ import shutil
 import subprocess
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -40,26 +44,37 @@ ENV_ID = "huaidjweekly-d8g1go7-d0a07863e3e"
 SERVICE_NAME = "weekly-api"
 TCB_CMD = "npm exec --yes --package @cloudbase/cli@3.3.1 -- tcb"
 DEFAULT_DEPLOY_MODE = "source-upload"
-MINIPROGRAM_DIR = Path(r"C:\code\githubstar\wechathtmldownload\apps\weekly_activity_miniprogram")
 DEVTOOLS_CLI = Path(r"C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat")
 ROUTE_PROPAGATION_DELAY = 70  # seconds — CloudRun needs ~60s after deploy
 
 # Paths relative to this script's project root (services/weekly_activity_cloudrun/)
-_SCRIPT_DIR = Path(__file__).parent
+_SCRIPT_DIR = Path(__file__).resolve().parent
 _PROJECT_DIR = _SCRIPT_DIR.parent
+_REPO_ROOT = _PROJECT_DIR.parents[1]
+MINIPROGRAM_DIR = _REPO_ROOT / "apps" / "weekly_activity_miniprogram"
 DATA_CURRENT_RELEASE = _PROJECT_DIR / "data" / "current_release"
 DATA_SOURCE_ACTIONS = _PROJECT_DIR / "data" / "source_actions"
 DATA_STAGE7_ATLAS = _PROJECT_DIR / "data" / "stage7_atlas"
 DATA_ROOT = _PROJECT_DIR / "data"
 DEPLOY_CONTEXT_DIR = _PROJECT_DIR / "tmp" / "cloudrun_deploy_context"
 DEPLOY_CONTEXT_MANIFEST = "deploy_context_manifest.json"
-DEPLOY_CONTEXT_TOP_ITEMS = ["package.json", "Dockerfile", "assets", "src", "scripts"]
-MINIAPP_ATLAS_INDEX_ITEMS = ["atlas_index.json.gz"]
+DEPLOY_CONTEXT_TOP_ITEMS = ["package.json", "package-lock.json", "Dockerfile", "assets", "src", "scripts"]
+MINIAPP_ATLAS_INDEX_ITEMS = [
+    "atlas_index.json.gz",
+    "atlas_neighborhood.json.gz",
+    "atlas_starmap_lenses.json.gz",
+    "dj_relation_trajectory_lens.json.gz",
+    "dj_external_links_accepted_candidate.json.gz",
+    "scene_clusters_candidate.json.gz",
+    "radio_programs_candidate.json.gz",
+    "radio_external_links_public_seed_candidate.json.gz",
+]
 
 # Files / dirs to copy from release dir into current_release
 RELEASE_ITEMS = [
     "current.json",
     "manifest.json",
+    "column.json",
     "by-city",
     "by-date",
     "by-id",
@@ -71,6 +86,7 @@ RELEASE_ITEMS = [
 # live LLM/vector/graph services at request time.
 OPTIONAL_RELEASE_ITEMS = [
     "SUMMARY.md",
+    "club_overviews.json",
     "llm",
     "weekly_entity_snapshot.json",
     "weekly_entity_observations.jsonl",
@@ -182,11 +198,80 @@ def materialized_llm_complete(data_dir: Path) -> bool:
     return all((data_dir / item).is_file() for item in MATERIALIZED_LLM_REQUIRED_ITEMS)
 
 
+def read_json_file(path: Path) -> dict:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return value if isinstance(value, dict) else {}
+
+
+def parse_iso_time(value: object) -> datetime | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    text = value.strip()
+    if text.endswith("Z"):
+        text = f"{text[:-1]}+00:00"
+    try:
+        parsed = datetime.fromisoformat(text)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone(timedelta(hours=8)))
+    return parsed.astimezone(timezone.utc)
+
+
+def materialized_llm_current(data_dir: Path) -> tuple[bool, list[str]]:
+    reasons: list[str] = []
+    if not materialized_llm_complete(data_dir):
+        reasons.append("missing_required_llm_files")
+        return False, reasons
+
+    current = read_json_file(data_dir / "current.json")
+    items = current.get("items")
+    if not isinstance(items, list) or not items:
+        reasons.append("missing_current_items")
+        return False, reasons
+    item_ids = {str(item.get("id")) for item in items if isinstance(item, dict) and item.get("id")}
+    if len(item_ids) != len(items):
+        reasons.append("current_item_ids_incomplete")
+
+    expected_count = len(items)
+    summary = read_json_file(data_dir / "llm" / "weekly_summary.json")
+    index = read_json_file(data_dir / "llm" / "enrichment_index.json")
+    report = read_json_file(data_dir / "llm" / "materialize_report.json")
+    enrichments = index.get("enrichments") if isinstance(index.get("enrichments"), list) else []
+    enrichment_ids = {str(item.get("id")) for item in enrichments if isinstance(item, dict) and item.get("id")}
+
+    if int(summary.get("itemCount") or 0) != expected_count:
+        reasons.append("summary_item_count_mismatch")
+    if int(index.get("itemCount") or 0) != expected_count:
+        reasons.append("enrichment_index_item_count_mismatch")
+    if len(enrichments) != expected_count:
+        reasons.append("enrichment_count_mismatch")
+    if enrichment_ids != item_ids:
+        reasons.append("enrichment_id_set_mismatch")
+    if report:
+        if int(report.get("itemCount") or 0) != expected_count:
+            reasons.append("materialize_report_item_count_mismatch")
+        if int(report.get("enrichWritten") or 0) != expected_count:
+            reasons.append("materialize_report_enrich_count_mismatch")
+
+    manifest_time = parse_iso_time(read_json_file(data_dir / "manifest.json").get("generated_at"))
+    generated_time = parse_iso_time(report.get("generatedAt") or index.get("generatedAt") or summary.get("generatedAt"))
+    if manifest_time and generated_time and generated_time < manifest_time:
+        reasons.append("materialized_llm_older_than_manifest")
+
+    return not reasons, reasons
+
+
 def ensure_source_grounded_llm_materialized(dry_run: bool) -> bool:
     """Ensure release ships deterministic materialized LLM files for runtime fallback."""
-    if materialized_llm_complete(DATA_CURRENT_RELEASE):
-        print("  OK materialized llm outputs present")
+    current, reasons = materialized_llm_current(DATA_CURRENT_RELEASE)
+    if current:
+        print("  OK materialized llm outputs current")
         return True
+    reason_text = ", ".join(reasons) if reasons else "unknown"
     script = _SCRIPT_DIR / "materialize_source_grounded_outputs.mjs"
     cmd = [
         "node",
@@ -198,20 +283,21 @@ def ensure_source_grounded_llm_materialized(dry_run: bool) -> bool:
     ]
     label = " ".join(str(c) for c in cmd)
     if dry_run:
-        print(f"  [DRY-RUN] generate source-grounded materialized llm outputs: {label}")
+        print(f"  [DRY-RUN] refresh source-grounded materialized llm outputs ({reason_text}): {label}")
         return True
     if not script.exists():
         print(f"  ERROR: materialized llm fallback script missing: {script}")
         return False
-    print("  generating source-grounded materialized llm outputs")
+    print(f"  refreshing source-grounded materialized llm outputs ({reason_text})")
     result = subprocess.run(cmd, cwd=_PROJECT_DIR)
     if result.returncode != 0:
         print(f"  ERROR: materialized llm generation exited {result.returncode}")
         return False
-    if not materialized_llm_complete(DATA_CURRENT_RELEASE):
-        print("  ERROR: materialized llm outputs missing after generation")
+    current, reasons = materialized_llm_current(DATA_CURRENT_RELEASE)
+    if not current:
+        print(f"  ERROR: materialized llm outputs stale after generation: {', '.join(reasons)}")
         return False
-    print("  OK materialized llm outputs generated")
+    print("  OK materialized llm outputs refreshed")
     return True
 
 
@@ -292,6 +378,7 @@ def build_deploy_context_manifest(
         "file_count": len(files),
         "total_bytes": sum(int(row["size"]) for row in files),
         "current_release_items": current_release_items,
+        "data_labels": [label for label, _src, _names in data_items],
         "files": files,
     }
 
@@ -325,7 +412,7 @@ def deploy_context_matches(manifest: dict) -> bool:
     return True
 
 
-def prepare_deploy_context(dry_run: bool) -> Path:
+def prepare_deploy_context(dry_run: bool, include_stage7_atlas: bool = False) -> Path:
     """Build a minimal CloudRun deploy context for source upload and image build."""
     print(f"\n--- prepare deploy context: {DEPLOY_CONTEXT_DIR} ---")
     current_release_items = [
@@ -336,8 +423,9 @@ def prepare_deploy_context(dry_run: bool) -> Path:
         ("data", DATA_ROOT, MINIAPP_ATLAS_INDEX_ITEMS),
         ("data/current_release", DATA_CURRENT_RELEASE, current_release_items),
         ("data/source_actions", DATA_SOURCE_ACTIONS, ["source_url_map.json"]),
-        ("data/stage7_atlas", DATA_STAGE7_ATLAS, None),
     ]
+    if include_stage7_atlas:
+        data_items.append(("data/stage7_atlas", DATA_STAGE7_ATLAS, None))
     manifest = None
     if not dry_run:
         manifest = build_deploy_context_manifest(current_release_items, data_items)
@@ -443,12 +531,57 @@ def normalize_current_release_manifest(release_dir: Path, dry_run: bool) -> bool
     return True
 
 
-def bake_data(release_dir: Path, source_url_map: Path | None, dry_run: bool) -> bool:
+def regenerate_neighborhood_bundle(dry_run: bool) -> bool:
+    """Rebuild atlas_neighborhood.json.gz from the live atlas_miniapp.sqlite.
+
+    Keeps the star-map neighborhood in lock-step with the deployed serving DB
+    (including identity merges), instead of a periodic atlas_serving_v2 snapshot
+    that drifts stale. The bundle is keyed by the same hash subject ids as
+    atlas_index, so the API resolves nodes natively. Skipped quietly if the
+    miniapp DB is absent (older release layouts that ship no atlas).
+    """
+    repo_root = MINIPROGRAM_DIR.parent.parent
+    builder = repo_root / "tools" / "atlas_rebuild" / "build_neighbor_bundle_from_miniapp.py"
+    miniapp_db = DATA_ROOT / "atlas_miniapp.sqlite"
+    out_gz = DATA_ROOT / "atlas_neighborhood.json.gz"
+    if not miniapp_db.exists():
+        print(f"  SKIP neighborhood rebuild: no atlas_miniapp.sqlite at {miniapp_db}")
+        return True
+    if not builder.exists():
+        print(f"  ERROR: neighborhood builder missing: {builder}")
+        return False
+    cmd = [sys.executable, str(builder), "--miniapp-db", str(miniapp_db), "--out", str(out_gz)]
+    if dry_run:
+        print(f"  [DRY-RUN] regenerate neighborhood bundle: {' '.join(cmd)}")
+        return True
+    print("  regenerating star-map neighborhood bundle from atlas_miniapp.sqlite")
+    result = subprocess.run(cmd, cwd=str(builder.parent))
+    if result.returncode != 0:
+        print(f"  ERROR: neighborhood bundle rebuild exited {result.returncode}")
+        return False
+    print("  OK neighborhood bundle aligned with atlas_miniapp.sqlite")
+    return True
+
+
+def bake_data(
+    release_dir: Path,
+    source_url_map: Path | None,
+    dry_run: bool,
+    *,
+    update_column_json: bool = False,
+) -> bool:
     print(f"\n--- bake data: {release_dir.name} ---")
     ok = True
 
     # 1. Copy release items into current_release
     for item in RELEASE_ITEMS:
+        if item == "column.json" and not update_column_json:
+            existing = DATA_CURRENT_RELEASE / item
+            if existing.exists():
+                print(f"  preserve existing column.json (use --update-column-json to replace)")
+            else:
+                print(f"  skip column.json update by default; existing column.json not found")
+            continue
         src = release_dir / item
         dst = DATA_CURRENT_RELEASE / item
         copy_item(src, dst, dry_run)
@@ -493,6 +626,14 @@ def bake_data(release_dir: Path, source_url_map: Path | None, dry_run: bool) -> 
         ok = False
 
     if not ensure_source_grounded_llm_materialized(dry_run):
+        ok = False
+
+    # Backend activity releases never mutate mini-program source. Successful
+    # online weekly responses are persisted by api.js; offlineSnapshot.js is a
+    # separately maintained first-install disaster seed, not a release artifact.
+    print("  mini-program disaster seed unchanged (online API + persisted last-good cache carry activity updates)")
+
+    if not regenerate_neighborhood_bundle(dry_run):
         ok = False
 
     return ok
@@ -552,7 +693,7 @@ def deploy_source_upload(dry_run: bool, deploy_context: Path) -> bool:
         "--mem",
         "2",
         "--minNum",
-        "0",
+        "1",
         "--maxNum",
         "2",
         "--dockerfile",
@@ -791,6 +932,12 @@ def main() -> int:
     parser.add_argument("--prepare-only", action="store_true", help="Bake data and prepare deploy context without deploying")
     parser.add_argument("--skip-patch-check", action="store_true", help="Skip tcb CLI patch verification")
     parser.add_argument("--require-stage7-atlas", action="store_true", help="Abort if data/stage7_atlas is incomplete")
+    parser.add_argument("--include-stage7-atlas", action="store_true", help="Include data/stage7_atlas in the deploy context")
+    parser.add_argument(
+        "--update-column-json",
+        action="store_true",
+        help="Also replace current_release/column.json. Off by default so activity releases do not overwrite column articles.",
+    )
     parser.add_argument(
         "--deploy-mode",
         choices=("source-upload", "image-upload", "auto"),
@@ -830,7 +977,12 @@ def main() -> int:
             return 1
 
     # Step 2: bake data
-    if not bake_data(release_dir, args.source_url_map, args.dry_run):
+    if not bake_data(
+        release_dir,
+        args.source_url_map,
+        args.dry_run,
+        update_column_json=args.update_column_json,
+    ):
         print("ERROR: Data bake incomplete. Deploy aborted.")
         return 1
 
@@ -838,7 +990,7 @@ def main() -> int:
     if not validate_stage7_atlas(args.require_stage7_atlas):
         return 1
 
-    deploy_context = prepare_deploy_context(args.dry_run)
+    deploy_context = prepare_deploy_context(args.dry_run, args.include_stage7_atlas or args.require_stage7_atlas)
 
     if args.prepare_only:
         print("\n=== Prepared deploy context only ===")

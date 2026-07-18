@@ -15,9 +15,13 @@ import datetime as dt
 import json
 import re
 import sqlite3
+import sys
 import tempfile
 from collections import Counter
 from pathlib import Path
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(errors="backslashreplace")
 
 DEFAULT_DB = Path.home() / "AppData/Roaming/sanji/sanji.db"
 

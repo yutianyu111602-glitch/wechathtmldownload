@@ -1,6 +1,7 @@
 import ast
 import os
 import runpy
+import subprocess
 from pathlib import Path
 
 
@@ -33,21 +34,45 @@ def test_weekly_pipeline_resumes_partial_vl_evidence_without_deleting_it():
 
     assert "function Complete-VlEnrichmentOutput" in weekly
     assert "vl_enrichment_exit_override.json" in weekly
+    assert "complete_outputs_nonzero_exit_recorded" in weekly
+    assert "non-zero process exit remains terminal" in weekly
     assert "--resume-from-evidence-dir" in weekly
     assert "$ResumeVlEvidenceDir" in weekly
     assert "Preserving VL output dir for evidence resume" in weekly
     assert "Complete-VlEnrichmentOutput -InputDir $PACK_DIR -OutputDir $PACK_OCR_DIR" in weekly
+    vl_step = weekly[
+        weekly.index('Invoke-Step "Step 3: Sanji Qwen3-VL Direct Enrichment') :
+        weekly.index("# ─── Step 3.5:")
+    ]
+    assert "$global:LASTEXITCODE = $vlExitCode" in vl_step
+    assert "$global:LASTEXITCODE = 0" not in vl_step
 
     build_block = runner[runner.index('Invoke-RunStep "Build daily source package from selected source queue"') :]
     build_block = build_block.split('if (-not $DisableIncrementalMerge)', 1)[0]
     assert '[string]$ResumeVlDir = ""' in runner
     assert '[string]$ResumeVlEvidenceDir = ""' in runner
+    assert (
+        '$allowImplicitVlResume = ($PosterExtractionMode -eq "vl_direct_qwen" -and '
+        '$SourceMode -ne "sanji_desktop_rss")'
+    ) in build_block
     assert "$vlCompleteOutput" in build_block
+    assert "elseif ($allowImplicitVlResume -and $vlCompleteOutput)" in build_block
+    assert "elseif ($allowImplicitVlResume -and (Test-Path $vlEvidenceDir)" in build_block
     assert "$pipelineArgs.ResumeVlDir = $vlDir" in build_block
     assert "$pipelineArgs.ResumeVlEvidenceDir = $vlEvidenceDir" in build_block
     assert build_block.index("$pipelineArgs.ResumeVlDir = $vlDir") < build_block.index(
         "$pipelineArgs.ResumeVlEvidenceDir = $vlEvidenceDir"
     )
+
+
+def test_sanji_publish_never_implicitly_resumes_a_week_tag_vl_package():
+    runner = (ROOT / "run_openclaw_weekly_daily_publish.ps1").read_text(encoding="utf-8")
+    build_block = runner[runner.index('Invoke-RunStep "Build daily source package from selected source queue"') :]
+    build_block = build_block.split('if (-not $DisableIncrementalMerge)', 1)[0]
+
+    assert '$SourceMode -ne "sanji_desktop_rss"' in build_block
+    assert "Skip implicit VL resume for Sanji source" in build_block
+    assert "Sanji source snapshot must be rebuilt" in build_block
 
 
 def test_weekly_pipeline_step_log_is_written_from_finally_on_failure():
@@ -258,7 +283,7 @@ def test_weekly_pipeline_stops_stale_daily_prefetch_writer_before_step0_refresh(
     step0 = step0.split("# ─── Step 1:", 1)[0]
     assert "Stop-StaleOutputWritersForPath -Path $DEFAULT_DAILY_PREFETCH_DIR" in step0
     assert step0.index("Stop-StaleOutputWritersForPath -Path $DEFAULT_DAILY_PREFETCH_DIR") < step0.index(
-        'python "$REFRESH_PREFETCH_SCRIPT" @prefetchArgs'
+        '& $PythonExecutable "$REFRESH_PREFETCH_SCRIPT" @prefetchArgs'
     )
 
 
@@ -290,7 +315,7 @@ def test_daily_runner_and_weekly_pipeline_support_sanji_desktop_rss_source_mode(
     assert "function Write-Utf8NoBomText" in runner
     assert "System.Text.UTF8Encoding($false)" in runner
     assert "function Assert-SanjiLatestExportReady" in runner
-    assert "Validate Sanji latest export on E drive" in runner
+    assert "Freeze Sanji source snapshot before build" in runner
     assert "sanji_latest_export_ready.json" in runner
     assert "copied_into_daily_queue_pointer = $false" in runner
     assert "sanji_source_snapshot" in runner
@@ -324,11 +349,47 @@ def test_daily_runner_and_weekly_pipeline_support_sanji_desktop_rss_source_mode(
     assert "--body-text-limit 8000" in sanji_scheduled
     assert "export_club_overviews_from_sanji.py" in sanji_scheduled
     assert "latest_club_overviews.json" in sanji_scheduled
-    assert "club_overviews.js" in sanji_scheduled
-    assert "--out-js" in sanji_scheduled
+    assert "OverviewMiniProgramJsPath" not in sanji_scheduled
+    assert "apps\\weekly_activity_miniprogram\\data\\club_overviews.js" not in sanji_scheduled
+    assert "--out-js" not in sanji_scheduled
     assert "export_club_overviews_from_sanji.py" in weekly
     assert "latest_club_overviews.json" in weekly
-    assert "club_overviews.js" in weekly
+    assert "SANJI_OVERVIEW_MINIPROGRAM_JS" not in weekly
+    assert "apps\\weekly_activity_miniprogram\\data\\club_overviews.js" not in weekly
+    assert '"--out-js",' not in weekly
+    assert "Step 4.1: Attach club overview online artifact" in weekly
+    assert '"$API_DIR\\club_overviews.json"' in weekly
+    assert "club_overviews.v1" in weekly
+    assert "$crossSourceAuditExit = $LASTEXITCODE" in weekly
+    assert "Cross-source strict audit failed with exit code" in weekly
+
+
+def test_openclaw_publish_freezes_one_sanji_snapshot_before_any_build_reads():
+    runner = (ROOT / "run_openclaw_weekly_daily_publish.ps1").read_text(encoding="utf-8")
+
+    freeze_label = 'Invoke-RunStep "Freeze Sanji source snapshot before build"'
+    build_label = 'Invoke-RunStep "Build daily source package from selected source queue"'
+    assert freeze_label in runner
+    assert runner.index(freeze_label) < runner.index(build_label)
+    assert runner.count("Assert-SanjiLatestExportReady") == 2  # function declaration + one call
+    assert "Use frozen Sanji source snapshot for manifest and coverage gates" in runner
+
+
+def test_openclaw_publish_can_resume_an_explicit_frozen_sanji_snapshot():
+    runner = (ROOT / "run_openclaw_weekly_daily_publish.ps1").read_text(encoding="utf-8")
+
+    assert '[string]$SanjiSourceSnapshotDir = ""' in runner
+    assert "$usingProvidedSanjiSnapshot" in runner
+    assert "$SanjiLatestExportRoot = (Resolve-Path -LiteralPath $SanjiSourceSnapshotDir).Path" in runner
+    assert "provided_frozen_snapshot" in runner
+
+
+def test_openclaw_run_step_initializes_native_exit_code_for_pure_powershell_steps():
+    runner = (ROOT / "run_openclaw_weekly_daily_publish.ps1").read_text(encoding="utf-8")
+    invoke_step = runner[runner.index("function Invoke-RunStep") : runner.index("function Assert-NativeSuccess")]
+
+    assert "$global:LASTEXITCODE = 0" in invoke_step
+    assert invoke_step.index("$global:LASTEXITCODE = 0") < invoke_step.index("& $Body")
 
 
 def test_openclaw_publish_wrapper_mirrors_sanji_contract_to_manifest_top_level():
@@ -363,7 +424,7 @@ def test_incremental_merge_preserves_sanji_manifest_source_contract_fields():
         assert key in block
 
 
-def test_bake_deploy_does_not_refresh_miniprogram_offline_snapshot_by_default():
+def test_backend_bake_deploy_cannot_refresh_miniprogram_disaster_seed():
     repo_root = ROOT.parents[1]
     script = (repo_root / "services" / "weekly_activity_cloudrun" / "scripts" / "bake_and_deploy.py").read_text(
         encoding="utf-8"
@@ -371,12 +432,13 @@ def test_bake_deploy_does_not_refresh_miniprogram_offline_snapshot_by_default():
     bake_block = script[script.index("def bake_data(") :]
     bake_block = bake_block.split("def validate_stage7_atlas", 1)[0]
 
-    assert "refresh_offline_snapshot: bool = False" in script
-    assert '"--refresh-offline-snapshot"' in script
-    assert "args.refresh_offline_snapshot" in script
-    assert "skip mini-program offlineSnapshot.js refresh" in script
-    assert "last live API cache tracks package updates" in script
-    assert bake_block.index("if refresh_offline_snapshot:") < bake_block.index("regenerate_neighborhood_bundle")
+    assert "refresh_offline_snapshot" not in script
+    assert '"--refresh-offline-snapshot"' not in script
+    assert "generate_offline_snapshot.py" not in script
+    assert "regenerate_miniprogram_offline_snapshot" not in bake_block
+    assert "MINIPROGRAM_DIR" not in bake_block
+    assert "mini-program disaster seed unchanged" in bake_block
+    assert "online API + persisted last-good cache carry activity updates" in bake_block
 
 
 def test_offline_snapshot_generator_keeps_small_first_launch_seed_default():
@@ -384,6 +446,23 @@ def test_offline_snapshot_generator_keeps_small_first_launch_seed_default():
 
     assert "default=55" in script
     assert "0 means full current_release" in script
+    assert '"--confirm-disaster-seed-update"' in script
+    assert "ordinary backend activity releases must not run this tool" in script
+
+
+def test_miniprogram_upload_carries_but_never_regenerates_disaster_seed():
+    repo_root = ROOT.parents[1]
+    script = (
+        repo_root / "apps" / "weekly_activity_miniprogram" / "scripts" / "upload_native_windows.ps1"
+    ).read_text(encoding="utf-8")
+
+    assert "frontend code upload; activity data stays online" in script
+    assert '$SourceOfflineSeed = Join-Path $ProjectDir "utils\\offlineSnapshot.js"' in script
+    assert '$UploadOfflineSeed = Join-Path $UploadProjectDir "utils\\offlineSnapshot.js"' in script
+    assert "Get-FileHash -LiteralPath $SourceOfflineSeed -Algorithm SHA256" in script
+    assert "Get-FileHash -LiteralPath $UploadOfflineSeed -Algorithm SHA256" in script
+    assert "Upload staging mutated offlineSnapshot.js" in script
+    assert "generate_offline_snapshot.py" not in script
 
 
 def test_openclaw_publish_wrapper_requires_small_sanji_gap_missing_rows():
@@ -476,7 +555,7 @@ def test_sanji_rss_fast_watch_skips_sanji_export_after_recent_successful_publish
     assert "skip_recent_successful_publish_cooldown" in watcher
     assert "sanji_export_executed = $false" in watcher
     assert watcher.index("Get-RecentSuccessfulPublishSummary -CooldownMinutes") < watcher.index(
-        "& powershell -NoProfile -ExecutionPolicy Bypass -File $ExportScript"
+        "& pwsh -NoProfile -ExecutionPolicy Bypass -File $ExportScript"
     )
 
 
@@ -495,10 +574,16 @@ def test_sanji_gap_audit_accounts_nested_review_risk_flags():
     assert reason == "review_flag:missing_lineup_visible"
 
 
-def test_daily_runner_and_weekly_pipeline_default_to_sanji_qwen_vl_extraction():
+def test_daily_runner_and_weekly_pipeline_default_to_online_qwen_vl_extraction():
     weekly = (ROOT / "weekly_activity_next_week_pipeline.ps1").read_text(encoding="utf-8")
     runner = (ROOT / "run_openclaw_weekly_daily_publish.ps1").read_text(encoding="utf-8")
 
+    assert '$env:PYTHONUTF8 = "1"' in weekly
+    assert '$env:PYTHONIOENCODING = "utf-8"' in weekly
+    assert 'GetEnvironmentVariable("HUAIDJ_PYTHON", "User")' in weekly
+    assert 'hermes-agent\\venv\\Scripts\\python.exe' in weekly
+    assert '& $PythonExecutable @vlArgs' in weekly
+    assert '$env:PYTHONUTF8 = "1"' in runner
     assert '[ValidateSet("legacy_ocr", "vl_direct_qwen")]' in weekly
     assert '[string]$PosterExtractionMode = "vl_direct_qwen"' in weekly
     assert "enrich_weekly_activity_pack_with_qwen_vl.py" in weekly
@@ -523,6 +608,40 @@ def test_daily_runner_and_weekly_pipeline_default_to_sanji_qwen_vl_extraction():
     assert "PosterVlConcurrency = $PosterVlConcurrency" in runner
     assert "poster_extraction_mode = $PosterExtractionMode" in runner
     assert '$PosterExtractionMode -eq "legacy_ocr"' in runner
+
+
+def test_sanji_twice_daily_publish_defaults_to_online_qwen_vl_route():
+    daily = (ROOT / "run_huaidj_sanji_daily_twice.ps1").read_text(encoding="utf-8")
+
+    assert '$env:PYTHONUTF8 = "1"' in daily
+    assert '$env:PYTHONIOENCODING = "utf-8"' in daily
+    assert '[string]$PosterExtractionMode = "vl_direct_qwen"' in daily
+    assert '"-PosterExtractionMode", $PosterExtractionMode' in daily
+
+
+def test_openclaw_publish_repairs_final_merged_source_policy_before_external_writes():
+    runner = (ROOT / "run_openclaw_weekly_daily_publish.ps1").read_text(encoding="utf-8")
+
+    assert '$SourcePolicyRepairScript = Join-Path $Scripts "repair_weekly_api_package_for_source_policy.py"' in runner
+    repair_label = 'Invoke-RunStep "Repair final merged package source policy"'
+    assert repair_label in runner
+    repair_block = runner[runner.index(repair_label) :]
+    assert "python $SourcePolicyRepairScript" in repair_block
+    assert '"--api-dir", $ApiDir' in repair_block
+    assert '"--source-policy", (Join-Path $Stage7 "registries\\weekly_sanji_source_policy.json")' in repair_block
+    assert '"--report", (Join-Path $RunReportDir "source_policy_package_repair.json")' in repair_block
+    assert runner.index('Invoke-RunStep "Repair soft lineup/address/time fields"') < runner.index(repair_label)
+    assert runner.index(repair_label) < runner.index('Invoke-RunStep "Apply confirmed venue geo locks"')
+    assert runner.index(repair_label) < runner.index('"Migrate public weekly posters into CloudBase storage"')
+    assert runner.index(repair_label) < runner.index('Write-Host "▶ Run release package quality gate"')
+
+
+def test_sanji_status_sync_preserves_ordered_dictionary_mutations():
+    daily = (ROOT / "run_huaidj_sanji_daily_twice.ps1").read_text(encoding="utf-8")
+
+    assert "return [ordered]@{" in daily
+    assert daily.count("[System.Collections.IDictionary]$Status") >= 3
+    assert "[hashtable]$Status" not in daily
 
 
 def test_sanji_twice_daily_publish_uses_source_policy_cleaned_base_floor():
@@ -654,6 +773,7 @@ def test_sanji_docs_do_not_restore_direct_rss_source_truth():
 
 def test_sanji_hermes_installer_uses_wed_fri_snapshot_contract():
     installer = (ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py").read_text(encoding="utf-8")
+    audit = (ROOT / "scripts" / "audit_huaidj_sanji_hermes_contract.py").read_text(encoding="utf-8")
 
     assert "HUAIDJ Sanji Wed 21:10" in installer
     assert "HUAIDJ Sanji Fri 20:10" in installer
@@ -682,6 +802,11 @@ def test_sanji_hermes_installer_uses_wed_fri_snapshot_contract():
     assert "HUAIDJ Coverage Audit Fri 17:40" in installer
     assert '"HUAIDJ Sanji Publish Noon": {' not in installer
     assert '"HUAIDJ Sanji Publish Evening": {' not in installer
+    assert '"HUAIDJ Sanji Wed 21:10": {' in installer
+    assert '"HUAIDJ Sanji Fri 20:10": {' in installer
+    assert installer.count('"deliver": "telegram"') >= 8
+    assert '"HUAIDJ Atlas v2 Sanji Import Nightly"' in audit
+    assert "ALLOWED_EXTRA_HERMES_JOBS" in audit
 
 
 def test_sanji_hermes_installer_templates_are_valid_python():
@@ -689,6 +814,165 @@ def test_sanji_hermes_installer_templates_are_valid_python():
 
     for rel_path, template in namespace["SCRIPT_TEMPLATES"].items():
         ast.parse(template, filename=rel_path)
+
+
+def _exec_hermes_template(template: str) -> dict:
+    namespace = {"__name__": "__test__"}
+    exec(compile(template, "<hermes-template>", "exec"), namespace)
+    return namespace
+
+
+def test_sanji_publish_template_returns_failed_child_exit(monkeypatch, tmp_path):
+    monkeypatch.setenv("HERMES_HOME", str(tmp_path / "hermes"))
+    monkeypatch.setenv("HUAIDJ_REPO", str(tmp_path / "repo"))
+    namespace = runpy.run_path(str(ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py"), run_name="__test__")
+    launcher = _exec_hermes_template(namespace["SCRIPT_TEMPLATES"]["huaidj/sanji_publish_afternoon.py"])
+    return_codes = iter((0, 7))
+
+    def fake_run(command, **kwargs):
+        return subprocess.CompletedProcess(command, next(return_codes))
+
+    monkeypatch.setattr(launcher["subprocess"], "run", fake_run)
+    assert launcher["main"]() == 7
+
+
+def test_atlas_template_returns_worker_exit_and_cleans_lock(monkeypatch, tmp_path):
+    repo = tmp_path / "repo"
+    orchestrator = repo / "tools" / "atlas_rebuild" / "run_atlas_v2_sanji_import.py"
+    orchestrator.parent.mkdir(parents=True)
+    orchestrator.write_text("raise SystemExit(0)\n", encoding="utf-8")
+    hermes_home = tmp_path / "hermes"
+    monkeypatch.setenv("HERMES_HOME", str(hermes_home))
+    monkeypatch.setenv("HUAIDJ_REPO", str(repo))
+    monkeypatch.setenv("HUAIDJ_PYTHON", os.sys.executable)
+    namespace = runpy.run_path(str(ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py"), run_name="__test__")
+    launcher = _exec_hermes_template(namespace["SCRIPT_TEMPLATES"]["huaidj/atlas_v2_sanji_import_nightly.py"])
+    return_codes = iter((0, 7))
+
+    def fake_run(command, **kwargs):
+        return subprocess.CompletedProcess(command, next(return_codes))
+
+    monkeypatch.setattr(launcher["subprocess"], "run", fake_run)
+    assert launcher["main"]() == 7
+    assert launcher["LOCK_PATH"].exists()
+    first = launcher["_acquire_lock"](tmp_path / "first.log")
+    assert first is not None
+    assert launcher["_acquire_lock"](tmp_path / "second.log") is None
+    launcher["_release_lock"](first)
+    reacquired = launcher["_acquire_lock"](tmp_path / "third.log")
+    assert reacquired is not None
+    launcher["_release_lock"](reacquired)
+
+
+def test_installer_pauses_duplicate_active_jobs(monkeypatch, tmp_path):
+    namespace = runpy.run_path(str(ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py"), run_name="__test__")
+    name, spec = next(iter(namespace["JOBS"].items()))
+    jobs = [
+        {
+            "id": "newer-duplicate",
+            "name": name,
+            "enabled": True,
+            "state": "scheduled",
+            "created_at": "2026-07-18T12:00:00+08:00",
+            "schedule": {"expr": spec["schedule"]},
+        },
+        {
+            "id": "canonical-oldest",
+            "name": name,
+            "enabled": True,
+            "state": "scheduled",
+            "created_at": "2026-07-17T12:00:00+08:00",
+            "schedule": {"expr": spec["schedule"]},
+        },
+    ]
+    updates = []
+
+    def fake_create_job(**kwargs):
+        return {"id": f"created-{kwargs['name']}"}
+
+    def fake_update_job(job_id, changes):
+        updates.append((job_id, dict(changes)))
+        return {"id": job_id, **changes}
+
+    monkeypatch.setitem(
+        namespace["ensure_jobs"].__globals__,
+        "load_api",
+        lambda *_args: (fake_create_job, lambda: list(jobs), fake_update_job),
+    )
+    actions = namespace["ensure_jobs"](tmp_path / "hermes", tmp_path / "runtime", True)
+    target = next(action for action in actions if action.get("name") == name)
+    assert target["job_id"] == "canonical-oldest"
+    assert target["paused_duplicate_job_ids"] == ["newer-duplicate"]
+    assert any(job_id == "canonical-oldest" and changes.get("enabled") is True for job_id, changes in updates)
+    assert any(
+        job_id == "newer-duplicate"
+        and changes.get("enabled") is False
+        and changes.get("state") == "paused"
+        for job_id, changes in updates
+    )
+
+
+def test_monitor_template_propagates_child_and_timeout_exit(monkeypatch, tmp_path):
+    monkeypatch.setenv("HERMES_HOME", str(tmp_path / "hermes"))
+    monkeypatch.setenv("HUAIDJ_REPO", str(tmp_path / "repo"))
+    namespace = runpy.run_path(str(ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py"), run_name="__test__")
+    monitor = _exec_hermes_template(namespace["SCRIPT_TEMPLATES"]["huaidj/package_api_tg_status.py"])
+    monkeypatch.setattr(
+        monitor["subprocess"],
+        "run",
+        lambda command, **kwargs: subprocess.CompletedProcess(command, 7, stdout="", stderr="failed"),
+    )
+    assert monitor["main"]() == 7
+
+    def timeout(command, **kwargs):
+        raise subprocess.TimeoutExpired(command, 90)
+
+    monkeypatch.setattr(monitor["subprocess"], "run", timeout)
+    assert monitor["main"]() == 124
+
+
+def test_installer_replaces_detached_legacy_launcher(tmp_path):
+    namespace = runpy.run_path(str(ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py"), run_name="__test__")
+    live_script = tmp_path / "scripts" / "huaidj" / "sanji_publish_afternoon.py"
+    live_script.parent.mkdir(parents=True)
+    live_script.write_text("import subprocess\nsubprocess.Popen([])\nprint('[LAUNCHED]')\n", encoding="utf-8")
+
+    namespace["write_scripts"](tmp_path, apply=True)
+
+    installed = live_script.read_text(encoding="utf-8")
+    assert "subprocess.run(" in installed
+    assert "subprocess.Popen(" not in installed
+    assert "[LAUNCHED]" not in installed
+
+
+def test_sanji_hermes_installer_waits_for_terminal_child_results():
+    namespace = runpy.run_path(str(ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py"), run_name="__test__")
+    templates = namespace["SCRIPT_TEMPLATES"]
+    publish = templates["huaidj/sanji_publish_afternoon.py"]
+    atlas = templates["huaidj/atlas_v2_sanji_import_nightly.py"]
+    monitor = templates["huaidj/package_api_tg_status.py"]
+
+    for template in (publish, atlas):
+        assert "subprocess.run(" in template
+        assert "subprocess.Popen(" not in template
+        assert "CREATE_NEW_PROCESS_GROUP" not in template
+        assert "subprocess.DETACHED_PROCESS" not in template
+        assert '["cmd.exe", "/d", "/c", "start"' not in template
+        assert "[LAUNCHED]" not in template
+    assert "return result_code" in publish
+    assert "return result_code" in atlas
+    assert "--advance-checkpoint" in atlas
+    assert "No production promotion or service restart" in atlas
+    assert "return int(result.returncode)" in monitor
+    assert "return 2" in monitor
+
+
+def test_sanji_fast_watch_propagates_finalize_failure():
+    script = (ROOT / "run_huaidj_sanji_rss_fast_watch.ps1").read_text(encoding="utf-8")
+
+    assert "$finalizeExitCode = $LASTEXITCODE" in script
+    assert "if ($finalizeExitCode -ne 0)" in script
+    assert "Sanji RSS finalize failed with exit code $finalizeExitCode" in script
 
 
 def test_sanji_rss_fast_watch_skips_deepseek_peak_pricing_window():
@@ -712,7 +996,7 @@ def test_sanji_aggregate_expansion_omits_blank_download_endpoint():
 
     assert "$aggregateArgs = @(" in weekly
     assert "[string]::IsNullOrWhiteSpace($AGGREGATE_DOWNLOAD_ENDPOINT)" in weekly
-    assert 'python "$AGGREGATE_EXPAND_SCRIPT" @aggregateArgs' in weekly
+    assert '& $PythonExecutable "$AGGREGATE_EXPAND_SCRIPT" @aggregateArgs' in weekly
     assert "--download-endpoint $AGGREGATE_DOWNLOAD_ENDPOINT" not in weekly
 
 
@@ -907,7 +1191,7 @@ def test_openclaw_publish_wrapper_audits_public_posters_before_quality_gate_with
     assert '"--cloud-dir", "weekly-posters/$WeekTag"' in script
 
 
-def test_openclaw_publish_wrapper_writes_summary_for_controlled_poster_blocker():
+def test_openclaw_publish_wrapper_writes_failed_summary_and_nonzero_for_hard_blockers():
     script = (ROOT / "run_openclaw_weekly_daily_publish.ps1").read_text(encoding="utf-8")
 
     assert "function Write-PublishSummary" in script
@@ -919,9 +1203,11 @@ def test_openclaw_publish_wrapper_writes_summary_for_controlled_poster_blocker()
     assert "-not [bool]$posterMigrationGate.execute_allowed_now" in script
     assert "[int]$posterMigrationGate.cloudbase_storage_write_allowed_count -eq 0" in script
     assert "[bool]$posterMigrationGate.boundary.report_only" in script
-    assert "exit 0" in script
+    assert "-Ok $false" in script
+    assert "exit $qualityExitCode" in script
+    assert "exit $sanjiGapExitCode" in script
+    assert "exit $blockedExitCode" in script
     assert "blocked_on_release_package_quality_gate" in script
-    assert 'throw "Release package quality gate failed' not in script
     assert script.index("blocked_on_cloudbase_poster_migration_write_gate") < script.index("blocked_on_release_package_quality_gate")
 
 
@@ -940,7 +1226,13 @@ def test_openclaw_publish_wrapper_reports_actual_deploy_and_upload_execution_fla
     ]
     assert "$script:CloudRunDeployExecuted = $true" in deploy_step
     upload_step = script[script.index('Invoke-RunStep "Upload miniprogram developer version"') :]
+    assert "pwsh -NoProfile -ExecutionPolicy Bypass" in upload_step
+    assert "-ConfirmUpload" in upload_step
+    assert 'Assert-NativeSuccess "Miniprogram developer upload"' in upload_step
     assert "$script:MiniProgramUploadExecuted = $true" in upload_step
+    assert upload_step.index('Assert-NativeSuccess "Miniprogram developer upload"') < upload_step.index(
+        "$script:MiniProgramUploadExecuted = $true"
+    )
 
 
 def test_openclaw_publish_wrapper_uses_activity_only_miniprogram_tests_for_backend_deploy():
@@ -962,13 +1254,14 @@ def test_openclaw_publish_wrapper_uses_activity_only_miniprogram_tests_for_backe
     assert "$SkipMiniProgramTests -or $ActivityOnlyBackendDeploy" in script
 
 
-def test_weekly_pipeline_entity_enrichment_complete_output_overrides_nonzero_exit():
+def test_weekly_pipeline_entity_enrichment_keeps_nonzero_exit_terminal():
     script = (ROOT / "weekly_activity_next_week_pipeline.ps1").read_text(encoding="utf-8")
 
     assert "function Complete-EntityEnrichmentOutput" in script
     assert "entity_enrichment_summary.json" in script
     assert "entity_enrichment_exit_override.json" in script
-    assert "complete_outputs_nonzero_exit_overridden" in script
+    assert "complete_outputs_nonzero_exit_recorded" in script
+    assert "non-zero process exit remains terminal" in script
     assert "$inputCandidateLines -ne $outputCandidateLines" in script
     assert "$inputReviewLines -ne $outputReviewLines" in script
     step35 = script[
@@ -976,7 +1269,8 @@ def test_weekly_pipeline_entity_enrichment_complete_output_overrides_nonzero_exi
         script.index("# fallback：若实体富化没有输出")
     ]
     assert "Complete-EntityEnrichmentOutput" in step35
-    assert "$global:LASTEXITCODE = 0" in step35
+    assert "$global:LASTEXITCODE = $entityExitCode" in step35
+    assert "$global:LASTEXITCODE = 0" not in step35
 
 
 def test_openclaw_publish_wrapper_builds_missing_poster_recovery_work_orders_on_quality_failure():

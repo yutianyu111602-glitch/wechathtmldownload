@@ -1,6 +1,6 @@
 function buildQuery(data) {
   const pairs = Object.keys(data || {})
-    .filter((key) => data[key] !== undefined && data[key] !== null && data[key] !== "")
+    .filter((key) => !isRequestControlKey(key) && data[key] !== undefined && data[key] !== null && data[key] !== "")
     .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(data[key])}`);
   return pairs.length ? `?${pairs.join("&")}` : "";
 }
@@ -9,24 +9,200 @@ function buildInflightKey(path, data) {
   return `${path}${buildQuery(data || {})}`;
 }
 
-const {
-  readCachedResponse,
-  writeCachedResponse,
-  withCachedResponse,
-} = require("./api/cache");
-
+const API_CACHE_PREFIX = "weeklyActivityApiCache:v20260704:";
+const DEFAULT_CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+const DEFAULT_CACHE_FALLBACK_DELAY_MS = 2200;
 const DEFAULT_REQUEST_TIMEOUT_MS = 8000;
 const DEFAULT_OFFLINE_SNAPSHOT_FALLBACK_DELAY_MS = -1;
 const DEFAULT_CLOUD_DATABASE_HOT_COOLDOWN_MS = 30 * 60 * 1000;
+const DEFAULT_CLOUD_DATABASE_BACKUP_DELAY_MS = 250;
 let cloudDatabaseHotDisabledUntil = 0;
 
-const { OFFLINE_SNAPSHOT, OFFLINE_SOURCE_URLS } = require("./offlineSnapshot");
+const { OFFLINE_SNAPSHOT, OFFLINE_SOURCE_URLS = {} } = require("./offlineSnapshot");
+const BUNDLED_CLUB_OVERVIEWS = require("../data/club_overviews");
+const { isElectronicMusicRelevantItem } = require("./electronicRelevance");
+
+function stableData(value) {
+  const out = {};
+  for (const key of Object.keys(value || {}).sort()) {
+    if (!isRequestControlKey(key) && value[key] !== undefined && value[key] !== null && value[key] !== "") {
+      out[key] = value[key];
+    }
+  }
+  return out;
+}
+
+function isRequestControlKey(key) {
+  return String(key || "").startsWith("__");
+}
+
+function shouldSkipStoredFallback(data) {
+  return Boolean(data && (data.__skipCache === true || data.__liveOnly === true));
+}
+
+function shouldRequireLiveResponse(data) {
+  return Boolean(data && data.__liveOnly === true);
+}
+
+function hashText(value) {
+  let hash = 2166136261;
+  const text = String(value || "");
+  for (let index = 0; index < text.length; index += 1) {
+    hash ^= text.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(36);
+}
+
+function cacheKey(path, data) {
+  return `${API_CACHE_PREFIX}${hashText(`${path}?${JSON.stringify(stableData(data))}`)}`;
+}
+
+function canCachePath(path) {
+  return String(path || "").startsWith("/api/v1/weekly/");
+}
+
+function cloneCachedPayload(payload, cachedAt) {
+  if (!payload || typeof payload !== "object") return payload;
+  const clone = Array.isArray(payload) ? payload.slice() : { ...payload };
+  clone.__fromCache = true;
+  clone.__cachedAt = cachedAt || 0;
+  return clone;
+}
 
 function cloneOfflinePayload(payload) {
   if (!payload || typeof payload !== "object") return payload;
   const clone = Array.isArray(payload) ? payload.slice() : { ...payload };
   clone.__fromSnapshot = true;
   return clone;
+}
+
+function isDefaultCurrentFeedRequest(path, data) {
+  if (path !== "/api/v1/weekly/current") return false;
+  const date = String((data && data.date) || "").trim();
+  if (date && date !== "today") return false;
+  const lookback = Number(data && data.lookbackDays);
+  return !Number.isFinite(lookback) || lookback <= 0;
+}
+
+function normalizeStoredCurrentPayload(path, data, payload) {
+  if (!isDefaultCurrentFeedRequest(path, data)) return payload;
+  if (!payload || typeof payload !== "object") return payload;
+  const items = Array.isArray(payload.items) ? payload.items : [];
+  if (!items.length) return payload;
+  const today = currentLocalDateKey();
+  const currentItems = dedupeItems(items.filter((item) => itemIsCurrentOrFuture(item, today)));
+  if (!currentItems.length) return null;
+  currentItems.sort((a, b) => {
+    const aKey = isoDate(a.event_date_start) || itemDateKeys(a)[0] || "9999-12-31";
+    const bKey = isoDate(b.event_date_start) || itemDateKeys(b)[0] || "9999-12-31";
+    return aKey < bKey ? -1 : aKey > bKey ? 1 : 0;
+  });
+  return {
+    ...payload,
+    items: currentItems,
+    page: {
+      ...(payload.page || {}),
+      nextCursor: null,
+      total: currentItems.length,
+    },
+  };
+}
+
+function cloneStoredPayload(path, data, payload, cachedAt) {
+  const normalized = normalizeStoredCurrentPayload(path, data, payload);
+  if (!normalized) return null;
+  return cloneCachedPayload(normalized, cachedAt);
+}
+
+function canStartFastOfflineSnapshot(path, data, cloud) {
+  if (cloud.offlineSnapshotFallback === false || cloud.fastOfflineSnapshotFallback !== true) return false;
+  return !isDefaultCurrentFeedRequest(path, data);
+}
+
+function readCachedResponse(path, data, cloud) {
+  if (!canCachePath(path) || !wx.getStorageSync) return null;
+  const maxAge = Number(cloud.cacheMaxAgeMs ?? DEFAULT_CACHE_MAX_AGE_MS);
+  if (!Number.isFinite(maxAge) || maxAge <= 0) return null;
+  try {
+    const entry = wx.getStorageSync(cacheKey(path, data));
+    const cachedAt = Number(entry && entry.cachedAt);
+    if (!entry || !entry.payload || !Number.isFinite(cachedAt)) return null;
+    if (Date.now() - cachedAt > maxAge) return null;
+    return cloneStoredPayload(path, data, entry.payload, cachedAt);
+  } catch {
+    return null;
+  }
+}
+
+// Last successful live response for a path, ignoring maxAge. writeCachedResponse
+// persists every online /api/v1/weekly/* success, so this mirrors the deployed
+// activity package as of the user's last online open — always fresher than the
+// baked OFFLINE_SNAPSHOT seed. Used only on the offline path, so staleness has
+// already been accepted; a real (if old) fetch beats the first-launch seed.
+function readPersistedResponse(path, data) {
+  if (!canCachePath(path) || !wx.getStorageSync) return null;
+  try {
+    const entry = wx.getStorageSync(cacheKey(path, data));
+    if (entry && entry.payload) {
+      return cloneStoredPayload(path, data, entry.payload, Number(entry.cachedAt) || 0);
+    }
+  } catch {}
+  return null;
+}
+
+function writeCachedResponse(path, data, value) {
+  if (
+    !canCachePath(path) ||
+    !value ||
+    typeof value !== "object" ||
+    value.__fromCache ||
+    value.__fromSnapshot ||
+    !wx.setStorageSync
+  ) return;
+  try {
+    wx.setStorageSync(cacheKey(path, data), {
+      cachedAt: Date.now(),
+      payload: value,
+    });
+  } catch {}
+}
+
+function withCachedResponse(rawPromise, path, data, cloud) {
+  const cached = shouldSkipStoredFallback(data) ? null : readCachedResponse(path, data, cloud);
+  const delay = Math.max(0, Number(cloud.cacheFallbackDelayMs ?? DEFAULT_CACHE_FALLBACK_DELAY_MS));
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let timer = null;
+    const resolveOnce = (value) => {
+      if (settled) return;
+      settled = true;
+      if (timer) clearTimeout(timer);
+      resolve(value);
+    };
+    const rejectOnce = (error) => {
+      if (settled) return;
+      settled = true;
+      if (timer) clearTimeout(timer);
+      reject(error);
+    };
+    if (cached) {
+      timer = setTimeout(() => resolveOnce(cached), delay);
+    }
+    rawPromise.then(
+      (value) => {
+        writeCachedResponse(path, data, value);
+        resolveOnce(value);
+      },
+      (error) => {
+        if (cached) {
+          resolveOnce(cached);
+        } else {
+          rejectOnce(error);
+        }
+      }
+    );
+  });
 }
 
 function requestJson(url, timeoutMs) {
@@ -139,28 +315,18 @@ function addDateRange(dates, start, end) {
   }
 }
 
-function directItemDateValues(item) {
-  return [
-    item.event_date_start,
-    item.event_date_end,
-    item.event_date_iso_guess,
-  ].map(isoDate).filter(Boolean);
-}
-
 function itemDateKeys(item) {
   const dates = new Set();
   for (const key of ["event_date_start", "event_date_end", "event_date_iso_guess"]) {
     const value = isoDate(item[key]);
     if (value) dates.add(value);
   }
-  if (directItemDateValues(item).length === 0) {
-    for (const key of ["event_date_iso_guesses", "event_date_text"]) {
-      const raw = item[key];
-      const values = Array.isArray(raw) ? raw : [raw];
-      for (const value of values) {
-        const date = isoDate(value);
-        if (date) dates.add(date);
-      }
+  for (const key of ["event_date_iso_guesses", "event_date_text"]) {
+    const raw = item[key];
+    const values = Array.isArray(raw) ? raw : [raw];
+    for (const value of values) {
+      const date = isoDate(value);
+      if (date) dates.add(date);
     }
   }
   addDateRange(dates, isoDate(item.event_date_start), isoDate(item.event_date_end));
@@ -206,7 +372,7 @@ function dateKey(item) {
 }
 
 function cityKey(item) {
-  return normalizeDedupePart(first(item.city, item.city_key || first(item.city_keys, "")));
+  return normalizeDedupePart(item.city_key || first(item.city_keys, "") || first(item.city, ""));
 }
 
 function venueKey(item) {
@@ -315,10 +481,22 @@ function itemQualityScore(item) {
 
 function dedupeItems(items) {
   const output = [];
+  const scopeIndexes = new Map();
   for (const item of items || []) {
-    const duplicateIndex = output.findIndex((current) => areLikelyDuplicateItems(current, item));
+    const scope = duplicateScopeKey(item);
+    const candidateIndexes = scopeIndexes.get(scope) || [];
+    let duplicateIndex = -1;
+    for (const index of candidateIndexes) {
+      if (areLikelyDuplicateItems(output[index], item)) {
+        duplicateIndex = index;
+        break;
+      }
+    }
     if (duplicateIndex === -1) {
       output.push(item);
+      const outputIndex = output.length - 1;
+      if (!scopeIndexes.has(scope)) scopeIndexes.set(scope, []);
+      scopeIndexes.get(scope).push(outputIndex);
       continue;
     }
     if (itemQualityScore(item) > itemQualityScore(output[duplicateIndex])) {
@@ -341,9 +519,15 @@ function itemMatchesDate(item, date) {
 let todayOverride = "";
 const inflightRequests = new Map();
 
+// Product rule: last night's events stay current until 07:00 next morning.
+const LATE_NIGHT_CUTOFF_HOUR = 7;
+
 function currentLocalDateKey() {
   if (todayOverride) return todayOverride;
   const now = new Date();
+  if (now.getHours() < LATE_NIGHT_CUTOFF_HOUR) {
+    now.setDate(now.getDate() - 1);
+  }
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const day = String(now.getDate()).padStart(2, "0");
@@ -360,16 +544,13 @@ function itemIsCurrentOrFuture(item, today) {
   return (end || start) >= target;
 }
 
-function filterDateIndexFromStatic(payload, options = {}) {
+function filterDateIndexFromStatic(payload) {
   const today = currentLocalDateKey();
   const allDates = payload.dates || [];
-  let dates = allDates.filter((entry) => {
+  const dates = allDates.filter((entry) => {
     const dateValue = isoDate(entry.date);
     return !today || !dateValue || dateValue >= today;
   });
-  if (options.allowStaleWhenEmpty && dates.length === 0 && allDates.length > 0) {
-    dates = allDates;
-  }
   return {
     ...payload,
     date_count: dates.length,
@@ -378,7 +559,7 @@ function filterDateIndexFromStatic(payload, options = {}) {
   };
 }
 
-function currentResponseFromStatic(payload, data, options = {}) {
+function currentResponseFromStatic(payload, data) {
   const filters = {
     cityKey: data.cityKey || "all",
     date: data.date || "today",
@@ -387,20 +568,25 @@ function currentResponseFromStatic(payload, data, options = {}) {
   const limit = normalizeLimit(data.limit);
   const allItems = payload.items || [];
   const filterItems = (allowStaleDate) => dedupeItems(allItems.filter((item) => {
-    const cityOk = !filters.cityKey || filters.cityKey === "all" || item.city_key === filters.cityKey;
+    const cityKeys = Array.isArray(item.city_keys) ? item.city_keys : [];
+    const cityOk = !filters.cityKey
+      || filters.cityKey === "all"
+      || item.city_key === filters.cityKey
+      || cityKeys.indexOf(filters.cityKey) !== -1;
     const dateOk = allowStaleDate
       ? true
       : (!filters.date || filters.date === "today"
         ? itemIsCurrentOrFuture(item, currentLocalDateKey())
         : itemMatchesDate(item, filters.date));
     const qualityOk = !item.quality_status || item.quality_status === "READY";
-    return cityOk && dateOk && qualityOk;
+    return cityOk && dateOk && qualityOk && isElectronicMusicRelevantItem(item);
   }));
   let items = filterItems(false);
-  const defaultDateFilter = !data.date || data.date === "today";
-  if (options.allowStaleWhenEmpty && defaultDateFilter && items.length === 0) {
-    items = filterItems(true);
-  }
+  items.sort((a, b) => {
+    const aKey = isoDate(a.event_date_start) || itemDateKeys(a)[0] || "9999-12-31";
+    const bKey = isoDate(b.event_date_start) || itemDateKeys(b)[0] || "9999-12-31";
+    return aKey < bKey ? -1 : aKey > bKey ? 1 : 0;
+  });
   const pageItems = items.slice(cursor, cursor + limit);
 
   return {
@@ -469,6 +655,11 @@ function requestStatic(path, data, cloud) {
 
   if (path === "/api/v1/weekly/manifest") {
     return requestJson(staticUrl(baseUrl, "manifest.json"));
+  }
+
+  if (path === "/api/v1/weekly/club-overviews") {
+    return requestJson(staticUrl(baseUrl, "club_overviews.json"))
+      .then((payload) => assertContainerData(path, { statusCode: 200, data: payload }));
   }
 
   if (path === "/api/v1/weekly/items/batch") {
@@ -601,6 +792,12 @@ function assertContainerData(path, res) {
   if (path === "/api/v1/weekly/dates" && !Array.isArray(payload.dates)) {
     return Promise.reject({ error: { code: "CONTAINER_BAD_DATES", path }, data: payload });
   }
+  if (
+    path === "/api/v1/weekly/club-overviews" &&
+    (!payload.by_club || typeof payload.by_club !== "object" || Array.isArray(payload.by_club))
+  ) {
+    return Promise.reject({ error: { code: "CONTAINER_BAD_CLUB_OVERVIEWS", path }, data: payload });
+  }
 
   return payload;
 }
@@ -659,6 +856,14 @@ function isCloudDatabaseQuotaError(error) {
 function getCloudDatabaseHotCooldownMs(cloud) {
   const value = Number(cloud && cloud.databaseCircuitBreakerMs);
   return Number.isFinite(value) && value >= 0 ? value : DEFAULT_CLOUD_DATABASE_HOT_COOLDOWN_MS;
+}
+
+function getCloudDatabaseBackupDelayMs(cloud) {
+  const explicit = Number(cloud && cloud.databaseBackupDelayMs);
+  if (Number.isFinite(explicit) && explicit >= 0) return explicit;
+  const publicDelay = Number(cloud && cloud.publicFallbackDelayMs);
+  if (Number.isFinite(publicDelay) && publicDelay >= 0) return publicDelay;
+  return DEFAULT_CLOUD_DATABASE_BACKUP_DELAY_MS;
 }
 
 function isCloudDatabaseHotCircuitOpen(cloud) {
@@ -806,9 +1011,18 @@ function requestLlmApi(path, method, body = {}, data = {}) {
 
 function requestOfflineSnapshot(path, data, cloud, originalError) {
   if (cloud.offlineSnapshotFallback === false) return Promise.reject(originalError);
+  if (shouldRequireLiveResponse(data)) return Promise.reject(originalError);
+
+  // Prefer the last live response we ever persisted (mirrors the deployed
+  // activity package) over the baked seed. This makes the offline view track
+  // activity-package updates automatically — no frontend re-upload needed when
+  // the weekly package changes. The baked OFFLINE_SNAPSHOT below only ever
+  // shows on a first-ever launch that has never reached the network.
+  const persisted = shouldSkipStoredFallback(data) ? null : readPersistedResponse(path, data);
+  if (persisted) return Promise.resolve(persisted);
 
   if (path === "/api/v1/weekly/current") {
-    return Promise.resolve(cloneOfflinePayload(currentResponseFromStatic(OFFLINE_SNAPSHOT, data, { allowStaleWhenEmpty: true })));
+    return Promise.resolve(cloneOfflinePayload(currentResponseFromStatic(OFFLINE_SNAPSHOT, data)));
   }
 
   if (path === "/api/v1/weekly/cities") {
@@ -826,7 +1040,11 @@ function requestOfflineSnapshot(path, data, cloud, originalError) {
       schema_version: "weekly_activity_miniprogram_date_index.v1",
       generated_at: OFFLINE_SNAPSHOT.generatedAt,
       dates: OFFLINE_SNAPSHOT.dates,
-    }, { allowStaleWhenEmpty: true })));
+    })));
+  }
+
+  if (path === "/api/v1/weekly/club-overviews") {
+    return Promise.resolve(cloneOfflinePayload(BUNDLED_CLUB_OVERVIEWS));
   }
 
   if (path === "/api/v1/weekly/items/batch") {
@@ -897,16 +1115,7 @@ function requestFallback(path, query, data, cloud, originalError) {
   return requestOfflineSnapshot(path, data, cloud, originalError);
 }
 
-function requestContainerOrFallback(path, query, data, cloud) {
-  if (cloud.useCloudDatabaseFirst && isCloudDatabaseHotPath(path) && !isCloudDatabaseHotCircuitOpen(cloud)) {
-    return requestCloudDatabaseHot(path, data, cloud)
-      .catch((dbError) => {
-        disableCloudDatabaseHotTemporarily(dbError, cloud);
-        console.warn("[api] cloud database hot path failed, fallback to container API", dbError);
-        const nextCloud = Object.assign({}, cloud, { useCloudDatabaseFirst: false });
-        return requestContainerOrFallback(path, query, data, nextCloud);
-      });
-  }
+function requestContainerPublicFallback(path, query, data, cloud) {
   const containerPromise = requestCloudContainer(path, query, cloud);
   if (!cloud.publicBaseUrl) {
     return containerPromise.catch((error) => requestFallback(path, query, data, cloud, error));
@@ -952,7 +1161,7 @@ function requestContainerOrFallback(path, query, data, cloud) {
     };
 
     const startFastSnapshot = () => {
-      if (settled || cloud.offlineSnapshotFallback === false || cloud.fastOfflineSnapshotFallback !== true) return;
+      if (settled || !canStartFastOfflineSnapshot(path, data, cloud)) return;
       requestOfflineSnapshot(path, data, cloud, containerError)
         .then(resolveOnce, () => {});
     };
@@ -967,6 +1176,77 @@ function requestContainerOrFallback(path, query, data, cloud) {
       rejectIfBothFailed();
     });
   });
+}
+
+function requestCloudDatabaseWithBackup(path, query, data, cloud) {
+  const backupCloud = Object.assign({}, cloud, { useCloudDatabaseFirst: false });
+  const backupDelayMs = getCloudDatabaseBackupDelayMs(cloud);
+  const snapshotDelayMs = Math.max(
+    0,
+    Number(cloud.offlineSnapshotFallbackDelayMs ?? 0)
+  );
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let backupStarted = false;
+    let dbError = null;
+    let backupError = null;
+    let backupTimer = null;
+    let snapshotTimer = null;
+
+    const resolveOnce = (value) => {
+      if (settled) return;
+      settled = true;
+      if (backupTimer) clearTimeout(backupTimer);
+      if (snapshotTimer) clearTimeout(snapshotTimer);
+      resolve(value);
+    };
+
+    const rejectIfBothFailed = () => {
+      if (settled || !dbError || !backupStarted || !backupError) return;
+      settled = true;
+      if (backupTimer) clearTimeout(backupTimer);
+      if (snapshotTimer) clearTimeout(snapshotTimer);
+      reject(backupError || dbError);
+    };
+
+    const startSnapshot = () => {
+      if (settled || cloud.offlineSnapshotFallback === false || isDefaultCurrentFeedRequest(path, data)) return;
+      requestOfflineSnapshot(path, data, cloud, dbError)
+        .then(resolveOnce, () => {});
+    };
+
+    if (snapshotDelayMs >= 0) {
+      snapshotTimer = setTimeout(startSnapshot, snapshotDelayMs);
+    }
+
+    const startBackup = () => {
+      if (backupStarted || settled) return;
+      backupStarted = true;
+      requestContainerPublicFallback(path, query, data, backupCloud)
+        .then(resolveOnce, (error) => {
+          backupError = error;
+          rejectIfBothFailed();
+        });
+    };
+
+    backupTimer = setTimeout(startBackup, backupDelayMs);
+    requestCloudDatabaseHot(path, data, cloud).then(resolveOnce, (error) => {
+      dbError = error;
+      disableCloudDatabaseHotTemporarily(error, cloud);
+      if (!settled) {
+        console.warn("[api] cloud database hot path failed, fallback to container API", error);
+      }
+      startBackup();
+      rejectIfBothFailed();
+    });
+  });
+}
+
+function requestContainerOrFallback(path, query, data, cloud) {
+  if (cloud.useCloudDatabaseFirst && isCloudDatabaseHotPath(path) && !isCloudDatabaseHotCircuitOpen(cloud)) {
+    return requestCloudDatabaseWithBackup(path, query, data, cloud);
+  }
+  return requestContainerPublicFallback(path, query, data, cloud);
 }
 function postApi(path, body = {}, data = {}) {
   const app = getApp();

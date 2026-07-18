@@ -6,6 +6,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -1182,6 +1183,155 @@ class RepairWeeklyReleaseConflictsTests(unittest.TestCase):
             self.assertEqual(current["items"][0]["id"], "inside:one")
             self.assertEqual(report["dropped_outside_window_start_count"], 1)
             self.assertEqual(report["dropped_outside_window_start_items"][0]["id"], "outside:one")
+
+    def test_write_failure_keeps_original_release_tree_byte_for_byte(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            api_dir = root / "current_release"
+            item = event("safe:one", "Safe Event", "safehash")
+            write_json(
+                api_dir / "current.json",
+                {"schema_version": "weekly_activity_miniprogram_current.v1", "item_count": 1, "items": [item]},
+            )
+            write_json(
+                api_dir / "manifest.json",
+                {"schema_version": "weekly_activity_miniprogram_api.v1", "item_count": 1},
+            )
+            write_json(api_dir / "by-id" / "legacy.json", {"sentinel": "must-survive"})
+            original = {
+                path.relative_to(api_dir).as_posix(): path.read_bytes()
+                for path in api_dir.rglob("*")
+                if path.is_file()
+            }
+
+            with mock.patch.object(repair, "repair_source_maps", side_effect=RuntimeError("injected write failure")):
+                with self.assertRaisesRegex(RuntimeError, "injected write failure"):
+                    repair.main(["--api-dir", str(api_dir), "--write"])
+
+            after = {
+                path.relative_to(api_dir).as_posix(): path.read_bytes()
+                for path in api_dir.rglob("*")
+                if path.is_file()
+            }
+            self.assertEqual(after, original)
+            self.assertEqual(list(root.glob(".current_release.repair-*")), [])
+
+    def test_successful_write_keeps_a_complete_tree_backup(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            api_dir = root / "current_release"
+            item = event("safe:one", "Safe Event", "safehash")
+            write_json(
+                api_dir / "current.json",
+                {"schema_version": "weekly_activity_miniprogram_current.v1", "item_count": 1, "items": [item]},
+            )
+            write_json(
+                api_dir / "manifest.json",
+                {"schema_version": "weekly_activity_miniprogram_api.v1", "item_count": 1},
+            )
+            write_json(api_dir / "by-id" / "legacy.json", {"sentinel": "complete-backup"})
+            write_json(api_dir / "llm" / "legacy.json", {"sentinel": "llm-backup"})
+
+            result = repair.main(["--api-dir", str(api_dir), "--write", "--backup"])
+
+            self.assertEqual(result, 0)
+            backups = list(root.glob("current_release.bak-*"))
+            self.assertEqual(len(backups), 1)
+            backup = backups[0]
+            self.assertEqual(
+                json.loads((backup / "by-id" / "legacy.json").read_text(encoding="utf-8"))["sentinel"],
+                "complete-backup",
+            )
+            self.assertEqual(
+                json.loads((backup / "llm" / "legacy.json").read_text(encoding="utf-8"))["sentinel"],
+                "llm-backup",
+            )
+            self.assertTrue((api_dir / "by-id" / repair.slugify("safe:one", fallback="item")).with_suffix(".json").is_file())
+            self.assertFalse((api_dir / "by-id" / "legacy.json").exists())
+
+    def test_directory_swap_failure_restores_original_release_tree(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            api_dir = root / "current_release"
+            item = event("safe:one", "Safe Event", "safehash")
+            write_json(
+                api_dir / "current.json",
+                {"schema_version": "weekly_activity_miniprogram_current.v1", "item_count": 1, "items": [item]},
+            )
+            write_json(
+                api_dir / "manifest.json",
+                {"schema_version": "weekly_activity_miniprogram_api.v1", "item_count": 1},
+            )
+            write_json(api_dir / "by-id" / "legacy.json", {"sentinel": "swap-rollback"})
+            original = {
+                path.relative_to(api_dir).as_posix(): path.read_bytes()
+                for path in api_dir.rglob("*")
+                if path.is_file()
+            }
+            real_replace = repair.os.replace
+
+            def fail_staged_tree_swap(source, destination):
+                if Path(source).name == "release" and Path(destination) == api_dir:
+                    raise OSError("injected directory swap failure")
+                return real_replace(source, destination)
+
+            with mock.patch.object(repair.os, "replace", side_effect=fail_staged_tree_swap):
+                with self.assertRaisesRegex(OSError, "injected directory swap failure"):
+                    repair.main(["--api-dir", str(api_dir), "--write"])
+
+            after = {
+                path.relative_to(api_dir).as_posix(): path.read_bytes()
+                for path in api_dir.rglob("*")
+                if path.is_file()
+            }
+            self.assertEqual(after, original)
+            self.assertEqual(list(root.glob("current_release.*rollback-*")), [])
+            self.assertEqual(list(root.glob(".current_release.repair-*")), [])
+
+    def test_external_report_commit_failure_rolls_back_release_and_report(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            api_dir = root / "current_release"
+            report_path = root / "external-report.json"
+            item = event("safe:one", "Safe Event", "safehash")
+            write_json(
+                api_dir / "current.json",
+                {"schema_version": "weekly_activity_miniprogram_current.v1", "item_count": 1, "items": [item]},
+            )
+            write_json(
+                api_dir / "manifest.json",
+                {"schema_version": "weekly_activity_miniprogram_api.v1", "item_count": 1},
+            )
+            write_json(api_dir / "by-id" / "legacy.json", {"sentinel": "external-rollback"})
+            report_path.write_bytes(b"original-report\n")
+            original_release = {
+                path.relative_to(api_dir).as_posix(): path.read_bytes()
+                for path in api_dir.rglob("*")
+                if path.is_file()
+            }
+            original_report = report_path.read_bytes()
+            real_replace = repair.os.replace
+
+            def fail_external_report_install(source, destination):
+                if Path(destination) == report_path and ".repair-new-" in Path(source).name:
+                    raise OSError("injected external report commit failure")
+                return real_replace(source, destination)
+
+            with mock.patch.object(repair.os, "replace", side_effect=fail_external_report_install):
+                with self.assertRaisesRegex(OSError, "injected external report commit failure"):
+                    repair.main(
+                        ["--api-dir", str(api_dir), "--report", str(report_path), "--write"]
+                    )
+
+            after_release = {
+                path.relative_to(api_dir).as_posix(): path.read_bytes()
+                for path in api_dir.rglob("*")
+                if path.is_file()
+            }
+            self.assertEqual(after_release, original_release)
+            self.assertEqual(report_path.read_bytes(), original_report)
+            self.assertEqual(list(root.glob("external-report.json.*rollback-*")), [])
+            self.assertEqual(list(root.glob(".current_release.repair-*")), [])
 
 
 if __name__ == "__main__":

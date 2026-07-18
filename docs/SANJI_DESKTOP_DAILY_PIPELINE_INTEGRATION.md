@@ -1,6 +1,34 @@
 # Sanji Desktop Daily Pipeline Integration
 
-Updated: 2026-06-19 CST
+Updated: 2026-07-18 CST
+
+## 2026-07-18 Recovery Authority
+
+This section supersedes conflicting paths, cadence, and provider examples in
+the historical detail below.
+
+- Sanji is a managed desktop source and must be launched with CDP port `19333`.
+- The refresh window is `96` hours, all configured accounts are synchronized,
+  pending article resources are fetched, and the export is taken from a
+  read-only SQLite backup snapshot.
+- Activity-poster understanding uses online Qwen VL model `qwen3.6-plus` for
+  every usable image. `PosterVlMaxImages=0`, `PosterVlLimit=0`, and the
+  equivalent worker argument is `--max-images 0`; zero means unlimited, not
+  disabled.
+- DeepSeek Flash enriches every activity row after the Qwen evidence stage;
+  DeepSeek Pro is reserved for aggregate/risky adjudication.
+- The weekly activity publish state machine and the AtlasV2 nightly state
+  machine are separate. Weekly publish must not silently launch AtlasV2 or
+  report Atlas success on a warning.
+- Backend activity packages are loaded online by the mini-program. The bundled
+  seed is first-install disaster fallback only; it is not rewritten for each
+  activity update.
+- Hermes desktop cron is the wall-clock authority. Windows Task Scheduler and
+  Codex automation must not become duplicate writers.
+
+A run showing only `last_status=ok` is not release proof. Verify the frozen
+Sanji snapshot, Qwen/DeepSeek evidence summaries, package quality decision,
+deploy/smoke result, and online manifest separately.
 
 This is the durable runbook for how the HUAIDJ daily pipeline connects to
 `公号三刀` / Sanji Desktop. It documents the low-level connection shape, not only
@@ -23,9 +51,9 @@ The stable integration path is:
 
 ## Installed App And Data Roots
 
-- Sanji app: `C:\Program Files\sanji\sanji.exe`
-- Sanji DB: `C:\Users\pc\AppData\Roaming\sanji\sanji.db`
-- Sanji article cache: under `C:\Users\pc\AppData\Roaming\sanji\articles`
+- Sanji app: `F:\DevApps\Sanji\0.4.1\sanji.exe`
+- Sanji DB: `%APPDATA%\sanji\sanji.db`
+- Sanji article cache: under `%APPDATA%\sanji\articles`
 - Daily export root: `E:\公众号\sanji-daily-export`
 - Mini-program overview data:
   `apps\weekly_activity_miniprogram\data\club_overviews.js`
@@ -81,7 +109,7 @@ Script:
 Launch requirement:
 
 ```powershell
-& "C:\Program Files\sanji\sanji.exe" --remote-debugging-port=19333
+& "F:\DevApps\Sanji\0.4.1\sanji.exe" --remote-debugging-port=19333
 ```
 
 An already-running normal Sanji window usually cannot be upgraded to a debug
@@ -101,7 +129,7 @@ Common commands:
 
 ```powershell
 node tools\stage7_rewrite\scripts\sanji_desktop_cdp_control.mjs --action probe --port 19333
-node tools\stage7_rewrite\scripts\sanji_desktop_cdp_control.mjs --action sync-fetch --fakeids all --cutoff-hours 48 --port 19333
+node tools\stage7_rewrite\scripts\sanji_desktop_cdp_control.mjs --action sync-fetch --fakeids all --cutoff-hours 96 --port 19333
 ```
 
 CDP control is a convenience layer for triggering Sanji's own sync/fetch. The

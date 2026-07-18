@@ -23,7 +23,7 @@ if ([string]::IsNullOrWhiteSpace($Version)) {
   $Version = Get-Date -Format "yyyy.MM.dd"
 }
 if ([string]::IsNullOrWhiteSpace($Desc)) {
-  $Desc = "pipeline upload $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
+  $Desc = "frontend code upload; activity data stays online $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
 }
 if ([string]::IsNullOrWhiteSpace($PrivateKeyPath)) {
   $candidates = @(
@@ -100,6 +100,25 @@ if (-not $NoCleanStaging) {
   }
 }
 
+# The bundled snapshot is a stable first-install disaster seed. A frontend
+# upload may carry that existing file, but staging must never regenerate or
+# rewrite it from the current backend activity package.
+$SourceOfflineSeed = Join-Path $ProjectDir "utils\offlineSnapshot.js"
+$UploadOfflineSeed = Join-Path $UploadProjectDir "utils\offlineSnapshot.js"
+if ($WhatIfPreference -and -not (Test-Path -LiteralPath $UploadOfflineSeed -PathType Leaf)) {
+  # WhatIf intentionally does not materialize clean staging; validate the
+  # source seed now and leave the real source-vs-staging hash check to upload.
+  $UploadOfflineSeed = $SourceOfflineSeed
+}
+if (-not (Test-Path -LiteralPath $SourceOfflineSeed -PathType Leaf) -or -not (Test-Path -LiteralPath $UploadOfflineSeed -PathType Leaf)) {
+  throw "Mini-program disaster seed missing from source or upload staging."
+}
+$SourceOfflineSeedHash = (Get-FileHash -LiteralPath $SourceOfflineSeed -Algorithm SHA256).Hash
+$UploadOfflineSeedHash = (Get-FileHash -LiteralPath $UploadOfflineSeed -Algorithm SHA256).Hash
+if ($SourceOfflineSeedHash -ne $UploadOfflineSeedHash) {
+  throw "Upload staging mutated offlineSnapshot.js; backend activity releases must not rewrite the disaster seed."
+}
+
 $env:HTTP_PROXY = ""
 $env:HTTPS_PROXY = ""
 $env:http_proxy = ""
@@ -112,6 +131,7 @@ Write-Host "  UploadProjectDir: $UploadProjectDir"
 Write-Host "  Version: $Version"
 Write-Host "  Desc: $Desc"
 Write-Host "  miniprogram-ci: $installedCiVersion (pinned local)"
+Write-Host "  DisasterSeed: unchanged sha256=$SourceOfflineSeedHash"
 
 if (-not $PSCmdlet.ShouldProcess($AppId, "upload miniprogram version $Version")) {
   Write-Host "[WhatIf] miniprogram upload skipped."

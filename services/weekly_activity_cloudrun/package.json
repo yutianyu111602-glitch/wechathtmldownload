@@ -6,9 +6,14 @@
   "description": "CloudBase Run compatible weekly activity recommendation API.",
   "scripts": {
     "start": "node src/server.mjs",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test"
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "@cloudbase/manager-node": "^5.5.3",
+    "better-sqlite3": "12.9.0",
+    "tencentcloud-sdk-nodejs-tcb": "^4.1.245"
   }
 }

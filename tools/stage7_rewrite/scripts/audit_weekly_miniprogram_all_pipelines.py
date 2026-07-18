@@ -265,6 +265,7 @@ def audit_frontend(checks: list[Check], miniapp_dir: Path) -> None:
         api_js_path,
         [
             EXPECTED_CACHE_PREFIX,
+            "const { OFFLINE_SNAPSHOT, OFFLINE_SOURCE_URLS = {} }",
             "isDefaultCurrentFeedRequest",
             "normalizeStoredCurrentPayload",
             "itemIsCurrentOrFuture",
@@ -397,18 +398,42 @@ def audit_backend(checks: list[Check], cloudrun_dir: Path) -> None:
         ],
         name="server current route accepts lookbackDays but defaults through store",
     )
-    require_tokens(
-        checks,
-        "backend",
-        bake_path,
-        [
-            "refresh_offline_snapshot: bool = False",
-            '"--refresh-offline-snapshot"',
-            "skip mini-program offlineSnapshot.js refresh",
-            "last live API cache tracks package updates",
-        ],
-        name="bake/deploy does not refresh bundled miniapp snapshot by default",
-    )
+    if bake_path.exists():
+        bake_text = read_text(bake_path)
+        forbidden_seed_wiring = [
+            token
+            for token in (
+                "refresh_offline_snapshot",
+                "--refresh-offline-snapshot",
+                "generate_offline_snapshot.py",
+            )
+            if token in bake_text
+        ]
+        add_check(
+            checks,
+            "backend",
+            "backend bake/deploy cannot rewrite mini-program disaster seed",
+            not forbidden_seed_wiring,
+            (
+                "no offline seed mutation entrypoint; online API plus persisted last-good cache carry updates"
+                if not forbidden_seed_wiring
+                else f"forbidden seed wiring present: {forbidden_seed_wiring}"
+            ),
+            evidence=str(bake_path),
+        )
+        add_check(
+            checks,
+            "backend",
+            "backend bake/deploy states the activity-loading boundary",
+            (
+                "mini-program disaster seed unchanged" in bake_text
+                and "online API + persisted last-good cache carry activity updates" in bake_text
+            ),
+            "backend operator output keeps data and frontend release boundaries separate",
+            evidence=str(bake_path),
+        )
+    else:
+        add_check(checks, "backend", "CloudRun bake/deploy script exists", False, f"missing file: {bake_path}")
     require_tokens(
         checks,
         "backend",

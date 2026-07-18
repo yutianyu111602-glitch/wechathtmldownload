@@ -22,7 +22,8 @@ from typing import Any
 ENV_ID = "huaidjweekly-d8g1go7-d0a07863e3e"
 SERVICE_NAME = "weekly-api"
 DEFAULT_OUT_DIR = Path("reports/cloudrun_weekly_production_smoke_20260518")
-TCB_CWD = Path(r"C:\code\githubstar\wechathtmldownload\services\weekly_activity_cloudrun")
+REPO_ROOT = Path(__file__).resolve().parents[3]
+DEFAULT_TCB_CWD = REPO_ROOT / "services" / "weekly_activity_cloudrun"
 TCB_CMD = [shutil.which("npm") or "npm", "exec", "--yes", "--package", "@cloudbase/cli@3.3.1", "--", "tcb"]
 EXPECTED_MIN_READY_ITEMS = 50
 EXPECTED_MIN_CURRENT_ITEMS = 1
@@ -48,7 +49,22 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     tmp.replace(path)
 
 
-def tcb_api(action: str, body: dict[str, Any], timeout_seconds: int | None) -> dict[str, Any]:
+def resolve_tcb_cwd(explicit: Path | None) -> Path:
+    cwd = (explicit or DEFAULT_TCB_CWD).expanduser().resolve()
+    if not cwd.is_dir():
+        raise ValueError(f"CloudBase CLI working directory does not exist: {cwd}")
+    if not (cwd / "package.json").is_file():
+        raise ValueError(f"CloudBase CLI working directory is not a CloudRun project (package.json missing): {cwd}")
+    return cwd
+
+
+def tcb_api(
+    action: str,
+    body: dict[str, Any],
+    timeout_seconds: int | None,
+    *,
+    tcb_cwd: Path | None = None,
+) -> dict[str, Any]:
     cmd = [
         *TCB_CMD,
         "api",
@@ -60,7 +76,7 @@ def tcb_api(action: str, body: dict[str, Any], timeout_seconds: int | None) -> d
         json.dumps(body, ensure_ascii=False, separators=(",", ":")),
         "--json",
     ]
-    run_kwargs: dict[str, Any] = {"cwd": TCB_CWD, "capture_output": True, "text": True}
+    run_kwargs: dict[str, Any] = {"cwd": resolve_tcb_cwd(tcb_cwd), "capture_output": True, "text": True}
     if timeout_seconds is not None:
         run_kwargs["timeout"] = timeout_seconds
     result = subprocess.run(cmd, **run_kwargs)
@@ -71,8 +87,19 @@ def tcb_api(action: str, body: dict[str, Any], timeout_seconds: int | None) -> d
     return data if isinstance(data, dict) else payload
 
 
-def discover_server(env_id: str, service_name: str, timeout_seconds: int | None) -> dict[str, Any]:
-    data = tcb_api("DescribeCloudRunServerDetail", {"EnvId": env_id, "ServerName": service_name}, timeout_seconds)
+def discover_server(
+    env_id: str,
+    service_name: str,
+    timeout_seconds: int | None,
+    *,
+    tcb_cwd: Path | None = None,
+) -> dict[str, Any]:
+    data = tcb_api(
+        "DescribeCloudRunServerDetail",
+        {"EnvId": env_id, "ServerName": service_name},
+        timeout_seconds,
+        tcb_cwd=tcb_cwd,
+    )
     base = data.get("BaseInfo") if isinstance(data.get("BaseInfo"), dict) else {}
     versions = data.get("OnlineVersionInfos") if isinstance(data.get("OnlineVersionInfos"), list) else []
     active = next((item for item in versions if str(item.get("FlowRatio")) == "100"), versions[0] if versions else {})
@@ -120,9 +147,24 @@ def get_json(base_url: str, path: str, timeout: int | None) -> dict[str, Any]:
         }
 
 
-def get_paginated_current(base_url: str, timeout: int | None, *, limit: int = 100) -> dict[str, Any]:
-    """Fetch the full default current feed so LLM coverage is not judged from page 1 only."""
-    first_path = f"/api/v1/weekly/current?limit={limit}"
+def current_path(*, limit: int, lookback_days: int | None = None, cursor: str | None = None) -> str:
+    params: list[tuple[str, str]] = [("limit", str(limit))]
+    if lookback_days is not None:
+        params.append(("lookbackDays", str(lookback_days)))
+    if cursor is not None:
+        params.append(("cursor", str(cursor)))
+    return f"/api/v1/weekly/current?{urllib.parse.urlencode(params)}"
+
+
+def get_paginated_current(
+    base_url: str,
+    timeout: int | None,
+    *,
+    limit: int = 100,
+    lookback_days: int | None = None,
+) -> dict[str, Any]:
+    """Fetch a full current feed so LLM coverage is not judged from page 1 only."""
+    first_path = current_path(limit=limit, lookback_days=lookback_days)
     first = get_json(base_url, first_path, timeout)
     payload = first.get("payload") if isinstance(first.get("payload"), dict) else {}
     if first.get("status_code") != 200 or not isinstance(payload.get("items"), list):
@@ -132,7 +174,7 @@ def get_paginated_current(base_url: str, timeout: int | None, *, limit: int = 10
     page = payload.get("page") if isinstance(payload.get("page"), dict) else {}
     next_cursor = page.get("nextCursor")
     while next_cursor:
-        path = f"/api/v1/weekly/current?limit={limit}&cursor={urllib.parse.quote(str(next_cursor), safe='')}"
+        path = current_path(limit=limit, lookback_days=lookback_days, cursor=str(next_cursor))
         response = get_json(base_url, path, timeout)
         next_payload = response.get("payload") if isinstance(response.get("payload"), dict) else {}
         if response.get("status_code") != 200 or not isinstance(next_payload.get("items"), list):
@@ -178,7 +220,7 @@ def endpoint_summary(name: str, response: dict[str, Any]) -> dict[str, Any]:
                 "date_route_count": payload.get("date_route_count"),
             }
         )
-    elif name == "current":
+    elif name in {"current", "full_current"}:
         page = payload.get("page") if isinstance(payload.get("page"), dict) else {}
         items = payload.get("items") if isinstance(payload.get("items"), list) else []
         summary.update(
@@ -243,7 +285,13 @@ def endpoint_summary(name: str, response: dict[str, Any]) -> dict[str, Any]:
     return summary
 
 
-def endpoint_ok(name: str, summary: dict[str, Any]) -> bool:
+def endpoint_ok(
+    name: str,
+    summary: dict[str, Any],
+    *,
+    expected_min_ready_items: int = EXPECTED_MIN_READY_ITEMS,
+    expected_min_current_items: int = EXPECTED_MIN_CURRENT_ITEMS,
+) -> bool:
     if summary.get("status_code") != 200 or not summary.get("json_object"):
         return False
     if name == "healthz":
@@ -251,10 +299,10 @@ def endpoint_ok(name: str, summary: dict[str, Any]) -> bool:
     if name == "manifest":
         return (
             summary.get("schema_version") == "weekly_activity_miniprogram_api.v1"
-            and int(summary.get("item_count") or 0) >= EXPECTED_MIN_READY_ITEMS
+            and int(summary.get("item_count") or 0) >= expected_min_ready_items
         )
-    if name == "current":
-        return int(summary.get("total") or 0) >= EXPECTED_MIN_CURRENT_ITEMS and int(summary.get("item_count") or 0) > 0
+    if name in {"current", "full_current"}:
+        return int(summary.get("total") or 0) >= expected_min_current_items and int(summary.get("item_count") or 0) > 0
     if name == "cities":
         return int(summary.get("city_count") or 0) > 0
     if name == "dates":
@@ -264,14 +312,14 @@ def endpoint_ok(name: str, summary: dict[str, Any]) -> bool:
     if name == "materialized_summary":
         return (
             summary.get("schema_version") == "weekly_activity_api.materialized_summary.v1"
-            and int(summary.get("item_count") or 0) >= EXPECTED_MIN_READY_ITEMS
+            and int(summary.get("item_count") or 0) >= expected_min_ready_items
             and summary.get("has_summary") is True
         )
     if name == "materialized_enrichments":
         return (
             summary.get("schema_version") == "weekly_activity_api.materialized_enrichment_index.v1"
-            and int(summary.get("item_count") or 0) >= EXPECTED_MIN_READY_ITEMS
-            and int(summary.get("enrichment_count") or 0) >= EXPECTED_MIN_READY_ITEMS
+            and int(summary.get("item_count") or 0) >= expected_min_ready_items
+            and int(summary.get("enrichment_count") or 0) >= expected_min_ready_items
         )
     if name == "materialized_enrichment_detail":
         return (
@@ -285,18 +333,31 @@ def by_name(endpoint_summaries: list[dict[str, Any]], name: str) -> dict[str, An
     return next((item for item in endpoint_summaries if item.get("name") == name), {})
 
 
-def build_report(server: dict[str, Any], endpoint_summaries: list[dict[str, Any]]) -> dict[str, Any]:
+def build_report(
+    server: dict[str, Any],
+    endpoint_summaries: list[dict[str, Any]],
+    *,
+    expected_min_ready_items: int = EXPECTED_MIN_READY_ITEMS,
+    expected_min_current_items: int = EXPECTED_MIN_CURRENT_ITEMS,
+) -> dict[str, Any]:
     endpoint_results = []
     for item in endpoint_summaries:
-        ok = endpoint_ok(str(item.get("name")), item)
+        ok = endpoint_ok(
+            str(item.get("name")),
+            item,
+            expected_min_ready_items=expected_min_ready_items,
+            expected_min_current_items=expected_min_current_items,
+        )
         endpoint_results.append({**item, "ok": ok})
     blockers = [str(item["name"]) for item in endpoint_results if not item["ok"]]
 
     manifest = by_name(endpoint_results, "manifest")
     current = by_name(endpoint_results, "current")
+    full_current = by_name(endpoint_results, "full_current")
     summary = by_name(endpoint_results, "materialized_summary")
     enrichments = by_name(endpoint_results, "materialized_enrichments")
-    current_ids = set(current.get("item_ids") or [])
+    llm_reference = full_current if full_current else current
+    current_ids = set(llm_reference.get("item_ids") or [])
     enrichment_ids = set(enrichments.get("enrichment_ids") or [])
     missing_current_enrichments = sorted(current_ids - enrichment_ids)
     extra_enrichments = sorted(enrichment_ids - current_ids)
@@ -307,8 +368,11 @@ def build_report(server: dict[str, Any], endpoint_summaries: list[dict[str, Any]
     manifest_count = int(manifest.get("item_count") or 0)
     summary_count = int(summary.get("item_count") or 0)
     enrichment_count = int(enrichments.get("enrichment_count") or 0)
+    full_current_count = int(full_current.get("item_count") or 0)
     if summary_count and manifest_count and summary_count != manifest_count:
         warnings.append("materialized_summary_item_count_differs_from_manifest")
+    if full_current and full_current_count and manifest_count and full_current_count != manifest_count:
+        blockers.append("full_current_count_differs_from_manifest")
     if extra_enrichments:
         warnings.append("materialized_enrichment_index_is_superset_of_current_release")
     if enrichment_count and summary_count and enrichment_count != summary_count:
@@ -328,10 +392,11 @@ def build_report(server: dict[str, Any], endpoint_summaries: list[dict[str, Any]
         "ok": ok,
         "decision": "cloudrun_weekly_production_smoke_ready" if ok else "cloudrun_weekly_production_smoke_blocked",
         "server": server,
-        "expected_min_ready_items": EXPECTED_MIN_READY_ITEMS,
-        "expected_min_current_items": EXPECTED_MIN_CURRENT_ITEMS,
+        "expected_min_ready_items": expected_min_ready_items,
+        "expected_min_current_items": expected_min_current_items,
         "endpoints": endpoint_results,
         "llm_coverage": {
+            "reference_endpoint": llm_reference.get("name") or "",
             "current_item_ids_checked": len(current_ids),
             "enrichment_ids_seen": len(enrichment_ids),
             "missing_current_enrichment_count": len(missing_current_enrichments),
@@ -374,6 +439,7 @@ def write_markdown(path: Path, report: dict[str, Any]) -> None:
     coverage = report["llm_coverage"]
     lines.extend(
         [
+            f"- reference_endpoint: `{coverage['reference_endpoint']}`",
             f"- current_item_ids_checked: `{coverage['current_item_ids_checked']}`",
             f"- enrichment_ids_seen: `{coverage['enrichment_ids_seen']}`",
             f"- missing_current_enrichment_count: `{coverage['missing_current_enrichment_count']}`",
@@ -390,7 +456,8 @@ def write_markdown(path: Path, report: dict[str, Any]) -> None:
 
 def run(args: argparse.Namespace) -> dict[str, Any]:
     timeout_seconds = None if args.no_timeout else args.timeout_seconds
-    server = discover_server(args.env_id, args.service_name, timeout_seconds)
+    tcb_cwd = resolve_tcb_cwd(getattr(args, "tcb_cwd", None))
+    server = discover_server(args.env_id, args.service_name, timeout_seconds, tcb_cwd=tcb_cwd)
     if args.base_url:
         server["base_url"] = args.base_url.rstrip("/")
     endpoint_specs = [
@@ -416,13 +483,25 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         response = get_paginated_current(server["base_url"], timeout_seconds)
     except Exception as exc:  # noqa: BLE001
         response = {
-            "url_path": "/api/v1/weekly/current?limit=100",
+            "url_path": current_path(limit=100),
             "status_code": None,
             "bytes_read": 0,
             "payload": {"_error": str(exc)[:240]},
         }
     responses["current"] = response
     summaries.insert(2, endpoint_summary("current", response))
+
+    try:
+        response = get_paginated_current(server["base_url"], timeout_seconds, lookback_days=999)
+    except Exception as exc:  # noqa: BLE001
+        response = {
+            "url_path": current_path(limit=100, lookback_days=999),
+            "status_code": None,
+            "bytes_read": 0,
+            "payload": {"_error": str(exc)[:240]},
+        }
+    responses["full_current"] = response
+    summaries.insert(3, endpoint_summary("full_current", response))
 
     current_items = responses.get("current", {}).get("payload", {}).get("items") or []
     first_id = ""
@@ -446,7 +525,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             }
         )
 
-    report = build_report(server, summaries)
+    report = build_report(
+        server,
+        summaries,
+        expected_min_ready_items=args.expected_min_ready_items,
+        expected_min_current_items=args.expected_min_current_items,
+    )
     args.out_dir.mkdir(parents=True, exist_ok=True)
     write_json(args.out_dir / "cloudrun_weekly_production_smoke.json", report)
     write_markdown(args.out_dir / "cloudrun_weekly_production_smoke.md", report)
@@ -458,9 +542,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--env-id", default=ENV_ID)
     parser.add_argument("--service-name", default=SERVICE_NAME)
     parser.add_argument("--base-url", default="")
+    parser.add_argument(
+        "--tcb-cwd",
+        type=Path,
+        default=None,
+        help="CloudRun project directory for CloudBase CLI; defaults to this checkout's services/weekly_activity_cloudrun.",
+    )
     parser.add_argument("--timeout-seconds", type=int, default=30)
     parser.add_argument("--no-timeout", action="store_true", help="Disable CloudBase and HTTP request timeouts for this smoke.")
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
+    parser.add_argument("--expected-min-ready-items", type=int, default=EXPECTED_MIN_READY_ITEMS)
+    parser.add_argument("--expected-min-current-items", type=int, default=EXPECTED_MIN_CURRENT_ITEMS)
     return parser.parse_args(argv)
 
 

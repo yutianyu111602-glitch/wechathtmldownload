@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { after, before, test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { createServer } from "../src/server.mjs";
 import { WeeklyActivityDataStore } from "../src/dataStore.mjs";
 
@@ -27,6 +28,26 @@ async function createFixture() {
     schema_version: "weekly_activity_miniprogram_api.v1",
     generated_at: "2026-05-07T09:48:35",
     item_count: 3,
+    window_start: "2026-05-07",
+    window_end: "2026-05-21",
+    source_mode: "sanji_desktop_rss",
+    source_queue_path: "C:\\Users\\pc\\local-only\\latest_queue.jsonl",
+    direct_rss_feed_fetch: false,
+    sanji_db_snapshot_export: true,
+    sanji_desktop_refresh_invoked: true,
+    sanji_snapshot_db_path: "C:\\Users\\pc\\AppData\\Roaming\\sanji\\sanji.db",
+    sanji_source_contract: {
+      schema_version: "weekly_sanji_source_contract.v1",
+      source_mode: "sanji_desktop_rss",
+      source: "sanji_desktop_local_sqlite_snapshot",
+      generated_at: "2026-05-07T09:40:00+08:00",
+      exported_rows: 88,
+      prefetch_queue_rows: 88,
+      direct_rss_feed_fetch: false,
+      sanji_db_snapshot_export: true,
+      sanji_desktop_refresh_invoked: true,
+      snapshot_db_path: "C:\\Users\\pc\\AppData\\Roaming\\sanji\\sanji.db",
+    },
     field_resource_repair: {
       schema_version: "weekly_resource_field_repair.v1",
       item_change_count: 2,
@@ -38,6 +59,36 @@ async function createFixture() {
     id_consistency_repair: {
       schema_version: "weekly_resource_id_consistency_repair.v1",
       changed_item_count: 2,
+    },
+  });
+  await writeJson(path.join(dir, "club_overviews.json"), {
+    schema_version: "club_overviews.v1",
+    generated_at: "2026-05-09T08:00:00+08:00",
+    as_of_date: "2026-05-09",
+    source: "sanji.db (fixture)",
+    club_count: 99,
+    overview_count: 99,
+    kind_counts: { week: 99 },
+    by_club: {
+      "Club A": [
+        {
+          record_type: "club_overview_parent",
+          parent_aggregate: true,
+          include_in_activity_feed: false,
+          source_table: "wechat_article",
+          club_fakeid: "private-fixture-id",
+          club: "Club A",
+          title: "Club A 本周活动一览",
+          publish_date: "2026-05-09",
+          original_url: "https://mp.weixin.qq.com/s/club-a-weekly",
+          cover_url: "https://mmbiz.qpic.cn/example/club-a-weekly.jpg",
+          window_kind: "week",
+          window_label: "5.9-5.15",
+          window_start: "2026-05-09",
+          window_end: "2026-05-15",
+        },
+      ],
+      "Invalid Club": [{ title: "missing required public URLs" }],
     },
   });
   const items = [
@@ -132,6 +183,20 @@ async function createFixture() {
       lineup: ["DJ Colon"],
       venue: ["Club Colon"],
       evidence: ["22:00 Club Colon"],
+    },
+    {
+      id: "cocktail-festival",
+      title: "重庆首届鸡尾酒节",
+      city_key: "shanghai",
+      city_keys: ["shanghai"],
+      city: ["上海"],
+      event_date_iso_guess: "2026-05-09",
+      event_date_iso_guesses: ["2026-05-09"],
+      quality_status: "READY",
+      promoter: "Market",
+      lineup: [],
+      venue: ["Market"],
+      evidence: ["Cocktail Festival"],
     },
     {
       id: "range-week",
@@ -534,9 +599,63 @@ test("returns manifest", async () => {
   assert.equal(res.status, 200);
   const body = await res.json();
   assert.equal(body.schema_version, "weekly_activity_miniprogram_api.v1");
+  assert.equal(body.window_start, "2026-05-07");
+  assert.equal(body.window_end, "2026-05-21");
+  assert.equal(body.source_mode, "sanji_desktop_rss");
+  assert.equal(body.direct_rss_feed_fetch, false);
+  assert.equal(body.sanji_db_snapshot_export, true);
+  assert.equal(body.sanji_desktop_refresh_invoked, true);
+  assert.equal(body.sanji_source_contract.source_mode, "sanji_desktop_rss");
+  assert.equal(body.sanji_source_contract.direct_rss_feed_fetch, false);
+  assert.equal(body.sanji_source_contract.sanji_db_snapshot_export, true);
+  assert.equal(body.sanji_source_contract.sanji_desktop_refresh_invoked, true);
+  assert.equal(Object.prototype.hasOwnProperty.call(body, "source_queue_path"), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(body, "sanji_snapshot_db_path"), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(body.sanji_source_contract, "snapshot_db_path"), false);
   assert.equal(body.field_resource_repair.schema_version, "weekly_resource_field_repair.v1");
   assert.equal(body.geocode_enrichment.schema_version, "weekly_geocode_enrichment.v1");
   assert.equal(body.id_consistency_repair.schema_version, "weekly_resource_id_consistency_repair.v1");
+});
+
+test("serves the baked club overview artifact through a stable public contract", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/weekly/club-overviews`);
+  assert.equal(res.status, 200);
+  const body = await res.json();
+  assert.equal(body.schema_version, "club_overviews.v1");
+  assert.equal(body.generated_at, "2026-05-09T08:00:00+08:00");
+  assert.equal(body.club_count, 1);
+  assert.equal(body.overview_count, 1);
+  assert.deepEqual(body.kind_counts, { week: 1 });
+  assert.equal(body.by_club["Club A"][0].title, "Club A 本周活动一览");
+  assert.equal(Object.prototype.hasOwnProperty.call(body.by_club["Club A"][0], "club_fakeid"), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(body.by_club["Club A"][0], "source_table"), false);
+});
+
+test("club overview route remains stable when the optional artifact is absent", async () => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), "weekly-club-overviews-empty-"));
+  const store = new WeeklyActivityDataStore({ baseDir: dir });
+  assert.deepEqual(await store.getClubOverviews(), {
+    schema_version: "club_overviews.v1",
+    generated_at: null,
+    as_of_date: null,
+    source: null,
+    club_count: 0,
+    overview_count: 0,
+    kind_counts: {},
+    by_club: {},
+  });
+});
+
+test("bake treats club overviews as an online-only optional release artifact", async () => {
+  const testDir = path.dirname(fileURLToPath(import.meta.url));
+  const source = await readFile(path.resolve(testDir, "../scripts/bake_and_deploy.py"), "utf8");
+  const optionalBlock = source.slice(
+    source.indexOf("OPTIONAL_RELEASE_ITEMS = ["),
+    source.indexOf("MATERIALIZED_LLM_REQUIRED_ITEMS = ["),
+  );
+  assert.match(optionalBlock, /"club_overviews\.json"/);
+  const bakeBlock = source.slice(source.indexOf("def bake_data("), source.indexOf("def validate_stage7_atlas"));
+  assert.doesNotMatch(bakeBlock, /data[\\/]club_overviews\.js|out-js|MINIPROGRAM_DIR/);
 });
 
 test("serves Stage7 atlas manifest and search from a release pointer", async () => {
@@ -865,6 +984,49 @@ test("filters current items by city and excludes review candidates", async () =>
   assert.equal(body.items[1].id, "club:abc123");
 });
 
+test("current feed excludes clearly non-electronic activities but preserves electronic evidence", async () => {
+  const dir = await mkdtemp(path.join(os.tmpdir(), "weekly-electronic-relevance-"));
+  await writeJson(path.join(dir, "current.json"), {
+    schema_version: "weekly_activity_miniprogram_current.v1",
+    generated_at: "2026-06-21T00:00:00+08:00",
+    item_count: 3,
+    items: [
+      {
+        id: "pure-cocktail",
+        title: "重庆首届鸡尾酒节",
+        city_key: "chongqing",
+        city_keys: ["chongqing"],
+        event_date_iso_guess: "2026-06-21",
+        quality_status: "READY",
+      },
+      {
+        id: "standup",
+        title: "周六脱口秀开放麦",
+        city_key: "chongqing",
+        city_keys: ["chongqing"],
+        event_date_iso_guess: "2026-06-21",
+        quality_status: "READY",
+      },
+      {
+        id: "cocktail-dj-room",
+        title: "Cocktail room with DJ Acid",
+        city_key: "chongqing",
+        city_keys: ["chongqing"],
+        event_date_iso_guess: "2026-06-21",
+        quality_status: "READY",
+        lineup: ["DJ Acid"],
+        venue: ["Club Room"],
+      },
+    ],
+  });
+  const store = new WeeklyActivityDataStore({ baseDir: dir, today: "2026-06-21" });
+
+  const body = await store.getCurrent({ cityKey: "chongqing", limit: 10 });
+
+  assert.deepEqual(Array.from(body.items, (item) => item.id), ["cocktail-dj-room"]);
+  assert.equal(body.page.total, 1);
+});
+
 test("filters multi-day events by inclusive date range", async () => {
   const res = await fetch(`${baseUrl}/api/v1/weekly/current?date=2026-05-20`);
   assert.equal(res.status, 200);
@@ -1106,6 +1268,20 @@ test("uses normalized current-list query values for cache keys", async () => {
     first.items.map((item) => item.id),
   );
   assert.equal(second.page.total, first.page.total);
+});
+
+test("keeps explicit max lookback distinct from default current cache key", async () => {
+  const defaultRes = await fetch(`${baseUrl}/api/v1/weekly/current?cityKey=cache-split-probe&limit=100&_ts=cache-split-default`);
+  assert.equal(defaultRes.status, 200);
+  assert.equal(defaultRes.headers.get("x-weekly-cache"), "MISS");
+  const defaultBody = await defaultRes.json();
+  assert.equal(defaultBody.filters.lookbackDays, null);
+
+  const lookbackRes = await fetch(`${baseUrl}/api/v1/weekly/current?cityKey=cache-split-probe&limit=100&lookbackDays=45&_ts=cache-split-lookback`);
+  assert.equal(lookbackRes.status, 200);
+  assert.equal(lookbackRes.headers.get("x-weekly-cache"), "MISS");
+  const lookbackBody = await lookbackRes.json();
+  assert.equal(lookbackBody.filters.lookbackDays, 45);
 });
 
 test("compresses public weekly JSON responses without changing the payload shape", async () => {

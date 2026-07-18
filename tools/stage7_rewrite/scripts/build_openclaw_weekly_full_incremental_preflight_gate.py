@@ -221,40 +221,77 @@ def summarize_readiness(readiness: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def summarize_auth_recovery(auth: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "present": bool(auth),
+        "schema_version": str(auth.get("schema_version") or ""),
+        "decision": str(auth.get("decision") or ""),
+        "auth_recovery_ready": bool_value(auth.get("auth_recovery_ready")),
+        "session_requires_auth": bool_value(auth.get("session_requires_auth")),
+        "qr_upstream_unavailable": bool_value(auth.get("qr_upstream_unavailable")),
+    }
+
+
 def build_gate(
     *,
     next_action_path: Path,
     darwin_path: Path | None = None,
     readiness_path: Path | None = None,
+    auth_recovery_path: Path | None = None,
 ) -> dict[str, Any]:
     next_action_raw = read_json(next_action_path)
     darwin_raw = read_json(darwin_path)
     readiness_raw = read_json(readiness_path)
+    auth_recovery_raw = read_json(auth_recovery_path)
     next_action = summarize_next_action(next_action_raw)
     darwin = summarize_darwin(darwin_raw)
     readiness = summarize_readiness(readiness_raw)
-    raw_secret_keys = sorted(set(raw_secret_key_hits(next_action_raw) + raw_secret_key_hits(darwin_raw) + raw_secret_key_hits(readiness_raw)))
-    forbidden_true_flags = false_flag_violations(next_action_raw, darwin_raw, readiness_raw)
+    auth_recovery = summarize_auth_recovery(auth_recovery_raw)
+    raw_secret_keys = sorted(
+        set(
+            raw_secret_key_hits(next_action_raw)
+            + raw_secret_key_hits(darwin_raw)
+            + raw_secret_key_hits(readiness_raw)
+            + raw_secret_key_hits(auth_recovery_raw)
+        )
+    )
+    forbidden_true_flags = false_flag_violations(next_action_raw, darwin_raw, readiness_raw, auth_recovery_raw)
     input_leak_count = leak_count(
         {
             "next_action": next_action,
             "darwin": darwin,
             "readiness": readiness,
+            "auth_recovery": auth_recovery,
         }
     )
+    prebuild_auth_gate_present = auth_recovery["present"]
+    prebuild_source_refresh_allowed = (
+        prebuild_auth_gate_present
+        and auth_recovery["auth_recovery_ready"]
+        and not auth_recovery["session_requires_auth"]
+    )
     checks = [
-        check("next_action_present", next_action["present"], str(next_action["present"])),
-        check("next_action_schema", next_action["schema_version"] == NEXT_ACTION_SCHEMA, next_action["schema_version"]),
-        check("next_action_has_no_open_tasks", next_action["task_count"] == 0, str(next_action["task_count"])),
-        check("next_action_source_refresh_allowed", next_action["source_refresh_allowed_now"], str(next_action["source_refresh_allowed_now"])),
-        check("next_action_full_incremental_allowed", next_action["full_incremental_run_allowed_now"], str(next_action["full_incremental_run_allowed_now"])),
-        check("next_action_leak_free", next_action["leak_count"] == 0, str(next_action["leak_count"])),
+        check("auth_recovery_ready_for_source_refresh", prebuild_source_refresh_allowed, str(prebuild_source_refresh_allowed), required=prebuild_auth_gate_present),
+        check("next_action_present", next_action["present"], str(next_action["present"]), required=not prebuild_auth_gate_present),
+        check("next_action_schema", next_action["schema_version"] == NEXT_ACTION_SCHEMA, next_action["schema_version"], required=next_action["present"]),
+        check("next_action_has_no_open_tasks", next_action["task_count"] == 0, str(next_action["task_count"]), required=not prebuild_auth_gate_present),
+        check(
+            "next_action_source_refresh_allowed",
+            next_action["source_refresh_allowed_now"] or prebuild_source_refresh_allowed,
+            str(next_action["source_refresh_allowed_now"] or prebuild_source_refresh_allowed),
+        ),
+        check(
+            "next_action_full_incremental_allowed",
+            next_action["full_incremental_run_allowed_now"] or prebuild_source_refresh_allowed,
+            str(next_action["full_incremental_run_allowed_now"] or prebuild_source_refresh_allowed),
+        ),
+        check("next_action_leak_free", next_action["leak_count"] == 0, str(next_action["leak_count"]), required=next_action["present"]),
         check("darwin_schema", not darwin["present"] or darwin["schema_version"] == DARWIN_SCHEMA, darwin["schema_version"], required=darwin["present"]),
         check("darwin_leak_free", not darwin["present"] or darwin["leak_count"] == 0, str(darwin["leak_count"]), required=darwin["present"]),
-        check("readiness_release_ready", not readiness["present"] or readiness["release_ready"], str(readiness["release_ready"]), required=readiness["present"]),
+        check("readiness_release_ready", not readiness["present"] or readiness["release_ready"] or prebuild_source_refresh_allowed, str(readiness["release_ready"]), required=readiness["present"]),
         check(
             "readiness_package_candidate_ready",
-            not readiness["present"] or readiness["package_candidate_ready"],
+            not readiness["present"] or readiness["package_candidate_ready"] or prebuild_source_refresh_allowed,
             str(readiness["package_candidate_ready"]),
             required=readiness["present"],
         ),
@@ -264,7 +301,7 @@ def build_gate(
     ]
     failed = [row["check_id"] for row in checks if row["required"] == "true" and row["status"] != "passed"]
     full_incremental_allowed = not failed
-    if not next_action["present"]:
+    if not next_action["present"] and not prebuild_auth_gate_present:
         decision = INCOMPLETE_DECISION
     elif full_incremental_allowed:
         decision = READY_DECISION
@@ -276,13 +313,15 @@ def build_gate(
         "decision": decision,
         "report_only": True,
         "full_incremental_candidate_run_allowed_now": full_incremental_allowed,
-        "source_refresh_allowed_now": full_incremental_allowed and next_action["source_refresh_allowed_now"],
+        "source_refresh_allowed_now": full_incremental_allowed
+        and (next_action["source_refresh_allowed_now"] or prebuild_source_refresh_allowed),
         "docker_worker_allowed_now": full_incremental_allowed,
         "release_actions_allowed_now": False,
         "write_actions_allowed_now": False,
         "next_action_summary": next_action,
         "darwin_summary": darwin,
         "readiness_summary": readiness,
+        "auth_recovery_summary": auth_recovery,
         "checks": checks,
         "failed_required_check_ids": failed,
         "counts": {
@@ -294,6 +333,7 @@ def build_gate(
             "next_action_packet": safe_repo_path(next_action_path),
             "darwin_scorecard": safe_repo_path(darwin_path),
             "readiness": safe_repo_path(readiness_path),
+            "auth_recovery": safe_repo_path(auth_recovery_path),
         },
         "next_gate": "run_full_incremental_candidate_pipeline" if full_incremental_allowed else "continue_ordered_next_action_recovery",
         "forbidden_true_flags": forbidden_true_flags,
@@ -332,6 +372,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--next-action-packet", type=Path, default=DEFAULT_NEXT_ACTION)
     parser.add_argument("--darwin-scorecard", type=Path, default=DEFAULT_DARWIN)
     parser.add_argument("--readiness", type=Path, default=DEFAULT_READINESS)
+    parser.add_argument("--auth-recovery", type=Path)
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
     parser.add_argument("--scorecard", type=Path, default=DEFAULT_SCORECARD)
     return parser.parse_args(argv)
@@ -343,6 +384,7 @@ def main(argv: list[str] | None = None) -> int:
         next_action_path=args.next_action_packet,
         darwin_path=args.darwin_scorecard,
         readiness_path=args.readiness,
+        auth_recovery_path=args.auth_recovery,
     )
     write_json(args.report, report)
     write_text(args.scorecard, render_markdown(report))

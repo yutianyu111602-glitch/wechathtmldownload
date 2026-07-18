@@ -41,6 +41,7 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS clean (
   token TEXT PRIMARY KEY,
   account_key TEXT, title TEXT,
+  source_published_at TEXT,
   clean_text TEXT, text_len INTEGER,
   poster_json TEXT,           -- [{asset_id, path, bytes}]
   poster_candidates_json TEXT,
@@ -75,6 +76,7 @@ def ensure_clean_schema(con):
         if name not in cols:
             con.execute(f"ALTER TABLE clean ADD COLUMN {name} TEXT")
     for name, col_type in (
+        ("source_published_at", "TEXT"),
         ("article_type", "TEXT"),
         ("should_process_text", "INTEGER"),
         ("should_process_images", "INTEGER"),
@@ -362,7 +364,7 @@ def main():
     con.executescript(SCHEMA)
     ensure_clean_schema(con)
 
-    q = "SELECT token, account_key, title, raw_html_path, assets_json_path, img_count FROM ingest"
+    q = "SELECT token, account_key, title, archived_at, raw_html_path, assets_json_path, img_count FROM ingest"
     if args.limit:
         q += f" LIMIT {int(args.limit)}"
     rows = src.execute(q).fetchall()
@@ -379,7 +381,7 @@ def main():
         "vision_count": 0,
         "text_count": 0,
     }
-    for token, acct, title, raw_html_path, assets_path, img_count in rows:
+    for token, acct, title, source_published_at, raw_html_path, assets_path, img_count in rows:
         try:
             with open(raw_html_path, "r", encoding="utf-8", errors="replace") as f:
                 text = html_to_text(f.read())
@@ -411,14 +413,14 @@ def main():
         con.execute(
             """
             INSERT OR REPLACE INTO clean
-              (token, account_key, title, clean_text, text_len, poster_json,
+              (token, account_key, title, source_published_at, clean_text, text_len, poster_json,
                poster_candidates_json, poster_selection_report_json,
                poster_count, dup_group, route, status,
                article_type, should_process_text, should_process_images,
                image_route_reason, classification_confidence, classification_reasons)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             """,
-            (token, acct, title, text, len(text), json.dumps(posters, ensure_ascii=False),
+            (token, acct, title, source_published_at, text, len(text), json.dumps(posters, ensure_ascii=False),
              json.dumps(candidates, ensure_ascii=False), json.dumps(selection_report, ensure_ascii=False),
              len(posters), dup_group(title, acct), route, "cleaned",
              article_type,

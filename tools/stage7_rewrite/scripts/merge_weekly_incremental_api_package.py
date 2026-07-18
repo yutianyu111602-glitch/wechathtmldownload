@@ -26,6 +26,10 @@ from repair_weekly_release_conflicts import (
 
 
 SCHEMA_VERSION = "weekly_incremental_api_merge.v1"
+STALE_BASE_MANIFEST_KEYS = {
+    "source_policy_title_dedupe_repair",
+}
+ISO_DATE_LENGTH = 10
 PLACE_LOCK_FIELDS = (
     "venue_id",
     "address",
@@ -59,6 +63,12 @@ TRUSTED_PLACE_SOURCE_MARKERS = (
     "tencent_map_picker",
     "tencent_place_search_exact_address_reviewed",
 )
+USAGE_SIDECAR_FILENAMES = (
+    "llm_usage_summary.json",
+    "poster_vl_usage_summary.json",
+    "qwen_vl_usage_summary.json",
+    "poster_vl_usage_details.jsonl",
+)
 
 
 def is_blank(value: Any) -> bool:
@@ -89,6 +99,69 @@ def wants_locked_place_override(item: dict[str, Any]) -> bool:
         or item.get("override_locked_fields")
         or item.get("geo_override_reason")
     )
+
+
+def iso_date(value: Any) -> str:
+    text = str(value or "").strip()
+    if len(text) != ISO_DATE_LENGTH:
+        return ""
+    if text[4] != "-" or text[7] != "-":
+        return ""
+    yyyy, mm, dd = text[:4], text[5:7], text[8:10]
+    if not (yyyy.isdigit() and mm.isdigit() and dd.isdigit()):
+        return ""
+    return text
+
+
+def copy_usage_sidecars(incremental_dir: Path, out_dir: Path) -> dict[str, str]:
+    copied: dict[str, str] = {}
+    for name in USAGE_SIDECAR_FILENAMES:
+        src = incremental_dir / name
+        if not src.is_file():
+            continue
+        dst = out_dir / name
+        shutil.copy2(src, dst)
+        copied[name] = str(dst)
+    return copied
+
+
+def copy_incremental_provenance_sidecars(incremental_dir: Path, out_dir: Path) -> dict[str, str]:
+    copied: dict[str, str] = {}
+    for name in ("build_filter_dispositions.json",):
+        src = incremental_dir / name
+        if not src.is_file():
+            continue
+        dst = out_dir / name
+        shutil.copy2(src, dst)
+        copied[name] = str(dst)
+    return copied
+
+
+def merge_manifest_window(base_manifest: dict[str, Any], incremental_manifest: dict[str, Any]) -> dict[str, Any]:
+    starts = [
+        value
+        for value in (
+            iso_date(base_manifest.get("window_start")),
+            iso_date(incremental_manifest.get("window_start")),
+        )
+        if value
+    ]
+    ends = [
+        value
+        for value in (
+            iso_date(base_manifest.get("window_end")),
+            iso_date(incremental_manifest.get("window_end")),
+        )
+        if value
+    ]
+    return {
+        "base_window_start": iso_date(base_manifest.get("window_start")),
+        "base_window_end": iso_date(base_manifest.get("window_end")),
+        "incremental_window_start": iso_date(incremental_manifest.get("window_start")),
+        "incremental_window_end": iso_date(incremental_manifest.get("window_end")),
+        "window_start": min(starts) if starts else "",
+        "window_end": max(ends) if ends else "",
+    }
 
 
 def merge_replacement_item(base_item: dict[str, Any], incremental_item: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
@@ -357,9 +430,13 @@ def merge_package(base_dir: Path, incremental_dir: Path, out_dir: Path, report_p
         "incremental_generated_at": incremental_current.get("generated_at") or incremental_manifest.get("generated_at"),
         **item_merge,
     }
+    usage_sidecars = copy_usage_sidecars(incremental_dir, out_dir)
+    provenance_sidecars = copy_incremental_provenance_sidecars(incremental_dir, out_dir)
 
     manifest_path = out_dir / "manifest.json"
     manifest = read_json(manifest_path) if manifest_path.exists() else {"schema_version": "weekly_activity_miniprogram_api.v1"}
+    for key in STALE_BASE_MANIFEST_KEYS:
+        manifest.pop(key, None)
     manifest["generated_at"] = generated_at
     manifest["out_dir"] = str(out_dir)
     manifest["source_pack_dir"] = incremental_manifest.get("source_pack_dir") or manifest.get("source_pack_dir")
@@ -367,9 +444,34 @@ def merge_package(base_dir: Path, incremental_dir: Path, out_dir: Path, report_p
     manifest["source_incremental_pack_dir"] = incremental_manifest.get("source_pack_dir") or incremental_manifest.get("pack_dir")
     manifest["source_base_api_dir"] = str(base_dir)
     manifest["source_incremental_api_dir"] = str(incremental_dir)
+    for source_contract_key in (
+        "source_mode",
+        "source_queue_path",
+        "sanji_source_contract",
+        "direct_rss_feed_fetch",
+        "sanji_db_snapshot_export",
+        "sanji_desktop_refresh_invoked",
+        "sanji_latest_summary_path",
+        "sanji_snapshot_db_path",
+        "source_contract_attached_at",
+    ):
+        source_contract_value = incremental_manifest.get(source_contract_key)
+        if not is_blank(source_contract_value):
+            manifest[source_contract_key] = deepcopy(source_contract_value)
+    window_merge = merge_manifest_window(base_manifest, incremental_manifest)
+    if window_merge["window_start"]:
+        manifest["window_start"] = window_merge["window_start"]
+    if window_merge["window_end"]:
+        manifest["window_end"] = window_merge["window_end"]
     manifest["incremental_merge"] = deepcopy(merged_current["incremental_merge"])
+    manifest["incremental_merge"]["window_merge"] = deepcopy(window_merge)
     manifest["source_url_map_path"] = str(source_map_path(out_dir))
     manifest["static_source_url_map_path"] = str(source_map_path(out_dir))
+    existing_usage_sidecars = manifest.get("usage_sidecars") if isinstance(manifest.get("usage_sidecars"), dict) else {}
+    manifest["usage_sidecars"] = {**existing_usage_sidecars, **usage_sidecars}
+    if provenance_sidecars:
+        manifest["build_filter_dispositions_path"] = "build_filter_dispositions.json"
+        manifest["build_filter_disposition_count"] = incremental_manifest.get("build_filter_disposition_count")
     write_json(manifest_path, manifest)
 
     repair_report = {
@@ -394,8 +496,11 @@ def merge_package(base_dir: Path, incremental_dir: Path, out_dir: Path, report_p
         "base_manifest_item_count": base_manifest.get("item_count"),
         "incremental_manifest_item_count": incremental_manifest.get("item_count"),
         **item_merge,
+        "window_merge": window_merge,
         "source_map_merge": source_merge,
         "llm_enrichment_merge": llm_enrichment_merge,
+        "usage_sidecars": usage_sidecars,
+        "provenance_sidecars": provenance_sidecars,
     }
     write_json(out_dir / "incremental_merge_report.json", report)
     if report_path:

@@ -62,6 +62,22 @@ def read_jsonl_rows(path: Path, limit: int | None = None) -> list[dict[str, Any]
     return rows
 
 
+def is_sanji_prefetch_summary(summary: dict[str, Any]) -> bool:
+    source_mode = first_string(summary.get("source_mode"))
+    source = first_string(summary.get("source"))
+    rss_contract = summary.get("rss_contract") if isinstance(summary.get("rss_contract"), dict) else {}
+    return source_mode == "sanji_desktop_rss" or source == "sanji_desktop" or "Sanji desktop" in first_string(rss_contract.get("source"))
+
+
+def jsonl_account_counts(path: Path) -> Counter[str]:
+    counts: Counter[str] = Counter()
+    for row in read_jsonl_rows(path, limit=None):
+        account_id = first_nonempty(row.get("account_key"), row.get("account_id"), row.get("account"), row.get("source_account_key"))
+        if account_id:
+            counts[account_id] += 1
+    return counts
+
+
 def first_string(value: Any) -> str:
     return value.strip() if isinstance(value, str) else ""
 
@@ -370,17 +386,21 @@ def pack_account_counts(pack_dir: Path) -> Counter[str]:
 
 def prefetch_counts(prefetch_dir: Path) -> dict[str, Any]:
     summary = read_json(prefetch_dir / "summary.json")
+    prefetch_queue_summary = summary.get("prefetch_queue_summary") if isinstance(summary.get("prefetch_queue_summary"), dict) else {}
     return {
         "prefetch_dir": str(prefetch_dir),
         "summary": {
             "accounts_requested": summary.get("accounts_requested"),
             "account_dirs_missing": summary.get("account_dirs_missing"),
-            "rows_written": summary.get("rows_written"),
+            "rows_written": summary.get("rows_written") or prefetch_queue_summary.get("rows_written") or summary.get("prefetch_queue_rows") or summary.get("exported_rows"),
             "exporter_refresh_requested": summary.get("exporter_refresh_requested"),
             "exporter_articles_per_account": summary.get("exporter_articles_per_account"),
             "exporter_accounts_ok": summary.get("exporter_accounts_ok"),
             "exporter_accounts_failed": summary.get("exporter_accounts_failed"),
             "exporter_article_rows": summary.get("exporter_article_rows"),
+            "source_mode": summary.get("source_mode"),
+            "source": summary.get("source"),
+            "sanji_snapshot": is_sanji_prefetch_summary(summary),
         },
         "jsonl_count": read_jsonl_count(prefetch_dir / "latest_queue.jsonl"),
     }
@@ -392,6 +412,11 @@ def account_coverage(registry: Path, prefetch_dir: Path, queue_dir: Path, pack_d
     queue_summary = read_json(queue_dir / "summary.json")
     prefetch_account_counts = Counter({str(k): int(v) for k, v in (prefetch_summary.get("account_counts") or {}).items()})
     exporter_account_counts = Counter({str(k): int(v) for k, v in (prefetch_summary.get("exporter_account_counts") or {}).items()})
+    sanji_snapshot = is_sanji_prefetch_summary(prefetch_summary)
+    if not prefetch_account_counts and sanji_snapshot:
+        prefetch_account_counts = jsonl_account_counts(prefetch_dir / "latest_queue.jsonl")
+    if not exporter_account_counts and sanji_snapshot:
+        exporter_account_counts = Counter(prefetch_account_counts)
     queue_counts_by_account = queue_account_counts(queue_dir)
     pack_counts_by_account = pack_account_counts(pack_dir)
     published_counts = api_account_counts(api_dir)
@@ -411,7 +436,9 @@ def account_coverage(registry: Path, prefetch_dir: Path, queue_dir: Path, pack_d
         published_count = int(published_counts.get(account_id, 0))
         latest_post_date = max(prefetch_latest_dates.get(account_id, ""), queue_latest_dates.get(account_id, ""))
         stale_for_window = bool(stale_cutoff_date and latest_post_date and latest_post_date < stale_cutoff_date and queue_count <= 0)
-        if prefetch_count <= 0:
+        if sanji_snapshot and prefetch_count > 0:
+            exporter_status = "sanji_snapshot_ok"
+        elif prefetch_count <= 0:
             exporter_status = "no_prefetch"
         elif exporter_count > 0:
             exporter_status = "exporter_ok"
@@ -490,6 +517,7 @@ def build_findings(report: dict[str, Any], min_items: int) -> list[dict[str, str
     findings: list[dict[str, str]] = []
     active = int((report.get("registry") or {}).get("active") or 0)
     prefetch = ((report.get("prefetch") or {}).get("summary") or {})
+    sanji_snapshot = bool(prefetch.get("sanji_snapshot"))
     queue = ((report.get("queue") or {}).get("summary") or {})
     pack = report.get("pack") or {}
     ocr = pack.get("ocr") or {}
@@ -498,9 +526,12 @@ def build_findings(report: dict[str, Any], min_items: int) -> list[dict[str, str
     item_count = int(api.get("current_item_count") or api.get("manifest_item_count") or 0)
     if item_count < min_items:
         findings.append({"severity": "error", "code": "LOW_PUBLISHED_COUNT", "message": f"published {item_count} < min_expected {min_items}"})
-    if active and int(prefetch.get("accounts_requested") or 0) < active:
+    accounts_requested = prefetch.get("accounts_requested")
+    if active and not sanji_snapshot and int(accounts_requested or 0) < active:
         findings.append({"severity": "error", "code": "PREFETCH_ACCOUNT_GAP", "message": "prefetch did not request all active accounts"})
-    if prefetch.get("exporter_refresh_requested") is not True:
+    if sanji_snapshot:
+        findings.append({"severity": "info", "code": "SANJI_DESKTOP_SNAPSHOT_SOURCE", "message": "Sanji Desktop/RSS snapshot source has no exporter account-request contract"})
+    elif prefetch.get("exporter_refresh_requested") is not True:
         findings.append({"severity": "warning", "code": "NO_EXPORTER_REFRESH", "message": "prefetch used only local _articles.json; high-volume accounts may be capped at first page"})
     coverage = report.get("account_coverage") or {}
     queue_relevant_active = int(coverage.get("queue_relevant_active_accounts") or active)

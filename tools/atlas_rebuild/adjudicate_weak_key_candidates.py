@@ -283,7 +283,13 @@ def adjudicate(candidates_db: Path, decisions_db: Path, report_path: Path | None
                         max(shared_dj_count, int(prior["shared_dj_count"] or 0)),
                         max(dj_jaccard, float(prior["dj_jaccard"] or 0.0)),
                         candidate_reason,
-                        requeue,requeue,requeue,requeue,requeue,requeue,pair_key,
+                        requeue,
+                        requeue,
+                        requeue,
+                        requeue,
+                        requeue,
+                        requeue,
+                        pair_key,
                     ),
                 )
                 counts["evidence_backfilled"] += 1
@@ -316,11 +322,13 @@ def adjudicate(candidates_db: Path, decisions_db: Path, report_path: Path | None
         )
 
     store.executemany(
-        """INSERT INTO weak_key_merge_decision (
-          pair_key,event_date,venue_id,title_norm_a,title_norm_b,title_display_a,title_display_b,
-          title_similarity,tier,decision,method,confidence,reason,llm_verdict_raw,decided_at,
-          shared_source_count,shared_dj_count,dj_jaccard,candidate_reason
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+        """
+        INSERT INTO weak_key_merge_decision
+          (pair_key,event_date,venue_id,title_norm_a,title_norm_b,title_display_a,title_display_b,
+           title_similarity,tier,decision,method,confidence,reason,llm_verdict_raw,decided_at,
+           shared_source_count,shared_dj_count,dj_jaccard,candidate_reason)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        """,
         inserted,
     )
     store.commit()
@@ -562,7 +570,7 @@ def llm_adjudicate(
                         )
                     done_rows += len(batch)
                 store.commit()
-                print(f"  progress {min(done_rows, len(pending))}/{len(pending)} spent≈¥{spent_rmb:.2f}")
+                print(f"  progress {min(done_rows, len(pending))}/{len(pending)} spent_rmb~{spent_rmb:.2f}")
     if budget_stopped:
         counts["budget_stopped"] = 1
 
@@ -590,7 +598,7 @@ def main() -> int:
     ap.add_argument("--decisions-db", type=Path, default=DEFAULT_DECISIONS_DB)
     ap.add_argument("--report", type=Path, default=None)
     ap.add_argument("--limit", type=int, default=0, help="llm mode: max pending pairs this run (0 = all)")
-    ap.add_argument("--batch-size", type=int, default=10)
+    ap.add_argument("--batch-size", type=int, default=20)
     ap.add_argument("--max-cost-rmb", type=float, default=25.0)
     ap.add_argument("--self-check", action="store_true")
     args = ap.parse_args()
@@ -602,7 +610,7 @@ def main() -> int:
     if args.mode == "llm":
         report = llm_adjudicate(args.decisions_db, args.limit, args.batch_size, args.max_cost_rmb, args.report)
         print(json.dumps(report["run_counts"], indent=2, ensure_ascii=False))
-        print(f"spent ≈ ¥{report['spent_rmb_estimate']}")
+        print(f"spent_rmb ~ {report['spent_rmb_estimate']}")
         print("store totals:", report["store_totals_by_decision"])
         return 0
 

@@ -132,9 +132,10 @@ Page({
       lang: this.lang,
       t: text("sub", this.lang),
       name: this.name,
-      clubOverviews: getClubOverviewsForVenue(this.name, { lang: this.lang }),
+      clubOverviews: [],
       clubOverviewImageFailedIds: [],
     });
+    this.loadClubOverviews();
     this.loadVenue();
   },
 
@@ -232,6 +233,23 @@ Page({
       console.error("[venue] loadVenue failed", error);
       this.setData({ loading: false, error: this.data.t.loadFailed });
       safeHideLoading();
+    }
+  },
+
+  async loadClubOverviews() {
+    try {
+      const payload = await requestApi("/api/v1/weekly/club-overviews");
+      this.setData({
+        clubOverviews: getClubOverviewsForVenue(this.name, {
+          data: payload,
+          lang: this.lang,
+        }),
+        clubOverviewImageFailedIds: [],
+      });
+    } catch (error) {
+      // Club roundup cards are optional. Activity and Atlas content must remain
+      // usable even when this online artifact and every fallback are unavailable.
+      console.warn("[venue] club overviews unavailable", error);
     }
   },
 

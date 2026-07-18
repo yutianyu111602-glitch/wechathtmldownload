@@ -1,5 +1,28 @@
 # Current Runtime Entry
 
+## 2026-07-18 HUAIDJ Pipeline Recovery Candidate
+
+Candidate root:
+`F:\DevData\HuaidjRuntime\releases\c8196bdc-pipeline-20260718`.
+This remains a candidate until its commit/deploy/smoke evidence is recorded;
+the older entries below are history, not current production authority.
+
+- Hermes desktop cron is the single wall-clock authority for scheduled HUAIDJ
+  work. Do not duplicate it in Windows Task Scheduler or Codex automation.
+- Sanji Desktop: CDP `19333`, cutoff `96h`, all accounts, pending-resource
+  fetch, then a frozen read-only SQLite export snapshot.
+- Sanji VL Image Window Set To Unlimited: `PosterVlMaxImages=0` and
+  `PosterVlLimit=0` mean all usable images.
+- Activity vision: online Qwen VL `qwen3.6-plus`; DeepSeek Flash enriches all
+  rows, with DeepSeek Pro only for risky/aggregate adjudication.
+- Weekly activity publish and AtlasV2 nightly import are separate state
+  machines. AtlasV2 remains a dedicated Hermes nightly job at `23:40`.
+- Mini-program activity data is online-first with a six-hour cache and
+  persisted last-good package; the bundled seed is first-install fallback.
+- A successful full run must prove source snapshot, provider evidence,
+  package gate, deployment smoke, and online manifest in one single wall-clock
+  evidence chain. A wrapper status alone is insufficient.
+
 Updated: 2026-06-07 14:15 CST
 
 Project: `C:\code\githubstar\wechathtmldownload`

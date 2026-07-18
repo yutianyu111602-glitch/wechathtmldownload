@@ -91,6 +91,9 @@ DIRECT_ADMIN_CITIES = {"北京", "上海", "天津", "重庆"}
 ADDRESS_TOKEN_RE = re.compile(r"[\u4e00-\u9fffA-Za-z0-9]{2,}?(?:区|县|镇|街道|路|街|巷|胡同|大道|大厦|广场|中心|园|里|号|楼|层)")
 PRECISE_ADDRESS_RE = re.compile(r"号|楼|层|室|栋|幢|座|大厦|广场|中心|园区|文创园|公园|商场|mall|plaza|building|bldg|B\d|L\d|F\d", re.I)
 COARSE_ADDRESS_RE = re.compile(r"(?:省|市|区|县|镇|街道|路|大道|街)$")
+ADDRESS_TOKEN_ALIASES = {
+    "杭钢薄板印象园": ["薄板印象园", "薄板印象文创园", "薄板印象园区", "薄板印象"],
+}
 
 
 def now_cst() -> str:
@@ -189,6 +192,7 @@ def required_address_tokens(value: str) -> list[str]:
 
 def address_token_variants(token: str) -> list[str]:
     variants = [token]
+    variants.extend(ADDRESS_TOKEN_ALIASES.get(token, []))
     for suffix in ("路", "街", "巷", "胡同", "大道"):
         if token.endswith(suffix) and len(token) > 4:
             variants.append(token[-4:])

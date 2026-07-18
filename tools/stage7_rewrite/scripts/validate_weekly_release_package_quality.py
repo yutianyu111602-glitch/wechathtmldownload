@@ -19,6 +19,7 @@ from repair_weekly_release_conflicts import CITY_LABEL_BY_KEY, read_json, write_
 
 
 SCHEMA_VERSION = "weekly_release_package_quality.v1"
+DEFAULT_SOURCE_POLICY = Path(__file__).resolve().parents[1] / "registries" / "weekly_sanji_source_policy.json"
 INTERNAL_WEEKLY_POSTER_RE = re.compile(r"^cloud://[^/]+/weekly-posters/\d{8}/.+", re.I)
 POSTER_FILE_ID_FIELDS = ("poster_file_id", "posterFileId", "cloudFileId", "cloud_file_id")
 POSTER_STORAGE_FIELDS = ("poster_storage", "posterStorage")
@@ -48,6 +49,32 @@ RUNTIME_ONLY_POSTER_FIELDS = (
     "posterFileIdFallbackTried",
     "posterLoadFailed",
 )
+POSTER_SELECTION_EVIDENCE_FIELDS = (
+    "poster_confidence",
+    "posterConfidence",
+    "poster_evidence",
+    "posterEvidence",
+    "poster_selection_evidence",
+    "posterSelectionEvidence",
+    "image_index",
+    "imageIndex",
+    "poster_image_index",
+    "posterImageIndex",
+    "poster_role",
+    "posterRole",
+)
+PARENT_OVERVIEW_TITLE_RE = re.compile(
+    r"("
+    r"活动(?:一览|预告|预览|全览|安排|日程|指南|汇总|合集)"
+    r"|(?:本周|这周|今周)\s*(?:活动)?(?:一览|预告|预览|安排|日程|指南|汇总|合集)"
+    r"|(?:本月|这个月|当月)\s*(?:活动)?(?:一览|预告|预览|安排|日程|指南|汇总|合集)"
+    r"|[0-9一二三四五六七八九十]{1,3}\s*月\s*(?:活动)?(?:一览|预告|预览|安排|日程|指南|汇总|合集)"
+    r"|月度\s*(?:活动)?(?:一览|预告|预览|安排|日程|指南|汇总|合集)?"
+    r"|(?:端午|假期|节日|holiday).*(?:三日|四日|三天|四天|多日|多天|活动|计划|一览|全览|预告|预览|周刊|日程)"
+    r"|全部理由\s*\|\s*亮点内容与活动日程"
+    r")",
+    re.I,
+)
 FRONT_END_ADAPTATION_CONTRACT = {
     "backend_package_truth": "cloudbase_internal_file_id",
     "accepted_backend_file_id_fields": list(POSTER_FILE_ID_FIELDS),
@@ -71,8 +98,53 @@ FRONT_END_ADAPTATION_CONTRACT = {
         "public_or_temp_poster_url_count": 0,
         "public_wechat_or_qpic_poster_count": 0,
         "runtime_poster_state_count": 0,
+        "main_poster_selection_review_required_count": 0,
     },
 }
+DEFAULT_NON_TARGET_ACTIVITY_TERMS = {
+    "standup_comedy": ["脱口秀", "喜剧", "stand-up", "standup", "comedy"],
+    "folk": ["民谣", "folk"],
+    "rock": ["摇滚", "rock", "朋克", "punk", "后摇", "post-rock", "乐队专场"],
+    "hiphop": ["hiphop", "hip-hop", "hip hop", "嘻哈", "说唱", "rap show", "rapper"],
+    "quiet_bar": ["静吧", "清吧", "小酒馆", "民谣酒馆"],
+    "classical_or_concert": ["古典", "交响", "管弦", "弦乐", "贝多芬", "莫扎特", "肖邦", "音乐会"],
+    "jazz_swing": ["爵士大乐队", "爵士现场", "swing音乐", "swing dance", "jazz night"],
+    "editorial_release": [
+        "发布全新 ep",
+        "全新 ep 发布",
+        "新 ep 发布",
+        "发布全新单曲",
+        "全新单曲发布",
+        "发布全新专辑",
+        "全新专辑发布",
+        "新专辑上线",
+        "新单曲上线",
+    ],
+    "recruitment_notice": ["招募中", "招募 dj", "dj 招募", "open decks 招募", "open deck 招募"],
+}
+EDITORIAL_RELEASE_EVENT_KEEP_RE = re.compile(r"派对|演出|首发现场|发布会|release\s*party|showcase|dj\s*set", re.I)
+DEFAULT_ELECTRONIC_KEEP_TERMS = [
+    "techno",
+    "house",
+    "trance",
+    "dnb",
+    "drum and bass",
+    "bass music",
+    "breakbeat",
+    "electro",
+    "rave",
+    "club night",
+    "dj set",
+    "open decks",
+    "four on the floor",
+    "disco",
+    "reggae",
+    "电子",
+    "电音",
+    "浩室",
+    "锐舞",
+    "雷鬼",
+]
 
 
 def first_non_empty(*values: Any) -> Any:
@@ -84,6 +156,125 @@ def first_non_empty(*values: Any) -> Any:
         if isinstance(value, (list, tuple)) and not value:
             continue
         return value
+    return ""
+
+
+def list_strings(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [item.strip() for item in value if isinstance(item, str) and item.strip()]
+
+
+def normalize_subject(value: str) -> str:
+    return re.sub(r"[\W_]+", "", str(value or "").casefold())
+
+
+def load_source_policy(path: Path | None) -> dict[str, Any]:
+    payload = read_json(path) if path and path.exists() else {}
+    categories = payload.get("article_level_block_categories") if isinstance(payload.get("article_level_block_categories"), dict) else {}
+    content_terms: dict[str, list[str]] = {}
+    for key, fallback in DEFAULT_NON_TARGET_ACTIVITY_TERMS.items():
+        values = categories.get(key) if isinstance(categories, dict) else None
+        content_terms[key] = list_strings(values) or list(fallback)
+    return {
+        "blocked_source_hashes": {value.lower() for value in list_strings(payload.get("blocked_source_hashes")) if value},
+        "blocked_account_fakeids": {value for value in list_strings(payload.get("blocked_account_fakeids")) if value},
+        "blocked_accounts": {normalize_subject(value) for value in list_strings(payload.get("blocked_accounts")) if normalize_subject(value)},
+        "blocked_venues": {normalize_subject(value) for value in list_strings(payload.get("blocked_venues")) if normalize_subject(value)},
+        "content_terms": content_terms,
+        "electronic_keep_terms": list_strings(payload.get("electronic_keep_terms")) or list(DEFAULT_ELECTRONIC_KEEP_TERMS),
+    }
+
+
+def subject_matches(value: str, blocked_values: set[str]) -> bool:
+    normalized = normalize_subject(value)
+    if not normalized:
+        return False
+    return any(normalized == blocked or blocked in normalized or normalized in blocked for blocked in blocked_values)
+
+
+def policy_term_matches(blob: str, terms: list[str]) -> bool:
+    haystack = " " + re.sub(r"\s+", " ", str(blob or "").casefold()) + " "
+    normalized = normalize_subject(blob)
+    for term in terms:
+        text = str(term or "").strip()
+        if not text:
+            continue
+        lower = re.sub(r"\s+", " ", text.casefold())
+        if re.search(r"[a-z0-9]", lower):
+            if re.search(r"(?<![a-z0-9])" + re.escape(lower) + r"(?![a-z0-9])", haystack):
+                return True
+        elif normalize_subject(text) and normalize_subject(text) in normalized:
+            return True
+    return False
+
+
+def non_target_activity_reason(item: dict[str, Any], policy: dict[str, Any]) -> str:
+    source_article = item.get("source_article") if isinstance(item.get("source_article"), dict) else {}
+    source_action = item.get("source_action") if isinstance(item.get("source_action"), dict) else {}
+    source_hashes = {
+        str(value).lower()
+        for value in [
+            first_non_empty(source_article.get("url_hash"), source_article.get("hash")),
+            first_non_empty(source_action.get("url_hash"), source_action.get("hash")),
+            first_non_empty(item.get("sourceHash"), item.get("source_hash"), item.get("source_url_hash"), item.get("article_hash")),
+        ]
+        if value
+    }
+    if source_hashes & (policy.get("blocked_source_hashes") or set()):
+        return "source_policy_blocked_source_hash"
+    if str(first_non_empty(item.get("account_fakeid")) or "") in (policy.get("blocked_account_fakeids") or set()):
+        return "source_policy_blocked_account"
+    account_values = [
+        str(first_non_empty(item.get("source_account_name"), item.get("account_nickname"), item.get("account")) or ""),
+        str(first_non_empty((item.get("source_article") or {}).get("account_name")) or ""),
+    ]
+    if any(subject_matches(value, policy.get("blocked_accounts") or set()) for value in account_values if value):
+        return "source_policy_blocked_account"
+    venue_values = [
+        str(first_non_empty(item.get("venue_name")) or ""),
+        *list_strings(item.get("venue")),
+        str(first_non_empty(item.get("title_display"), item.get("title")) or ""),
+    ]
+    if any(subject_matches(value, policy.get("blocked_venues") or set()) for value in venue_values if value):
+        return "source_policy_blocked_venue"
+    evidence = item.get("poster_selection_evidence")
+    strict_blob = "\n".join(
+        value
+        for value in [
+            str(first_non_empty(item.get("title_display"), item.get("title")) or ""),
+            str(first_non_empty(item.get("source_account_name"), item.get("account")) or ""),
+            str(first_non_empty(item.get("venue_name")) or ""),
+        ]
+        if value.strip()
+    )
+    wide_parts = [
+        strict_blob,
+        " ".join(list_strings(item.get("music_styles"))),
+        " ".join(list_strings(item.get("genres"))),
+        " ".join(list_strings(item.get("lineup"))),
+    ]
+    if isinstance(evidence, dict):
+        wide_parts.extend(list_strings(evidence.get("visible_text_lines")))
+        wide_parts.extend(list_strings(evidence.get("risk_flags")))
+    wide_blob = "\n".join(part for part in wide_parts if part)
+    has_keep = policy_term_matches(wide_blob, policy.get("electronic_keep_terms") or [])
+    for category, terms in (policy.get("content_terms") or {}).items():
+        if category == "editorial_release":
+            if policy_term_matches(strict_blob, terms) and not EDITORIAL_RELEASE_EVENT_KEEP_RE.search(strict_blob):
+                return f"non_target_activity_{category}"
+            continue
+        if category == "hiphop":
+            if policy_term_matches(strict_blob, terms) and not has_keep:
+                return f"non_target_activity_{category}"
+            if policy_term_matches(wide_blob, terms) and not has_keep:
+                return f"non_target_activity_{category}"
+            continue
+        if policy_term_matches(strict_blob, terms):
+            return f"non_target_activity_{category}"
+        if category in {"standup_comedy", "folk", "rock", "quiet_bar", "classical_or_concert", "jazz_swing"}:
+            if policy_term_matches(wide_blob, terms) and not has_keep:
+                return f"non_target_activity_{category}"
     return ""
 
 
@@ -241,6 +432,77 @@ def item_text_values(value: Any, *, limit: int = 24) -> list[str]:
     return out[:limit]
 
 
+def item_title_value(item: dict[str, Any]) -> str:
+    return str(first_non_empty(item.get("title_display"), item.get("title"), item.get("event_title")) or "")
+
+
+def item_has_value(item: dict[str, Any], *keys: str) -> bool:
+    for key in keys:
+        value = item.get(key)
+        if isinstance(value, list):
+            if any(str(child or "").strip() for child in value):
+                return True
+        elif str(value or "").strip():
+            return True
+    return False
+
+
+def has_strong_single_event_evidence(item: dict[str, Any]) -> bool:
+    if not item_has_value(item, "event_date_start", "event_date", "date_start", "date"):
+        return False
+    return (
+        item_has_value(item, "event_title", "title_display")
+        and item_has_value(item, "venue", "venue_name")
+        and item_has_value(item, "lineup", "lineup_artists", "artists")
+    )
+
+
+def llm_parent_overview_decision(item: dict[str, Any]) -> bool:
+    decision = item.get("sanji_parent_overview_llm_decision")
+    if not isinstance(decision, dict):
+        return False
+    return str(first_non_empty(decision.get("classification")) or "").strip().lower() in {
+        "parent_overview",
+        "club_overview",
+        "roundup",
+        "aggregate_parent",
+        "overview",
+    }
+
+
+def is_parent_overview_feed_item(item: dict[str, Any]) -> bool:
+    if is_aggregate_child_item(item):
+        return False
+    if item.get("record_type") == "club_overview_parent" or item.get("parent_aggregate") is True:
+        return True
+    if item.get("include_in_activity_feed") is False:
+        return True
+    if llm_parent_overview_decision(item):
+        return True
+    if has_strong_single_event_evidence(item):
+        return False
+    return bool(PARENT_OVERVIEW_TITLE_RE.search(item_title_value(item)))
+
+
+def parent_overview_feed_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            **item_identity(item),
+            "record_type": item.get("record_type"),
+            "parent_aggregate": item.get("parent_aggregate"),
+            "include_in_activity_feed": item.get("include_in_activity_feed"),
+            "llm_classification": (
+                item.get("sanji_parent_overview_llm_decision", {}).get("classification")
+                if isinstance(item.get("sanji_parent_overview_llm_decision"), dict)
+                else ""
+            ),
+            "reason": "parent_overview_must_render_only_in_venue_overview",
+        }
+        for item in items
+        if is_parent_overview_feed_item(item)
+    ]
+
+
 def aggregate_child_date_evidence_texts(item: dict[str, Any]) -> list[str]:
     texts: list[str] = []
     for key in (
@@ -333,6 +595,134 @@ def runtime_poster_state_residue(item: dict[str, Any]) -> dict[str, Any] | None:
     identity["fields"] = sorted(set(fields))
     identity["reason"] = "frontend_runtime_poster_state_must_not_be_persisted_in_release_package"
     return identity
+
+
+def poster_public_source_hash_value(item: dict[str, Any]) -> str:
+    return str(first_non_empty(
+        item.get("poster_public_source_hash"),
+        item.get("posterPublicSourceHash"),
+        item.get("poster_source_hash"),
+        item.get("posterSourceHash"),
+    ) or "").strip()
+
+
+def source_article_hash_value(item: dict[str, Any]) -> str:
+    source_article = item.get("source_article") if isinstance(item.get("source_article"), dict) else {}
+    source_action = item.get("source_action") if isinstance(item.get("source_action"), dict) else {}
+    return str(first_non_empty(
+        source_article.get("url_hash"),
+        source_article.get("hash"),
+        source_action.get("url_hash"),
+        item.get("sourceHash"),
+        item.get("source_hash"),
+        item.get("source_url_hash"),
+        item.get("article_hash"),
+    ) or "").strip()
+
+
+def has_poster_selection_evidence(item: dict[str, Any]) -> bool:
+    for key in POSTER_SELECTION_EVIDENCE_FIELDS:
+        value = item.get(key)
+        if value is None:
+            continue
+        if isinstance(value, str) and not value.strip():
+            continue
+        if isinstance(value, (list, tuple, dict)) and not value:
+            continue
+        return True
+    return False
+
+
+def is_schedule_split_item(item: dict[str, Any]) -> bool:
+    item_id = str(first_non_empty(item.get("id"), item.get("event_id")) or "").strip()
+    if ":schedule:" in item_id:
+        return True
+    if item.get("schedule_split") is True or item.get("schedule_item") is True:
+        return True
+    return False
+
+
+def schedule_base_id(item: dict[str, Any]) -> str:
+    """Base article id of a schedule item (text before ':schedule:').
+
+    A non-split parent maps to its own id, so a parent and its dated splits
+    collapse to one base id and form a single schedule family.
+    """
+    item_id = str(first_non_empty(item.get("id"), item.get("event_id")) or "").strip()
+    return item_id.split(":schedule:", 1)[0]
+
+
+def shared_poster_source_hash_groups(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    by_hash: dict[str, list[dict[str, Any]]] = {}
+    for item in items:
+        source_hash = poster_public_source_hash_value(item)
+        if not source_hash:
+            continue
+        by_hash.setdefault(source_hash, []).append(item)
+
+    groups: list[dict[str, Any]] = []
+    for source_hash, group_items in sorted(by_hash.items()):
+        if len(group_items) < 2:
+            continue
+        article_hashes = sorted({source_article_hash_value(item) for item in group_items if source_article_hash_value(item)})
+        all_same_article = len(article_hashes) <= 1
+        all_schedule_splits = all(is_schedule_split_item(item) for item in group_items)
+        # A schedule parent shares its poster with its own dated ':schedule:' splits.
+        # The parent itself is not tagged as a split, which used to break
+        # all_schedule_splits and force a false main-poster review. Treat
+        # {parent + its splits} as one schedule family when every item collapses
+        # to a single base article id and the group contains at least one split.
+        base_ids = {schedule_base_id(item) for item in group_items if schedule_base_id(item)}
+        schedule_family = len(base_ids) <= 1 and any(is_schedule_split_item(item) for item in group_items)
+        evidence_items = [item for item in group_items if has_poster_selection_evidence(item)]
+        missing_evidence_items = [item for item in group_items if not has_poster_selection_evidence(item)]
+        has_complete_selection_evidence = len(evidence_items) == len(group_items)
+        review_required = (
+            not (schedule_family or (all_same_article and all_schedule_splits))
+            and not has_complete_selection_evidence
+        )
+        if all_same_article and all_schedule_splits:
+            reason = "same_article_schedule_split_shared_poster_hash"
+        elif schedule_family:
+            reason = "schedule_family_parent_plus_splits_shared_poster_hash"
+        elif has_complete_selection_evidence:
+            reason = "shared_original_poster_hash_has_explicit_selection_evidence"
+        else:
+            reason = "same_original_poster_hash_reused_across_distinct_activities"
+        groups.append({
+            "poster_public_source_hash": source_hash,
+            "item_count": len(group_items),
+            "source_article_hash_count": len(article_hashes),
+            "source_article_hashes": article_hashes[:20],
+            "poster_selection_evidence_count": len(evidence_items),
+            "missing_poster_selection_evidence_count": len(missing_evidence_items),
+            "review_required": review_required,
+            "reason": reason,
+            "items": [
+                {
+                    **item_identity(item),
+                    "source_article_hash": source_article_hash_value(item),
+                    "poster_source": item.get("poster_source"),
+                    "has_poster_selection_evidence": has_poster_selection_evidence(item),
+                    "quality_flags": item.get("quality_flags"),
+                }
+                for item in group_items[:20]
+            ],
+        })
+    return groups
+
+
+def missing_poster_selection_evidence_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            **item_identity(item),
+            "poster_public_source_hash": poster_public_source_hash_value(item),
+            "poster_source": item.get("poster_source"),
+            "reason": "main_poster_selection_has_no_image_index_confidence_or_evidence",
+        }
+        for item in items
+        if poster_public_source_hash_value(item) and not has_poster_selection_evidence(item)
+    ]
 
 
 def has_geo(item: dict[str, Any]) -> bool:
@@ -435,7 +825,7 @@ def static_route_index_issues(api_dir: Path) -> list[dict[str, Any]]:
     return issues
 
 
-def validate(api_dir: Path, *, require_internal_posters: bool, enforce_window_start: bool, fail_on_missing_geo: bool) -> dict[str, Any]:
+def validate(api_dir: Path, *, require_internal_posters: bool, enforce_window_start: bool, fail_on_missing_geo: bool, source_policy_path: Path | None = DEFAULT_SOURCE_POLICY) -> dict[str, Any]:
     current_path = api_dir / "current.json"
     manifest_path = api_dir / "manifest.json"
     if not current_path.exists():
@@ -513,7 +903,25 @@ def validate(api_dir: Path, *, require_internal_posters: bool, enforce_window_st
         for item in items
         if (residue := runtime_poster_state_residue(item)) is not None
     ]
+    parent_overview_items = parent_overview_feed_items(items)
+    shared_poster_groups = shared_poster_source_hash_groups(items)
+    main_poster_review_groups = [group for group in shared_poster_groups if group.get("review_required")]
+    main_poster_review_items = [
+        item
+        for group in main_poster_review_groups
+        for item in group.get("items", [])
+    ]
+    missing_poster_selection_evidence = missing_poster_selection_evidence_items(items)
     missing_geo_items = [item_identity(item) for item in items if not has_geo(item)]
+    source_policy = load_source_policy(source_policy_path)
+    non_target_activity_items = [
+        {
+            **item_identity(item),
+            "reason": reason,
+        }
+        for item in items
+        if (reason := non_target_activity_reason(item, source_policy))
+    ]
     outside_window = outside_window_items(
         items,
         str(first_non_empty(manifest.get("window_start")) or ""),
@@ -555,8 +963,14 @@ def validate(api_dir: Path, *, require_internal_posters: bool, enforce_window_st
         hard_failures.append("aggregate_child_weak_date_evidence")
     if require_internal_posters and runtime_poster_state_items:
         hard_failures.append("runtime_poster_state_persisted")
+    if parent_overview_items:
+        hard_failures.append("parent_overview_in_activity_feed")
+    if require_internal_posters and main_poster_review_groups:
+        hard_failures.append("main_poster_selection_review_required")
     if fail_on_missing_geo and missing_geo_items:
         hard_failures.append("missing_geo")
+    if non_target_activity_items:
+        hard_failures.append("non_target_activity_in_feed")
 
     return {
         "schema_version": SCHEMA_VERSION,
@@ -570,9 +984,10 @@ def validate(api_dir: Path, *, require_internal_posters: bool, enforce_window_st
         "require_internal_posters": require_internal_posters,
         "enforce_window_start": enforce_window_start,
         "fail_on_missing_geo": fail_on_missing_geo,
+        "source_policy_path": str(source_policy_path) if source_policy_path else "",
         "front_end_adaptation_contract": FRONT_END_ADAPTATION_CONTRACT,
         "missing_internal_poster_count": len(missing_internal_posters),
-        "missing_internal_poster_items": missing_internal_posters[:50],
+        "missing_internal_poster_items": missing_internal_posters,
         "invalid_internal_poster_file_id_count": len(invalid_internal_posters),
         "invalid_internal_poster_file_id_items": invalid_internal_posters[:50],
         "invalid_poster_storage_count": len(invalid_poster_storage_items),
@@ -597,8 +1012,19 @@ def validate(api_dir: Path, *, require_internal_posters: bool, enforce_window_st
         "aggregate_child_weak_date_evidence_items": aggregate_child_weak_date_items[:50],
         "runtime_poster_state_count": len(runtime_poster_state_items),
         "runtime_poster_state_items": runtime_poster_state_items[:50],
+        "parent_overview_in_activity_feed_count": len(parent_overview_items),
+        "parent_overview_in_activity_feed_items": parent_overview_items[:100],
+        "shared_poster_source_hash_group_count": len(shared_poster_groups),
+        "shared_poster_source_hash_groups": shared_poster_groups[:50],
+        "main_poster_selection_review_required_count": len(main_poster_review_items),
+        "main_poster_selection_review_required_items": main_poster_review_items[:100],
+        "main_poster_selection_review_required_groups": main_poster_review_groups[:50],
+        "missing_poster_selection_evidence_count": len(missing_poster_selection_evidence),
+        "missing_poster_selection_evidence_items": missing_poster_selection_evidence[:100],
         "missing_geo_count": len(missing_geo_items),
         "missing_geo_items": missing_geo_items[:50],
+        "non_target_activity_count": len(non_target_activity_items),
+        "non_target_activity_items": non_target_activity_items[:100],
         "missing_event_date_start_count": len(missing_event_dates),
         "missing_event_date_start_items": missing_event_dates[:50],
         "outside_window_start_count": len(outside_window),
@@ -619,6 +1045,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--require-internal-posters", action="store_true")
     parser.add_argument("--enforce-window-start", action="store_true")
     parser.add_argument("--fail-on-missing-geo", action="store_true")
+    parser.add_argument("--source-policy", default=str(DEFAULT_SOURCE_POLICY))
     args = parser.parse_args(argv)
 
     report = validate(
@@ -626,6 +1053,7 @@ def main(argv: list[str]) -> int:
         require_internal_posters=args.require_internal_posters,
         enforce_window_start=args.enforce_window_start,
         fail_on_missing_geo=args.fail_on_missing_geo,
+        source_policy_path=Path(args.source_policy) if args.source_policy else None,
     )
     if args.report:
         write_json(args.report, report)

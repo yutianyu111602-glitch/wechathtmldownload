@@ -55,8 +55,15 @@ CREATE INDEX IF NOT EXISTS ix_ext_status ON extractions(status);
 """
 
 
-def build_user_text(title, clean_text, posters):
+def build_user_text(title, clean_text, posters, source_published_at=""):
     lines = [f"公众号文章标题：{title}", ""]
+    if source_published_at:
+        lines.append(f"文章来源时间：{source_published_at}")
+        lines.append(
+            "时间解释规则：仅当标题、正文或海报明确出现“今天/今晚/本周”等相对时间时，"
+            "才可用文章来源时间换算；不得把文章来源时间直接当作活动日期。"
+        )
+        lines.append("")
     if posters:
         ids = ", ".join(p["asset_id"] for p in posters)
         lines.append(f"附带 {len(posters)} 张海报图（顺序对应 {ids}）。请优先从海报读取演出信息。")
@@ -64,6 +71,32 @@ def build_user_text(title, clean_text, posters):
     lines.append("正文：")
     lines.append(clean_text or "(正文为空，信息以海报为准)")
     return "\n".join(lines)
+
+
+def expand_failure_posters(poster_json, candidate_json, max_total):
+    """Add high-ranked source candidates only for an explicit failure retry.
+
+    The normal route remains limited to Stage1's SSD-staged poster selection.
+    Failure recovery may read a small number of additional source assets so an
+    early high-resolution portrait cannot hide a later, information-rich poster.
+    """
+    selected = json.loads(poster_json or "[]")
+    if max_total <= 0:
+        return selected
+    seen = {str(item.get("asset_id") or "") for item in selected if isinstance(item, dict)}
+    expanded = list(selected)
+    for candidate in json.loads(candidate_json or "[]"):
+        if len(expanded) >= max_total:
+            break
+        if not isinstance(candidate, dict):
+            continue
+        asset_id = str(candidate.get("asset_id") or "")
+        path = str(candidate.get("path") or "")
+        if not asset_id or asset_id in seen or not path or not os.path.isfile(path):
+            continue
+        expanded.append(candidate)
+        seen.add(asset_id)
+    return expanded
 
 
 def _first_text(*values):
@@ -108,9 +141,14 @@ def repair_entity_surfaces(raw):
     return raw
 
 
-def run_one(backend, schema_dict, title, clean_text, posters):
+def run_one(backend, schema_dict, title, clean_text, posters, source_published_at=""):
     img_paths = [p["path"] for p in posters] if backend.vision else []
-    raw = backend.extract(SYSTEM_PROMPT, build_user_text(title, clean_text, posters), img_paths, schema_dict)
+    raw = backend.extract(
+        SYSTEM_PROMPT,
+        build_user_text(title, clean_text, posters, source_published_at),
+        img_paths,
+        schema_dict,
+    )
     raw = repair_entity_surfaces(raw)
     obj = ArticleExtraction.model_validate(raw)          # liberal capture validation
     for ev in obj.events:                                # driver backfills missing title
@@ -137,18 +175,18 @@ def _thread_escalation_backend(name: str):
 
 
 def extract_row(row_data, backend_name, esc_name, schema_dict):
-    token, acct, title, clean_text, poster_json = row_data
+    token, acct, title, source_published_at, clean_text, poster_json = row_data
     posters = json.loads(poster_json or "[]")
     t0 = time.time()
     tier = backend_name
     try:
         backend = _thread_backend(backend_name)
-        obj = run_one(backend, schema_dict, title, clean_text, posters)
+        obj = run_one(backend, schema_dict, title, clean_text, posters, source_published_at)
         max_conf = max([e.confidence for e in obj.events], default=0.0)
         prompt_tokens, completion_tokens = backend.last_usage
         if esc_name and max_conf < config.LOW_CONF_THRESHOLD:
             esc = _thread_escalation_backend(esc_name)
-            obj = run_one(esc, schema_dict, title, clean_text, posters)
+            obj = run_one(esc, schema_dict, title, clean_text, posters, source_published_at)
             tier = esc_name
             max_conf = max([e.confidence for e in obj.events], default=0.0)
             prompt_tokens += esc.last_usage[0]
@@ -201,6 +239,12 @@ def main():
                     help="parallel model calls; SQLite remains single-writer (default: 1)")
     ap.add_argument("--submit-delay-sec", type=float, default=float(os.environ.get("ATLAS_STAGE2_SUBMIT_DELAY_SEC", "-1")),
                     help="delay between parallel submissions; default 0.25 sec when workers>1")
+    ap.add_argument(
+        "--poster-candidate-fallback-count",
+        type=int,
+        default=0,
+        help="failure-retry only: expand selected posters with ranked Stage1 candidates up to this total",
+    )
     args = ap.parse_args()
 
     config.ensure_dirs()
@@ -239,8 +283,13 @@ def main():
         "article_type", "should_process_text", "should_process_images", "image_route_reason"
     }
     has_classification = _required_classification_cols.issubset(clean_cols)
+    source_published_expr = "source_published_at" if "source_published_at" in clean_cols else "''"
+    candidate_expr = "poster_candidates_json" if "poster_candidates_json" in clean_cols else "'[]'"
     extra_cols = ", article_type, should_process_text, should_process_images, image_route_reason" if has_classification else ""
-    q = f"SELECT token, account_key, title, clean_text, poster_json{extra_cols} FROM clean"
+    q = (
+        f"SELECT token, account_key, title, {source_published_expr}, clean_text, "
+        f"poster_json, {candidate_expr}{extra_cols} FROM clean"
+    )
     if args.route != "both":
         q += f" WHERE route = '{args.route}'"
     rows = clean.execute(q).fetchall()
@@ -303,9 +352,11 @@ def main():
 
     for row in rows:
         if has_classification:
-            token, acct, title, clean_text, poster_json, article_type, should_proc_text, should_proc_images, img_route_reason = row
+            (token, acct, title, source_published_at, clean_text, poster_json,
+             poster_candidates_json, article_type, should_proc_text,
+             should_proc_images, img_route_reason) = row
         else:
-            token, acct, title, clean_text, poster_json = row
+            token, acct, title, source_published_at, clean_text, poster_json, poster_candidates_json = row
             article_type = should_proc_text = should_proc_images = img_route_reason = None
         if token in existing:
             skipped += 1
@@ -361,7 +412,19 @@ def main():
             budget_stopped = True
             break
 
-        row_data = (token, acct, title, clean_text, poster_json)
+        posters = expand_failure_posters(
+            poster_json,
+            poster_candidates_json,
+            max(0, int(args.poster_candidate_fallback_count or 0)),
+        )
+        row_data = (
+            token,
+            acct,
+            title,
+            source_published_at,
+            clean_text,
+            json.dumps(posters, ensure_ascii=False),
+        )
         if executor is None:
             apply_result(extract_row(row_data, args.backend, esc_name, schema_dict), precharged=False)
         else:

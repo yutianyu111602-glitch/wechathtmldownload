@@ -515,20 +515,38 @@ def build_rows(
     payload_copy_mode: str = "none",
     ignore_missing_before_date: str = "2014-01-01",
 ) -> tuple[list[dict], list[dict], dict]:
-    con = sqlite3.connect(str(db_path))
-    con.row_factory = sqlite3.Row
-    try:
-        account_cols = [c for c in ACCOUNT_COLUMNS if c in sqlite_columns(con, "wechat_account")]
-        article_cols = [c for c in ARTICLE_COLUMNS if c in sqlite_columns(con, "wechat_article")]
-        accounts = {
-            row["fakeid"]: row_dict(row, account_cols)
-            for row in select_existing(con, "wechat_account", ACCOUNT_COLUMNS)
-            if row["fakeid"]
-        }
-        stats.account_count = len(accounts)
-        articles = select_existing(con, "wechat_article", ARTICLE_COLUMNS)
-    finally:
-        con.close()
+    # Sanji may keep writing its WAL while the nightly Atlas job starts. Read a
+    # SQLite backup snapshot so the long metadata scan sees one stable database
+    # image and never races the Electron writer.
+    with tempfile.TemporaryDirectory(prefix="atlas_sanji_snapshot_") as temp_dir:
+        snapshot_path = Path(temp_dir) / "sanji.snapshot.db"
+        source = sqlite3.connect(str(db_path))
+        try:
+            snapshot = sqlite3.connect(str(snapshot_path))
+            try:
+                source.backup(snapshot)
+            finally:
+                snapshot.close()
+        finally:
+            source.close()
+
+        con = sqlite3.connect(str(snapshot_path))
+        con.row_factory = sqlite3.Row
+        try:
+            account_cols = [c for c in ACCOUNT_COLUMNS if c in sqlite_columns(con, "wechat_account")]
+            article_cols = [c for c in ARTICLE_COLUMNS if c in sqlite_columns(con, "wechat_article")]
+            accounts = {
+                row["fakeid"]: row_dict(row, account_cols)
+                for row in select_existing(con, "wechat_account", ACCOUNT_COLUMNS)
+                if row["fakeid"]
+            }
+            stats.account_count = len(accounts)
+            articles = [
+                row_dict(row, article_cols)
+                for row in select_existing(con, "wechat_article", ARTICLE_COLUMNS)
+            ]
+        finally:
+            con.close()
 
     rows = []
     asset_rows = []
@@ -536,8 +554,7 @@ def build_rows(
     excluded = exclude_tokens or set()
     stats.exclude_token_count = len(excluded)
     payload_root = out_root / "payload" / "articles"
-    for row in articles:
-        raw_article = row_dict(row, article_cols)
+    for raw_article in articles:
         if raw_article.get("is_deleted"):
             continue
         fakeid = raw_article.get("account_fakeid") or ""
@@ -588,6 +605,8 @@ def build_rows(
         "source": "sanji_appdata",
         "sanji_root": str(sanji_root),
         "db_path": str(db_path),
+        "db_snapshot_read": True,
+        "snapshot_mechanism": "sqlite_backup_api",
         "cache_root": str(payload_root if payload_copy_mode == "copy" else articles_root),
         "articles_jsonl": "articles.jsonl",
         "assets_jsonl": "assets.jsonl",

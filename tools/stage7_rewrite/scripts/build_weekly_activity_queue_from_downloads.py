@@ -13,6 +13,7 @@ import html
 import json
 import os
 import re
+import sys
 import time
 from collections import Counter
 from datetime import date, datetime
@@ -36,8 +37,8 @@ DEFAULT_REGISTRY = platform_path(
 )
 DEFAULT_DOWNLOAD_DIR = platform_path(r"D:\DDownload", "/mnt/d/DDownload")
 DEFAULT_OUT_DIR = platform_path(
-    r"D:\downstream_results\stage7_rewrite\longrun\LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE",
-    "/mnt/d/downstream_results/stage7_rewrite/longrun/LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE",
+    r"E:\weekly_activity_pipeline\longrun\LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE",
+    "/mnt/e/weekly_activity_pipeline/longrun/LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE",
 )
 DEFAULT_EXPORTER_ENDPOINT = "http://127.0.0.1:17300"
 DEFAULT_COOKIE_DIR = REPO_ROOT / ".mptext-data" / "kv" / "cookie"
@@ -69,7 +70,9 @@ def read_json_value(path: Path) -> Any:
 
 def write_json(path: Path, value: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    tmp_path = path.with_name(f"{path.name}.tmp.{os.getpid()}")
+    tmp_path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    os.replace(tmp_path, path)
 
 
 def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
@@ -108,6 +111,77 @@ def parse_epoch(value: Any) -> tuple[str, str]:
 
 def short_hash(value: str, length: int = 16) -> str:
     return hashlib.sha256(value.encode("utf-8", errors="ignore")).hexdigest()[:length]
+
+
+def write_body_backfill_progress(
+    progress_path: Path | None,
+    state: Counter[str],
+    *,
+    account_id: str = "",
+    title: str = "",
+    limit: int = 0,
+    final: bool = False,
+) -> None:
+    if progress_path is None:
+        return
+    keys = (
+        "attempted",
+        "ok",
+        "failed",
+        "short",
+        "chars",
+        "skipped_outside_date_range",
+        "skipped_missing_url",
+        "skipped_limit",
+    )
+    counts = {key: int(state.get(key) or 0) for key in keys}
+    payload = {
+        "schema_version": "weekly_activity_body_backfill_progress.v1",
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "final": bool(final),
+        "limit": max(0, int(limit or 0)),
+        "unlimited": max(0, int(limit or 0)) == 0,
+        "current_account_id": account_id,
+        "current_title_hash": short_hash(title, 12) if title else "",
+        "counts": counts,
+        **counts,
+    }
+    write_json(progress_path, payload)
+
+
+def emit_body_backfill_progress(
+    body_backfill: dict[str, Any],
+    account_id: str,
+    title: str,
+    *,
+    final: bool = False,
+) -> None:
+    state = body_backfill.setdefault("state", Counter())
+    progress_path = body_backfill.get("progress_path")
+    progress_path = progress_path if isinstance(progress_path, Path) else None
+    limit = int(body_backfill.get("limit") or 0)
+    write_body_backfill_progress(
+        progress_path,
+        state,
+        account_id=account_id,
+        title=title,
+        limit=limit,
+        final=final,
+    )
+    print(
+        "[body-backfill] "
+        f"attempted={int(state.get('attempted') or 0)} "
+        f"ok={int(state.get('ok') or 0)} "
+        f"failed={int(state.get('failed') or 0)} "
+        f"short={int(state.get('short') or 0)} "
+        f"skipped_limit={int(state.get('skipped_limit') or 0)} "
+        f"limit={limit} "
+        f"unlimited={limit == 0} "
+        f"account={account_id} "
+        f"title_hash={short_hash(title, 12) if title else ''}",
+        file=sys.stderr,
+        flush=True,
+    )
 
 
 def discover_latest_cookie_auth_key(cookie_dir: Path = DEFAULT_COOKIE_DIR) -> str:
@@ -190,6 +264,19 @@ def merge_articles(*article_groups: list[dict[str, Any]]) -> list[dict[str, Any]
     return merged
 
 
+def exporter_base_resp_error_text(base_resp: dict[str, Any]) -> str:
+    if not isinstance(base_resp, dict) or not base_resp:
+        return ""
+    ret_value = base_resp.get("ret")
+    ret_ok = ret_value in (0, "0", None)
+    err_msg = first_string(base_resp.get("err_msg"))
+    if ret_ok:
+        return "" if err_msg.lower() in {"", "ok", "success"} else err_msg
+    if err_msg.lower() in {"ok", "success"}:
+        err_msg = ""
+    return first_string(err_msg, str(ret_value))
+
+
 def fetch_exporter_articles(
     *,
     fakeid: str,
@@ -201,21 +288,24 @@ def fetch_exporter_articles(
     request_delay_sec: float,
     max_retries: int,
     retry_backoff_sec: float,
+    retry_freq_control: bool = False,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     stats: dict[str, Any] = {
-        "requested": bool(fakeid and max_articles > 0),
+        "requested": bool(fakeid),
         "ok": False,
         "pages": 0,
         "articles": 0,
         "error": "",
+        "unlimited": max_articles <= 0,
     }
-    if not fakeid or max_articles <= 0:
+    if not fakeid:
         return [], stats
     endpoint = normalize_exporter_endpoint(endpoint)
     page_size = max(1, min(page_size, 20))
     articles: list[dict[str, Any]] = []
     begin = 0
-    while len(articles) < max_articles:
+    unlimited = max_articles <= 0
+    while unlimited or len(articles) < max_articles:
         query = urlencode({"fakeid": fakeid, "begin": begin, "size": page_size})
         request = Request(f"{endpoint}/api/public/v1/article?{query}", method="GET")
         if auth_key:
@@ -231,18 +321,22 @@ def fetch_exporter_articles(
             else:
                 page_error = ""
                 base_resp = payload.get("base_resp") if isinstance(payload.get("base_resp"), dict) else {}
-                error_text = first_string(base_resp.get("err_msg"), str(base_resp.get("ret")) if base_resp.get("ret") not in (0, "0", None) else "")
-                if not error_text or "freq control" not in error_text.lower() or attempt >= max_retries:
+                error_text = exporter_base_resp_error_text(base_resp)
+                freq_control = "freq control" in error_text.lower()
+                if not error_text:
                     break
                 page_error = error_text
+                if not freq_control or not retry_freq_control or attempt >= max_retries:
+                    break
             if attempt < max_retries:
                 time.sleep(max(0.0, retry_backoff_sec) * (attempt + 1))
         if page_error:
             stats["error"] = page_error
             break
         base_resp = payload.get("base_resp") if isinstance(payload.get("base_resp"), dict) else {}
-        if base_resp and base_resp.get("ret") not in (0, "0", None):
-            stats["error"] = first_string(base_resp.get("err_msg"), str(base_resp.get("ret")))
+        base_resp_error = exporter_base_resp_error_text(base_resp)
+        if base_resp_error:
+            stats["error"] = base_resp_error
             break
         page_articles = payload.get("articles") if isinstance(payload.get("articles"), list) else []
         stats["pages"] = int(stats["pages"]) + 1
@@ -257,8 +351,8 @@ def fetch_exporter_articles(
             time.sleep(request_delay_sec)
     if articles:
         stats["ok"] = True
-        stats["articles"] = len(articles[:max_articles])
-    return articles[:max_articles], stats
+        stats["articles"] = len(articles if unlimited else articles[:max_articles])
+    return (articles if unlimited else articles[:max_articles]), stats
 
 
 class VisibleTextParser(HTMLParser):
@@ -473,7 +567,7 @@ def downloaded_article_context(account_dir: Path, article: dict[str, Any], limit
     return text[:limit], str(article_dir), poi
 
 
-def load_accounts(registry_path: Path, accounts_filter: str) -> list[dict[str, Any]]:
+def load_accounts(registry_path: Path, accounts_filter: str, *, include_inactive: bool = False) -> list[dict[str, Any]]:
     payload = read_json(registry_path)
     rows = payload.get("accounts") if isinstance(payload.get("accounts"), list) else []
     wanted = {item.strip() for item in accounts_filter.split(",") if item.strip()} if accounts_filter != "all" else set()
@@ -487,8 +581,10 @@ def load_accounts(registry_path: Path, accounts_filter: str) -> list[dict[str, A
         explicitly_requested = bool(
             wanted and (account_id in wanted or account_name in wanted or fakeid in wanted)
         )
-        if row.get("status") != "active" and not explicitly_requested:
-            continue
+        status = first_string(row.get("status")).lower() or "active"
+        if status != "active" and not explicitly_requested:
+            if not (include_inactive and status == "inactive"):
+                continue
         if wanted and account_id not in wanted and account_name not in wanted and fakeid not in wanted:
             continue
         if not account_id or not account_name:
@@ -561,6 +657,10 @@ def article_rows_from_articles(
                 delay = float(body_backfill.get("delay_sec") or 0.0)
                 if delay > 0:
                     time.sleep(delay)
+                progress_every = int(body_backfill.get("progress_every") or 0)
+                attempted = int(state.get("attempted") or 0)
+                if progress_every > 0 and attempted > 0 and attempted % progress_every == 0:
+                    emit_body_backfill_progress(body_backfill, account["account_id"], title)
         rich_digest = "\n".join(part for part in [digest, body_text] if part)
         token_source = first_string(
             link,
@@ -624,6 +724,7 @@ def build_queue(
     out_dir: Path,
     accounts_filter: str,
     *,
+    include_inactive_accounts: bool = False,
     refresh_from_exporter: bool = False,
     exporter_endpoint: str = DEFAULT_EXPORTER_ENDPOINT,
     exporter_auth_key: str = "",
@@ -633,6 +734,7 @@ def build_queue(
     exporter_delay_sec: float = 0.15,
     exporter_retries: int = 3,
     exporter_backoff_sec: float = 8.0,
+    exporter_retry_freq_control: bool = False,
     exporter_auth_source: str = "",
     body_backfill: bool = False,
     body_backfill_endpoint: str = "",
@@ -645,8 +747,9 @@ def build_queue(
     body_backfill_timeout_sec: int = 20,
     body_backfill_delay_sec: float = 0.05,
     body_backfill_limit: int = 0,
+    body_backfill_progress_every: int = 25,
 ) -> dict[str, Any]:
-    accounts = load_accounts(registry, accounts_filter)
+    accounts = load_accounts(registry, accounts_filter, include_inactive=include_inactive_accounts)
     rows: list[dict[str, Any]] = []
     missing_dirs: list[str] = []
     account_counts: Counter[str] = Counter()
@@ -666,6 +769,8 @@ def build_queue(
             "timeout_sec": body_backfill_timeout_sec,
             "delay_sec": max(0.0, body_backfill_delay_sec),
             "limit": max(0, body_backfill_limit),
+            "progress_every": max(0, body_backfill_progress_every),
+            "progress_path": out_dir / "body_backfill_progress.json",
             "text_limit": 8000,
             "state": Counter(),
             "errors": [],
@@ -692,6 +797,7 @@ def build_queue(
                 request_delay_sec=exporter_delay_sec,
                 max_retries=exporter_retries,
                 retry_backoff_sec=exporter_backoff_sec,
+                retry_freq_control=exporter_retry_freq_control,
             )
             if exporter_stats.get("ok"):
                 exporter_counts[account["account_id"]] = int(exporter_stats.get("articles") or 0)
@@ -710,6 +816,8 @@ def build_queue(
         )
         rows.extend(account_rows)
         account_counts[account["account_id"]] += len(account_rows)
+        if body_backfill_config:
+            emit_body_backfill_progress(body_backfill_config, account["account_id"], "", final=False)
         for row in account_rows:
             if row.get("post_date"):
                 date_counts[str(row["post_date"])] += 1
@@ -718,6 +826,8 @@ def build_queue(
     queue_path = out_dir / "latest_queue.jsonl"
     summary_path = out_dir / "summary.json"
     account_counts_path = out_dir / "account_counts.jsonl"
+    if body_backfill_config:
+        emit_body_backfill_progress(body_backfill_config, "", "", final=True)
     write_jsonl(queue_path, rows)
     write_jsonl(
         account_counts_path,
@@ -730,17 +840,21 @@ def build_queue(
         "download_dir": str(download_dir),
         "out_dir": str(out_dir),
         "queue": str(queue_path),
+        "account_scope": "active+inactive" if include_inactive_accounts else "active",
+        "include_inactive_accounts": include_inactive_accounts,
         "accounts_requested": len(accounts),
         "account_dirs_missing": len(missing_dirs),
         "missing_account_ids": missing_dirs[:50],
         "exporter_refresh_requested": refresh_from_exporter,
         "exporter_endpoint": normalize_exporter_endpoint(exporter_endpoint) if refresh_from_exporter else "",
         "exporter_articles_per_account": articles_per_account if refresh_from_exporter else 0,
+        "exporter_articles_per_account_unlimited": articles_per_account <= 0 if refresh_from_exporter else False,
         "exporter_accounts_ok": len(exporter_counts),
         "exporter_accounts_failed": len(exporter_errors),
         "exporter_article_rows": int(sum(exporter_counts.values())),
         "exporter_retries": exporter_retries if refresh_from_exporter else 0,
         "exporter_backoff_sec": exporter_backoff_sec if refresh_from_exporter else 0,
+        "exporter_retry_freq_control": bool(exporter_retry_freq_control) if refresh_from_exporter else False,
         "exporter_auth_source": exporter_auth_source if refresh_from_exporter else "",
         "exporter_auth_key_hash": short_hash(exporter_auth_key, 12) if refresh_from_exporter and exporter_auth_key else "",
         "exporter_error_counts": dict(exporter_error_counts.most_common()),
@@ -753,6 +867,9 @@ def build_queue(
         "body_backfill_until_date": body_backfill_until_date if body_backfill_config else "",
         "body_backfill_min_chars": body_backfill_min_chars if body_backfill_config else 0,
         "body_backfill_limit": body_backfill_limit if body_backfill_config else 0,
+        "body_backfill_unlimited": body_backfill_limit == 0 if body_backfill_config else False,
+        "body_backfill_progress_every": body_backfill_progress_every if body_backfill_config else 0,
+        "body_backfill_progress_path": str((body_backfill_config or {}).get("progress_path") or ""),
         "body_backfill_counts": dict((body_backfill_config or {}).get("state", Counter())),
         "body_backfill_errors_sample": list((body_backfill_config or {}).get("errors", []))[:20],
         "rows_written": len(rows),
@@ -770,18 +887,21 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--download-dir", default=str(DEFAULT_DOWNLOAD_DIR))
     parser.add_argument("--out-dir", default=str(DEFAULT_OUT_DIR))
     parser.add_argument("--accounts", default="all", help="'all' or comma-separated account_id/account_name/fakeid")
+    parser.add_argument("--include-inactive-accounts", action="store_true", help="Include inactive registry accounts when --accounts all is used; review accounts still require explicit selection")
+    parser.add_argument("--active-only-accounts", action="store_true", help="Legacy escape hatch: limit --accounts all to active accounts only")
     parser.add_argument("--refresh-from-exporter", action="store_true", help="Merge paged article metadata from the local wechat-article-exporter API")
     parser.add_argument("--exporter-endpoint", default=DEFAULT_EXPORTER_ENDPOINT)
     parser.add_argument("--exporter-auth-key", default="")
     parser.add_argument("--exporter-auth-prefer-env", action="store_true", help="Prefer MPTEXT_AUTH_KEY over the latest Docker cookie key")
     parser.add_argument("--exporter-cookie-dir", default=str(DEFAULT_COOKIE_DIR))
     parser.add_argument("--exporter-auth-cache", default=str(DEFAULT_AUTH_CACHE))
-    parser.add_argument("--articles-per-account", type=int, default=80)
+    parser.add_argument("--articles-per-account", type=int, default=0, help="0 means no per-account exporter article limit")
     parser.add_argument("--exporter-page-size", type=int, default=20)
     parser.add_argument("--exporter-timeout-sec", type=int, default=20)
     parser.add_argument("--exporter-delay-sec", type=float, default=0.15)
     parser.add_argument("--exporter-retries", type=int, default=3)
     parser.add_argument("--exporter-backoff-sec", type=float, default=8.0)
+    parser.add_argument("--exporter-retry-freq-control", action="store_true", help="Opt in to retrying WeChat freq-control responses; default is fast-fail and local queue fallback")
     parser.add_argument("--body-backfill", action="store_true", help="Fetch missing article body text before rules/LLM extraction")
     parser.add_argument("--body-backfill-endpoint", default=DEFAULT_EXPORTER_ENDPOINT + "/api/public/v1/download")
     parser.add_argument("--body-backfill-auth-key", default="")
@@ -793,6 +913,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--body-backfill-timeout-sec", type=int, default=20)
     parser.add_argument("--body-backfill-delay-sec", type=float, default=0.05)
     parser.add_argument("--body-backfill-limit", type=int, default=0, help="0 means no body backfill limit")
+    parser.add_argument("--body-backfill-progress-every", type=int, default=25, help="Write body_backfill_progress.json every N attempted body fetches; 0 disables interval progress writes")
     args = parser.parse_args(argv)
 
     exporter_auth_key, exporter_auth_source = resolve_exporter_auth_key(
@@ -813,6 +934,7 @@ def main(argv: list[str] | None = None) -> int:
         download_dir=Path(args.download_dir),
         out_dir=Path(args.out_dir),
         accounts_filter=args.accounts,
+        include_inactive_accounts=args.include_inactive_accounts or not args.active_only_accounts,
         refresh_from_exporter=args.refresh_from_exporter,
         exporter_endpoint=args.exporter_endpoint,
         exporter_auth_key=exporter_auth_key,
@@ -822,6 +944,7 @@ def main(argv: list[str] | None = None) -> int:
         exporter_delay_sec=args.exporter_delay_sec,
         exporter_retries=args.exporter_retries,
         exporter_backoff_sec=args.exporter_backoff_sec,
+        exporter_retry_freq_control=args.exporter_retry_freq_control,
         exporter_auth_source=exporter_auth_source,
         body_backfill=args.body_backfill,
         body_backfill_endpoint=args.body_backfill_endpoint,
@@ -834,6 +957,7 @@ def main(argv: list[str] | None = None) -> int:
         body_backfill_timeout_sec=args.body_backfill_timeout_sec,
         body_backfill_delay_sec=args.body_backfill_delay_sec,
         body_backfill_limit=args.body_backfill_limit,
+        body_backfill_progress_every=args.body_backfill_progress_every,
     )
     print(json.dumps(summary, ensure_ascii=False, indent=2))
     return 0

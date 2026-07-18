@@ -10,9 +10,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import shutil
 import sys
+import tempfile
+import uuid
 from collections import defaultdict
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
@@ -73,6 +76,7 @@ CITY_LABEL_BY_KEY = {
     "guiyang": "贵阳",
     "haikou": "海口",
     "hangzhou": "杭州",
+    "hohhot": "呼和浩特",
     "jinan": "济南",
     "kunming": "昆明",
     "lanzhou": "兰州",
@@ -90,6 +94,7 @@ CITY_LABEL_BY_KEY = {
 }
 AGGREGATE_CALENDAR_TITLE_RE = re.compile(
     r"本周活动|活动一览|活动预览|活动预告|活动安排|活动日程|六月活动|月活动|"
+    r"(?:端午|假期|节日).*(?:三日|四日|三天|四天|多日|多天|活动|计划|一览|全览|预告|预览|周刊|日程)|"
     r"(?:\d{1,2}|\d\ufe0f?\u20e3|[一二三四五六七八九十]+)\s*月\s*$|"
     r"\bweekly\s+(?:preview|calendar|schedule|program|guide)\b|\bcalendar\b|\bschedule\b|\bjune\s+at\b",
     re.I,
@@ -97,6 +102,14 @@ AGGREGATE_CALENDAR_TITLE_RE = re.compile(
 TITLE_DATE_RANGE_RE = re.compile(
     r"(?<!\d)\d{1,2}[./·・•]\d{1,2}\s*[-–—~]\s*(?:\d{1,2}[./·・•])?\d{1,2}(?!\d)|"
     r"(?<!\d)\d{1,2}\s*月\s*\d{1,2}\s*(?:日|号)?\s*[-–—~]\s*\d{1,2}\s*(?:日|号)?",
+    re.I,
+)
+OPERATIONAL_NOTICE_RE = re.compile(
+    r"高考期间停业|停业通知|暂停营业|暂停开放|临时闭店|店休公告|休息公告|营业时间调整|考试期间.*(?:停业|暂停营业)",
+    re.I,
+)
+EVENT_ANCHOR_RE = re.compile(
+    r"\b(?:dj|live|set|b2b|pres\.?|w/)\b|派对|演出|入场|门票|阵容|嘉宾|放歌|舞池|rave|club night",
     re.I,
 )
 
@@ -320,6 +333,24 @@ def aggregate_child_date_evidence_texts(item: dict[str, Any]) -> list[str]:
     return [text for text in texts if text]
 
 
+def english_month_pattern(month: int) -> str:
+    names = {
+        1: r"jan(?:uary)?",
+        2: r"feb(?:ruary)?",
+        3: r"mar(?:ch)?",
+        4: r"apr(?:il)?",
+        5: r"may",
+        6: r"jun(?:e)?",
+        7: r"jul(?:y)?",
+        8: r"aug(?:ust)?",
+        9: r"sep(?:t(?:ember)?|tember)?",
+        10: r"oct(?:ober)?",
+        11: r"nov(?:ember)?",
+        12: r"dec(?:ember)?",
+    }
+    return names.get(month, "")
+
+
 def aggregate_child_has_strong_date_evidence(item: dict[str, Any]) -> bool:
     event_date = date_of(item)
     if not ISO_DATE_RE.match(event_date):
@@ -333,6 +364,7 @@ def aggregate_child_has_strong_date_evidence(item: dict[str, Any]) -> bool:
     day = parsed.day
     month_0 = f"{month:02d}"
     day_0 = f"{day:02d}"
+    english_month = english_month_pattern(month)
     explicit_patterns = [
         re.compile(rf"\b{year}[-./]{month:02d}[-./]{day:02d}\b"),
         re.compile(rf"\b{year}[-./]{month}[-./]{day}\b"),
@@ -341,6 +373,13 @@ def aggregate_child_has_strong_date_evidence(item: dict[str, Any]) -> bool:
         re.compile(rf"(?<!\d){month_0}{day_0}(?!\d)"),
         re.compile(rf"(?<!\d){month}\s*月\s*0?{day}\s*(?:日|号)?"),
     ]
+    if english_month:
+        explicit_patterns.extend(
+            [
+                re.compile(rf"\b{english_month}\s+0?{day}(?:st|nd|rd|th)?\b", re.I),
+                re.compile(rf"\b0?{day}(?:st|nd|rd|th)?\s+{english_month}\b", re.I),
+            ]
+        )
     texts = aggregate_child_date_evidence_texts(item)
     for text in texts:
         if any(pattern.search(text) for pattern in explicit_patterns):
@@ -393,6 +432,36 @@ def raw_title_tokens(item: dict[str, Any]) -> set[str]:
     return {re.sub(r"\s+", " ", value).strip() for value in values if value}
 
 
+def item_text_blob(item: dict[str, Any]) -> str:
+    texts: list[str] = []
+    for key in (
+        "title",
+        "title_original",
+        "title_display",
+        "display_title",
+        "evidence",
+        "description_original_lines",
+        "quality_flags",
+    ):
+        texts.extend(text_values(item.get(key), limit=12))
+    return "\n".join(texts)
+
+
+def is_operational_notice_item(item: dict[str, Any]) -> bool:
+    text = item_text_blob(item)
+    if not OPERATIONAL_NOTICE_RE.search(text):
+        return False
+    has_lineup = bool(item.get("lineup") or item.get("lineup_artists"))
+    has_event_time = bool(first(item.get("event_time_text") or item.get("running_hours_text") or item.get("time_start")))
+    has_ticketing = bool(item.get("price") or first(item.get("price_text") or item.get("ticketing_text")))
+    if has_lineup or has_event_time or has_ticketing:
+        return False
+    title = " ".join(sorted(raw_title_tokens(item)))
+    if EVENT_ANCHOR_RE.search(title) and not re.search(r"停业|暂停营业|暂停开放|闭店|休息", title):
+        return False
+    return True
+
+
 def explicit_address_mismatch(left: dict[str, Any], right: dict[str, Any]) -> bool:
     left_address = norm(address_of(left))
     right_address = norm(address_of(right))
@@ -438,8 +507,42 @@ def source_ref(item: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def source_refs_for_item(item: dict[str, Any]) -> list[dict[str, Any]]:
+    refs: list[dict[str, Any]] = []
+    direct = source_ref(item)
+    if direct.get("event_id") or direct.get("source_hash"):
+        refs.append(direct)
+    provenance = item.get("merge_provenance") if isinstance(item.get("merge_provenance"), dict) else {}
+    for source in provenance.get("sources") or []:
+        if isinstance(source, dict) and (first(source.get("event_id")) or first(source.get("source_hash"))):
+            refs.append(deepcopy(source))
+    for source_hash in provenance.get("merged_source_hashes") or []:
+        if first(source_hash):
+            refs.append(
+                {
+                    "event_id": "",
+                    "source_hash": first(source_hash),
+                    "title": title_of(item),
+                    "published_at": source_date_value(item),
+                    "account_name": first(item.get("source_account_name") or item.get("account")),
+                    "source_type": "wechat_article",
+                }
+            )
+    seen: set[tuple[str, str]] = set()
+    unique_refs: list[dict[str, Any]] = []
+    for ref in refs:
+        key = (first(ref.get("source_hash")), first(ref.get("event_id")))
+        if key in seen:
+            continue
+        seen.add(key)
+        unique_refs.append(ref)
+    return unique_refs
+
+
 def attach_merge_provenance(kept: dict[str, Any], group_items: list[dict[str, Any]], keep_item: dict[str, Any]) -> None:
-    source_refs = [source_ref(item) for item in group_items]
+    source_refs: list[dict[str, Any]] = []
+    for item in group_items:
+        source_refs.extend(source_refs_for_item(item))
     source_hashes = sorted({ref["source_hash"] for ref in source_refs if ref["source_hash"]})
     kept["merge_provenance"] = {
         "schema_version": "weekly_merge_provenance.v1",
@@ -802,6 +905,33 @@ def quarantine_weak_aggregate_children(items: list[dict[str, Any]]) -> tuple[lis
     return kept, removed
 
 
+def has_internal_activity_poster_file_id(item: dict[str, Any]) -> bool:
+    return any(is_internal_weekly_poster_file_id(item.get(key)) for key in (*POSTER_FILE_ID_FIELDS, *POSTER_URL_FIELDS))
+
+
+def quarantine_operational_notices(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    kept: list[dict[str, Any]] = []
+    removed: list[dict[str, Any]] = []
+    for item in items:
+        if is_operational_notice_item(item):
+            removed.append(
+                {
+                    "id": item_id(item),
+                    "title": title_of(item),
+                    "raw_titles": sorted(raw_title_tokens(item)),
+                    "venue": venue_of(item),
+                    "date": date_of(item),
+                    "city": city_of(item),
+                    "source_hash": source_hash_of(item),
+                    "reason": "operational_notice",
+                    "note": "business-hour, closure, or exam-period notices are not publishable activity events",
+                }
+            )
+            continue
+        kept.append(item)
+    return kept, removed
+
+
 def suppress_aggregate_child_source_and_poster(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     repaired: list[dict[str, Any]] = []
     changed: list[dict[str, Any]] = []
@@ -814,10 +944,7 @@ def suppress_aggregate_child_source_and_poster(items: list[dict[str, Any]]) -> t
                 for key in (*POSTER_FILE_ID_FIELDS, *POSTER_URL_FIELDS, *POSTER_STORAGE_FIELDS, "poster_source", "poster_cloud_path")
                 if first(next_item.get(key))
             }
-            has_internal_activity_poster = any(
-                is_internal_weekly_poster_file_id(next_item.get(key))
-                for key in (*POSTER_FILE_ID_FIELDS, *POSTER_URL_FIELDS)
-            )
+            has_internal_activity_poster = has_internal_activity_poster_file_id(next_item)
             source_action = deepcopy(next_item.get("source_action") if isinstance(next_item.get("source_action"), dict) else {})
             source_article = deepcopy(next_item.get("source_article") if isinstance(next_item.get("source_article"), dict) else {})
             source_action["type"] = first(source_action.get("type") or "wechat_article")
@@ -1031,6 +1158,7 @@ def repair_items(
     )
     repaired, calendar_parent_removed = quarantine_calendar_parents(repaired)
     repaired, weak_aggregate_removed = quarantine_weak_aggregate_children(repaired)
+    repaired, operational_notice_removed = quarantine_operational_notices(repaired)
     repaired, aggregate_source_suppressed = suppress_aggregate_child_source_and_poster(repaired)
     repaired, aggregate_merge_pruned = prune_aggregate_child_merge_provenance(repaired)
     repaired, cloudbase_poster_normalized = normalize_cloudbase_poster_fields(repaired)
@@ -1047,6 +1175,7 @@ def repair_items(
         "normalized_non_calendar_multi_date_count": len(date_normalized),
         "removed_calendar_parent_count": len(calendar_parent_removed),
         "removed_weak_aggregate_child_count": len(weak_aggregate_removed),
+        "removed_operational_notice_count": len(operational_notice_removed),
         "suppressed_aggregate_child_source_count": len(aggregate_source_suppressed),
         "pruned_aggregate_child_merge_source_group_count": len(aggregate_merge_pruned),
         "pruned_aggregate_child_merge_source_count": sum(row.get("removed_source_count", 0) for row in aggregate_merge_pruned),
@@ -1065,6 +1194,7 @@ def repair_items(
         "conflict_groups": conflict_summaries,
         "date_normalized_items": date_normalized,
         "weak_aggregate_child_items": weak_aggregate_removed,
+        "operational_notice_items": operational_notice_removed,
         "aggregate_child_source_suppressed_items": aggregate_source_suppressed,
         "aggregate_child_merge_sources_pruned": aggregate_merge_pruned,
         "cloudbase_poster_normalized_items": cloudbase_poster_normalized,
@@ -1074,6 +1204,7 @@ def repair_items(
             *audit_fallback_removed,
             *calendar_parent_removed,
             *weak_aggregate_removed,
+            *operational_notice_removed,
             *conflict_removed,
         ],
     }
@@ -1292,6 +1423,19 @@ def repair_source_maps(paths: list[Path], items: list[dict[str, Any]], report: d
             and first(row.get("retained_id"))
         )
     }
+    duplicate_event_redirects = {
+        first(row.get("id")): {
+            "retained_id": first(row.get("retained_id")),
+            "retained_source_hash": first(row.get("retained_source_hash")),
+        }
+        for row in report.get("removed_items", [])
+        if (
+            row.get("reason") == "duplicate"
+            and first(row.get("id"))
+            and not first(row.get("id")).startswith("agg-child-")
+            and first(row.get("retained_id"))
+        )
+    }
     touched: list[str] = []
 
     for path in paths:
@@ -1306,7 +1450,8 @@ def repair_source_maps(paths: list[Path], items: list[dict[str, Any]], report: d
             entry = deepcopy(value) if isinstance(value, dict) else value
             if first(key) in disabled_source_hashes:
                 continue
-            redirect = duplicate_source_redirects.get(first(key))
+            entry_event_id = first((value or {}).get("event_id"))
+            redirect = duplicate_source_redirects.get(first(key)) or duplicate_event_redirects.get(entry_event_id)
             if redirect and isinstance(entry, dict):
                 entry["event_id"] = redirect["retained_id"]
                 entry["merged_into_event_id"] = redirect["retained_id"]
@@ -1315,7 +1460,6 @@ def repair_source_maps(paths: list[Path], items: list[dict[str, Any]], report: d
                 filtered[key] = entry
                 redirected += 1
                 continue
-            entry_event_id = first((value or {}).get("event_id"))
             if entry_event_id in disabled_source_event_ids:
                 continue
             if key in kept_hashes or entry_event_id in kept_ids:
@@ -1443,19 +1587,209 @@ def prune_summary(value: Any, items: list[dict[str, Any]], report: dict[str, Any
     return prune(value)
 
 
-def backup_paths(paths: list[Path]) -> list[str]:
-    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    copied: list[str] = []
-    for path in paths:
-        if not path.exists():
-            continue
-        backup = path.with_name(f"{path.name}.bak-{stamp}")
-        shutil.copy2(path, backup)
-        copied.append(str(backup))
-    return copied
+def relative_to_tree(path: Path, root: Path) -> Path | None:
+    try:
+        return path.resolve().relative_to(root.resolve())
+    except ValueError:
+        return None
+
+
+def make_staged_release_tree(api_dir: Path) -> tuple[Path, Path]:
+    """Copy the whole release to a same-volume workspace before mutating it."""
+
+    api_dir = api_dir.resolve()
+    workspace = Path(
+        tempfile.mkdtemp(
+            prefix=f".{api_dir.name}.repair-",
+            dir=api_dir.parent,
+        )
+    )
+    staged_api_dir = workspace / "release"
+    try:
+        shutil.copytree(api_dir, staged_api_dir, copy_function=shutil.copy2)
+    except Exception:
+        shutil.rmtree(workspace, ignore_errors=True)
+        raise
+    return workspace, staged_api_dir
+
+
+def stage_existing_paths(
+    paths: list[Path],
+    *,
+    api_dir: Path,
+    staged_api_dir: Path,
+    workspace: Path,
+) -> tuple[list[Path], list[dict[str, Any]], dict[Path, Path]]:
+    """Map release-owned files into the staged tree and copy external files."""
+
+    staged_paths: list[Path] = []
+    external_replacements: list[dict[str, Any]] = []
+    reverse: dict[Path, Path] = {}
+    for index, original in enumerate(paths):
+        original = original.resolve()
+        relative = relative_to_tree(original, api_dir)
+        if relative is not None:
+            staged = staged_api_dir / relative
+        else:
+            staged = workspace / "external" / str(index) / original.name
+            staged.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(original, staged)
+            external_replacements.append({"target": original, "staged": staged})
+        staged_paths.append(staged)
+        reverse[staged.resolve()] = original
+    return staged_paths, external_replacements, reverse
+
+
+def stage_output_path(
+    path: Path,
+    *,
+    api_dir: Path,
+    staged_api_dir: Path,
+    workspace: Path,
+    external_replacements: list[dict[str, Any]],
+) -> Path:
+    path = path.resolve()
+    relative = relative_to_tree(path, api_dir)
+    if relative is not None:
+        return staged_api_dir / relative
+    staged = workspace / "external-output" / f"{len(external_replacements)}-{path.name}"
+    staged.parent.mkdir(parents=True, exist_ok=True)
+    external_replacements.append({"target": path, "staged": staged})
+    return staged
+
+
+def validate_staged_release_tree(api_dir: Path) -> None:
+    """Fail before commit if the staged route graph is incomplete or inconsistent."""
+
+    current = read_json(api_dir / "current.json")
+    manifest = read_json(api_dir / "manifest.json")
+    items = current.get("items")
+    if not isinstance(items, list):
+        raise ValueError("staged current.json does not contain an item list")
+    if int(current.get("item_count") or 0) != len(items):
+        raise ValueError("staged current.json item_count mismatch")
+    if int(manifest.get("item_count") or 0) != len(items):
+        raise ValueError("staged manifest.json item_count mismatch")
+
+    for index_name, rows_name in (("by-city/index.json", "cities"), ("by-date/index.json", "dates")):
+        index = read_json(api_dir / index_name)
+        rows = index.get(rows_name)
+        if not isinstance(rows, list):
+            raise ValueError(f"staged {index_name} does not contain {rows_name}")
+        for row in rows:
+            route = first((row or {}).get("path") or (row or {}).get("url"))
+            if not route or not (api_dir / route).is_file():
+                raise ValueError(f"staged route missing: {route or '<empty>'}")
+            read_json(api_dir / route)
+
+    for item in items:
+        detail = detail_path_for(item)
+        detail_path = api_dir / detail
+        if not detail_path.is_file():
+            raise ValueError(f"staged detail route missing: {detail}")
+        read_json(detail_path)
+
+
+def unique_sibling(path: Path, label: str, transaction_id: str) -> Path:
+    candidate = path.with_name(f"{path.name}.{label}-{transaction_id}")
+    if candidate.exists():
+        raise FileExistsError(f"transaction path already exists: {candidate}")
+    return candidate
+
+
+def commit_staged_release_tree(
+    *,
+    api_dir: Path,
+    staged_api_dir: Path,
+    workspace: Path,
+    external_replacements: list[dict[str, Any]],
+    keep_backup: bool,
+) -> list[str]:
+    """Swap a verified tree into place and restore the original on any exception."""
+
+    transaction_id = datetime.now().strftime("%Y%m%d_%H%M%S") + "-" + uuid.uuid4().hex[:8]
+    original_slot = unique_sibling(api_dir, "bak" if keep_backup else ".rollback", transaction_id)
+    external_commits: list[dict[str, Any]] = []
+    replacement_slot = workspace / "failed-new-release"
+    backups: list[str] = []
+    api_swapped = False
+    try:
+        os.replace(api_dir, original_slot)
+        try:
+            os.replace(staged_api_dir, api_dir)
+            api_swapped = True
+        except Exception:
+            os.replace(original_slot, api_dir)
+            raise
+
+        for replacement in external_replacements:
+            target = Path(replacement["target"])
+            staged = Path(replacement["staged"])
+            target.parent.mkdir(parents=True, exist_ok=True)
+            new_slot = unique_sibling(target, ".repair-new", transaction_id)
+            try:
+                shutil.copy2(staged, new_slot)
+            except Exception:
+                new_slot.unlink(missing_ok=True)
+                raise
+            existed = target.exists()
+            old_slot = unique_sibling(target, "bak" if keep_backup else ".rollback", transaction_id) if existed else None
+            record = {
+                "target": target,
+                "old_slot": old_slot,
+                "new_slot": new_slot,
+                "old_moved": False,
+                "new_installed": False,
+            }
+            external_commits.append(record)
+            if old_slot is not None:
+                os.replace(target, old_slot)
+                record["old_moved"] = True
+            os.replace(new_slot, target)
+            record["new_installed"] = True
+
+        if keep_backup:
+            backups.append(str(original_slot))
+            backups.extend(str(record["old_slot"]) for record in external_commits if record["old_slot"] is not None)
+        else:
+            shutil.rmtree(original_slot, ignore_errors=True)
+            for record in external_commits:
+                old_slot = record["old_slot"]
+                if old_slot is not None:
+                    try:
+                        old_slot.unlink(missing_ok=True)
+                    except OSError:
+                        pass
+        return backups
+    except Exception:
+        for record in reversed(external_commits):
+            target = record["target"]
+            old_slot = record["old_slot"]
+            if record["new_installed"] and target.exists():
+                target.unlink()
+            if record["old_moved"] and old_slot is not None and old_slot.exists():
+                os.replace(old_slot, target)
+            record["new_slot"].unlink(missing_ok=True)
+        if api_swapped:
+            os.replace(api_dir, replacement_slot)
+            os.replace(original_slot, api_dir)
+        raise
+
+
+def configure_utf8_stdio() -> None:
+    """Keep JSON diagnostics Unicode-safe under the Windows GBK default."""
+
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if callable(reconfigure):
+            try:
+                reconfigure(encoding="utf-8", errors="backslashreplace")
+            except (OSError, ValueError):
+                pass
 
 
 def main(argv: list[str]) -> int:
+    configure_utf8_stdio()
     parser = argparse.ArgumentParser()
     parser.add_argument("--api-dir", type=Path, default=DEFAULT_API_DIR)
     parser.add_argument("--source-url-map", type=Path, action="append", default=[])
@@ -1522,15 +1856,43 @@ def main(argv: list[str]) -> int:
     )
 
     if args.write:
-        if args.backup:
-            backup_paths([current_path, manifest_path, *source_maps])
-        rebuild_release_files(args.api_dir, current, repaired_items, report)
-        touched_maps = repair_source_maps(source_maps, repaired_items, report)
-        report["source_maps_repaired"] = touched_maps
-        report["llm_materialization"] = update_llm_materialization(args.api_dir, repaired_items, report)
-        write_json(args.api_dir / "repair_report.json", report)
-
-    if args.report:
+        api_dir = args.api_dir.resolve()
+        workspace, staged_api_dir = make_staged_release_tree(api_dir)
+        external_replacements: list[dict[str, Any]] = []
+        try:
+            staged_source_maps, external_replacements, reverse_source_maps = stage_existing_paths(
+                source_maps,
+                api_dir=api_dir,
+                staged_api_dir=staged_api_dir,
+                workspace=workspace,
+            )
+            rebuild_release_files(staged_api_dir, current, repaired_items, report)
+            touched_staged_maps = repair_source_maps(staged_source_maps, repaired_items, report)
+            report["source_maps_repaired"] = [
+                str(reverse_source_maps.get(Path(path).resolve(), Path(path))) for path in touched_staged_maps
+            ]
+            report["llm_materialization"] = update_llm_materialization(staged_api_dir, repaired_items, report)
+            write_json(staged_api_dir / "repair_report.json", report)
+            if args.report:
+                staged_report_path = stage_output_path(
+                    args.report,
+                    api_dir=api_dir,
+                    staged_api_dir=staged_api_dir,
+                    workspace=workspace,
+                    external_replacements=external_replacements,
+                )
+                write_json(staged_report_path, report)
+            validate_staged_release_tree(staged_api_dir)
+            commit_staged_release_tree(
+                api_dir=api_dir,
+                staged_api_dir=staged_api_dir,
+                workspace=workspace,
+                external_replacements=external_replacements,
+                keep_backup=args.backup,
+            )
+        finally:
+            shutil.rmtree(workspace, ignore_errors=True)
+    elif args.report:
         write_json(args.report, report)
     print(json.dumps(report, ensure_ascii=False, indent=JSON_INDENT))
 

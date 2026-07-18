@@ -3665,6 +3665,8 @@ export class Stage7AtlasSqliteStore {
         SELECT r.dst_dj_id AS eid, p.display_name AS name, 'dj' AS type, p.city_primary AS city,
                MAX(r.relation_score) AS relationship_score,
                SUM(r.same_event_count) AS same_event_count,
+               SUM(r.same_venue_count) AS same_venue_count,
+               SUM(r.same_label_count) AS same_label_count,
                MAX(r.relation_label_zh) AS relation_label_zh
         FROM dj_relation_rollup r
         JOIN dj_profile p ON p.dj_id = r.dst_dj_id
@@ -3800,6 +3802,61 @@ export class Stage7AtlasSqliteStore {
     let events = Array.from(eventById.values())
       .sort((a, b) => text(b.time_iso || b.starts_at).localeCompare(text(a.time_iso || a.starts_at)) || finiteNumber(b.confidence, 0) - finiteNumber(a.confidence, 0))
       .slice(0, eventPageLimit);
+    // 2-hop 回填：DJ 直接同台太少时，用「同场馆的人 / 同厂牌的人」补齐邻居，避免小程序星图死胡同。
+    // 数据全来自既有 rollup；回填项 relationship_score=0，排在真实同台关系之后，仅作可继续探索的弱连接。
+    const BACKFILL_MIN_COLLABORATORS = 6;
+    if (scope.djIds.length && collaboratorById.size < BACKFILL_MIN_COLLABORATORS) {
+      const djPlaceholders = scope.djIds.map(() => "?").join(",");
+      const venueIds = Array.from(venueById.keys()).filter((vid) => text(vid).includes(":")).slice(0, 6);
+      if (venueIds.length) {
+        const vp = venueIds.map(() => "?").join(",");
+        db.prepare(`
+          SELECT v.dj_id AS eid, p.display_name AS name, 'dj' AS type, p.city_primary AS city,
+                 SUM(v.event_count) AS same_venue_count
+          FROM dj_venue_rollup v
+          JOIN dj_profile p ON p.dj_id = v.dj_id
+          WHERE v.venue_id IN (${vp})
+            AND v.dj_id NOT IN (${djPlaceholders})
+          GROUP BY v.dj_id, p.display_name, p.city_primary
+          ORDER BY same_venue_count DESC
+          LIMIT ?
+        `).all(...venueIds, ...scope.djIds, collaboratorPageLimit).forEach((row) => upsertCollaborator({
+          eid: row.eid,
+          name: row.name,
+          type: "dj",
+          city: row.city || "",
+          relationship_score: 0,
+          same_event_count: 0,
+          same_venue_count: finiteNumber(row.same_venue_count, 0),
+          relation_label_zh: "同场馆",
+        }));
+      }
+      const orgIds = Array.from(orgById.keys()).filter((oid) => text(oid).includes(":")).slice(0, 6);
+      if (orgIds.length) {
+        const op = orgIds.map(() => "?").join(",");
+        db.prepare(`
+          SELECT o.dj_id AS eid, p.display_name AS name, 'dj' AS type, p.city_primary AS city,
+                 SUM(o.evidence_count) AS same_label_count
+          FROM dj_org_rollup o
+          JOIN dj_profile p ON p.dj_id = o.dj_id
+          WHERE o.org_id IN (${op})
+            AND o.dj_id NOT IN (${djPlaceholders})
+          GROUP BY o.dj_id, p.display_name, p.city_primary
+          ORDER BY same_label_count DESC
+          LIMIT ?
+        `).all(...orgIds, ...scope.djIds, collaboratorPageLimit).forEach((row) => upsertCollaborator({
+          eid: row.eid,
+          name: row.name,
+          type: "dj",
+          city: row.city || "",
+          relationship_score: 0,
+          same_event_count: 0,
+          same_label_count: finiteNumber(row.same_label_count, 0),
+          relation_label_zh: "同厂牌",
+        }));
+      }
+    }
+
     let collaborators = Array.from(collaboratorById.values())
       .sort((a, b) => finiteNumber(b.relationship_score ?? b.score, 0) - finiteNumber(a.relationship_score ?? a.score, 0))
       .slice(0, collaboratorPageLimit);
@@ -3890,6 +3947,8 @@ export class Stage7AtlasSqliteStore {
           relationshipScore: finiteNumber(row.relationship_score ?? row.score, 0),
           relationScore: finiteNumber(row.relationship_score ?? row.score, 0),
           sameEventCount: finiteNumber(row.same_event_count, 0),
+          sameVenueCount: finiteNumber(row.sameVenueCount ?? row.same_venue_count, 0),
+          sameLabelCount: finiteNumber(row.sameLabelCount ?? row.same_label_count, 0),
         sourceRefId: row.source_ref_id || "",
         sampleEvidenceIds: sampleEvidenceIds(row.sample_evidence_json || []),
         sample: publicGraphEdgeLabel("dj_collaboration", row.relation_label_zh || ""),

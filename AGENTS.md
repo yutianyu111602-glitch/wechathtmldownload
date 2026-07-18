@@ -208,12 +208,18 @@ node apps/weekly_activity_miniprogram/tests/smoke-test.cjs
 & "C:\Program Files (x86)\Tencent\微信web开发者工具\cli.bat" upload --project "apps\weekly_activity_miniprogram" --version X.Y.Z --desc "description"
 ```
 
-### Mini-program key config (app.js)
+### Mini-program activity loading authority
 
-- `offlineSnapshotFallback: true` (was false — caused black screen)
-- `fastOfflineSnapshotFallback: true`
-- `offlineSnapshotFallbackDelayMs: 2500`
-- `publicRequestTimeoutMs: 3000` (was 1200 — too short on slow networks)
+- Activity data is online-first through `/api/v1/weekly/*`; normal updates do
+  not rewrite or ship a new `offlineSnapshot.js`.
+- Fresh response cache TTL is six hours. After that, online routes are tried
+  first and the persisted last-good package is the offline recovery source.
+- The bundled static seed is first-install/disaster fallback only, never the
+  routine weekly update transport.
+- `__liveOnly` probes bypass cache, persisted last-good data, and the bundled
+  seed so deployment checks cannot report a fallback as live success.
+- Backend package deploy, mini-program developer upload, review submission, and
+  public release remain separate actions with separate evidence.
 
 ### DevTools automator
 

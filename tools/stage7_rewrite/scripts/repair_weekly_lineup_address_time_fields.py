@@ -147,6 +147,7 @@ LINEUP_SENTENCE_RE = re.compile(
     r"介绍|简介|履历|教学|科普|面向|爱好者|乐手|艺人介绍|毕业|学院|厂牌故事|场地介绍|"
     r"因为|开始了|分享|不支持|退换|预售|限量|时而|融合|热情|惬意|地下音乐|玩家|听见|设计|单曲|"
     r"sound designer|music producer|he began|"
+    r"open\s*decks?\s*@|"
     r"统筹|混音师|制作人|广告|服务|听众|看见|见证|欲望|演绎|纯现场|顶到爆炸|长期|合作|"
     r"同时|一个|一种|这些|这种|以及|提供|他们|她们|穿梭|快节奏|生活|暖阳|璀璨|出发|尽情|"
     r"声音探索者|音乐探索者|"
@@ -209,6 +210,11 @@ LOCATION_NAME_RE = re.compile(
 
 SOURCE_AGGREGATE_NOTE = "source aggregate row quarantined until child events are split and verified"
 LINEUP_UNCERTAIN_TEXT = "点击海报跳转公众号原文查看"
+MISSING_LINEUP_VISIBLE_NOTE = (
+    "strong VL poster evidence reported no visible lineup; after conservative "
+    "lineup repair the row has no source-grounded lineup, so it is excluded "
+    "from the ordinary activity feed instead of publishing fabricated artists"
+)
 
 ADDRESS_OVERRIDES = {
     "oil": {
@@ -233,6 +239,44 @@ ADDRESS_OVERRIDES = {
         "address": "浙江省杭州市上城区中山南路411号",
         "note": "event title is the Hangzhou tour stop at 肆幺幺; the previous address was polluted by later Shenzhen/Foshan tour-stop text",
     },
+    "cedar_kitchen:04310025cd8aa199": {
+        "match_id": "cedar_kitchen:04310025cd8aa199",
+        "venue_id": "cedar_kitchen_maoming_south",
+        "venue": ["Cedar Kitchen(茂名南路店)"],
+        "venue_name": "Cedar Kitchen(茂名南路店)",
+        "city": ["上海"],
+        "address": "上海市黄浦区瑞金二路街道巨鹿路272号",
+        "geo_lng": 121.461366,
+        "geo_lat": 31.223088,
+        "geo_coord_system": "GCJ-02",
+        "geo_source": "user_tencent_map_picker_confirmed",
+        "geo_provider": "tencent_map",
+        "geo_provider_title": "Cedar Kitchen(茂名南路店)",
+        "geo_provider_address": "上海市黄浦区瑞金二路街道巨鹿路272号",
+        "poi_id": "3608572956257176042",
+        "map_poi_name": "Cedar Kitchen(茂名南路店)",
+        "prefer_verified_place": True,
+        "note": "source evidence says 上海巨鹿路272号Cedar自由贸易市场; user-confirmed Tencent map picker resolves it to Cedar Kitchen(茂名南路店)",
+    },
+    "system:60533a00b093c8f5": {
+        "match_id": "system:60533a00b093c8f5",
+        "venue_id": "system_zhengzhou_ersha",
+        "venue": ["SYSTEM 系统"],
+        "venue_name": "SYSTEM 系统",
+        "city": ["郑州"],
+        "address": "河南省郑州市中原区华山路与颍河路交叉口二砂文化创意园",
+        "geo_lng": 113.593681,
+        "geo_lat": 34.743255,
+        "geo_coord_system": "GCJ-02",
+        "geo_source": "amap_place_search_source_confirmed",
+        "geo_provider": "amap_place_search",
+        "geo_provider_title": "郑州二砂文化创意园",
+        "geo_provider_address": "华山路与颍河西路交叉口西500米路北",
+        "poi_id": "B0FFMDY75G",
+        "map_poi_name": "郑州二砂文化创意园",
+        "prefer_verified_place": True,
+        "note": "source copy places the event in 河南郑州二砂创意园区; public venue evidence identifies 郑州二砂文化创意园, and Amap place search plus reverse geocode confirm the same GCJ-02 POI",
+    },
 }
 
 ADDRESS_ADJUDICATIONS = {
@@ -251,6 +295,30 @@ ADDRESS_ADJUDICATIONS = {
 }
 
 TIME_ADJUDICATIONS = {
+    "cedar_kitchen:d2b70596abad814b": {
+        "decision": "poster_ocr_over_llm",
+        "value": "22:30-Late",
+        "note": "direct poster evidence for the ILLUM stop says '7.11 SAT @ ILLUM 22:30-late'; DeepSeek Pro returned the generic multi-night text instead of the selected event window",
+    },
+    "tote_music:9237c9e0c5fab1d8:schedule:20260710:28": {
+        "decision": "poster_ocr_over_llm",
+        "value": "20:00-21:30",
+        "note": "direct source poster/title evidence says '7.10 周五 20:00-21:30' for the 咸山氛围即兴对话 item; DeepSeek Pro picked a later unrelated source time",
+    },
+    "roam:efbaad3b2b82bec1": {
+        "decision": "poster_ocr_over_llm",
+        "clear_value": True,
+        "note": "direct VL poster evidence confirms date, venue, and lineup but shows no event time; the extracted 14:57 value is the WeChat article publish time and must not be displayed as event time",
+    },
+    "deepcool:14e850334e7997ac": {
+        "decision": "source_candidate_over_llm",
+        "value": "22:00-Late",
+        "note": "direct VL poster evidence marks 20:00-03:00 as venue opening hours and the event lineup schedule as 22:00-Late",
+    },
+    "yuanhe:400b71948c98bda9": {
+        "decision": "source_candidate_over_llm",
+        "note": "current Chinese source text '当晚9点一直到天亮' is display-equivalent to the materialized 9pm-dawn time",
+    },
     "deepcool:8d8d40884e3c0fda": {
         "decision": "poster_ocr_over_llm",
         "note": "source pack evidence and poster OCR say 03:00-LATE; DeepSeek Pro 00:00-01:30 is a partial set time",
@@ -439,6 +507,8 @@ def source_support_text(item: dict[str, Any], source_row: dict[str, Any] | None)
             "plain_text",
             "description_original_lines",
             "evidence",
+            "poster_vl_lineup_evidence",
+            "poster_selection_evidence",
         ):
             parts.extend(flatten_strings(row.get(key)))
     return "\n".join(parts)
@@ -569,6 +639,8 @@ def event_context_lines(item: dict[str, Any], source_row: dict[str, Any] | None)
             "ocr_text",
             "plain_text",
             "description_original_lines",
+            "poster_vl_lineup_evidence",
+            "poster_selection_evidence",
         ):
             lines.extend(flatten_strings(row.get(key)))
     return [line for line in lines if first(line)]
@@ -594,6 +666,51 @@ def lineup_supported_by_event_context(
         return False
     lines = event_context_lines(item, source_row)
     return all(any(line_supported_by_event_context(candidate, line) for line in lines) for candidate in candidates)
+
+
+def poster_vl_direct_evidence(item: dict[str, Any]) -> dict[str, Any] | None:
+    for key in ("poster_selection_evidence", "posterSelectionEvidence"):
+        evidence = item.get(key)
+        if not isinstance(evidence, dict):
+            continue
+        marker_text = "\n".join(
+            first(evidence.get(marker))
+            for marker in ("schema_version", "provider", "selected_by", "model")
+            if first(evidence.get(marker))
+        ).lower()
+        if "vl_direct" in marker_text or "qwen_vl" in marker_text or "qwen3" in marker_text:
+            return evidence
+    return None
+
+
+def poster_vl_direct_lineup(item: dict[str, Any]) -> list[str]:
+    evidence = poster_vl_direct_evidence(item)
+    if not evidence:
+        return []
+    values = (
+        list_strings(item.get("poster_vl_lineup"))
+        or list_strings(item.get("posterVlLineup"))
+        or list_strings(evidence.get("cleaned_lineup"))
+    )
+    cleaned = clean_lineup(values)
+    if len(cleaned) < 3:
+        return []
+
+    evidence_lines = [
+        *flatten_strings(evidence.get("evidence")),
+        *flatten_strings(evidence.get("visible_text_lines")),
+        *flatten_strings(evidence.get("lineup_evidence")),
+        *list_strings(item.get("poster_vl_lineup_evidence")),
+        *list_strings(item.get("posterVlLineupEvidence")),
+    ]
+    evidence_text = "\n".join(evidence_lines)
+    if not evidence_text:
+        return []
+    if not any(LINEUP_EVENT_CONTEXT_RE.search(line) for line in evidence_lines if first(line)):
+        return []
+    if not lineup_supported_by_text(cleaned, evidence_text):
+        return []
+    return cleaned
 
 
 def raw_line_rejected(raw: str, cleaned: str) -> bool:
@@ -637,12 +754,57 @@ def is_aggregate_item(item: dict[str, Any]) -> bool:
     verification = item.get("aggregate_verification") if isinstance(item.get("aggregate_verification"), dict) else {}
     if first(verification.get("decision")) == "quarantine_until_child_events_split":
         return True
+    if has_strong_single_event_poster_evidence(item):
+        return False
     title = aggregate_title_text(item) or title_of(item)
     if AGGREGATE_TITLE_RE.search(title):
         return True
     artists = current_lineup(item)
     dated = [value for value in artists if LINEUP_DATE_RE.search(value)]
     return len(dated) >= 2
+
+
+def has_strong_single_event_poster_evidence(item: dict[str, Any]) -> bool:
+    if not any(first(item.get(key)) for key in ("event_date_start", "event_date", "date")):
+        return False
+    if not any(first(item.get(key)) for key in ("venue_name", "venue")):
+        return False
+    artists = current_lineup(item)
+    if not artists:
+        return False
+    evidence = item.get("poster_selection_evidence")
+    if not isinstance(evidence, dict):
+        evidence = item.get("posterSelectionEvidence")
+    if not isinstance(evidence, dict):
+        return False
+    if not any(first(evidence.get(key)) for key in ("selected_sha", "selected_source_url")):
+        return False
+    risk_flags = {normalized_risk_flag(value) for value in list_strings(evidence.get("risk_flags"))}
+    if risk_flags & {"missinglineupvisible", "notmusicevent", "notelectronicmusicevent"}:
+        return False
+    evidence_text = "\n".join(
+        list_strings(evidence.get("cleaned_lineup"))
+        + list_strings(evidence.get("lineup_evidence"))
+        + list_strings(evidence.get("visible_text_lines"))
+    )
+    return all(candidate_supported_by_text(artist, evidence_text) for artist in artists)
+
+
+def normalized_risk_flag(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", first(value).lower())
+
+
+def poster_evidence_has_missing_lineup_visible(item: dict[str, Any]) -> bool:
+    flags: set[str] = set()
+    for key in ("poster_selection_evidence", "posterSelectionEvidence"):
+        evidence = item.get(key)
+        if isinstance(evidence, dict):
+            flags.update(normalized_risk_flag(value) for value in list_strings(evidence.get("risk_flags")))
+    return "missinglineupvisible" in flags
+
+
+def should_quarantine_missing_visible_lineup(item: dict[str, Any]) -> bool:
+    return not current_lineup(item) and poster_evidence_has_missing_lineup_visible(item)
 
 
 def has_suspicious_lineup(item: dict[str, Any]) -> bool:
@@ -713,6 +875,7 @@ def apply_lineup_repair(
     current_supported = lineup_supported_by_event_context(current_clean, item, source_row)
     source_supported = lineup_supported_by_event_context(source_clean, item, source_row)
     pro_supported = lineup_supported_by_event_context(pro_clean, item, source_row)
+    poster_vl_clean = poster_vl_direct_lineup(item)
 
     if is_aggregate_item(item):
         set_lineup_uncertain(item)
@@ -750,6 +913,22 @@ def apply_lineup_repair(
             "decision": "cleaned_source_lineup",
             "note": "source lineup kept after removing structured suffix/prefix noise",
         }
+        return "lineup_cleaned"
+
+    if poster_vl_clean and (
+        raw_had_rejected
+        or not current_clean
+        or not current_supported
+        or set(map(norm_name, poster_vl_clean)) != current_set
+    ):
+        item["lineup"] = poster_vl_clean
+        item["lineup_artists"] = poster_vl_clean
+        item["lineup_quality"] = {
+            "status": "verified",
+            "decision": "poster_vl_source_grounded_lineup",
+            "note": "direct VL poster evidence contains a structured lineup block; malformed OCR fragments were dropped",
+        }
+        item.pop("lineup_display_hint", None)
         return "lineup_cleaned"
 
     if pro_clean and current_set != pro_set and pro_supported and (raw_had_rejected or pro_title_supported or not current_clean):
@@ -804,6 +983,11 @@ def apply_address_repair(item: dict[str, Any], source_row: dict[str, Any] | None
     current = current_address(item)
     current_source = first(item.get("address_source"))
     source_candidates = source_address_lines(item, source_row)
+    preferred_override = ADDRESS_OVERRIDES.get(iid)
+    if preferred_override and preferred_override.get("prefer_verified_place"):
+        apply_address_override(item, preferred_override)
+        return "verified_place_replaced"
+
     if current_source == "manual_registry" and current and source_candidates:
         candidate = source_candidates[0]
         if address_city_conflicts_item(candidate, item):
@@ -872,18 +1056,7 @@ def apply_address_repair(item: dict[str, Any], source_row: dict[str, Any] | None
             return "oil_address_replaced"
     override = ADDRESS_OVERRIDES.get(iid)
     if override:
-        item["venue_id"] = override["venue_id"]
-        item["venue"] = override["venue"]
-        item["venue_name"] = override["venue_name"]
-        if override.get("city"):
-            item["city"] = list(override["city"])
-        item["address"] = override["address"]
-        item["address_full"] = override["address"]
-        item["address_source"] = "source_llm_web_crosscheck"
-        item["address_verification"] = {
-            "decision": "source_candidate_over_registry",
-            "note": override["note"],
-        }
+        apply_address_override(item, override)
         return "track_address_replaced"
     adjudication = ADDRESS_ADJUDICATIONS.get(iid)
     if adjudication:
@@ -892,10 +1065,49 @@ def apply_address_repair(item: dict[str, Any], source_row: dict[str, Any] | None
     return None
 
 
+def apply_address_override(item: dict[str, Any], override: dict[str, Any]) -> None:
+    item["venue_id"] = override["venue_id"]
+    item["venue"] = list(override["venue"])
+    item["venue_name"] = override["venue_name"]
+    if override.get("city"):
+        item["city"] = list(override["city"])
+        item["city_name"] = first(override["city"])
+        item["city_key"] = first(item.get("city_key")) or norm_name(first(override["city"]))
+    item["address"] = override["address"]
+    item["address_full"] = override["address"]
+    item["address_source"] = first(override.get("address_source")) or "source_llm_web_crosscheck"
+    for key in (
+        "geo_lng",
+        "geo_lat",
+        "geo_coord_system",
+        "geo_source",
+        "geo_provider",
+        "geo_provider_title",
+        "geo_provider_address",
+        "poi_id",
+        "map_poi_name",
+    ):
+        if key in override:
+            item[key] = override[key]
+    item["address_verification"] = {
+        "decision": "source_candidate_over_registry",
+        "note": override["note"],
+    }
+
+
 def apply_time_repair(item: dict[str, Any], enriched: dict[str, Any] | None = None) -> str | None:
     adjudication = TIME_ADJUDICATIONS.get(item_id(item))
     if adjudication:
         value = first(adjudication.get("value"))
+        if adjudication.get("clear_value"):
+            item["event_time_text"] = ""
+            item["running_hours_text"] = ""
+            item.pop("time_start", None)
+            item.pop("time_end", None)
+            item["event_time_source"] = first(item.get("event_time_source")) or "source_text"
+            item["running_hours_source"] = first(item.get("running_hours_source")) or item["event_time_source"]
+            item["time_verification"] = adjudication
+            return "time_cleared"
         if value:
             item["event_time_text"] = value
             item["running_hours_text"] = value
@@ -974,6 +1186,19 @@ def repair(current: dict[str, Any], api_dir: Path, *, quarantine_aggregates: boo
         if time_action:
             actions.append(time_action)
             bump(time_action)
+
+        if should_quarantine_missing_visible_lineup(next_item):
+            quarantined.append(
+                {
+                    "id": iid,
+                    "title": title_of(next_item),
+                    "venue": first(next_item.get("venue_name") or next_item.get("venue")),
+                    "reason": "missing_lineup_visible",
+                    "note": MISSING_LINEUP_VISIBLE_NOTE,
+                }
+            )
+            bump("missing_lineup_visible_quarantined")
+            continue
 
         if quarantine_aggregates and is_aggregate_item(next_item):
             quarantined.append(

@@ -694,7 +694,6 @@ def resolve_input_paths(args: argparse.Namespace) -> dict[str, Path]:
         for label, path in (
             ("quality report", quality),
             ("poster migration report", poster_migration),
-            ("poster write gate report", poster_write_gate),
             ("output report", report),
         )
         if path is None
@@ -722,7 +721,9 @@ def resolve_input_paths(args: argparse.Namespace) -> dict[str, Path]:
         )
         if public_poster_upload_review is not None and public_poster_upload_review.is_file()
         else None,
-        "poster_write_gate_report": require_path(poster_write_gate, "poster write gate report"),
+        "poster_write_gate_report": require_path(poster_write_gate, "poster write gate report")
+        if poster_write_gate is not None and poster_write_gate.is_file()
+        else None,
         "docker_smoke_report": require_path(docker, "docker smoke report"),
         "poster_ocr_canary_report": require_path(poster_ocr_canary, "poster OCR canary report")
         if poster_ocr_canary is not None
@@ -960,6 +961,7 @@ def summarize_poster_gate(gate: dict[str, Any]) -> dict[str, Any]:
             if boundary.get(key):
                 safety_failures.append(f"poster_write_gate_{key}")
     return {
+        "present": bool(gate),
         "write_gate_ready": bool(gate.get("write_gate_ready")),
         "execute_allowed_now": bool(gate.get("execute_allowed_now")),
         "cloudbase_storage_write_allowed_count": int_value(gate.get("cloudbase_storage_write_allowed_count")),
@@ -1848,6 +1850,10 @@ def summarize_fallback(fallback: dict[str, Any]) -> dict[str, Any]:
     if schema_version == "openclaw_weekly_daily_publish_summary.v2":
         boundary = as_dict(fallback.get("boundary"))
         secret_like_leak_count = secret_like_diagnostic_leak_count(fallback)
+        deploy_backend = bool(fallback.get("deploy_backend"))
+        upload_frontend = bool(fallback.get("upload_frontend"))
+        cloudrun_deploy_executed = bool(boundary.get("cloudrun_deploy_executed"))
+        post_backend_deploy_ok = bool(fallback.get("ok")) and deploy_backend and cloudrun_deploy_executed and not upload_frontend
         safety_failures: list[str] = []
         if boundary.get("cloudbase_storage_write_executed"):
             safety_failures.append("publish_summary_cloudbase_storage_write_executed")
@@ -1857,7 +1863,7 @@ def summarize_fallback(fallback: dict[str, Any]) -> dict[str, Any]:
             safety_failures.append("publish_summary_db2_write_executed")
         if boundary.get("db3_write_executed"):
             safety_failures.append("publish_summary_db3_write_executed")
-        if boundary.get("cloudrun_deploy_executed"):
+        if cloudrun_deploy_executed and not post_backend_deploy_ok:
             safety_failures.append("publish_summary_cloudrun_deploy_executed")
         if boundary.get("miniprogram_upload_executed"):
             safety_failures.append("publish_summary_miniprogram_upload_executed")
@@ -1866,9 +1872,14 @@ def summarize_fallback(fallback: dict[str, Any]) -> dict[str, Any]:
         package_candidate_ready = bool(fallback.get("package_candidate_ready"))
         preflight_ok = (
             bool(fallback.get("ok"))
-            and not bool(fallback.get("write_actions_allowed_now"))
-            and not bool(fallback.get("deploy_backend"))
-            and not bool(fallback.get("upload_frontend"))
+            and (
+                (
+                    not bool(fallback.get("write_actions_allowed_now"))
+                    and not deploy_backend
+                    and not upload_frontend
+                )
+                or post_backend_deploy_ok
+            )
             and not safety_failures
         )
         overall_ok = preflight_ok and package_candidate_ready
@@ -1878,7 +1889,25 @@ def summarize_fallback(fallback: dict[str, Any]) -> dict[str, Any]:
             "preflight_ok": preflight_ok,
             "status": str(fallback.get("status") or ""),
             "source": "publish_summary",
+            "source_mode": str(fallback.get("source_mode") or ""),
             "package_candidate_ready": package_candidate_ready,
+            "write_actions_allowed_now": bool(fallback.get("write_actions_allowed_now")),
+            "deploy_backend": deploy_backend,
+            "upload_frontend": upload_frontend,
+            "post_backend_deploy_ok": post_backend_deploy_ok,
+            "storage_write_only": bool(boundary.get("cloudbase_storage_write_executed"))
+            and not any(
+                bool(boundary.get(key))
+                for key in (
+                    "cloudbase_db_write_executed",
+                    "db2_write_executed",
+                    "db3_write_executed",
+                    "cloudrun_deploy_executed",
+                    "miniprogram_upload_executed",
+                    "review_submitted",
+                    "public_release_executed",
+                )
+            ),
             "scoped_dirty_tracked_count": 0,
             "current_release_quality_ok": None,
             "docker_contract_ok": None,
@@ -2070,10 +2099,77 @@ def build_readiness(
     )
     vision_summary = summarize_vision(vision)
     fallback_summary = summarize_fallback(fallback)
+    uses_sanji_source = (
+        fallback_summary.get("source") == "publish_summary"
+        and fallback_summary.get("source_mode") == "sanji_desktop_rss"
+    )
+    quality_green = quality_summary["ok"] and not quality_summary["hard_failures"]
+    poster_migration_write_failure_ids = {
+        "poster_migration_write_requested",
+        "poster_migration_write_authorized",
+        "poster_migration_confirm_token_valid",
+        "poster_migration_write_flag_not_false",
+        "poster_migration_side_effect_count_nonzero",
+    }
+    authorized_poster_storage_migration = (
+        quality_green
+        and poster_summary["write"] is True
+        and poster_summary["dry_run"] is False
+        and poster_summary["requested_write"]
+        and poster_summary["write_authorized"]
+        and poster_summary["confirm_token_valid"]
+        and not poster_summary["secret_like_diagnostic_leak_count"]
+        and set(poster_summary["safety_failures"]).issubset(poster_migration_write_failure_ids)
+    )
+    authorized_publish_storage_summary = (
+        authorized_poster_storage_migration
+        and fallback_summary.get("source") == "publish_summary"
+        and fallback_summary.get("package_candidate_ready") is True
+        and fallback_summary.get("write_actions_allowed_now") is True
+        and fallback_summary.get("upload_frontend") is False
+        and (
+            (
+                fallback_summary.get("storage_write_only") is True
+                and fallback_summary.get("deploy_backend") is False
+            )
+            or (
+                fallback_summary.get("deploy_backend") is True
+                and fallback_summary.get("post_backend_deploy_ok") is True
+            )
+        )
+        and set(fallback_summary["safety_failures"]).issubset({"publish_summary_cloudbase_storage_write_executed"})
+    )
+    poster_migration_safety_failures = [
+        check_id
+        for check_id in poster_summary["safety_failures"]
+        if not (authorized_poster_storage_migration and check_id in poster_migration_write_failure_ids)
+    ]
+    fallback_safety_failures = [
+        check_id
+        for check_id in fallback_summary["safety_failures"]
+        if not (
+            authorized_publish_storage_summary
+            and check_id == "publish_summary_cloudbase_storage_write_executed"
+        )
+    ]
+    poster_migration_accepted = poster_summary["dry_run_write_free"] or authorized_poster_storage_migration
+    fallback_preflight_accepted = fallback_summary["preflight_ok"] or authorized_publish_storage_summary
+    exporter_gate_blocked = (
+        not uses_sanji_source
+        and
+        (
+            exporter_freshness_preflight_summary["present"]
+            and not exporter_freshness_preflight_summary["freshness_ready"]
+        )
+        or (
+            exporter_auth_recovery_preflight_summary["present"]
+            and not exporter_auth_recovery_preflight_summary["auth_recovery_ready"]
+        )
+    )
 
     failed_check_ids: list[str] = []
     failed_check_ids.extend(quality_summary["safety_failures"])
-    failed_check_ids.extend(poster_summary["safety_failures"])
+    failed_check_ids.extend(poster_migration_safety_failures)
     failed_check_ids.extend(poster_recovery_summary["safety_failures"])
     failed_check_ids.extend(poster_gate_summary["safety_failures"])
     failed_check_ids.extend(docker_summary["safety_failures"])
@@ -2087,7 +2183,7 @@ def build_readiness(
     failed_check_ids.extend(poster_recovery_split_packet_summary["safety_failures"])
     failed_check_ids.extend(public_poster_upload_review_packet_summary["safety_failures"])
     failed_check_ids.extend(vision_summary["safety_failures"])
-    failed_check_ids.extend(fallback_summary["safety_failures"])
+    failed_check_ids.extend(fallback_safety_failures)
     failed_check_ids.extend(poster_ocr_canary_summary["contract_failures"])
     failed_check_ids.extend(poster_ocr_execution_preflight_summary["contract_failures"])
     failed_check_ids.extend(poster_ocr_controller_packet_summary["contract_failures"])
@@ -2121,16 +2217,20 @@ def build_readiness(
         and not poster_ocr_source_material_preflight_summary["material_ready"]
     ):
         failed_check_ids.append("poster_ocr_source_material_missing")
-    if not exporter_freshness_preflight_summary["ok"]:
+    if not uses_sanji_source and not exporter_freshness_preflight_summary["ok"]:
         failed_check_ids.append("exporter_freshness_preflight_not_ok")
     if (
+        not uses_sanji_source
+        and
         exporter_freshness_preflight_summary["present"]
         and not exporter_freshness_preflight_summary["freshness_ready"]
     ):
         failed_check_ids.append("exporter_freshness_not_ready")
-    if not exporter_auth_recovery_preflight_summary["ok"]:
+    if not uses_sanji_source and not exporter_auth_recovery_preflight_summary["ok"]:
         failed_check_ids.append("exporter_auth_recovery_preflight_not_ok")
     if (
+        not uses_sanji_source
+        and
         exporter_auth_recovery_preflight_summary["present"]
         and not exporter_auth_recovery_preflight_summary["auth_recovery_ready"]
     ):
@@ -2141,14 +2241,14 @@ def build_readiness(
         failed_check_ids.append("public_poster_upload_candidate_review_packet_not_ok")
     if not vision_summary["stepfun_complete"]:
         failed_check_ids.append("vision_stepfun_batch_not_ok")
-    if not fallback_summary["preflight_ok"]:
+    if not fallback_preflight_accepted:
         failed_check_ids.append("fallback_preflight_not_ok")
-    if not poster_summary["dry_run_write_free"]:
+    if not poster_migration_accepted:
         failed_check_ids.append("poster_migration_dry_run_not_write_free")
 
     hard_safety_failure = bool(
         quality_summary["safety_failures"]
-        or poster_summary["safety_failures"]
+        or poster_migration_safety_failures
         or poster_recovery_summary["safety_failures"]
         or poster_gate_summary["safety_failures"]
         or docker_summary["safety_failures"]
@@ -2162,9 +2262,8 @@ def build_readiness(
         or poster_recovery_split_packet_summary["safety_failures"]
         or public_poster_upload_review_packet_summary["safety_failures"]
         or vision_summary["safety_failures"]
-        or fallback_summary["safety_failures"]
+        or fallback_safety_failures
     )
-    quality_green = quality_summary["ok"] and not quality_summary["hard_failures"]
     poster_gate_ready = (
         quality_summary["poster_only_failure"]
         and poster_gate_summary["write_gate_ready"]
@@ -2196,19 +2295,23 @@ def build_readiness(
         and poster_recovery_split_packet_summary["ok"]
         and public_poster_upload_review_packet_summary["ok"]
         and vision_summary["ok"]
-        and fallback_summary["preflight_ok"]
+        and fallback_preflight_accepted
     )
     package_candidate_ready = (
         not hard_safety_failure
         and evidence_green
         and quality_summary["item_count_meets_minimum"]
         and quality_summary["hard_drift_count"] == 0
-        and poster_summary["dry_run_write_free"]
+        and poster_migration_accepted
         and (
+            uses_sanji_source
+            or
             not exporter_freshness_preflight_summary["present"]
             or exporter_freshness_preflight_summary["freshness_ready"]
         )
         and (
+            uses_sanji_source
+            or
             not exporter_auth_recovery_preflight_summary["present"]
             or exporter_auth_recovery_preflight_summary["auth_recovery_ready"]
         )
@@ -2219,8 +2322,12 @@ def build_readiness(
         decision = "hard_safety_failure"
     elif package_candidate_ready and poster_gate_ready and not quality_green:
         decision = "blocked_on_cloudbase_poster_migration_write_gate"
+    elif package_candidate_ready and authorized_poster_storage_migration and quality_green:
+        decision = "package_candidate_ready_after_authorized_poster_migration"
     elif package_candidate_ready and quality_green:
         decision = "package_candidate_ready_report_only"
+    elif evidence_green and quality_green and quality_summary["item_count_meets_minimum"] and exporter_gate_blocked:
+        decision = "blocked_on_exporter_auth_or_freshness_gate"
     elif evidence_green and quality_summary["item_count_meets_minimum"]:
         decision = "blocked_on_release_package_quality_gate"
     else:
@@ -2236,6 +2343,9 @@ def build_readiness(
     elif decision == "blocked_on_release_package_quality_gate":
         next_required_actions.extend(failed_check_ids)
         allowed_next_actions.extend(["inspect_release_package_quality_report", "rerun_report_only_preflight"])
+    elif decision == "blocked_on_exporter_auth_or_freshness_gate":
+        next_required_actions.extend(failed_check_ids)
+        allowed_next_actions.extend(["refresh_exporter_session", "retry_source_refresh", "inspect_auth_qr_reports"])
     else:
         next_required_actions.extend(failed_check_ids)
 
@@ -2246,7 +2356,9 @@ def build_readiness(
         "ok": decision in {
             "blocked_on_cloudbase_poster_migration_write_gate",
             "blocked_on_release_package_quality_gate",
+            "blocked_on_exporter_auth_or_freshness_gate",
             "package_candidate_ready_report_only",
+            "package_candidate_ready_after_authorized_poster_migration",
         },
         "package_candidate_ready": package_candidate_ready,
         "release_ready": False,
@@ -2391,7 +2503,12 @@ def build_readiness(
                 "work_order_count": poster_recovery_summary["work_order_count"],
                 "article_image_ocr_required": poster_recovery_summary["article_image_ocr_required"],
             },
-            {"gate": "poster_migration_dry_run", "ok": poster_summary["dry_run_write_free"]},
+            {
+                "gate": "poster_migration",
+                "ok": poster_migration_accepted,
+                "dry_run_write_free": poster_summary["dry_run_write_free"],
+                "authorized_storage_migration": authorized_poster_storage_migration,
+            },
             {"gate": "poster_migration_write_gate", "ok": poster_gate_ready, "execute_allowed_now": poster_gate_summary["execute_allowed_now"]},
         ],
         "paths": paths,
@@ -2487,7 +2604,9 @@ def run(args: argparse.Namespace) -> int:
         )
         if resolved["public_poster_upload_candidate_review_packet_report"]
         else None,
-        poster_write_gate=read_json(resolved["poster_write_gate_report"]),
+        poster_write_gate=read_json(resolved["poster_write_gate_report"])
+        if resolved["poster_write_gate_report"]
+        else {},
         docker=read_json(resolved["docker_smoke_report"]),
         poster_ocr_canary=read_json(resolved["poster_ocr_canary_report"])
         if resolved["poster_ocr_canary_report"]

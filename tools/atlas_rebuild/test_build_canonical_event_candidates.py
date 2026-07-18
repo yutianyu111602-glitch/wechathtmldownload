@@ -12,9 +12,18 @@ import sys
 import tempfile
 from pathlib import Path
 
+import pytest
+
 from build_canonical_event_candidates import load_dj_redirects, norm_key, run
 
 HERE = Path(__file__).resolve().parent
+
+
+@pytest.fixture
+def root(tmp_path: Path) -> Path:
+    """Let the direct smoke functions also participate in the pytest suite."""
+
+    return tmp_path
 
 
 def create_source(path: Path, performance_rows: list[tuple], dj_rows: list[tuple]) -> None:

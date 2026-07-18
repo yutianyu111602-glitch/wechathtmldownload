@@ -30,7 +30,22 @@ REMOTE_NEXT="$REMOTE_DIR/atlas_serving.next.sqlite"
 REMOTE_PREV="$REMOTE_DIR/atlas_serving.prev.sqlite"
 REMOTE_VERIFY="$REMOTE_DIR/verify-atlas-db.mjs"
 REMOTE_NODE="/opt/node-v24.15.0-linux-x64/bin/node"   # PATH node is v20, too old for node:sqlite
-WEBSITE_REPO="${WEBSITE_REPO:-/mnt/c/code/mavelpoint-cn-v2}"
+if [ -n "${WEBSITE_REPO:-}" ]; then
+    : # Explicit operator override wins.
+else
+    for repo_candidate in \
+        /mnt/f/code/mavelpoint-cn-v2 \
+        /f/code/mavelpoint-cn-v2 \
+        /mnt/c/code/mavelpoint-cn-v2 \
+        /c/code/mavelpoint-cn-v2
+    do
+        if [ -f "$repo_candidate/scripts/infra/verify-atlas-db.mjs" ]; then
+            WEBSITE_REPO="$repo_candidate"
+            break
+        fi
+    done
+fi
+[ -n "${WEBSITE_REPO:-}" ] || { echo "FATAL: cannot locate mavelpoint-cn-v2 verifier repo; set WEBSITE_REPO explicitly"; exit 1; }
 LOCAL_VERIFY="$WEBSITE_REPO/scripts/infra/verify-atlas-db.mjs"
 PROFILE_CHECK_PATH="/artists"   # listing page exercises the atlas DB read path
 

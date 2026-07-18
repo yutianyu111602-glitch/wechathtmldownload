@@ -66,3 +66,43 @@ def test_local_ocr_empty_result_uses_explicit_title_date_only() -> None:
 
     assert text_backend.calls[0][2] == []
     assert "extract only explicit facts from title/body" in text_backend.calls[0][1]
+
+
+def test_source_publish_date_only_does_not_become_event_evidence() -> None:
+    backend = LocalOcrDeepSeekBackend(
+        "ocr_deepseek",
+        {},
+        ocr_engine=lambda _path: ([], 0.1),
+        text_backend=FakeTextBackend(),
+    )
+
+    with pytest.raises(RuntimeError, match="refusing text-only fallback"):
+        backend.extract(
+            "system",
+            "公众号文章标题：JETSKI Performance\n\n"
+            "文章来源时间：2026-07-12T15:13:19+08:00\n"
+            "时间解释规则：仅当标题出现今天/今晚/本周才可换算。\n\n正文：\n(正文为空)",
+            ["portrait.png"],
+            {"type": "object"},
+        )
+
+
+def test_relative_event_date_can_use_source_publish_context() -> None:
+    text_backend = FakeTextBackend()
+    backend = LocalOcrDeepSeekBackend(
+        "ocr_deepseek",
+        {},
+        ocr_engine=lambda _path: ([], 0.1),
+        text_backend=text_backend,
+    )
+
+    backend.extract(
+        "system",
+        "公众号文章标题：今晚演出\n\n"
+        "文章来源时间：2026-07-09T14:39:03+08:00\n"
+        "时间解释规则：仅当标题出现今天/今晚/本周才可换算。\n\n正文：\n(正文为空)",
+        ["portrait.png"],
+        {"type": "object"},
+    )
+
+    assert len(text_backend.calls) == 1

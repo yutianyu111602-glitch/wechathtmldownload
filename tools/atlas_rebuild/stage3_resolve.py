@@ -66,7 +66,10 @@ SCHEMA_MIGRATIONS = {
     ),
 }
 
-_PUNC = re.compile(r"[\s·・·.,!?\"'’“”（）()\[\]{}|/\\@#&*\-_:：，。！？、]+")
+_PUNC = re.compile(
+    r"[\s·・·.,!?\"'’“”（）()\[\]{}|/\\@#&*\-_:：，。！？、"
+    r"\ufe0e\ufe0f\U0001f300-\U0001faff]+"
+)
 
 
 def norm(s):
@@ -93,12 +96,16 @@ _DATE_OR_TIME_RE = re.compile(
     r"|周[一二三四五六日天]"
 )
 _PLACEHOLDER_NAME_NORMS = {
-    "未明确", "未知", "不详", "待定", "待公布", "敬请期待",
+    "未明确", "未明确说明", "未知", "不详", "待定", "待公布", "敬请期待",
     # 旧库抽样 ~16% 噪声，占位「嘉宾」类是大头（exact-norm 匹配，不误伤真名）
     "神秘嘉宾", "神秘", "嘉宾", "特邀嘉宾", "神秘dj", "惊喜嘉宾", "神秘客人",
     "unknown", "unk", "na", "none", "null", "tbd", "tba",
     "guest", "specialguest", "surpriseguest", "mysteryguest", "secretguest", "surprise",
 }
+_B2B_MARKER_RE = re.compile(
+    r"(^|[\s\-_/\\|:+（(])(?:b\s*2\s*b|back\s*[- ]?to\s*[- ]?back)(?=$|[\s\-_/\\|:+）).,!！?？])",
+    re.IGNORECASE,
+)
 
 
 def _sanity_reject(name: str) -> bool:
@@ -131,12 +138,45 @@ def _sanity_reject(name: str) -> bool:
         return True
     if normed in _PLACEHOLDER_NAME_NORMS:
         return True
+    # A standalone b2b/back-to-back marker is a relation, not a person/venue/org/series.
+    # Legitimate two-sided lineup cells are split before this fallback path.
+    if _B2B_MARKER_RE.search(n):
+        return True
     return False
 
 
 def _usable_alias_surface(surface: str) -> bool:
     sn = norm(surface)
     return bool(sn) and sn not in _PLACEHOLDER_NAME_NORMS
+
+
+_B2B_COMPOUND_RE = re.compile(
+    r"\s+(?:b\s*2\s*b|back\s*[- ]?to\s*[- ]?back)\s+",
+    re.IGNORECASE,
+)
+
+
+def _split_compound_b2b_name(name: str) -> list[str]:
+    """Split a single lineup cell like "Alpha b2b Beta" into DJ endpoints.
+
+    This is deliberately narrow: only a two-sided explicit b2b/back-to-back
+    separator is split. Other compound-looking names stay intact for review.
+    """
+    raw = (name or "").strip()
+    if not raw:
+        return []
+    if _B2B_MARKER_RE.search(raw) and any(ch in raw for ch in "()（）"):
+        return []
+    parts = [p.strip() for p in _B2B_COMPOUND_RE.split(raw) if p.strip()]
+    if len(parts) == 2 and all(not _sanity_reject(p) for p in parts):
+        return parts
+    return [raw] if not _sanity_reject(raw) else []
+
+
+def _lineup_member_names(member: dict) -> list[str]:
+    if not isinstance(member, dict):
+        return []
+    return _split_compound_b2b_name(member.get("name") or "")
 
 
 def ensure_schema_migrations(con):
@@ -158,9 +198,10 @@ def _event_identity_key(ev, venue_id, series_id, organizer_id, token, index):
     venue = venue_id or norm(ev.get("venue"))
     org = organizer_id or series_id or norm(ev.get("organizer") or ev.get("series_name"))
     lineup = sorted({
-        norm((m or {}).get("name"))
+        norm(member_name)
         for m in (ev.get("lineup") or [])
-        if isinstance(m, dict) and norm(m.get("name"))
+        for member_name in _lineup_member_names(m)
+        if norm(member_name)
     })
     lineup_key = ",".join(lineup[:16])
 
@@ -255,7 +296,7 @@ class Resolver:
 
     def resolve(self, name, etype, attrs=None, name_en=None, city=None):
         name = (name or "").strip()
-        if not name:
+        if not name or _sanity_reject(name):
             return None
         key = (norm(name), etype)
         eid = self.alias.get(key)
@@ -523,9 +564,12 @@ def main():
         # affiliations -> orgs + dj_affiliation edges
         for d in ents.get("djs", []):
             dj_id = R.resolve(d["surface"], "dj")
+            if not dj_id:
+                continue
             for aff in d.get("affiliations", []) or []:
                 org_id = R.resolve(aff, "org", attrs={"org_type": "label"})
-                con.execute("INSERT OR IGNORE INTO dj_affiliation VALUES (?,?)", (dj_id, org_id))
+                if org_id:
+                    con.execute("INSERT OR IGNORE INTO dj_affiliation VALUES (?,?)", (dj_id, org_id))
 
         for i, ev in enumerate(payload.get("events", [])):
             venue_id = R.resolve(ev.get("venue"), "venue", city=ev.get("city")) if ev.get("venue") else None
@@ -595,31 +639,51 @@ def main():
             if not prev:
                 n_ev += 1
             name_to_djid = {}
+            compound_b2b_pairs = set()
             for m in ev.get("lineup", []):
                 if not isinstance(m, dict) or not m.get("name"):
                     continue
-                dj_id = R.resolve(m.get("name"), "dj", name_en=m.get("name_en"),
-                                  attrs={"roles": ["dj"], "styles": m.get("styles")})
-                name_to_djid[norm(m.get("name"))] = dj_id
-                if m.get("name_en"):
-                    name_to_djid[norm(m.get("name_en"))] = dj_id
-                cur = con.execute("INSERT OR IGNORE INTO event_participant VALUES (?,?,?,?)",
-                                  (event_id, dj_id, m.get("role", "unknown"), m.get("performance_type", "unknown")))
-                n_part += int(cur.rowcount > 0)
+                member_names = _lineup_member_names(m)
+                member_ids = []
+                for member_name in member_names:
+                    dj_id = R.resolve(member_name, "dj", name_en=m.get("name_en") if len(member_names) == 1 else None,
+                                      attrs={"roles": ["dj"], "styles": m.get("styles")})
+                    if not dj_id:
+                        continue
+                    name_to_djid[norm(member_name)] = dj_id
+                    if len(member_names) == 1:
+                        name_to_djid[norm(m.get("name"))] = dj_id
+                        if m.get("name_en"):
+                            name_to_djid[norm(m.get("name_en"))] = dj_id
+                    cur = con.execute("INSERT OR IGNORE INTO event_participant VALUES (?,?,?,?)",
+                                      (event_id, dj_id, m.get("role", "unknown"), m.get("performance_type", "unknown")))
+                    n_part += int(cur.rowcount > 0)
+                    member_ids.append(dj_id)
+                if len(member_ids) >= 2:
+                    for xi in range(len(member_ids)):
+                        for yi in range(xi + 1, len(member_ids)):
+                            if member_ids[xi] != member_ids[yi]:
+                                compound_b2b_pairs.add(tuple(sorted((member_ids[xi], member_ids[yi]))))
             # b2b capture（★ DJ-DJ 最强边）：lineup.b2b_with + event.b2b_sets，只在已解析阵容内配对（不造新实体）
-            b2b_pairs = set()
+            b2b_pairs = set(compound_b2b_pairs)
             for m in ev.get("lineup", []) or []:
                 if not isinstance(m, dict):
                     continue
-                a = name_to_djid.get(norm(m.get("name") or ""))
+                a_ids = [name_to_djid.get(norm(n)) for n in _lineup_member_names(m)]
+                a_ids = [x for x in a_ids if x]
                 for partner in (m.get("b2b_with") or []):
-                    b = name_to_djid.get(norm(str(partner)))
-                    if a and b and a != b:
-                        b2b_pairs.add(tuple(sorted((a, b))))
+                    b_ids = [name_to_djid.get(norm(n)) for n in _split_compound_b2b_name(str(partner))]
+                    b_ids = [x for x in b_ids if x]
+                    for a in a_ids:
+                        for b in b_ids:
+                            if a and b and a != b:
+                                b2b_pairs.add(tuple(sorted((a, b))))
             for grp in (ev.get("b2b_sets") or []):
                 if not isinstance(grp, (list, tuple)):
                     continue
-                ids = [name_to_djid.get(norm(str(x))) for x in grp]
+                ids = []
+                for x in grp:
+                    ids.extend(name_to_djid.get(norm(n)) for n in _split_compound_b2b_name(str(x)))
                 ids = [x for x in ids if x]
                 for xi in range(len(ids)):
                     for yi in range(xi + 1, len(ids)):

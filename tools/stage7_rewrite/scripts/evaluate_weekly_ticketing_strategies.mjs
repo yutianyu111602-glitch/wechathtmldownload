@@ -4,7 +4,7 @@ import path from "node:path";
 import { createDeepSeekClient } from "../../../services/weekly_activity_cloudrun/src/deepSeekClient.mjs";
 
 const DEFAULT_QUEUE =
-  "D:\\downstream_results\\stage7_rewrite\\longrun\\LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE\\latest_queue.jsonl";
+  "E:\\weekly_activity_pipeline\\longrun\\LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE\\latest_queue.jsonl";
 const DEFAULT_CURRENT =
   "D:\\downstream_results\\stage7_rewrite\\longrun\\WEEKLY_ACTIVITY_MINIPROGRAM_API_20260521_TICKETING_REPAIR_V2\\current.json";
 const DEFAULT_OUT_DIR = "tools/stage7_rewrite/reports/weekly_ticketing_strategy_eval_20260521";

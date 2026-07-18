@@ -48,16 +48,30 @@ GENRE_WORDS = {
     "trance",
     "ukg",
 }
-AGGREGATE_TITLE_RE = re.compile(r"总览|预览|安排|信号|本周活动|本周预览|月.*安排|月.*预告", re.I)
+AGGREGATE_TITLE_RE = re.compile(
+    r"总览|活动一览|活动全览|活动安排|活动日程|全览|预览|本周活动|本周预览|月.*安排|月.*预告|月.*活动",
+    re.I,
+)
 ADJUDICATED_ADDRESS_DECISIONS = {
     "manual_registry_over_llm",
+    "manual_locked_place_over_llm",
     "registry_over_source_poi",
     "registry_over_poster_ocr_address",
     "source_candidate_over_registry",
     "source_candidate_over_source_text",
     "verified_registry_over_llm",
+    "known_venue_resource_correction",
+    "venue_id_normalization_correction",
+    "event_specific_venue_correction",
 }
 ADJUDICATED_TIME_DECISIONS = {"poster_ocr_over_llm", "verified_registry_over_llm", "source_candidate_over_llm"}
+MANUAL_LOCKED_ADDRESS_SOURCES = {
+    "manual_registry",
+    "manual_user_confirmed_map_crosscheck",
+    "tencent_map_picker_user_confirmed",
+    "tencent_amap_cross_geocode_user_confirmed",
+    "tencent_amap_exact_place_user_confirmed",
+}
 
 
 def read_json(path: Path) -> Any:
@@ -72,6 +86,15 @@ def first(value: Any) -> str:
 
 def item_id(item: dict[str, Any]) -> str:
     return first(item.get("id") or item.get("event_id") or item.get("article_id") or item.get("queue_id"))
+
+
+def has_manual_locked_address(item: dict[str, Any]) -> bool:
+    source = first(item.get("address_source") or item.get("geo_source"))
+    return (
+        source in MANUAL_LOCKED_ADDRESS_SOURCES
+        or bool(item.get("place_fields_locked"))
+        or bool(item.get("geo_locked"))
+    )
 
 
 def title_of(item: dict[str, Any]) -> str:
@@ -155,6 +178,38 @@ def norm_name(value: str) -> str:
     return re.sub(r"[\s\-—–:：,，.。()（）\[\]【】]+", "", text.lower())
 
 
+def normalized_risk_flag(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", first(value).lower())
+
+
+def has_strong_single_event_poster_evidence(item: dict[str, Any], artists: list[str]) -> bool:
+    if not any(first(item.get(key)) for key in ("event_date_start", "event_date", "date")):
+        return False
+    if not any(first(item.get(key)) for key in ("venue_name", "venue")):
+        return False
+    if not artists:
+        return False
+    evidence = item.get("poster_selection_evidence")
+    if not isinstance(evidence, dict):
+        evidence = item.get("posterSelectionEvidence")
+    if not isinstance(evidence, dict):
+        return False
+    if not any(first(evidence.get(key)) for key in ("selected_sha", "selected_source_url")):
+        return False
+    risk_flags = {normalized_risk_flag(value) for value in list_strings(evidence.get("risk_flags"))}
+    if risk_flags & {"missinglineupvisible", "notmusicevent", "notelectronicmusicevent"}:
+        return False
+    evidence_text = "\n".join(
+        list_strings(evidence.get("cleaned_lineup"))
+        + list_strings(evidence.get("lineup_evidence"))
+        + list_strings(evidence.get("visible_text_lines"))
+    )
+    normalized_evidence = norm_name(evidence_text)
+    return bool(normalized_evidence) and all(
+        norm_name(artist) and norm_name(artist) in normalized_evidence for artist in artists
+    )
+
+
 def time_tokens(value: str) -> tuple[str, str]:
     text = str(value or "").lower()
     text = text.replace("—", "-").replace("–", "-")
@@ -193,7 +248,34 @@ def address_compatible(left: str, right: str) -> bool:
     b = norm_text(right)
     if not a or not b:
         return True
-    return a in b or b in a
+    if a in b or b in a:
+        return True
+    return address_tokens_contained(a, b) or address_tokens_contained(b, a)
+
+
+ADDRESS_TOKEN_RE = re.compile(
+    r".+?(?:省|市|区|县|路|街道|街|镇|乡|村|广场|园区|公园|中心|大厦|工厂|厂|馆)|[a-z0-9]+",
+    re.I,
+)
+
+
+def address_tokens(value: str) -> list[str]:
+    text = norm_text(value)
+    tokens = [match.group(0) for match in ADDRESS_TOKEN_RE.finditer(text)]
+    return [token for token in tokens if len(token) >= 2]
+
+
+def address_tokens_contained(haystack: str, needle: str) -> bool:
+    tokens = address_tokens(needle)
+    if len(tokens) < 2:
+        return False
+    position = 0
+    for token in tokens:
+        index = haystack.find(token, position)
+        if index < 0:
+            return False
+        position = index + len(token)
+    return True
 
 
 def clean_lineup_for_compare(values: list[str]) -> list[str]:
@@ -247,7 +329,11 @@ def enrichment_index_path(api_dir: Path) -> Path:
     return api_dir / "llm" / "enrichment_index.json"
 
 
-def audit(api_dir: Path) -> dict[str, Any]:
+def audit(
+    api_dir: Path,
+    soft_missing_lineup: bool = False,
+    soft_missing_enrichment: bool = False,
+) -> dict[str, Any]:
     current = read_json(api_dir / "current.json")
     items = current.get("items") if isinstance(current, dict) else current
     if not isinstance(items, list):
@@ -259,6 +345,7 @@ def audit(api_dir: Path) -> dict[str, Any]:
     missing_enrichment_current_count = 0
     issues: dict[str, list[dict[str, Any]]] = {
         "missing_lineup": [],
+        "underfilled_lineup_review": [],
         "suspicious_lineup": [],
         "lineup_diff": [],
         "adjudicated_lineup_diff": [],
@@ -292,7 +379,24 @@ def audit(api_dir: Path) -> dict[str, Any]:
         pro_artists = list_strings(enriched.get("lineup_artists"))
 
         if not current_artists:
-            issues["missing_lineup"].append({"id": iid, "title": title, "venue": venue})
+            issues["missing_lineup"].append(
+                {
+                    "id": iid,
+                    "title": title,
+                    "venue": venue,
+                    "current_feed_relevant": item_is_current_or_future(item, today),
+                }
+            )
+        elif item_is_current_or_future(item, today) and len(clean_lineup_for_compare(current_artists)) < 3:
+            issues["underfilled_lineup_review"].append(
+                {
+                    "id": iid,
+                    "title": title,
+                    "venue": venue,
+                    "lineup": current_artists[:8],
+                    "note": "review with VL evidence if this is a normal club night; do not invent artists for one-guest or live-show events",
+                }
+            )
 
         bad_artists = [
             artist
@@ -300,7 +404,7 @@ def audit(api_dir: Path) -> dict[str, Any]:
             if len(artist) > 32
             or LINEUP_NOISE_RE.search(artist)
             or LINEUP_PROSE_RE.search(artist)
-            or re.search(r"[。；：:，]", artist)
+            or (re.search(r"[。；：:，]", artist) and re.search(r"[\u4e00-\u9fff]", artist))
         ]
         if bad_artists:
             issues["suspicious_lineup"].append({"id": iid, "title": title, "venue": venue, "bad": bad_artists[:8]})
@@ -329,6 +433,7 @@ def audit(api_dir: Path) -> dict[str, Any]:
                 "cleaned_source_lineup",
                 "deepseek_pro_source_grounded_lineup",
                 "source_grounded_lineup",
+                "poster_vl_source_grounded_lineup",
                 "cleared_untrusted_lineup",
             }:
                 row["decision"] = decision
@@ -349,10 +454,10 @@ def audit(api_dir: Path) -> dict[str, Any]:
             }
             verification = item.get("address_verification") if isinstance(item.get("address_verification"), dict) else {}
             decision = first(verification.get("decision"))
-            if decision in ADJUDICATED_ADDRESS_DECISIONS or first(item.get("address_source")) == "manual_registry":
-                row["decision"] = decision or "manual_registry_over_llm"
+            if decision in ADJUDICATED_ADDRESS_DECISIONS or has_manual_locked_address(item):
+                row["decision"] = decision or "manual_locked_place_over_llm"
                 row["verification_note"] = first(verification.get("note")) or (
-                    "manual venue registry is treated as the public display authority over materialized LLM candidates"
+                    "manual or locked venue address is treated as the public display authority over materialized LLM candidates"
                 )
                 issues["adjudicated_address_diff"].append(row)
             else:
@@ -377,7 +482,10 @@ def audit(api_dir: Path) -> dict[str, Any]:
             else:
                 issues["time_diff"].append(row)
 
-        if AGGREGATE_TITLE_RE.search(aggregate_title_text(item)):
+        if AGGREGATE_TITLE_RE.search(aggregate_title_text(item)) and not has_strong_single_event_poster_evidence(
+            item,
+            current_artists,
+        ):
             issues["aggregate_like"].append(
                 {
                     "id": iid,
@@ -390,13 +498,19 @@ def audit(api_dir: Path) -> dict[str, Any]:
             )
 
     summary = {key: len(value) for key, value in issues.items()}
-    missing_enrichment_fail_count = missing_enrichment_current_count if enrichment_index_expected else 0
+    missing_enrichment_fail_count = 0 if soft_missing_enrichment else (
+        missing_enrichment_current_count if enrichment_index_expected else 0
+    )
+    missing_lineup_fail_count = sum(1 for row in issues["missing_lineup"] if row.get("current_feed_relevant", True))
+    if soft_missing_lineup:
+        missing_lineup_fail_count = 0
     hard_fail_count = (
         summary["suspicious_lineup"]
         + summary["address_diff"]
         + summary["time_diff"]
         + summary["aggregate_like"]
         + missing_enrichment_fail_count
+        + missing_lineup_fail_count
     )
     return {
         "schema_version": "weekly_activity_lineup_address_time_audit.v1",
@@ -417,9 +531,17 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--api-dir", type=Path, default=DEFAULT_API_DIR)
     parser.add_argument("--report", type=Path)
     parser.add_argument("--strict", action="store_true")
+    parser.add_argument("--soft-missing-lineup", action="store_true",
+                        help="Downgrade missing_lineup from hard-fail to soft warning (for confirmed events with no DJs listed in source)")
+    parser.add_argument("--soft-missing-enrichment", action="store_true",
+                        help="Downgrade missing LLM enrichment from hard-fail to warning for incremental packages whose fields are already source-grounded")
     args = parser.parse_args(argv)
 
-    report = audit(args.api_dir)
+    report = audit(
+        args.api_dir,
+        soft_missing_lineup=args.soft_missing_lineup,
+        soft_missing_enrichment=args.soft_missing_enrichment,
+    )
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

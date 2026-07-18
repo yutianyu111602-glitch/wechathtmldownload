@@ -10,7 +10,7 @@ from typing import Any
 
 
 DEFAULT_SUMMARY = Path(
-    r"D:\downstream_results\stage7_rewrite\longrun\LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE\summary.json"
+    r"E:\weekly_activity_pipeline\longrun\LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE\summary.json"
 )
 
 

@@ -10,6 +10,7 @@ are supported by the existing candidate evidence.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -25,7 +26,7 @@ from urllib.request import Request, urlopen
 
 
 DEFAULT_DEEPSEEK_BASE_URL = "https://api.deepseek.com"
-DEFAULT_PRIMARY_MODEL = "deepseek-v4-pro"
+DEFAULT_PRIMARY_MODEL = "deepseek-v4-flash"
 DEFAULT_ADJUDICATION_MODEL = "deepseek-v4-pro"
 DEFAULT_MAX_TOKENS = 2048
 DEFAULT_TEMP = 0
@@ -404,6 +405,56 @@ def parse_chat_response(response_payload: dict[str, Any]) -> dict[str, Any]:
     return strict_merge.extract_json_object(content)
 
 
+def deepseek_cache_key(payload: dict[str, Any]) -> str:
+    key_source = json.dumps(
+        {
+            "model": payload.get("model"),
+            "messages": payload.get("messages"),
+            "max_tokens": payload.get("max_tokens"),
+            "temperature": payload.get("temperature"),
+        },
+        ensure_ascii=False,
+        sort_keys=True,
+    )
+    return hashlib.sha256(key_source.encode("utf-8")).hexdigest()
+
+
+def make_cached_caller(
+    cache_dir: Path,
+    inner: Callable[..., dict[str, Any]],
+    stats: dict[str, int] | None = None,
+) -> Callable[..., dict[str, Any]]:
+    """Content-keyed response cache for daily incremental reruns.
+
+    The prompt embeds all row evidence (source text, OCR, review flags), so any
+    evidence change yields a new key and a fresh API call; only responses that
+    parse into a JSON object are cached to avoid poisoning the cache with
+    transient garbage.
+    """
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    def cached(payload: dict[str, Any], **kwargs: Any) -> dict[str, Any]:
+        path = cache_dir / f"{deepseek_cache_key(payload)}.json"
+        if path.exists():
+            try:
+                response = json.loads(path.read_text(encoding="utf-8"))
+                if stats is not None:
+                    stats["hits"] = stats.get("hits", 0) + 1
+                return response
+            except Exception:
+                pass
+        response = inner(payload, **kwargs)
+        if stats is not None:
+            stats["misses"] = stats.get("misses", 0) + 1
+        if parse_chat_response(response):
+            tmp = path.with_name(f"{path.stem}.{os.getpid()}-{time.time_ns()}.tmp")
+            tmp.write_text(json.dumps(response, ensure_ascii=False), encoding="utf-8")
+            os.replace(tmp, path)
+        return response
+
+    return cached
+
+
 def merge_deepseek_enrichment(
     row: dict[str, Any],
     parsed: dict[str, Any],
@@ -456,22 +507,47 @@ def enrich_rows(
     risk_counter: Counter[str] = Counter()
 
     total = len(rows)
+    if output_jsonl:
+        Path(output_jsonl).parent.mkdir(parents=True, exist_ok=True)
     out_fh = open(output_jsonl, "w", encoding="utf-8") if output_jsonl else None
+
+    def failed_result(
+        index: int,
+        row: dict[str, Any],
+        exc: BaseException,
+        *,
+        model: str = "",
+        risk_flags: list[str] | None = None,
+    ) -> tuple[int, dict[str, Any], bool, bool, list[str], list[str], list[str], list[str]]:
+        flags = risk_flags or []
+        failed_row = dict(row)
+        failed_row["deepseek_enrichment_error"] = str(exc)[-500:]
+        if model:
+            failed_row["deepseek_enrichment_model"] = model
+        failed_row["deepseek_enrichment_risk_flags"] = flags
+        return index, failed_row, False, True, [], [], flags, [str(exc)[-200:]]
+
     def process_one(index: int, row: dict[str, Any]) -> tuple[int, dict[str, Any], bool, bool, list[str], list[str], list[str], list[str]]:
         if limit >= 0 and index >= limit:
             return index, row, False, False, [], [], [], []
-        sequence, risk_flags = model_sequence_for_row(
-            row,
-            primary_model=primary_model,
-            adjudication_model=adjudication_model,
-            adjudicate_risky=adjudicate_risky,
-        )
+        try:
+            sequence, risk_flags = model_sequence_for_row(
+                row,
+                primary_model=primary_model,
+                adjudication_model=adjudication_model,
+                adjudicate_risky=adjudicate_risky,
+            )
+        except Exception as exc:
+            return failed_result(index, row, exc)
         current = dict(row)
         changed_total: list[str] = []
         models_used: list[str] = []
         did_enrich = False
         for model, pass_risk_flags in sequence:
-            payload = build_deepseek_payload(current, model=model, max_tokens=max_tokens, temp=temp)
+            try:
+                payload = build_deepseek_payload(current, model=model, max_tokens=max_tokens, temp=temp)
+            except Exception as exc:
+                return failed_result(index, current, exc, model=model, risk_flags=risk_flags)
             attempts = max(1, int(max_retries) + 1)
             for attempt in range(attempts):
                 try:
@@ -487,11 +563,17 @@ def enrich_rows(
                         if retry_backoff_s > 0:
                             time.sleep(float(retry_backoff_s) * (2 ** attempt))
                         continue
-                    failed_row = dict(current)
-                    failed_row["deepseek_enrichment_error"] = str(exc)[-500:]
-                    failed_row["deepseek_enrichment_model"] = model
-                    failed_row["deepseek_enrichment_risk_flags"] = risk_flags
-                    return index, failed_row, did_enrich, True, changed_total, models_used, risk_flags, [str(exc)[-200:]]
+                    failed_row = failed_result(index, current, exc, model=model, risk_flags=risk_flags)
+                    return (
+                        failed_row[0],
+                        failed_row[1],
+                        did_enrich,
+                        True,
+                        changed_total,
+                        models_used,
+                        risk_flags,
+                        failed_row[7],
+                    )
         return index, current, did_enrich, False, changed_total, models_used, risk_flags, []
 
     def accept_result(
@@ -538,10 +620,15 @@ def enrich_rows(
     else:
         done_count = 0
         with ThreadPoolExecutor(max_workers=concurrency) as executor:
-            futures = [executor.submit(process_one, index, row) for index, row in enumerate(rows)]
+            futures = {executor.submit(process_one, index, row): (index, row) for index, row in enumerate(rows)}
             for future in as_completed(futures):
                 done_count += 1
-                accept_result(future.result(), done_count)
+                try:
+                    result = future.result()
+                except Exception as exc:
+                    index, row = futures[future]
+                    result = failed_result(index, row, exc)
+                accept_result(result, done_count)
 
     if out_fh is not None:
         out_fh.close()
@@ -582,12 +669,18 @@ def main(
     parser.add_argument("--temp", type=float, default=DEFAULT_TEMP)
     parser.add_argument("--progress-every", type=int, default=25, help="Print JSON progress to stderr every N rows; 0 disables")
     parser.add_argument("--concurrency", type=int, default=1)
+    parser.add_argument("--cache-dir", default="", help="Content-keyed response cache dir for incremental reruns; empty disables")
     args = parser.parse_args(argv)
 
     api_key = args.api_key or os.environ.get(args.api_key_env, "")
     if not api_key:
         print(f"{args.api_key_env} is not configured", file=sys.stderr)
         return 2
+
+    effective_caller = caller
+    cache_stats: dict[str, int] = {"hits": 0, "misses": 0}
+    if args.cache_dir:
+        effective_caller = make_cached_caller(Path(args.cache_dir), caller, stats=cache_stats)
 
     rows = read_jsonl(Path(args.input_jsonl))
     enriched_rows, stats = enrich_rows(
@@ -605,7 +698,8 @@ def main(
         retry_backoff_s=args.retry_backoff_s,
         progress_every=args.progress_every,
         concurrency=args.concurrency,
-        caller=caller,
+        caller=effective_caller,
+        output_jsonl=args.output_jsonl,
     )
     write_jsonl(Path(args.output_jsonl), enriched_rows)
     summary = {
@@ -617,6 +711,10 @@ def main(
         "base_url": args.base_url,
         "api_key_configured": bool(api_key),
     }
+    if args.cache_dir:
+        summary["cache_dir"] = args.cache_dir
+        summary["cache_hits"] = cache_stats["hits"]
+        summary["cache_misses"] = cache_stats["misses"]
     if args.summary_json:
         write_json(Path(args.summary_json), summary)
     return 0 if stats["failed"] == 0 else 1

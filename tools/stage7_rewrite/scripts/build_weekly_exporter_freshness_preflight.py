@@ -19,7 +19,7 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[3]
 STAGE7_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_LATEST_QUEUE_SUMMARY = Path(
-    r"D:\downstream_results\stage7_rewrite\longrun\LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE\summary.json"
+    r"E:\weekly_activity_pipeline\longrun\LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE\summary.json"
 )
 DEFAULT_SCHEMA_VERSION = "weekly_exporter_freshness_preflight.v1"
 READY_DECISION = "weekly_exporter_freshness_preflight_ready_report_only"

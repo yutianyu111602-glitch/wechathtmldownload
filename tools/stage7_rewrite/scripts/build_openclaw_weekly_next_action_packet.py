@@ -99,6 +99,9 @@ def source_summary(quality: dict[str, Any]) -> dict[str, Any]:
         "public_or_temp_poster_url_count": int_value(quality.get("public_or_temp_poster_url_count")),
         "public_wechat_or_qpic_poster_count": int_value(quality.get("public_wechat_or_qpic_poster_count")),
         "runtime_poster_state_count": int_value(quality.get("runtime_poster_state_count")),
+        "main_poster_selection_review_required_count": int_value(
+            quality.get("main_poster_selection_review_required_count")
+        ),
         "aggregate_child_poster_suppressed_count": int_value(quality.get("aggregate_child_poster_suppressed_count")),
         "aggregate_child_source_enabled_count": int_value(quality.get("aggregate_child_source_enabled_count")),
         "aggregate_child_source_hash_present_count": int_value(quality.get("aggregate_child_source_hash_present_count")),
@@ -180,6 +183,11 @@ def auth_qr_retry_controller_summary(controller: dict[str, Any]) -> dict[str, An
 def current_release_quality_recovery_summary(packet: dict[str, Any]) -> dict[str, Any]:
     current_quality = packet.get("current_release_quality", {}) if isinstance(packet.get("current_release_quality"), dict) else {}
     poster = packet.get("poster_recovery", {}) if isinstance(packet.get("poster_recovery"), dict) else {}
+    main_poster = (
+        packet.get("main_poster_selection_recovery", {})
+        if isinstance(packet.get("main_poster_selection_recovery"), dict)
+        else {}
+    )
     geo = packet.get("geo_recovery", {}) if isinstance(packet.get("geo_recovery"), dict) else {}
     return {
         "decision": packet.get("decision"),
@@ -189,12 +197,26 @@ def current_release_quality_recovery_summary(packet: dict[str, Any]) -> dict[str
         "invalid_poster_storage_count": int_value(current_quality.get("invalid_poster_storage_count")),
         "public_or_temp_poster_url_count": int_value(current_quality.get("public_or_temp_poster_url_count")),
         "public_wechat_or_qpic_poster_count": int_value(current_quality.get("public_wechat_or_qpic_poster_count")),
+        "main_poster_selection_review_required_count": int_value(
+            current_quality.get("main_poster_selection_review_required_count")
+        ),
         "missing_geo_count": int_value(current_quality.get("missing_geo_count")),
         "poster_recovery_required": bool_value(poster.get("required")),
         "poster_recovery_next_action_task_id": text_value(poster.get("next_action_task_id")),
         "poster_article_image_ocr_recovery_count": int_value(poster.get("article_image_ocr_recovery_count")),
         "poster_public_upload_candidate_count": int_value(poster.get("public_upload_candidate_count")),
         "all_missing_posters_are_aggregate_children": bool_value(poster.get("all_missing_posters_are_aggregate_children")),
+        "main_poster_selection_recovery_required": bool_value(main_poster.get("required")),
+        "main_poster_selection_next_action_task_id": text_value(main_poster.get("next_action_task_id")),
+        "main_poster_review_required_count": int_value(main_poster.get("review_required_count")),
+        "selected_poster_rejected_count": int_value(main_poster.get("selected_poster_rejected_count")),
+        "accepted_selected_poster_count": int_value(main_poster.get("accepted_selected_poster_count")),
+        "main_poster_manual_review_count": int_value(main_poster.get("manual_review_count")),
+        "main_poster_provider_error_count": int_value(main_poster.get("provider_error_count")),
+        "main_poster_vision_api_executed_in_batch": bool_value(
+            main_poster.get("vision_api_executed_in_batch")
+        ),
+        "main_poster_mimo_api_executed_in_batch": bool_value(main_poster.get("mimo_api_executed_in_batch")),
         "geo_recovery_required": bool_value(geo.get("required")),
         "geo_recovery_next_action_task_id": text_value(geo.get("next_action_task_id")),
         "task_count": int_value(packet.get("task_count")),
@@ -424,6 +446,42 @@ def build_packet(
             ],
         )
 
+    if current_release_recovery_summary.get("main_poster_selection_recovery_required"):
+        append_task(
+            tasks,
+            task_id=current_release_recovery_summary.get("main_poster_selection_next_action_task_id")
+            or "openclaw_weekly:poster_selection:current_release_mimo_rejected_recovery",
+            task_type="current_release_quality_recovery_packet_main_poster_selection",
+            blocker_class="semantic_main_poster_quality_blocker",
+            evidence_path=safe_path(current_release_quality_recovery_packet_path)
+            if current_release_quality_recovery_packet_path
+            else "",
+            item_count=current_release_recovery_summary.get("item_count"),
+            review_required_count=current_release_recovery_summary.get(
+                "main_poster_review_required_count"
+            ),
+            selected_poster_rejected_count=current_release_recovery_summary.get(
+                "selected_poster_rejected_count"
+            ),
+            accepted_selected_poster_count=current_release_recovery_summary.get(
+                "accepted_selected_poster_count"
+            ),
+            manual_review_count=current_release_recovery_summary.get("main_poster_manual_review_count"),
+            provider_error_count=current_release_recovery_summary.get("main_poster_provider_error_count"),
+            vision_api_executed_in_batch=current_release_recovery_summary.get(
+                "main_poster_vision_api_executed_in_batch"
+            ),
+            mimo_api_executed_in_batch=current_release_recovery_summary.get(
+                "main_poster_mimo_api_executed_in_batch"
+            ),
+            next_safe_actions=[
+                "use existing MiMo rejection evidence to replace bad selected posters from article body images",
+                "demote venue notices, opening-hours cards, QR/social cards, maps, menus, safety rules, recruitment cards, and generic photos",
+                "rerun MiMo main-poster review after selection changes and before CloudBase/package/deploy gates",
+                "do not run CloudBase upload, package patch, deploy, upload, review, or release without later controller gates",
+            ],
+        )
+
     if (candidate["missing_geo_count"] or runtime["missing_geo_count"]) and not current_release_recovery_summary.get(
         "geo_recovery_required"
     ):
@@ -550,6 +608,7 @@ def build_packet(
             if current_release_recovery_summary
             and (
                 current_release_recovery_summary.get("poster_recovery_required")
+                or current_release_recovery_summary.get("main_poster_selection_recovery_required")
                 or current_release_recovery_summary.get("geo_recovery_required")
             )
             else ("missing_or_not_consumed" if not current_release_recovery_summary else "not_required"),

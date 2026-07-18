@@ -99,6 +99,27 @@ function itemEndDate(item) {
   return item.event_date_end || itemDate(item);
 }
 
+function dateKey(value) {
+  const match = String(value || "").match(/\d{4}-\d{2}-\d{2}/);
+  return match ? match[0] : "";
+}
+
+function chinaDateKey(value = new Date()) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Date(date.getTime() + 8 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+function compareByStartDateAsc(a, b) {
+  const dateCompare = dateKey(itemDate(a)).localeCompare(dateKey(itemDate(b)));
+  if (dateCompare !== 0) return dateCompare;
+  return itemTitle(a).localeCompare(itemTitle(b), "zh-Hans-CN");
+}
+
+function compareByStartDateDesc(a, b) {
+  return compareByStartDateAsc(b, a);
+}
+
 function itemCity(item) {
   return first(item.city, item.city_name || item.city_key || first(item.city_keys, ""));
 }
@@ -203,7 +224,15 @@ function buildSummary(items, generatedAt) {
       if (key) artists.set(key, (artists.get(key) || 0) + 1);
     }
   }
-  const highlightEvents = items.slice(0, 4).map((item) => ({
+  const today = chinaDateKey(generatedAt);
+  const currentOrUpcoming = today
+    ? items.filter((item) => {
+        const end = dateKey(itemEndDate(item));
+        return end && end >= today;
+      })
+    : [];
+  const highlightSource = (currentOrUpcoming.length ? currentOrUpcoming.sort(compareByStartDateAsc) : [...items].sort(compareByStartDateDesc)).slice(0, 4);
+  const highlightEvents = highlightSource.map((item) => ({
     title: itemTitle(item),
     reason_zh: `源字段显示 ${itemCity(item) || "未知城市"} / ${itemVenue(item) || "未知场地"} / ${itemDate(item) || "未知日期"}；未调用模型。`,
     reason_en: `Source fields show ${itemCity(item) || "unknown city"} / ${itemVenue(item) || "unknown venue"} / ${itemDate(item) || "unknown date"}; no model call was made.`,

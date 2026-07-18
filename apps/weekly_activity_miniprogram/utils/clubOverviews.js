@@ -1,5 +1,3 @@
-const clubOverviewData = require("../data/club_overviews");
-
 const KIND_PRIORITY = {
   week: 0,
   holiday: 1,
@@ -68,7 +66,7 @@ function toDisplayItem(item = {}, lang = "zh") {
 }
 
 function getClubOverviewsForVenue(name, options = {}) {
-  const data = options.data || clubOverviewData;
+  const data = options.data || {};
   const lang = options.lang || "zh";
   const byClub = data && data.by_club && typeof data.by_club === "object" ? data.by_club : {};
   const matched = [];

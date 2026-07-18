@@ -12,17 +12,15 @@ Usage:
     --check   Verify patch is applied without modifying the file.
 """
 import argparse
-import glob
+import json
+import os
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
-# The npx cache lives here; the hash changes only when the package lock changes.
-# If the hash directory disappears, this script searches the whole npm-cache tree.
-_NPX_CACHE_HINT = (
-    r"C:\Users\pc\AppData\Local\npm-cache\_npx"
-    r"\541eff4f486037bb"
-    r"\node_modules\@cloudbase\cli\dist\standalone\cli.js"
-)
+TCB_PACKAGE = "@cloudbase/cli@3.3.1"
+TCB_RELATIVE_CLI = Path("node_modules/@cloudbase/cli/dist/standalone/cli.js")
 
 OLD_SNIPPET = "options: cmdOptions,"
 NEW_SNIPPET = "options: Object.assign({}, cmdOptions, envId ? { envId: envId } : {}),"
@@ -32,31 +30,77 @@ CONTEXT_BEFORE = "containerPort"
 CONTEXT_WINDOW = 600  # chars around the match to check for context
 
 
+def npm_cache_roots() -> list[Path]:
+    roots: list[Path] = []
+
+    def add(value: str | Path | None) -> None:
+        if value is None:
+            return
+        path = Path(value).expanduser()
+        if path not in roots:
+            roots.append(path)
+
+    add(os.environ.get("NPM_CONFIG_CACHE"))
+    npm = shutil.which("npm")
+    if npm:
+        try:
+            result = subprocess.run(
+                [npm, "config", "get", "cache"],
+                check=False,
+                capture_output=True,
+                text=True,
+                timeout=20,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                add(result.stdout.strip())
+        except (OSError, subprocess.SubprocessError):
+            pass
+    add(Path.home() / "AppData" / "Local" / "npm-cache")
+    return roots
+
+
 def find_cli_js() -> Path | None:
-    """Return the path to the patched cli.js, or None if not found."""
+    """Return the active pinned tcb cli.js from local install or npm's real cache."""
     local_cli = (
         Path(__file__).resolve().parents[1]
-        / "node_modules"
-        / "@cloudbase"
-        / "cli"
-        / "dist"
-        / "standalone"
-        / "cli.js"
+        / TCB_RELATIVE_CLI
     )
     if local_cli.exists():
         return local_cli
 
-    hint = Path(_NPX_CACHE_HINT)
-    if hint.exists():
-        return hint
-
-    # Fallback: search entire npm-cache
-    npm_cache = Path(r"C:\Users\pc\AppData\Local\npm-cache\_npx")
-    if not npm_cache.exists():
-        return None
-    for candidate in npm_cache.rglob("@cloudbase/cli/dist/standalone/cli.js"):
-        return candidate
+    for npm_cache in npm_cache_roots():
+        npx_root = npm_cache / "_npx"
+        if not npx_root.exists():
+            continue
+        for candidate in npx_root.glob(f"*/{TCB_RELATIVE_CLI.as_posix()}"):
+            package_json = candidate.parents[2] / "package.json"
+            try:
+                package = json.loads(package_json.read_text(encoding="utf-8"))
+                if package.get("version") == "3.3.1":
+                    return candidate
+            except (OSError, json.JSONDecodeError):
+                continue
     return None
+
+
+def ensure_cli_js() -> Path | None:
+    path = find_cli_js()
+    if path is not None:
+        return path
+    npm = shutil.which("npm")
+    if not npm:
+        return None
+    print(f"Pinned {TCB_PACKAGE} is not cached; restoring it with npm exec...")
+    try:
+        result = subprocess.run(
+            [npm, "exec", "--yes", "--package", TCB_PACKAGE, "--", "tcb", "--version"],
+            check=False,
+            timeout=180,
+        )
+    except (OSError, subprocess.SubprocessError) as error:
+        print(f"WARNING: could not restore {TCB_PACKAGE}: {error}")
+        return None
+    return find_cli_js() if result.returncode == 0 else None
 
 
 def check_patch(content: str) -> str:
@@ -79,6 +123,10 @@ def apply_patch(path: Path, content: str) -> bool:
             path.write_text(patched, encoding="utf-8")
             return True
         idx = content.find(OLD_SNIPPET, idx + 1)
+    if content.count(OLD_SNIPPET) == 1:
+        patched = content.replace(OLD_SNIPPET, NEW_SNIPPET, 1)
+        path.write_text(patched, encoding="utf-8")
+        return True
     return False
 
 
@@ -87,9 +135,9 @@ def main() -> int:
     parser.add_argument("--check", action="store_true", help="Check only, no modification")
     args = parser.parse_args()
 
-    path = find_cli_js()
+    path = find_cli_js() if args.check else ensure_cli_js()
     if path is None:
-        print("ERROR: cli.js not found in npm-cache. Run: npm exec --yes --package @cloudbase/cli@3.3.1 -- tcb --version  to re-cache, then retry.")
+        print(f"ERROR: cli.js for pinned {TCB_PACKAGE} was not found in the configured npm cache.")
         return 1
 
     print(f"cli.js: {path}")

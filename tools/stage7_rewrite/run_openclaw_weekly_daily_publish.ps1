@@ -8,6 +8,7 @@ param(
     [switch]$DryRun,
     [switch]$SkipBuild,
     [switch]$DeployBackend,
+    [switch]$PromoteDjBioAtoms,
     [switch]$UploadFrontend,
     [switch]$SkipMiniProgramTests,
     [string]$WeekStart = "",
@@ -16,8 +17,10 @@ param(
     [int]$MaxItems = 10000,
     [ValidateSet("docker_exporter", "sanji_desktop_rss")]
     [string]$SourceMode = "sanji_desktop_rss",
+    [string]$SanjiSourceSnapshotDir = "",
+    [string[]]$SourcePolicyPriorReportPath = @(),
     [ValidateSet("legacy_ocr", "vl_direct_qwen")]
-    [string]$PosterExtractionMode = "legacy_ocr",
+    [string]$PosterExtractionMode = "vl_direct_qwen",
     [int]$PosterVlMaxImages = 0,
     [int]$PosterVlLimit = 0,
     [string]$PosterVlProvider = "qwen3_vl",
@@ -61,16 +64,54 @@ param(
     [string]$FullIncrementalPreflightGateScorecardPath = "",
     [int]$SanjiGapMinCandidateEventLike = 25,
     [double]$SanjiGapMaxQueueStalenessHours = 36.0,
-    [string]$PublicApiBase = "https://weekly-api-255880-4-1371956557.sh.run.tcloudbase.com"
+    [string]$PublicApiBase = "https://weekly-api-255880-4-1371956557.sh.run.tcloudbase.com",
+    [string]$ReleaseGuardPath = ""
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+$env:PYTHONUTF8 = "1"
+$env:PYTHONIOENCODING = "utf-8"
 
-$Repo = "C:\code\githubstar\wechathtmldownload"
+# Resolve one project-owned Python runtime for every nested helper.  The script
+# historically used bare `python` calls, which made the runtime depend on the
+# launching shell's PATH (and could mix Python 3.13 with Hermes' Python 3.11 in
+# one release).  Keep the existing call sites readable while routing all of
+# them through the same explicit Hermes runtime.
+$PythonExecutable = [Environment]::GetEnvironmentVariable("HUAIDJ_PYTHON", "Process")
+if ([string]::IsNullOrWhiteSpace($PythonExecutable)) {
+    $PythonExecutable = [Environment]::GetEnvironmentVariable("HUAIDJ_PYTHON", "User")
+}
+if ([string]::IsNullOrWhiteSpace($PythonExecutable)) {
+    $HermesHome = [Environment]::GetEnvironmentVariable("HERMES_HOME", "Process")
+    if ([string]::IsNullOrWhiteSpace($HermesHome)) {
+        $HermesHome = [Environment]::GetEnvironmentVariable("HERMES_HOME", "User")
+    }
+    if ([string]::IsNullOrWhiteSpace($HermesHome)) {
+        $HermesHome = "F:\DevData\Hermes"
+    }
+    $PythonExecutable = Join-Path $HermesHome "hermes-agent\venv\Scripts\python.exe"
+}
+if (-not (Test-Path -LiteralPath $PythonExecutable -PathType Leaf)) {
+    throw "HUAIDJ Python runtime not found: $PythonExecutable"
+}
+$script:PythonExecutable = (Resolve-Path -LiteralPath $PythonExecutable).Path
+function Invoke-HuaidjPython {
+    & $script:PythonExecutable @args
+}
+Set-Alias -Name python -Value Invoke-HuaidjPython -Scope Script
+
+$Repo = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $Stage7 = Join-Path $Repo "tools\stage7_rewrite"
 $Scripts = Join-Path $Stage7 "scripts"
 $SanjiLatestExportRoot = "E:\公众号\sanji-daily-export"
+$usingProvidedSanjiSnapshot = -not [string]::IsNullOrWhiteSpace($SanjiSourceSnapshotDir)
+if ($usingProvidedSanjiSnapshot) {
+    if (-not (Test-Path -LiteralPath $SanjiSourceSnapshotDir -PathType Container)) {
+        throw "Explicit Sanji source snapshot directory not found: $SanjiSourceSnapshotDir"
+    }
+    $SanjiLatestExportRoot = (Resolve-Path -LiteralPath $SanjiSourceSnapshotDir).Path
+}
 $SanjiLatestQueuePath = Join-Path $SanjiLatestExportRoot "latest_queue.jsonl"
 $SanjiLatestSummaryPath = Join-Path $SanjiLatestExportRoot "latest_summary.json"
 $script:SanjiRunQueuePath = ""
@@ -79,8 +120,40 @@ $Longrun = "E:\weekly_activity_pipeline\longrun"
 $Reports = Join-Path $Stage7 "reports"
 $CloudRun = Join-Path $Repo "services\weekly_activity_cloudrun"
 $MiniProgram = Join-Path $Repo "apps\weekly_activity_miniprogram"
-$SkillGuard = "C:\Users\pc\.codex\skills\huaidj-weekly-release-guardian\scripts\check_weekly_release_guard.ps1"
+$HermesRoot = [Environment]::GetEnvironmentVariable("HERMES_HOME", "Process")
+if ([string]::IsNullOrWhiteSpace($HermesRoot)) {
+    $HermesRoot = [Environment]::GetEnvironmentVariable("HERMES_HOME", "User")
+}
+if ([string]::IsNullOrWhiteSpace($HermesRoot)) {
+    $HermesRoot = "F:\DevData\Hermes"
+}
+$openClawDailySkillCandidates = @(
+    [Environment]::GetEnvironmentVariable("HUAIDJ_OPENCLAW_DAILY_SKILL", "Process"),
+    [Environment]::GetEnvironmentVariable("HUAIDJ_OPENCLAW_DAILY_SKILL", "User"),
+    (Join-Path $env:USERPROFILE ".openclaw\skills\openclaw-weekly-daily-run\SKILL.md"),
+    (Join-Path $HermesRoot "skills\openclaw-weekly-daily-run\SKILL.md")
+) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+$OpenClawDailySkillPath = $openClawDailySkillCandidates | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
+$openClawDockerSkillCandidates = @(
+    [Environment]::GetEnvironmentVariable("HUAIDJ_OPENCLAW_DOCKER_SKILL", "Process"),
+    [Environment]::GetEnvironmentVariable("HUAIDJ_OPENCLAW_DOCKER_SKILL", "User"),
+    (Join-Path $env:USERPROFILE ".openclaw\skills\openclaw-docker-arsenal\SKILL.md"),
+    (Join-Path $HermesRoot "skills\openclaw-docker-arsenal\SKILL.md")
+) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+$OpenClawDockerSkillPath = $openClawDockerSkillCandidates | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
+$releaseGuardCandidates = @(
+    $ReleaseGuardPath,
+    [Environment]::GetEnvironmentVariable("HUAIDJ_RELEASE_GUARD", "Process"),
+    [Environment]::GetEnvironmentVariable("HUAIDJ_RELEASE_GUARD", "User"),
+    (Join-Path $env:USERPROFILE ".codex\skills\huaidj-weekly-release-guardian\scripts\check_weekly_release_guard.ps1"),
+    (Join-Path $env:USERPROFILE ".codex\skill-quarantine\recovery-20260715\huaidj-weekly-release-guardian\scripts\check_weekly_release_guard.ps1")
+) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+$SkillGuard = $releaseGuardCandidates | Where-Object { Test-Path -LiteralPath $_ -PathType Leaf } | Select-Object -First 1
+if ([string]::IsNullOrWhiteSpace($SkillGuard)) {
+    throw "HUAIDJ weekly release guard not found. Set -ReleaseGuardPath or HUAIDJ_RELEASE_GUARD."
+}
 $MergeIncrementalScript = Join-Path $Scripts "merge_weekly_incremental_api_package.py"
+$SourcePolicyRepairScript = Join-Path $Scripts "repair_weekly_api_package_for_source_policy.py"
 $PosterMigrationScript = Join-Path $Scripts "migrate_weekly_public_posters_to_cloudbase.py"
 $PosterMigrationGateScript = Join-Path $Scripts "validate_weekly_poster_cloudbase_migration_gate.py"
 $MissingPosterRecoveryScript = Join-Path $Scripts "build_weekly_missing_internal_poster_recovery_work_orders.py"
@@ -149,6 +222,11 @@ $MiniProgramTestScope = if ($SkipMiniProgramTests) {
 $script:PosterCloudBaseMigrationExecuted = $false
 $script:CloudRunDeployExecuted = $false
 $script:MiniProgramUploadExecuted = $false
+$script:AtlasMiniappBioPromotionExecuted = $false
+
+if ($PromoteDjBioAtoms -and -not $DeployBackend) {
+    throw "-PromoteDjBioAtoms writes the Atlas miniapp DB/index and is only valid with -DeployBackend so the same deploy context contains those writes."
+}
 
 $RunId = "openclaw_weekly_daily_${WeekTag}_" + (Get-Date -Format "HHmmss")
 $RunReportDir = Join-Path $Reports $RunId
@@ -166,6 +244,8 @@ $openclawWeeklyDarwinScorecardDir = Join-Path $RunReportDir "openclaw_darwin_sco
 $openclawWeeklyDarwinScorecardPath = Join-Path $openclawWeeklyDarwinScorecardDir "openclaw_weekly_darwin_scorecard.json"
 $fullIncrementalPreflightGateGeneratedReportPath = Join-Path $RunReportDir "openclaw_weekly_full_incremental_preflight_gate.json"
 $fullIncrementalPreflightGateGeneratedScorecardPath = Join-Path $RunReportDir "openclaw_weekly_full_incremental_preflight_gate.md"
+$sanjiLatestExportReadyReportPath = Join-Path $RunReportDir "sanji_latest_export_ready.json"
+$releaseConflictRepairReportPath = Join-Path $RunReportDir "release_conflict_repair.json"
 
 function Invoke-RunStep {
     param(
@@ -178,6 +258,7 @@ function Invoke-RunStep {
         Write-Host "  [DRY RUN] $Body" -ForegroundColor DarkGray
         return
     }
+    $global:LASTEXITCODE = 0
     & $Body
     if ($LASTEXITCODE -ne 0) {
         throw "Step failed: $Label (exit $LASTEXITCODE)"
@@ -430,7 +511,8 @@ function Assert-SanjiLatestExportReady {
         sanji_desktop_refresh_invoked = $sanjiContract.sanji_desktop_refresh_invoked
         snapshot_db_path = $sanjiContract.snapshot_db_path
         boundary = [pscustomobject]@{
-            refreshed_sanji_export_required = $true
+            refreshed_sanji_export_required = -not $usingProvidedSanjiSnapshot
+            provided_frozen_snapshot = $usingProvidedSanjiSnapshot
             copied_into_daily_queue_pointer = $false
             frozen_run_snapshot_created = $true
             sanji_source_stays_on_e_drive = $true
@@ -775,6 +857,7 @@ function Write-PublishSummary {
         sanji_queue_package_gap_audit_report = $SanjiGapAuditReportPath
         write_actions_allowed_now = $WriteActionsAllowedNow
         deploy_backend = [bool]$DeployBackend
+        promote_dj_bio_atoms = [bool]$PromoteDjBioAtoms
         upload_frontend = [bool]$UploadFrontend
         miniprogram_test_scope = $MiniProgramTestScope
         miniprogram_version = if ($UploadFrontend) { $Version } else { "" }
@@ -784,6 +867,7 @@ function Write-PublishSummary {
             cloudbase_db_write_executed = $false
             db2_write_executed = $false
             db3_write_executed = $false
+            atlas_miniapp_bio_write_executed = [bool]$script:AtlasMiniappBioPromotionExecuted
             cloudrun_deploy_executed = [bool]$script:CloudRunDeployExecuted
             miniprogram_upload_executed = [bool]$script:MiniProgramUploadExecuted
             review_submitted = $false
@@ -897,14 +981,16 @@ function Write-OpenClawReadinessAndNextAction {
     }
 
     if ((Test-Path $OpenClawWeeklyDarwinScorecardScript) -and
+        -not [string]::IsNullOrWhiteSpace($OpenClawDailySkillPath) -and
+        -not [string]::IsNullOrWhiteSpace($OpenClawDockerSkillPath) -and
         (Test-Path -LiteralPath $readinessSummaryReportPath) -and
         (Test-Path -LiteralPath $exporterFreshnessPreflightReportPath) -and
         (Test-Path -LiteralPath $exporterAuthRecoveryPreflightReportPath)) {
         Write-Host ""
         Write-Host "▶ Build OpenClaw Darwin scorecard before next-action packet" -ForegroundColor Yellow
         python $OpenClawWeeklyDarwinScorecardScript `
-            --daily-skill "C:\Users\pc\.openclaw\skills\openclaw-weekly-daily-run\SKILL.md" `
-            --docker-skill "C:\Users\pc\.openclaw\skills\openclaw-docker-arsenal\SKILL.md" `
+            --daily-skill $OpenClawDailySkillPath `
+            --docker-skill $OpenClawDockerSkillPath `
             --readiness $readinessSummaryReportPath `
             --exporter-freshness $exporterFreshnessPreflightReportPath `
             --exporter-auth-recovery $exporterAuthRecoveryPreflightReportPath `
@@ -941,14 +1027,16 @@ function Write-OpenClawReadinessAndNextAction {
 
     if ((Test-Path -LiteralPath $openclawWeeklyNextActionPacketPath) -and
         (Test-Path $OpenClawWeeklyDarwinScorecardScript) -and
+        -not [string]::IsNullOrWhiteSpace($OpenClawDailySkillPath) -and
+        -not [string]::IsNullOrWhiteSpace($OpenClawDockerSkillPath) -and
         (Test-Path -LiteralPath $readinessSummaryReportPath) -and
         (Test-Path -LiteralPath $exporterFreshnessPreflightReportPath) -and
         (Test-Path -LiteralPath $exporterAuthRecoveryPreflightReportPath)) {
         Write-Host ""
         Write-Host "▶ Rebuild OpenClaw Darwin scorecard with next-action packet" -ForegroundColor Yellow
         python $OpenClawWeeklyDarwinScorecardScript `
-            --daily-skill "C:\Users\pc\.openclaw\skills\openclaw-weekly-daily-run\SKILL.md" `
-            --docker-skill "C:\Users\pc\.openclaw\skills\openclaw-docker-arsenal\SKILL.md" `
+            --daily-skill $OpenClawDailySkillPath `
+            --docker-skill $OpenClawDockerSkillPath `
             --readiness $readinessSummaryReportPath `
             --exporter-freshness $exporterFreshnessPreflightReportPath `
             --exporter-auth-recovery $exporterAuthRecoveryPreflightReportPath `
@@ -987,13 +1075,14 @@ function Resolve-LatestOpenClawAuthReport {
 function Write-FullIncrementalPreflightBlockedSummary {
     param(
         [string]$GateReportPath,
-        [object]$Gate
+        [object]$Gate,
+        [int]$GateExitCode
     )
     $nextActionSummary = if ($Gate -and ($Gate.PSObject.Properties.Name -contains "next_action_summary")) { $Gate.next_action_summary } else { $null }
     $failedRequired = if ($Gate -and ($Gate.PSObject.Properties.Name -contains "failed_required_check_ids")) { @($Gate.failed_required_check_ids) } else { @() }
     $summary = [pscustomobject]@{
         schema_version = "openclaw_weekly_daily_publish_summary.v2"
-        ok = $true
+        ok = $false
         status = "blocked_on_full_incremental_preflight_gate"
         decision = "blocked_on_full_incremental_preflight_gate"
         dry_run = [bool]$DryRun
@@ -1020,7 +1109,7 @@ function Write-FullIncrementalPreflightBlockedSummary {
         guard_min_expected_items = $EffectiveMinExpectedItems
         package_candidate_ready = $false
         release_ready = $false
-        quality_gate_exit_code = 0
+        quality_gate_exit_code = if ($GateExitCode -ne 0) { $GateExitCode } else { 20 }
         blocked_reason = "full incremental preflight gate denied source refresh/build; continue ordered next-action recovery before any full incremental package run"
         full_incremental_preflight_gate_report = $GateReportPath
         full_incremental_candidate_run_allowed_now = if ($Gate) { [bool]$Gate.full_incremental_candidate_run_allowed_now } else { $false }
@@ -1125,11 +1214,12 @@ function Assert-FullIncrementalPreflightGate {
         $allowed = $false
     }
     if (-not $allowed) {
-        $summaryPath = Write-FullIncrementalPreflightBlockedSummary -GateReportPath $gateReportPath -Gate $gate
+        $summaryPath = Write-FullIncrementalPreflightBlockedSummary -GateReportPath $gateReportPath -Gate $gate -GateExitCode $gateExitCode
         $failed = if ($gate.PSObject.Properties.Name -contains "failed_required_check_ids") { @($gate.failed_required_check_ids) -join "," } else { "unknown" }
         Write-Host ""
         Write-Host "⚠ Full incremental preflight gate blocked source refresh/build: report=$gateReportPath summary=$summaryPath failed=$failed" -ForegroundColor Yellow
-        exit 0
+        $blockedExitCode = if ($gateExitCode -ne 0) { [int]$gateExitCode } else { 20 }
+        exit $blockedExitCode
     }
     Write-Host "  ✓ Full incremental preflight gate allows source refresh/build: $gateReportPath" -ForegroundColor Green
 }
@@ -1241,6 +1331,14 @@ if (-not $DryRun -and $SourceMode -eq "docker_exporter") {
 
 Assert-FullIncrementalPreflightGate
 
+if ($SourceMode -eq "sanji_desktop_rss") {
+    Invoke-RunStep "Freeze Sanji source snapshot before build" {
+        Assert-SanjiLatestExportReady `
+            -Mode $SourceMode `
+            -ReportPath $sanjiLatestExportReadyReportPath
+    }
+}
+
 if (-not $SkipBuild) {
     Invoke-RunStep "Build daily source package from selected source queue" {
         $pipelineArgs = @{
@@ -1277,18 +1375,21 @@ if (-not $SkipBuild) {
             (Test-Path (Join-Path $vlDir "weekly_activity_recommendation_review_candidates.jsonl")) -and
             (Test-Path (Join-Path $vlDir "summary.json"))
         )
+        $allowImplicitVlResume = ($PosterExtractionMode -eq "vl_direct_qwen" -and $SourceMode -ne "sanji_desktop_rss")
         if (-not [string]::IsNullOrWhiteSpace($ResumeVlDir)) {
             $pipelineArgs.ResumeVlDir = $ResumeVlDir
             Write-Host "  Resume VL from explicit complete package: $ResumeVlDir" -ForegroundColor Cyan
         } elseif (-not [string]::IsNullOrWhiteSpace($ResumeVlEvidenceDir)) {
             $pipelineArgs.ResumeVlEvidenceDir = $ResumeVlEvidenceDir
             Write-Host "  Resume VL from explicit evidence dir: $ResumeVlEvidenceDir" -ForegroundColor Cyan
-        } elseif ($vlCompleteOutput) {
+        } elseif ($allowImplicitVlResume -and $vlCompleteOutput) {
             $pipelineArgs.ResumeVlDir = $vlDir
             Write-Host "  Auto-resume downstream pipeline from complete VL package: $vlDir" -ForegroundColor Cyan
-        } elseif ((Test-Path $vlEvidenceDir) -and ((Get-ChildItem $vlEvidenceDir -File -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0)) {
+        } elseif ($allowImplicitVlResume -and (Test-Path $vlEvidenceDir) -and ((Get-ChildItem $vlEvidenceDir -File -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0)) {
             $pipelineArgs.ResumeVlEvidenceDir = $vlEvidenceDir
             Write-Host "  Auto-resume VL enrichment from evidence $vlEvidenceDir ($((Get-ChildItem $vlEvidenceDir -File -ErrorAction SilentlyContinue | Measure-Object).Count) existing evidence files)" -ForegroundColor Cyan
+        } elseif ($SourceMode -eq "sanji_desktop_rss" -and ($vlCompleteOutput -or (Test-Path $vlEvidenceDir))) {
+            Write-Host "  Skip implicit VL resume for Sanji source: Sanji source snapshot must be rebuilt for this run." -ForegroundColor Yellow
         }
         if ($SourceMode -eq "sanji_desktop_rss") {
             $sanjiQueueForPipeline = if (-not [string]::IsNullOrWhiteSpace($script:SanjiRunQueuePath)) {
@@ -1381,11 +1482,15 @@ Invoke-RunStep "Repair duplicate/conflicting release rows" {
         --api-dir $ApiDir `
         --source-url-map (Join-Path $ApiDir "source_actions\source_url_map.json") `
         --explicit-source-maps-only `
-        --report (Join-Path $RunReportDir "release_conflict_repair.json") `
+        --report $releaseConflictRepairReportPath `
         --write `
         --backup `
         --quarantine-conflicts `
         --enforce-window-start
+    Assert-NativeSuccess "Release conflict repair"
+    Copy-Item -LiteralPath $releaseConflictRepairReportPath `
+        -Destination (Join-Path $ApiDir "release_conflict_repair_history_$RunId.json") `
+        -Force
 }
 
 Invoke-RunStep "Repair soft lineup/address/time fields" {
@@ -1393,6 +1498,26 @@ Invoke-RunStep "Repair soft lineup/address/time fields" {
         --api-dir $ApiDir `
         --report (Join-Path $RunReportDir "lineup_address_time_repair.json") `
         --write
+}
+
+Invoke-RunStep "Repair final merged package source policy" {
+    if (-not (Test-Path $SourcePolicyRepairScript)) {
+        throw "Final source-policy repair script not found: $SourcePolicyRepairScript"
+    }
+    $sourcePolicyRepairArgs = @(
+        "--api-dir", $ApiDir,
+        "--source-policy", (Join-Path $Stage7 "registries\weekly_sanji_source_policy.json"),
+        "--report", (Join-Path $RunReportDir "source_policy_package_repair.json"),
+        "--policy-only"
+    )
+    foreach ($priorReport in @($SourcePolicyPriorReportPath)) {
+        if (-not [string]::IsNullOrWhiteSpace($priorReport)) {
+            $sourcePolicyRepairArgs += "--prior-report"
+            $sourcePolicyRepairArgs += $priorReport
+        }
+    }
+    python $SourcePolicyRepairScript @sourcePolicyRepairArgs
+    Assert-NativeSuccess "Final merged package source-policy repair"
 }
 
 Invoke-RunStep "Apply confirmed venue geo locks" {
@@ -1531,7 +1656,6 @@ $exporterQrEndpointDiagnosticGeneratedReportPath = Join-Path $RunReportDir "week
 $exporterAuthRecoveryPreflightReportPath = Join-Path $RunReportDir "weekly_exporter_auth_recovery_preflight.json"
 $sanjiGapAuditReportPath = Join-Path $RunReportDir "sanji_queue_package_gap_audit.json"
 $sanjiSourceContractManifestReportPath = Join-Path $RunReportDir "sanji_source_contract_manifest_patch.json"
-$sanjiLatestExportReadyReportPath = Join-Path $RunReportDir "sanji_latest_export_ready.json"
 $posterMigrationWriteGateReady = $false
 
 Invoke-RunStep "Repair API manifest provenance" {
@@ -1545,10 +1669,15 @@ Invoke-RunStep "Repair API manifest provenance" {
     Assert-NativeSuccess "API manifest provenance repair"
 }
 
-Invoke-RunStep "Validate Sanji latest export on E drive" {
-    Assert-SanjiLatestExportReady `
-        -Mode $SourceMode `
-        -ReportPath $sanjiLatestExportReadyReportPath
+if ($SourceMode -eq "sanji_desktop_rss") {
+    Invoke-RunStep "Use frozen Sanji source snapshot for manifest and coverage gates" {
+        if ([string]::IsNullOrWhiteSpace($script:SanjiRunSummaryPath) -or -not (Test-Path -LiteralPath $script:SanjiRunSummaryPath)) {
+            throw "Frozen Sanji summary snapshot is unavailable: $($script:SanjiRunSummaryPath)"
+        }
+        if ([string]::IsNullOrWhiteSpace($script:SanjiRunQueuePath) -or -not (Test-Path -LiteralPath $script:SanjiRunQueuePath)) {
+            throw "Frozen Sanji queue snapshot is unavailable: $($script:SanjiRunQueuePath)"
+        }
+    }
 }
 
 Invoke-RunStep "Attach API manifest source contract" {
@@ -1881,7 +2010,7 @@ if ((Test-Path $ExporterAuthRecoveryPreflightScript) -and (
 }
 if ($qualityExitCode -ne 0 -and $posterMigrationWriteGateReady) {
     $summaryPath = Write-PublishSummary `
-        -Ok $true `
+        -Ok $false `
         -Status "blocked_on_cloudbase_poster_migration_write_gate" `
         -Decision "blocked_on_cloudbase_poster_migration_write_gate" `
         -PackageCandidateReady $true `
@@ -1907,11 +2036,11 @@ if ($qualityExitCode -ne 0 -and $posterMigrationWriteGateReady) {
     Write-OpenClawReadinessAndNextAction -SummaryPath $summaryPath
     Write-Host ""
     Write-Host "⚠ OpenClaw weekly daily runbook blocked on CloudBase poster migration write gate: $summaryPath" -ForegroundColor Yellow
-    exit 0
+    exit $qualityExitCode
 }
 if ($qualityExitCode -ne 0) {
     $summaryPath = Write-PublishSummary `
-        -Ok $true `
+        -Ok $false `
         -Status "blocked_on_release_package_quality_gate" `
         -Decision "blocked_on_release_package_quality_gate" `
         -PackageCandidateReady $false `
@@ -1938,7 +2067,7 @@ if ($qualityExitCode -ne 0) {
     Write-OpenClawReadinessAndNextAction -SummaryPath $summaryPath
     Write-Host ""
     Write-Host "⚠ OpenClaw weekly daily runbook blocked on release package quality gate: $summaryPath" -ForegroundColor Yellow
-    exit 0
+    exit $qualityExitCode
 }
 Write-Host "  ✓ Run release package quality gate" -ForegroundColor Green
 
@@ -1959,6 +2088,7 @@ if ($SourceMode -eq "sanji_desktop_rss") {
     python $SanjiGapAuditScript `
         --queue $sanjiQueueForGapAudit `
         --api-dir $ApiDir `
+        --repair-report $releaseConflictRepairReportPath `
         --report $sanjiGapAuditReportPath `
         --week-start $WeekStart `
         --window-days $WindowDays `
@@ -1968,7 +2098,7 @@ if ($SourceMode -eq "sanji_desktop_rss") {
     $sanjiGapExitCode = $LASTEXITCODE
     if ($sanjiGapExitCode -ne 0) {
         $summaryPath = Write-PublishSummary `
-            -Ok $true `
+            -Ok $false `
             -Status "blocked_on_sanji_queue_package_gap" `
             -Decision "blocked_on_sanji_queue_package_gap" `
             -PackageCandidateReady $false `
@@ -1995,7 +2125,7 @@ if ($SourceMode -eq "sanji_desktop_rss") {
         Write-OpenClawReadinessAndNextAction -SummaryPath $summaryPath
         Write-Host ""
         Write-Host "⚠ OpenClaw weekly daily runbook blocked on Sanji source coverage gate: $summaryPath" -ForegroundColor Yellow
-        exit 0
+        exit $sanjiGapExitCode
     }
     Write-Host "  ✓ Run Sanji source coverage gate" -ForegroundColor Green
 }
@@ -2046,6 +2176,7 @@ if (-not $SkipMiniProgramTests) {
 Invoke-RunStep "Run release guard against candidate API package" {
     $guardArgs = @(
         "-File", $SkillGuard,
+        "-RepoPath", $Repo,
         "-GateMode", "current-package",
         "-ExpectedMinItems", "$EffectiveMinExpectedItems",
         "-CurrentReleaseDir", $ApiDir,
@@ -2071,6 +2202,17 @@ $itemCount = 0
 if (-not $DryRun) {
     $manifest = Get-Content -Raw -LiteralPath (Join-Path $ApiDir "manifest.json") | ConvertFrom-Json
     $itemCount = [int]$manifest.item_count
+}
+
+$BioPromotionScript = Join-Path $Scripts "promote_dj_bio_atoms.py"
+if ($PromoteDjBioAtoms) {
+    if (-not (Test-Path -LiteralPath $BioPromotionScript -PathType Leaf)) {
+        throw "DJ bio promotion script not found: $BioPromotionScript"
+    }
+    Invoke-RunStep "Promote DJ bio atoms before baking deploy context" {
+        python $BioPromotionScript --write
+        $script:AtlasMiniappBioPromotionExecuted = $true
+    }
 }
 
 if ($DeployBackend) {
@@ -2109,22 +2251,16 @@ if ($DeployBackend) {
     }
 }
 
-# Bio atom promotion — merge DJ bios into atlas profiles (post-deploy)
-$BioPromotionScript = Join-Path $Scripts "promote_dj_bio_atoms.py"
-if (Test-Path $BioPromotionScript) {
-    Invoke-RunStep "Promote DJ bio atoms to atlas profiles" {
-        python "$BioPromotionScript" --write 2>&1
-    }
-}
-
 if ($UploadFrontend) {
     Invoke-RunStep "Run final guard before miniprogram upload" {
-        Invoke-GuardJson -GuardArgs @("-File", $SkillGuard, "-GateMode", "current-package", "-ExpectedMinItems", "$EffectiveMinExpectedItems", "-PublicApiBase", $PublicApiBase)
+        Invoke-GuardJson -GuardArgs @("-File", $SkillGuard, "-RepoPath", $Repo, "-GateMode", "current-package", "-ExpectedMinItems", "$EffectiveMinExpectedItems", "-PublicApiBase", $PublicApiBase)
     }
     Invoke-RunStep "Upload miniprogram developer version" {
-        powershell -ExecutionPolicy Bypass -File (Join-Path $MiniProgram "scripts\upload_native_windows.ps1") `
+        pwsh -NoProfile -ExecutionPolicy Bypass -File (Join-Path $MiniProgram "scripts\upload_native_windows.ps1") `
             -Version $Version `
-            -Desc $Desc
+            -Desc $Desc `
+            -ConfirmUpload
+        Assert-NativeSuccess "Miniprogram developer upload"
         $script:MiniProgramUploadExecuted = $true
     }
 }
@@ -2152,7 +2288,7 @@ $summaryPath = Write-PublishSummary `
     -ExporterQrEndpointDiagnosticReportPath $resolvedExporterQrEndpointDiagnosticPath `
     -ExporterAuthRecoveryPreflightReportPath $exporterAuthRecoveryPreflightReportPath `
     -SanjiGapAuditReportPath $sanjiGapAuditReportPath `
-    -WriteActionsAllowedNow ([bool]($DeployBackend -or $UploadFrontend -or $EnablePosterCloudBaseMigration))
+    -WriteActionsAllowedNow ([bool]($DeployBackend -or $PromoteDjBioAtoms -or $UploadFrontend -or $EnablePosterCloudBaseMigration))
 Write-OpenClawReadinessAndNextAction -SummaryPath $summaryPath
 Write-Host ""
 if ($DryRun) {

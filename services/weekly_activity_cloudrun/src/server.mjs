@@ -17,11 +17,12 @@ import { WeeklyActivityDataStore } from "./dataStore.mjs";
 import { renderItemPage, renderLandingPage, renderPreviewPage } from "./previewPage.mjs";
 import { Stage7AtlasStore } from "./stage7AtlasStore.mjs";
 import { Stage7AtlasSqliteStore } from "./stage7AtlasSqliteStore.mjs";
-import { getArtist, getArtistById, getVenue, getEntity, getSourceEvidence, resolveCrossDbEntity, getMergeMapStats } from "./miniappAtlasApi.mjs";
+import { getArtist, getArtistById, getVenue, getSearch, getNeighborhood, getPath, getEntity, getSourceEvidence, getStarmapLens, getRadioExternalLinks, getRadioPrograms, resolveCrossDbEntity, getMergeMapStats } from "./miniappAtlasApi.mjs";
 
 const modulePath = fileURLToPath(import.meta.url);
 const moduleDir = path.dirname(modulePath);
 const huaidjLogoPath = path.resolve(moduleDir, "../assets/huaidj-logo-nav-512x128.png");
+const ATLAS_STARMAP_DIR = path.resolve(moduleDir, "../data/atlas_starmap");
 const ATLAS_SESSION_COOKIE = "atlas_session";
 const ATLAS_SESSION_TTL_MS = 4 * 60 * 60 * 1000;
 const ATLAS_FALLBACK_CHALLENGE_TTL_MS = 5 * 60 * 1000;
@@ -31,6 +32,13 @@ const ATLAS_ASSET_TYPES = new Map([
   [".gif", "image/gif"],
   [".jpg", "image/jpeg"],
   [".jpeg", "image/jpeg"],
+  [".png", "image/png"],
+  [".webp", "image/webp"],
+]);
+const ATLAS_STARMAP_ASSET_TYPES = new Map([
+  [".js", "text/javascript; charset=utf-8"],
+  [".css", "text/css; charset=utf-8"],
+  [".json", "application/json; charset=utf-8"],
   [".png", "image/png"],
   [".webp", "image/webp"],
 ]);
@@ -211,8 +219,8 @@ function canonicalWeeklyCacheValue(name, rawValue) {
     return value === 0 ? "" : String(value);
   }
   if (name === "lookbackDays") {
-    const value = normalizeCacheInt(rawValue, { fallback: 45, min: 0, max: 45 });
-    return value === 45 ? "" : String(value);
+    const value = normalizeCacheInt(rawValue, { fallback: 0, min: 0, max: 45 });
+    return value === 0 ? "" : String(value);
   }
   return String(rawValue);
 }
@@ -609,6 +617,72 @@ async function sendAtlasAsset(reqPath, res, env) {
   }
 }
 
+function atlasStarmapRoot(env) {
+  return path.resolve(String(env.ATLAS_STARMAP_ASSET_DIR || ATLAS_STARMAP_DIR).trim());
+}
+
+async function sendAtlasStarmapPage(res, env) {
+  const root = atlasStarmapRoot(env);
+  const indexPath = path.join(root, "index.html");
+  try {
+    const body = await readFile(indexPath, "utf8");
+    res.writeHead(200, {
+      ...htmlSecurityHeaders(),
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "public, max-age=60",
+    });
+    res.end(body);
+  } catch {
+    sendError(res, 503, "ATLAS_STARMAP_NOT_BAKED", "Atlas starmap web build is not available.");
+  }
+}
+
+async function sendAtlasStarmapAsset(reqPath, res, env) {
+  let relativePath = "";
+  try {
+    relativePath = decodeURIComponent(reqPath.replace(/^\/atlas-starmap-assets\/?/, ""));
+    if (/%[0-9a-fA-F]{2}/.test(relativePath)) {
+      try { relativePath = decodeURIComponent(relativePath); } catch {}
+    }
+  } catch {
+    sendError(res, 400, "ATLAS_STARMAP_BAD_PATH", "Atlas starmap asset path is invalid.");
+    return;
+  }
+  if (!relativePath || relativePath.includes("\0")) {
+    sendError(res, 404, "ATLAS_STARMAP_ASSET_NOT_FOUND", "Atlas starmap asset was not found.");
+    return;
+  }
+
+  const root = atlasStarmapRoot(env);
+  const resolved = path.resolve(root, relativePath);
+  if (resolved !== root && !resolved.startsWith(root + path.sep)) {
+    sendError(res, 403, "ATLAS_STARMAP_ASSET_FORBIDDEN", "Atlas starmap asset path is outside the public asset directory.");
+    return;
+  }
+
+  const contentType = ATLAS_STARMAP_ASSET_TYPES.get(path.extname(resolved).toLowerCase());
+  if (!contentType) {
+    sendError(res, 403, "ATLAS_STARMAP_ASSET_TYPE_FORBIDDEN", "Atlas starmap asset type is not public.");
+    return;
+  }
+
+  try {
+    const body = await readFile(resolved);
+    const cacheHeader = path.basename(resolved) === "atlas_layout.json"
+      ? "public, max-age=300"
+      : "public, max-age=86400, immutable";
+    res.writeHead(200, {
+      ...securityHeaders(),
+      "Content-Type": contentType,
+      "Cache-Control": cacheHeader,
+      "X-Robots-Tag": "noindex, noarchive",
+    });
+    res.end(body);
+  } catch {
+    sendError(res, 404, "ATLAS_STARMAP_ASSET_NOT_FOUND", "Atlas starmap asset was not found.");
+  }
+}
+
 const POSTER_ALLOWED_DOMAINS = new Set([
   "mmbiz.qpic.cn",
   "mmbiz.qlogo.cn",
@@ -880,6 +954,11 @@ export function createServer(options = {}) {
         return;
       }
 
+      if (pathname.startsWith("/atlas-starmap-assets/")) {
+        await sendAtlasStarmapAsset(pathname, res, env);
+        return;
+      }
+
       if (pathname === "/") {
         sendHtml(res, 200, renderLandingPage());
         return;
@@ -930,6 +1009,11 @@ export function createServer(options = {}) {
         return;
       }
 
+      if (pathname === "/atlas/starmap") {
+        await sendAtlasStarmapPage(res, env);
+        return;
+      }
+
       if (pathname === "/atlas/identity") {
         sendHtml(res, 200, renderAtlasIdentityPage());
         return;
@@ -963,6 +1047,17 @@ export function createServer(options = {}) {
           res,
           weeklyCacheKey(pathname, url.searchParams, []),
           () => store.getManifest(),
+          60_000,
+        );
+        return;
+      }
+
+      if (pathname === "/api/v1/weekly/club-overviews") {
+        await sendCachedWeeklyJson(
+          req,
+          res,
+          weeklyCacheKey(pathname, url.searchParams, []),
+          () => store.getClubOverviews(),
           60_000,
         );
         return;
@@ -1567,12 +1662,19 @@ export function createServer(options = {}) {
 
       // ── Miniapp Atlas API (in-memory JSON, no native deps) ──
       if (pathname === "/api/v1/weekly/atlas/artist") {
-        sendJson(res, 200, await getArtist({
-          name: url.searchParams.get("name") || "",
+        const artistOptions = {
           eventLimit: url.searchParams.get("eventLimit") || undefined,
           collaboratorLimit: url.searchParams.get("collaboratorLimit") || undefined,
           venueLimit: url.searchParams.get("venueLimit") || undefined,
-        }), {}, { req, cacheMaxAge: 300 });
+        };
+        const subjectId = url.searchParams.get("subjectId") || "";
+        const payload = subjectId
+          ? await getArtistById(subjectId, artistOptions)
+          : await getArtist({
+            name: url.searchParams.get("name") || "",
+            ...artistOptions,
+          });
+        sendJson(res, 200, payload, {}, { req, cacheMaxAge: 300 });
         return;
       }
 
@@ -1584,9 +1686,64 @@ export function createServer(options = {}) {
         return;
       }
 
+      if (pathname === "/api/v1/weekly/atlas/search") {
+        sendJson(res, 200, await getSearch({
+          q: url.searchParams.get("q") || "",
+          type: url.searchParams.get("type") || "",
+          limit: url.searchParams.get("limit") || undefined,
+        }), {}, { req, cacheMaxAge: 120 });
+        return;
+      }
+
+      if (pathname === "/api/v1/weekly/atlas/neighborhood") {
+        sendJson(res, 200, await getNeighborhood({
+          subjectId: url.searchParams.get("subjectId") || "",
+          q: url.searchParams.get("q") || "",
+          depth: url.searchParams.get("depth") || undefined,
+          limit: url.searchParams.get("limit") || undefined,
+        }), {}, { req, cacheMaxAge: 300 });
+        return;
+      }
+
+      if (pathname === "/api/v1/weekly/atlas/path") {
+        sendJson(res, 200, await getPath({
+          from: url.searchParams.get("from") || "",
+          to: url.searchParams.get("to") || "",
+          fromName: url.searchParams.get("fromName") || "",
+          toName: url.searchParams.get("toName") || "",
+          maxDepth: url.searchParams.get("maxDepth") || undefined,
+        }), {}, { req, cacheMaxAge: 300 });
+        return;
+      }
+
       const atlasEntityMatch = pathname.match(/^\/api\/v1\/weekly\/atlas\/entity\/([^/]+)$/);
       if (atlasEntityMatch) {
         sendJson(res, 200, await getEntity(decodeURIComponent(atlasEntityMatch[1])));
+        return;
+      }
+
+      if (pathname === "/api/v1/weekly/atlas/starmap/lens") {
+        sendJson(res, 200, await getStarmapLens({
+          name: url.searchParams.get("name") || "future",
+          subjectId: url.searchParams.get("subjectId") || "",
+        }), {}, { req, cacheMaxAge: 300 });
+        return;
+      }
+
+      if (pathname === "/api/v1/weekly/atlas/radio-external-links") {
+        sendJson(res, 200, await getRadioExternalLinks({
+          stationKey: url.searchParams.get("stationKey") || "",
+        }), {}, { req, cacheMaxAge: 300 });
+        return;
+      }
+
+      if (pathname === "/api/v1/weekly/atlas/radio-programs") {
+        sendJson(res, 200, await getRadioPrograms({
+          stationKey: url.searchParams.get("stationKey") || "",
+          djId: url.searchParams.get("djId") || "",
+          limit: url.searchParams.get("limit") || undefined,
+          includeReviewOnly: url.searchParams.get("includeReviewOnly") || "",
+        }), {}, { req, cacheMaxAge: 300 });
         return;
       }
 

@@ -1,0 +1,24 @@
+# HUAIDJ scheduled pipeline runtime (Python 3.11, Windows).
+# Keep this separate from Hermes: Hermes owns scheduling, while this environment
+# owns Sanji export, QwenVL/DeepSeek enrichment, poster OCR, and AtlasV2 import.
+beautifulsoup4==4.15.0
+httpx==0.28.1
+lxml==6.1.1
+numpy==2.4.6
+onnxruntime==1.27.0
+openai==2.24.0
+opencv-python==5.0.0.93
+pillow==12.2.0
+pyclipper==1.4.0
+pycryptodome==3.23.0
+pydantic==2.13.4
+pytesseract==0.3.13
+pytest==9.0.2
+pytest-asyncio==1.4.0
+python-dotenv==1.2.2
+pywin32==312
+PyYAML==6.0.3
+rapidocr-onnxruntime==1.4.4
+requests==2.33.0
+rich==14.3.3
+shapely==2.1.2

@@ -1647,6 +1647,16 @@ test("reads DJ-first Atlas serving read model for graph windows and profiles", a
     "[]",
     "2026-05-22T00:00:00",
   );
+  // Phase 2 fixture: 一个 0 直接同台的「薄星」DJ，靠同场馆/同厂牌 2-hop 回填邻居。
+  db.prepare("INSERT INTO search_document VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").run(
+    99, "dj:thinny", "dj", "Thinny", "thinny", "Thinny", "上海", "音乐人/DJ", 20, "2026-05-01", "public_rollup", "Thinny 上海 DJ",
+  );
+  db.prepare("INSERT INTO search_document_fts(rowid, search_text) VALUES (?, ?)").run(99, "Thinny 上海 DJ");
+  db.prepare("INSERT INTO dj_profile VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)").run("dj:thinny", "Thinny", "thinny", "[\"Thinny\"]", "上海", "", 1, 1, 1, 0, 1, 0, "2026-05-01", "2026-05-01", 0.8);
+  db.prepare("INSERT INTO dj_venue_rollup VALUES (?, ?, ?, ?, ?, ?, ?, ?)").run("dj:thinny", "venue:thinroom", "Thin Room", "上海", 3, "2026-05-01", "2026-05-01", 5);
+  db.prepare("INSERT INTO dj_venue_rollup VALUES (?, ?, ?, ?, ?, ?, ?, ?)").run("dj:darou", "venue:thinroom", "Thin Room", "上海", 5, "2026-05-01", "2026-05-01", 7);
+  db.prepare("INSERT INTO dj_org_rollup VALUES (?, ?, ?, ?, ?, ?, ?)").run("dj:thinny", "org:thinlabel", "Thin Label", "label", 2, 4, "[]");
+  db.prepare("INSERT INTO dj_org_rollup VALUES (?, ?, ?, ?, ?, ?, ?)").run("dj:akkoii", "org:thinlabel", "Thin Label", "label", 4, 8, "[]");
   db.close();
 
   const soundSystemEvidencePath = path.join(tmp, "venue_sound_system_evidence.jsonl");
@@ -1800,6 +1810,16 @@ test("reads DJ-first Atlas serving read model for graph windows and profiles", a
   assert.ok(profile.relationships.collaborators.every((row) => !Object.hasOwn(row, "count")));
   assert.ok(profile.sources.articles.some((row) => row.public_snippet === "snippet"));
   assert.equal(profile.attributes.soundSystemSummary.available, false);
+
+  // Phase 2: 薄星（0 直接同台）靠同场馆/同厂牌 2-hop 回填出可继续探索的邻居，避免死胡同。
+  const thinProfile = await store.getGraphEntityProfile({ id: "dj:thinny", collaboratorLimit: 10, venueLimit: 5 });
+  assert.equal(thinProfile.found, true);
+  const thinCollabs = thinProfile.relationships.collaborators;
+  const venuePeer = thinCollabs.find((row) => row.label === "DaRou");
+  assert.ok(venuePeer && venuePeer.sameVenueCount > 0, "同场馆 2-hop 回填出邻居");
+  const labelPeer = thinCollabs.find((row) => row.label === "akkoii [loopy]");
+  assert.ok(labelPeer && labelPeer.sameLabelCount > 0, "同厂牌 2-hop 回填出邻居");
+  assert.equal(venuePeer.relationshipScore, 0, "回填项是弱连接，relationshipScore=0 排在真实同台之后");
 
   const venueProfile = await store.getGraphEntityProfile({ id: "venue:all", eventLimit: 5, collaboratorLimit: 5 });
   assert.equal(venueProfile.found, true);

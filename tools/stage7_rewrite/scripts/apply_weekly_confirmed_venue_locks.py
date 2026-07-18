@@ -234,13 +234,18 @@ CONFIRMED_LOCKS: list[dict[str, Any]] = [
     {
         "venue_id": "gum_guangzhou",
         "canonical_name": "GUM Guangzhou",
-        "aliases": ["GUM Guangzhou", "GUM", "创味园私厨餐厅"],
+        "aliases": ["GUM Guangzhou", "GUM", "T.I.T文创园45栋104", "创味园私厨餐厅"],
         "city_key": "guangzhou",
         "city_name": "广州",
-        "address_full": "广东省广州市海珠区工业大道北路132号自编45号102室",
+        "address_full": "广州市海珠区工业大道北132号T.I.T文创园45栋104",
         "geo_lat": 23.083889,
         "geo_lng": 113.262581,
         "poi_id": "17985270023101861769",
+        "id_prefixes": ["gum_guangzhou:"],
+        "geo_provider_title": "GUM Guangzhou",
+        "geo_provider_address": "广州市海珠区工业大道北132号T.I.T文创园45栋104",
+        "confirmed_date": "2026-06-19",
+        "geo_override_reason": "User confirmed GUM Guangzhou address as T.I.T Creative Park building 45 room 104; nearby navigation aid is 创味园私厨餐厅. Override wrong Hong Kong extraction.",
     },
     {
         "venue_id": "nu_lab_chengdu",
@@ -297,6 +302,160 @@ CONFIRMED_LOCKS: list[dict[str, Any]] = [
         "geo_lng": 113.26167,
         "poi_id": "16382352057994102022",
     },
+    {
+        "venue_id": "pools_dali",
+        "canonical_name": "POOLS",
+        "aliases": ["POOLS", "Love POOLS", "POOLS Dali", "POOLS 大理", "大理 POOLS", "下关金港中民城市广场 POOLS"],
+        "city_key": "dali",
+        "city_name": "大理",
+        "address_full": "云南省大理白族自治州大理市下关街道洱河南路下关金港中民城市广场B幢1-58号",
+        "geo_lat": 25.596385,
+        "geo_lng": 100.227515,
+        "poi_id": "1816199312489970978",
+        "id_prefixes": ["pools:"],
+        "text_markers": ["中民城市广场", "Zhongmin City Plaza", "Love POOLS"],
+        "confirmed_date": "2026-06-06",
+        "geo_override_reason": "User confirmed POOLS weekly rows are Dali/Love POOLS; routine refresh must not downgrade them to Shanghai or empty geo.",
+    },
+    {
+        "venue_id": "illum_shanghai",
+        "canonical_name": "ILLUM Shanghai",
+        "aliases": ["ILLUM Shanghai", "ILLUM", "ILLUM上海"],
+        "city_key": "shanghai",
+        "city_name": "上海",
+        "address_full": "上海市长宁区昭化路658号海粟文化广场D栋地下一层LG-16室",
+        "geo_lat": 31.210481,
+        "geo_lng": 121.419529,
+        "poi_id": "",
+        "id_prefixes": ["illum_shanghai:"],
+        "text_markers": ["ILLUM Shanghai", "ILLUM上海"],
+        "confirmed_date": "2026-06-01",
+        "geo_override_reason": "Weekly venue registry and prior current_release rows confirmed ILLUM Shanghai address/coordinate; routine refresh must not downgrade it to Beijing or empty geo.",
+    },
+    {
+        "venue_id": "apailang_creativity_planet_chaoyang_park",
+        "canonical_name": "阿派朗创造力星球(朝阳公园店)",
+        "aliases": ["阿派朗创造力星球(朝阳公园店)", "阿派朗创造力星球", "阿派朗 朝阳公园店"],
+        "city_key": "beijing",
+        "city_name": "北京",
+        "address_full": "北京市朝阳区朝阳公园路附近阿派朗创造力星球(朝阳公园店)",
+        "geo_lat": 39.947645,
+        "geo_lng": 116.484822,
+        "poi_id": "",
+        "text_markers": ["阿派朗创造力星球"],
+        "confirmed_date": "2026-06-07",
+        "geo_override_reason": "User-confirmed TRUST floating-promoter venue extracted from title evidence; TRUST remains promoter, this is the event venue.",
+    },
+    {
+        "venue_id": "system_shanghai_yunhai",
+        "canonical_name": "SYSTEM 系统",
+        "aliases": ["SYSTEM 系统", "SYSTEM", "系统", "下城秘密据点"],
+        "city_key": "shanghai",
+        "city_name": "上海",
+        "address_full": "上海市徐汇区淮海中路1327号云海大厦3层",
+        "geo_lat": 31.211892,
+        "geo_lng": 121.449483,
+        "poi_id": "",
+        "text_markers_all": ["周六，下城见"],
+        "confirmed_date": "2026-06-12",
+        "geo_source": "tencent_amap_cross_geocode_user_confirmed",
+        "geo_provider": "tencent_geocoder",
+        "geo_provider_title": "仲益云海大厦(淮海中路)",
+        "geo_provider_address": "上海市徐汇区淮海中路1327号云海大厦3层",
+        "geo_override_reason": "Historical SYSTEM venue address plus Tencent/Amap cross geocode. Source copy says down-city secret spot and does not expose a public address; keep this as a narrow title lock.",
+    },
+    {
+        "venue_id": "byyb_radio_changle_115",
+        "canonical_name": "byyb·radio",
+        "aliases": ["byyb·radio", "byyb.radio", "byyb radio", "byyb", "长乐路115号"],
+        "city_key": "shanghai",
+        "city_name": "上海",
+        "address_full": "上海市长乐路115号",
+        "geo_lat": 31.221836,
+        "geo_lng": 121.467442,
+        "poi_id": "B0L6TLEFDU",
+        "id_prefixes": ["byyb:"],
+        "text_markers_all": ["周六风云榜"],
+        "confirmed_date": "2026-06-19",
+        "geo_source": "tencent_amap_cross_geocode_user_confirmed",
+        "geo_provider": "amap_place_search",
+        "geo_provider_title": "byyb·radio",
+        "geo_provider_address": "长乐路115号",
+        "geo_override_reason": "Source evidence and prior rows identify byyb.radio at 115 Changle Road; Tencent geocoder and Amap place search cross-check within 11m.",
+    },
+    {
+        "venue_id": "wakeywakey_hohhot",
+        "canonical_name": "WAKEYWAKEY Bar Club",
+        "aliases": ["WAKEYWAKEY Bar Club", "WAKEY WAKEY", "WakeyWakey", "wakeywakey", "天鹅坊d1栋东座"],
+        "city_key": "hohhot",
+        "city_name": "呼和浩特",
+        "address_full": "内蒙古自治区呼和浩特市新城区新华大街15号天鹅坊d1栋东座",
+        "geo_lat": 40.827079,
+        "geo_lng": 111.689982,
+        "poi_id": "B0J2RZHF2H",
+        "id_prefixes": ["wakeywakey:"],
+        "confirmed_date": "2026-06-19",
+        "geo_source": "tencent_amap_cross_geocode_user_confirmed",
+        "geo_provider": "amap_place_search",
+        "geo_provider_title": "WAKEY WAKEY",
+        "geo_provider_address": "新华大街15号天鹅坊d1栋东座",
+        "geo_override_reason": "User confirmed WAKEYWAKEY Bar Club is a new Hohhot club at Xinhua Avenue 15 Swan Square D1 east block. Tencent geocoder and Amap place search resolve the same building; override wrong Beijing extraction.",
+    },
+    {
+        "venue_id": "sim_lab_changchun_longli",
+        "canonical_name": "SiM Lab",
+        "aliases": ["SiM Lab", "SiM俱乐部", "SiM", "隆礼路485号", "百汇街"],
+        "city_key": "changchun",
+        "city_name": "长春",
+        "address_full": "吉林省长春市朝阳区隆礼路与百汇街交汇负一层（朝阳区隆礼路485号）",
+        "geo_lat": 43.868128,
+        "geo_lng": 125.322609,
+        "poi_id": "",
+        "id_prefixes": ["sim_lab:"],
+        "confirmed_date": "2026-06-19",
+        "geo_source": "amap_geocoder_user_confirmed",
+        "geo_provider": "amap_geocoder",
+        "geo_provider_title": "吉林省长春市朝阳区隆礼路与百汇街交汇",
+        "geo_provider_address": "吉林省长春市朝阳区隆礼路与百汇街交汇",
+        "geo_override_reason": "User confirmed SiM Lab at Changchun Chaoyang Longli Road and Baihui Street basement, specifically Longli Road 485. Amap geocoder resolves the same intersection; Tencent result was low precision.",
+    },
+    {
+        "venue_id": "wigwam_shanghai",
+        "canonical_name": "wigwam",
+        "aliases": ["wigwam", "Wigwam", "wigwam Shanghai", "wigwam 海粟广场店"],
+        "city_key": "shanghai",
+        "city_name": "上海",
+        "address_full": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+        "geo_lat": 31.210481,
+        "geo_lng": 121.419529,
+        "poi_id": "",
+        "text_markers_all": ["wigwam"],
+        "allow_city_override": True,
+        "confirmed_date": "2026-06-19",
+        "geo_source": "registry_user_confirmed",
+        "geo_provider": "registry_existing",
+        "geo_provider_title": "wigwam",
+        "geo_provider_address": "上海市长宁区昭化路658号海粟文化广场LG1-02室",
+        "geo_override_reason": "User confirmed ShyPeople is a label/platform, not a venue. Rows whose title explicitly says @ wigwam should be locked to the existing wigwam Shanghai venue instead of ShyPeople or Beijing.",
+    },
+    {
+        "venue_id": "riserroom_beijing_fangchengyuan",
+        "canonical_name": "RiserRoom升舱室·NightClub",
+        "aliases": ["RiserRoom升舱室·NightClub", "RiserRoom 升舱室·NightClub", "升舱室 NightClub", "升舱室"],
+        "city_key": "beijing",
+        "city_name": "北京",
+        "address_full": "北京市丰台区芳城园二区15号楼-1层至4层101内四层402号",
+        "geo_lat": 39.8661,
+        "geo_lng": 116.43295,
+        "poi_id": "1467912330077849184",
+        "text_markers_all": ["RiserRoom", "升舱室", "NightClub"],
+        "confirmed_date": "2026-06-12",
+        "geo_source": "tencent_amap_exact_place_user_confirmed",
+        "geo_provider": "tencent_place_search",
+        "geo_provider_title": "RiserRoom升舱室·NightClub",
+        "geo_provider_address": "北京市丰台区芳城园二区15号楼-1层至4层101内四层402号",
+        "geo_override_reason": "Source title explicitly names RiserRoom/升舱室/NightClub. Tencent and Amap place search both hit the same named venue within roughly 20m; reverse-place mismatch is treated as a strict-gate false negative for this locked row.",
+    },
 ]
 
 
@@ -335,11 +494,18 @@ def backup_inputs(registry_path: Path, api_dir: Path, backup_dir: Path) -> None:
             shutil.copytree(src, dst)
 
 
+def lock_confirmed_date(lock: dict[str, Any]) -> str:
+    return first(lock.get("confirmed_date")) or CONFIRMED_DATE
+
+
 def lock_note(lock: dict[str, Any]) -> str:
     poi = f", POI id {lock['poi_id']}" if lock.get("poi_id") else ""
+    confirmed_date = lock_confirmed_date(lock)
+    reason = f" Reason: {lock['geo_override_reason']}" if lock.get("geo_override_reason") else ""
     return (
-        f"{CONFIRMED_DATE} user Tencent map picker confirmed address and GCJ-02 coordinate{poi}. "
+        f"{confirmed_date} user/source evidence confirmed address and GCJ-02 coordinate{poi}. "
         "Locked as production venue data; routine OCR/LLM/incremental refresh must not overwrite without explicit geo_override_reason."
+        f"{reason}"
     )
 
 
@@ -363,8 +529,8 @@ def apply_lock_to_registry_row(row: dict[str, Any], lock: dict[str, Any]) -> boo
         "geo_lat": lock["geo_lat"],
         "geo_lng": lock["geo_lng"],
         "geo_coord_system": "GCJ-02",
-        "geo_source": "tencent_map_picker_user_confirmed",
-        "last_verified_at": CONFIRMED_DATE,
+        "geo_source": lock.get("geo_source") or "tencent_map_picker_user_confirmed",
+        "last_verified_at": lock_confirmed_date(lock),
         "poi_id": lock.get("poi_id") or "",
         "map_poi_name": lock["canonical_name"],
         "place_fields_locked": True,
@@ -406,8 +572,12 @@ def item_matches_lock(item: dict[str, Any], lock: dict[str, Any]) -> bool:
             return True
     text = item_text(item)
     city = first(item.get("city_name"), first(item.get("city")))
+    city_ok = not city or city == lock["city_name"] or bool(lock.get("allow_city_override"))
+    markers_all = [str(marker or "").strip() for marker in lock.get("text_markers_all") or [] if str(marker or "").strip()]
+    if markers_all and all(marker in text for marker in markers_all) and city_ok:
+        return True
     for marker in lock.get("text_markers") or []:
-        if marker in text and (not city or city == lock["city_name"]):
+        if marker in text and city_ok:
             return True
     return False
 
@@ -415,6 +585,7 @@ def item_matches_lock(item: dict[str, Any], lock: dict[str, Any]) -> bool:
 def apply_lock_to_item(item: dict[str, Any], lock: dict[str, Any], verified_at: str) -> bool:
     if not item_matches_lock(item, lock):
         return False
+    confirmed_date = lock_confirmed_date(lock)
     updates = {
         "venue_id": lock["venue_id"],
         "venue_name": lock["canonical_name"],
@@ -431,12 +602,12 @@ def apply_lock_to_item(item: dict[str, Any], lock: dict[str, Any], verified_at: 
         "venue_lat": lock["geo_lat"],
         "venue_lng": lock["geo_lng"],
         "geo_coord_system": "GCJ-02",
-        "geo_source": "tencent_map_picker_user_confirmed",
-        "geo_provider": "tencent_map_picker",
-        "geo_provider_title": lock["canonical_name"],
-        "geo_provider_address": lock["address_full"],
+        "geo_source": lock.get("geo_source") or "tencent_map_picker_user_confirmed",
+        "geo_provider": lock.get("geo_provider") or "tencent_map_picker",
+        "geo_provider_title": lock.get("geo_provider_title") or lock["canonical_name"],
+        "geo_provider_address": lock.get("geo_provider_address") or lock["address_full"],
         "geo_verified_at": verified_at,
-        "geo_candidate_id": f"{lock['venue_id']}_tencent_picker_{CONFIRMED_DATE.replace('-', '')}",
+        "geo_candidate_id": f"{lock['venue_id']}_confirmed_{confirmed_date.replace('-', '')}",
         "poi_id": lock.get("poi_id") or "",
         "map_poi_name": lock["canonical_name"],
         "map_search_aliases": lock["aliases"],
@@ -444,7 +615,8 @@ def apply_lock_to_item(item: dict[str, Any], lock: dict[str, Any], verified_at: 
         "poi_aliases": lock["aliases"],
         "place_fields_locked": True,
         "geo_locked": True,
-        "geo_override_reason": "user confirmed Tencent picker lock; do not overwrite in routine refresh",
+        "geo_override_reason": lock.get("geo_override_reason")
+        or "user confirmed venue lock; do not overwrite in routine refresh",
     }
     changed = False
     for key, value in updates.items():
@@ -507,7 +679,7 @@ def rebuild_city_routes(api_dir: Path, current_payload: dict[str, Any]) -> None:
     )
 
 
-def apply_locks(registry_path: Path, api_dir: Path, out_dir: Path, *, dry_run: bool = False) -> dict[str, Any]:
+def apply_locks(registry_path: Path, api_dir: Path, out_dir: Path, *, dry_run: bool = False, api_only: bool = False) -> dict[str, Any]:
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup_dir = out_dir / f"backup_before_confirmed_venue_locks_{stamp}"
     if not dry_run:
@@ -515,12 +687,13 @@ def apply_locks(registry_path: Path, api_dir: Path, out_dir: Path, *, dry_run: b
     registry = read_json(registry_path)
     locks_by_id = {lock["venue_id"]: lock for lock in CONFIRMED_LOCKS}
     changed_registry_ids: list[str] = []
-    for row in registry.get("venues", []):
-        if not isinstance(row, dict):
-            continue
-        lock = locks_by_id.get(first(row.get("venue_id")))
-        if lock and apply_lock_to_registry_row(row, lock):
-            changed_registry_ids.append(lock["venue_id"])
+    if not api_only:
+        for row in registry.get("venues", []):
+            if not isinstance(row, dict):
+                continue
+            lock = locks_by_id.get(first(row.get("venue_id")))
+            if lock and apply_lock_to_registry_row(row, lock):
+                changed_registry_ids.append(lock["venue_id"])
 
     verified_at = now_cst()
     files = [api_dir / "current.json"]
@@ -556,9 +729,10 @@ def apply_locks(registry_path: Path, api_dir: Path, out_dir: Path, *, dry_run: b
         rebuild_city_routes(api_dir, current_payload)
         changed_by_file["by-city/*"] = len(current_payload.get("items") or [])
 
-    if not dry_run:
+    if not dry_run and not api_only:
         registry["updated_at"] = CONFIRMED_DATE
         write_json(registry_path, registry)
+    if not dry_run:
         manifest_path = api_dir / "manifest.json"
         if manifest_path.exists():
             manifest = read_json(manifest_path)
@@ -569,6 +743,7 @@ def apply_locks(registry_path: Path, api_dir: Path, out_dir: Path, *, dry_run: b
                 "lock_count": len(CONFIRMED_LOCKS),
                 "changed_current_item_count": len(changed_item_ids),
                 "changed_registry_count": len(changed_registry_ids),
+                "registry_write_skipped": api_only,
                 "source": "user_confirmed_tencent_map_picker",
                 "phones_ignored": True,
                 "routine_refresh_must_not_overwrite": True,
@@ -586,6 +761,7 @@ def apply_locks(registry_path: Path, api_dir: Path, out_dir: Path, *, dry_run: b
         "confirmed_lock_count": len(CONFIRMED_LOCKS),
         "changed_registry_count": len(changed_registry_ids),
         "changed_registry_ids": sorted(changed_registry_ids),
+        "registry_write_skipped": api_only,
         "changed_item_count": len(changed_item_ids),
         "changed_item_ids": sorted(changed_item_ids),
         "changed_by_file": changed_by_file,
@@ -604,8 +780,9 @@ def main() -> int:
     parser.add_argument("--api-dir", type=Path, default=DEFAULT_API_DIR)
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_REPORT_ROOT / "weekly_confirmed_venue_locks_20260601")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--api-only", action="store_true", help="Apply locks to the API package without rewriting the venue registry.")
     args = parser.parse_args()
-    report = apply_locks(args.registry, args.api_dir, args.out_dir, dry_run=args.dry_run)
+    report = apply_locks(args.registry, args.api_dir, args.out_dir, dry_run=args.dry_run, api_only=args.api_only)
     print(json.dumps({"ok": True, **report}, ensure_ascii=False, indent=2))
     return 0
 

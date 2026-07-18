@@ -15,8 +15,8 @@ from merge_stage4_shard_into_base import merge
 
 promote_seen_tokens_checkpoint = orchestrator.promote_seen_tokens_checkpoint
 
-NIGHTLY_LAUNCHER = Path(
-    r"C:\Users\pc\AppData\Local\hermes\scripts\huaidj\atlas_v2_sanji_import_nightly.py"
+NIGHTLY_LAUNCHER = Path(os.environ.get("HERMES_HOME", r"F:\DevData\Hermes")) / (
+    "scripts/huaidj/atlas_v2_sanji_import_nightly.py"
 )
 
 
@@ -37,11 +37,6 @@ def test_canonical_pipeline_order_contract() -> None:
 
     assert orchestrator.CANONICAL_PIPELINE_ORDER == expected
     assert orchestrator.ordered_subset(orchestrator.CANONICAL_PIPELINE_ORDER, expected)
-
-
-def test_canonical_llm_batch_size_preserves_complete_verdicts() -> None:
-    assert orchestrator.CANONICAL_LLM_BATCH_SIZE == 10
-    assert orchestrator.DEFAULT_ACCEPTED_IDENTITY_PLAN.is_file()
 
 
 def test_optional_historical_geo_does_not_block_clean_clone() -> None:
@@ -333,12 +328,22 @@ def test_eight_hour_import_lock_remains_fail_closed() -> None:
             module.LOCK_PATH = original_lock
 
 
-def test_nightly_launcher_only_refreshes_deepseek_cloud_credentials() -> None:
+def test_nightly_launcher_refreshes_primary_and_failure_only_fallback_credentials() -> None:
     source = NIGHTLY_LAUNCHER.read_text(encoding="utf-8")
 
     assert '"DEEPSEEK_API_KEY"' in source
-    assert '"DASHSCOPE_API_KEY"' not in source
-    assert '"MIMO_API_KEY"' not in source
+    assert '"DASHSCOPE_API_KEY"' in source
+    assert '"MIMO_API_KEY"' in source
+
+
+def test_orchestrator_has_failure_only_online_vision_fallback() -> None:
+    source = Path(orchestrator.__file__).read_text(encoding="utf-8")
+
+    assert 'default="vl_direct_router"' in source
+    assert 'default="qwen3.6-plus"' in source
+    assert '"stage2_extract_vision_fallback"' in source
+    assert '"--poster-candidate-fallback-count"' in source
+    assert "if not extraction_gate[\"gate_pass\"]" in source
 
 
 def test_extraction_completion_gate_rejects_missing_and_failed_rows() -> None:
@@ -400,7 +405,6 @@ def test_extraction_completion_gate_accepts_valid_terminal_rows() -> None:
 
 if __name__ == "__main__":
     test_canonical_pipeline_order_contract()
-    test_canonical_llm_batch_size_preserves_complete_verdicts()
     test_checkpoint_readiness_fails_closed_on_materialize_or_gate_failure()
     test_default_base_fails_closed_without_cumulative_state()
     test_default_base_loads_candidate_bound_to_current_checkpoint()
