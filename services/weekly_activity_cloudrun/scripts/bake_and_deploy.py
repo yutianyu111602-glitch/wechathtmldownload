@@ -8,8 +8,9 @@ Workflow
    unique external publish transaction. Authoritative current_release is not
    changed by prepare or deploy.
 3. Deploy the staged context (or let the OpenClaw wrapper use its direct API).
-4. After remote smoke and full item-ID pagination succeed, explicitly promote
-   the named transaction with those evidence reports.
+4. After remote smoke, full item-ID pagination, and exact club-overviews
+   reconciliation succeed, explicitly promote the named transaction with all
+   evidence reports.
 5. Promotion keeps a versioned rollback backup and restores the old local
    baseline if the filesystem swap fails.
 
@@ -57,6 +58,12 @@ ROUTE_PROPAGATION_DELAY = 70  # seconds — CloudRun needs ~60s after deploy
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _PROJECT_DIR = _SCRIPT_DIR.parent
 _REPO_ROOT = _PROJECT_DIR.parents[1]
+_STAGE7_SCRIPTS_DIR = _REPO_ROOT / "tools" / "stage7_rewrite" / "scripts"
+if str(_STAGE7_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_STAGE7_SCRIPTS_DIR))
+
+from verify_weekly_club_overviews_remote import build_snapshot as build_club_overviews_snapshot  # noqa: E402
+
 MINIPROGRAM_DIR = _REPO_ROOT / "apps" / "weekly_activity_miniprogram"
 DEFAULT_RUNTIME_DATA_ROOT = Path(
     r"F:\DevData\HuaidjRuntime\state\weekly_activity_cloudrun\data"
@@ -103,6 +110,10 @@ OPTIONAL_RELEASE_ITEMS = [
     "weekly_entity_snapshot.json",
     "weekly_entity_observations.jsonl",
 ]
+CLUB_OVERVIEWS_SCHEMA_VERSION = "club_overviews.v1"
+CLUB_OVERVIEWS_REPORT_SCHEMA_VERSION = "cloudrun_club_overviews_reconciliation.v1"
+CLUB_OVERVIEWS_REPORT_DECISION = "cloudrun_club_overviews_reconciled"
+CLUB_OVERVIEWS_DIGEST_ALGORITHM = "sha256(canonical_backend_normalized_club_overviews_json)"
 
 
 def _resolved(path: Path) -> Path:
@@ -435,6 +446,16 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: fh.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def candidate_club_overviews_snapshot(release_dir: Path) -> dict:
+    path = release_dir / "club_overviews.json"
+    if not path.is_file():
+        raise FileNotFoundError(f"required club_overviews.json missing: {path}")
+    payload = read_json_file(path)
+    snapshot = build_club_overviews_snapshot(payload, source="candidate")
+    snapshot["file_sha256"] = sha256_file(path)
+    return snapshot
 
 
 def iter_context_files(src: Path, dst_rel: Path) -> list[dict]:
@@ -791,6 +812,7 @@ def prepare_publish_transaction(
             source = release_dir / name
             if source.exists():
                 copy_context_item(source, staged_current / name)
+        candidate_club_overviews = candidate_club_overviews_snapshot(staged_current)
 
         selected_source_map = resolve_source_url_map(release_dir, source_url_map)
         copy_context_item(selected_source_map, staged_source_actions / "source_url_map.json")
@@ -835,6 +857,7 @@ def prepare_publish_transaction(
                 "candidate": candidate,
                 "candidate_item_count": item_count,
                 "candidate_item_ids": package_item_id_snapshot(staged_current),
+                "candidate_club_overviews": candidate_club_overviews,
                 "source_url_map": {
                     "size": (staged_source_actions / "source_url_map.json").stat().st_size,
                     "sha256": sha256_file(staged_source_actions / "source_url_map.json"),
@@ -880,6 +903,7 @@ def promote_publish_transaction(
     deploy_report_path: Path,
     smoke_report_path: Path,
     pagination_report_path: Path,
+    club_overviews_report_path: Path,
 ) -> dict:
     """Promote only a named, verified transaction; evidence failure is read-only."""
     transaction_id = validate_transaction_id(transaction_id)
@@ -914,12 +938,52 @@ def promote_publish_transaction(
         block_publish_promotion(report_path, report, reason)
         raise ValueError(reason)
 
+    club_overviews_report = read_required_report(club_overviews_report_path, "club-overviews")
+    club_candidate_evidence = club_overviews_report.get("candidate") or {}
+    club_remote_evidence = club_overviews_report.get("remote") or {}
+    club_evidence_checks = {
+        "club_report_schema": club_overviews_report.get("schema_version")
+        == CLUB_OVERVIEWS_REPORT_SCHEMA_VERSION,
+        "club_report_ok": club_overviews_report.get("ok") is True,
+        "club_report_decision": club_overviews_report.get("decision")
+        == CLUB_OVERVIEWS_REPORT_DECISION,
+        "club_candidate_schema": club_candidate_evidence.get("schema_version")
+        == CLUB_OVERVIEWS_SCHEMA_VERSION,
+        "club_remote_schema": club_remote_evidence.get("schema_version")
+        == CLUB_OVERVIEWS_SCHEMA_VERSION,
+        "club_candidate_digest_format": bool(
+            re.fullmatch(r"[0-9a-f]{64}", str(club_candidate_evidence.get("summary_sha256") or ""))
+        ),
+        "club_remote_digest_format": bool(
+            re.fullmatch(r"[0-9a-f]{64}", str(club_remote_evidence.get("summary_sha256") or ""))
+        ),
+        "club_summary_digest_matches": club_candidate_evidence.get("summary_sha256")
+        == club_remote_evidence.get("summary_sha256"),
+        "club_digest_algorithm_matches": club_candidate_evidence.get("digest_algorithm")
+        == CLUB_OVERVIEWS_DIGEST_ALGORITHM
+        and club_remote_evidence.get("digest_algorithm") == CLUB_OVERVIEWS_DIGEST_ALGORITHM,
+        "club_count_matches": club_candidate_evidence.get("club_count")
+        == club_remote_evidence.get("club_count"),
+        "club_overview_count_matches": club_candidate_evidence.get("overview_count")
+        == club_remote_evidence.get("overview_count"),
+        "club_kind_counts_match": club_candidate_evidence.get("kind_counts")
+        == club_remote_evidence.get("kind_counts"),
+    }
+    failed_club_evidence = [name for name, passed in club_evidence_checks.items() if not passed]
+    if failed_club_evidence:
+        reason = "club-overviews evidence is not successful: " + ", ".join(failed_club_evidence)
+        report["club_overviews_evidence_checks"] = club_evidence_checks
+        block_publish_promotion(report_path, report, reason)
+        raise ValueError(reason)
+
     staged_data = transaction_dir / "staged_data"
     staged_current = staged_data / "current_release"
     staged_source = staged_data / "source_actions" / "source_url_map.json"
     candidate_snapshot = directory_snapshot(staged_current)
     candidate_ids = package_item_id_snapshot(staged_current)
+    staged_club_overviews = candidate_club_overviews_snapshot(staged_current)
     prepared_ids = report.get("candidate_item_ids") or {}
+    prepared_club_overviews = report.get("candidate_club_overviews") or {}
     evidence_checks = {
         "baseline_unchanged": authoritative_runtime_snapshot().get("fingerprint")
         == (report.get("baseline") or {}).get("fingerprint"),
@@ -941,6 +1005,16 @@ def promote_publish_transaction(
         == candidate_ids.get("item_id_digest"),
         "pagination_digest_algorithm_matches": pagination_report.get("digest_algorithm")
         == candidate_ids.get("digest_algorithm"),
+        "club_candidate_digest_matches_prepared": club_candidate_evidence.get("summary_sha256")
+        == prepared_club_overviews.get("summary_sha256"),
+        "club_candidate_digest_matches_staged": club_candidate_evidence.get("summary_sha256")
+        == staged_club_overviews.get("summary_sha256"),
+        "club_candidate_file_digest_matches_staged": club_candidate_evidence.get("file_sha256")
+        == staged_club_overviews.get("file_sha256"),
+        "club_candidate_count_matches_prepared": club_candidate_evidence.get("club_count")
+        == prepared_club_overviews.get("club_count")
+        and club_candidate_evidence.get("overview_count")
+        == prepared_club_overviews.get("overview_count"),
         "staged_source_url_map_unchanged": staged_source.is_file()
         and sha256_file(staged_source) == (report.get("source_url_map") or {}).get("sha256"),
     }
@@ -969,7 +1043,9 @@ def promote_publish_transaction(
                 "deploy_report": str(Path(deploy_report_path).resolve()),
                 "smoke_report": str(Path(smoke_report_path).resolve()),
                 "pagination_report": str(Path(pagination_report_path).resolve()),
+                "club_overviews_report": str(Path(club_overviews_report_path).resolve()),
                 "remote_item_id_digest": pagination_report.get("remote_item_id_digest"),
+                "remote_club_overviews_digest": club_remote_evidence.get("summary_sha256"),
             },
         }
     )
@@ -1566,11 +1642,16 @@ def main() -> int:
     parser.add_argument(
         "--promote-transaction",
         action="store_true",
-        help="Promote a prepared transaction after verified deploy, smoke, and full-pagination reports.",
+        help="Promote only after verified deploy, smoke, full-pagination, and club-overviews reports.",
     )
     parser.add_argument("--deploy-report", default="", help="Verified direct deploy report for --promote-transaction.")
     parser.add_argument("--smoke-report", default="", help="Successful production smoke report for --promote-transaction.")
     parser.add_argument("--pagination-report", default="", help="Successful full item-ID pagination report for --promote-transaction.")
+    parser.add_argument(
+        "--club-overviews-report",
+        default="",
+        help="Successful exact club-overviews reconciliation report for --promote-transaction.",
+    )
     parser.add_argument("--skip-patch-check", action="store_true", help="Skip tcb CLI patch verification")
     parser.add_argument("--require-stage7-atlas", action="store_true", help="Abort if data/stage7_atlas is incomplete")
     parser.add_argument("--include-stage7-atlas", action="store_true", help="Include data/stage7_atlas in the deploy context")
@@ -1616,6 +1697,7 @@ def main() -> int:
                 ("--deploy-report", args.deploy_report),
                 ("--smoke-report", args.smoke_report),
                 ("--pagination-report", args.pagination_report),
+                ("--club-overviews-report", args.club_overviews_report),
             )
             if not value
         ]
@@ -1628,6 +1710,7 @@ def main() -> int:
                 deploy_report_path=Path(args.deploy_report),
                 smoke_report_path=Path(args.smoke_report),
                 pagination_report_path=Path(args.pagination_report),
+                club_overviews_report_path=Path(args.club_overviews_report),
             )
         except (OSError, ValueError, RuntimeError) as exc:
             print(f"ERROR: publish transaction promotion failed: {exc}")

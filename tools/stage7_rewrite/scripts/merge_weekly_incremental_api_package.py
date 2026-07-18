@@ -8,6 +8,7 @@ Those rows must update the full current package instead of replacing it.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shutil
 import sys
@@ -69,6 +70,7 @@ USAGE_SIDECAR_FILENAMES = (
     "qwen_vl_usage_summary.json",
     "poster_vl_usage_details.jsonl",
 )
+CLUB_OVERVIEWS_SCHEMA_VERSION = "club_overviews.v1"
 
 
 def is_blank(value: Any) -> bool:
@@ -135,6 +137,104 @@ def copy_incremental_provenance_sidecars(incremental_dir: Path, out_dir: Path) -
         shutil.copy2(src, dst)
         copied[name] = str(dst)
     return copied
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def validate_incremental_club_overviews(incremental_dir: Path) -> tuple[Path, dict[str, Any], dict[str, Any]]:
+    path = incremental_dir / "club_overviews.json"
+    if not path.is_file():
+        raise SystemExit(
+            "Incremental API package is missing club_overviews.json; refusing to retain the stale base overview file: "
+            f"{path}"
+        )
+    try:
+        payload = read_json(path)
+    except (OSError, ValueError, TypeError) as exc:
+        raise SystemExit(f"Invalid incremental club_overviews.json: {path}: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise SystemExit(f"Incremental club_overviews.json must be a JSON object: {path}")
+    if payload.get("schema_version") != CLUB_OVERVIEWS_SCHEMA_VERSION:
+        raise SystemExit(
+            "Incremental club_overviews.json schema_version mismatch: "
+            f"expected={CLUB_OVERVIEWS_SCHEMA_VERSION} actual={payload.get('schema_version')!r} path={path}"
+        )
+    by_club = payload.get("by_club")
+    if not isinstance(by_club, dict):
+        raise SystemExit(f"Incremental club_overviews.json by_club must be an object: {path}")
+
+    overview_count = 0
+    kind_counts: dict[str, int] = {}
+    for club, items in by_club.items():
+        if not isinstance(club, str) or not club.strip():
+            raise SystemExit(f"Incremental club_overviews.json contains an empty/non-string by_club key: {path}")
+        if not isinstance(items, list):
+            raise SystemExit(f"Incremental club_overviews.json by_club[{club!r}] must be an array: {path}")
+        for index, item in enumerate(items):
+            if not isinstance(item, dict):
+                raise SystemExit(
+                    f"Incremental club_overviews.json by_club[{club!r}][{index}] must be an object: {path}"
+                )
+            if not str(item.get("original_url") or "").strip():
+                raise SystemExit(
+                    f"Incremental club_overviews.json by_club[{club!r}][{index}] is missing original_url: {path}"
+                )
+            if not str(item.get("cover_url") or "").strip():
+                raise SystemExit(
+                    f"Incremental club_overviews.json by_club[{club!r}][{index}] is missing cover_url: {path}"
+                )
+            overview_count += 1
+            kind = str(item.get("window_kind") or "other").strip() or "other"
+            kind_counts[kind] = kind_counts.get(kind, 0) + 1
+
+    club_count = len(by_club)
+    declared_club_count = payload.get("club_count")
+    declared_overview_count = payload.get("overview_count")
+    if declared_club_count is not None and declared_club_count != club_count:
+        raise SystemExit(
+            "Incremental club_overviews.json club_count mismatch: "
+            f"declared={declared_club_count!r} actual={club_count} path={path}"
+        )
+    if declared_overview_count is not None and declared_overview_count != overview_count:
+        raise SystemExit(
+            "Incremental club_overviews.json overview_count mismatch: "
+            f"declared={declared_overview_count!r} actual={overview_count} path={path}"
+        )
+    declared_kind_counts = payload.get("kind_counts")
+    if declared_kind_counts is not None and declared_kind_counts != kind_counts:
+        raise SystemExit(
+            "Incremental club_overviews.json kind_counts mismatch: "
+            f"declared={declared_kind_counts!r} actual={kind_counts!r} path={path}"
+        )
+
+    summary = {
+        "schema_version": CLUB_OVERVIEWS_SCHEMA_VERSION,
+        "source": str(path),
+        "club_count": club_count,
+        "overview_count": overview_count,
+        "kind_counts": kind_counts,
+        "sha256": sha256_file(path),
+    }
+    return path, payload, summary
+
+
+def copy_incremental_club_overviews(source: Path, out_dir: Path) -> Path:
+    destination = out_dir / "club_overviews.json"
+    temporary = out_dir / ".club_overviews.json.incremental-copy.tmp"
+    try:
+        shutil.copy2(source, temporary)
+        if sha256_file(temporary) != sha256_file(source):
+            raise OSError(f"Incremental club_overviews.json copy digest mismatch: {source} -> {temporary}")
+        temporary.replace(destination)
+    finally:
+        temporary.unlink(missing_ok=True)
+    return destination
 
 
 def merge_manifest_window(base_manifest: dict[str, Any], incremental_manifest: dict[str, Any]) -> dict[str, Any]:
@@ -409,6 +509,9 @@ def merge_package(base_dir: Path, incremental_dir: Path, out_dir: Path, report_p
         raise SystemExit(f"Base API package has no items: {base_dir}")
     if not incremental_items:
         raise SystemExit(f"Incremental API package has no items: {incremental_dir}")
+    incremental_club_overviews_path, _incremental_club_overviews, club_overviews = (
+        validate_incremental_club_overviews(incremental_dir)
+    )
 
     if out_dir.exists():
         if not overwrite:
@@ -416,6 +519,8 @@ def merge_package(base_dir: Path, incremental_dir: Path, out_dir: Path, report_p
         ensure_removable_output(out_dir, base_dir, incremental_dir)
         shutil.rmtree(out_dir)
     shutil.copytree(base_dir, out_dir)
+    copied_club_overviews_path = copy_incremental_club_overviews(incremental_club_overviews_path, out_dir)
+    club_overviews["destination"] = str(copied_club_overviews_path)
 
     generated_at = now_iso()
     merged_items, item_merge = merge_items(base_items, incremental_items)
@@ -465,6 +570,7 @@ def merge_package(base_dir: Path, incremental_dir: Path, out_dir: Path, report_p
         manifest["window_end"] = window_merge["window_end"]
     manifest["incremental_merge"] = deepcopy(merged_current["incremental_merge"])
     manifest["incremental_merge"]["window_merge"] = deepcopy(window_merge)
+    manifest["incremental_merge"]["club_overviews"] = deepcopy(club_overviews)
     manifest["source_url_map_path"] = str(source_map_path(out_dir))
     manifest["static_source_url_map_path"] = str(source_map_path(out_dir))
     existing_usage_sidecars = manifest.get("usage_sidecars") if isinstance(manifest.get("usage_sidecars"), dict) else {}
@@ -499,6 +605,7 @@ def merge_package(base_dir: Path, incremental_dir: Path, out_dir: Path, report_p
         "window_merge": window_merge,
         "source_map_merge": source_merge,
         "llm_enrichment_merge": llm_enrichment_merge,
+        "club_overviews": club_overviews,
         "usage_sidecars": usage_sidecars,
         "provenance_sidecars": provenance_sidecars,
     }

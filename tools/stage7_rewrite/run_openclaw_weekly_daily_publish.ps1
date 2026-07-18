@@ -315,6 +315,7 @@ $CloudRunDeployReportPath = Join-Path $DeployReportDir "cloudrun_direct_api_depl
 $CloudRunSmokeReportDir = Join-Path $RunReportDir "cloudrun_weekly_production_smoke"
 $CloudRunSmokeReportPath = Join-Path $CloudRunSmokeReportDir "cloudrun_weekly_production_smoke.json"
 $CloudRunPaginationReportPath = Join-Path $RunReportDir "cloudrun_remote_pagination.json"
+$CloudRunClubOverviewsReportPath = Join-Path $RunReportDir "cloudrun_club_overviews_reconciliation.json"
 $CloudRunRemoteRollbackPacketPath = Join-Path $RunReportDir "cloudrun_remote_rollback_packet.json"
 $exporterSessionDiagnosticGeneratedReportPath = Join-Path $RunReportDir "exporter_session_no_secret.json"
 $exporterQrStatusGeneratedReportPath = Join-Path $RunReportDir "weekly_exporter_qr_status.json"
@@ -979,6 +980,7 @@ function Write-RemoteRollbackPacket {
         deploy_report = $CloudRunDeployReportPath
         smoke_report = $CloudRunSmokeReportPath
         pagination_report = $CloudRunPaginationReportPath
+        club_overviews_report = $CloudRunClubOverviewsReportPath
         failure_reason = $FailureReason
         previous_server_identity = if ($null -ne $deployEvidence) { $deployEvidence.previous_server_identity } else { $null }
         post_update_server_identity = if ($null -ne $deployEvidence) { $deployEvidence.post_update_server_identity } else { $null }
@@ -992,7 +994,7 @@ function Write-RemoteRollbackPacket {
         operator_steps = @(
             "Freeze further weekly-api deploy attempts for this transaction.",
             "In CloudBase version history, restore rollback_target.previous_active_version for rollback_target.service_name to 100 percent traffic; verify the target against previous_server_identity before confirming.",
-            "Run smoke_cloudrun_weekly_production.py and the lookbackDays=999 full item-ID reconciliation against the restored endpoint.",
+            "Run smoke_cloudrun_weekly_production.py, the lookbackDays=999 full item-ID reconciliation, and the exact club-overviews reconciliation against the restored endpoint.",
             "Keep local current_release unchanged; only close this packet after the restored remote identity and smoke reports are attached."
         )
     }
@@ -1176,6 +1178,7 @@ function Write-PublishSummary {
         weekly_exporter_qr_endpoint_diagnostic_report = $ExporterQrEndpointDiagnosticReportPath
         weekly_exporter_auth_recovery_preflight_report = $ExporterAuthRecoveryPreflightReportPath
         sanji_queue_package_gap_audit_report = $SanjiGapAuditReportPath
+        cloudrun_club_overviews_reconciliation_report = $CloudRunClubOverviewsReportPath
         write_actions_allowed_now = $WriteActionsAllowedNow
         deploy_backend = [bool]$DeployBackend
         promote_dj_bio_atoms = [bool]$PromoteDjBioAtoms
@@ -2604,6 +2607,14 @@ if ($DeployBackend) {
                 -CandidateApiDir $ApiDir `
                 -ReportPath $CloudRunPaginationReportPath
         }
+        Invoke-RunStep "Reconcile remote CloudRun club overviews" {
+            python (Join-Path $Scripts "verify_weekly_club_overviews_remote.py") `
+                --base-url $PublicApiBase `
+                --candidate-api-dir $ApiDir `
+                --proxy-url $ProxyUrl `
+                --report $CloudRunClubOverviewsReportPath
+            Assert-NativeSuccess "CloudRun club-overviews reconciliation"
+        }
         Invoke-RunStep "Promote verified CloudRun publish transaction" {
             python (Join-Path $CloudRun "scripts\bake_and_deploy.py") `
                 --promote-transaction `
@@ -2613,7 +2624,8 @@ if ($DeployBackend) {
                 --work-root $CloudRunWorkRoot `
                 --deploy-report $CloudRunDeployReportPath `
                 --smoke-report $CloudRunSmokeReportPath `
-                --pagination-report $CloudRunPaginationReportPath
+                --pagination-report $CloudRunPaginationReportPath `
+                --club-overviews-report $CloudRunClubOverviewsReportPath
             Assert-NativeSuccess "CloudRun publish transaction promotion"
         }
     } catch {

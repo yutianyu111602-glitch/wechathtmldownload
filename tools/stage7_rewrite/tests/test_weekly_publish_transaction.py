@@ -63,6 +63,36 @@ def write_release(directory: Path, item_id: str, generated_at: str) -> None:
             "generatedAt": generated_at,
         },
     )
+    write_json(
+        directory / "club_overviews.json",
+        {
+            "schema_version": "club_overviews.v1",
+            "generated_at": generated_at,
+            "as_of_date": "2026-07-18",
+            "source": "sanji.db (fixture)",
+            "club_count": 1,
+            "overview_count": 1,
+            "kind_counts": {"week": 1},
+            "by_club": {
+                "Fixture Club": [
+                    {
+                        "record_type": "club_overview_parent",
+                        "parent_aggregate": True,
+                        "include_in_activity_feed": False,
+                        "club": "Fixture Club",
+                        "title": f"overview-{item_id}",
+                        "publish_date": "2026-07-18",
+                        "original_url": f"https://mp.weixin.qq.com/s/{item_id}",
+                        "cover_url": f"https://mmbiz.qpic.cn/{item_id}.jpg",
+                        "window_kind": "week",
+                        "window_label": "7.18-7.24",
+                        "window_start": "2026-07-18",
+                        "window_end": "2026-07-24",
+                    }
+                ]
+            },
+        },
+    )
 
 
 def tree_digest(directory: Path) -> str:
@@ -118,6 +148,27 @@ def test_prepare_transaction_leaves_authoritative_release_byte_identical(tmp_pat
     assert json.loads(context_current.read_text(encoding="utf-8"))["items"][0]["id"] == "new-event"
 
 
+def test_prepare_blocks_candidate_that_cloudrun_would_normalize_to_missing_overviews(tmp_path: Path) -> None:
+    bake = load_bake_module()
+    _data_root, _work_root, current_release, candidate = configure_fixture(bake, tmp_path)
+    before = tree_digest(current_release)
+    club_path = candidate / "club_overviews.json"
+    payload = json.loads(club_path.read_text(encoding="utf-8"))
+    payload["by_club"]["Fixture Club"][0]["cover_url"] = ""
+    write_json(club_path, payload)
+
+    with pytest.raises(ValueError, match="club_count mismatch|overview_count mismatch"):
+        bake.prepare_publish_transaction(
+            release_dir=candidate,
+            source_url_map=candidate / "source_actions" / "source_url_map.json",
+            transaction_id="run-invalid-club-overviews",
+            include_stage7_atlas=False,
+            update_column_json=False,
+        )
+
+    assert tree_digest(current_release) == before
+
+
 def test_promotion_is_blocked_when_remote_smoke_failed(tmp_path: Path) -> None:
     bake = load_bake_module()
     _data_root, _work_root, current_release, candidate = configure_fixture(bake, tmp_path)
@@ -133,6 +184,7 @@ def test_promotion_is_blocked_when_remote_smoke_failed(tmp_path: Path) -> None:
     deploy_report = evidence / "deploy.json"
     smoke_report = evidence / "smoke.json"
     pagination_report = evidence / "pagination.json"
+    club_overviews_report = evidence / "club-overviews.json"
     write_json(
         deploy_report,
         {"ok": True, "safety": {"cloud_deploy_executed": True}},
@@ -153,6 +205,7 @@ def test_promotion_is_blocked_when_remote_smoke_failed(tmp_path: Path) -> None:
             deploy_report_path=deploy_report,
             smoke_report_path=smoke_report,
             pagination_report_path=pagination_report,
+            club_overviews_report_path=club_overviews_report,
         )
 
     assert tree_digest(current_release) == before
@@ -164,10 +217,11 @@ def test_promotion_is_blocked_when_remote_smoke_failed(tmp_path: Path) -> None:
     assert report["status"] == "promotion_blocked"
 
 
-def write_success_evidence(root: Path, prepared: dict) -> tuple[Path, Path, Path]:
+def write_success_evidence(root: Path, prepared: dict) -> tuple[Path, Path, Path, Path]:
     deploy_report = root / "deploy.json"
     smoke_report = root / "smoke.json"
     pagination_report = root / "pagination.json"
+    club_overviews_report = root / "club-overviews.json"
     write_json(deploy_report, {"ok": True, "safety": {"cloud_deploy_executed": True}})
     write_json(smoke_report, {"ok": True, "decision": "cloudrun_weekly_production_smoke_ready"})
     ids = prepared["candidate_item_ids"]
@@ -181,7 +235,20 @@ def write_success_evidence(root: Path, prepared: dict) -> tuple[Path, Path, Path
             "digest_algorithm": ids["digest_algorithm"],
         },
     )
-    return deploy_report, smoke_report, pagination_report
+    club_candidate = prepared["candidate_club_overviews"]
+    club_remote = {key: value for key, value in club_candidate.items() if key != "file_sha256"}
+    club_remote["source"] = "remote"
+    write_json(
+        club_overviews_report,
+        {
+            "schema_version": "cloudrun_club_overviews_reconciliation.v1",
+            "ok": True,
+            "decision": "cloudrun_club_overviews_reconciled",
+            "candidate": club_candidate,
+            "remote": club_remote,
+        },
+    )
+    return deploy_report, smoke_report, pagination_report, club_overviews_report
 
 
 def test_successful_promotion_swaps_candidate_and_keeps_versioned_backup(tmp_path: Path) -> None:
@@ -195,13 +262,16 @@ def test_successful_promotion_swaps_candidate_and_keeps_versioned_backup(tmp_pat
         include_stage7_atlas=False,
         update_column_json=False,
     )
-    deploy_report, smoke_report, pagination_report = write_success_evidence(tmp_path / "evidence", prepared)
+    deploy_report, smoke_report, pagination_report, club_overviews_report = write_success_evidence(
+        tmp_path / "evidence", prepared
+    )
 
     promoted = bake.promote_publish_transaction(
         transaction_id="run-success",
         deploy_report_path=deploy_report,
         smoke_report_path=smoke_report,
         pagination_report_path=pagination_report,
+        club_overviews_report_path=club_overviews_report,
     )
 
     current = json.loads((current_release / "current.json").read_text(encoding="utf-8"))
@@ -229,7 +299,9 @@ def test_promotion_error_restores_authoritative_package_and_source_map(tmp_path:
     )
     before_release = tree_digest(current_release)
     before_source = (data_root / "source_actions" / "source_url_map.json").read_bytes()
-    deploy_report, smoke_report, pagination_report = write_success_evidence(tmp_path / "evidence", prepared)
+    deploy_report, smoke_report, pagination_report, club_overviews_report = write_success_evidence(
+        tmp_path / "evidence", prepared
+    )
     transaction_dir = Path(prepared["paths"]["transaction_dir"])
     staged_source = transaction_dir / "staged_data" / "source_actions" / "source_url_map.json"
     authoritative_source = data_root / "source_actions" / "source_url_map.json"
@@ -249,6 +321,7 @@ def test_promotion_error_restores_authoritative_package_and_source_map(tmp_path:
             deploy_report_path=deploy_report,
             smoke_report_path=smoke_report,
             pagination_report_path=pagination_report,
+            club_overviews_report_path=club_overviews_report,
         )
 
     assert tree_digest(current_release) == before_release
@@ -284,7 +357,9 @@ def test_same_remote_count_with_different_item_id_digest_cannot_promote(tmp_path
         update_column_json=False,
     )
     before = tree_digest(current_release)
-    deploy_report, smoke_report, pagination_report = write_success_evidence(tmp_path / "evidence", prepared)
+    deploy_report, smoke_report, pagination_report, club_overviews_report = write_success_evidence(
+        tmp_path / "evidence", prepared
+    )
     pagination = json.loads(pagination_report.read_text(encoding="utf-8"))
     pagination["remote_item_id_digest"] = "0" * 64
     write_json(pagination_report, pagination)
@@ -295,6 +370,36 @@ def test_same_remote_count_with_different_item_id_digest_cannot_promote(tmp_path
             deploy_report_path=deploy_report,
             smoke_report_path=smoke_report,
             pagination_report_path=pagination_report,
+            club_overviews_report_path=club_overviews_report,
+        )
+    assert tree_digest(current_release) == before
+
+
+def test_matching_club_counts_with_different_summary_digest_cannot_promote(tmp_path: Path) -> None:
+    bake = load_bake_module()
+    _data_root, _work_root, current_release, candidate = configure_fixture(bake, tmp_path)
+    prepared = bake.prepare_publish_transaction(
+        release_dir=candidate,
+        source_url_map=candidate / "source_actions" / "source_url_map.json",
+        transaction_id="run-club-digest-mismatch",
+        include_stage7_atlas=False,
+        update_column_json=False,
+    )
+    before = tree_digest(current_release)
+    deploy_report, smoke_report, pagination_report, club_overviews_report = write_success_evidence(
+        tmp_path / "evidence", prepared
+    )
+    club_evidence = json.loads(club_overviews_report.read_text(encoding="utf-8"))
+    club_evidence["remote"]["summary_sha256"] = "0" * 64
+    write_json(club_overviews_report, club_evidence)
+
+    with pytest.raises(ValueError, match="club-overviews evidence"):
+        bake.promote_publish_transaction(
+            transaction_id="run-club-digest-mismatch",
+            deploy_report_path=deploy_report,
+            smoke_report_path=smoke_report,
+            pagination_report_path=pagination_report,
+            club_overviews_report_path=club_overviews_report,
         )
     assert tree_digest(current_release) == before
 
@@ -305,13 +410,15 @@ def test_openclaw_wrapper_promotes_only_after_smoke_and_full_pagination() -> Non
     deploy_at = script.index("direct_cloudbase_deploy.py", prepare_at)
     smoke_at = script.index("smoke_cloudrun_weekly_production.py", deploy_at)
     pagination_at = script.index("Assert-RemotePagination", smoke_at)
-    promote_at = script.index("--promote-transaction", pagination_at)
+    club_overviews_at = script.index("verify_weekly_club_overviews_remote.py", pagination_at)
+    promote_at = script.index("--promote-transaction", club_overviews_at)
 
-    assert prepare_at < deploy_at < smoke_at < pagination_at < promote_at
+    assert prepare_at < deploy_at < smoke_at < pagination_at < club_overviews_at < promote_at
     assert "--transaction-id $RunId" in script
     assert "lookbackDays=999" in script
     assert "remote_item_id_digest" in script
     assert "cloudrun_remote_pagination.json" in script
+    assert "--club-overviews-report $CloudRunClubOverviewsReportPath" in script
     assert 'decision = if ($deployMayHaveChangedRemote) { "remote_rollback_required" }' in script
     assert "automatic_rollback_executed = $false" in script
     assert "previous_server_identity" in script
