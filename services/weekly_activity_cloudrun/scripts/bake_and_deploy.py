@@ -4,11 +4,14 @@
 Workflow
 --------
 1. (Optional) Check / apply tcb CLI envId patch.
-2. Copy release data into the configured external CloudRun runtime data root.
-   Copy source_url_map into its runtime source_actions directory.
-3. tcb run deploy weekly-api --envId <ENV_ID>
-4. Wait ROUTE_PROPAGATION_DELAY seconds for CloudRun route propagation.
-5. Generate a dated preview QR via WeChat DevTools CLI.
+2. Stage release data, source_url_map, and a self-contained deploy context in a
+   unique external publish transaction. Authoritative current_release is not
+   changed by prepare or deploy.
+3. Deploy the staged context (or let the OpenClaw wrapper use its direct API).
+4. After remote smoke and full item-ID pagination succeed, explicitly promote
+   the named transaction with those evidence reports.
+5. Promotion keeps a versioned rollback backup and restores the old local
+   baseline if the filesystem swap fails.
 
 This backend workflow never rewrites mini-program offlineSnapshot.js and never
 uploads a mini-program version. Activity updates reach clients through the
@@ -16,10 +19,11 @@ online API and the persisted last-good response cache.
 
 Usage examples
 --------------
-# Bake the latest named release and deploy:
+# Stage the latest named release without changing current_release:
 python scripts/bake_and_deploy.py \
     --release-dir "E:\\weekly_activity_pipeline\\longrun\\WEEKLY_ACTIVITY_MINIPROGRAM_API_YYYYMMDD" \
-    --source-url-map "E:\\weekly_activity_pipeline\\longrun\\source_actions\\source_url_map.json"
+    --source-url-map "E:\\weekly_activity_pipeline\\longrun\\source_actions\\source_url_map.json" \
+    --transaction-id weekly-YYYYMMDD --prepare-only
 
 # Dry-run (show what would be copied/run, make no changes):
 python scripts/bake_and_deploy.py --release-dir ... --dry-run
@@ -31,6 +35,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -63,6 +68,8 @@ DATA_STAGE7_ATLAS = DATA_ROOT / "stage7_atlas"
 WORK_ROOT = _PROJECT_DIR / "tmp"
 DEPLOY_CONTEXT_DIR = WORK_ROOT / "cloudrun_deploy_context"
 DEPLOY_CONTEXT_MANIFEST = "deploy_context_manifest.json"
+PUBLISH_TRANSACTIONS_DIR = "publish_transactions"
+PUBLISH_TRANSACTION_REPORT = "publish_transaction.json"
 DEPLOY_CONTEXT_TOP_ITEMS = ["package.json", "package-lock.json", "Dockerfile", "assets", "src", "scripts"]
 MINIAPP_ATLAS_INDEX_ITEMS = [
     "atlas_index.json.gz",
@@ -372,9 +379,13 @@ def materialized_llm_current(data_dir: Path) -> tuple[bool, list[str]]:
     return not reasons, reasons
 
 
-def ensure_source_grounded_llm_materialized(dry_run: bool) -> bool:
+def ensure_source_grounded_llm_materialized(
+    dry_run: bool,
+    data_dir: Path | None = None,
+) -> bool:
     """Ensure release ships deterministic materialized LLM files for runtime fallback."""
-    current, reasons = materialized_llm_current(DATA_CURRENT_RELEASE)
+    target_dir = data_dir or DATA_CURRENT_RELEASE
+    current, reasons = materialized_llm_current(target_dir)
     if current:
         print("  OK materialized llm outputs current")
         return True
@@ -384,7 +395,7 @@ def ensure_source_grounded_llm_materialized(dry_run: bool) -> bool:
         "node",
         str(script),
         "--data-dir",
-        str(DATA_CURRENT_RELEASE),
+        str(target_dir),
         "--all-release-items",
         "--force",
     ]
@@ -400,7 +411,7 @@ def ensure_source_grounded_llm_materialized(dry_run: bool) -> bool:
     if result.returncode != 0:
         print(f"  ERROR: materialized llm generation exited {result.returncode}")
         return False
-    current, reasons = materialized_llm_current(DATA_CURRENT_RELEASE)
+    current, reasons = materialized_llm_current(target_dir)
     if not current:
         print(f"  ERROR: materialized llm outputs stale after generation: {', '.join(reasons)}")
         return False
@@ -490,8 +501,8 @@ def build_deploy_context_manifest(
     }
 
 
-def read_deploy_context_manifest() -> dict:
-    path = DEPLOY_CONTEXT_DIR / DEPLOY_CONTEXT_MANIFEST
+def read_deploy_context_manifest(context_dir: Path | None = None) -> dict:
+    path = (context_dir or DEPLOY_CONTEXT_DIR) / DEPLOY_CONTEXT_MANIFEST
     if not path.exists():
         return {}
     try:
@@ -501,14 +512,15 @@ def read_deploy_context_manifest() -> dict:
     return value if isinstance(value, dict) else {}
 
 
-def deploy_context_matches(manifest: dict) -> bool:
-    if not DEPLOY_CONTEXT_DIR.exists():
+def deploy_context_matches(manifest: dict, context_dir: Path | None = None) -> bool:
+    selected_context = context_dir or DEPLOY_CONTEXT_DIR
+    if not selected_context.exists():
         return False
-    existing = read_deploy_context_manifest()
+    existing = read_deploy_context_manifest(selected_context)
     if existing.get("fingerprint") != manifest.get("fingerprint"):
         return False
     for row in manifest.get("files", []):
-        dst = DEPLOY_CONTEXT_DIR / str(row.get("dst", ""))
+        dst = selected_context / str(row.get("dst", ""))
         if not dst.is_file():
             return False
         try:
@@ -519,30 +531,44 @@ def deploy_context_matches(manifest: dict) -> bool:
     return True
 
 
-def prepare_deploy_context(dry_run: bool, include_stage7_atlas: bool = False) -> Path:
+def prepare_deploy_context(
+    dry_run: bool,
+    include_stage7_atlas: bool = False,
+    *,
+    context_dir: Path | None = None,
+    data_root: Path | None = None,
+    current_release_dir: Path | None = None,
+    source_actions_dir: Path | None = None,
+    stage7_atlas_dir: Path | None = None,
+) -> Path:
     """Build a minimal CloudRun deploy context for source upload and image build."""
-    print(f"\n--- prepare deploy context: {DEPLOY_CONTEXT_DIR} ---")
+    selected_context = context_dir or DEPLOY_CONTEXT_DIR
+    selected_data = data_root or DATA_ROOT
+    selected_current = current_release_dir or DATA_CURRENT_RELEASE
+    selected_source_actions = source_actions_dir or DATA_SOURCE_ACTIONS
+    selected_stage7 = stage7_atlas_dir or DATA_STAGE7_ATLAS
+    print(f"\n--- prepare deploy context: {selected_context} ---")
     current_release_items = [
         *RELEASE_ITEMS,
-        *[item for item in OPTIONAL_RELEASE_ITEMS if (DATA_CURRENT_RELEASE / item).exists()],
+        *[item for item in OPTIONAL_RELEASE_ITEMS if (selected_current / item).exists()],
     ]
     data_items = [
-        ("data", DATA_ROOT, MINIAPP_ATLAS_INDEX_ITEMS),
-        ("data/current_release", DATA_CURRENT_RELEASE, current_release_items),
-        ("data/source_actions", DATA_SOURCE_ACTIONS, ["source_url_map.json"]),
+        ("data", selected_data, MINIAPP_ATLAS_INDEX_ITEMS),
+        ("data/current_release", selected_current, current_release_items),
+        ("data/source_actions", selected_source_actions, ["source_url_map.json"]),
     ]
     if include_stage7_atlas:
-        data_items.append(("data/stage7_atlas", DATA_STAGE7_ATLAS, None))
+        data_items.append(("data/stage7_atlas", selected_stage7, None))
     manifest = None
     if not dry_run:
         manifest = build_deploy_context_manifest(current_release_items, data_items)
-        if deploy_context_matches(manifest):
+        if deploy_context_matches(manifest, selected_context):
             print(
                 "  reused deploy context: "
                 f"fingerprint={manifest['fingerprint'][:12]} files={manifest['file_count']} "
                 f"bytes={manifest['total_bytes']}"
             )
-            return DEPLOY_CONTEXT_DIR
+            return selected_context
 
     if dry_run:
         for item in DEPLOY_CONTEXT_TOP_ITEMS:
@@ -553,32 +579,32 @@ def prepare_deploy_context(dry_run: bool, include_stage7_atlas: bool = False) ->
             else:
                 for name in names:
                     print(f"  [DRY-RUN] stage {label}/{name}")
-        return DEPLOY_CONTEXT_DIR
+        return selected_context
 
-    if DEPLOY_CONTEXT_DIR.exists():
-        shutil.rmtree(DEPLOY_CONTEXT_DIR)
-    DEPLOY_CONTEXT_DIR.mkdir(parents=True, exist_ok=True)
+    if selected_context.exists():
+        shutil.rmtree(selected_context)
+    selected_context.mkdir(parents=True, exist_ok=True)
     for item in DEPLOY_CONTEXT_TOP_ITEMS:
         src = _PROJECT_DIR / item
         if not src.exists():
             raise FileNotFoundError(f"deploy context source missing: {src}")
-        copy_context_item(src, DEPLOY_CONTEXT_DIR / item)
+        copy_context_item(src, selected_context / item)
         print(f"  staged: {item}")
     for label, src_dir, names in data_items:
         if names is None:
             if not src_dir.exists():
                 raise FileNotFoundError(f"deploy context source missing: {src_dir}")
-            copy_context_item(src_dir, DEPLOY_CONTEXT_DIR / label)
+            copy_context_item(src_dir, selected_context / label)
             print(f"  staged: {label}/")
             continue
         for name in names:
             src = src_dir / name
             if not src.exists():
                 raise FileNotFoundError(f"deploy context source missing: {src}")
-            copy_context_item(src, DEPLOY_CONTEXT_DIR / label / name)
+            copy_context_item(src, selected_context / label / name)
             print(f"  staged: {label}/{name}")
     if manifest is not None:
-        (DEPLOY_CONTEXT_DIR / DEPLOY_CONTEXT_MANIFEST).write_text(
+        (selected_context / DEPLOY_CONTEXT_MANIFEST).write_text(
             json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True),
             encoding="utf-8",
         )
@@ -587,7 +613,486 @@ def prepare_deploy_context(dry_run: bool, include_stage7_atlas: bool = False) ->
             f"fingerprint={manifest['fingerprint'][:12]} files={manifest['file_count']} "
             f"bytes={manifest['total_bytes']}"
         )
-    return DEPLOY_CONTEXT_DIR
+    return selected_context
+
+
+def now_iso() -> str:
+    return datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
+
+
+def write_json_atomic(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.tmp-{os.getpid()}")
+    temporary.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    os.replace(temporary, path)
+
+
+def directory_snapshot(path: Path) -> dict:
+    files = []
+    if path.exists():
+        for item in sorted(candidate for candidate in path.rglob("*") if candidate.is_file()):
+            files.append(
+                {
+                    "path": item.relative_to(path).as_posix(),
+                    "size": item.stat().st_size,
+                    "sha256": sha256_file(item),
+                }
+            )
+    encoded = json.dumps(files, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    return {
+        "exists": path.exists(),
+        "fingerprint": hashlib.sha256(encoded).hexdigest(),
+        "file_count": len(files),
+        "total_bytes": sum(int(item["size"]) for item in files),
+        "files": files,
+    }
+
+
+def authoritative_runtime_snapshot() -> dict:
+    current = directory_snapshot(DATA_CURRENT_RELEASE)
+    source_map = DATA_SOURCE_ACTIONS / "source_url_map.json"
+    source = {
+        "exists": source_map.is_file(),
+        "size": source_map.stat().st_size if source_map.is_file() else 0,
+        "sha256": sha256_file(source_map) if source_map.is_file() else "",
+    }
+    encoded = json.dumps(
+        {"current_release": current["fingerprint"], "source_url_map": source},
+        ensure_ascii=False,
+        sort_keys=True,
+    ).encode("utf-8")
+    return {
+        "fingerprint": hashlib.sha256(encoded).hexdigest(),
+        "current_release": current,
+        "source_url_map": source,
+    }
+
+
+def package_item_id_snapshot(data_dir: Path) -> dict:
+    current = read_json_file(data_dir / "current.json")
+    items = current.get("items") if isinstance(current.get("items"), list) else []
+    ids = [str(item.get("id")) for item in items if isinstance(item, dict) and item.get("id")]
+    unique_ids = sorted(set(ids))
+    digest = hashlib.sha256(
+        "\n".join(unique_ids).encode("utf-8")
+    ).hexdigest()
+    return {
+        "item_count": len(items),
+        "item_id_count": len(ids),
+        "unique_item_id_count": len(unique_ids),
+        "duplicate_item_id_count": len(ids) - len(unique_ids),
+        "digest_algorithm": "sha256(sorted_unique_item_ids_utf8_lf)",
+        "item_id_digest": digest,
+    }
+
+
+def normalize_release_manifest_at(
+    current_release_dir: Path,
+    release_dir: Path,
+    deployed_current_release_dir: Path,
+) -> None:
+    manifest_path = current_release_dir / "manifest.json"
+    manifest = read_json_file(manifest_path)
+    if not manifest:
+        raise ValueError(f"manifest.json missing or invalid after staging: {manifest_path}")
+    manifest.setdefault("source_pack_dir", str(release_dir))
+    manifest["out_dir"] = str(deployed_current_release_dir)
+    manifest["deployed_current_release_dir"] = str(deployed_current_release_dir)
+    write_json_atomic(manifest_path, manifest)
+
+
+def resolve_source_url_map(release_dir: Path, source_url_map: Path | None) -> Path:
+    candidates = []
+    if source_url_map:
+        candidates.append(Path(source_url_map))
+    candidates.extend(
+        [
+            release_dir / "source_actions" / "source_url_map.json",
+            release_dir.parent / "source_actions" / "source_url_map.json",
+        ]
+    )
+    selected = next((candidate for candidate in candidates if candidate.is_file()), None)
+    if selected is None:
+        raise FileNotFoundError("source_url_map.json is required for a publish transaction")
+    return selected
+
+
+def validate_transaction_id(transaction_id: str) -> str:
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", transaction_id):
+        raise ValueError("transaction_id must be a safe 1-128 character path label")
+    return transaction_id
+
+
+def prepare_publish_transaction(
+    *,
+    release_dir: Path,
+    source_url_map: Path | None,
+    transaction_id: str,
+    include_stage7_atlas: bool,
+    update_column_json: bool,
+) -> dict:
+    """Stage one immutable publish candidate without changing the authoritative baseline."""
+    transaction_id = validate_transaction_id(transaction_id)
+    if DATA_ROOT.anchor.lower() != WORK_ROOT.anchor.lower():
+        raise ValueError("publish work root and runtime data root must be on the same volume")
+    release_dir = _resolved(Path(release_dir))
+    if not release_dir.is_dir():
+        raise FileNotFoundError(f"release-dir not found: {release_dir}")
+    valid_bake, bake_failures = validate_production_bake_input(release_dir)
+    if not valid_bake:
+        raise ValueError("authoritative base/candidate validation failed: " + ", ".join(bake_failures))
+
+    transaction_dir = WORK_ROOT / PUBLISH_TRANSACTIONS_DIR / transaction_id
+    if transaction_dir.exists():
+        raise FileExistsError(
+            f"publish transaction already exists and will not be silently reused: {transaction_dir}"
+        )
+    staged_data = transaction_dir / "staged_data"
+    staged_current = staged_data / "current_release"
+    staged_source_actions = staged_data / "source_actions"
+    staged_stage7 = staged_data / "stage7_atlas"
+    context_dir = transaction_dir / "deploy_context"
+    report_path = transaction_dir / PUBLISH_TRANSACTION_REPORT
+    transaction_dir.mkdir(parents=True, exist_ok=False)
+    baseline = authoritative_runtime_snapshot()
+    report = {
+        "schema_version": "weekly_cloudrun_publish_transaction.v1",
+        "transaction_id": transaction_id,
+        "status": "preparing",
+        "created_at": now_iso(),
+        "updated_at": now_iso(),
+        "paths": {
+            "transaction_dir": str(transaction_dir),
+            "staged_data": str(staged_data),
+            "deploy_context": str(context_dir),
+            "authoritative_current_release": str(DATA_CURRENT_RELEASE),
+        },
+        "release_dir": str(release_dir),
+        "include_stage7_atlas": bool(include_stage7_atlas),
+        "update_column_json": bool(update_column_json),
+        "baseline": baseline,
+    }
+    write_json_atomic(report_path, report)
+
+    try:
+        staged_current.mkdir(parents=True, exist_ok=False)
+        for name in RELEASE_ITEMS:
+            if name == "column.json" and not update_column_json:
+                source = DATA_CURRENT_RELEASE / name
+            else:
+                source = release_dir / name
+            if not source.exists():
+                raise FileNotFoundError(f"required staged release item missing: {source}")
+            copy_context_item(source, staged_current / name)
+        for name in OPTIONAL_RELEASE_ITEMS:
+            source = release_dir / name
+            if source.exists():
+                copy_context_item(source, staged_current / name)
+
+        selected_source_map = resolve_source_url_map(release_dir, source_url_map)
+        copy_context_item(selected_source_map, staged_source_actions / "source_url_map.json")
+        copy_context_item(
+            selected_source_map,
+            staged_current / "source_actions" / "source_url_map.json",
+        )
+        normalize_release_manifest_at(staged_current, release_dir, DATA_CURRENT_RELEASE)
+        if not ensure_source_grounded_llm_materialized(False, staged_current):
+            raise RuntimeError("staged materialized LLM outputs are incomplete")
+
+        for name in MINIAPP_ATLAS_INDEX_ITEMS:
+            source = DATA_ROOT / name
+            if not source.is_file():
+                raise FileNotFoundError(f"activity deploy context dependency missing: {source}")
+            copy_context_item(source, staged_data / name)
+        if include_stage7_atlas:
+            if not DATA_STAGE7_ATLAS.is_dir():
+                raise FileNotFoundError(f"Stage7 atlas package missing: {DATA_STAGE7_ATLAS}")
+            if not validate_stage7_atlas(True, DATA_STAGE7_ATLAS):
+                raise ValueError("Stage7 atlas package failed required-item validation")
+            copy_context_item(DATA_STAGE7_ATLAS, staged_stage7)
+
+        prepare_deploy_context(
+            False,
+            include_stage7_atlas,
+            context_dir=context_dir,
+            data_root=staged_data,
+            current_release_dir=staged_current,
+            source_actions_dir=staged_source_actions,
+            stage7_atlas_dir=staged_stage7,
+        )
+        candidate = directory_snapshot(staged_current)
+        item_count, item_failures = package_item_count(staged_current)
+        if item_failures:
+            raise ValueError("staged candidate package invalid: " + ", ".join(item_failures))
+        report.update(
+            {
+                "status": "prepared",
+                "updated_at": now_iso(),
+                "prepared_at": now_iso(),
+                "candidate": candidate,
+                "candidate_item_count": item_count,
+                "candidate_item_ids": package_item_id_snapshot(staged_current),
+                "source_url_map": {
+                    "size": (staged_source_actions / "source_url_map.json").stat().st_size,
+                    "sha256": sha256_file(staged_source_actions / "source_url_map.json"),
+                },
+                "deploy_context": read_deploy_context_manifest(context_dir),
+            }
+        )
+        write_json_atomic(report_path, report)
+        return report
+    except Exception as exc:
+        report.update(
+            {
+                "status": "prepare_failed",
+                "updated_at": now_iso(),
+                "error": f"{type(exc).__name__}: {exc}",
+            }
+        )
+        write_json_atomic(report_path, report)
+        raise
+
+
+def read_required_report(path: Path, label: str) -> dict:
+    value = read_json_file(Path(path))
+    if not value:
+        raise ValueError(f"{label} report missing or invalid: {path}")
+    return value
+
+
+def block_publish_promotion(report_path: Path, report: dict, reason: str) -> None:
+    report.update(
+        {
+            "status": "promotion_blocked",
+            "updated_at": now_iso(),
+            "promotion_blocked_reason": reason,
+        }
+    )
+    write_json_atomic(report_path, report)
+
+
+def promote_publish_transaction(
+    *,
+    transaction_id: str,
+    deploy_report_path: Path,
+    smoke_report_path: Path,
+    pagination_report_path: Path,
+) -> dict:
+    """Promote only a named, verified transaction; evidence failure is read-only."""
+    transaction_id = validate_transaction_id(transaction_id)
+    transaction_dir = WORK_ROOT / PUBLISH_TRANSACTIONS_DIR / transaction_id
+    report_path = transaction_dir / PUBLISH_TRANSACTION_REPORT
+    report = read_required_report(report_path, "publish transaction")
+    if report.get("status") not in {"prepared", "promotion_failed_restored"}:
+        reason = f"transaction status is not promotable: {report.get('status')}"
+        block_publish_promotion(report_path, report, reason)
+        raise ValueError(reason)
+
+    deploy_report = read_required_report(deploy_report_path, "deploy")
+    if not deploy_report.get("ok") or not bool(
+        (deploy_report.get("safety") or {}).get("cloud_deploy_executed")
+    ):
+        reason = "deploy evidence is not successful"
+        block_publish_promotion(report_path, report, reason)
+        raise ValueError(reason)
+
+    smoke_report = read_required_report(smoke_report_path, "smoke")
+    if not smoke_report.get("ok") or smoke_report.get("decision") != "cloudrun_weekly_production_smoke_ready":
+        reason = "smoke evidence is not successful"
+        block_publish_promotion(report_path, report, reason)
+        raise ValueError(reason)
+
+    pagination_report = read_required_report(pagination_report_path, "pagination")
+    if (
+        not pagination_report.get("ok")
+        or pagination_report.get("decision") != "cloudrun_remote_pagination_verified"
+    ):
+        reason = "pagination evidence is not successful"
+        block_publish_promotion(report_path, report, reason)
+        raise ValueError(reason)
+
+    staged_data = transaction_dir / "staged_data"
+    staged_current = staged_data / "current_release"
+    staged_source = staged_data / "source_actions" / "source_url_map.json"
+    candidate_snapshot = directory_snapshot(staged_current)
+    candidate_ids = package_item_id_snapshot(staged_current)
+    prepared_ids = report.get("candidate_item_ids") or {}
+    evidence_checks = {
+        "baseline_unchanged": authoritative_runtime_snapshot().get("fingerprint")
+        == (report.get("baseline") or {}).get("fingerprint"),
+        "candidate_unchanged": candidate_snapshot.get("fingerprint")
+        == (report.get("candidate") or {}).get("fingerprint"),
+        "candidate_ids_complete": (
+            candidate_ids.get("item_count") == candidate_ids.get("item_id_count")
+            and candidate_ids.get("duplicate_item_id_count") == 0
+        ),
+        "candidate_id_digest_unchanged": candidate_ids.get("item_id_digest")
+        == prepared_ids.get("item_id_digest"),
+        "pagination_id_count_matches_candidate": int(
+            pagination_report.get("remote_item_id_count") or -1
+        )
+        == int(candidate_ids.get("unique_item_id_count") or 0),
+        "pagination_id_digest_matches_candidate": pagination_report.get(
+            "remote_item_id_digest"
+        )
+        == candidate_ids.get("item_id_digest"),
+        "pagination_digest_algorithm_matches": pagination_report.get("digest_algorithm")
+        == candidate_ids.get("digest_algorithm"),
+        "staged_source_url_map_unchanged": staged_source.is_file()
+        and sha256_file(staged_source) == (report.get("source_url_map") or {}).get("sha256"),
+    }
+    failed_checks = [name for name, passed in evidence_checks.items() if not passed]
+    if failed_checks:
+        reason = "promotion integrity evidence failed: " + ", ".join(failed_checks)
+        report["promotion_evidence_checks"] = evidence_checks
+        block_publish_promotion(report_path, report, reason)
+        raise ValueError(reason)
+
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    backup_dir = DATA_ROOT / "publish_backups" / f"{timestamp}-{transaction_id}"
+    rollback_current = DATA_ROOT / f".current_release.rollback-{transaction_id}"
+    rollback_source = DATA_SOURCE_ACTIONS / f".source_url_map.rollback-{transaction_id}.json"
+    if backup_dir.exists() or rollback_current.exists() or rollback_source.exists():
+        reason = "promotion backup/rollback target already exists"
+        block_publish_promotion(report_path, report, reason)
+        raise ValueError(reason)
+
+    report.update(
+        {
+            "status": "promoting",
+            "updated_at": now_iso(),
+            "promotion_evidence_checks": evidence_checks,
+            "evidence": {
+                "deploy_report": str(Path(deploy_report_path).resolve()),
+                "smoke_report": str(Path(smoke_report_path).resolve()),
+                "pagination_report": str(Path(pagination_report_path).resolve()),
+                "remote_item_id_digest": pagination_report.get("remote_item_id_digest"),
+            },
+        }
+    )
+    write_json_atomic(report_path, report)
+
+    try:
+        backup_dir.parent.mkdir(parents=True, exist_ok=True)
+        backup_dir.mkdir(parents=False, exist_ok=False)
+        shutil.copytree(DATA_CURRENT_RELEASE, backup_dir / "current_release")
+        (backup_dir / "source_actions").mkdir(parents=True, exist_ok=True)
+        shutil.copy2(
+            DATA_SOURCE_ACTIONS / "source_url_map.json",
+            backup_dir / "source_actions" / "source_url_map.json",
+        )
+        backup_snapshot = directory_snapshot(backup_dir / "current_release")
+        backup_source_sha = sha256_file(backup_dir / "source_actions" / "source_url_map.json")
+        if backup_snapshot.get("fingerprint") != (
+            report.get("baseline") or {}
+        ).get("current_release", {}).get("fingerprint"):
+            raise RuntimeError("versioned current_release backup digest mismatch")
+        if backup_source_sha != (
+            report.get("baseline") or {}
+        ).get("source_url_map", {}).get("sha256"):
+            raise RuntimeError("versioned source_url_map backup digest mismatch")
+        write_json_atomic(
+            backup_dir / "backup_manifest.json",
+            {
+                "schema_version": "weekly_cloudrun_publish_backup.v1",
+                "transaction_id": transaction_id,
+                "created_at": now_iso(),
+                "baseline": report.get("baseline"),
+            },
+        )
+    except Exception as exc:
+        report.update(
+            {
+                "status": "promotion_backup_failed_baseline_unchanged",
+                "updated_at": now_iso(),
+                "promotion_error": f"{type(exc).__name__}: {exc}",
+                "promotion": {"backup_dir": str(backup_dir)},
+            }
+        )
+        write_json_atomic(report_path, report)
+        raise RuntimeError(f"versioned backup failed before promotion: {exc}") from exc
+
+    current_swapped = False
+    source_swapped = False
+    try:
+        os.replace(DATA_CURRENT_RELEASE, rollback_current)
+        os.replace(staged_current, DATA_CURRENT_RELEASE)
+        current_swapped = True
+        os.replace(DATA_SOURCE_ACTIONS / "source_url_map.json", rollback_source)
+        os.replace(staged_source, DATA_SOURCE_ACTIONS / "source_url_map.json")
+        source_swapped = True
+
+        promoted_ids = package_item_id_snapshot(DATA_CURRENT_RELEASE)
+        promoted_source_sha = sha256_file(DATA_SOURCE_ACTIONS / "source_url_map.json")
+        if promoted_ids.get("item_id_digest") != candidate_ids.get("item_id_digest"):
+            raise RuntimeError("promoted current_release item ID digest mismatch")
+        if promoted_source_sha != (report.get("source_url_map") or {}).get("sha256"):
+            raise RuntimeError("promoted source_url_map digest mismatch")
+    except Exception as exc:
+        restore_errors = []
+        try:
+            if source_swapped and (DATA_SOURCE_ACTIONS / "source_url_map.json").exists():
+                staged_source.parent.mkdir(parents=True, exist_ok=True)
+                os.replace(DATA_SOURCE_ACTIONS / "source_url_map.json", staged_source)
+            if rollback_source.exists():
+                os.replace(rollback_source, DATA_SOURCE_ACTIONS / "source_url_map.json")
+        except Exception as restore_exc:  # noqa: BLE001
+            restore_errors.append(f"source_url_map: {restore_exc}")
+        try:
+            if current_swapped and DATA_CURRENT_RELEASE.exists():
+                os.replace(DATA_CURRENT_RELEASE, staged_current)
+            if rollback_current.exists():
+                os.replace(rollback_current, DATA_CURRENT_RELEASE)
+        except Exception as restore_exc:  # noqa: BLE001
+            restore_errors.append(f"current_release: {restore_exc}")
+
+        restored = not restore_errors and authoritative_runtime_snapshot().get("fingerprint") == (
+            report.get("baseline") or {}
+        ).get("fingerprint")
+        report.update(
+            {
+                "status": "promotion_failed_restored" if restored else "promotion_failed_restore_error",
+                "updated_at": now_iso(),
+                "promotion_error": f"{type(exc).__name__}: {exc}",
+                "restore_errors": restore_errors,
+                "baseline_restored": restored,
+                "promotion": {"backup_dir": str(backup_dir)},
+            }
+        )
+        write_json_atomic(report_path, report)
+        raise RuntimeError(
+            f"publish promotion failed; baseline_restored={restored}: {exc}"
+        ) from exc
+
+    cleanup_warnings = []
+    try:
+        if rollback_current.exists():
+            shutil.rmtree(rollback_current)
+    except OSError as exc:
+        cleanup_warnings.append(f"rollback_current_cleanup: {exc}")
+    try:
+        if rollback_source.exists():
+            rollback_source.unlink()
+    except OSError as exc:
+        cleanup_warnings.append(f"rollback_source_cleanup: {exc}")
+
+    report.update(
+        {
+            "status": "promoted",
+            "updated_at": now_iso(),
+            "promoted_at": now_iso(),
+            "promotion": {
+                "backup_dir": str(backup_dir),
+                "candidate_item_id_digest": candidate_ids.get("item_id_digest"),
+                "cleanup_warnings": cleanup_warnings,
+            },
+        }
+    )
+    write_json_atomic(report_path, report)
+    return report
 
 
 def apply_tcb_patch(dry_run: bool) -> bool:
@@ -746,17 +1251,18 @@ def bake_data(
     return ok
 
 
-def validate_stage7_atlas(required: bool) -> bool:
+def validate_stage7_atlas(required: bool, stage7_atlas_dir: Path | None = None) -> bool:
     print("\n--- Stage7 atlas package ---")
+    selected_stage7 = stage7_atlas_dir or DATA_STAGE7_ATLAS
     missing = []
     for item in REQUIRED_STAGE7_STATIC_ITEMS:
-        path = DATA_STAGE7_ATLAS / item
+        path = selected_stage7 / item
         if path.exists():
             print(f"  OK {item} bytes={path.stat().st_size}")
         else:
             print(f"  MISSING {item}")
             missing.append(item)
-    pointer_path = DATA_STAGE7_ATLAS / "release_pointer.staging.json"
+    pointer_path = selected_stage7 / "release_pointer.staging.json"
     if pointer_path.exists():
         try:
             pointer = json.loads(pointer_path.read_text(encoding="utf-8-sig"))
@@ -767,7 +1273,7 @@ def validate_stage7_atlas(required: bool) -> bool:
         for key in ["articles", "entities", "events"]:
             item = files.get(key) if isinstance(files.get(key), dict) else {}
             rel_path = item.get("path") or ""
-            path = DATA_STAGE7_ATLAS / str(rel_path)
+            path = selected_stage7 / str(rel_path)
             if rel_path and path.exists():
                 print(f"  OK {key} payload {rel_path} bytes={path.stat().st_size}")
             else:
@@ -1031,7 +1537,7 @@ def generate_qr(desc: str, dry_run: bool) -> Path | None:
 def main() -> int:
     global ENV_ID  # noqa: PLW0603
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--release-dir", required=True, help="Path to the built release directory")
+    parser.add_argument("--release-dir", default="", help="Path to the built release directory")
     parser.add_argument("--source-url-map", default=None, help="Path to source_url_map.json (optional, auto-detected from release)")
     parser.add_argument(
         "--data-root",
@@ -1051,7 +1557,20 @@ def main() -> int:
     parser.add_argument("--env-id", default=ENV_ID, help=f"CloudBase env ID (default: {ENV_ID})")
     parser.add_argument("--no-qr", action="store_true", help="Skip QR generation")
     parser.add_argument("--dry-run", action="store_true", help="Print steps without making changes")
-    parser.add_argument("--prepare-only", action="store_true", help="Bake data and prepare deploy context without deploying")
+    parser.add_argument(
+        "--prepare-only",
+        action="store_true",
+        help="Stage a fresh publish transaction and deploy context without changing current_release or deploying.",
+    )
+    parser.add_argument("--transaction-id", default="", help="Unique publish transaction/run ID; an existing ID is never reused.")
+    parser.add_argument(
+        "--promote-transaction",
+        action="store_true",
+        help="Promote a prepared transaction after verified deploy, smoke, and full-pagination reports.",
+    )
+    parser.add_argument("--deploy-report", default="", help="Verified direct deploy report for --promote-transaction.")
+    parser.add_argument("--smoke-report", default="", help="Successful production smoke report for --promote-transaction.")
+    parser.add_argument("--pagination-report", default="", help="Successful full item-ID pagination report for --promote-transaction.")
     parser.add_argument("--skip-patch-check", action="store_true", help="Skip tcb CLI patch verification")
     parser.add_argument("--require-stage7-atlas", action="store_true", help="Abort if data/stage7_atlas is incomplete")
     parser.add_argument("--include-stage7-atlas", action="store_true", help="Include data/stage7_atlas in the deploy context")
@@ -1086,21 +1605,59 @@ def main() -> int:
         print(f"ERROR: invalid CloudRun runtime path contract: {exc}")
         return 2
 
+    if args.promote_transaction:
+        if args.dry_run:
+            print("ERROR: --promote-transaction cannot be combined with --dry-run")
+            return 2
+        missing = [
+            name
+            for name, value in (
+                ("--transaction-id", args.transaction_id),
+                ("--deploy-report", args.deploy_report),
+                ("--smoke-report", args.smoke_report),
+                ("--pagination-report", args.pagination_report),
+            )
+            if not value
+        ]
+        if missing:
+            print("ERROR: promotion requires " + ", ".join(missing))
+            return 2
+        try:
+            report = promote_publish_transaction(
+                transaction_id=args.transaction_id,
+                deploy_report_path=Path(args.deploy_report),
+                smoke_report_path=Path(args.smoke_report),
+                pagination_report_path=Path(args.pagination_report),
+            )
+        except (OSError, ValueError, RuntimeError) as exc:
+            print(f"ERROR: publish transaction promotion failed: {exc}")
+            return 2
+        print(
+            json.dumps(
+                {
+                    "transaction_id": report.get("transaction_id"),
+                    "status": report.get("status"),
+                    "backup_dir": (report.get("promotion") or {}).get("backup_dir"),
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return 0
+
+    if not args.release_dir:
+        print("ERROR: --release-dir is required unless --promote-transaction is used")
+        return 2
     release_dir = Path(args.release_dir)
     if not release_dir.exists():
         print(f"ERROR: release-dir not found: {release_dir}")
         return 1
-    if not args.dry_run:
-        valid_bake, bake_failures = validate_production_bake_input(release_dir)
-        if not valid_bake:
-            print(
-                "ERROR: authoritative base/candidate validation failed before bake: "
-                + ", ".join(bake_failures)
-            )
-            return 2
 
     ts_label = datetime.now().strftime("%Y-%m-%d %H:%M")
     desc = args.desc or f"deploy {release_dir.name} @ {ts_label}"
+    transaction_id = args.transaction_id or (
+        "publish-" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    )
 
     print(f"=== bake_and_deploy ===")
     print(f"  release : {release_dir}")
@@ -1112,6 +1669,7 @@ def main() -> int:
     print(f"  work    : {WORK_ROOT}")
     print(f"  dry-run : {args.dry_run}")
     print(f"  prepare : {args.prepare_only}")
+    print(f"  tx      : {transaction_id}")
     print()
 
     # Step 1: tcb patch
@@ -1120,24 +1678,39 @@ def main() -> int:
             print("ERROR: tcb CLI patch failed. Deploy aborted.")
             return 1
 
-    # Step 2: bake data
-    if not bake_data(
-        release_dir,
-        args.source_url_map,
-        args.dry_run,
-        update_column_json=args.update_column_json,
-    ):
-        print("ERROR: Data bake incomplete. Deploy aborted.")
-        return 1
-
-    # Step 2b: Stage7 atlas package is part of the full-pipeline CloudRun surface.
-    if not validate_stage7_atlas(args.require_stage7_atlas):
-        return 1
-
-    deploy_context = prepare_deploy_context(args.dry_run, args.include_stage7_atlas or args.require_stage7_atlas)
+    if args.dry_run:
+        if not bake_data(
+            release_dir,
+            Path(args.source_url_map) if args.source_url_map else None,
+            True,
+            update_column_json=args.update_column_json,
+        ):
+            return 1
+        deploy_context = prepare_deploy_context(
+            True,
+            args.include_stage7_atlas or args.require_stage7_atlas,
+        )
+    else:
+        try:
+            transaction = prepare_publish_transaction(
+                release_dir=release_dir,
+                source_url_map=Path(args.source_url_map) if args.source_url_map else None,
+                transaction_id=transaction_id,
+                include_stage7_atlas=args.include_stage7_atlas or args.require_stage7_atlas,
+                update_column_json=args.update_column_json,
+            )
+        except (OSError, ValueError, RuntimeError) as exc:
+            print(f"ERROR: publish transaction prepare failed: {exc}")
+            return 2
+        deploy_context = Path(transaction["paths"]["deploy_context"])
+        print(
+            "  prepared transaction: "
+            f"status={transaction['status']} context={deploy_context} "
+            f"item_id_digest={transaction['candidate_item_ids']['item_id_digest']}"
+        )
 
     if args.prepare_only:
-        print("\n=== Prepared deploy context only ===")
+        print("\n=== Prepared publish transaction only; authoritative baseline unchanged ===")
         return 0
 
     # Step 3: deploy
@@ -1151,7 +1724,7 @@ def main() -> int:
     if not args.no_qr:
         generate_qr(desc, args.dry_run)
 
-    print("\n=== Done ===")
+    print("\n=== Deploy complete; transaction remains prepared pending remote smoke/pagination promotion ===")
     return 0
 
 

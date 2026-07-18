@@ -183,7 +183,7 @@ $PublishedApiDir = Resolve-ConfiguredPathValue `
     -Value $PublishedApiDir `
     -EnvironmentVariableName "HUAIDJ_PUBLISHED_API_DIR" `
     -Default $IncrementalBaseApiDir
-$CloudRunDeployContextDir = Join-Path $CloudRunWorkRoot "cloudrun_deploy_context"
+$CloudRunPublishTransactionsRoot = Join-Path $CloudRunWorkRoot "publish_transactions"
 $ProxyUrl = Resolve-ConfiguredPathValue `
     -Value $ProxyUrl `
     -EnvironmentVariableName "HUAIDJ_PROXY_URL" `
@@ -301,6 +301,14 @@ if ($PromoteDjBioAtoms -and -not $DeployBackend) {
 $RunId = "openclaw_weekly_daily_${WeekTag}_" + (Get-Date -Format "HHmmss")
 $RunReportDir = Join-Path $Reports $RunId
 $DeployReportDir = Join-Path $Reports "cloudrun_direct_deploy_$RunId"
+$CloudRunPublishTransactionDir = Join-Path $CloudRunPublishTransactionsRoot $RunId
+$CloudRunDeployContextDir = Join-Path $CloudRunPublishTransactionDir "deploy_context"
+$CloudRunPublishTransactionReportPath = Join-Path $CloudRunPublishTransactionDir "publish_transaction.json"
+$CloudRunDeployReportPath = Join-Path $DeployReportDir "cloudrun_direct_api_deploy_report.json"
+$CloudRunSmokeReportDir = Join-Path $RunReportDir "cloudrun_weekly_production_smoke"
+$CloudRunSmokeReportPath = Join-Path $CloudRunSmokeReportDir "cloudrun_weekly_production_smoke.json"
+$CloudRunPaginationReportPath = Join-Path $RunReportDir "cloudrun_remote_pagination.json"
+$CloudRunRemoteRollbackPacketPath = Join-Path $RunReportDir "cloudrun_remote_rollback_packet.json"
 $exporterSessionDiagnosticGeneratedReportPath = Join-Path $RunReportDir "exporter_session_no_secret.json"
 $exporterQrStatusGeneratedReportPath = Join-Path $RunReportDir "weekly_exporter_qr_status.json"
 $exporterQrImageGeneratedPath = Join-Path $RunReportDir "weekly_exporter_login_qr.png"
@@ -851,13 +859,100 @@ function Get-MissingGeoItemIds {
     return @($ids)
 }
 
+function Get-StableUniqueItemIds {
+    param([string[]]$Ids)
+    $idSet = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+    foreach ($id in $Ids) {
+        if (-not [string]::IsNullOrWhiteSpace($id)) {
+            [void]$idSet.Add($id)
+        }
+    }
+    $uniqueIds = [string[]]@($idSet)
+    [Array]::Sort($uniqueIds, [System.StringComparer]::Ordinal)
+    return $uniqueIds
+}
+
+function Get-StableItemIdDigest {
+    param([string[]]$Ids)
+    $uniqueIds = @(Get-StableUniqueItemIds -Ids $Ids)
+    $payload = [string]::Join("`n", $uniqueIds)
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($payload)
+        return (($sha256.ComputeHash($bytes) | ForEach-Object { $_.ToString("x2") }) -join "")
+    } finally {
+        $sha256.Dispose()
+    }
+}
+
+function Write-RemoteRollbackPacket {
+    param([string]$FailureReason)
+    $deployEvidence = $null
+    $transactionEvidence = $null
+    if (Test-Path -LiteralPath $CloudRunDeployReportPath -PathType Leaf) {
+        try {
+            $deployEvidence = Get-Content -Raw -LiteralPath $CloudRunDeployReportPath | ConvertFrom-Json
+        } catch {
+            $deployEvidence = $null
+        }
+    }
+    if (Test-Path -LiteralPath $CloudRunPublishTransactionReportPath -PathType Leaf) {
+        try {
+            $transactionEvidence = Get-Content -Raw -LiteralPath $CloudRunPublishTransactionReportPath | ConvertFrom-Json
+        } catch {
+            $transactionEvidence = $null
+        }
+    }
+    $deployMayHaveChangedRemote = [bool]$script:CloudRunDeployExecuted
+    if ($null -ne $deployEvidence -and $null -ne $deployEvidence.safety) {
+        $deployMayHaveChangedRemote = $deployMayHaveChangedRemote -or [bool]$deployEvidence.safety.cloud_deploy_executed
+    }
+    $packet = [ordered]@{
+        schema_version = "cloudrun_remote_rollback_packet.v1"
+        generated_at = [DateTimeOffset]::Now.ToString("o")
+        decision = if ($deployMayHaveChangedRemote) { "remote_rollback_required" } else { "remote_deploy_not_proven" }
+        remote_rollback_required = $deployMayHaveChangedRemote
+        automatic_rollback_executed = $false
+        automatic_rollback_verified = $false
+        local_authoritative_promotion_completed = $false
+        local_transaction_status = if ($null -ne $transactionEvidence) { $transactionEvidence.status } else { "unknown" }
+        local_baseline_restored = if ($null -ne $transactionEvidence) { $transactionEvidence.baseline_restored } else { $null }
+        transaction_id = $RunId
+        transaction_report = $CloudRunPublishTransactionReportPath
+        deploy_report = $CloudRunDeployReportPath
+        smoke_report = $CloudRunSmokeReportPath
+        pagination_report = $CloudRunPaginationReportPath
+        failure_reason = $FailureReason
+        previous_server_identity = if ($null -ne $deployEvidence) { $deployEvidence.previous_server_identity } else { $null }
+        post_update_server_identity = if ($null -ne $deployEvidence) { $deployEvidence.post_update_server_identity } else { $null }
+        rollback_target = [ordered]@{
+            env_id = if ($null -ne $deployEvidence) { $deployEvidence.env_id } else { $null }
+            service_name = if ($null -ne $deployEvidence) { $deployEvidence.service_name } else { $null }
+            previous_active_version = if ($null -ne $deployEvidence) { $deployEvidence.previous_server_identity.active_version } else { $null }
+            previous_active_flow_ratio = if ($null -ne $deployEvidence) { $deployEvidence.previous_server_identity.active_flow_ratio } else { $null }
+        }
+        automatic_rollback_blocker = "The direct deploy report captures previous version identity but not a verified reusable package artifact; version identity alone is insufficient for a safe unattended rollback."
+        operator_steps = @(
+            "Freeze further weekly-api deploy attempts for this transaction.",
+            "In CloudBase version history, restore rollback_target.previous_active_version for rollback_target.service_name to 100 percent traffic; verify the target against previous_server_identity before confirming.",
+            "Run smoke_cloudrun_weekly_production.py and the lookbackDays=999 full item-ID reconciliation against the restored endpoint.",
+            "Keep local current_release unchanged; only close this packet after the restored remote identity and smoke reports are attached."
+        )
+    }
+    $packetJson = $packet | ConvertTo-Json -Depth 12
+    [System.IO.File]::WriteAllText($CloudRunRemoteRollbackPacketPath, $packetJson + [Environment]::NewLine, (New-Object System.Text.UTF8Encoding($false)))
+    return $CloudRunRemoteRollbackPacketPath
+}
+
 function Assert-RemotePagination {
     param(
         [string]$BaseUrl,
-        [int]$ExpectedCount
+        [int]$ExpectedCount,
+        [string]$CandidateApiDir,
+        [string]$ReportPath
     )
     $base = $BaseUrl.TrimEnd('/')
-    $manifest = Invoke-RestMethod -Uri "$base/api/v1/weekly/manifest"
+    $manifest = Invoke-RestMethod -Uri "$base/api/v1/weekly/manifest" -Proxy $ProxyUrl
     $remoteManifestCount = [int]$manifest.item_count
     if ($ExpectedCount -gt 0 -and $remoteManifestCount -ne $ExpectedCount) {
         throw "Remote manifest mismatch: manifest=$remoteManifestCount expected=$ExpectedCount"
@@ -866,7 +961,7 @@ function Assert-RemotePagination {
     $all = @()
     $cursor = "0"
     do {
-        $response = Invoke-RestMethod -Uri "$base/api/v1/weekly/current?limit=100&lookbackDays=45&cursor=$cursor"
+        $response = Invoke-RestMethod -Uri "$base/api/v1/weekly/current?limit=100&lookbackDays=999&cursor=$cursor" -Proxy $ProxyUrl
         $all += $response.items
         $cursor = if ($response.page) { $response.page.nextCursor } else { $null }
     } while ($cursor)
@@ -874,8 +969,30 @@ function Assert-RemotePagination {
         throw "Remote current feed is empty after deploy; refusing to continue."
     }
 
-    $index = Invoke-RestMethod -Uri "$base/api/v1/weekly/llm/materialized-enrichments"
-    $ids = @($all | ForEach-Object { $_.id })
+    $candidatePayload = Get-Content -Raw -LiteralPath (Join-Path $CandidateApiDir "current.json") | ConvertFrom-Json
+    $candidateItems = @($candidatePayload.items)
+    $candidateIds = @($candidateItems | ForEach-Object { [string]$_.id })
+    $candidateUniqueIds = @(Get-StableUniqueItemIds -Ids $candidateIds)
+    if ($candidateIds.Count -ne $candidateItems.Count -or $candidateUniqueIds.Count -ne $candidateItems.Count) {
+        throw "Candidate current.json has missing or duplicate item IDs; remote promotion is blocked."
+    }
+
+    $index = Invoke-RestMethod -Uri "$base/api/v1/weekly/llm/materialized-enrichments" -Proxy $ProxyUrl
+    $ids = @($all | ForEach-Object { [string]$_.id })
+    $remoteUniqueIds = @(Get-StableUniqueItemIds -Ids $ids)
+    if ($ids.Count -ne $remoteUniqueIds.Count) {
+        throw "Remote full current feed has missing or duplicate item IDs; remote promotion is blocked."
+    }
+    $candidateMissingRemote = @($candidateUniqueIds | Where-Object { $_ -notin $remoteUniqueIds })
+    $remoteExtra = @($remoteUniqueIds | Where-Object { $_ -notin $candidateUniqueIds })
+    if ($candidateMissingRemote.Count -or $remoteExtra.Count) {
+        throw "Remote full item ID set differs from staged candidate: candidate=$($candidateUniqueIds.Count) remote=$($remoteUniqueIds.Count) missing=$($candidateMissingRemote.Count) extra=$($remoteExtra.Count)"
+    }
+    $candidateDigest = Get-StableItemIdDigest -Ids $candidateUniqueIds
+    $remoteDigest = Get-StableItemIdDigest -Ids $remoteUniqueIds
+    if ($candidateDigest -ne $remoteDigest) {
+        throw "Remote item ID digest differs from staged candidate: candidate=$candidateDigest remote=$remoteDigest"
+    }
     $enrichmentIds = @($index.enrichments | ForEach-Object { $_.id })
     $missing = @($ids | Where-Object { $_ -notin $enrichmentIds })
     $extra = @($enrichmentIds | Where-Object { $_ -notin $ids })
@@ -883,12 +1000,33 @@ function Assert-RemotePagination {
         throw "Remote pagination/enrichment mismatch: current=$($all.Count) manifest=$remoteManifestCount missing=$($missing.Count) extra=$($extra.Count)"
     }
     if ($all.Count -ne $remoteManifestCount) {
-        Write-Warning "remote current display feed count differs from raw manifest; accepted because /weekly/current applies date filters and dedupe: current=$($all.Count) manifest=$remoteManifestCount"
+        throw "Remote full current count differs from manifest: current=$($all.Count) manifest=$remoteManifestCount"
     }
     if ($extra.Count) {
         Write-Warning "materialized enrichment index is a superset of the current display feed: extra=$($extra.Count)"
     }
-    Write-Host "  remote pagination passed: manifest=$remoteManifestCount current=$($all.Count) enrichment=$($index.enrichments.Count) missing=0 extra=$($extra.Count)"
+    $paginationReport = [ordered]@{
+        schema_version = "cloudrun_remote_pagination.v1"
+        generated_at = [DateTimeOffset]::Now.ToString("o")
+        ok = $true
+        decision = "cloudrun_remote_pagination_verified"
+        lookback_days = 999
+        remote_manifest_item_count = $remoteManifestCount
+        remote_item_id_count = $remoteUniqueIds.Count
+        remote_item_id_digest = $remoteDigest
+        candidate_item_id_count = $candidateUniqueIds.Count
+        candidate_item_id_digest = $candidateDigest
+        digest_algorithm = "sha256(sorted_unique_item_ids_utf8_lf)"
+        missing_candidate_item_id_count = 0
+        extra_remote_item_id_count = 0
+        missing_enrichment_count = 0
+        extra_enrichment_count = $extra.Count
+    }
+    $reportParent = Split-Path -Parent $ReportPath
+    New-Item -ItemType Directory -Force -Path $reportParent | Out-Null
+    $reportJson = $paginationReport | ConvertTo-Json -Depth 6
+    [System.IO.File]::WriteAllText($ReportPath, $reportJson + [Environment]::NewLine, (New-Object System.Text.UTF8Encoding($false)))
+    Write-Host "  remote pagination passed: manifest=$remoteManifestCount current=$($all.Count) digest=$remoteDigest enrichment=$($index.enrichments.Count) missing=0 extra=$($extra.Count)"
 }
 
 function Write-PublishSummary {
@@ -2356,10 +2494,11 @@ if ($DeployBackend) {
         python (Join-Path $CloudRun "scripts\bake_and_deploy.py") `
             --release-dir $ApiDir `
             --source-url-map (Join-Path $ApiDir "source_actions\source_url_map.json") `
-            --data-root $CloudRunDataRoot `
-            --current-release-dir $IncrementalBaseApiDir `
-            --work-root $CloudRunWorkRoot `
-            --prepare-only `
+             --data-root $CloudRunDataRoot `
+             --current-release-dir $IncrementalBaseApiDir `
+             --work-root $CloudRunWorkRoot `
+             --transaction-id $RunId `
+             --prepare-only `
             --no-qr `
             --desc $Desc
     }
@@ -2372,21 +2511,41 @@ if ($DeployBackend) {
             Pop-Location
         }
     }
-    Invoke-RunStep "Deploy CloudRun by direct CloudBase API" {
-        python (Join-Path $CloudRun "scripts\direct_cloudbase_deploy.py") `
-            --context-dir $CloudRunDeployContextDir `
-            --out-dir $DeployReportDir `
-            --no-timeout `
-            --allow-unverified-task-poll
-        $script:CloudRunDeployExecuted = $true
-    }
-    Invoke-RunStep "Smoke remote CloudRun and reconcile pagination" {
-        python (Join-Path $Scripts "smoke_cloudrun_weekly_production.py") `
-            --base-url $PublicApiBase `
-            --no-timeout `
-            --out-dir (Join-Path $RunReportDir "cloudrun_weekly_production_smoke")
-        Assert-NativeSuccess "CloudRun production smoke"
-        Assert-RemotePagination -BaseUrl $PublicApiBase -ExpectedCount $itemCount
+    try {
+        Invoke-RunStep "Deploy CloudRun by direct CloudBase API" {
+            python (Join-Path $CloudRun "scripts\direct_cloudbase_deploy.py") `
+                --context-dir $CloudRunDeployContextDir `
+                --out-dir $DeployReportDir `
+                --no-timeout `
+                --allow-unverified-task-poll
+            $script:CloudRunDeployExecuted = $true
+        }
+        Invoke-RunStep "Smoke remote CloudRun and reconcile pagination" {
+            python (Join-Path $Scripts "smoke_cloudrun_weekly_production.py") `
+                --base-url $PublicApiBase `
+                --no-timeout `
+                --out-dir $CloudRunSmokeReportDir
+            Assert-NativeSuccess "CloudRun production smoke"
+            Assert-RemotePagination -BaseUrl $PublicApiBase -ExpectedCount $itemCount `
+                -CandidateApiDir $ApiDir `
+                -ReportPath $CloudRunPaginationReportPath
+        }
+        Invoke-RunStep "Promote verified CloudRun publish transaction" {
+            python (Join-Path $CloudRun "scripts\bake_and_deploy.py") `
+                --promote-transaction `
+                --transaction-id $RunId `
+                --data-root $CloudRunDataRoot `
+                --current-release-dir $IncrementalBaseApiDir `
+                --work-root $CloudRunWorkRoot `
+                --deploy-report $CloudRunDeployReportPath `
+                --smoke-report $CloudRunSmokeReportPath `
+                --pagination-report $CloudRunPaginationReportPath
+            Assert-NativeSuccess "CloudRun publish transaction promotion"
+        }
+    } catch {
+        $failureReason = $_.Exception.Message
+        $rollbackPacket = Write-RemoteRollbackPacket -FailureReason $failureReason
+        throw "CloudRun publish transaction did not complete; inspect transaction status and baseline_restored. Remote rollback may be required. Packet: $rollbackPacket. Cause: $failureReason"
     }
 }
 
