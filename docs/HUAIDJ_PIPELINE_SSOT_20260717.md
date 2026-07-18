@@ -134,11 +134,11 @@ flowchart TD
 - primary provider 必须成功，fallback 占比不得超过 20%，`failures>0` 即不通过。
 - summary 必须记录调用数、tokens、人民币成本和 provider 分布。
 
-最新日志证据：
+2026-07-10～11 历史日志证据（当前成功水位见第 13 节）：
 
 - 2026-07-10：355/355 成功，Qwen 调用 355，失败 0，无 fallback，约 958 万 tokens，¥21.311698。
 - 2026-07-11：250/250 成功，162 条从 evidence 恢复，88 次新 API 调用，失败 0，¥4.726026。
-- 最后一次完整 Qwen 后端成功发布是 `openclaw_weekly_daily_20260702_141534`。
+- 截至 2026-07-11，当时最后一次完整 Qwen 后端成功发布是 `openclaw_weekly_daily_20260702_141534`；该历史结论已被 2026-07-18 的 `openclaw_weekly_daily_20260718_195817` 成功发布取代。
 - `openclaw_weekly_daily_20260711_230659` 的 Qwen 阶段成功；最终被 1 条 `non_target_activity_hiphop` 质量门拦下，并非 Qwen 失败。
 
 ## 6. DeepSeek 富化
@@ -238,11 +238,11 @@ flowchart TD
 - `latest_cumulative_candidate.json` 指向本次 candidate DB
 - candidate SQLite `PRAGMA quick_check=ok`，canonical/raw 映射和 dangling checks 全过
 
-2026-07-17 新 delta 导出已看到 271 篇、5,230 个资产；由于运行时 RapidOCR 依赖缺失，第一次视觉路由未完成，checkpoint 仍保持 138,692，没有误推进。依赖已补，但在用户要求重新确认管线后主动停止，必须在新理解和修复完成后从干净状态重跑。
+历史失败证据：2026-07-17 新 delta 导出曾看到 271 篇、5,230 个资产；由于运行时 RapidOCR 依赖缺失，第一次视觉路由未完成，checkpoint 保持 138,692，没有误推进。该恢复中间态已由第 12、13 节记录的后续干净重跑与成功 promotion 取代，不得再把它当成当前待执行状态。
 
 ## 10. Hermes Desktop、Gateway 与定时计划
 
-2026-07-15 的统一暂停已在 2026-07-18 全量验收后解除。当前有九个 canonical jobs active，两个旧 Friday jobs paused；不得从历史暂停记录推断当前状态，也不得手工再造第二套 Windows/Codex 执行器。
+2026-07-15 的统一暂停已在 2026-07-18 全量验收后解除。当前有九个 HUAIDJ canonical jobs active、两个旧 Friday HUAIDJ jobs paused，另有两个与本管线无关的天气任务 disabled；不得从历史暂停记录推断当前状态，也不得手工再造第二套 Windows/Codex 执行器。
 
 Windows 运行边界：
 
@@ -339,7 +339,7 @@ AtlasV2：
 Hermes：
 
 1. `Hermes_Gateway` task Running，`gateway status --deep --full` 6/6，Telegram connected，cron heartbeat 新鲜。
-2. 九个 canonical jobs active、两个旧 Friday jobs paused；workdir 统一指向不可变 release，contract audit 208/208。Fast Watch、health、package monitor 直接 canary 均 exit 0，20:30 Fast Watch 又由 cron 自动执行成功。
+2. 九个 canonical jobs active、两个旧 Friday jobs paused；workdir 统一指向不可变 release，contract audit 208/208。Fast Watch、health、package monitor 直接 canary 均 exit 0。20:30 Fast Watch 曾由与最终代码相同的 `818ba0c` runtime 自动执行成功；`0cf5794` 安装器和契约审计完成后，Package/API Monitor 又于 20:45:47 由 Gateway 自动触发并写回 `last_status=ok`，这是最终 `0cf5794` runtime 的明确自动计划证明。Atlas job 仍显示 7 月 17 日的历史失败状态；本轮只证明同一 launcher 的手工全链 canary 成功，下一次自动成功需在 23:40 运行后另行读回。
 3. 旧启动时约 110 秒的 PID/lock/state 假阴性来自慢初始化前未认领生命周期，不是持续 HOME 漂移。现役已稳定；最新 GitHub main 候选必须先保留本地 supervisor 并修复 early `starting`/失败清理，再经隔离 canary，不能直接覆盖重装。
 
 外部恢复证据与日常 runbook：
