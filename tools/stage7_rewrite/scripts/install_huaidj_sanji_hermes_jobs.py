@@ -886,6 +886,9 @@ SCRIPT_CONTRACT_TOKENS = {
         "HUAIDJ_PROXY_URL",
         "HTTP_PROXY",
         "HTTPS_PROXY",
+        "def _emit(text: str) -> None:",
+        'text.encode(encoding, errors="replace").decode(encoding, errors="replace")',
+        "sys.stdout.write(rendered)",
         "return int(result.returncode)",
     ),
     "huaidj/health_check.py": (
@@ -898,6 +901,9 @@ SCRIPT_CONTRACT_TOKENS = {
         "HUAIDJ_PROXY_URL",
         "HTTP_PROXY",
         "HTTPS_PROXY",
+        "def _emit(text: str) -> None:",
+        'text.encode(encoding, errors="replace").decode(encoding, errors="replace")',
+        "sys.stdout.write(rendered)",
         "return int(result.returncode)",
     ),
     "huaidj/atlas_v2_sanji_import_nightly.py": (

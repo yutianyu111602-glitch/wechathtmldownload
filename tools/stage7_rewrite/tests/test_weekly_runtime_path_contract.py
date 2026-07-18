@@ -271,6 +271,63 @@ def test_installer_templates_make_health_canary_checkout_read_only(
     "template_name",
     ("huaidj/health_check.py", "huaidj/package_api_tg_status.py"),
 )
+def test_installer_upgrades_status_launchers_missing_console_safe_emit(
+    tmp_path: Path, template_name: str
+) -> None:
+    import runpy
+
+    namespace = runpy.run_path(
+        str(ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py"),
+        run_name="__test__",
+    )
+    template = namespace["SCRIPT_TEMPLATES"][template_name]
+    emit_start = template.index("\ndef _emit(text: str) -> None:")
+    main_start = template.index("\ndef main() -> int:", emit_start)
+    legacy = template[:emit_start] + "\n" + template[main_start:]
+    legacy = legacy.replace("_emit(", "print(")
+
+    live_script = tmp_path / "scripts" / Path(template_name)
+    live_script.parent.mkdir(parents=True)
+    live_script.write_text(legacy, encoding="utf-8")
+
+    actions = namespace["write_scripts"](tmp_path, apply=True)
+    action = next(row for row in actions if Path(row["path"]) == live_script)
+    installed = live_script.read_text(encoding="utf-8")
+
+    assert action["contract_ok"] is False
+    assert action["changed"] is True
+    assert "def _emit(text: str) -> None:" in installed
+    assert 'text.encode(encoding, errors="replace").decode(encoding, errors="replace")' in installed
+    assert "sys.stdout.write(rendered)" in installed
+
+
+@pytest.mark.parametrize(
+    "template_name",
+    ("huaidj/health_check.py", "huaidj/package_api_tg_status.py"),
+)
+def test_installer_keeps_current_status_launchers_idempotent(tmp_path: Path, template_name: str) -> None:
+    import runpy
+
+    namespace = runpy.run_path(
+        str(ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py"),
+        run_name="__test__",
+    )
+    namespace["write_scripts"](tmp_path, apply=True)
+    live_script = tmp_path / "scripts" / Path(template_name)
+    before = live_script.read_bytes()
+
+    actions = namespace["write_scripts"](tmp_path, apply=True)
+    action = next(row for row in actions if Path(row["path"]) == live_script)
+
+    assert action["contract_ok"] is True
+    assert action["changed"] is False
+    assert live_script.read_bytes() == before
+
+
+@pytest.mark.parametrize(
+    "template_name",
+    ("huaidj/health_check.py", "huaidj/package_api_tg_status.py"),
+)
 def test_installer_status_launchers_preserve_exit_code_on_gbk_console(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path, template_name: str
 ) -> None:
