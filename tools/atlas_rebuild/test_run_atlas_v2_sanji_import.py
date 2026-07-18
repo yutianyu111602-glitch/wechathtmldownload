@@ -7,7 +7,6 @@ import json
 import os
 import sqlite3
 import tempfile
-import time
 from pathlib import Path
 
 import run_atlas_v2_sanji_import as orchestrator
@@ -309,7 +308,7 @@ def test_promote_seen_tokens_checkpoint_replaces_target_and_keeps_run_artifact()
         assert not list(target.parent.glob(".seen_tokens_latest.txt.tmp-*"))
 
 
-def test_eight_hour_import_lock_remains_fail_closed() -> None:
+def test_import_lock_uses_live_kernel_ownership() -> None:
     spec = importlib.util.spec_from_file_location("atlas_v2_sanji_import_nightly", NIGHTLY_LAUNCHER)
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
@@ -317,14 +316,27 @@ def test_eight_hour_import_lock_remains_fail_closed() -> None:
 
     with tempfile.TemporaryDirectory(prefix="atlas_import_lock_") as td:
         lock = Path(td) / ".atlas_v2_import.lock"
-        lock.write_text("active-run\n", encoding="utf-8")
-        eight_hours_ago = time.time() - (8 * 3600)
-        os.utime(lock, (eight_hours_ago, eight_hours_ago))
         original_lock = module.LOCK_PATH
         module.LOCK_PATH = lock
+        first = None
+        reacquired = None
         try:
-            assert module._lock_is_stale() is False
+            first = module._acquire_lock(Path(td) / "first.log")
+            assert first is not None
+            assert module._acquire_lock(Path(td) / "second.log") is None
+            module._release_lock(first)
+            first = None
+
+            # The sentinel remains after release, but without a live kernel lock
+            # it must be immediately reusable by the next run.
+            assert lock.is_file()
+            reacquired = module._acquire_lock(Path(td) / "third.log")
+            assert reacquired is not None
         finally:
+            if first is not None:
+                module._release_lock(first)
+            if reacquired is not None:
+                module._release_lock(reacquired)
             module.LOCK_PATH = original_lock
 
 
@@ -414,5 +426,5 @@ if __name__ == "__main__":
     test_checkpoint_is_restored_when_candidate_state_promotion_fails()
     test_second_delta_merges_on_first_candidate_from_cumulative_state()
     test_promote_seen_tokens_checkpoint_replaces_target_and_keeps_run_artifact()
-    test_eight_hour_import_lock_remains_fail_closed()
+    test_import_lock_uses_live_kernel_ownership()
     print("checkpoint promotion regression test OK")

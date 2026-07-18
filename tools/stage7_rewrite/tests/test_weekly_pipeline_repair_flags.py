@@ -842,11 +842,15 @@ def test_atlas_template_returns_worker_exit_and_cleans_lock(monkeypatch, tmp_pat
     orchestrator.parent.mkdir(parents=True)
     orchestrator.write_text("raise SystemExit(0)\n", encoding="utf-8")
     hermes_home = tmp_path / "hermes"
+    report_root = tmp_path / "reports"
     monkeypatch.setenv("HERMES_HOME", str(hermes_home))
     monkeypatch.setenv("HUAIDJ_REPO", str(repo))
     monkeypatch.setenv("HUAIDJ_PYTHON", os.sys.executable)
+    monkeypatch.setenv("HUAIDJ_REPORT_ROOT", str(report_root))
     namespace = runpy.run_path(str(ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py"), run_name="__test__")
     launcher = _exec_hermes_template(namespace["SCRIPT_TEMPLATES"]["huaidj/atlas_v2_sanji_import_nightly.py"])
+    assert launcher["LOG_DIR"] == report_root / "atlas_v2_import"
+    assert launcher["LOCK_PATH"] == report_root / "_locks" / "atlas_v2_import.lock"
     return_codes = iter((0, 7))
 
     def fake_run(command, **kwargs):
