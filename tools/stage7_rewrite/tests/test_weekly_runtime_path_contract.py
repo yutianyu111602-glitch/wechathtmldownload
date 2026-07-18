@@ -29,6 +29,14 @@ def test_daily_and_fast_watch_plumb_authoritative_runtime_paths() -> None:
     assert "HUAIDJ_CURRENT_RELEASE_DIR" in detector
 
 
+def test_daily_path_resolver_accepts_intentionally_empty_default() -> None:
+    daily = (ROOT / "run_huaidj_sanji_daily_twice.ps1").read_text(encoding="utf-8")
+
+    assert "[AllowEmptyString()][string]$Default" in daily
+    assert '-EnvironmentVariableName "HUAIDJ_CURRENT_RELEASE_DIR" -Default ""' in daily
+    assert '-EnvironmentVariableName "HUAIDJ_CLOUDRUN_DATA_ROOT" -Default ""' in daily
+
+
 def test_publish_runner_validates_external_base_and_keeps_post_deploy_readback() -> None:
     runner = (ROOT / "run_openclaw_weekly_daily_publish.ps1").read_text(encoding="utf-8")
 

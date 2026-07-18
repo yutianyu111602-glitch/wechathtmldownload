@@ -51,7 +51,7 @@ function Resolve-ConfiguredPath {
     param(
         [string]$Value,
         [Parameter(Mandatory = $true)][string]$EnvironmentVariableName,
-        [Parameter(Mandatory = $true)][string]$Default
+        [Parameter(Mandatory = $true)][AllowEmptyString()][string]$Default
     )
     if (-not [string]::IsNullOrWhiteSpace($Value)) {
         return $Value
