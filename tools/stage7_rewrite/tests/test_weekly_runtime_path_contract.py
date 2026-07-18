@@ -59,6 +59,103 @@ def test_monitor_and_prefect_default_to_runtime_ssot() -> None:
     assert "--current-release-dir" in prefect
 
 
+def test_scheduled_runtime_reports_and_locks_stay_outside_checkout() -> None:
+    sources = {
+        ROOT / "run_huaidj_sanji_daily_twice.ps1": (
+            'Join-Path $Stage7 "reports',
+            'Join-Path $Repo ".locks"',
+        ),
+        ROOT / "run_huaidj_sanji_rss_fast_watch.ps1": (
+            'Join-Path $Stage7 "reports',
+            'Join-Path $Repo ".locks"',
+        ),
+        ROOT / "run_openclaw_weekly_daily_publish.ps1": (
+            'Join-Path $Stage7 "reports',
+            'Join-Path $Repo "reports',
+        ),
+        ROOT / "run_sanji_desktop_recent_export.ps1": ("Join-Path $RepoRoot '.locks'",),
+        ROOT / "scripts" / "report_huaidj_package_api_tg_status.py": (
+            'REPO / "tools/stage7_rewrite/reports',
+        ),
+        ROOT / "scripts" / "watch_sanji_rss_fast_trigger.py": (
+            'ROOT / "reports" / "sanji_rss_fast_watch"',
+        ),
+        ROOT / "scripts" / "send_sanji_publish_wechat_notification.py": (
+            'repo / "tools" / "stage7_rewrite" / "reports"',
+        ),
+        ROOT / "prefect" / "huaidj_weekly_flow.py": (
+            'REPO_ROOT / "tools" / "stage7_rewrite" / "reports" / "prefect_weekly_flow"',
+        ),
+    }
+    for path, forbidden in sources.items():
+        text = path.read_text(encoding="utf-8")
+        assert "HUAIDJ_REPORT_ROOT" in text, path
+        assert not [fragment for fragment in forbidden if fragment in text], path
+
+    for name in (
+        "run_sanji_desktop_recent_export.ps1",
+        "run_huaidj_sanji_daily_twice.ps1",
+        "run_huaidj_sanji_rss_fast_watch.ps1",
+        "run_openclaw_weekly_daily_publish.ps1",
+        "weekly_activity_next_week_pipeline.ps1",
+    ):
+        assert "PYTHONDONTWRITEBYTECODE" in (ROOT / name).read_text(encoding="utf-8")
+
+
+def test_python_report_defaults_honor_explicit_external_root(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    report_root = tmp_path / "runtime-reports"
+    monkeypatch.setenv("HUAIDJ_REPORT_ROOT", str(report_root))
+
+    def load(name: str, path: Path):
+        spec = importlib.util.spec_from_file_location(name, path)
+        assert spec is not None and spec.loader is not None
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+    monitor = load("huaidj_monitor_report_root_test", ROOT / "scripts" / "report_huaidj_package_api_tg_status.py")
+    watcher = load("huaidj_watch_report_root_test", ROOT / "scripts" / "watch_sanji_rss_fast_trigger.py")
+
+    assert monitor.DEFAULT_REPORT_ROOT == report_root
+    assert monitor.DEFAULT_JSON_OUT.is_relative_to(report_root)
+    assert monitor.DEFAULT_STATUS_JSON.is_relative_to(report_root)
+    assert watcher.DEFAULT_STATE.is_relative_to(report_root)
+    assert watcher.DEFAULT_REPORT.is_relative_to(report_root)
+
+
+def test_installer_templates_make_health_canary_checkout_read_only(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    import runpy
+    import subprocess
+
+    repo = tmp_path / "immutable-checkout"
+    report_root = tmp_path / "runtime-reports"
+    monkeypatch.setenv("HUAIDJ_REPO", str(repo))
+    monkeypatch.setenv("HUAIDJ_REPORT_ROOT", str(report_root))
+    monkeypatch.setenv("HERMES_HOME", str(tmp_path / "hermes"))
+
+    namespace = runpy.run_path(str(ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py"), run_name="__test__")
+    templates = namespace["SCRIPT_TEMPLATES"]
+    assert all("HUAIDJ_REPORT_ROOT" in template for template in templates.values())
+    assert all("PYTHONDONTWRITEBYTECODE" in template for template in templates.values())
+
+    health: dict[str, object] = {"__name__": "__test__"}
+    exec(compile(templates["huaidj/health_check.py"], "huaidj/health_check.py", "exec"), health)
+    command = health["CMD"]
+    json_out = Path(command[command.index("--json-out") + 1])
+    assert json_out == report_root / "huaidj_health" / "latest.json"
+
+    subprocess_module = health["subprocess"]
+    monkeypatch.setattr(
+        subprocess_module,
+        "run",
+        lambda cmd, **kwargs: subprocess.CompletedProcess(cmd, 0, stdout="", stderr=""),
+    )
+    assert health["main"]() == 0
+    assert not repo.exists()
+
+
 def load_bake_module():
     script = REPO / "services" / "weekly_activity_cloudrun" / "scripts" / "bake_and_deploy.py"
     spec = importlib.util.spec_from_file_location("weekly_bake_and_deploy_runtime_test", script)

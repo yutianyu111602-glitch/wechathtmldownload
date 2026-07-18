@@ -24,7 +24,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_CURRENT_JSON = ROOT / "services" / "weekly_activity_cloudrun" / "data" / "current_release" / "current.json"
-DEFAULT_REPORT_ROOT = ROOT / "tools" / "stage7_rewrite" / "reports"
+DEFAULT_REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports"))
 
 TENCENT_KEY_ENVS = (
     "TENCENT_MAP_WEBSERVICE_KEY",

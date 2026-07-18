@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -2531,7 +2532,12 @@ def build_readiness(
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--publish-report-dir", type=Path, help="Infer quality/poster/write-gate/output paths from this daily publish report dir.")
-    parser.add_argument("--reports-root", type=Path, default=Path("tools/stage7_rewrite/reports"), help="Root used to infer latest Docker, vision, and fallback reports.")
+    parser.add_argument(
+        "--reports-root",
+        type=Path,
+        default=Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports")),
+        help="External runtime root used to infer latest Docker, vision, and fallback reports.",
+    )
     parser.add_argument("--quality-report", type=Path)
     parser.add_argument("--poster-migration-report", type=Path)
     parser.add_argument("--poster-recovery-report", type=Path)

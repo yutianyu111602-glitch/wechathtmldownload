@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import base64
 import json
+import os
 import random
 import re
 import shutil
@@ -631,7 +632,10 @@ def build_sync_key_report(args: argparse.Namespace) -> dict[str, Any]:
 
 def default_qr_out() -> Path:
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    return Path("tools/stage7_rewrite/reports") / f"weekly_exporter_login_qr_{stamp}.png"
+    report_root = Path(
+        os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports")
+    )
+    return report_root / "weekly_exporter_auth" / f"weekly_exporter_login_qr_{stamp}.png"
 
 
 def write_report(report: dict[str, Any], out: Path | None) -> None:

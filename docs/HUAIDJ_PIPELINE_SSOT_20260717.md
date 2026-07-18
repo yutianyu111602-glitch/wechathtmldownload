@@ -34,7 +34,8 @@ HUAIDJ 现在有两条共享 Sanji 数据源、但目的和模型路由不同的
 | Sanji 热文章正文/图片 | `E:\sanji_hot\articles` |
 | Sanji 安全导出 marker | `E:\公众号\sanji-daily-export` |
 | 活动包 longrun | `E:\weekly_activity_pipeline\longrun` |
-| CloudRun current package | `services\weekly_activity_cloudrun\data\current_release` |
+| 计划任务报告/日志/锁 SSOT | `F:\DevData\HuaidjRuntime\state\reports`（可用 `HUAIDJ_REPORT_ROOT` 显式覆盖，但必须位于源码检出目录之外） |
+| CloudRun current package | `F:\DevData\HuaidjRuntime\state\weekly_activity_cloudrun\data\current_release` |
 | AtlasV2 run root | `E:\atlas_v2_import_runs` |
 | AtlasV2 checkpoint | `E:\atlas_manifest_exports\sanji_pipeline_seen_tokens_latest.txt` |
 | AtlasV2 cumulative state | `E:\atlas_v2_import_runs\latest_cumulative_candidate.json` |
@@ -270,6 +271,7 @@ Windows 运行边界：
 - workdir 指向当前 F 盘仓库（或脚本不依赖 workdir）
 - launcher 写 bootstrap log，子进程写最终 status/summary
 - 不能只依据 detached PID 或 Hermes `last_status` 判成功
+- 所有计划任务的 report/log/status/lock 必须写入 `HUAIDJ_REPORT_ROOT`；不可变发布检出目录只读，Python 子进程固定 `PYTHONDONTWRITEBYTECODE=1`，禁止生成 `__pycache__`
 
 ## 11. 成功门与“完成”的定义
 
@@ -318,3 +320,4 @@ AtlasV2 全量导入：
 - 不用截图、视觉点击、模拟键鼠控制 Sanji。
 - 不把活动包 CloudBase Storage 写入、CloudRun 部署、小程序代码上传、审核、公开发布、Atlas candidate promotion 混成一个状态。
 - 任何 checkpoint/pointer 只在完整门禁通过后推进；失败 run 必须保持旧水位可重放。
+- 生产代码、只读 fixture/历史证据和运行期状态必须分离：不要批量改写历史报告引用，但任何 active/default output 都不得落回 Git checkout。

@@ -29,7 +29,9 @@ from prefect import flow, get_run_logger, task
 
 REPO_ROOT = Path(os.environ.get("HUAIDJ_REPO_ROOT", Path(__file__).resolve().parents[3]))
 LONGRUN_ROOT = Path(os.environ.get("HUAIDJ_LONGRUN_ROOT", r"E:\weekly_activity_pipeline\longrun"))
-REPORT_ROOT = REPO_ROOT / "tools" / "stage7_rewrite" / "reports" / "prefect_weekly_flow"
+REPORT_ROOT = Path(
+    os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports")
+) / "prefect_weekly_flow"
 DEFAULT_RUNTIME_DATA_ROOT = Path(
     r"F:\DevData\HuaidjRuntime\state\weekly_activity_cloudrun\data"
 )

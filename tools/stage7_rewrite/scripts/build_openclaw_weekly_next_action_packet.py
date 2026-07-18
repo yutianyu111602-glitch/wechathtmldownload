@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -48,7 +49,9 @@ DEFAULT_CURRENT_RELEASE_QUALITY_RECOVERY_PACKET = (
     / "openclaw_current_release_quality_recovery_packet_round81_20260606"
     / "openclaw_current_release_quality_recovery_packet.json"
 )
-DEFAULT_OUT_DIR = REPORTS_ROOT / "openclaw_weekly_next_action_packet_20260606_round68"
+DEFAULT_OUT_DIR = Path(
+    os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports")
+) / "openclaw_weekly_next_action_packet"
 
 
 def now_cst() -> str:

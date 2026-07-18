@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -26,8 +27,9 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_PUBLISH_DIR = REPO_ROOT / "tools" / "stage7_rewrite" / "reports" / "openclaw_weekly_daily_20260606_060904"
 DEFAULT_RUNTIME_PREFLIGHT = DEFAULT_PUBLISH_DIR / "aggregate_child_poster_ocr_runtime_release_preflight.json"
 DEFAULT_TASKS = DEFAULT_PUBLISH_DIR / "aggregate_child_poster_ocr_recovery_tasks.json"
-DEFAULT_REPORT = DEFAULT_PUBLISH_DIR / "aggregate_child_poster_ocr_source_material_preflight.json"
-DEFAULT_SCORECARD = REPO_ROOT / "reports" / "WEEKLY_AGGREGATE_CHILD_POSTER_OCR_SOURCE_MATERIAL_PREFLIGHT_20260606.md"
+RUNTIME_REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports"))
+DEFAULT_REPORT = RUNTIME_REPORT_ROOT / "poster_recovery" / "aggregate_child_poster_ocr_source_material_preflight.json"
+DEFAULT_SCORECARD = RUNTIME_REPORT_ROOT / "poster_recovery" / "WEEKLY_AGGREGATE_CHILD_POSTER_OCR_SOURCE_MATERIAL_PREFLIGHT.md"
 SCHEMA_VERSION = "weekly_aggregate_child_poster_ocr_source_material_preflight.v1"
 READY_DECISION = "weekly_aggregate_child_poster_ocr_source_material_preflight_ready_report_only_local_material_found"
 BLOCKED_DECISION = "weekly_aggregate_child_poster_ocr_source_material_preflight_blocked_report_only_source_material_missing"

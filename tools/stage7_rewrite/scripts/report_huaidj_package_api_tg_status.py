@@ -26,8 +26,11 @@ REPO = Path(__file__).resolve().parents[3]
 TZ = timezone(timedelta(hours=8))
 
 DEFAULT_CLOUDRUN_BASE = "https://weekly-api-255880-4-1371956557.sh.run.tcloudbase.com"
-DEFAULT_STATUS_JSON = REPO / "tools/stage7_rewrite/reports/sanji_twice_daily_7day/latest_status.json"
-DEFAULT_PUBLISH_REPORT_ROOT = REPO / "tools/stage7_rewrite/reports"
+DEFAULT_REPORT_ROOT = Path(
+    os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports")
+)
+DEFAULT_STATUS_JSON = DEFAULT_REPORT_ROOT / "sanji_twice_daily_7day/latest_status.json"
+DEFAULT_PUBLISH_REPORT_ROOT = DEFAULT_REPORT_ROOT
 DEFAULT_RUNTIME_DATA_ROOT = Path(
     r"F:\DevData\HuaidjRuntime\state\weekly_activity_cloudrun\data"
 )
@@ -42,10 +45,10 @@ def default_local_deploy_dir() -> Path:
 
 
 DEFAULT_LOCAL_DEPLOY_DIR = default_local_deploy_dir()
-DEFAULT_JSON_OUT = REPO / "tools/stage7_rewrite/reports/huaidj_package_api_tg_status/latest.json"
+DEFAULT_JSON_OUT = DEFAULT_REPORT_ROOT / "huaidj_package_api_tg_status/latest.json"
 DEFAULT_STATE_FILE = (
-    Path(os.environ.get("USERPROFILE", r"C:\Users\pc"))
-    / "AppData/Local/hermes/scripts/huaidj/.package_api_tg_state.json"
+    Path(os.environ.get("HERMES_HOME", r"F:\DevData\Hermes"))
+    / "scripts/huaidj/.package_api_tg_state.json"
 )
 
 

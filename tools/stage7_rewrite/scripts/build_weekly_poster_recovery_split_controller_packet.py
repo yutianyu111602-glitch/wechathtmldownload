@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -27,8 +28,9 @@ WRITE_GATE_SCHEMA = "weekly_poster_cloudbase_migration_write_gate.v1"
 DEFAULT_PUBLISH_DIR = REPO_ROOT / "tools" / "stage7_rewrite" / "reports" / "openclaw_weekly_daily_20260606_060904"
 DEFAULT_WORK_ORDERS = DEFAULT_PUBLISH_DIR / "missing_internal_poster_recovery_work_orders.json"
 DEFAULT_WRITE_GATE = DEFAULT_PUBLISH_DIR / "poster_cloudbase_migration_write_gate.json"
-DEFAULT_REPORT = DEFAULT_PUBLISH_DIR / "poster_recovery_split_controller_packet.json"
-DEFAULT_SCORECARD = REPO_ROOT / "reports" / "WEEKLY_POSTER_RECOVERY_SPLIT_CONTROLLER_PACKET_20260606.md"
+RUNTIME_REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports"))
+DEFAULT_REPORT = RUNTIME_REPORT_ROOT / "poster_recovery" / "poster_recovery_split_controller_packet.json"
+DEFAULT_SCORECARD = RUNTIME_REPORT_ROOT / "poster_recovery" / "WEEKLY_POSTER_RECOVERY_SPLIT_CONTROLLER_PACKET.md"
 RAW_URL_RE = re.compile(r"https?://|mp\.weixin\.qq\.com|mmbiz\.qpic\.cn|mmecoa\.qpic\.cn|qpic\.cn|wxfile://", re.I)
 PRIVATE_PATH_RE = re.compile(r"(?i)([A-Z]:\\|/mnt/[a-z]/|/home/pc/|\\\\wsl\.localhost\\)")
 SECRET_RE = re.compile(r"(?i)(bearer\s+[a-z0-9._-]+|authorization\s*[:=]|api[_-]?key\s*[:=]|cookie\s*[:=]|password\s*[:=]|secret\s*[:=]|sk-[a-z0-9_-]{12,})")

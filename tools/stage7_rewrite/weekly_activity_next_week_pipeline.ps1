@@ -70,6 +70,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $env:PYTHONUTF8 = "1"
 $env:PYTHONIOENCODING = "utf-8"
+$env:PYTHONDONTWRITEBYTECODE = "1"
 
 # ─── 常量 ────────────────────────────────────────────────────────────────────
 $REPO = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)

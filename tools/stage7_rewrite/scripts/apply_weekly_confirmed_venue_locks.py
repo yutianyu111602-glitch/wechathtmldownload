@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 from copy import deepcopy
 from datetime import datetime, timezone
@@ -15,7 +16,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_REGISTRY = ROOT / "tools" / "stage7_rewrite" / "registries" / "weekly_venues_seed.json"
 DEFAULT_API_DIR = ROOT / "services" / "weekly_activity_cloudrun" / "data" / "current_release"
-DEFAULT_REPORT_ROOT = ROOT / "tools" / "stage7_rewrite" / "reports"
+DEFAULT_REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports"))
 CONFIRMED_DATE = "2026-06-01"
 
 

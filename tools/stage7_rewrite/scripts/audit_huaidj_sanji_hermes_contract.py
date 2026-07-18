@@ -21,6 +21,7 @@ from typing import Any
 REPO = Path(__file__).resolve().parents[3]
 DEFAULT_HERMES_HOME = Path(r"F:\DevData\Hermes")
 DEFAULT_HERMES_AGENT = DEFAULT_HERMES_HOME / "hermes-agent"
+DEFAULT_REPORT_ROOT = Path(r"F:\DevData\HuaidjRuntime\state\reports")
 CODEX_AUTOMATION = Path.home() / ".codex" / "automations" / "weekly-daily-incremental-18" / "automation.toml"
 SKILL_PATH = Path.home() / ".codex" / "skills" / "huaidj-weekly-pipeline" / "SKILL.md"
 FORBIDDEN_SANJI_SOURCE_CLAIMS = (
@@ -49,6 +50,27 @@ def resolve_hermes_runtime_root() -> Path:
         except (FileNotFoundError, OSError):
             configured = ""
     return Path(configured) if configured else DEFAULT_HERMES_AGENT
+
+
+def resolve_report_root() -> Path:
+    configured = os.environ.get("HUAIDJ_REPORT_ROOT", "").strip()
+    if not configured and os.name == "nt":
+        try:
+            import winreg
+
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as key:
+                configured = str(winreg.QueryValueEx(key, "HUAIDJ_REPORT_ROOT")[0] or "").strip()
+        except (FileNotFoundError, OSError):
+            configured = ""
+    return Path(configured) if configured else DEFAULT_REPORT_ROOT
+
+
+def path_is_within(path: Path, parent: Path) -> bool:
+    try:
+        path.resolve().relative_to(parent.resolve())
+    except (OSError, ValueError):
+        return False
+    return True
 
 EXPECTED_HERMES_JOBS = {
     "HUAIDJ Atlas v2 Sanji Import Nightly": {
@@ -120,6 +142,8 @@ EXPECTED_HERMES_SCRIPTS = {
         "MAX_COST_RMB = 15.0",
         "--advance-checkpoint",
         "HUAIDJ_PYTHON",
+        "HUAIDJ_REPORT_ROOT",
+        "PYTHONDONTWRITEBYTECODE",
         "CREATE_NO_WINDOW",
         "subprocess.run(",
         "msvcrt.locking(",
@@ -137,6 +161,9 @@ EXPECTED_HERMES_SCRIPTS = {
         "PosterVlMaxImages",
         '"0"',
         "HUAIDJ_REPO",
+        "HUAIDJ_REPORT_ROOT",
+        "PYTHONDONTWRITEBYTECODE",
+        "-ReportRoot",
         "CREATE_NO_WINDOW",
         "subprocess.run(",
         "return result_code",
@@ -146,19 +173,38 @@ EXPECTED_HERMES_SCRIPTS = {
         "pwsh.exe",
         "run_huaidj_sanji_rss_fast_watch.ps1",
         "-DetectOnly",
+        "HUAIDJ_REPORT_ROOT",
+        "PYTHONDONTWRITEBYTECODE",
+        "-ReportRoot",
     ),
-    "huaidj/audit_coverage_gap.py": ("Wed 21:10 + Fri 20:10", "hours=20, minutes=10"),
+    "huaidj/audit_coverage_gap.py": (
+        "Wed 21:10 + Fri 20:10",
+        "hours=20, minutes=10",
+        "HUAIDJ_REPORT_ROOT",
+        "PYTHONDONTWRITEBYTECODE",
+    ),
     "huaidj/health_check.py": (
         "CloudRun API",
         "data-freshness",
         "report_huaidj_package_api_tg_status.py",
+        "HUAIDJ_REPORT_ROOT",
+        "PYTHONDONTWRITEBYTECODE",
         "return int(result.returncode)",
     ),
-    "huaidj/sanji_login_reminder.py": ("公众号登录授权提醒", "2 天", "cookie", "token"),
+    "huaidj/sanji_login_reminder.py": (
+        "公众号登录授权提醒",
+        "2 天",
+        "cookie",
+        "token",
+        "HUAIDJ_REPORT_ROOT",
+        "PYTHONDONTWRITEBYTECODE",
+    ),
     "huaidj/package_api_tg_status.py": (
         "report_huaidj_package_api_tg_status.py",
         ".package_api_tg_state.json",
         "huaidj_package_api_tg_status",
+        "HUAIDJ_REPORT_ROOT",
+        "PYTHONDONTWRITEBYTECODE",
         "return int(result.returncode)",
     ),
 }
@@ -214,6 +260,9 @@ def audit_wrappers(checks: list[dict[str, Any]]) -> None:
             "direct_rss_feed_fetch must stay false",
             "HUAIDJ_CURRENT_RELEASE_DIR",
             "HUAIDJ_PUBLISHED_API_DIR",
+            "HUAIDJ_REPORT_ROOT",
+            "PYTHONDONTWRITEBYTECODE",
+            '"-ReportRoot", $HuaidjReportRoot',
             '"-IncrementalBaseApiDir", $IncrementalBaseApiDir',
             '"-PublishedApiDir", $PublishedApiDir',
         ],
@@ -235,6 +284,9 @@ def audit_wrappers(checks: list[dict[str, Any]]) -> None:
             "& pwsh @publishArgs",
             "HUAIDJ_CURRENT_RELEASE_DIR",
             "HUAIDJ_PUBLISHED_API_DIR",
+            "HUAIDJ_REPORT_ROOT",
+            "PYTHONDONTWRITEBYTECODE",
+            '"-ReportRoot", $HuaidjReportRoot',
             '"-IncrementalBaseApiDir", $IncrementalBaseApiDir',
         ],
         REPO / "tools/stage7_rewrite/run_openclaw_weekly_daily_publish.ps1": [
@@ -246,6 +298,8 @@ def audit_wrappers(checks: list[dict[str, Any]]) -> None:
             "HUAIDJ_CLOUDRUN_DATA_ROOT",
             "HUAIDJ_CLOUDRUN_WORK_ROOT",
             "HUAIDJ_PUBLISHED_API_DIR",
+            "HUAIDJ_REPORT_ROOT",
+            "PYTHONDONTWRITEBYTECODE",
             "HUAIDJ_PROXY_URL",
             "--expected-online-item-count",
             "--data-root $CloudRunDataRoot",
@@ -271,6 +325,8 @@ def audit_wrappers(checks: list[dict[str, Any]]) -> None:
             "-SkipSanjiExport",
             "-DetectOnly",
             "LEGACY_JOB_NAMES",
+            "HUAIDJ_REPORT_ROOT",
+            "PYTHONDONTWRITEBYTECODE",
         ],
         REPO / "tools/stage7_rewrite/scripts/enrich_weekly_activity_pack_with_qwen_vl.py": [
             "DEFAULT_MAX_IMAGES = 0",
@@ -286,6 +342,7 @@ def audit_wrappers(checks: list[dict[str, Any]]) -> None:
             "DEFAULT_RUNTIME_DATA_ROOT",
             "HUAIDJ_CURRENT_RELEASE_DIR",
             "HUAIDJ_CLOUDRUN_DATA_ROOT",
+            "HUAIDJ_REPORT_ROOT",
         ],
     }
     for path, needles in wrapper_checks.items():
@@ -437,6 +494,115 @@ def audit_wrappers(checks: list[dict[str, Any]]) -> None:
         secret_scan.is_file(),
         str(secret_scan),
     )
+
+
+def audit_runtime_write_boundary(checks: list[dict[str, Any]], report_root: Path) -> None:
+    report_root_ok = report_root.is_absolute() and not path_is_within(report_root, REPO)
+    add(
+        checks,
+        "HUAIDJ report root is external to immutable checkout",
+        report_root_ok,
+        f"report_root={report_root} repo={REPO}",
+    )
+
+    core_sources: dict[Path, tuple[str, ...]] = {
+        REPO / "tools/stage7_rewrite/run_huaidj_sanji_daily_twice.ps1": (
+            'Join-Path $Stage7 "reports',
+            'Join-Path $Repo ".locks"',
+        ),
+        REPO / "tools/stage7_rewrite/run_huaidj_sanji_rss_fast_watch.ps1": (
+            'Join-Path $Stage7 "reports',
+            'Join-Path $Repo ".locks"',
+        ),
+        REPO / "tools/stage7_rewrite/run_openclaw_weekly_daily_publish.ps1": (
+            'Join-Path $Stage7 "reports',
+            'Join-Path $Repo "reports',
+        ),
+        REPO / "tools/stage7_rewrite/run_sanji_desktop_recent_export.ps1": (
+            "Join-Path $RepoRoot '.locks'",
+        ),
+        REPO / "tools/stage7_rewrite/scripts/report_huaidj_package_api_tg_status.py": (
+            'REPO / "tools/stage7_rewrite/reports',
+        ),
+        REPO / "tools/stage7_rewrite/scripts/watch_sanji_rss_fast_trigger.py": (
+            'ROOT / "reports" / "sanji_rss_fast_watch"',
+        ),
+        REPO / "tools/stage7_rewrite/scripts/send_sanji_publish_wechat_notification.py": (
+            'repo / "tools" / "stage7_rewrite" / "reports"',
+        ),
+        REPO / "tools/stage7_rewrite/prefect/huaidj_weekly_flow.py": (
+            'REPO_ROOT / "tools" / "stage7_rewrite" / "reports" / "prefect_weekly_flow"',
+        ),
+        REPO / "tools/stage7_rewrite/scripts/install_huaidj_sanji_hermes_jobs.py": (
+            'REPORT_DIR = REPO / "tools" / "stage7_rewrite" / "reports"',
+            'str(REPO / "tools" / "stage7_rewrite" / "reports"',
+        ),
+    }
+    for path, forbidden_fragments in core_sources.items():
+        if not path.is_file():
+            add(checks, f"runtime report boundary: {path.name}", False, f"missing: {path}")
+            continue
+        text = read_text(path)
+        hits = [fragment for fragment in forbidden_fragments if fragment in text]
+        ok = "HUAIDJ_REPORT_ROOT" in text and not hits
+        add(
+            checks,
+            f"runtime report boundary: {path.name}",
+            ok,
+            "external_report_root=true" if ok else "forbidden=" + ", ".join(hits),
+        )
+
+    python_output_helpers = (
+        "apply_weekly_confirmed_venue_locks.py",
+        "apply_weekly_geocodes_to_api_package.py",
+        "geocode_weekly_activity_places.py",
+        "repair_weekly_current_resource_fields.py",
+        "smoke_cloudrun_weekly_production.py",
+        "summarize_openclaw_weekly_daily_readiness.py",
+        "manage_weekly_exporter_auth.py",
+        "build_openclaw_weekly_darwin_scorecard.py",
+        "build_openclaw_weekly_next_action_packet.py",
+        "build_weekly_poster_recovery_split_controller_packet.py",
+        "build_weekly_public_poster_upload_candidate_review_packet.py",
+        "build_weekly_aggregate_child_poster_ocr_controller_release_packet.py",
+        "build_weekly_aggregate_child_poster_ocr_runtime_release_preflight.py",
+        "build_weekly_aggregate_child_poster_ocr_source_material_preflight.py",
+    )
+    scripts_dir = REPO / "tools/stage7_rewrite/scripts"
+    for name in python_output_helpers:
+        path = scripts_dir / name
+        ok = path.is_file() and "HUAIDJ_REPORT_ROOT" in read_text(path)
+        add(checks, f"direct report default: {name}", ok, str(path))
+
+    bytecode_wrappers = (
+        REPO / "tools/stage7_rewrite/run_sanji_desktop_recent_export.ps1",
+        REPO / "tools/stage7_rewrite/run_huaidj_sanji_daily_twice.ps1",
+        REPO / "tools/stage7_rewrite/run_huaidj_sanji_rss_fast_watch.ps1",
+        REPO / "tools/stage7_rewrite/run_openclaw_weekly_daily_publish.ps1",
+        REPO / "tools/stage7_rewrite/weekly_activity_next_week_pipeline.ps1",
+    )
+    for path in bytecode_wrappers:
+        ok = path.is_file() and "PYTHONDONTWRITEBYTECODE" in read_text(path)
+        add(checks, f"immutable Python bytecode guard: {path.name}", ok, str(path))
+
+
+def audit_pipeline_checkout_clean(checks: list[dict[str, Any]]) -> None:
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(REPO), "status", "--porcelain", "--untracked-files=all"],
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            capture_output=True,
+            timeout=30,
+        )
+        dirty_rows = [row for row in result.stdout.splitlines() if row.strip()]
+        ok = result.returncode == 0 and not dirty_rows
+        detail = f"exit={result.returncode} dirty_rows={len(dirty_rows)}"
+    except Exception as exc:
+        ok = False
+        detail = str(exc)
+    add(checks, "Pipeline immutable checkout Git clean", ok, detail)
 
 
 def audit_docs(checks: list[dict[str, Any]]) -> None:
@@ -952,6 +1118,7 @@ def main() -> int:
 
     hermes_home = Path(args.hermes_home)
     hermes_agent = Path(args.hermes_agent)
+    report_root = resolve_report_root()
 
     checks: list[dict[str, Any]] = []
     add(checks, "repo root", REPO.exists(), str(REPO))
@@ -959,11 +1126,13 @@ def main() -> int:
     add(checks, "Hermes agent exists", hermes_agent.exists(), str(hermes_agent))
 
     audit_wrappers(checks)
+    audit_runtime_write_boundary(checks, report_root)
     audit_docs(checks)
     audit_hermes_runtime(checks, hermes_home, hermes_agent)
     audit_hermes(checks, hermes_home, hermes_agent)
     audit_windows_tasks(checks)
     audit_codex(checks)
+    audit_pipeline_checkout_clean(checks)
 
     failures = [c for c in checks if c["status"] == "fail"]
     warnings = [c for c in checks if c["status"] == "warn"]
@@ -975,6 +1144,7 @@ def main() -> int:
         "repo": str(REPO),
         "hermes_home": str(hermes_home),
         "hermes_agent": str(hermes_agent),
+        "report_root": str(report_root),
         "checks": checks,
     }
 

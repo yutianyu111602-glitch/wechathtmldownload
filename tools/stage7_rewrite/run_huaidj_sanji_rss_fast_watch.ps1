@@ -25,6 +25,7 @@ param(
     [string]$PublishedApiDir = "",
     [string]$CloudRunDataRoot = "",
     [string]$CloudRunWorkRoot = "",
+    [string]$ReportRoot = "",
     [string]$SanjiExportOutRoot = "",
     [string]$SanjiRoot = "",
     [string]$SanjiHotArticlesRoot = "",
@@ -33,6 +34,7 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+$env:PYTHONDONTWRITEBYTECODE = "1"
 
 function Resolve-ConfiguredPath {
     param(
@@ -61,13 +63,18 @@ if (-not (Test-Path -LiteralPath $PythonExecutable -PathType Leaf)) {
 }
 $PythonExecutable = (Resolve-Path -LiteralPath $PythonExecutable).Path
 $env:HUAIDJ_PYTHON = $PythonExecutable
+$HuaidjReportRoot = Resolve-ConfiguredPath `
+    -Value $ReportRoot `
+    -EnvironmentVariableName "HUAIDJ_REPORT_ROOT" `
+    -Default "F:\DevData\HuaidjRuntime\state\reports"
+$env:HUAIDJ_REPORT_ROOT = $HuaidjReportRoot
 $ExportScript = Join-Path $Stage7 "run_sanji_desktop_recent_export.ps1"
 $DetectorScript = Join-Path $Stage7 "scripts\watch_sanji_rss_fast_trigger.py"
 $PublishScript = Join-Path $Stage7 "run_huaidj_sanji_daily_twice.ps1"
-$ReportRoot = Join-Path $Stage7 "reports\sanji_rss_fast_watch"
-$RunRoot = Join-Path $ReportRoot "runs"
-$StatePath = Join-Path $ReportRoot "state.json"
-$LatestReportPath = Join-Path $ReportRoot "latest_watch_report.json"
+$FastWatchReportRoot = Join-Path $HuaidjReportRoot "sanji_rss_fast_watch"
+$RunRoot = Join-Path $FastWatchReportRoot "runs"
+$StatePath = Join-Path $FastWatchReportRoot "state.json"
+$LatestReportPath = Join-Path $FastWatchReportRoot "latest_watch_report.json"
 $SanjiExportOutRoot = Resolve-ConfiguredPath -Value $SanjiExportOutRoot -EnvironmentVariableName "SANJI_EXPORT_OUT_ROOT" -Default "E:\公众号\sanji-daily-export"
 $SanjiRoot = Resolve-ConfiguredPath -Value $SanjiRoot -EnvironmentVariableName "SANJI_ROOT" -Default (Join-Path $env:APPDATA "sanji")
 $SanjiHotArticlesRoot = Resolve-ConfiguredPath -Value $SanjiHotArticlesRoot -EnvironmentVariableName "SANJI_HOT_ARTICLES_ROOT" -Default "E:\sanji_hot\articles"
@@ -104,7 +111,7 @@ if ($DryRun -and -not (Test-Path -LiteralPath $ApiDir -PathType Container)) {
 if (-not (Test-Path -LiteralPath (Join-Path $ApiDir "current.json") -PathType Leaf)) {
     throw "Authoritative runtime current_release is not ready for fast watch: $ApiDir"
 }
-$LockDir = Join-Path $Repo ".locks"
+$LockDir = Join-Path $HuaidjReportRoot "_locks"
 $LockPath = Join-Path $LockDir "huaidj_sanji_rss_fast_watch.lock"
 
 function Acquire-Lock {
@@ -157,7 +164,7 @@ function Get-RecentSuccessfulPublishSummary {
         return $null
     }
     $publishCutoff = (Get-Date).AddMinutes(-1 * $CooldownMinutes)
-    $reportsRoot = Join-Path $Stage7 "reports"
+    $reportsRoot = $HuaidjReportRoot
     $recentDirs = Get-ChildItem -LiteralPath $reportsRoot -Directory -Filter "openclaw_weekly_daily_*" -ErrorAction SilentlyContinue |
         Sort-Object LastWriteTime -Descending |
         Select-Object -First 20
@@ -275,6 +282,7 @@ try {
             -SanjiRoot $SanjiRoot `
             -SanjiHotArticlesRoot $SanjiHotArticlesRoot `
             -SanjiColdArchiveRoot $SanjiColdArchiveRoot `
+            -ReportRoot $HuaidjReportRoot `
             *> $exportChildLog
         $exportExitCode = $LASTEXITCODE
     } finally {
@@ -372,7 +380,8 @@ try {
         "-IncrementalBaseApiDir", $IncrementalBaseApiDir,
         "-PublishedApiDir", $PublishedApiDir,
         "-CloudRunDataRoot", $CloudRunDataRoot,
-        "-CloudRunWorkRoot", $CloudRunWorkRoot
+        "-CloudRunWorkRoot", $CloudRunWorkRoot,
+        "-ReportRoot", $HuaidjReportRoot
     )
     if (-not $NoDeployBackend) { $publishArgs += "-DeployBackend" }
     if ($UploadFrontend) { $publishArgs += "-UploadFrontend" }

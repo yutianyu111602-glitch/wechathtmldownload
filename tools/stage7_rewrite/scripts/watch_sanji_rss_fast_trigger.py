@@ -22,8 +22,11 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 AUDIT_SCRIPT = ROOT / "scripts" / "audit_weekly_sanji_queue_package_gap.py"
 DEFAULT_QUEUE = Path(r"E:\公众号\sanji-daily-export\latest_queue.jsonl")
-DEFAULT_STATE = ROOT / "reports" / "sanji_rss_fast_watch" / "state.json"
-DEFAULT_REPORT = ROOT / "reports" / "sanji_rss_fast_watch" / "latest_watch_report.json"
+DEFAULT_REPORT_ROOT = Path(
+    os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports")
+)
+DEFAULT_STATE = DEFAULT_REPORT_ROOT / "sanji_rss_fast_watch" / "state.json"
+DEFAULT_REPORT = DEFAULT_REPORT_ROOT / "sanji_rss_fast_watch" / "latest_watch_report.json"
 DEFAULT_RUNTIME_DATA_ROOT = Path(
     r"F:\DevData\HuaidjRuntime\state\weekly_activity_cloudrun\data"
 )

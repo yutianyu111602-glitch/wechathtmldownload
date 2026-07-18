@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
@@ -18,7 +19,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_API_DIR = ROOT / "services" / "weekly_activity_cloudrun" / "data" / "current_release"
-DEFAULT_REPORT_ROOT = ROOT / "tools" / "stage7_rewrite" / "reports"
+DEFAULT_REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports"))
 
 
 def now_cst() -> str:

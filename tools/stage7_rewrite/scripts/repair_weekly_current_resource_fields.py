@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import re
 import shutil
 import sys
@@ -34,7 +35,7 @@ ROOT = SCRIPT_DIR.parents[2]
 DEFAULT_API_DIR = ROOT / "services" / "weekly_activity_cloudrun" / "data" / "current_release"
 DEFAULT_REGISTRY = ROOT / "tools" / "stage7_rewrite" / "registries" / "weekly_venues_seed.json"
 DEFAULT_FORMAT_JS = ROOT / "apps" / "weekly_activity_miniprogram" / "utils" / "mapLocationBook.js"
-DEFAULT_REPORT_ROOT = ROOT / "tools" / "stage7_rewrite" / "reports"
+DEFAULT_REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports"))
 
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))

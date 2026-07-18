@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -46,8 +47,9 @@ DEFAULT_CANARY = (
     / "openclaw_poster_ocr_recovery_worker_canary_20260606_round55_frontend_adapted"
     / "weekly_aggregate_child_poster_ocr_recovery_worker_canary_summary.json"
 )
-DEFAULT_REPORT = DEFAULT_PUBLISH_DIR / "aggregate_child_poster_ocr_runtime_release_preflight.json"
-DEFAULT_SCORECARD = REPO_ROOT / "reports" / "WEEKLY_AGGREGATE_CHILD_POSTER_OCR_RUNTIME_RELEASE_PREFLIGHT_20260606.md"
+RUNTIME_REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports"))
+DEFAULT_REPORT = RUNTIME_REPORT_ROOT / "poster_recovery" / "aggregate_child_poster_ocr_runtime_release_preflight.json"
+DEFAULT_SCORECARD = RUNTIME_REPORT_ROOT / "poster_recovery" / "WEEKLY_AGGREGATE_CHILD_POSTER_OCR_RUNTIME_RELEASE_PREFLIGHT.md"
 RAW_URL_RE = re.compile(r"https?://|mp\.weixin\.qq\.com|mmbiz\.qpic\.cn|mmecoa\.qpic\.cn|qpic\.cn|wxfile://", re.I)
 PRIVATE_PATH_RE = re.compile(r"(?i)([A-Z]:\\|/mnt/[a-z]/|/home/pc/|\\\\wsl\.localhost\\)")
 SECRET_RE = re.compile(r"(?i)(bearer\s+[a-z0-9._-]+|authorization\s*[:=]|api[_-]?key\s*[:=]|cookie\s*[:=]|password\s*[:=]|secret\s*[:=]|sk-[a-z0-9_-]{12,})")

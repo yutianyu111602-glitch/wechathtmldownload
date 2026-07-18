@@ -29,6 +29,7 @@ param(
     [string]$PublishedApiDir = "",
     [string]$CloudRunDataRoot = "",
     [string]$CloudRunWorkRoot = "",
+    [string]$ReportRoot = "",
     [string]$SanjiExportOutRoot = "",
     [string]$SanjiRoot = "",
     [string]$SanjiHotArticlesRoot = "",
@@ -39,6 +40,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $env:PYTHONUTF8 = "1"
 $env:PYTHONIOENCODING = "utf-8"
+$env:PYTHONDONTWRITEBYTECODE = "1"
 $PwshCommand = Get-Command pwsh.exe -ErrorAction SilentlyContinue
 if (-not $PwshCommand) {
     throw "PowerShell 7 (pwsh.exe) is required for Unicode-safe Sanji paths."
@@ -75,9 +77,14 @@ if (-not (Test-Path -LiteralPath $PythonExecutable -PathType Leaf)) {
 }
 $PythonExecutable = (Resolve-Path -LiteralPath $PythonExecutable).Path
 $env:HUAIDJ_PYTHON = $PythonExecutable
-$ReportRoot = Join-Path $Stage7 "reports\sanji_twice_daily_7day"
+$HuaidjReportRoot = Resolve-ConfiguredPath `
+    -Value $ReportRoot `
+    -EnvironmentVariableName "HUAIDJ_REPORT_ROOT" `
+    -Default "F:\DevData\HuaidjRuntime\state\reports"
+$env:HUAIDJ_REPORT_ROOT = $HuaidjReportRoot
+$DailyReportRoot = Join-Path $HuaidjReportRoot "sanji_twice_daily_7day"
 $Longrun = "E:\weekly_activity_pipeline\longrun"
-$LockDir = Join-Path $Repo ".locks"
+$LockDir = Join-Path $HuaidjReportRoot "_locks"
 $LockPath = Join-Path $LockDir "huaidj_sanji_daily_publish.lock"
 $DefaultRuntimeDataRoot = "F:\DevData\HuaidjRuntime\state\weekly_activity_cloudrun\data"
 $IncrementalBaseApiDir = Resolve-ConfiguredPath -Value $IncrementalBaseApiDir -EnvironmentVariableName "HUAIDJ_CURRENT_RELEASE_DIR" -Default ""
@@ -154,6 +161,7 @@ function New-RunStatus {
         published_api_dir = $PublishedApiDir
         cloudrun_data_root = $CloudRunDataRoot
         cloudrun_work_root = $CloudRunWorkRoot
+        report_root = $HuaidjReportRoot
         atlas_v2_import_triggered = $false
         atlas_v2_import_note = "AtlasV2 is a separate Hermes nightly state machine; this weekly publish wrapper never launches it."
         log_path = $LogPath
@@ -168,7 +176,7 @@ function Write-Status {
     $Status.generated_at = (Get-Date).ToString("o")
     $json = $Status | ConvertTo-Json -Depth 10
     $json | Set-Content -LiteralPath (Join-Path $RunDir "status.json") -Encoding UTF8
-    $json | Set-Content -LiteralPath (Join-Path $ReportRoot "latest_status.json") -Encoding UTF8
+    $json | Set-Content -LiteralPath (Join-Path $DailyReportRoot "latest_status.json") -Encoding UTF8
 }
 
 function Invoke-PublishNotification {
@@ -215,7 +223,7 @@ function Invoke-PublishNotification {
 }
 
 function Get-LatestPublishSummary {
-    $reportsRoot = Join-Path $Stage7 "reports"
+    $reportsRoot = $HuaidjReportRoot
     if (-not (Test-Path -LiteralPath $reportsRoot)) {
         return $null
     }
@@ -352,10 +360,10 @@ function ConvertTo-BooleanFlag {
 }
 
 Set-Location $Repo
-New-Item -ItemType Directory -Force -Path $ReportRoot | Out-Null
+New-Item -ItemType Directory -Force -Path $DailyReportRoot | Out-Null
 $EffectiveSlot = Resolve-Slot
 $RunId = "sanji_twice_daily_{0}_{1}_{2}" -f (Get-Date -Format "yyyyMMdd"), $EffectiveSlot, (Get-Date -Format "HHmmss")
-$RunDir = Join-Path $ReportRoot $RunId
+$RunDir = Join-Path $DailyReportRoot $RunId
 New-Item -ItemType Directory -Force -Path $RunDir | Out-Null
 $LogPath = Join-Path $RunDir "run.log"
 $Status = New-RunStatus -RunId $RunId -EffectiveSlot $EffectiveSlot -LogPath $LogPath
@@ -379,6 +387,7 @@ try {
                 -SanjiRoot $SanjiRoot `
                 -SanjiHotArticlesRoot $SanjiHotArticlesRoot `
                 -SanjiColdArchiveRoot $SanjiColdArchiveRoot `
+                -ReportRoot $HuaidjReportRoot `
                 *> $LogPath
             $exportExitCode = $LASTEXITCODE
         } finally {
@@ -475,7 +484,8 @@ try {
         "-IncrementalBaseApiDir", $IncrementalBaseApiDir,
         "-PublishedApiDir", $PublishedApiDir,
         "-CloudRunDataRoot", $CloudRunDataRoot,
-        "-CloudRunWorkRoot", $CloudRunWorkRoot
+        "-CloudRunWorkRoot", $CloudRunWorkRoot,
+        "-ReportRoot", $HuaidjReportRoot
     )
     if ($DeployBackend) { $publishArgs += "-DeployBackend" }
     if ($UploadFrontend) { $publishArgs += "-UploadFrontend" }

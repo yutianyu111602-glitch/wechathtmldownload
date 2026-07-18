@@ -11,6 +11,7 @@ param(
   [string]$SanjiExePath = '',
   [int]$SanjiCdpStartupWaitSeconds = 90,
   [switch]$NoAutoStartSanji,
+  [string]$ReportRoot = '',
   [string]$OutRoot = '',
   [string]$SanjiRoot = '',
   [string]$SanjiHotArticlesRoot = '',
@@ -18,6 +19,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$env:PYTHONDONTWRITEBYTECODE = '1'
 if ($PSVersionTable.PSVersion.Major -lt 7) {
   throw 'run_sanji_desktop_recent_export.ps1 requires PowerShell 7 (pwsh.exe) so Unicode paths survive native Python/Node argument passing.'
 }
@@ -48,6 +50,8 @@ if (-not (Test-Path -LiteralPath $PythonExecutable -PathType Leaf)) {
 }
 $PythonExecutable = (Resolve-Path -LiteralPath $PythonExecutable).Path
 $env:HUAIDJ_PYTHON = $PythonExecutable
+$HuaidjReportRoot = Resolve-ConfiguredPath -Value $ReportRoot -EnvironmentVariableName 'HUAIDJ_REPORT_ROOT' -Default 'F:\DevData\HuaidjRuntime\state\reports'
+$env:HUAIDJ_REPORT_ROOT = $HuaidjReportRoot
 $SanjiExePath = Resolve-ConfiguredPath -Value $SanjiExePath -EnvironmentVariableName 'SANJI_EXE_PATH' -Default 'F:\DevApps\Sanji\0.4.1\sanji.exe'
 $DefaultSanjiExportRoot = 'E:\' + (-join @([char]0x516C, [char]0x4F17, [char]0x53F7)) + '\sanji-daily-export'
 $OutRoot = Resolve-ConfiguredPath -Value $OutRoot -EnvironmentVariableName 'SANJI_EXPORT_OUT_ROOT' -Default $DefaultSanjiExportRoot
@@ -68,7 +72,7 @@ $FetchRefsSummaryPath = Join-Path $LogRoot "sanji_recent_fetch_refs_summary_$Sta
 $FetchRefsLogPath = Join-Path $LogRoot "sanji_recent_fetch_refs_$Stamp.log"
 $FetchCancelLogPath = Join-Path $LogRoot "sanji_cdp_fetch_cancel_$Stamp.json"
 $FetchLogPath = Join-Path $LogRoot "sanji_cdp_fetch_$Stamp.json"
-$LockDir = Join-Path $RepoRoot '.locks'
+$LockDir = Join-Path $HuaidjReportRoot '_locks'
 $LockPath = Join-Path $LockDir 'sanji_desktop_recent_export.lock'
 $SanjiExportMutexName = 'Global\HUAIDJ_SANJI_DESKTOP_RECENT_EXPORT_LOCK'
 $script:SanjiExportMutex = $null

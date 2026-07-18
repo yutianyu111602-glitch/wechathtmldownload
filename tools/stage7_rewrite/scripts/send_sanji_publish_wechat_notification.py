@@ -137,8 +137,9 @@ def discover_publish_summary(status: dict[str, Any]) -> Path | None:
     if not status.get("ok"):
         return None
 
-    repo = Path(str(status.get("repo") or r"C:\code\githubstar\wechathtmldownload"))
-    reports = repo / "tools" / "stage7_rewrite" / "reports"
+    reports = Path(
+        os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports")
+    )
     if not reports.exists():
         return None
     candidates = sorted(

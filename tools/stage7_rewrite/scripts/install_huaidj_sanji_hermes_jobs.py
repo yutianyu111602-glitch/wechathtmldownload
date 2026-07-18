@@ -19,6 +19,7 @@ from typing import Any
 REPO = Path(__file__).resolve().parents[3]
 DEFAULT_HERMES_HOME = Path(r"F:\DevData\Hermes")
 DEFAULT_HERMES_AGENT = DEFAULT_HERMES_HOME / "hermes-agent"
+DEFAULT_REPORT_ROOT = Path(r"F:\DevData\HuaidjRuntime\state\reports")
 
 
 def resolve_hermes_runtime_root() -> Path:
@@ -52,7 +53,11 @@ from pathlib import Path
 
 HERMES_HOME = Path(os.environ.get("HERMES_HOME", r"C:\\Users\\pc\\AppData\\Local\\hermes"))
 REPO = Path(os.environ.get("HUAIDJ_REPO", r"C:\\code\\githubstar\\wechathtmldownload"))
-LOG_DIR = HERMES_HOME / "logs"
+REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\\DevData\\HuaidjRuntime\\state\\reports"))
+LOG_DIR = REPORT_ROOT / "hermes_scheduled" / "sanji_publish"
+os.environ["HUAIDJ_REPORT_ROOT"] = str(REPORT_ROOT)
+os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
+sys.dont_write_bytecode = True
 POWERSHELL = shutil.which("pwsh.exe") or "pwsh.exe"
 CREATE_NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 EXPORT_CMD = [
@@ -62,6 +67,8 @@ EXPORT_CMD = [
     "Bypass",
     "-File",
     str(REPO / "tools" / "stage7_rewrite" / "run_sanji_desktop_recent_export.ps1"),
+    "-ReportRoot",
+    str(REPORT_ROOT),
 ]
 PUBLISH_CMD = [
     POWERSHELL,
@@ -80,6 +87,8 @@ PUBLISH_CMD = [
     "vl_direct_qwen",
     "-PosterVlMaxImages",
     "0",
+    "-ReportRoot",
+    str(REPORT_ROOT),
 ]
 
 
@@ -139,6 +148,10 @@ from pathlib import Path
 
 
 REPO = Path(os.environ.get("HUAIDJ_REPO", r"C:\\code\\githubstar\\wechathtmldownload"))
+REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\\DevData\\HuaidjRuntime\\state\\reports"))
+os.environ["HUAIDJ_REPORT_ROOT"] = str(REPORT_ROOT)
+os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
+sys.dont_write_bytecode = True
 POWERSHELL = shutil.which("pwsh.exe") or "pwsh.exe"
 CMD = [
     POWERSHELL,
@@ -152,11 +165,20 @@ CMD = [
     "qwen3.6-plus",
     "-PosterVlMaxImages",
     "0",
+    "-ReportRoot",
+    str(REPORT_ROOT),
 ]
 
 
 def main() -> int:
-    result = subprocess.run(CMD, text=True, encoding="utf-8", errors="replace", capture_output=True)
+    result = subprocess.run(
+        CMD,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        capture_output=True,
+        env=os.environ.copy(),
+    )
     if result.returncode == 0:
         return 0
     tail = ((result.stdout or "") + "\\n" + (result.stderr or "")).strip()[-4000:]
@@ -178,10 +200,15 @@ import sys
 from pathlib import Path
 
 
-REPO = Path(r"C:\\code\\githubstar\\wechathtmldownload")
-REPORT_DIR = REPO / "tools" / "stage7_rewrite" / "reports" / "coverage_audit"
+REPO = Path(os.environ.get("HUAIDJ_REPO", r"C:\\code\\githubstar\\wechathtmldownload"))
+REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\\DevData\\HuaidjRuntime\\state\\reports"))
+REPORT_DIR = REPORT_ROOT / "coverage_audit"
 SANJI_DB = Path(os.environ.get("USERPROFILE", r"C:\\Users\\pc")) / "AppData" / "Roaming" / "sanji" / "sanji.db"
-API_DIR = REPO / "services" / "weekly_activity_cloudrun" / "data" / "current_release"
+DEFAULT_RUNTIME_DATA_ROOT = Path(r"F:\\DevData\\HuaidjRuntime\\state\\weekly_activity_cloudrun\\data")
+API_DIR = Path(os.environ.get("HUAIDJ_CURRENT_RELEASE_DIR", str(DEFAULT_RUNTIME_DATA_ROOT / "current_release")))
+os.environ["HUAIDJ_REPORT_ROOT"] = str(REPORT_ROOT)
+os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
+sys.dont_write_bytecode = True
 
 REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -362,6 +389,16 @@ databases, cookies, tokens, browser credentials, or WeChat profile data.
 
 from __future__ import annotations
 
+import os
+import sys
+from pathlib import Path
+
+
+REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\\DevData\\HuaidjRuntime\\state\\reports"))
+os.environ["HUAIDJ_REPORT_ROOT"] = str(REPORT_ROOT)
+os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
+sys.dont_write_bytecode = True
+
 
 MESSAGE = """Sanji 公众号登录授权提醒
 
@@ -402,8 +439,12 @@ REPO = Path(os.environ.get("HUAIDJ_REPO", r"C:\\code\\githubstar\\wechathtmldown
 PYTHON_EXE = Path(os.environ.get("HUAIDJ_PYTHON") or sys.executable)
 SANJI_ROOT = Path(os.environ.get("SANJI_ROOT", str(Path(os.environ.get("APPDATA", "")) / "sanji")))
 SANJI_ARTICLES_ROOT = Path(os.environ.get("SANJI_HOT_ARTICLES_ROOT", r"E:\\sanji_hot\\articles"))
-LOG_DIR = HERMES_HOME / "logs"
-LOCK_PATH = HERMES_HOME / "scripts" / "huaidj" / ".atlas_v2_import.lock"
+REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\\DevData\\HuaidjRuntime\\state\\reports"))
+LOG_DIR = REPORT_ROOT / "atlas_v2_import"
+LOCK_PATH = REPORT_ROOT / "_locks" / "atlas_v2_import.lock"
+os.environ["HUAIDJ_REPORT_ROOT"] = str(REPORT_ROOT)
+os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
+sys.dont_write_bytecode = True
 RUN_ID = os.environ.get("ATLAS_RUN_ID", "").strip()
 RUN_LIMIT = 0
 MAX_COST_RMB = 15.0
@@ -421,6 +462,8 @@ def _fresh_launch_env() -> dict[str, str]:
     env = os.environ.copy()
     env["PYTHONUTF8"] = "1"
     env["PYTHONIOENCODING"] = "utf-8"
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    env["HUAIDJ_REPORT_ROOT"] = str(REPORT_ROOT)
     if os.name != "nt":
         return env
     try:
@@ -611,13 +654,17 @@ from pathlib import Path
 HERMES_HOME = Path(os.environ.get("HERMES_HOME", r"C:\\Users\\pc\\AppData\\Local\\hermes"))
 REPO = Path(os.environ.get("HUAIDJ_REPO", r"C:\\code\\githubstar\\wechathtmldownload"))
 PYTHON_EXE = os.environ.get("HUAIDJ_PYTHON") or sys.executable
+REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\\DevData\\HuaidjRuntime\\state\\reports"))
+os.environ["HUAIDJ_REPORT_ROOT"] = str(REPORT_ROOT)
+os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
+sys.dont_write_bytecode = True
 CMD = [
     PYTHON_EXE,
     str(REPO / "tools" / "stage7_rewrite" / "scripts" / "report_huaidj_package_api_tg_status.py"),
     "--state-file",
     str(HERMES_HOME / "scripts" / "huaidj" / ".health_state.json"),
     "--json-out",
-    str(REPO / "tools" / "stage7_rewrite" / "reports" / "huaidj_health" / "latest.json"),
+    str(REPORT_ROOT / "huaidj_health" / "latest.json"),
     "--force",
 ]
 
@@ -631,6 +678,7 @@ def main() -> int:
             errors="replace",
             capture_output=True,
             timeout=90,
+            env=os.environ.copy(),
         )
     except subprocess.TimeoutExpired as exc:
         print(f"HUAIDJ CloudRun API / Data freshness health timed out: {exc}")
@@ -669,13 +717,17 @@ from pathlib import Path
 HERMES_HOME = Path(os.environ.get("HERMES_HOME", r"C:\\Users\\pc\\AppData\\Local\\hermes"))
 REPO = Path(os.environ.get("HUAIDJ_REPO", r"C:\\code\\githubstar\\wechathtmldownload"))
 PYTHON_EXE = os.environ.get("HUAIDJ_PYTHON") or sys.executable
+REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\\DevData\\HuaidjRuntime\\state\\reports"))
+os.environ["HUAIDJ_REPORT_ROOT"] = str(REPORT_ROOT)
+os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
+sys.dont_write_bytecode = True
 CMD = [
     PYTHON_EXE,
     str(REPO / "tools" / "stage7_rewrite" / "scripts" / "report_huaidj_package_api_tg_status.py"),
     "--state-file",
     str(HERMES_HOME / "scripts" / "huaidj" / ".package_api_tg_state.json"),
     "--json-out",
-    str(REPO / "tools" / "stage7_rewrite" / "reports" / "huaidj_package_api_tg_status" / "latest.json"),
+    str(REPORT_ROOT / "huaidj_package_api_tg_status" / "latest.json"),
 ]
 
 
@@ -688,6 +740,7 @@ def main() -> int:
             errors="replace",
             capture_output=True,
             timeout=90,
+            env=os.environ.copy(),
         )
     except subprocess.TimeoutExpired as exc:
         print(f"HUAIDJ 活动包/API TG 状态脚本超时: {exc}")
@@ -721,6 +774,9 @@ SCRIPT_CONTRACT_TOKENS = {
         "vl_direct_qwen",
         '"0"',
         "HUAIDJ_REPO",
+        "HUAIDJ_REPORT_ROOT",
+        "PYTHONDONTWRITEBYTECODE",
+        "-ReportRoot",
         "CREATE_NO_WINDOW",
         "subprocess.run(",
         "return result_code",
@@ -730,23 +786,32 @@ SCRIPT_CONTRACT_TOKENS = {
         "run_huaidj_sanji_rss_fast_watch.ps1",
         "-DetectOnly",
         "HUAIDJ_REPO",
+        "HUAIDJ_REPORT_ROOT",
+        "PYTHONDONTWRITEBYTECODE",
+        "-ReportRoot",
         "return result.returncode",
     ),
     "huaidj/audit_coverage_gap.py": (
         "Wed 21:10 + Fri 20:10",
         "hours=20, minutes=10",
+        "HUAIDJ_REPORT_ROOT",
+        "PYTHONDONTWRITEBYTECODE",
     ),
     "huaidj/sanji_login_reminder.py": (
         "公众号登录授权提醒",
         "2 天",
         "cookie",
         "token",
+        "HUAIDJ_REPORT_ROOT",
+        "PYTHONDONTWRITEBYTECODE",
     ),
     "huaidj/package_api_tg_status.py": (
         "report_huaidj_package_api_tg_status.py",
         ".package_api_tg_state.json",
         "huaidj_package_api_tg_status",
         "HUAIDJ_PYTHON",
+        "HUAIDJ_REPORT_ROOT",
+        "PYTHONDONTWRITEBYTECODE",
         "return int(result.returncode)",
     ),
     "huaidj/health_check.py": (
@@ -754,6 +819,8 @@ SCRIPT_CONTRACT_TOKENS = {
         "data-freshness",
         "report_huaidj_package_api_tg_status.py",
         "HUAIDJ_PYTHON",
+        "HUAIDJ_REPORT_ROOT",
+        "PYTHONDONTWRITEBYTECODE",
         "return int(result.returncode)",
     ),
     "huaidj/atlas_v2_sanji_import_nightly.py": (
@@ -766,6 +833,8 @@ SCRIPT_CONTRACT_TOKENS = {
         "MAX_COST_RMB = 15.0",
         "--advance-checkpoint",
         "HUAIDJ_PYTHON",
+        "HUAIDJ_REPORT_ROOT",
+        "PYTHONDONTWRITEBYTECODE",
         "CREATE_NO_WINDOW",
         "subprocess.run(",
         "msvcrt.locking(",

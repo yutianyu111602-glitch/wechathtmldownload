@@ -109,7 +109,9 @@ DEFAULT_CURRENT_RELEASE_QUALITY_RECOVERY_PACKET = (
     / "openclaw_current_release_quality_recovery_packet_round81_20260606"
     / "openclaw_current_release_quality_recovery_packet.json"
 )
-DEFAULT_OUT_DIR = REPO_ROOT / "tools" / "stage7_rewrite" / "reports" / "openclaw_darwin_scorecard_20260606_round65"
+DEFAULT_OUT_DIR = Path(
+    os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports")
+) / "openclaw_darwin_scorecard"
 RAW_URL_RE = re.compile(r"https?://|mp\.weixin\.qq\.com|mmbiz\.qpic\.cn|mmecoa\.qpic\.cn|qpic\.cn|wxfile://", re.I)
 PRIVATE_PATH_RE = re.compile(r"(?i)([A-Z]:\\|/mnt/[a-z]/|/home/pc/|\\\\wsl\.localhost\\|D:\\DDownload\\)")
 SECRET_RE = re.compile(

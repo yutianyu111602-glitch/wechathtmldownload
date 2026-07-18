@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import shutil
 import subprocess
 import urllib.error
@@ -21,7 +22,9 @@ from typing import Any
 
 ENV_ID = "huaidjweekly-d8g1go7-d0a07863e3e"
 SERVICE_NAME = "weekly-api"
-DEFAULT_OUT_DIR = Path("reports/cloudrun_weekly_production_smoke_20260518")
+DEFAULT_OUT_DIR = Path(
+    os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports")
+) / "cloudrun_weekly_production_smoke"
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_TCB_CWD = REPO_ROOT / "services" / "weekly_activity_cloudrun"
 TCB_CMD = [shutil.which("npm") or "npm", "exec", "--yes", "--package", "@cloudbase/cli@3.3.1", "--", "tcb"]

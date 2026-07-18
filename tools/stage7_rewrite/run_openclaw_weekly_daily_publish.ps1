@@ -52,6 +52,7 @@ param(
     [string]$IncrementalMergedApiDir = "",
     [string]$CloudRunDataRoot = "",
     [string]$CloudRunWorkRoot = "",
+    [string]$ReportRoot = "",
     [string]$Version = "",
     [string]$Desc = "",
     [switch]$EnablePosterCloudBaseMigration,
@@ -76,6 +77,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $env:PYTHONUTF8 = "1"
 $env:PYTHONIOENCODING = "utf-8"
+$env:PYTHONDONTWRITEBYTECODE = "1"
 
 function Resolve-ConfiguredPathValue {
     param(
@@ -139,7 +141,12 @@ $SanjiLatestSummaryPath = Join-Path $SanjiLatestExportRoot "latest_summary.json"
 $script:SanjiRunQueuePath = ""
 $script:SanjiRunSummaryPath = ""
 $Longrun = "E:\weekly_activity_pipeline\longrun"
-$Reports = Join-Path $Stage7 "reports"
+$HuaidjReportRoot = Resolve-ConfiguredPathValue `
+    -Value $ReportRoot `
+    -EnvironmentVariableName "HUAIDJ_REPORT_ROOT" `
+    -Default "F:\DevData\HuaidjRuntime\state\reports"
+$env:HUAIDJ_REPORT_ROOT = $HuaidjReportRoot
+$Reports = $HuaidjReportRoot
 $CloudRun = Join-Path $Repo "services\weekly_activity_cloudrun"
 $MiniProgram = Join-Path $Repo "apps\weekly_activity_miniprogram"
 $DefaultRuntimeDataRoot = "F:\DevData\HuaidjRuntime\state\weekly_activity_cloudrun\data"
@@ -1030,6 +1037,7 @@ function Write-OpenClawReadinessAndNextAction {
         $readinessArgs = @(
             $ReadinessSummaryScript,
             "--publish-report-dir", $RunReportDir,
+            "--reports-root", $HuaidjReportRoot,
             "--report", $readinessSummaryReportPath,
             "--expected-min-items", "$EffectiveMinExpectedItems",
             "--report-only-exit-zero"
@@ -1417,7 +1425,7 @@ if (-not $DryRun -and $SourceMode -eq "docker_exporter") {
         $preBuildAuthRecoveryArgs = @(
             $ExporterAuthRecoveryPreflightScript,
             "--report", $exporterAuthRecoveryPreflightReportPath,
-            "--scorecard", (Join-Path $Repo "reports\WEEKLY_EXPORTER_AUTH_RECOVERY_PREFLIGHT_PREBUILD_$WeekTag.md")
+            "--scorecard", (Join-Path $RunReportDir "WEEKLY_EXPORTER_AUTH_RECOVERY_PREFLIGHT_PREBUILD_$WeekTag.md")
         )
         if (-not [string]::IsNullOrWhiteSpace($resolvedExporterSessionDiagnosticPath)) {
             $preBuildAuthRecoveryArgs += "--session-diagnostic"
@@ -1877,7 +1885,7 @@ if ((Test-Path $missingPosterRecoveryReportPath) -and (Test-Path $posterMigratio
         --work-orders $missingPosterRecoveryReportPath `
         --write-gate $posterMigrationWriteGatePath `
         --report $posterRecoverySplitControllerPacketReportPath `
-        --scorecard (Join-Path $Repo "reports\WEEKLY_POSTER_RECOVERY_SPLIT_CONTROLLER_PACKET_$WeekTag.md")
+        --scorecard (Join-Path $RunReportDir "WEEKLY_POSTER_RECOVERY_SPLIT_CONTROLLER_PACKET_$WeekTag.md")
     if ($LASTEXITCODE -eq 0) {
         Write-Host "  ✓ Poster recovery split controller packet: $posterRecoverySplitControllerPacketReportPath" -ForegroundColor Green
     } else {
@@ -1893,7 +1901,7 @@ if ((Test-Path $missingPosterRecoveryReportPath) -and (Test-Path $posterMigratio
         "--work-orders", $missingPosterRecoveryReportPath,
         "--write-gate", $posterMigrationWriteGatePath,
         "--report", $publicPosterUploadCandidateReviewPacketReportPath,
-        "--scorecard", (Join-Path $Repo "reports\WEEKLY_PUBLIC_POSTER_UPLOAD_CANDIDATE_REVIEW_PACKET_$WeekTag.md")
+        "--scorecard", (Join-Path $RunReportDir "WEEKLY_PUBLIC_POSTER_UPLOAD_CANDIDATE_REVIEW_PACKET_$WeekTag.md")
     )
     if (Test-Path $posterRecoverySplitControllerPacketReportPath) {
         $publicPosterReviewArgs += "--split-packet"
@@ -1959,7 +1967,7 @@ if ((Test-Path $aggregateChildPosterOcrExecutionPreflightReportPath) -and (Test-
         --preflight $aggregateChildPosterOcrExecutionPreflightReportPath `
         --canary $PosterOcrCanaryReportPath `
         --report $aggregateChildPosterOcrControllerReleasePacketReportPath `
-        --scorecard (Join-Path $Repo "reports\WEEKLY_AGGREGATE_CHILD_POSTER_OCR_CONTROLLER_RELEASE_PACKET_$WeekTag.md") `
+        --scorecard (Join-Path $RunReportDir "WEEKLY_AGGREGATE_CHILD_POSTER_OCR_CONTROLLER_RELEASE_PACKET_$WeekTag.md") `
         --max-tasks 5
     if ($LASTEXITCODE -eq 0) {
         Write-Host "  ✓ Aggregate-child poster OCR controller release packet: $aggregateChildPosterOcrControllerReleasePacketReportPath" -ForegroundColor Green
@@ -1976,7 +1984,7 @@ if ((Test-Path $aggregateChildPosterOcrExecutionPreflightReportPath) -and (Test-
         --controller-packet $aggregateChildPosterOcrControllerReleasePacketReportPath `
         --canary $PosterOcrCanaryReportPath `
         --report $aggregateChildPosterOcrRuntimeReleasePreflightReportPath `
-        --scorecard (Join-Path $Repo "reports\WEEKLY_AGGREGATE_CHILD_POSTER_OCR_RUNTIME_RELEASE_PREFLIGHT_$WeekTag.md") `
+        --scorecard (Join-Path $RunReportDir "WEEKLY_AGGREGATE_CHILD_POSTER_OCR_RUNTIME_RELEASE_PREFLIGHT_$WeekTag.md") `
         --max-tasks 5
     if ($LASTEXITCODE -eq 0) {
         Write-Host "  ✓ Aggregate-child poster OCR runtime release preflight: $aggregateChildPosterOcrRuntimeReleasePreflightReportPath" -ForegroundColor Green
@@ -1993,7 +2001,7 @@ if ((Test-Path $aggregateChildPosterOcrRuntimeReleasePreflightReportPath) -and (
         "--runtime-preflight", $aggregateChildPosterOcrRuntimeReleasePreflightReportPath,
         "--tasks", $aggregateChildPosterOcrRecoveryReportPath,
         "--report", $aggregateChildPosterOcrSourceMaterialPreflightReportPath,
-        "--scorecard", (Join-Path $Repo "reports\WEEKLY_AGGREGATE_CHILD_POSTER_OCR_SOURCE_MATERIAL_PREFLIGHT_$WeekTag.md"),
+        "--scorecard", (Join-Path $RunReportDir "WEEKLY_AGGREGATE_CHILD_POSTER_OCR_SOURCE_MATERIAL_PREFLIGHT_$WeekTag.md"),
         "--max-tasks", "5"
     )
     $sourceUrlMapForOcr = Join-Path $ApiDir "source_actions\source_url_map.json"
@@ -2049,7 +2057,7 @@ if (Test-Path $ExporterFreshnessPreflightScript) {
     $exporterFreshnessArgs = @(
         $ExporterFreshnessPreflightScript,
         "--report", $exporterFreshnessPreflightReportPath,
-        "--scorecard", (Join-Path $Repo "reports\WEEKLY_EXPORTER_FRESHNESS_PREFLIGHT_$WeekTag.md"),
+        "--scorecard", (Join-Path $RunReportDir "WEEKLY_EXPORTER_FRESHNESS_PREFLIGHT_$WeekTag.md"),
         "--latest-queue-summary", $latestQueueSummaryPath
     )
     if (Test-Path -LiteralPath $aggregateChildPosterOcrSourceMaterialPreflightReportPath) {
@@ -2107,7 +2115,7 @@ if ((Test-Path $ExporterAuthRecoveryPreflightScript) -and (
     $exporterAuthRecoveryArgs = @(
         $ExporterAuthRecoveryPreflightScript,
         "--report", $exporterAuthRecoveryPreflightReportPath,
-        "--scorecard", (Join-Path $Repo "reports\WEEKLY_EXPORTER_AUTH_RECOVERY_PREFLIGHT_$WeekTag.md")
+        "--scorecard", (Join-Path $RunReportDir "WEEKLY_EXPORTER_AUTH_RECOVERY_PREFLIGHT_$WeekTag.md")
     )
     if (-not [string]::IsNullOrWhiteSpace($resolvedExporterSessionDiagnosticPath)) {
         $exporterAuthRecoveryArgs += "--session-diagnostic"
