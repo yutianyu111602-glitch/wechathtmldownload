@@ -63,6 +63,9 @@ param(
     [string]$PublishedApiDir = "",
     [string]$ReleaseDir = "",
     [string]$DjProfilesPath = "",
+    [switch]$RequireDjProfiles,
+    [ValidateRange(1000, 10000000)]
+    [int]$MinDjProfileKeys = 1000,
     [switch]$EnableLegacyStaticUpload
 )
 
@@ -589,6 +592,44 @@ function Complete-EntityEnrichmentOutput {
     return $true
 }
 
+$DJ_PROFILES = $DjProfilesPath
+if ([string]::IsNullOrWhiteSpace($DJ_PROFILES)) {
+    $DJ_PROFILES = [Environment]::GetEnvironmentVariable("HUAIDJ_DJ_PROFILES", "Process")
+}
+if ([string]::IsNullOrWhiteSpace($DJ_PROFILES)) {
+    $DJ_PROFILES = [Environment]::GetEnvironmentVariable("HUAIDJ_DJ_PROFILES", "User")
+}
+if ([string]::IsNullOrWhiteSpace($DJ_PROFILES)) {
+    $DJ_PROFILES = Join-Path $env:USERPROFILE "code\dj-dataset\output\enhancement_run\final\enhanced_dj_profiles.csv"
+}
+if ($RequireDjProfiles) {
+    if (-not (Test-Path -LiteralPath $DJ_PROFILES -PathType Leaf)) {
+        throw "Required production DJ profile CSV not found: $DJ_PROFILES"
+    }
+    try {
+        $djProfileRows = @(Import-Csv -LiteralPath $DJ_PROFILES)
+    } catch {
+        throw "Required production DJ profile CSV is not parseable: $DJ_PROFILES ($($_.Exception.Message))"
+    }
+    $djProfileHeaders = if ($djProfileRows.Count -gt 0) { @($djProfileRows[0].PSObject.Properties.Name) } else { @() }
+    if (-not ($djProfileHeaders -contains "name")) {
+        throw "Required production DJ profile CSV lacks the name column: $DJ_PROFILES"
+    }
+    $uniqueDjProfileNames = @(
+        $djProfileRows |
+            ForEach-Object { [string]$_.name } |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+            ForEach-Object { $_.Trim() } |
+            Sort-Object -Unique
+    )
+    if ($uniqueDjProfileNames.Count -lt $MinDjProfileKeys) {
+        throw "DJ profile CSV has fewer unique non-empty names than the production minimum: names=$($uniqueDjProfileNames.Count) required=$MinDjProfileKeys path=$DJ_PROFILES"
+    }
+    Write-Host "Production DJ profile preflight passed: rows=$($djProfileRows.Count) unique_names=$($uniqueDjProfileNames.Count) minimum=$MinDjProfileKeys" -ForegroundColor Green
+} elseif (-not (Test-Path -LiteralPath $DJ_PROFILES -PathType Leaf)) {
+    Write-Host "  DJ profile CSV not found; entity registry will continue with the checked-in artist registry only: $DJ_PROFILES" -ForegroundColor Yellow
+}
+
 $ResumeFromVl = -not [string]::IsNullOrWhiteSpace($ResumeVlDir)
 if ($ResumeFromVl) {
     if ($PosterExtractionMode -ne "vl_direct_qwen") {
@@ -858,19 +899,6 @@ if ($PosterExtractionMode -eq "legacy_ocr") {
 # ─── Step 3.5: 实体信息富化（DJ档案 / dj-dataset） ──────────────────────────
 $PACK_ENTITY_DIR = "$LONGRUN\WEEKLY_ACTIVITY_RECOMMENDATION_PACK_ENTITY_$WEEK_TAG"
 Reset-OutputDir $PACK_ENTITY_DIR
-$DJ_PROFILES = $DjProfilesPath
-if ([string]::IsNullOrWhiteSpace($DJ_PROFILES)) {
-    $DJ_PROFILES = [Environment]::GetEnvironmentVariable("HUAIDJ_DJ_PROFILES", "Process")
-}
-if ([string]::IsNullOrWhiteSpace($DJ_PROFILES)) {
-    $DJ_PROFILES = [Environment]::GetEnvironmentVariable("HUAIDJ_DJ_PROFILES", "User")
-}
-if ([string]::IsNullOrWhiteSpace($DJ_PROFILES)) {
-    $DJ_PROFILES = Join-Path $env:USERPROFILE "code\dj-dataset\output\enhancement_run\final\enhanced_dj_profiles.csv"
-}
-if (-not (Test-Path -LiteralPath $DJ_PROFILES -PathType Leaf)) {
-    Write-Host "  DJ profile CSV not found; entity registry will continue with the checked-in artist registry only: $DJ_PROFILES" -ForegroundColor Yellow
-}
 Invoke-Step "Step 3.5: Entity Enrichment (dj-dataset) → $PACK_ENTITY_DIR" {
     & $PythonExecutable "$ENTITY_ENRICH_SCRIPT" `
         --pack-dir $PACK_OCR_DIR `
@@ -884,8 +912,37 @@ Invoke-Step "Step 3.5: Entity Enrichment (dj-dataset) → $PACK_ENTITY_DIR" {
     }
 }
 
+if ($RequireDjProfiles -and -not $DryRun) {
+    $entityCandidatePath = Join-Path $PACK_ENTITY_DIR "weekly_activity_recommendation_candidates.jsonl"
+    if (-not (Test-Path -LiteralPath $entityCandidatePath -PathType Leaf)) {
+        throw "Required DJ entity enrichment output is missing; fallback is forbidden: $entityCandidatePath"
+    }
+    $entitySummaryPath = Join-Path $PACK_ENTITY_DIR "entity_enrichment_summary.json"
+    if (-not (Test-Path -LiteralPath $entitySummaryPath -PathType Leaf)) {
+        throw "Required DJ entity enrichment summary is missing: $entitySummaryPath"
+    }
+    try {
+        $entitySummary = Get-Content -Raw -LiteralPath $entitySummaryPath | ConvertFrom-Json
+    } catch {
+        throw "Required DJ entity enrichment summary is not parseable: $entitySummaryPath ($($_.Exception.Message))"
+    }
+    if ($entitySummary.schema_version -ne "weekly_entity_enrichment.v1") {
+        throw "Required DJ entity enrichment summary has an unexpected schema: $($entitySummary.schema_version)"
+    }
+    if (-not ($entitySummary.PSObject.Properties.Name -contains "dj_profiles_keys")) {
+        throw "Required DJ entity enrichment summary lacks dj_profiles_keys: $entitySummaryPath"
+    }
+    if ([int]$entitySummary.dj_profiles_keys -lt $MinDjProfileKeys) {
+        throw "DJ entity enrichment loaded too few profile keys: keys=$($entitySummary.dj_profiles_keys) required=$MinDjProfileKeys summary=$entitySummaryPath"
+    }
+    Write-Host "  ✓ Production DJ entity enrichment gate: keys=$($entitySummary.dj_profiles_keys) required=$MinDjProfileKeys" -ForegroundColor Green
+}
+
 # fallback：若实体富化没有输出，继续用 OCR pack
 if (-not $DryRun -and -not (Test-Path "$PACK_ENTITY_DIR\weekly_activity_recommendation_candidates.jsonl")) {
+    if ($RequireDjProfiles) {
+        throw "Required DJ entity enrichment output is missing; fallback is forbidden: $PACK_ENTITY_DIR"
+    }
     Write-Host "  ⚠ Entity enrichment output not found, falling back to OCR pack" -ForegroundColor Yellow
     $PACK_ENTITY_DIR = $PACK_OCR_DIR
 }

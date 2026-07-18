@@ -44,6 +44,9 @@ param(
     [switch]$IncludeInactiveAccounts,
     [string]$ApiDir = "",
     [string]$PackDir = "",
+    [string]$DjProfilesPath = "",
+    [ValidateRange(1000, 10000000)]
+    [int]$MinDjProfileKeys = 1000,
     [switch]$DisableIncrementalMerge,
     [switch]$SkipInternalPosterGate,
     [int]$IncrementalMinExpectedItems = 1,
@@ -141,6 +144,10 @@ $SanjiLatestSummaryPath = Join-Path $SanjiLatestExportRoot "latest_summary.json"
 $script:SanjiRunQueuePath = ""
 $script:SanjiRunSummaryPath = ""
 $Longrun = "E:\weekly_activity_pipeline\longrun"
+$DjProfilesPath = Resolve-ConfiguredPathValue `
+    -Value $DjProfilesPath `
+    -EnvironmentVariableName "HUAIDJ_DJ_PROFILES" `
+    -Default (Join-Path $env:USERPROFILE "code\dj-dataset\output\enhancement_run\final\enhanced_dj_profiles.csv")
 $HuaidjReportRoot = Resolve-ConfiguredPathValue `
     -Value $ReportRoot `
     -EnvironmentVariableName "HUAIDJ_REPORT_ROOT" `
@@ -344,6 +351,56 @@ function Invoke-RunStep {
         throw "Step failed: $Label (exit $LASTEXITCODE)"
     }
     Write-Host "  ✓ $Label" -ForegroundColor Green
+}
+
+function Assert-DjProfilesSourceReady {
+    param([string]$ProfilePath)
+    if (-not (Test-Path -LiteralPath $ProfilePath -PathType Leaf)) {
+        throw "Required production DJ profile CSV not found: $ProfilePath"
+    }
+    try {
+        $profileRows = @(Import-Csv -LiteralPath $ProfilePath)
+    } catch {
+        throw "Required production DJ profile CSV is not parseable: $ProfilePath ($($_.Exception.Message))"
+    }
+    $profileHeaders = if ($profileRows.Count -gt 0) { @($profileRows[0].PSObject.Properties.Name) } else { @() }
+    if (-not ($profileHeaders -contains "name")) {
+        throw "Required production DJ profile CSV lacks the name column: $ProfilePath"
+    }
+    $uniqueProfileNames = @(
+        $profileRows |
+            ForEach-Object { [string]$_.name } |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+            ForEach-Object { $_.Trim() } |
+            Sort-Object -Unique
+    )
+    if ($uniqueProfileNames.Count -lt $MinDjProfileKeys) {
+        throw "DJ profile CSV has fewer unique non-empty names than the production minimum: names=$($uniqueProfileNames.Count) required=$MinDjProfileKeys path=$ProfilePath"
+    }
+    Write-Host "  Production DJ profile source ready: rows=$($profileRows.Count) unique_names=$($uniqueProfileNames.Count) minimum=$MinDjProfileKeys" -ForegroundColor Green
+}
+
+function Assert-DjProfilesEnrichmentEvidence {
+    param([string]$PackPath)
+    $summaryPath = Join-Path $PackPath "entity_enrichment_summary.json"
+    if (-not (Test-Path -LiteralPath $summaryPath -PathType Leaf)) {
+        throw "Production pack lacks DJ entity enrichment evidence: $summaryPath"
+    }
+    try {
+        $summary = Get-Content -Raw -LiteralPath $summaryPath | ConvertFrom-Json
+    } catch {
+        throw "Production DJ entity enrichment evidence is not parseable: $summaryPath ($($_.Exception.Message))"
+    }
+    if ($summary.schema_version -ne "weekly_entity_enrichment.v1") {
+        throw "Production DJ entity enrichment evidence has an unexpected schema: $($summary.schema_version)"
+    }
+    if (-not ($summary.PSObject.Properties.Name -contains "dj_profiles_keys")) {
+        throw "Production DJ entity enrichment evidence lacks dj_profiles_keys: $summaryPath"
+    }
+    if ([int]$summary.dj_profiles_keys -lt $MinDjProfileKeys) {
+        throw "Production DJ entity enrichment evidence is below minimum: keys=$($summary.dj_profiles_keys) required=$MinDjProfileKeys summary=$summaryPath"
+    }
+    Write-Host "  Production DJ entity enrichment evidence passed: keys=$($summary.dj_profiles_keys) required=$MinDjProfileKeys" -ForegroundColor Green
 }
 
 function Assert-NativeSuccess {
@@ -1596,6 +1653,12 @@ if (-not $DryRun -and $SourceMode -eq "docker_exporter") {
 
 Assert-FullIncrementalPreflightGate
 
+if ($DeployBackend) {
+    Invoke-RunStep "Validate production DJ profile source" {
+        Assert-DjProfilesSourceReady -ProfilePath $DjProfilesPath
+    }
+}
+
 if (-not $DisableIncrementalMerge -or $DeployBackend) {
     Invoke-RunStep "Validate authoritative current release baseline" {
         Assert-AuthoritativeBasePackage
@@ -1637,6 +1700,11 @@ if (-not $SkipBuild) {
             PackDeepSeekDir = $PackDir
             ApiDir = $ApiDir
             PublishedApiDir = $PublishedApiDir
+            DjProfilesPath = $DjProfilesPath
+            MinDjProfileKeys = $MinDjProfileKeys
+        }
+        if ($DeployBackend) {
+            $pipelineArgs.RequireDjProfiles = $true
         }
         # Auto-resume VL enrichment from complete package first; otherwise reuse partial evidence.
         $vlDir = Join-Path $Longrun "WEEKLY_ACTIVITY_RECOMMENDATION_PACK_VL_$WeekTag"
@@ -1683,6 +1751,12 @@ if (-not $SkipBuild) {
             $pipelineArgs.IncludeInactiveAccounts = $true
         }
         & (Join-Path $Stage7 "weekly_activity_next_week_pipeline.ps1") @pipelineArgs
+    }
+}
+
+if ($DeployBackend) {
+    Invoke-RunStep "Validate production DJ entity enrichment evidence" {
+        Assert-DjProfilesEnrichmentEvidence -PackPath $PackDir
     }
 }
 
