@@ -3,6 +3,8 @@ from __future__ import annotations
 import importlib.util
 import json
 import os
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -36,6 +38,59 @@ def test_daily_path_resolver_accepts_intentionally_empty_default() -> None:
     assert "[AllowEmptyString()][string]$Default" in daily
     assert '-EnvironmentVariableName "HUAIDJ_CURRENT_RELEASE_DIR" -Default ""' in daily
     assert '-EnvironmentVariableName "HUAIDJ_CLOUDRUN_DATA_ROOT" -Default ""' in daily
+
+
+def test_fast_watch_path_resolver_binds_intentionally_empty_default() -> None:
+    pwsh = shutil.which("pwsh.exe") or shutil.which("pwsh")
+    if not pwsh:
+        pytest.skip("PowerShell 7 is required to exercise the wrapper parameter binder")
+
+    script_path = ROOT / "run_huaidj_sanji_rss_fast_watch.ps1"
+    probe = r"""
+$ErrorActionPreference = "Stop"
+$tokens = $null
+$parseErrors = $null
+$ast = [System.Management.Automation.Language.Parser]::ParseFile(
+    $env:HUAIDJ_FAST_WATCH_TEST_SCRIPT,
+    [ref]$tokens,
+    [ref]$parseErrors
+)
+if ($parseErrors.Count -ne 0) {
+    throw "Fast Watch wrapper did not parse cleanly."
+}
+$resolver = $ast.Find({
+    param($node)
+    $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+        $node.Name -eq "Resolve-ConfiguredPath"
+}, $true)
+if ($null -eq $resolver) {
+    throw "Resolve-ConfiguredPath was not found."
+}
+Invoke-Expression $resolver.Extent.Text
+[Environment]::SetEnvironmentVariable("HUAIDJ_TEST_UNSET_PATH", $null, "Process")
+$resolved = Resolve-ConfiguredPath `
+    -Value "" `
+    -EnvironmentVariableName "HUAIDJ_TEST_UNSET_PATH" `
+    -Default ""
+if ($null -ne $resolved -and $resolved -ne "") {
+    throw "Unexpected non-empty resolver result: $resolved"
+}
+Write-Output "ok"
+"""
+    probe_env = os.environ.copy()
+    probe_env["HUAIDJ_FAST_WATCH_TEST_SCRIPT"] = str(script_path)
+    result = subprocess.run(
+        [pwsh, "-NoProfile", "-Command", probe],
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        capture_output=True,
+        timeout=30,
+        env=probe_env,
+    )
+
+    assert result.returncode == 0, (result.stdout + result.stderr).strip()
+    assert "ok" in result.stdout
 
 
 def test_publish_runner_validates_external_base_and_keeps_post_deploy_readback() -> None:
