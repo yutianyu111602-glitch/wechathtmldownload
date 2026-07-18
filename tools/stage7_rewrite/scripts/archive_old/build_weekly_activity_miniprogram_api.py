@@ -13,6 +13,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import sys
 import unicodedata
 from collections import defaultdict
@@ -28,7 +29,17 @@ from validate_weekly_event_published import raise_for_issues, validate_published
 
 
 LONGRUN_ROOT = Path(r"D:\downstream_results\stage7_rewrite\longrun")
-DEFAULT_REGISTRY_ROOT = Path(__file__).resolve().parents[1] / "registries"
+
+
+def _default_registry_root() -> Path:
+    for parent in Path(__file__).resolve().parents:
+        candidate = parent / "registries"
+        if candidate.exists():
+            return candidate
+    return Path(__file__).resolve().parents[1] / "registries"
+
+
+DEFAULT_REGISTRY_ROOT = _default_registry_root()
 DEFAULT_PACK_DIR = LONGRUN_ROOT / "WEEKLY_ACTIVITY_RECOMMENDATION_PACK_20260507"
 DEFAULT_OUT_DIR = LONGRUN_ROOT / "WEEKLY_ACTIVITY_MINIPROGRAM_API_20260507"
 DEFAULT_SOURCE_QUEUE = Path(
@@ -36,11 +47,18 @@ DEFAULT_SOURCE_QUEUE = Path(
 )
 DEFAULT_VENUE_REGISTRY = DEFAULT_REGISTRY_ROOT / "weekly_venues_seed.json"
 DEFAULT_ACCOUNT_REGISTRY = DEFAULT_REGISTRY_ROOT / "weekly_accounts_seed.json"
+DEFAULT_SOURCE_POLICY = DEFAULT_REGISTRY_ROOT / "weekly_sanji_source_policy.json"
 DEFAULT_MAX_ITEMS = 10000
 DEFAULT_EVIDENCE_LIMIT = 5
 DEFAULT_WINDOW_DAYS = 15
 SOURCE_EVIDENCE_DATE_READ_LIMIT = 30000
 SOURCE_QUEUE_TEXT_LIMIT = 30000
+USAGE_SIDECAR_FILENAMES = (
+    "llm_usage_summary.json",
+    "poster_vl_usage_summary.json",
+    "qwen_vl_usage_summary.json",
+    "poster_vl_usage_details.jsonl",
+)
 CITY_DEFS = [
     ("beijing", "北京", ["北京", "beijing", "bj"]),
     ("shanghai", "上海", ["上海", "shanghai", "长宁区"]),
@@ -97,6 +115,38 @@ STYLE_RULES = [
     ("trance", ["trance"]),
     ("disco", ["disco", "迪斯科"]),
     ("ambient", ["ambient", "氛围"]),
+]
+DEFAULT_NON_TARGET_ACTIVITY_TERMS = {
+    "standup_comedy": ["脱口秀", "喜剧", "stand-up", "standup", "comedy"],
+    "folk": ["民谣", "folk"],
+    "rock": ["摇滚", "rock", "朋克", "punk", "后摇", "post-rock", "乐队专场"],
+    "hiphop": ["hiphop", "hip-hop", "hip hop", "嘻哈", "说唱", "rap show", "rapper"],
+    "quiet_bar": ["静吧", "清吧", "小酒馆", "民谣酒馆"],
+    "live_band_acoustic": ["迷幻吉他", "灵魂吟唱", "实验即兴", "唱作", "不插电", "原声现场", "吉他弹唱"],
+    "classical_or_concert": ["古典", "交响", "管弦", "弦乐", "贝多芬", "莫扎特", "肖邦", "音乐会"],
+    "jazz_swing": ["爵士大乐队", "爵士现场", "swing音乐", "swing dance", "jazz night"],
+}
+DEFAULT_ELECTRONIC_KEEP_TERMS = [
+    "techno",
+    "house",
+    "trance",
+    "dnb",
+    "drum and bass",
+    "bass music",
+    "breakbeat",
+    "electro",
+    "rave",
+    "club night",
+    "dj set",
+    "open decks",
+    "four on the floor",
+    "disco",
+    "reggae",
+    "电子",
+    "电音",
+    "浩室",
+    "锐舞",
+    "雷鬼",
 ]
 ADDRESS_LABEL_PREFIX_RE = re.compile(
     r"^(?:活动地点|场地地址|详细地址|地址|地点|ADD(?:RESS)?|LOCATION|Venue|📍|⭕地址)\s*[:：]?\s*",
@@ -780,6 +830,33 @@ def load_inactive_registry(path: Path | None) -> dict[str, set[str]]:
     }
 
 
+def load_source_policy(path: Path | None = DEFAULT_SOURCE_POLICY) -> dict[str, Any]:
+    payload = read_json(path) if path and path.exists() else {}
+    categories = payload.get("article_level_block_categories") if isinstance(payload.get("article_level_block_categories"), dict) else {}
+    content_terms: dict[str, list[str]] = {}
+    for key, fallback in DEFAULT_NON_TARGET_ACTIVITY_TERMS.items():
+        values = categories.get(key) if isinstance(categories, dict) else None
+        content_terms[key] = list_strings(values) or list(fallback)
+    keep_terms = list_strings(payload.get("electronic_keep_terms")) or list(DEFAULT_ELECTRONIC_KEEP_TERMS)
+    return {
+        "path": str(path) if path else "",
+        "blocked_source_hashes": {value.lower() for value in list_strings(payload.get("blocked_source_hashes")) if value},
+        "blocked_account_fakeids": {value for value in list_strings(payload.get("blocked_account_fakeids")) if value},
+        "blocked_accounts": {
+            normalize_subject(value)
+            for value in list_strings(payload.get("blocked_accounts"))
+            if normalize_subject(value)
+        },
+        "blocked_venues": {
+            normalize_subject(value)
+            for value in list_strings(payload.get("blocked_venues"))
+            if normalize_subject(value)
+        },
+        "content_terms": content_terms,
+        "electronic_keep_terms": keep_terms,
+    }
+
+
 def subject_matches(value: str, inactive_values: set[str]) -> bool:
     normalized = normalize_subject(value)
     if not normalized:
@@ -800,6 +877,121 @@ def inactive_reason(row: dict[str, Any], inactive_registry: dict[str, set[str]])
         return "inactive_account"
     if any(subject_matches(value, inactive_registry["venues"]) for value in venue_values if value):
         return "inactive_venue"
+    return ""
+
+
+def source_policy_block_reason(row: dict[str, Any], item: dict[str, Any], policy: dict[str, Any]) -> str:
+    source_hashes = {
+        value.lower()
+        for value in [
+            first_string(row.get("source_url_hash"), row.get("source_hash"), row.get("url_hash")),
+            first_string(item.get("source_article", {}).get("url_hash") if isinstance(item.get("source_article"), dict) else ""),
+            first_string(item.get("source_action", {}).get("url_hash") if isinstance(item.get("source_action"), dict) else ""),
+        ]
+        if value
+    }
+    if source_hashes & (policy.get("blocked_source_hashes") or set()):
+        return "source_policy_blocked_source_hash"
+    fakeids = [
+        first_string(row.get("account_fakeid")),
+        first_string(item.get("account_fakeid")),
+    ]
+    blocked_fakeids = policy.get("blocked_account_fakeids") or set()
+    if any(value and value in blocked_fakeids for value in fakeids):
+        return "source_policy_blocked_account"
+    account_values = [
+        first_string(row.get("account_key"), row.get("account")),
+        first_string(row.get("account_nickname")),
+        first_string(row.get("promoter")),
+        first_string(item.get("source_account_name")),
+        first_string(item.get("account_nickname")),
+    ]
+    if any(subject_matches(value, policy.get("blocked_accounts") or set()) for value in account_values if value):
+        return "source_policy_blocked_account"
+    venue_values = [
+        first_string(item.get("venue_name")),
+        *list_strings(item.get("venue")),
+        *list_strings(row.get("venue")),
+        first_string(row.get("title")),
+        first_string(item.get("title_display")),
+    ]
+    if any(subject_matches(value, policy.get("blocked_venues") or set()) for value in venue_values if value):
+        return "source_policy_blocked_venue"
+    return ""
+
+
+def policy_term_matches(blob: str, terms: list[str]) -> bool:
+    haystack = " " + re.sub(r"\s+", " ", str(blob or "").casefold()) + " "
+    normalized_haystack = normalize_subject(blob)
+    for term in terms:
+        term_text = str(term or "").strip()
+        if not term_text:
+            continue
+        term_lower = re.sub(r"\s+", " ", term_text.casefold())
+        if re.search(r"[a-z0-9]", term_lower):
+            pattern = r"(?<![a-z0-9])" + re.escape(term_lower) + r"(?![a-z0-9])"
+            if re.search(pattern, haystack):
+                return True
+        elif normalize_subject(term_text) and normalize_subject(term_text) in normalized_haystack:
+            return True
+    return False
+
+
+def policy_text_parts(row: dict[str, Any], item: dict[str, Any], *, wide: bool) -> list[str]:
+    parts = [
+        first_string(item.get("title_display")),
+        first_string(item.get("title_original"), item.get("title")),
+        first_string(row.get("title")),
+        first_string(item.get("source_account_name")),
+        first_string(item.get("venue_name")),
+    ]
+    if wide:
+        parts.extend(list_strings(item.get("music_styles")))
+        parts.extend(list_strings(item.get("style_tags")))
+        parts.extend(list_strings(item.get("genres")))
+        parts.extend(list_strings(row.get("lineup")))
+        parts.extend(list_strings(row.get("evidence"), limit=20))
+        parts.extend(list_strings(row.get("description_original_lines"), limit=20))
+        evidence = row.get("poster_selection_evidence")
+        if isinstance(evidence, dict):
+            parts.extend(list_strings(evidence.get("visible_text_lines"), limit=24))
+            parts.extend(list_strings(evidence.get("evidence"), limit=24))
+            parts.extend(list_strings(evidence.get("risk_flags"), limit=12))
+        item_evidence = item.get("poster_selection_evidence")
+        if isinstance(item_evidence, dict):
+            parts.extend(list_strings(item_evidence.get("visible_text_lines"), limit=24))
+            parts.extend(list_strings(item_evidence.get("risk_flags"), limit=12))
+    return [part for part in parts if part]
+
+
+def non_target_activity_reason(row: dict[str, Any], item: dict[str, Any], policy: dict[str, Any]) -> str:
+    source_reason = source_policy_block_reason(row, item, policy)
+    if source_reason:
+        return source_reason
+    strict_blob = "\n".join(policy_text_parts(row, item, wide=False))
+    wide_blob = "\n".join(policy_text_parts(row, item, wide=True))
+    has_electronic_keep = policy_term_matches(wide_blob, policy.get("electronic_keep_terms") or [])
+    content_terms: dict[str, list[str]] = policy.get("content_terms") or DEFAULT_NON_TARGET_ACTIVITY_TERMS
+    for category, terms in content_terms.items():
+        if category == "hiphop":
+            if policy_term_matches(strict_blob, terms) and not has_electronic_keep:
+                return f"non_target_activity_{category}"
+            if policy_term_matches(wide_blob, terms) and not has_electronic_keep:
+                return f"non_target_activity_{category}"
+            continue
+        if policy_term_matches(strict_blob, terms):
+            return f"non_target_activity_{category}"
+        if category in {
+            "standup_comedy",
+            "folk",
+            "rock",
+            "quiet_bar",
+            "live_band_acoustic",
+            "classical_or_concert",
+            "jazz_swing",
+        }:
+            if policy_term_matches(wide_blob, terms) and not has_electronic_keep:
+                return f"non_target_activity_{category}"
     return ""
 
 
@@ -1058,9 +1250,18 @@ def strip_leading_date_words(value: str) -> str:
         text,
         flags=re.I,
     )
-    text = re.sub(r"^\s*(\d{1,2})[./-](\d{1,2})(\s*\([^)]+\))?\s*(周[一二三四五六日天]|星期[一二三四五六日天]|今晚|今夜)?\s*", "", text, flags=re.I)
-    text = re.sub(r"^\s*(20\d{2})[./-](\d{1,2})[./-](\d{1,2})\s*", "", text)
-    text = re.sub(r"^\s*[｜|·:：,，\-–—]+\s*", "", text)
+    text = re.sub(
+        r"^\s*(\d{1,2})[./-](\d{1,2})(?:\s*(?:[-–—~～至到/&]|＆)\s*(?:(?:\d{1,2})[./-])?\d{1,2})?(\s*\([^)]+\))?\s*(周[一二三四五六日天]|星期[一二三四五六日天]|今晚|今夜)?\s*",
+        "",
+        text,
+        flags=re.I,
+    )
+    text = re.sub(
+        r"^\s*(20\d{2})[./-](\d{1,2})[./-](\d{1,2})(?:\s*(?:[-–—~～至到/&]|＆)\s*(?:(?:\d{1,2})[./-])?\d{1,2})?\s*",
+        "",
+        text,
+    )
+    text = re.sub(r"^\s*[｜|丨·:：,，\-–—、/&＆]+\s*", "", text)
     return text.strip()
 
 
@@ -1070,9 +1271,9 @@ GENERIC_TITLE_PREFIX_RE = re.compile(
 )
 TITLE_DATE_PREFIX_RE = re.compile(
     r"^\s*(?:"
-    r"(?:\d{1,2})[./-](?:\d{1,2})(?:\s*[-–—~～至到]\s*(?:(?:\d{1,2})[./-])?(?:\d{1,2}))?"
-    r"|(?:\d{1,2})\s*月\s*(?:\d{1,2})(?:\s*[-–—~～至到]\s*(?:\d{1,2}))?\s*日?"
-    r"|(?:20\d{2})[./-](?:\d{1,2})[./-](?:\d{1,2})"
+    r"(?:\d{1,2})[./-](?:\d{1,2})(?:\s*(?:[-–—~～至到/&]|＆)\s*(?:(?:\d{1,2})[./-])?(?:\d{1,2}))?"
+    r"|(?:\d{1,2})\s*月\s*(?:\d{1,2})(?:\s*[-–—~～至到]\s*(?:\d{1,2}))?\s*(?:日|号)?"
+    r"|(?:20\d{2})[./-](?:\d{1,2})[./-](?:\d{1,2})(?:\s*(?:[-–—~～至到/&]|＆)\s*(?:(?:\d{1,2})[./-])?(?:\d{1,2}))?"
     r")"
     r"(?:\s*(?:周[一二三四五六日天]|星期[一二三四五六日天]|Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?))?\.?"
     r"\s*",
@@ -1084,47 +1285,327 @@ TITLE_TIME_PREFIX_RE = re.compile(
     r"\s*",
     re.I,
 )
+TITLE_WEEKDAY_PREFIX_RE = re.compile(
+    r"^\s*(?:"
+    r"(?:周[一二三四五六日天]|星期[一二三四五六日天])(?:\.?(?:\s+|[｜|丨·:：,，\-–—、/&＆]+|$))|"
+    r"(?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)(?![A-Za-z])"
+    r"\.?(?:\s+|$)"
+    r")",
+    re.I,
+)
+TITLE_EVIDENCE_REJECT_RE = re.compile(
+    r"(?:地址|票价|门票|预售|早鸟|现场|免费入场|入场方式|扫码|二维码|"
+    r"candidate\s+date|candidate\s+city|candidate\s+address|image\s+\d+|body\s+text|"
+    r"not\s+necessary|weekly\s+preview|活动一览|活动预告|活动预览)",
+    re.I,
+)
+TITLE_EVIDENCE_BOOST_RE = re.compile(
+    r"(?:pres\.?|presents?|presented\s+by|呈现|×| x | vs\.? |对决|周年|夜游|龙舟|"
+    r"vol\.?\s*\d+|session|party|club|room|tour|joint\s+tour|派对|巡演|专场|邀请|厂牌|开票|回归|双厅)",
+    re.I,
+)
+TITLE_ADDRESS_TOKEN_RE = re.compile(
+    r"(?:省|市|区|县|路|街|道|胡同|弄|巷|号|座|栋|楼|层|B\d|F\d|地铁|中心|广场|园区|"
+    r"朝阳|海淀|静安|黄浦|余杭|拱墅|天河|越秀|锦江|武侯|"
+    r"avenue|road|street|district|floor|unit|building|shopping\s+center|book\s+shopping\s+center|no\.\s*\d+)",
+    re.I,
+)
+TITLE_CITY_ONLY_RE = re.compile(
+    r"^(?:北京|上海|广州|深圳|杭州|成都|重庆|南京|武汉|长沙|天津|西安|厦门|大理|惠州|东莞|佛山|苏州|福州|青岛|大庆|昆明)$",
+    re.I,
+)
+TITLE_STATUS_FRAGMENT_RE = re.compile(
+    r"(?:即将开售|票档|享\s*\d?\s*折|购买\s*\d|购买.{0,12}票|早鸟优惠|限时早鸟)",
+    re.I,
+)
+TITLE_PROMO_PREFIX_RE = re.compile(
+    r"^\s*(?:转发|分享).{0,80}?(?:优惠|折|特价)[^，,]*[，,]\s*",
+    re.I,
+)
+
+
+def normalize_title_spacing(value: str) -> str:
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    text = re.sub(r"(?i)\boff\s+-\s+duty\b", "Off-duty", text)
+    text = re.sub(r"(?i)\b(pres\.)\s*(?=[\u4e00-\u9fff])", r"\1 ", text)
+    text = re.sub(r"\s+([，。！？；：、])", r"\1", text)
+    return text.strip()
 
 
 def strip_title_segment_noise(value: str) -> str:
     text = strip_leading_date_words(value)
     text = GENERIC_TITLE_PREFIX_RE.sub("", text).strip()
+    text = TITLE_WEEKDAY_PREFIX_RE.sub("", text).strip()
     text = TITLE_DATE_PREFIX_RE.sub("", text).strip()
+    text = TITLE_WEEKDAY_PREFIX_RE.sub("", text).strip()
+    text = re.sub(r"^\s*[」】\]\)）]+", "", text).strip()
+    text = re.sub(r"^\s*[｜|丨·:：,，\-–—、/&＆]+\s*", "", text).strip()
+    text = re.sub(r"^\s*\d{1,2}\s*(?:[｜|丨·,，\-–—、&＆]|/(?![A-Za-z]))+\s*", "", text).strip()
     text = TITLE_TIME_PREFIX_RE.sub("", text).strip()
-    text = re.sub(r"^\s*[｜|·:：,，\-–—]+\s*", "", text)
-    return text.strip()
+    text = re.sub(r"^\s*[」】\]\)）]+", "", text).strip()
+    text = re.sub(r"^\s*[｜|丨·:：,，\-–—、/&＆]+\s*", "", text).strip()
+    text = re.sub(r"^\s*\d{1,2}\s*(?:[｜|丨·,，\-–—、&＆]|/(?![A-Za-z]))+\s*", "", text).strip()
+    promo = TITLE_PROMO_PREFIX_RE.sub("", text)
+    if promo and len(normalize_subject(promo)) >= 4:
+        text = promo
+    return normalize_title_spacing(text)
+
+
+def date_time_only_title(value: str) -> bool:
+    text = str(value or "").strip()
+    if not text:
+        return True
+    reduced = TITLE_WEEKDAY_PREFIX_RE.sub("", text)
+    reduced = TITLE_DATE_PREFIX_RE.sub("", reduced)
+    reduced = TITLE_TIME_PREFIX_RE.sub("", reduced)
+    reduced = re.sub(
+        r"(?:周[一二三四五六日天]|星期[一二三四五六日天]|"
+        r"Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?|"
+        r"\d{1,2}[./-]\d{1,2}|\d{1,2}\s*月\s*\d{1,2}\s*日?|\d{1,2}[:：][0-5]\d|late|am|pm)",
+        "",
+        reduced,
+        flags=re.I,
+    )
+    reduced = re.sub(r"[\s｜|/\\·:：,，.\-–—~～至到]+", "", reduced)
+    return not normalize_subject(reduced)
 
 
 def weak_title_segment(value: str) -> bool:
     normalized = normalize_subject(value)
     if not normalized:
         return True
-    return normalized in {"预告", "活动预告", "本周预告", "活动", "活动安排", "活动日程"}
+    if normalized in {
+        "预告",
+        "活动预告",
+        "本周预告",
+        "活动",
+        "活动安排",
+        "活动日程",
+        "sun",
+        "sunday",
+        "mon",
+        "monday",
+        "tue",
+        "tuesday",
+        "wed",
+        "wednesday",
+        "thu",
+        "thursday",
+        "fri",
+        "friday",
+        "sat",
+        "saturday",
+        "周一",
+        "周二",
+        "周三",
+        "周四",
+        "周五",
+        "周六",
+        "周日",
+        "周天",
+        "星期一",
+        "星期二",
+        "星期三",
+        "星期四",
+        "星期五",
+        "星期六",
+        "星期日",
+        "星期天",
+    }:
+        return True
+    if TITLE_CITY_ONLY_RE.search(str(value or "").strip()):
+        return True
+    if TITLE_STATUS_FRAGMENT_RE.search(str(value or "")):
+        return True
+    return date_time_only_title(value)
+
+
+def title_part_is_entity(value: str, candidates: list[str]) -> bool:
+    normalized = normalize_subject(value)
+    if not normalized:
+        return True
+    for candidate in candidates:
+        key = normalize_subject(candidate)
+        if key and (normalized == key or (key in normalized and len(normalized) <= len(key) + 3)):
+            return True
+    return False
+
+
+def title_line_looks_lineup_only(value: str, row: dict[str, Any]) -> bool:
+    normalized = normalize_subject(value)
+    if not normalized:
+        return True
+    names = [
+        *list_strings(row.get("lineup")),
+        *list_strings(row.get("lineup_artists")),
+        *list_strings(row.get("poster_vl_lineup")),
+    ]
+    if len(names) < 2:
+        return False
+    remainder = normalized
+    matched = 0
+    for name in names:
+        key = normalize_subject(name)
+        if key and key in remainder:
+            matched += 1
+            remainder = remainder.replace(key, "")
+    for signal in [
+        first_string(row.get("account_key"), row.get("account")),
+        first_string(row.get("account_nickname")),
+        first_string(row.get("promoter")),
+        first_string(row.get("venue_name")),
+        *list_strings(row.get("venue")),
+        *list_strings(row.get("city")),
+    ]:
+        key = normalize_subject(signal)
+        if key:
+            remainder = remainder.replace(key, "")
+    remainder = re.sub(r"(?:dj|djs|live|b2b|vs|and|with|guest|guests|lineup|阵容)", "", remainder, flags=re.I)
+    remainder = re.sub(r"\d{1,4}", "", remainder)
+    return matched >= 2 and not remainder
+
+
+def title_line_looks_address(value: str) -> bool:
+    text = first_string(value).strip()
+    if not text:
+        return False
+    if re.search(r"^\s*(?:地址|add(?:ress)?\.?)\s*[:：]", text, re.I):
+        return True
+    if re.search(r"\b(?:avenue|road|street|district|floor|unit|building|shopping\s+center|book\s+shopping\s+center|no\.\s*\d+)\b", text, re.I):
+        return True
+    tokens = TITLE_ADDRESS_TOKEN_RE.findall(text)
+    if len(tokens) >= 3:
+        return True
+    return bool(
+        len(tokens) >= 2
+        and re.search(
+            r"^\s*(?:北京|上海|广州|深圳|杭州|成都|重庆|南京|武汉|长沙|天津|西安|厦门|大理|"
+            r"beijing|shanghai|guangzhou|shenzhen|hangzhou|chengdu|chongqing|nanjing|wuhan|changsha|tianjin|xian|xiamen)",
+            text,
+            re.I,
+        )
+    )
+
+
+def poster_evidence_title_lines(row: dict[str, Any]) -> list[str]:
+    evidence = row.get("poster_selection_evidence")
+    if not isinstance(evidence, dict):
+        return []
+    lines: list[str] = []
+    for key in ("event_title", "title", "poster_title"):
+        value = first_string(evidence.get(key))
+        if value:
+            lines.append(value)
+    lines.extend(list_strings(evidence.get("visible_text_lines"), limit=24))
+    lines.extend(list_strings(evidence.get("evidence"), limit=24))
+    return lines
+
+
+def clean_poster_title_candidate(value: str, row: dict[str, Any]) -> str:
+    text = first_string(value).strip().strip("'\"")
+    if not text:
+        return ""
+    text = re.sub(r"(?i)^\s*(?:candidate\s+)?(?:event_)?title\s*[:：]\s*", "", text).strip("'\" ")
+    if re.search(r"[:：]", text):
+        head, tail = re.split(r"[:：]", text, maxsplit=1)
+        if weak_title_segment(head) or re.search(r"not\s+necessary|calendar|schedule", head, re.I):
+            text = tail.strip()
+    if TITLE_EVIDENCE_REJECT_RE.search(text):
+        return ""
+    if title_line_looks_address(text):
+        return ""
+    cleaned = strip_title_segment_noise(text).strip("'\" ")
+    cleaned = re.sub(r"^\s*[「【\[]?\s*(?:周[一二三四五六日天]|星期[一二三四五六日天])\s*[」】\]]?\s*", "", cleaned)
+    cleaned = TITLE_DATE_PREFIX_RE.sub("", cleaned).strip("'\" ")
+    cleaned = normalize_title_spacing(cleaned)
+    cleaned = re.sub(r"\s*[｜|丨·:：,，\-–—、/&＆]+\s*$", "", cleaned).strip()
+    if weak_title_segment(cleaned):
+        return ""
+    if title_line_looks_lineup_only(cleaned, row):
+        return ""
+    if title_line_looks_address(cleaned):
+        return ""
+    if len(cleaned) < 3 or len(cleaned) > 80:
+        return ""
+    return cleaned
+
+
+def poster_evidence_display_title(row: dict[str, Any]) -> str:
+    scored: list[tuple[int, int, str]] = []
+    seen: set[str] = set()
+    for index, line in enumerate(poster_evidence_title_lines(row)):
+        candidate = clean_poster_title_candidate(line, row)
+        if not candidate:
+            continue
+        key = normalize_subject(candidate)
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        score = 40
+        if TITLE_EVIDENCE_BOOST_RE.search(f" {candidate} "):
+            score = 100 + min(len(candidate), 64)
+        if re.search(r"\d{1,2}[./-]\d{1,2}|\d{1,2}\s*月\s*\d{1,2}", candidate):
+            score -= 15
+        scored.append((score, -index, candidate))
+    if not scored:
+        return ""
+    scored.sort(reverse=True)
+    primary = scored[0][2]
+    for _, _, extra in scored[1:4]:
+        if len(primary) + len(extra) + 3 > 64:
+            continue
+        primary_key = normalize_subject(primary)
+        extra_key = normalize_subject(extra)
+        if extra_key in primary_key or primary_key in extra_key:
+            continue
+        if TITLE_EVIDENCE_BOOST_RE.search(f" {extra} "):
+            return f"{primary} / {extra}"
+    return primary
+
+
+def lineup_display_title(row: dict[str, Any]) -> str:
+    lineup = list_strings(row.get("lineup_artists")) or list_strings(row.get("lineup")) or list_strings(row.get("poster_vl_lineup"))
+    if not lineup:
+        return ""
+    if len(lineup) <= 5:
+        return " / ".join(lineup)
+    return " / ".join(lineup[:4]) + " 等"
 
 
 def display_title(row: dict[str, Any]) -> str:
     raw = first_string(row.get("title"))
     candidates = [
         first_string(row.get("account_key"), row.get("account")),
+        first_string(row.get("account_nickname")),
         first_string(row.get("promoter")),
+        first_string(row.get("venue_name")),
         *list_strings(row.get("venue")),
         *list_strings(row.get("city")),
     ]
     parts = [part.strip() for part in re.split(r"[｜|]", raw) if part.strip()]
+    split_parts_checked = len(parts) >= 2
     if len(parts) >= 2:
         usable_parts: list[str] = []
         for index, part in enumerate(parts):
             cleaned = strip_title_segment_noise(part)
             if weak_title_segment(cleaned):
                 continue
-            if index == 0 and any(normalized_contains(cleaned or part, candidate) for candidate in candidates if candidate):
+            if title_part_is_entity(cleaned or part, candidates):
                 continue
             usable_parts.append(cleaned)
         if usable_parts:
             return " | ".join(usable_parts).strip()
 
     title = strip_title_segment_noise(raw)
-    return title or raw or "活动"
+    if title and not split_parts_checked and not weak_title_segment(title):
+        return title
+    evidence_title = poster_evidence_display_title(row)
+    if evidence_title:
+        return evidence_title
+    lineup_title = lineup_display_title(row)
+    if lineup_title:
+        return lineup_title
+    return raw or "活动"
 
 
 def visible_account_key(row: dict[str, Any]) -> str:
@@ -1432,7 +1913,19 @@ def calendar_preview_text(row: dict[str, Any]) -> str:
     )
 
 
+def row_llm_parent_overview_classification(row: dict[str, Any]) -> str:
+    decision = row.get("sanji_parent_overview_llm_decision")
+    if not isinstance(decision, dict):
+        return ""
+    return normalize_subject(first_string(decision.get("classification")))
+
+
 def row_is_calendar_preview(row: dict[str, Any]) -> bool:
+    llm_classification = row_llm_parent_overview_classification(row)
+    if llm_classification in {"singleevent", "event", "activity", "normalevent", "notparentoverview"}:
+        return False
+    if llm_classification in {"parentoverview", "cluboverview", "roundup", "aggregateparent", "overview"}:
+        return True
     text = calendar_preview_text(row)
     return bool(text and CALENDAR_PREVIEW_RE.search(text))
 
@@ -1475,6 +1968,29 @@ def calendar_preview_can_enter_publish_gate(row: dict[str, Any]) -> bool:
     return True
 
 
+def calendar_preview_has_strong_single_event_evidence(row: dict[str, Any]) -> bool:
+    if row.get("aggregation_parent") or row.get("publish_blocked"):
+        return False
+    date_values = list_strings(row.get("event_date_text")) or list_strings(row.get("date_text")) or infer_date_values(row)
+    if len(date_values) != 1:
+        return False
+    if not list_strings(row.get("venue")):
+        return False
+    evidence = row.get("poster_selection_evidence")
+    poster_lineup: list[str] = []
+    if isinstance(evidence, dict):
+        poster_lineup = list_strings(evidence.get("cleaned_lineup")) or list_strings(evidence.get("lineup_evidence"))
+    return bool(
+        first_string(row.get("event_title"))
+        and (
+            list_strings(row.get("lineup"))
+            or list_strings(row.get("lineup_artists"))
+            or list_strings(row.get("poster_vl_lineup"))
+            or poster_lineup
+        )
+    )
+
+
 def row_is_aggregate_child(row: dict[str, Any], item_id: str = "") -> bool:
     candidate_id = first_string(item_id, row.get("queue_id"), row.get("article_id"))
     return bool(
@@ -1484,9 +2000,36 @@ def row_is_aggregate_child(row: dict[str, Any], item_id: str = "") -> bool:
     )
 
 
+def row_is_longform_column_article(row: dict[str, Any]) -> bool:
+    texts = [
+        first_string(row.get("title")),
+        first_string(row.get("title_display")),
+        first_string(row.get("account_key"), row.get("account"), row.get("account_nickname")),
+        *list_strings(row.get("description_original_lines"), limit=8),
+        *list_strings(row.get("evidence"), limit=12),
+        first_string(row.get("_source_queue_text"))[:4000],
+    ]
+    text = " | ".join(value for value in texts if value)
+    if not re.search(r"阅读时间|字数[:：]|知识专栏|byyb\.radio|专栏\s*EP\.?\s*\d+", text, re.I):
+        return False
+    has_event_anchor = bool(
+        extract_event_time(row)
+        or list_strings(row.get("venue"))
+        or first_string(row.get("address"))
+        or list_strings(row.get("lineup"))
+        or clean_price_items(row)
+    )
+    return not has_event_anchor
+
+
 def row_is_publish_blocked(row: dict[str, Any]) -> bool:
-    if row_is_calendar_preview(row):
+    if row_is_longform_column_article(row):
         return True
+    if row_is_calendar_preview(row):
+        return not (
+            calendar_preview_can_enter_publish_gate(row)
+            and calendar_preview_has_strong_single_event_evidence(row)
+        )
     if row.get("aggregation_parent"):
         return not calendar_preview_can_enter_publish_gate(row)
     if row.get("publish_blocked") or row.get("aggregation_child_review"):
@@ -1494,6 +2037,18 @@ def row_is_publish_blocked(row: dict[str, Any]) -> bool:
             return False
         return not review_child_can_enter_publish_gate(row)
     return False
+
+
+def missing_visible_lineup_publish_block_reason(row: dict[str, Any], item: dict[str, Any]) -> str:
+    if list_strings(item.get("lineup")) or list_strings(item.get("lineup_artists")):
+        return ""
+    evidence = row.get("poster_selection_evidence")
+    if not isinstance(evidence, dict):
+        evidence = item.get("poster_selection_evidence") if isinstance(item.get("poster_selection_evidence"), dict) else {}
+    flags = {normalize_subject(value) for value in list_strings(evidence.get("risk_flags"))}
+    if "missinglineupvisible" in flags:
+        return "missing_lineup_visible"
+    return ""
 
 
 def row_needs_ocr_review(row: dict[str, Any]) -> bool:
@@ -1789,7 +2344,7 @@ def windowed_date_guesses(item: dict[str, Any], window_start: date, window_end: 
         return []
     primary = parsed_sequence[0][1]
     in_window = [value for value, parsed in parsed_sequence if window_start <= parsed <= window_end]
-    if primary < window_start and title_has_date_range(first_string(item.get("title"), item.get("title_original"), item.get("title_display"))):
+    if primary < window_start and title_has_date_range(first_string(item.get("title_original"), item.get("title"), item.get("title_display"))):
         return in_window
     if not (window_start <= primary <= window_end):
         return []
@@ -2124,6 +2679,65 @@ def clean_lineup_values(row: dict[str, Any], lineup: list[str]) -> list[str]:
     return out
 
 
+def lineup_values_for_publish(row: dict[str, Any]) -> list[str]:
+    values: list[str] = []
+    values.extend(list_strings(row.get("lineup")))
+    values.extend(list_strings(row.get("lineup_artists")))
+    values.extend(list_strings(row.get("poster_vl_lineup")))
+    evidence = row.get("poster_selection_evidence")
+    if isinstance(evidence, dict):
+        values.extend(list_strings(evidence.get("cleaned_lineup")))
+    return clean_lineup_values(row, values)
+
+
+def sanitize_poster_selection_evidence(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        return {}
+    allowed_keys = {
+        "schema_version",
+        "selected_by",
+        "provider",
+        "model",
+        "fallback_used",
+        "main_poster_image_index",
+        "selected_sha",
+        "visible_text_lines",
+        "lineup_evidence",
+        "cleaned_lineup",
+        "evidence",
+        "risk_flags",
+        "generated_at",
+    }
+    out: dict[str, Any] = {}
+    for key in allowed_keys:
+        if key not in value:
+            continue
+        child = value.get(key)
+        if isinstance(child, list):
+            cleaned = list_strings(child, limit=20)
+            if cleaned:
+                out[key] = cleaned
+        elif isinstance(child, (str, int, float, bool)):
+            out[key] = child
+    return out
+
+
+def copy_optional_release_evidence(item: dict[str, Any], row: dict[str, Any]) -> None:
+    evidence = row.get("poster_selection_evidence")
+    sanitized = sanitize_poster_selection_evidence(evidence)
+    if sanitized:
+        item["poster_selection_evidence"] = sanitized
+        item["posterSelectionEvidence"] = sanitized
+    poster_vl_lineup = clean_lineup_values(row, list_strings(row.get("poster_vl_lineup")))
+    if poster_vl_lineup:
+        item["poster_vl_lineup"] = poster_vl_lineup
+        item["posterVlLineup"] = poster_vl_lineup
+    lineup_evidence = list_strings(row.get("poster_vl_lineup_evidence"))
+    if lineup_evidence:
+        item["poster_vl_lineup_evidence"] = lineup_evidence
+        item["posterVlLineupEvidence"] = lineup_evidence
+
+
 def dedupe_title_core(title: str) -> str:
     normalized = normalize_subject(title)
     for token in (
@@ -2160,8 +2774,122 @@ def published_dedupe_key(item: dict[str, Any]) -> str:
     return "|".join(part for part in (city_key, venue_key, date_key, title_key) if part)
 
 
+def source_alias_for_item(item: dict[str, Any]) -> dict[str, str]:
+    source_url = first_string(item.get("_source_url"))
+    url_hash = first_string((item.get("source_action") or {}).get("url_hash"))
+    if not source_url or not url_hash:
+        return {}
+    return {
+        "url_hash": url_hash,
+        "url": source_url,
+        "account_name": first_string(item.get("source_account_name")),
+        "published_at": first_string(item.get("source_published_at")),
+        "source_event_id": first_string(item.get("event_id")),
+    }
+
+
+def source_aliases_from_row(row: dict[str, Any], *, default_event_id: str = "") -> list[dict[str, str]]:
+    raw_aliases = row.get("_source_aliases") or row.get("source_aliases") or []
+    if not isinstance(raw_aliases, list):
+        return []
+    aliases: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for alias in raw_aliases:
+        if not isinstance(alias, dict):
+            continue
+        source_url = first_string(alias.get("url"), alias.get("source_url"))
+        url_hash = first_string(alias.get("url_hash"), alias.get("source_hash"), alias.get("source_url_hash"))
+        if source_url and not url_hash:
+            url_hash = sha256_short(source_url)
+        if not source_url or not url_hash or url_hash in seen:
+            continue
+        seen.add(url_hash)
+        aliases.append(
+            {
+                "url_hash": url_hash,
+                "url": source_url,
+                "account_name": first_string(alias.get("account_name"), alias.get("account")),
+                "published_at": first_string(alias.get("published_at"), alias.get("post_date")),
+                "source_event_id": first_string(alias.get("source_event_id"), alias.get("event_id"), alias.get("id"), default_event_id),
+            }
+        )
+    return aliases
+
+
+def item_source_aliases(item: dict[str, Any]) -> list[dict[str, str]]:
+    aliases: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for alias in [source_alias_for_item(item), *(item.get("_source_aliases") or [])]:
+        if not isinstance(alias, dict):
+            continue
+        url_hash = first_string(alias.get("url_hash"))
+        source_url = first_string(alias.get("url"))
+        if not url_hash or not source_url or url_hash in seen:
+            continue
+        seen.add(url_hash)
+        aliases.append(
+            {
+                "url_hash": url_hash,
+                "url": source_url,
+                "account_name": first_string(alias.get("account_name")),
+                "published_at": first_string(alias.get("published_at")),
+                "source_event_id": first_string(alias.get("source_event_id")),
+            }
+        )
+    return aliases
+
+
+def merge_item_source_aliases(target: dict[str, Any], source: dict[str, Any]) -> None:
+    aliases = item_source_aliases(target)
+    seen = {alias["url_hash"] for alias in aliases}
+    for alias in item_source_aliases(source):
+        if alias["url_hash"] in seen:
+            continue
+        seen.add(alias["url_hash"])
+        aliases.append(alias)
+    if aliases:
+        target["_source_aliases"] = aliases
+
+
 def dedupe_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
     best_by_key: dict[str, dict[str, Any]] = {}
+
+    def is_aggregate_child_item(item: dict[str, Any]) -> bool:
+        return bool(item.get("aggregation_child") or first_string(item.get("id"), item.get("event_id")).startswith("agg-child-"))
+
+    def normalized_lineup_key(item: dict[str, Any]) -> str:
+        raw_values: list[Any] = []
+        for key in ("lineup", "lineup_artists", "poster_vl_lineup"):
+            value = item.get(key)
+            if isinstance(value, list):
+                raw_values.extend(value)
+            elif isinstance(value, str):
+                raw_values.append(value)
+        names: list[str] = []
+        for value in raw_values:
+            for part in re.split(r"[/,，、|｜]+", str(value or "")):
+                normalized = normalize_subject(part)
+                if normalized and normalized not in names:
+                    names.append(normalized)
+        if len(names) < 2:
+            return ""
+        return "|".join(sorted(names))
+
+    def title_quality(item: dict[str, Any]) -> int:
+        title = first_string(item.get("title_display"), item.get("title"))
+        title_core = dedupe_title_core(title)
+        if not title_core:
+            return 0
+        venue = normalize_subject(first_string(item.get("venue_name")))
+        account = normalize_subject(first_string(item.get("account"), item.get("source_account_name")))
+        normalized_title = normalize_subject(title_core)
+        penalty = 0
+        if normalized_title and normalized_title in {venue, account}:
+            penalty += 80
+        lineup_key = normalized_lineup_key(item)
+        if lineup_key and normalized_title and normalized_title.replace(" ", "") in lineup_key.replace("|", ""):
+            penalty += 40
+        return max(0, min(len(title_core), 120) - penalty)
 
     def dedupe_key(item: dict[str, Any]) -> str:
         title = dedupe_title_core(first_string(item.get("title_display"), item.get("title")))
@@ -2169,15 +2897,20 @@ def dedupe_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
         dates = item.get("event_date_iso_guesses") if isinstance(item.get("event_date_iso_guesses"), list) else []
         date_key = "|".join(value for value in dates if isinstance(value, str)) or first_string(item.get("event_date_iso_guess"))
         venue_key = normalize_subject(first_string(item.get("venue_id"), item.get("venue_name")))
+        lineup_key = normalized_lineup_key(item)
+        if venue_key and date_key and lineup_key:
+            return f"{venue_key}|{date_key}|lineup:{lineup_key}"
         if venue_key and date_key and title:
             return f"{venue_key}|{date_key}|{title}"
         return f"{promoter}|{title}|{date_key}"
 
-    def score(item: dict[str, Any]) -> tuple[float, int, int, str]:
+    def score(item: dict[str, Any]) -> tuple[float, int, int, int, int, str]:
         lineup_count = len(item.get("lineup") if isinstance(item.get("lineup"), list) else [])
         evidence_count = len(item.get("evidence") if isinstance(item.get("evidence"), list) else [])
         return (
+            0 if is_aggregate_child_item(item) else 1,
             float(item.get("_score_confidence") or 0),
+            title_quality(item),
             lineup_count,
             evidence_count,
             first_string(item.get("post_date")),
@@ -2187,8 +2920,23 @@ def dedupe_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
         key = dedupe_key(item)
         current = best_by_key.get(key)
         if current is None or score(item) > score(current):
+            if current is not None:
+                merge_item_source_aliases(item, current)
             best_by_key[key] = item
-    return list(best_by_key.values())
+        else:
+            merge_item_source_aliases(current, item)
+
+    best_by_published_key: dict[str, dict[str, Any]] = {}
+    for item in best_by_key.values():
+        key = published_dedupe_key(item)
+        current = best_by_published_key.get(key)
+        if current is None or score(item) > score(current):
+            if current is not None:
+                merge_item_source_aliases(item, current)
+            best_by_published_key[key] = item
+        else:
+            merge_item_source_aliases(current, item)
+    return list(best_by_published_key.values())
 
 
 def route_url(base_url: str, route: str) -> str:
@@ -2242,8 +2990,8 @@ def build_item(
     date_guesses = infer_date_values(row)
     primary_date = date_guesses[0] if date_guesses else ""
     item_route = f"by-id/{slugify(item_id, fallback='item')}.json"
-    title = first_string(row.get("title"))
-    title_for_display = display_title(row)
+    title_original = first_string(row.get("title"))
+    title_for_display = display_title(row) or title_original
     source_url = first_string(row.get("source_url"))
     is_aggregate_child = row_is_aggregate_child(row, item_id)
     source_hash = "" if is_aggregate_child else sha256_short(source_url)
@@ -2256,7 +3004,7 @@ def build_item(
         else first_string(first_list_string(row.get("venue")), account_name)
     )
     address_full, address_source = choose_address(first_string(row.get("address")), registry_venue)
-    lineup_artists = clean_lineup_values(row, list_strings(row.get("lineup")))
+    lineup_artists = lineup_values_for_publish(row)
     source_grounded_bio_lines = dj_bio_lines(row, lineup_artists)
     artist_profiles = artist_profiles_from_row(row)
     music_styles = infer_music_styles(row)
@@ -2283,8 +3031,8 @@ def build_item(
         "event_id": item_id,
         "article_id": article_id,
         "queue_id": queue_id,
-        "title": title,
-        "title_original": title,
+        "title": title_for_display,
+        "title_original": title_original,
         "title_display": title_for_display,
         "account": account_name,
         "account_key": account_key,
@@ -2354,6 +3102,10 @@ def build_item(
         "detail_path": item_route,
         "detail_url": route_url(base_url, item_route),
     }
+    source_aliases = source_aliases_from_row(row, default_event_id=item_id)
+    if source_aliases:
+        item["_source_aliases"] = source_aliases
+    copy_optional_release_evidence(item, row)
     item["dedupe_key"] = published_dedupe_key(item)
     return item
 
@@ -2380,6 +3132,51 @@ def clean_generated_json_dirs(out_dir: Path) -> None:
                 path.unlink()
 
 
+def build_filter_disposition(row: dict[str, Any], reason: str, item: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Keep a minimal, URL-free audit trail for rows excluded by the builder."""
+    source_hashes: set[str] = set()
+
+    def add_hash(value: Any) -> None:
+        text = first_string(value)
+        if SOURCE_HASH_VALUE_RE.fullmatch(text):
+            source_hashes.add(text.lower())
+
+    def add_source(source: dict[str, Any]) -> None:
+        source_url = first_string(source.get("source_url"), source.get("url"), source.get("link"), source.get("original_url"))
+        if source_url:
+            source_hashes.add(sha256_short(source_url))
+        for key in ("url_hash", "source_hash", "source_url_hash", "article_hash", "link_hash"):
+            add_hash(source.get(key))
+
+    add_source(row)
+    for field in ("source_hashes", "source_alias_hashes", "merged_source_hashes"):
+        for value in list_strings(row.get(field)):
+            add_hash(value)
+    for field in ("_source_aliases", "source_aliases", "source_queue_aliases"):
+        aliases = row.get(field)
+        if not isinstance(aliases, list):
+            continue
+        for alias in aliases:
+            if isinstance(alias, dict):
+                add_source(alias)
+            else:
+                add_hash(alias)
+    if isinstance(item, dict):
+        add_hash((item.get("source_action") or {}).get("url_hash"))
+        add_hash((item.get("source_article") or {}).get("url_hash"))
+        for alias in item_source_aliases(item):
+            add_hash(alias.get("url_hash"))
+
+    hashes = sorted(value for value in source_hashes if value)
+    return {
+        "id": first_string((item or {}).get("id"), row.get("id"), row.get("event_id"), row.get("queue_id")),
+        "article_id": first_string((item or {}).get("article_id"), row.get("article_id")),
+        "source_hash": hashes[0] if hashes else "",
+        "removed_source_hashes": hashes,
+        "reason": reason,
+    }
+
+
 def build_static_api(
     *,
     pack_dir: Path,
@@ -2391,6 +3188,7 @@ def build_static_api(
     window_days: int,
     inactive_registry_path: Path | None,
     deleted_source_registry_path: Path | None,
+    source_policy_path: Path | None,
     source_queue_path: Path | None,
     venue_registry_path: Path | None,
     account_registry_path: Path | None,
@@ -2403,27 +3201,45 @@ def build_static_api(
     if source_queue_lookup:
         rows = [merge_source_queue_fields(row, source_queue_lookup) for row in rows]
     source_queue_match_count = sum(1 for row in rows if first_string(row.get("_source_queue_text")))
+    usage_sidecars: dict[str, str] = {}
+    for name in USAGE_SIDECAR_FILENAMES:
+        src = pack_dir / name
+        if src.exists() and src.is_file():
+            dst = out_dir / name
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+            usage_sidecars[name] = str(dst)
     inactive_registry = load_inactive_registry(inactive_registry_path)
     deleted_source_registry = load_deleted_source_registry(deleted_source_registry_path)
+    source_policy = load_source_policy(source_policy_path)
     venue_registry = load_venue_registry(venue_registry_path)
     account_registry = load_account_registry(account_registry_path)
     window_end = window_start + timedelta(days=max(1, window_days) - 1)
     raw_items: list[dict[str, Any]] = []
     filtered_counts: dict[str, int] = defaultdict(int)
+    filtered_items: list[dict[str, Any]] = []
+
+    def filter_out(row: dict[str, Any], reason: str, item: dict[str, Any] | None = None) -> None:
+        filtered_counts[reason] += 1
+        filtered_items.append(build_filter_disposition(row, reason, item))
+
     for row in rows:
         if row_needs_ocr_review(row):
-            filtered_counts["needs_ocr_review"] += 1
+            filter_out(row, "needs_ocr_review")
+            continue
+        if row_is_longform_column_article(row):
+            filter_out(row, "longform_column_article")
             continue
         if row_is_publish_blocked(row):
-            filtered_counts["publish_blocked"] += 1
+            filter_out(row, "publish_blocked")
             continue
         reason = inactive_reason(row, inactive_registry)
         if reason:
-            filtered_counts[reason] += 1
+            filter_out(row, reason)
             continue
         reason = source_unavailable_reason(row, deleted_source_registry)
         if reason:
-            filtered_counts[reason] += 1
+            filter_out(row, reason)
             continue
         item = build_item(
             row,
@@ -2434,20 +3250,28 @@ def build_static_api(
         )
         is_aggregate_child = row_is_aggregate_child(row, first_string(item.get("id")))
         if not first_string(row.get("source_url")):
-            filtered_counts["missing_source_url"] += 1
+            filter_out(row, "missing_source_url", item)
             continue
         if not first_string((item.get("source_action") or {}).get("url_hash")) and not is_aggregate_child:
-            filtered_counts["missing_source_url"] += 1
+            filter_out(row, "missing_source_url", item)
             continue
         if not item.get("event_date_text"):
-            filtered_counts["missing_source_date"] += 1
+            filter_out(row, "missing_source_date", item)
             continue
         in_window_dates = windowed_date_guesses(item, window_start, window_end)
         if not in_window_dates:
-            filtered_counts["outside_date_window"] += 1
+            filter_out(row, "outside_date_window", item)
             continue
         if not item.get("city_keys"):
-            filtered_counts["missing_city"] += 1
+            filter_out(row, "missing_city", item)
+            continue
+        reason = missing_visible_lineup_publish_block_reason(row, item)
+        if reason:
+            filter_out(row, reason, item)
+            continue
+        reason = non_target_activity_reason(row, item, source_policy)
+        if reason:
+            filter_out(row, reason, item)
             continue
         is_calendar_preview = row_is_calendar_preview(row)
         item["event_date_iso_guess"] = in_window_dates[0]
@@ -2458,7 +3282,7 @@ def build_static_api(
         if not item.get("address_full"):
             announcement_reason = non_local_announcement_reason(row, item)
             if announcement_reason:
-                filtered_counts[announcement_reason] += 1
+                filter_out(row, announcement_reason, item)
                 continue
             filtered_counts["missing_address_warning"] += 1
         if not item.get("running_hours_text"):
@@ -2466,27 +3290,37 @@ def build_static_api(
         raw_items.append(item)
     # Pre-dedupe by article_id: same article pushed multiple times = 1 event
     seen_articles: set[str] = set()
+    item_by_article_id: dict[str, dict[str, Any]] = {}
     article_deduped: list[dict[str, Any]] = []
     for item in raw_items:
         aid = first_string(item.get("article_id"))
         if aid and aid in seen_articles:
+            merge_item_source_aliases(item_by_article_id[aid], item)
             continue
         if aid:
             seen_articles.add(aid)
+            item_by_article_id[aid] = item
         article_deduped.append(item)
     items = sort_items(dedupe_items(article_deduped))[:max_items]
     source_map: dict[str, dict[str, Any]] = {}
     for item in items:
-        source_url = first_string(item.pop("_source_url", ""))
-        url_hash = first_string((item.get("source_action") or {}).get("url_hash"))
-        if source_url and url_hash:
+        aliases = item_source_aliases(item)
+        canonical_event_id = first_string(item.get("event_id"))
+        for alias in aliases:
+            url_hash = first_string(alias.get("url_hash"))
+            source_url = first_string(alias.get("url"))
+            if not source_url or not url_hash:
+                continue
             source_map[url_hash] = {
                 "type": "wechat_article",
                 "url": source_url,
-                "account_name": first_string(item.get("source_account_name")),
-                "published_at": first_string(item.get("source_published_at")),
-                "event_id": first_string(item.get("event_id")),
+                "account_name": first_string(alias.get("account_name")),
+                "published_at": first_string(alias.get("published_at")),
+                "event_id": canonical_event_id,
+                "source_event_id": first_string(alias.get("source_event_id")),
             }
+        item.pop("_source_url", None)
+        item.pop("_source_aliases", None)
         item.pop("_score_confidence", None)
     schema_issues = validate_published_items(items)
     raise_for_issues(schema_issues)
@@ -2513,6 +3347,15 @@ def build_static_api(
         "source_count": len(source_map),
         "sources": source_map,
     }
+    build_filter_dispositions = {
+        "schema_version": "weekly_activity_build_filter_dispositions.v1",
+        "generated_at": generated_at,
+        "source_pack_dir": str(pack_dir),
+        "filtered_item_count": len(filtered_items),
+        "filtered_counts": dict(sorted(filtered_counts.items())),
+        "filtered_items": filtered_items,
+    }
+    write_json(out_dir / "build_filter_dispositions.json", build_filter_dispositions)
     private_source_dir = out_dir.parent / "source_actions"
     static_source_dir = out_dir / "source_actions"
     write_json(private_source_dir / "source_url_map.json", source_map_payload)
@@ -2620,8 +3463,11 @@ def build_static_api(
         "window_end": window_end.isoformat(),
         "item_count": len(items),
         "filtered_counts": dict(sorted(filtered_counts.items())),
+        "build_filter_dispositions_path": "build_filter_dispositions.json",
+        "build_filter_disposition_count": len(filtered_items),
         "deleted_source_registry_path": str(deleted_source_registry_path) if deleted_source_registry_path else "",
         "deleted_source_registry_count": len(deleted_source_registry),
+        "source_policy_path": str(source_policy_path) if source_policy_path else "",
         "source_queue_path": str(source_queue_path) if source_queue_path else "",
         "source_queue_match_count": source_queue_match_count,
         "venue_registry_path": str(venue_registry_path) if venue_registry_path else "",
@@ -2637,6 +3483,7 @@ def build_static_api(
             "by_date_index": route_url(base_url, "by-date/index.json"),
             "weekly_entity_snapshot": route_url(base_url, "weekly_entity_snapshot.json"),
             "source_url_map": route_url(base_url, "source_actions/source_url_map.json"),
+            "build_filter_dispositions": route_url(base_url, "build_filter_dispositions.json"),
         },
         "source_summary": {
             "weekly_queue_total": source_summary.get("weekly_queue_total"),
@@ -2645,6 +3492,7 @@ def build_static_api(
             "review_candidates": source_summary.get("review_candidates"),
             "source_rows_loaded": len(rows),
         },
+        "usage_sidecars": usage_sidecars,
     }
     write_json(out_dir / "manifest.json", manifest)
     summary = {
@@ -2674,6 +3522,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--inactive-registry", default="", help="Optional JSON file with closed/inactive accounts and venues")
     parser.add_argument("--deleted-source-registry", default="", help="Optional JSON/JSONL file with deleted or unavailable source URLs/hashes")
     parser.add_argument(
+        "--source-policy",
+        default=str(DEFAULT_SOURCE_POLICY),
+        help="Optional Sanji source/content policy JSON. Defaults to weekly_sanji_source_policy.json.",
+    )
+    parser.add_argument(
         "--source-queue",
         default=str(DEFAULT_SOURCE_QUEUE) if DEFAULT_SOURCE_QUEUE.exists() else "",
         help="Optional latest downloaded article queue JSONL; used read-only to recover source-backed ticketing text",
@@ -2700,6 +3553,7 @@ def main(argv: list[str] | None = None) -> int:
         window_days=max(1, args.window_days),
         inactive_registry_path=Path(args.inactive_registry) if args.inactive_registry else None,
         deleted_source_registry_path=Path(args.deleted_source_registry) if args.deleted_source_registry else None,
+        source_policy_path=Path(args.source_policy) if args.source_policy else None,
         source_queue_path=Path(args.source_queue) if args.source_queue else None,
         venue_registry_path=Path(args.venue_registry) if args.venue_registry else None,
         account_registry_path=Path(args.account_registry) if args.account_registry else None,

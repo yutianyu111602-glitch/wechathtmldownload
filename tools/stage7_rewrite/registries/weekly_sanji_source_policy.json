@@ -1,0 +1,97 @@
+{
+  "schema_version": "weekly_sanji_source_policy.v2",
+  "updated_at": "2026-07-12T12:30:00+08:00",
+  "notes": "Sanji daily publish source policy. Block clearly out-of-scope accounts at export/source level; filter mixed accounts at article level. v2: added special_curated_accounts for DONG/我只会为你心动 and recurring editorial music-release announcement filtering.",
+  "blocked_accounts": [
+    "光芒enlightening"
+  ],
+  "blocked_account_fakeids": [
+    "Mzg2Nzk0MDMyNw=="
+  ],
+  "blocked_source_hashes": [
+    "9145e8b9ae36ff68",
+    "88ef2cb0ea937ed2",
+    "040cf81d2496efaa",
+    "3501add74449bda6",
+    "be0588b1b49627eb",
+    "4038957804fbc423",
+    "a8c6a3e5ac7458e5",
+    "772263336dd90678",
+    "ff50cfbb1efdbecc",
+    "08c257cfeec3366e",
+    "67494b3e6e712f6b",
+    "87bf84b072916405",
+    "2a9239eebae37872"
+  ],
+  "blocked_source_hash_notes": {
+    "9145e8b9ae36ff68": "Rust Club article is a youth music wave with guest bands/rappers; not a source-grounded DJ/electronic club listing.",
+    "88ef2cb0ea937ed2": "International Beatles Day record-store/live-band themed article; outside HUAIDJ electronic club feed.",
+    "040cf81d2496efaa": "Film screening from non-curated account; outside HUAIDJ feed. (Curated accounts like DONG bypass this at article level.)",
+    "3501add74449bda6": "CAPSULE weekly preview parent/overview; should not enter ordinary city/date feed.",
+    "be0588b1b49627eb": "Bar.SOS overseas Chiang Mai bartending guest shift; Qwen VL flags not_china_event and bartending_event_not_dj.",
+    "4038957804fbc423": "wigwam recruitment/part-time hiring notice.",
+    "a8c6a3e5ac7458e5": "THE WINDOW ticket giveaway/festival announcement article, not a city club event listing.",
+    "772263336dd90678": "Knock OpenDeck signup article has no source-grounded lineup; Qwen VL flags missing_lineup_visible.",
+    "ff50cfbb1efdbecc": "DEEPCOOL DJ CHOPKO guest article is hip-hop focused; quality gate flagged non_target_activity_hiphop for the 2026-07-01 weekly package.",
+    "08c257cfeec3366e": "ShyPeople Leonwill solo EP release announcement; Qwen VL evidence flags not_an_event with no physical event, venue, or ticket information.",
+    "67494b3e6e712f6b": "OIL Tommy Genesis China tour article is Trap/rap focused; source title says Trap说唱女王 and is outside the HUAIDJ electronic club feed.",
+    "87bf84b072916405": "Rust Club 雨夜缓拍 was flagged by release quality gate as non_target_activity_hiphop in the 2026-07-09 package run.",
+    "2a9239eebae37872": "CaveCave 7.9 article is a film viewing post; Qwen VL evidence flags not_music_event with no DJ/live music lineup."
+  },
+  "blocked_venues": [
+    "光芒喜剧脱口秀(体育西路广州购书中心店)",
+    "光芒喜剧脱口秀",
+    "光芒·喜闻乐见"
+  ],
+  "special_curated_accounts": [
+    {
+      "fakeid": "MzU0ODY3NjcyMw==",
+      "nickname": "我只会为你心动",
+      "venue": "DONG / 门洞",
+      "notes": "Mixed venue: electronic events + film/documentary screenings. Both categories are in-scope. Only pure-admin posts (菜单/招聘/营业时间) should be excluded.",
+      "bypass_non_event_re": true,
+      "admin_block_terms": ["菜单", "酒水单", "招聘", "招募", "营业时间", "兼职", "店休"]
+    }
+  ],
+  "unfollow_recommended_in_sanji_ui": [
+    {
+      "account_name": "光芒enlightening",
+      "fakeid": "Mzg2Nzk0MDMyNw==",
+      "reason": "Venue/account is primarily comedy/classical/jazz/live-studio content, outside HUAIDJ underground electronic activity feed."
+    }
+  ],
+  "article_level_block_categories": {
+    "standup_comedy": ["脱口秀", "喜剧", "stand-up", "standup", "comedy"],
+    "folk": ["民谣", "folk"],
+    "rock": ["摇滚", "rock", "朋克", "punk", "后摇", "post-rock", "乐队专场"],
+    "hiphop": ["hiphop", "hip-hop", "hip hop", "嘻哈", "说唱", "rap show", "rapper"],
+    "quiet_bar": ["静吧", "清吧", "小酒馆", "民谣酒馆"],
+    "live_band_acoustic": ["迷幻吉他", "灵魂吟唱", "实验即兴", "唱作", "不插电", "原声现场", "吉他弹唱"],
+    "classical_or_concert": ["古典", "交响", "管弦", "弦乐", "贝多芬", "莫扎特", "肖邦", "音乐会"],
+    "jazz_swing": ["爵士大乐队", "爵士现场", "swing音乐", "swing dance", "jazz night"],
+    "editorial_release": ["发布全新 ep", "全新 ep 发布", "新 ep 发布", "发布全新单曲", "全新单曲发布", "发布全新专辑", "全新专辑发布", "新专辑上线", "新单曲上线"],
+    "recruitment_notice": ["招募中", "招募 dj", "dj 招募", "open decks 招募", "open deck 招募"]
+  },
+  "electronic_keep_terms": [
+    "techno",
+    "house",
+    "trance",
+    "dnb",
+    "drum and bass",
+    "bass music",
+    "breakbeat",
+    "electro",
+    "rave",
+    "club night",
+    "dj set",
+    "open decks",
+    "four on the floor",
+    "disco",
+    "reggae",
+    "电子",
+    "电音",
+    "浩室",
+    "锐舞",
+    "雷鬼"
+  ]
+}

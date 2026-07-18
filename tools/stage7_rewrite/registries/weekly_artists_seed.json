@@ -1,0 +1,74 @@
+{
+  "schema_version": "weekly_artist_registry.v1",
+  "updated_at": "2026-05-08",
+  "notes": [
+    "Starter artist registry for HUAIDJ weekly publication.",
+    "Manual bios should be added only after source or user verification. Empty bio_manual is allowed."
+  ],
+  "blocked_lineup_terms": [
+    "AURORA BJ",
+    "Night Tour",
+    "夜游",
+    "POTENT",
+    "OONOO",
+    "OONOO CLUB",
+    "KEY JINAN",
+    "ILLUM Shanghai",
+    "Dada Bar Beijing",
+    "Dada Kunming",
+    "Dada Shanghai",
+    "DIRTY HOUSE 得体",
+    "VERVO国际独立电音俱乐部",
+    "POOLS",
+    "武宫",
+    "loopy Club",
+    "工GONG",
+    "Cs Bar",
+    "糊游ROAM",
+    "wigwam",
+    "上海",
+    "北京",
+    "成都",
+    "长沙",
+    "济南",
+    "昆明"
+  ],
+  "artists": [
+    {
+      "artist_id": "farhan",
+      "canonical_name": "Farhan",
+      "aliases": [],
+      "bio_manual": "",
+      "style_tags": [],
+      "status": "review",
+      "last_verified_at": ""
+    },
+    {
+      "artist_id": "kevin_shao",
+      "canonical_name": "Kevin Shao",
+      "aliases": [],
+      "bio_manual": "",
+      "style_tags": [],
+      "status": "review",
+      "last_verified_at": ""
+    },
+    {
+      "artist_id": "fat_k",
+      "canonical_name": "Fat-K",
+      "aliases": ["Fat K"],
+      "bio_manual": "",
+      "style_tags": [],
+      "status": "review",
+      "last_verified_at": ""
+    },
+    {
+      "artist_id": "blue_shift",
+      "canonical_name": "BLUE SHIFT",
+      "aliases": ["蓝色偏移"],
+      "bio_manual": "",
+      "style_tags": [],
+      "status": "review",
+      "last_verified_at": ""
+    }
+  ]
+}
