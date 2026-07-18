@@ -701,6 +701,18 @@ def _child_env() -> dict[str, str]:
     return env
 
 
+def _emit(text: str) -> None:
+    """Write child output without crashing on a legacy Windows console codec."""
+    if not text or sys.stdout is None:
+        return
+    encoding = getattr(sys.stdout, "encoding", None)
+    rendered = text
+    if encoding:
+        rendered = text.encode(encoding, errors="replace").decode(encoding, errors="replace")
+    sys.stdout.write(rendered)
+    sys.stdout.flush()
+
+
 def main() -> int:
     try:
         result = subprocess.run(
@@ -713,18 +725,18 @@ def main() -> int:
             env=_child_env(),
         )
     except subprocess.TimeoutExpired as exc:
-        print(f"HUAIDJ CloudRun API / Data freshness health timed out: {exc}")
+        _emit(f"HUAIDJ CloudRun API / Data freshness health timed out: {exc}\\n")
         return 124
     except Exception as exc:
-        print(f"HUAIDJ CloudRun API / Data freshness health launch failed: {exc}")
+        _emit(f"HUAIDJ CloudRun API / Data freshness health launch failed: {exc}\\n")
         return 2
     if result.stdout:
-        print(result.stdout, end="")
+        _emit(result.stdout)
     if result.returncode != 0:
         tail = ((result.stdout or "") + "\\n" + (result.stderr or "")).strip()[-3500:]
-        print(f"HUAIDJ health check failed: exit={result.returncode}")
+        _emit(f"HUAIDJ health check failed: exit={result.returncode}\\n")
         if tail:
-            print(tail)
+            _emit(tail + "\\n")
     return int(result.returncode)
 
 
@@ -772,6 +784,18 @@ def _child_env() -> dict[str, str]:
     return env
 
 
+def _emit(text: str) -> None:
+    """Write child output without crashing on a legacy Windows console codec."""
+    if not text or sys.stdout is None:
+        return
+    encoding = getattr(sys.stdout, "encoding", None)
+    rendered = text
+    if encoding:
+        rendered = text.encode(encoding, errors="replace").decode(encoding, errors="replace")
+    sys.stdout.write(rendered)
+    sys.stdout.flush()
+
+
 def main() -> int:
     try:
         result = subprocess.run(
@@ -784,18 +808,18 @@ def main() -> int:
             env=_child_env(),
         )
     except subprocess.TimeoutExpired as exc:
-        print(f"HUAIDJ 活动包/API TG 状态脚本超时: {exc}")
+        _emit(f"HUAIDJ 活动包/API TG 状态脚本超时: {exc}\\n")
         return 124
     except Exception as exc:
-        print(f"HUAIDJ 活动包/API TG 状态脚本启动失败: {exc}")
+        _emit(f"HUAIDJ 活动包/API TG 状态脚本启动失败: {exc}\\n")
         return 2
     if result.stdout:
-        print(result.stdout, end="")
+        _emit(result.stdout)
     if result.returncode != 0:
         tail = ((result.stdout or "") + "\\n" + (result.stderr or "")).strip()[-3500:]
-        print(f"HUAIDJ 活动包/API TG 状态脚本执行失败: exit={result.returncode}")
+        _emit(f"HUAIDJ 活动包/API TG 状态脚本执行失败: exit={result.returncode}\\n")
         if tail:
-            print(tail)
+            _emit(tail + "\\n")
     return int(result.returncode)
 
 

@@ -267,6 +267,49 @@ def test_installer_templates_make_health_canary_checkout_read_only(
     assert not repo.exists()
 
 
+@pytest.mark.parametrize(
+    "template_name",
+    ("huaidj/health_check.py", "huaidj/package_api_tg_status.py"),
+)
+def test_installer_status_launchers_preserve_exit_code_on_gbk_console(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, template_name: str
+) -> None:
+    import io
+    import runpy
+    import subprocess
+
+    monkeypatch.setenv("HUAIDJ_REPO", str(tmp_path / "immutable-checkout"))
+    monkeypatch.setenv("HUAIDJ_REPORT_ROOT", str(tmp_path / "runtime-reports"))
+    monkeypatch.setenv("HERMES_HOME", str(tmp_path / "hermes"))
+    namespace = runpy.run_path(
+        str(ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py"),
+        run_name="__test__",
+    )
+    generated: dict[str, object] = {"__name__": "__test__"}
+    exec(compile(namespace["SCRIPT_TEMPLATES"][template_name], template_name, "exec"), generated)
+
+    subprocess_module = generated["subprocess"]
+    monkeypatch.setattr(
+        subprocess_module,
+        "run",
+        lambda cmd, **kwargs: subprocess.CompletedProcess(
+            cmd,
+            7,
+            stdout="status contains replacement: \ufffd\n",
+            stderr="stderr contains replacement: \ufffd\n",
+        ),
+    )
+    raw_output = io.BytesIO()
+    gbk_console = io.TextIOWrapper(raw_output, encoding="gbk", errors="strict")
+    monkeypatch.setattr(generated["sys"], "stdout", gbk_console)
+
+    assert generated["main"]() == 7
+    gbk_console.flush()
+    rendered = raw_output.getvalue().decode("gbk")
+    assert "status contains replacement: ?" in rendered
+    assert "stderr contains replacement: ?" in rendered
+
+
 def test_installer_templates_scope_proxy_to_child_env_and_atlas_reloads_user_runtime_inputs(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
