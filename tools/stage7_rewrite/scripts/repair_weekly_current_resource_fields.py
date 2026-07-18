@@ -40,7 +40,7 @@ DEFAULT_REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\Hua
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-from repair_weekly_release_conflicts import rebuild_release_files, write_json  # noqa: E402
+from repair_weekly_release_conflicts import CITY_LABEL_BY_KEY, rebuild_release_files, write_json  # noqa: E402
 
 
 def portable_path_label(path: Path, *, repo_root: Path = ROOT) -> str:
@@ -321,6 +321,157 @@ def list_strings(value: Any) -> list[str]:
 
 def norm(value: Any) -> str:
     return re.sub(r"[^a-z0-9\u4e00-\u9fff]", "", first(value).lower())
+
+
+ADDRESS_TRADITIONAL_TO_SIMPLIFIED = str.maketrans(
+    {
+        "長": "长",
+        "寧": "宁",
+        "區": "区",
+        "縣": "县",
+        "鎮": "镇",
+        "鄉": "乡",
+        "號": "号",
+        "層": "层",
+        "樓": "楼",
+        "臺": "台",
+        "廣": "广",
+        "東": "东",
+        "門": "门",
+        "裏": "里",
+    }
+)
+ADDRESS_ROUTE_NUMBER_RE = re.compile(
+    r"(?P<street>[a-z0-9\u4e00-\u9fff]{1,20}?(?:大道|公路|路|街|巷|弄))"
+    r"(?P<number>\d+[a-z]?)(?:号)?",
+    re.I,
+)
+ADDRESS_ADMIN_SEPARATOR_RE = re.compile(r"[省市区县镇乡]")
+KNOWN_CITY_MARKERS = {
+    norm(value)
+    for pair in CITY_LABEL_BY_KEY.items()
+    for value in pair
+    if norm(value)
+}
+
+
+def canonical_address_text(value: Any) -> str:
+    return re.sub(
+        r"[^a-z0-9\u4e00-\u9fff]",
+        "",
+        first(value).translate(ADDRESS_TRADITIONAL_TO_SIMPLIFIED).lower(),
+    )
+
+
+def address_route_number_anchor(value: Any) -> tuple[str, str] | None:
+    text = canonical_address_text(value)
+    if not text:
+        return None
+    starts = [0, *(match.end() for match in ADDRESS_ADMIN_SEPARATOR_RE.finditer(text))]
+    matches: list[tuple[str, str]] = []
+    for start in starts:
+        match = ADDRESS_ROUTE_NUMBER_RE.search(text[start:])
+        if match:
+            matches.append((match.group("street"), match.group("number").lower()))
+    if not matches:
+        return None
+    return min(matches, key=lambda pair: (len(pair[0]), pair[0], pair[1]))
+
+
+def address_floor_anchor(value: Any) -> str:
+    text = canonical_address_text(value)
+    chinese_digits = {
+        "一": "1",
+        "二": "2",
+        "三": "3",
+        "四": "4",
+        "五": "5",
+        "六": "6",
+        "七": "7",
+        "八": "8",
+        "九": "9",
+        "十": "10",
+    }
+    match = re.search(r"(?:地下|负|b)([一二三四五六七八九十]|\d+)(?:层|楼)?", text, re.I)
+    if match:
+        level = chinese_digits.get(match.group(1), match.group(1))
+        return f"b{level}"
+    if re.search(r"地下(?:层|楼)", text):
+        return "b1"
+    return ""
+
+
+def item_city_markers(item: dict[str, Any]) -> set[str]:
+    markers: set[str] = set()
+    for key in ("city", "city_name", "city_key", "city_keys", "city_labels"):
+        for value in list_strings(item.get(key)):
+            marker = norm(value)
+            if marker:
+                markers.add(marker)
+    address_text = canonical_address_text(first(item.get("address_full"), first(item.get("address"))))
+    for city_key, city_name in CITY_LABEL_BY_KEY.items():
+        if norm(city_name) and norm(city_name) in address_text:
+            markers.add(norm(city_name))
+        if norm(city_key) and norm(city_key) in address_text:
+            markers.add(norm(city_key))
+    return markers
+
+
+def locked_registry_location_evidence(
+    item: dict[str, Any], registry_entry: dict[str, Any] | None
+) -> dict[str, Any] | None:
+    if not registry_entry or has_geo(item):
+        return None
+    if registry_entry.get("place_fields_locked") is not True or registry_entry.get("geo_locked") is not True:
+        return None
+    if not has_geo(registry_entry):
+        return None
+
+    registry_aliases = {
+        norm(value)
+        for value in (
+            registry_entry.get("venue_id"),
+            registry_entry.get("canonical_name"),
+            *(registry_entry.get("aliases") or []),
+        )
+        if norm(value)
+    }
+    item_aliases = set(venue_keys(item))
+    alias_matches = sorted(registry_aliases & item_aliases)
+    if not alias_matches:
+        return None
+
+    item_address = first(item.get("address_full"), first(item.get("address")))
+    registry_address = first(registry_entry.get("address_full"))
+    item_anchor = address_route_number_anchor(item_address)
+    registry_anchor = address_route_number_anchor(registry_address)
+    if not item_anchor or item_anchor != registry_anchor:
+        return None
+    item_floor = address_floor_anchor(item_address)
+    registry_floor = address_floor_anchor(registry_address)
+    if item_floor and registry_floor and item_floor != registry_floor:
+        return None
+
+    expected_city_markers = {
+        norm(registry_entry.get("city_key")),
+        norm(registry_entry.get("city_name")),
+    } - {""}
+    observed_city_markers = item_city_markers(item)
+    if observed_city_markers & KNOWN_CITY_MARKERS and not observed_city_markers & expected_city_markers:
+        return None
+
+    return {
+        "decision": "locked_registry_alias_address_anchor_match",
+        "venue_alias_matches": alias_matches,
+        "item_address_anchor": {"street": item_anchor[0], "house_number": item_anchor[1], "floor": item_floor},
+        "registry_address_anchor": {
+            "street": registry_anchor[0],
+            "house_number": registry_anchor[1],
+            "floor": registry_floor,
+        },
+        "observed_city_markers": sorted(observed_city_markers),
+        "expected_city_markers": sorted(expected_city_markers),
+    }
 
 
 def normalize_style(value: str) -> str:
@@ -958,6 +1109,92 @@ def find_registry_entry(item: dict[str, Any], lookup: dict[str, dict[str, Any]])
     return None
 
 
+def apply_locked_registry_canonicalization(
+    item: dict[str, Any], registry_entry: dict[str, Any] | None
+) -> dict[str, Any] | None:
+    evidence = locked_registry_location_evidence(item, registry_entry)
+    if not evidence or not registry_entry:
+        return None
+
+    before = {
+        key: deepcopy(item.get(key))
+        for key in (
+            "venue_id",
+            "venue_name",
+            "venue",
+            "city",
+            "city_name",
+            "city_key",
+            "city_keys",
+            "address",
+            "address_full",
+            "geo_lat",
+            "geo_lng",
+            "venue_lat",
+            "venue_lng",
+            "place_fields_locked",
+            "geo_locked",
+        )
+    }
+    canonical_name = first(registry_entry.get("canonical_name"))
+    city_name = first(registry_entry.get("city_name"))
+    city_key = first(registry_entry.get("city_key"))
+    address = first(registry_entry.get("address_full"))
+    aliases = [
+        value
+        for value in [canonical_name, *(registry_entry.get("aliases") or [])]
+        if first(value)
+    ]
+    verified_at = now_iso()
+    updates = {
+        "venue_id": first(registry_entry.get("venue_id")),
+        "venue_name": canonical_name,
+        "venue": [canonical_name],
+        "city": [city_name],
+        "city_name": city_name,
+        "city_key": city_key,
+        "city_keys": [city_key],
+        "city_labels": [city_name],
+        "address": address,
+        "address_full": address,
+        "address_source": "locked_venue_registry_evidence",
+        "address_verification": evidence,
+        "geo_lat": registry_entry.get("geo_lat"),
+        "geo_lng": registry_entry.get("geo_lng"),
+        "venue_lat": registry_entry.get("geo_lat"),
+        "venue_lng": registry_entry.get("geo_lng"),
+        "geo_coord_system": first(registry_entry.get("geo_coord_system"), "GCJ-02"),
+        "geo_source": first(registry_entry.get("geo_source"), "locked_venue_registry"),
+        "geo_verified_at": verified_at,
+        "geo_verification": evidence,
+        "map_poi_name": canonical_name,
+        "map_search_aliases": aliases,
+        "geo_search_aliases": aliases,
+        "poi_aliases": aliases,
+        "place_fields_locked": True,
+        "geo_locked": True,
+        "geo_override_reason": "locked venue registry alias and exact street-number evidence",
+    }
+    for key, value in updates.items():
+        if value not in ("", [], None):
+            item[key] = deepcopy(value)
+
+    return {
+        "field": "venue_geo",
+        "type": "locked_registry_canonicalization",
+        "before": before,
+        "after": {
+            "venue_id": item.get("venue_id"),
+            "venue_name": item.get("venue_name"),
+            "city": item.get("city"),
+            "address": item.get("address"),
+            "geo_lat": item.get("geo_lat"),
+            "geo_lng": item.get("geo_lng"),
+            "evidence": evidence,
+        },
+    }
+
+
 def apply_item_repair(
     item: dict[str, Any],
     *,
@@ -1048,6 +1285,13 @@ def apply_item_repair(
             }
             changes.append({"field": "geo", "type": "stale_coord_clear", "before": before_geo, "after": None})
 
+    locked_registry_change = apply_locked_registry_canonicalization(item, registry_entry)
+    if locked_registry_change:
+        changes.append(locked_registry_change)
+        address = first(item.get("address"))
+        address_full = first(item.get("address_full"))
+        canonical_address = first((registry_entry or {}).get("address_full"))
+
     if canonical_address and item.get("venue_id") in KNOWN_VENUE_CORRECTIONS:
         if is_address_like(canonical_address) and (
             not address
@@ -1090,8 +1334,20 @@ def apply_item_repair(
         geo = map_entry
         geo_source = first(map_entry.get("source"), "verified_map_location_book")
     if not geo and registry_entry and has_geo(registry_entry):
+        registry_is_locked = (
+            registry_entry.get("place_fields_locked") is True and registry_entry.get("geo_locked") is True
+        )
         reg_address = first(registry_entry.get("address_full"))
-        if not reg_address or address_compatible(first(item.get("address")), reg_address) or item.get("venue_id") in KNOWN_VENUE_CORRECTIONS:
+        registry_geo_is_compatible = (
+            locked_registry_location_evidence(item, registry_entry) is not None
+            if registry_is_locked
+            else (
+                not reg_address
+                or address_compatible(first(item.get("address")), reg_address)
+                or item.get("venue_id") in KNOWN_VENUE_CORRECTIONS
+            )
+        )
+        if registry_geo_is_compatible:
             geo = registry_entry
             geo_source = first(registry_entry.get("geo_source"), "venue_registry")
     if not geo and historical_geo_entry:
