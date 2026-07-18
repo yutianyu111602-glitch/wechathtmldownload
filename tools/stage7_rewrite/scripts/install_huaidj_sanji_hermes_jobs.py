@@ -92,6 +92,15 @@ PUBLISH_CMD = [
 ]
 
 
+def _child_env() -> dict[str, str]:
+    env = os.environ.copy()
+    proxy_url = env.get("HUAIDJ_PROXY_URL", "").strip()
+    if proxy_url:
+        env["HTTP_PROXY"] = proxy_url
+        env["HTTPS_PROXY"] = proxy_url
+    return env
+
+
 def _tail(path: Path, limit: int = 4000) -> str:
     try:
         return path.read_text(encoding="utf-8", errors="replace")[-limit:]
@@ -115,7 +124,7 @@ def main() -> int:
                     cwd=str(REPO),
                     stdout=log_handle,
                     stderr=subprocess.STDOUT,
-                    env=os.environ.copy(),
+                    env=_child_env(),
                     creationflags=CREATE_NO_WINDOW,
                 )
                 result_code = int(result.returncode)
@@ -170,6 +179,15 @@ CMD = [
 ]
 
 
+def _child_env() -> dict[str, str]:
+    env = os.environ.copy()
+    proxy_url = env.get("HUAIDJ_PROXY_URL", "").strip()
+    if proxy_url:
+        env["HTTP_PROXY"] = proxy_url
+        env["HTTPS_PROXY"] = proxy_url
+    return env
+
+
 def main() -> int:
     result = subprocess.run(
         CMD,
@@ -177,7 +195,7 @@ def main() -> int:
         encoding="utf-8",
         errors="replace",
         capture_output=True,
-        env=os.environ.copy(),
+        env=_child_env(),
     )
     if result.returncode == 0:
         return 0
@@ -455,6 +473,8 @@ CRITICAL_ENV_KEYS = (
     "DASHSCOPE_API_KEY",
     "MIMO_API_KEY",
     "MIMO_VISION_API_KEY",
+    "ATLAS_HISTORICAL_VENUE_GEO",
+    "HUAIDJ_PROXY_URL",
 )
 
 
@@ -464,21 +484,24 @@ def _fresh_launch_env() -> dict[str, str]:
     env["PYTHONIOENCODING"] = "utf-8"
     env["PYTHONDONTWRITEBYTECODE"] = "1"
     env["HUAIDJ_REPORT_ROOT"] = str(REPORT_ROOT)
-    if os.name != "nt":
-        return env
-    try:
-        import winreg
+    if os.name == "nt":
+        try:
+            import winreg
 
-        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as key:
-            for name in CRITICAL_ENV_KEYS:
-                try:
-                    value, _ = winreg.QueryValueEx(key, name)
-                except FileNotFoundError:
-                    continue
-                if value:
-                    env[name] = str(value)
-    except OSError:
-        pass
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as key:
+                for name in CRITICAL_ENV_KEYS:
+                    try:
+                        value, _ = winreg.QueryValueEx(key, name)
+                    except FileNotFoundError:
+                        continue
+                    if value:
+                        env[name] = str(value)
+        except OSError:
+            pass
+    proxy_url = env.get("HUAIDJ_PROXY_URL", "").strip()
+    if proxy_url:
+        env["HTTP_PROXY"] = proxy_url
+        env["HTTPS_PROXY"] = proxy_url
     return env
 
 
@@ -669,6 +692,15 @@ CMD = [
 ]
 
 
+def _child_env() -> dict[str, str]:
+    env = os.environ.copy()
+    proxy_url = env.get("HUAIDJ_PROXY_URL", "").strip()
+    if proxy_url:
+        env["HTTP_PROXY"] = proxy_url
+        env["HTTPS_PROXY"] = proxy_url
+    return env
+
+
 def main() -> int:
     try:
         result = subprocess.run(
@@ -678,7 +710,7 @@ def main() -> int:
             errors="replace",
             capture_output=True,
             timeout=90,
-            env=os.environ.copy(),
+            env=_child_env(),
         )
     except subprocess.TimeoutExpired as exc:
         print(f"HUAIDJ CloudRun API / Data freshness health timed out: {exc}")
@@ -731,6 +763,15 @@ CMD = [
 ]
 
 
+def _child_env() -> dict[str, str]:
+    env = os.environ.copy()
+    proxy_url = env.get("HUAIDJ_PROXY_URL", "").strip()
+    if proxy_url:
+        env["HTTP_PROXY"] = proxy_url
+        env["HTTPS_PROXY"] = proxy_url
+    return env
+
+
 def main() -> int:
     try:
         result = subprocess.run(
@@ -740,7 +781,7 @@ def main() -> int:
             errors="replace",
             capture_output=True,
             timeout=90,
-            env=os.environ.copy(),
+            env=_child_env(),
         )
     except subprocess.TimeoutExpired as exc:
         print(f"HUAIDJ 活动包/API TG 状态脚本超时: {exc}")
@@ -776,6 +817,9 @@ SCRIPT_CONTRACT_TOKENS = {
         "HUAIDJ_REPO",
         "HUAIDJ_REPORT_ROOT",
         "PYTHONDONTWRITEBYTECODE",
+        "HUAIDJ_PROXY_URL",
+        "HTTP_PROXY",
+        "HTTPS_PROXY",
         "-ReportRoot",
         "CREATE_NO_WINDOW",
         "subprocess.run(",
@@ -788,6 +832,9 @@ SCRIPT_CONTRACT_TOKENS = {
         "HUAIDJ_REPO",
         "HUAIDJ_REPORT_ROOT",
         "PYTHONDONTWRITEBYTECODE",
+        "HUAIDJ_PROXY_URL",
+        "HTTP_PROXY",
+        "HTTPS_PROXY",
         "-ReportRoot",
         "return result.returncode",
     ),
@@ -812,6 +859,9 @@ SCRIPT_CONTRACT_TOKENS = {
         "HUAIDJ_PYTHON",
         "HUAIDJ_REPORT_ROOT",
         "PYTHONDONTWRITEBYTECODE",
+        "HUAIDJ_PROXY_URL",
+        "HTTP_PROXY",
+        "HTTPS_PROXY",
         "return int(result.returncode)",
     ),
     "huaidj/health_check.py": (
@@ -821,6 +871,9 @@ SCRIPT_CONTRACT_TOKENS = {
         "HUAIDJ_PYTHON",
         "HUAIDJ_REPORT_ROOT",
         "PYTHONDONTWRITEBYTECODE",
+        "HUAIDJ_PROXY_URL",
+        "HTTP_PROXY",
+        "HTTPS_PROXY",
         "return int(result.returncode)",
     ),
     "huaidj/atlas_v2_sanji_import_nightly.py": (
@@ -835,6 +888,10 @@ SCRIPT_CONTRACT_TOKENS = {
         "HUAIDJ_PYTHON",
         "HUAIDJ_REPORT_ROOT",
         "PYTHONDONTWRITEBYTECODE",
+        "ATLAS_HISTORICAL_VENUE_GEO",
+        "HUAIDJ_PROXY_URL",
+        "HTTP_PROXY",
+        "HTTPS_PROXY",
         "CREATE_NO_WINDOW",
         "subprocess.run(",
         "msvcrt.locking(",

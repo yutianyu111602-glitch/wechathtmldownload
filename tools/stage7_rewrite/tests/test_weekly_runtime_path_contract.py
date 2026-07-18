@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -162,6 +163,71 @@ def test_installer_templates_make_health_canary_checkout_read_only(
     )
     assert health["main"]() == 0
     assert not repo.exists()
+
+
+def test_installer_templates_scope_proxy_to_child_env_and_atlas_reloads_user_runtime_inputs(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import runpy
+
+    winreg = pytest.importorskip("winreg")
+
+    namespace = runpy.run_path(str(ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py"), run_name="__test__")
+    templates = namespace["SCRIPT_TEMPLATES"]
+    proxy_url = "http://127.0.0.1:7890"
+    monkeypatch.setenv("HUAIDJ_PROXY_URL", proxy_url)
+    monkeypatch.delenv("HTTP_PROXY", raising=False)
+    monkeypatch.delenv("HTTPS_PROXY", raising=False)
+
+    for name in (
+        "huaidj/sanji_publish_afternoon.py",
+        "huaidj/sanji_rss_fast_watch.py",
+        "huaidj/health_check.py",
+        "huaidj/package_api_tg_status.py",
+    ):
+        generated: dict[str, object] = {"__name__": "__test__"}
+        exec(compile(templates[name], name, "exec"), generated)
+        child_env = generated["_child_env"]()
+        assert child_env["HTTP_PROXY"] == proxy_url
+        assert child_env["HTTPS_PROXY"] == proxy_url
+        assert "HTTP_PROXY" not in os.environ
+        assert "HTTPS_PROXY" not in os.environ
+
+    historical_geo = r"F:\DevData\HuaidjRuntime\state\atlas_v2\historical_venue_geo.json"
+    registry_values = {
+        "ATLAS_HISTORICAL_VENUE_GEO": historical_geo,
+        "HUAIDJ_PROXY_URL": proxy_url,
+    }
+
+    class FakeKey:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, traceback):
+            return False
+
+    monkeypatch.setattr(winreg, "OpenKey", lambda *args, **kwargs: FakeKey())
+
+    def query_value(_key, name):
+        if name not in registry_values:
+            raise FileNotFoundError(name)
+        return registry_values[name], winreg.REG_SZ
+
+    monkeypatch.setattr(winreg, "QueryValueEx", query_value)
+    atlas: dict[str, object] = {"__name__": "__test__"}
+    exec(
+        compile(
+            templates["huaidj/atlas_v2_sanji_import_nightly.py"],
+            "huaidj/atlas_v2_sanji_import_nightly.py",
+            "exec",
+        ),
+        atlas,
+    )
+    launch_env = atlas["_fresh_launch_env"]()
+    assert launch_env["ATLAS_HISTORICAL_VENUE_GEO"] == historical_geo
+    assert launch_env["HUAIDJ_PROXY_URL"] == proxy_url
+    assert launch_env["HTTP_PROXY"] == proxy_url
+    assert launch_env["HTTPS_PROXY"] == proxy_url
 
 
 def load_bake_module():

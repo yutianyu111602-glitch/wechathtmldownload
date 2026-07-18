@@ -38,14 +38,89 @@ def test_canonical_pipeline_order_contract() -> None:
     assert orchestrator.ordered_subset(orchestrator.CANONICAL_PIPELINE_ORDER, expected)
 
 
-def test_optional_historical_geo_does_not_block_clean_clone() -> None:
-    with tempfile.TemporaryDirectory(prefix="atlas_missing_geo_") as td:
-        missing = Path(td) / "historical_venue_geo.json"
-        assert orchestrator.optional_existing_path(missing) is None
+def test_missing_default_historical_geo_fails_before_any_stage(monkeypatch, tmp_path, capsys) -> None:
+    missing_geo = tmp_path / "historical_venue_geo.json"
+    sanji_root = tmp_path / "sanji"
+    articles_root = tmp_path / "articles"
+    base_db = tmp_path / "base.sqlite"
+    run_root = tmp_path / "runs"
+    sanji_root.mkdir()
+    articles_root.mkdir()
+    (sanji_root / "sanji.db").write_bytes(b"")
+    base_db.write_bytes(b"")
 
-        present = Path(td) / "historical_venue_geo.json"
-        present.write_text("{}", encoding="utf-8")
-        assert orchestrator.optional_existing_path(present) == present
+    monkeypatch.setattr(orchestrator, "DEFAULT_HISTORICAL_VENUE_GEO", missing_geo)
+    monkeypatch.setattr(
+        orchestrator.sys,
+        "argv",
+        [
+            str(orchestrator.__file__),
+            "--sanji-root",
+            str(sanji_root),
+            "--articles-root",
+            str(articles_root),
+            "--base-serving-db",
+            str(base_db),
+            "--run-root",
+            str(run_root),
+        ],
+    )
+
+    def fail_if_stage_starts(*args, **kwargs):
+        raise AssertionError("Atlas stage started without required historical venue geo")
+
+    monkeypatch.setattr(orchestrator, "run_step", fail_if_stage_starts)
+    try:
+        orchestrator.main()
+    except SystemExit as exc:
+        assert exc.code == 2
+    else:
+        raise AssertionError("missing historical venue geo must fail closed")
+
+    stderr = capsys.readouterr().err
+    assert "--historical-venue-geo not found" in stderr
+    assert str(missing_geo) in stderr
+    assert not run_root.exists(), "input validation must happen before creating an Atlas run directory"
+
+
+def test_explicit_present_historical_geo_passes_input_gate(monkeypatch, tmp_path) -> None:
+    historical_geo = tmp_path / "historical_venue_geo.json"
+    sanji_root = tmp_path / "sanji"
+    articles_root = tmp_path / "articles"
+    base_db = tmp_path / "base.sqlite"
+    run_root = tmp_path / "runs"
+    historical_geo.write_text("{}", encoding="utf-8")
+    sanji_root.mkdir()
+    articles_root.mkdir()
+    (sanji_root / "sanji.db").write_bytes(b"")
+    base_db.write_bytes(b"")
+    monkeypatch.setattr(
+        orchestrator.sys,
+        "argv",
+        [
+            str(orchestrator.__file__),
+            "--sanji-root",
+            str(sanji_root),
+            "--articles-root",
+            str(articles_root),
+            "--base-serving-db",
+            str(base_db),
+            "--run-root",
+            str(run_root),
+            "--historical-venue-geo",
+            str(historical_geo),
+        ],
+    )
+    stage_names = []
+
+    def stop_after_input_gate(name, cmd, env, log_dir):
+        stage_names.append(name)
+        return {"name": name, "cmd": cmd, "returncode": 1, "log": str(log_dir / f"{name}.log")}
+
+    monkeypatch.setattr(orchestrator, "run_step", stop_after_input_gate)
+
+    assert orchestrator.main() == 1
+    assert stage_names == ["export_delta"]
 
 
 def test_checkpoint_readiness_fails_closed_on_materialize_or_gate_failure() -> None:

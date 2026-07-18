@@ -1376,6 +1376,11 @@ def run(args: argparse.Namespace) -> int:
     lookup = load_queue_lookup(Path(args.weekly_queue))
     provider = provider_config(args.provider, args.model)
     fallback = provider_config(args.fallback_provider)
+    if args.execute and args.require_primary_provider and not args.mock_response and not provider.api_key:
+        raise RuntimeError(
+            f"required primary provider {provider.name}/{provider.model} API key is not configured; "
+            "configure the primary provider or explicitly pass --no-require-primary-provider"
+        )
     if args.execute and not args.mock_response and not provider.api_key and not fallback.api_key:
         raise RuntimeError(
             "No VL provider key configured. Set DASHSCOPE_API_KEY/ATLAS_DASHSCOPE_API_KEY "
@@ -1464,7 +1469,6 @@ def run(args: argparse.Namespace) -> int:
         args.execute
         and args.require_primary_provider
         and not args.mock_response
-        and provider.api_key
         and processed_count > 0
         and primary_provider_count <= 0
     ):
@@ -1477,7 +1481,6 @@ def run(args: argparse.Namespace) -> int:
         args.execute
         and args.require_primary_provider
         and not args.mock_response
-        and provider.api_key
         and processed_count > 0
         and fallback_provider_count > 0
         and fallback_ratio > float(args.max_fallback_ratio)

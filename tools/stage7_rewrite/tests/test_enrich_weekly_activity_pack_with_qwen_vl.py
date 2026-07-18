@@ -284,6 +284,104 @@ def test_execute_requires_primary_qwen_provider_when_fallback_succeeds(tmp_path,
     assert "qwen3_vl/qwen3.6-plus" in summary["primary_provider_gate_reason"]
 
 
+def test_execute_require_primary_rejects_missing_primary_key_before_any_provider_call(tmp_path, monkeypatch):
+    vl = load_vl_module()
+    article_dir = make_sanji_article(tmp_path)
+    pack_dir = tmp_path / "pack"
+    out_dir = tmp_path / "out"
+    queue_path = tmp_path / "queue.jsonl"
+    source_hash = "missingprimary001"
+
+    write_jsonl(
+        queue_path,
+        [
+            {
+                "queue_id": f"loopy_club:{source_hash}",
+                "account_key": "loopy_club",
+                "source_url_hash": source_hash,
+                "article_dir": str(article_dir),
+                "title": "6.29 周一 | Primary Gate",
+                "body_text": "2026-06-29 21:00 loopy Club lineup: A / B / C",
+            }
+        ],
+    )
+    write_jsonl(
+        pack_dir / CANDIDATE_FILE,
+        [
+            {
+                "queue_id": f"loopy_club:{source_hash}",
+                "account_key": "loopy_club",
+                "source_url_hash": source_hash,
+                "title": "6.29 周一 | Primary Gate",
+                "event_date_text": ["2026-06-29"],
+                "include_in_activity_feed": True,
+            }
+        ],
+    )
+    write_jsonl(pack_dir / REVIEW_FILE, [])
+    for name in (
+        "ATLAS_DASHSCOPE_API_KEY",
+        "DASHSCOPE_API_KEY",
+        "DASHSCOPE_COMPATIBLE_API_KEY",
+        "QWEN_API_KEY",
+    ):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("MIMO_API_KEY", "test-mimo")
+
+    provider_calls = []
+
+    def fake_call(provider, prompt, assets, timeout_sec, retries):
+        provider_calls.append(provider.name)
+        if provider.name == "qwen3_vl":
+            raise RuntimeError("qwen3_vl API key is not configured in environment")
+        return {
+            "is_event": True,
+            "event_title": "Primary Gate",
+            "date_start": "2026-06-29",
+            "time_text": "21:00",
+            "city": "杭州",
+            "venue": "loopy",
+            "lineup": ["A", "B", "C"],
+            "main_poster_image_index": 0,
+            "confidence": 0.9,
+        }
+
+    monkeypatch.setattr(vl, "call_openai_compatible_vl", fake_call)
+    args = vl.parse_args(
+        [
+            "--pack-dir",
+            str(pack_dir),
+            "--weekly-queue",
+            str(queue_path),
+            "--out-dir",
+            str(out_dir),
+            "--window-start",
+            "2026-06-19",
+            "--window-days",
+            "15",
+            "--provider",
+            "qwen3_vl",
+            "--fallback-provider",
+            "mimo",
+            "--require-primary-provider",
+            "--execute",
+        ]
+    )
+
+    error = None
+    try:
+        vl.run(args)
+    except RuntimeError as exc:
+        error = str(exc)
+
+    assert error is not None, (
+        "require-primary must reject a missing primary key; the old behavior completed entirely on MiMo"
+    )
+    assert "required primary provider qwen3_vl/qwen3.6-plus" in error
+    assert "API key is not configured" in error
+    assert provider_calls == [], "the primary-key gate must run before any paid provider call"
+
+
 def test_execute_records_exact_qwen_vl_usage_cost(tmp_path, monkeypatch):
     vl = load_vl_module()
     article_dir = make_sanji_article(tmp_path)
