@@ -1,7 +1,7 @@
 # HUAIDJ / Sanji / Qwen-VL / DeepSeek / AtlasV2 管线 SSOT
 
-状态：当前权威理解
-核验时间：2026-07-17 CST
+状态：当前权威理解；2026-07-17 水位保留为历史基线，2026-07-18 水位见第 13 节
+核验时间：2026-07-18 CST
 证据优先级：实际运行日志与产物 > 当前安装脚本 > 仓库入口脚本 > 历史文档与记忆
 
 ## 1. 结论
@@ -22,13 +22,15 @@ HUAIDJ 现在有两条共享 Sanji 数据源、但目的和模型路由不同的
 
 | 角色 | 路径 |
 |---|---|
-| 仓库 | `F:\code\githubstar\wechathtmldownload` |
-| Hermes home / 受管运行时 | `F:\DevData\Hermes` |
-| Hermes Desktop 正式安装目标 | `F:\DevData\Hermes\hermes-agent\apps\desktop\release\win-unpacked\Hermes.exe` |
+| 开发/发现仓库 | `F:\code\githubstar\wechathtmldownload`（可能 dirty，不是自动执行权威） |
+| 不可变执行仓库 | 由 `HUAIDJ_REPO` 选择 `F:\DevData\HuaidjRuntime\releases\<commit>-pipeline-20260718`；当前精确 commit/path 以外部恢复 SSOT 和 `git rev-parse HEAD` 为准 |
+| Hermes home | `F:\DevData\Hermes` |
+| Hermes 现役 runtime | `F:\DevData\HermesRuntime\releases\c48d53413-official-recovery`（实际 HEAD `ba16a8246`） |
+| Hermes Desktop 现役目标 | `F:\DevData\HermesRuntime\releases\c48d53413-official-recovery\apps\desktop\release\win-unpacked\Hermes.exe` |
 | Hermes Desktop 灾后保全副本 | `F:\DevApps\HermesDesktop\win-unpacked`（只作来源/回滚证据，不冒充正式安装） |
 | Hermes jobs | `F:\DevData\Hermes\cron\jobs.json` |
 | Hermes HUAIDJ scripts | `F:\DevData\Hermes\scripts\huaidj` |
-| Hermes Python | `F:\DevData\Hermes\hermes-agent\venv\Scripts\python.exe` |
+| Hermes Python | `F:\DevData\HermesRuntime\releases\c48d53413-official-recovery\venv\Scripts\python.exe` |
 | Sanji Desktop | `F:\DevApps\Sanji\0.4.1\sanji.exe` |
 | Sanji DB | `%APPDATA%\sanji\sanji.db` |
 | Sanji 热文章正文/图片 | `E:\sanji_hot\articles` |
@@ -240,14 +242,14 @@ flowchart TD
 
 ## 10. Hermes Desktop、Gateway 与定时计划
 
-当前 `jobs.json` 中所有 HUAIDJ job 都被统一暂停于 2026-07-15，原因 `disaster_recovery_validation_pending`。代码修复和一次全量验收前不能直接恢复。
+2026-07-15 的统一暂停已在 2026-07-18 全量验收后解除。当前有九个 canonical jobs active，两个旧 Friday jobs paused；不得从历史暂停记录推断当前状态，也不得手工再造第二套 Windows/Codex 执行器。
 
 Windows 运行边界：
 
 - Desktop 正式构建必须位于受管源码树的 `apps\desktop\release\win-unpacked`，这样 `hermes update` 重建和原位 relaunch 才不会发生 GUI/backend 漂移。
 - `F:\DevApps\HermesDesktop` 是 2026-07-15 灾后保全出来的可运行副本；直接给它建快捷方式会让后续 updater 在另一目录重建，属于双权威，禁止作为长期安装。
 - Desktop 首启会拉起 `hermes serve` 供本地 UI 使用，但不会替代长期 Gateway。
-- 调度常驻应执行 `hermes gateway install --start-now --start-on-login`。当前 Windows 实现优先注册 `HermesGateway` ONLOGON Scheduled Task，并以 `pythonw.exe` 无窗口启动；若组策略阻止才回退 Startup folder。
+- 调度常驻应执行 `hermes gateway install --start-now --start-on-login`。当前唯一 owner 是 `Hermes_Gateway` ONLOGON Scheduled Task，并以 `pythonw.exe` 无窗口启动；Scheduled Task 正常时 Startup folder fallback 必须移除或放入可恢复备份，避免双 Gateway。
 - 恢复后必须同时验证：Desktop 可启动且解析到当前 `HERMES_HOME`、Gateway `status=running`、`cron status` 有活跃任务且 heartbeat 新鲜。
 
 目标常态计划：
@@ -312,7 +314,39 @@ AtlasV2 全量导入：
 3. 契约审计结果 `ok=true, failures=0, warnings=0`。RSS 快监固定 `DetectOnly`，其仓库根目录从 `$PSScriptRoot` 解析并强制使用 PowerShell 7，避免旧 C 盘和 Unicode 回归。
 4. 小程序后端增量包和 CloudRun 已更新；开发者代码上传、微信审核、公开发布未执行，仍是独立授权边界。
 
-## 13. 维护规则
+## 13. 2026-07-18 全量恢复水位
+
+代码与运行：
+
+1. 完整修复线已推送到 GitHub 分支 `codex/huaidj-pipeline-recovery-20260718`；数据与调度代码的已验证基线为 `818ba0c4283c9405f3d824c5db050795d0193335`，后续只允许文档/证据提交或重新通过同等级测试的代码提交成为新 runtime。该基线在前序 schema、Qwen/Atlas fail-closed、事务发布、DJ 门、club overviews、geo、source-mode readiness 和稳定事件身份修复上，增加了 Fast Watch 空默认值兼容、Hermes status launcher GBK/Unicode 安全输出，以及旧 launcher 自动升级契约。
+2. Stage7 为 364 passed + 6 subtests；CloudRun 为 117/117；`better-sqlite3` 真实内存库 canary 通过。原 dirty worktree 未被覆盖，常态调度只指向不可变 release。
+
+活动包全量运行 `openclaw_weekly_daily_20260718_195817`：
+
+1. Sanji 31 天冻结导出 1,635 行、原始窗口 1,667 行；缺失 HTML 0。
+2. 在线 Qwen-VL 全图处理 297/297：`qwen3.6-plus` 296、MiMo fallback 1、失败 0，共 7,232,153 tokens。
+3. DeepSeek 250/250、失败 0：Flash 250、Pro 138；生产 DJ profile keys 2,711。
+4. 最终包 626 条；CloudBase Storage 海报迁移 111/111、patched occurrences 516；missing internal poster、public poster URL、missing geo、non-target、source/duplicate/gap 均为 0。
+5. 事务状态 `promoted`；CloudRun `weekly-api-123` 100% 流量。线上分页 626/626，ID digest `101296eee0840ce6563d7275fb0ebba38376dab0f253ba254b6c20cea848924b`；club overviews 11 clubs/13 overviews，digest `e27a304edc2a84bd9045c913afdcbae41b0bb76f81a6968e1eedbb8605948373`。
+6. 小程序保持 online-first：在线 API -> 最近成功持久化缓存 -> 仅首次全断网时 static seed。本轮没有上传小程序代码、提交审核或公开发布版本；活动数据更新不等于产生新的小程序版本号。
+
+AtlasV2：
+
+1. `run_20260718_200513_post_weekly` status `ok`，34/34 视觉记录完成，canonical gate pass。
+2. checkpoint 从 138,978 推进到 139,014，SHA-256 `3e5048132fcd60589f95a8613c22bf6af77738db0fec5b82e97550210ebaefe6`；pointer 与 live 文件精确一致。
+3. candidate `canonical_serving_candidate.sqlite` 的 `PRAGMA quick_check=ok`，canonical events 258,924、profiles 54,312、members 512,461、DJ-event relations 751,469。这里只推进 cumulative candidate/checkpoint，没有替换另一个公开生产库或重启服务。
+
+Hermes：
+
+1. `Hermes_Gateway` task Running，`gateway status --deep --full` 6/6，Telegram connected，cron heartbeat 新鲜。
+2. 九个 canonical jobs active、两个旧 Friday jobs paused；workdir 统一指向不可变 release，contract audit 208/208。Fast Watch、health、package monitor 直接 canary 均 exit 0，20:30 Fast Watch 又由 cron 自动执行成功。
+3. 旧启动时约 110 秒的 PID/lock/state 假阴性来自慢初始化前未认领生命周期，不是持续 HOME 漂移。现役已稳定；最新 GitHub main 候选必须先保留本地 supervisor 并修复 early `starting`/失败清理，再经隔离 canary，不能直接覆盖重装。
+
+外部恢复证据与日常 runbook：
+
+`C:\Users\win\Documents\Codex\2026-07-17\xian\outputs\HUAIDJ_PIPELINE_RECOVERY_20260718.md`
+
+## 14. 维护规则
 
 - 新结论必须带来源：代码路径、run id、summary/gate 路径或数据库读回。
 - 历史 run 只能解释历史，不得覆盖当前用户确认的架构策略。
