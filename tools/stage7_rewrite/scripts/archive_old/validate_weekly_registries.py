@@ -60,6 +60,7 @@ VALID_CITY_KEYS = {
     "hongkong",
     "taipei",
     "sanya",
+    "hohhot",
 }
 VENUE_STATUSES = {"active", "closed", "pending_geocode", "review"}
 ACCOUNT_STATUSES = {"active", "closed", "inactive", "review"}
@@ -173,7 +174,7 @@ def validate_venue_registry(data: dict[str, Any], *, path: str) -> list[Registry
     issues: list[RegistryIssue] = []
     rows = validate_root(data, "weekly_venue_registry.v1", "venues", path, issues)
     seen_ids: dict[str, str] = {}
-    seen_names: dict[str, str] = {}
+    seen_identities: dict[str, str] = {}
     for index, row in enumerate(rows):
         row_path = f"{path}.venues[{index}]"
         if not isinstance(row, dict):
@@ -184,20 +185,23 @@ def validate_venue_registry(data: dict[str, Any], *, path: str) -> list[Registry
         aliases = require_string_array(row, "aliases", row_path, issues)
         city_key = require_string(row, "city_key", row_path, issues)
         require_string(row, "city_name", row_path, issues)
+        address_full = optional_string(row, "address_full")
         status = require_string(row, "status", row_path, issues)
         validate_iso_date(row.get("last_verified_at"), f"{row_path}.last_verified_at", issues, required=True)
         validate_city_key(city_key, f"{row_path}.city_key", issues)
         if status and status not in VENUE_STATUSES:
             issues.append(RegistryIssue("error", f"{row_path}.status", f"must be one of {sorted(VENUE_STATUSES)}"))
         check_duplicate(normalize_key(venue_id), f"{row_path}.venue_id", seen_ids, issues, "venue_id")
-        row_names: set[str] = set()
-        for name in [canonical_name, *aliases]:
-            normalized_name = normalize_key(name)
-            if normalized_name in row_names:
-                continue
-            row_names.add(normalized_name)
-            check_duplicate(normalized_name, f"{row_path}.aliases", seen_names, issues, "venue name or alias")
-        if status == "active" and not optional_string(row, "address_full"):
+        identity_parts = [normalize_key(city_key), normalize_key(canonical_name), normalize_key(address_full)]
+        if all(identity_parts):
+            check_duplicate(
+                "|".join(identity_parts),
+                f"{row_path}.identity",
+                seen_identities,
+                issues,
+                "venue city/name/address identity",
+            )
+        if status == "active" and not address_full:
             issues.append(RegistryIssue("warning", f"{row_path}.address_full", "active venue has no full address; events at this venue stay in review"))
         if status == "active" and (row.get("geo_lng") in (None, "") or row.get("geo_lat") in (None, "")):
             issues.append(RegistryIssue("warning", f"{row_path}.geo", "active venue has no geo coordinates"))

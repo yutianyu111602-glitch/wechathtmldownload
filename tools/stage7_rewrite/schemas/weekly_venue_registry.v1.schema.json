@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://huaidj.local/schemas/weekly_venue_registry.v1.schema.json",
+  "title": "HUAIDJ Weekly Venue Registry",
+  "type": "object",
+  "required": ["schema_version", "updated_at", "venues"],
+  "properties": {
+    "schema_version": { "const": "weekly_venue_registry.v1" },
+    "updated_at": { "type": "string", "pattern": "^20\\d{2}-\\d{2}-\\d{2}$" },
+    "notes": { "type": "array", "items": { "type": "string" } },
+    "venues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["venue_id", "canonical_name", "aliases", "city_key", "city_name", "address_full", "status", "last_verified_at"],
+        "properties": {
+          "venue_id": { "type": "string", "minLength": 1 },
+          "canonical_name": { "type": "string", "minLength": 1 },
+          "aliases": { "type": "array", "items": { "type": "string" } },
+          "city_key": {
+            "enum": [
+              "beijing", "changchun", "changsha", "chengdu", "chongqing", "dali", "dalian", "daqing",
+              "fuzhou", "guangzhou", "guiyang", "haikou", "hangzhou", "harbin", "hohhot", "hongkong",
+              "huaian", "jinan", "kunming", "lanzhou", "lhasa", "luoyang", "nanjing", "nanning",
+              "qingdao", "quanzhou", "sanya", "shanghai", "shenyang", "shenzhen", "shijiazhuang",
+              "suzhou", "taipei", "taiyuan", "tianjin", "urumqi", "weifang", "wuhan", "xiamen",
+              "xian", "yinchuan", "zhengzhou", "zhuhai"
+            ]
+          },
+          "city_name": { "type": "string" },
+          "address_full": { "type": "string" },
+          "geo_lng": { "type": ["number", "null"] },
+          "geo_lat": { "type": ["number", "null"] },
+          "status": { "enum": ["active", "closed", "pending_geocode", "review"] },
+          "last_verified_at": { "type": "string" },
+          "source_note": { "type": "string" }
+        }
+      }
+    }
+  }
+}

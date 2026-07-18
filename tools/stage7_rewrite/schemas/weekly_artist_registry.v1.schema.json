@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://huaidj.local/schemas/weekly_artist_registry.v1.schema.json",
+  "title": "HUAIDJ Weekly Artist Registry",
+  "type": "object",
+  "required": ["schema_version", "updated_at", "blocked_lineup_terms", "artists"],
+  "properties": {
+    "schema_version": { "const": "weekly_artist_registry.v1" },
+    "updated_at": { "type": "string", "pattern": "^20\\d{2}-\\d{2}-\\d{2}$" },
+    "notes": { "type": "array", "items": { "type": "string" } },
+    "blocked_lineup_terms": { "type": "array", "items": { "type": "string" } },
+    "artists": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["artist_id", "canonical_name", "aliases", "bio_manual", "style_tags", "status", "last_verified_at"],
+        "properties": {
+          "artist_id": { "type": "string", "minLength": 1 },
+          "canonical_name": { "type": "string", "minLength": 1 },
+          "aliases": { "type": "array", "items": { "type": "string" } },
+          "bio_manual": { "type": "string" },
+          "style_tags": { "type": "array", "items": { "type": "string" } },
+          "status": { "enum": ["active", "inactive", "review"] },
+          "last_verified_at": { "type": "string" }
+        }
+      }
+    }
+  }
+}

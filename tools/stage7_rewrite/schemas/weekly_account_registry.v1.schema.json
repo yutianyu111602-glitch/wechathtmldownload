@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://huaidj.local/schemas/weekly_account_registry.v1.schema.json",
+  "title": "HUAIDJ Weekly Account Registry",
+  "type": "object",
+  "required": ["schema_version", "updated_at", "accounts"],
+  "properties": {
+    "schema_version": { "const": "weekly_account_registry.v1" },
+    "updated_at": { "type": "string", "pattern": "^20\\d{2}-\\d{2}-\\d{2}$" },
+    "source_export": { "type": "string" },
+    "notes": { "type": ["string", "array"], "items": { "type": "string" } },
+    "accounts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["account_id", "account_name", "aliases", "city_key", "type", "status", "sync_priority"],
+        "properties": {
+          "account_id": { "type": "string", "minLength": 1 },
+          "account_name": { "type": "string", "minLength": 1 },
+          "fakeid": { "type": "string" },
+          "aliases": { "type": "array", "items": { "type": "string" } },
+          "city_key": {
+            "enum": [
+              "", "beijing", "changchun", "changsha", "chengdu", "chongqing", "dali", "dalian",
+              "daqing", "fuzhou", "guangzhou", "guiyang", "haikou", "hangzhou", "harbin", "hohhot",
+              "hongkong", "huaian", "jinan", "kunming", "lanzhou", "lhasa", "luoyang", "nanjing",
+              "nanning", "qingdao", "quanzhou", "sanya", "shanghai", "shenyang", "shenzhen",
+              "shijiazhuang", "suzhou", "taipei", "taiyuan", "tianjin", "urumqi", "weifang", "wuhan",
+              "xiamen", "xian", "yinchuan", "zhengzhou", "zhuhai"
+            ]
+          },
+          "type": { "enum": ["club", "promoter", "media", "venue", "label", "artist_collective", "unknown"] },
+          "status": { "enum": ["active", "closed", "inactive", "review"] },
+          "sync_priority": { "type": "integer", "minimum": 0 },
+          "last_seen_at": { "type": "string" },
+          "export_completed": { "type": "boolean" },
+          "export_synced_count": { "type": "integer" },
+          "export_total_count": { "type": "integer" },
+          "avatar_url": { "type": "string" },
+          "source": { "type": "string" }
+        }
+      }
+    }
+  }
+}

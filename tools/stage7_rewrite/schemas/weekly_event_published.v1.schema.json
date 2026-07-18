@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://huaidj.local/schemas/weekly_event_published.v1.schema.json",
+  "title": "HUAIDJ Weekly Published Event",
+  "type": "object",
+  "additionalProperties": true,
+  "not": {
+    "anyOf": [
+      { "required": ["source_url"] },
+      { "required": ["raw_source_url"] },
+      { "required": ["sourceUrl"] },
+      { "required": ["confidence"] },
+      { "required": ["llm_confidence"] },
+      { "required": ["recommendation_reason"] }
+    ]
+  },
+  "required": [
+    "schema_version",
+    "event_id",
+    "title_display",
+    "title_original",
+    "event_date_start",
+    "event_date_end",
+    "time_start",
+    "time_end",
+    "running_hours_text",
+    "city_key",
+    "city_name",
+    "venue_id",
+    "venue_name",
+    "address_full",
+    "cover_image_url",
+    "poster_file_id",
+    "poster_source",
+    "lineup_artists",
+    "music_styles",
+    "price_text",
+    "ticketing_text",
+    "description_original_lines",
+    "dj_bio_lines",
+    "artist_profiles",
+    "source_account_name",
+    "source_published_at",
+    "source_article",
+    "source_action",
+    "quality_status",
+    "publish_status",
+    "dedupe_key"
+  ],
+  "properties": {
+    "schema_version": { "const": "weekly_event_published.v1" },
+    "event_id": { "type": "string", "minLength": 1 },
+    "title_display": { "type": "string", "minLength": 1 },
+    "title_original": { "type": "string" },
+    "event_date_start": { "type": "string", "pattern": "^20\\d{2}-\\d{2}-\\d{2}$" },
+    "event_date_end": { "type": "string", "pattern": "^20\\d{2}-\\d{2}-\\d{2}$" },
+    "time_start": { "type": "string" },
+    "time_end": { "type": "string" },
+    "running_hours_text": { "type": "string" },
+    "city_key": { "type": "string", "minLength": 1 },
+    "city_name": { "type": "string", "minLength": 1 },
+    "venue_id": { "type": "string" },
+    "venue_name": { "type": "string", "minLength": 1 },
+    "address_full": { "type": "string", "minLength": 1 },
+    "geo_lng": { "type": ["number", "null"] },
+    "geo_lat": { "type": ["number", "null"] },
+    "cover_image_url": { "type": "string" },
+    "poster_file_id": { "type": "string" },
+    "poster_source": { "type": "string" },
+    "lineup_artists": { "type": "array", "items": { "type": "string" } },
+    "music_styles": { "type": "array", "items": { "type": "string" } },
+    "price_text": { "type": "string" },
+    "ticketing_text": { "type": "string" },
+    "description_original_lines": { "type": "array", "items": { "type": "string" } },
+    "dj_bio_lines": { "type": "array", "items": { "type": "string" } },
+    "artist_profiles": { "type": "array", "items": { "type": "object" } },
+    "source_account_name": { "type": "string", "minLength": 1 },
+    "source_published_at": { "type": "string" },
+    "source_article": {
+      "type": "object",
+      "required": ["url_hash", "account_name", "published_at"],
+      "properties": {
+        "url_hash": { "type": "string" },
+        "account_name": { "type": "string" },
+        "published_at": { "type": "string" }
+      }
+    },
+    "source_action": {
+      "type": "object",
+      "required": ["type", "label", "available", "url_hash"],
+      "properties": {
+        "type": { "type": "string" },
+        "label": { "type": "string" },
+        "available": { "type": "boolean" },
+        "url_hash": { "type": "string" }
+      }
+    },
+    "quality_status": { "type": "string" },
+    "publish_status": { "type": "string" },
+    "dedupe_key": { "type": "string", "minLength": 1 }
+  }
+}

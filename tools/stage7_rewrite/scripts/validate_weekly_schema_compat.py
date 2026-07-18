@@ -31,6 +31,12 @@ REGISTRY_BY_SCHEMA = {
     "weekly_artist_registry.v1.schema.json": "weekly_artists_seed.json",
     "weekly_venue_registry.v1.schema.json": "weekly_venues_seed.json",
 }
+EXPECTED_SCHEMA_NAMES = (
+    "weekly_account_registry.v1.schema.json",
+    "weekly_artist_registry.v1.schema.json",
+    "weekly_event_published.v1.schema.json",
+    "weekly_venue_registry.v1.schema.json",
+)
 
 
 def now_iso() -> str:
@@ -358,7 +364,13 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     reject_d_path(args.registries, "registries")
     if args.weekly_path_report is not None:
         reject_d_path(args.weekly_path_report, "weekly_path_report")
-    schema_files = sorted(args.schemas.glob("weekly_*.v1.schema.json"))
+    schema_files = sorted(args.schemas.glob("*.schema.json"))
+    discovered_schema_names = [schema_file.name for schema_file in schema_files]
+    expected_schema_names = set(EXPECTED_SCHEMA_NAMES)
+    discovered_schema_name_set = set(discovered_schema_names)
+    missing_schema_names = sorted(expected_schema_names - discovered_schema_name_set)
+    unexpected_schema_names = sorted(discovered_schema_name_set - expected_schema_names)
+    schema_set_ok = not missing_schema_names and not unexpected_schema_names
     release_names = collect_release_names(args.release_pack, args.coverage_limit)
     weekly_path = read_optional_json(args.weekly_path_report)
 
@@ -372,10 +384,17 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         else:
             checks[schema_file.name] = {"ok": False, "decision": "unknown_weekly_schema_target"}
 
+    for schema_name in missing_schema_names:
+        checks[schema_name] = {
+            "target": schema_name,
+            "path": str(args.schemas / schema_name),
+            "exists": False,
+            "ok": False,
+            "decision": "required_schema_missing",
+        }
+
     event_check = checks.get("weekly_event_published.v1.schema.json") or {}
-    registry_checks = {
-        name: item for name, item in checks.items() if name != "weekly_event_published.v1.schema.json"
-    }
+    registry_checks = {name: checks.get(name) or {} for name in REGISTRY_BY_SCHEMA}
     direct_event_ok = bool(event_check.get("ok"))
     registries_ok = all(bool(item.get("ok")) for item in registry_checks.values())
     selected_weekly_path_ready = (
@@ -387,14 +406,21 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
     direct_schema_blocked_but_selected_path_ready = (
         registries_ok and not direct_event_ok and selected_weekly_path_ready
     )
-    ok = all(bool(item.get("ok")) for item in checks.values()) or direct_schema_blocked_but_selected_path_ready
+    all_expected_checks_ok = all(bool((checks.get(name) or {}).get("ok")) for name in EXPECTED_SCHEMA_NAMES)
+    ok = schema_set_ok and (all_expected_checks_ok or direct_schema_blocked_but_selected_path_ready)
     blockers: list[str] = []
+    if missing_schema_names:
+        blockers.append(f"schema_set: missing required schemas: {', '.join(missing_schema_names)}")
+    if unexpected_schema_names:
+        blockers.append(f"schema_set: unexpected schemas: {', '.join(unexpected_schema_names)}")
     for name, item in checks.items():
         if direct_schema_blocked_but_selected_path_ready and name == "weekly_event_published.v1.schema.json":
             continue
         if not item.get("ok"):
             blockers.append(f"{name}: {item.get('decision')}")
-    if direct_schema_blocked_but_selected_path_ready:
+    if not schema_set_ok:
+        decision = "weekly_schema_set_missing_or_unexpected"
+    elif direct_schema_blocked_but_selected_path_ready:
         decision = "weekly_schema_selected_path_ready_direct_stage7_adapter_deferred"
     else:
         decision = "weekly_schema_compat_ready" if ok else "weekly_schema_adapter_or_registry_fix_required"
@@ -409,6 +435,13 @@ def build_report(args: argparse.Namespace) -> dict[str, Any]:
         "sample_per_file": args.sample_per_file,
         "coverage_limit": args.coverage_limit,
         "release_name_counts": {key: len(value) for key, value in release_names.items()},
+        "schema_set": {
+            "ok": schema_set_ok,
+            "expected": list(EXPECTED_SCHEMA_NAMES),
+            "discovered": discovered_schema_names,
+            "missing": missing_schema_names,
+            "unexpected": unexpected_schema_names,
+        },
         "checks": checks,
         "selected_weekly_path": {
             "enabled": bool(args.allow_selected_weekly_path),
@@ -448,6 +481,14 @@ def write_markdown(path: Path, report: dict[str, Any]) -> None:
         f"- sample_per_file: `{report['sample_per_file']}`",
         f"- coverage_limit: `{report['coverage_limit']}`",
         f"- release_name_counts: `{json.dumps(report['release_name_counts'], ensure_ascii=False, sort_keys=True)}`",
+        "",
+        "## Schema Set",
+        "",
+        f"- ok: `{report['schema_set']['ok']}`",
+        f"- expected: `{json.dumps(report['schema_set']['expected'], ensure_ascii=False)}`",
+        f"- discovered: `{json.dumps(report['schema_set']['discovered'], ensure_ascii=False)}`",
+        f"- missing: `{json.dumps(report['schema_set']['missing'], ensure_ascii=False)}`",
+        f"- unexpected: `{json.dumps(report['schema_set']['unexpected'], ensure_ascii=False)}`",
         "",
         "## Selected Weekly Path",
         "",
