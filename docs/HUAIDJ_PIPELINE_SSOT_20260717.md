@@ -340,7 +340,7 @@ Hermes：
 
 1. `Hermes_Gateway` task Running，`gateway status --deep --full` 6/6，Telegram connected，cron heartbeat 新鲜。
 2. 九个 canonical jobs active、两个旧 Friday jobs paused；workdir 统一指向不可变 release，contract audit 208/208。Fast Watch、health、package monitor 直接 canary 均 exit 0。20:30 Fast Watch 曾由与最终代码相同的 `818ba0c` runtime 自动执行成功；`0cf5794` 安装器和契约审计完成后，Package/API Monitor 又于 20:45:47 由 Gateway 自动触发并写回 `last_status=ok`，这是最终 `0cf5794` runtime 的明确自动计划证明。Atlas job 仍显示 7 月 17 日的历史失败状态；本轮只证明同一 launcher 的手工全链 canary 成功，下一次自动成功需在 23:40 运行后另行读回。
-3. 旧启动时约 110 秒的 PID/lock/state 假阴性来自慢初始化前未认领生命周期，不是持续 HOME 漂移。现役已稳定。GitHub main `7fd419e5` 已在独立目录与本地 supervisor 合并为候选 `eb74897a`，early identity claim、统一失败清理和 Windows 状态测试的 Python gate 为 161/161；但 Electron 依赖下载受 TLS 握手中断，JS/typecheck/pack 和独立 Desktop UAT 尚未完成。候选没有 push、stage 或切换，现役仍是 `c48d53413-official-recovery`；不得把“Python 候选通过”写成“最新版 Desktop 已安装”。
+3. 旧启动时约 110 秒的 PID/lock/state 假阴性来自慢初始化前未认领生命周期，不是持续 HOME 漂移。现役已稳定。GitHub main `7fd419e5` 已在独立目录与本地 supervisor 合并为候选 `6fa21c6a`；early identity claim、统一失败清理、外层 lifecycle 唯一 claim 所有权和 Windows/VBS 状态门禁经独立复审无 blocker，Python gate 为 163/163。但 Electron 依赖下载受 TLS 握手中断，JS/typecheck/pack 和独立 Desktop UAT 尚未完成。候选没有 push、stage 或切换，现役仍是 `c48d53413-official-recovery`；不得把“Python 候选通过”写成“最新版 Desktop 已安装”。
 
 外部恢复证据与日常 runbook：
 
