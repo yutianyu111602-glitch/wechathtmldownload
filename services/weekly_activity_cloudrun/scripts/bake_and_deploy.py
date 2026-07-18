@@ -4,8 +4,8 @@
 Workflow
 --------
 1. (Optional) Check / apply tcb CLI envId patch.
-2. Copy release data  →  services/weekly_activity_cloudrun/data/current_release/
-   Copy source_url_map  →  data/source_actions/source_url_map.json
+2. Copy release data into the configured external CloudRun runtime data root.
+   Copy source_url_map into its runtime source_actions directory.
 3. tcb run deploy weekly-api --envId <ENV_ID>
 4. Wait ROUTE_PROPAGATION_DELAY seconds for CloudRun route propagation.
 5. Generate a dated preview QR via WeChat DevTools CLI.
@@ -30,6 +30,7 @@ python scripts/bake_and_deploy.py --release-dir ... --no-qr
 import argparse
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -52,11 +53,15 @@ _SCRIPT_DIR = Path(__file__).resolve().parent
 _PROJECT_DIR = _SCRIPT_DIR.parent
 _REPO_ROOT = _PROJECT_DIR.parents[1]
 MINIPROGRAM_DIR = _REPO_ROOT / "apps" / "weekly_activity_miniprogram"
-DATA_CURRENT_RELEASE = _PROJECT_DIR / "data" / "current_release"
-DATA_SOURCE_ACTIONS = _PROJECT_DIR / "data" / "source_actions"
-DATA_STAGE7_ATLAS = _PROJECT_DIR / "data" / "stage7_atlas"
+DEFAULT_RUNTIME_DATA_ROOT = Path(
+    r"F:\DevData\HuaidjRuntime\state\weekly_activity_cloudrun\data"
+)
 DATA_ROOT = _PROJECT_DIR / "data"
-DEPLOY_CONTEXT_DIR = _PROJECT_DIR / "tmp" / "cloudrun_deploy_context"
+DATA_CURRENT_RELEASE = DATA_ROOT / "current_release"
+DATA_SOURCE_ACTIONS = DATA_ROOT / "source_actions"
+DATA_STAGE7_ATLAS = DATA_ROOT / "stage7_atlas"
+WORK_ROOT = _PROJECT_DIR / "tmp"
+DEPLOY_CONTEXT_DIR = WORK_ROOT / "cloudrun_deploy_context"
 DEPLOY_CONTEXT_MANIFEST = "deploy_context_manifest.json"
 DEPLOY_CONTEXT_TOP_ITEMS = ["package.json", "package-lock.json", "Dockerfile", "assets", "src", "scripts"]
 MINIAPP_ATLAS_INDEX_ITEMS = [
@@ -91,6 +96,77 @@ OPTIONAL_RELEASE_ITEMS = [
     "weekly_entity_snapshot.json",
     "weekly_entity_observations.jsonl",
 ]
+
+
+def _resolved(path: Path) -> Path:
+    return path.expanduser().resolve(strict=False)
+
+
+def _is_within(path: Path, root: Path) -> bool:
+    try:
+        _resolved(path).relative_to(_resolved(root))
+    except ValueError:
+        return False
+    return True
+
+
+def configure_runtime_paths(
+    *,
+    data_root: str = "",
+    current_release_dir: str = "",
+    work_root: str = "",
+    production_write: bool,
+) -> tuple[Path, Path, Path]:
+    """Configure mutable CloudRun state outside the immutable source checkout."""
+
+    global DATA_ROOT, DATA_CURRENT_RELEASE, DATA_SOURCE_ACTIONS, DATA_STAGE7_ATLAS  # noqa: PLW0603
+    global WORK_ROOT, DEPLOY_CONTEXT_DIR  # noqa: PLW0603
+
+    selected_data = str(data_root or os.environ.get("HUAIDJ_CLOUDRUN_DATA_ROOT") or "").strip()
+    selected_current = str(
+        current_release_dir or os.environ.get("HUAIDJ_CURRENT_RELEASE_DIR") or ""
+    ).strip()
+    selected_work = str(work_root or os.environ.get("HUAIDJ_CLOUDRUN_WORK_ROOT") or "").strip()
+    runtime_configured = bool(selected_data or selected_current)
+
+    if selected_current and not selected_data:
+        selected_data = str(Path(selected_current).parent)
+    if not selected_data:
+        selected_data = str(DEFAULT_RUNTIME_DATA_ROOT)
+    if not selected_current:
+        selected_current = str(Path(selected_data) / "current_release")
+    if (
+        not production_write
+        and not runtime_configured
+        and not Path(selected_current).exists()
+    ):
+        selected_data = str(_PROJECT_DIR / "data")
+        selected_current = str(Path(selected_data) / "current_release")
+        if not selected_work:
+            selected_work = str(_PROJECT_DIR / "tmp")
+    if not selected_work:
+        selected_work = str(Path(selected_data).parent / "work")
+
+    resolved_data = _resolved(Path(selected_data))
+    resolved_current = _resolved(Path(selected_current))
+    resolved_work = _resolved(Path(selected_work))
+    if resolved_current != resolved_data / "current_release":
+        raise ValueError(
+            "current_release_dir must equal <data_root>/current_release for an atomic runtime layout"
+        )
+    if production_write:
+        if _is_within(resolved_data, _REPO_ROOT):
+            raise ValueError("production CloudRun data root must be outside the source checkout")
+        if _is_within(resolved_work, _REPO_ROOT):
+            raise ValueError("production CloudRun work root must be outside the source checkout")
+
+    DATA_ROOT = resolved_data
+    DATA_CURRENT_RELEASE = resolved_current
+    DATA_SOURCE_ACTIONS = DATA_ROOT / "source_actions"
+    DATA_STAGE7_ATLAS = DATA_ROOT / "stage7_atlas"
+    WORK_ROOT = resolved_work
+    DEPLOY_CONTEXT_DIR = WORK_ROOT / "cloudrun_deploy_context"
+    return DATA_ROOT, DATA_CURRENT_RELEASE, WORK_ROOT
 MATERIALIZED_LLM_REQUIRED_ITEMS = [
     Path("llm") / "weekly_summary.json",
     Path("llm") / "enrichment_index.json",
@@ -204,6 +280,37 @@ def read_json_file(path: Path) -> dict:
     except (OSError, json.JSONDecodeError):
         return {}
     return value if isinstance(value, dict) else {}
+
+
+def package_item_count(data_dir: Path) -> tuple[int, list[str]]:
+    failures: list[str] = []
+    manifest = read_json_file(data_dir / "manifest.json")
+    current = read_json_file(data_dir / "current.json")
+    try:
+        manifest_count = int(manifest.get("item_count") or 0)
+    except (TypeError, ValueError):
+        manifest_count = 0
+    items = current.get("items")
+    current_count = len(items) if isinstance(items, list) else 0
+    if manifest_count <= 0:
+        failures.append("manifest_item_count_not_positive")
+    if current_count <= 0:
+        failures.append("current_item_count_not_positive")
+    if manifest_count and current_count and manifest_count != current_count:
+        failures.append("manifest_current_item_count_mismatch")
+    return current_count, failures
+
+
+def validate_production_bake_input(release_dir: Path) -> tuple[bool, list[str]]:
+    """Prevent a stale candidate from replacing a larger authoritative base."""
+
+    base_count, base_failures = package_item_count(DATA_CURRENT_RELEASE)
+    release_count, release_failures = package_item_count(release_dir)
+    failures = [f"base_{item}" for item in base_failures]
+    failures.extend(f"release_{item}" for item in release_failures)
+    if base_count > 0 and release_count > 0 and release_count < base_count:
+        failures.append("release_item_count_below_authoritative_base")
+    return not failures, sorted(set(failures))
 
 
 def parse_iso_time(value: object) -> datetime | None:
@@ -926,6 +1033,21 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--release-dir", required=True, help="Path to the built release directory")
     parser.add_argument("--source-url-map", default=None, help="Path to source_url_map.json (optional, auto-detected from release)")
+    parser.add_argument(
+        "--data-root",
+        default="",
+        help="Mutable CloudRun data root (or HUAIDJ_CLOUDRUN_DATA_ROOT).",
+    )
+    parser.add_argument(
+        "--current-release-dir",
+        default="",
+        help="Authoritative current_release directory (or HUAIDJ_CURRENT_RELEASE_DIR).",
+    )
+    parser.add_argument(
+        "--work-root",
+        default="",
+        help="Mutable deploy work root (or HUAIDJ_CLOUDRUN_WORK_ROOT).",
+    )
     parser.add_argument("--env-id", default=ENV_ID, help=f"CloudBase env ID (default: {ENV_ID})")
     parser.add_argument("--no-qr", action="store_true", help="Skip QR generation")
     parser.add_argument("--dry-run", action="store_true", help="Print steps without making changes")
@@ -953,10 +1075,29 @@ def main() -> int:
 
     ENV_ID = args.env_id
 
+    try:
+        configure_runtime_paths(
+            data_root=args.data_root,
+            current_release_dir=args.current_release_dir,
+            work_root=args.work_root,
+            production_write=not args.dry_run,
+        )
+    except ValueError as exc:
+        print(f"ERROR: invalid CloudRun runtime path contract: {exc}")
+        return 2
+
     release_dir = Path(args.release_dir)
     if not release_dir.exists():
         print(f"ERROR: release-dir not found: {release_dir}")
         return 1
+    if not args.dry_run:
+        valid_bake, bake_failures = validate_production_bake_input(release_dir)
+        if not valid_bake:
+            print(
+                "ERROR: authoritative base/candidate validation failed before bake: "
+                + ", ".join(bake_failures)
+            )
+            return 2
 
     ts_label = datetime.now().strftime("%Y-%m-%d %H:%M")
     desc = args.desc or f"deploy {release_dir.name} @ {ts_label}"
@@ -966,6 +1107,9 @@ def main() -> int:
     print(f"  env     : {ENV_ID}")
     print(f"  service : {SERVICE_NAME}")
     print(f"  mode    : {args.deploy_mode}")
+    print(f"  data    : {DATA_ROOT}")
+    print(f"  current : {DATA_CURRENT_RELEASE}")
+    print(f"  work    : {WORK_ROOT}")
     print(f"  dry-run : {args.dry_run}")
     print(f"  prepare : {args.prepare_only}")
     print()

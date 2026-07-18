@@ -212,6 +212,10 @@ def audit_wrappers(checks: list[dict[str, Any]]) -> None:
             "SkipSanjiExport",
             "sanji_db_snapshot_export",
             "direct_rss_feed_fetch must stay false",
+            "HUAIDJ_CURRENT_RELEASE_DIR",
+            "HUAIDJ_PUBLISHED_API_DIR",
+            '"-IncrementalBaseApiDir", $IncrementalBaseApiDir',
+            '"-PublishedApiDir", $PublishedApiDir',
         ],
         REPO / "tools/stage7_rewrite/scripts/sanji_desktop_cdp_control.mjs": [
             "isExistingTaskError",
@@ -229,12 +233,24 @@ def audit_wrappers(checks: list[dict[str, Any]]) -> None:
             "14:00-18:00",
             "& pwsh -NoProfile",
             "& pwsh @publishArgs",
+            "HUAIDJ_CURRENT_RELEASE_DIR",
+            "HUAIDJ_PUBLISHED_API_DIR",
+            '"-IncrementalBaseApiDir", $IncrementalBaseApiDir',
         ],
         REPO / "tools/stage7_rewrite/run_openclaw_weekly_daily_publish.ps1": [
             '[string]$PosterExtractionMode = "vl_direct_qwen"',
             '[int]$PosterVlMaxImages = 0',
             '[string]$PosterVlModel = "qwen3.6-plus"',
             "sanji_desktop_rss",
+            "validate_weekly_authoritative_base.py",
+            "HUAIDJ_CLOUDRUN_DATA_ROOT",
+            "HUAIDJ_CLOUDRUN_WORK_ROOT",
+            "HUAIDJ_PUBLISHED_API_DIR",
+            "HUAIDJ_PROXY_URL",
+            "--expected-online-item-count",
+            "--data-root $CloudRunDataRoot",
+            "--context-dir $CloudRunDeployContextDir",
+            "Assert-RemotePagination",
         ],
         REPO / "tools/stage7_rewrite/scripts/install_huaidj_sanji_hermes_jobs.py": [
             "HUAIDJ Sanji Wed 21:10",
@@ -265,6 +281,11 @@ def audit_wrappers(checks: list[dict[str, Any]]) -> None:
             "hermes_gateway",
             "HUAIDJ_ALLOW_IMESSAGE_FALLBACK",
             "wrap_response",
+        ],
+        REPO / "tools/stage7_rewrite/scripts/report_huaidj_package_api_tg_status.py": [
+            "DEFAULT_RUNTIME_DATA_ROOT",
+            "HUAIDJ_CURRENT_RELEASE_DIR",
+            "HUAIDJ_CLOUDRUN_DATA_ROOT",
         ],
     }
     for path, needles in wrapper_checks.items():
@@ -369,6 +390,8 @@ def audit_wrappers(checks: list[dict[str, Any]]) -> None:
         ],
         prefect_flow: [
             r"E:\weekly_activity_pipeline\longrun",
+            "HUAIDJ_CURRENT_RELEASE_DIR",
+            "HUAIDJ_CLOUDRUN_DATA_ROOT",
         ],
         ticket_eval: [
             r"E:\\weekly_activity_pipeline\\longrun\\LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE\\latest_queue.jsonl",
@@ -395,6 +418,25 @@ def audit_wrappers(checks: list[dict[str, Any]]) -> None:
             stale_mnt_d_hint not in text,
             "stale_hint_present=" + str(stale_mnt_d_hint in text).lower(),
         )
+
+    legacy_background = REPO / "tools/stage7_rewrite/scripts/run_pipeline_background.ps1"
+    legacy_text = read_text(legacy_background) if legacy_background.is_file() else ""
+    add(
+        checks,
+        "legacy background launcher is env-only delegator",
+        "HUAIDJ_REPO" in legacy_text
+        and "run_openclaw_weekly_daily_publish.ps1" in legacy_text
+        and r"C:\code\githubstar\wechathtmldownload" not in legacy_text
+        and "$env:MPTEXT_AUTH_KEY =" not in legacy_text,
+        "env_only=true" if legacy_text else "missing launcher",
+    )
+    secret_scan = REPO / "tools/stage7_rewrite/scripts/scan_huaidj_tracked_secrets.py"
+    add(
+        checks,
+        "tracked secret regression scanner exists",
+        secret_scan.is_file(),
+        str(secret_scan),
+    )
 
 
 def audit_docs(checks: list[dict[str, Any]]) -> None:

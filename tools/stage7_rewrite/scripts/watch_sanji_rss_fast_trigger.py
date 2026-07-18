@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import importlib.util
 import json
+import os
 import sys
 from collections import Counter
 from datetime import datetime, timedelta
@@ -23,7 +24,20 @@ AUDIT_SCRIPT = ROOT / "scripts" / "audit_weekly_sanji_queue_package_gap.py"
 DEFAULT_QUEUE = Path(r"E:\公众号\sanji-daily-export\latest_queue.jsonl")
 DEFAULT_STATE = ROOT / "reports" / "sanji_rss_fast_watch" / "state.json"
 DEFAULT_REPORT = ROOT / "reports" / "sanji_rss_fast_watch" / "latest_watch_report.json"
-DEFAULT_API_DIR = ROOT.parents[1] / "services" / "weekly_activity_cloudrun" / "data" / "current_release"
+DEFAULT_RUNTIME_DATA_ROOT = Path(
+    r"F:\DevData\HuaidjRuntime\state\weekly_activity_cloudrun\data"
+)
+
+
+def default_api_dir() -> Path:
+    configured_current = os.environ.get("HUAIDJ_CURRENT_RELEASE_DIR", "").strip()
+    if configured_current:
+        return Path(configured_current)
+    configured_data = os.environ.get("HUAIDJ_CLOUDRUN_DATA_ROOT", "").strip()
+    return Path(configured_data or DEFAULT_RUNTIME_DATA_ROOT) / "current_release"
+
+
+DEFAULT_API_DIR = default_api_dir()
 DEFAULT_SOURCE_POLICY = ROOT / "registries" / "weekly_sanji_source_policy.json"
 SCHEMA_VERSION = "huaidj_sanji_rss_fast_watch.v2"
 

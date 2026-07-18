@@ -30,6 +30,9 @@ from prefect import flow, get_run_logger, task
 REPO_ROOT = Path(os.environ.get("HUAIDJ_REPO_ROOT", Path(__file__).resolve().parents[3]))
 LONGRUN_ROOT = Path(os.environ.get("HUAIDJ_LONGRUN_ROOT", r"E:\weekly_activity_pipeline\longrun"))
 REPORT_ROOT = REPO_ROOT / "tools" / "stage7_rewrite" / "reports" / "prefect_weekly_flow"
+DEFAULT_RUNTIME_DATA_ROOT = Path(
+    r"F:\DevData\HuaidjRuntime\state\weekly_activity_cloudrun\data"
+)
 
 WIN_RELEASE_SCRIPT = REPO_ROOT / "tools" / "stage7_rewrite" / "weekly_activity_next_week_pipeline.ps1"
 SCRIPTS_DIR = REPO_ROOT / "tools" / "stage7_rewrite" / "scripts"
@@ -157,10 +160,19 @@ def _windows_path_to_wsl(path: Path) -> str:
     return f"/mnt/{drive}/{rest}"
 
 
+def _authoritative_current_release(value: str = "") -> Path:
+    configured_current = str(value or os.environ.get("HUAIDJ_CURRENT_RELEASE_DIR") or "").strip()
+    if configured_current:
+        return Path(configured_current)
+    configured_data = str(os.environ.get("HUAIDJ_CLOUDRUN_DATA_ROOT") or "").strip()
+    return Path(configured_data or DEFAULT_RUNTIME_DATA_ROOT) / "current_release"
+
+
 @task(name="preflight")
 def preflight(
     api_dir: str,
     release_dir: str,
+    current_release_dir: str,
     build_release: bool,
     deploy_backend: bool,
     upload_miniprogram: bool,
@@ -172,6 +184,16 @@ def preflight(
     ]
     if deploy_backend:
         required_paths.append(REPO_ROOT / "services" / "weekly_activity_cloudrun" / "scripts" / "bake_and_deploy.py")
+        authoritative = _authoritative_current_release(current_release_dir).resolve()
+        try:
+            authoritative.relative_to(REPO_ROOT.resolve())
+        except ValueError:
+            pass
+        else:
+            raise ValueError("Production current_release must be outside the source checkout")
+        for name in ("current.json", "manifest.json"):
+            if not (authoritative / name).is_file():
+                raise FileNotFoundError(f"Authoritative current_release is incomplete: {authoritative / name}")
     missing = [str(path) for path in required_paths if not path.exists()]
     if missing:
         raise FileNotFoundError(f"Missing required pipeline files: {missing}")
@@ -188,6 +210,7 @@ def preflight(
         "longrun_root": str(LONGRUN_ROOT),
         "api_dir_param": api_dir,
         "release_dir_param": release_dir,
+        "current_release_dir": str(_authoritative_current_release(current_release_dir)),
         "build_release": build_release,
         "deploy_backend": deploy_backend,
         "upload_miniprogram": upload_miniprogram,
@@ -328,7 +351,13 @@ def quality_audits(
 
 
 @task(name="backend_publish")
-def backend_publish(release_dir: str, dry_run: bool, deploy_backend: bool, upload_miniprogram: bool) -> dict[str, Any]:
+def backend_publish(
+    release_dir: str,
+    current_release_dir: str,
+    dry_run: bool,
+    deploy_backend: bool,
+    upload_miniprogram: bool,
+) -> dict[str, Any]:
     if not deploy_backend:
         return {
             "skipped": True,
@@ -338,7 +367,14 @@ def backend_publish(release_dir: str, dry_run: bool, deploy_backend: bool, uploa
     if not shutil.which("wsl.exe"):
         raise RuntimeError("wsl.exe is required for the existing OpenClaw production script")
     wsl_release = _windows_path_to_wsl(Path(release_dir))
-    command = f"bash {shlex.quote(DEFAULT_WSL_PIPELINE)} --release-dir {shlex.quote(wsl_release)}"
+    authoritative = _authoritative_current_release(current_release_dir)
+    wsl_current = _windows_path_to_wsl(authoritative)
+    wsl_data_root = _windows_path_to_wsl(authoritative.parent)
+    command = (
+        f"HUAIDJ_CURRENT_RELEASE_DIR={shlex.quote(wsl_current)} "
+        f"HUAIDJ_CLOUDRUN_DATA_ROOT={shlex.quote(wsl_data_root)} "
+        f"bash {shlex.quote(DEFAULT_WSL_PIPELINE)} --release-dir {shlex.quote(wsl_release)}"
+    )
     if not upload_miniprogram:
         command += " --skip-upload"
     result = _run_command(
@@ -366,6 +402,7 @@ def huaidj_weekly_publication_flow(
     upload_miniprogram: bool = False,
     api_dir: str = "",
     release_dir: str = "",
+    current_release_dir: str = "",
     week_start: str = "",
     window_days: int = 15,
     article_since_date: str = "",
@@ -379,7 +416,14 @@ def huaidj_weekly_publication_flow(
 ) -> dict[str, Any]:
     """Run the public weekly pipeline through Prefect gates."""
 
-    preflight_result = preflight(api_dir, release_dir, build_release, deploy_backend, upload_miniprogram)
+    preflight_result = preflight(
+        api_dir,
+        release_dir,
+        current_release_dir,
+        build_release,
+        deploy_backend,
+        upload_miniprogram,
+    )
     build_result: dict[str, Any] | None = None
     if build_release:
         build_result = build_future_release(
@@ -404,6 +448,7 @@ def huaidj_weekly_publication_flow(
     )
     backend = backend_publish(
         release_dir=resolved["release_dir"],
+        current_release_dir=current_release_dir,
         dry_run=dry_run,
         deploy_backend=deploy_backend,
         upload_miniprogram=upload_miniprogram,
@@ -430,6 +475,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--upload-miniprogram", action="store_true", help="Allow mini-program upload in the backend script.")
     parser.add_argument("--api-dir", default="")
     parser.add_argument("--release-dir", default="")
+    parser.add_argument("--current-release-dir", default="")
     parser.add_argument("--week-start", default="")
     parser.add_argument("--window-days", type=int, default=15)
     parser.add_argument("--article-since-date", default="")
@@ -452,6 +498,7 @@ def main() -> None:
         upload_miniprogram=args.upload_miniprogram,
         api_dir=args.api_dir,
         release_dir=args.release_dir,
+        current_release_dir=args.current_release_dir,
         week_start=args.week_start,
         window_days=args.window_days,
         article_since_date=args.article_since_date,

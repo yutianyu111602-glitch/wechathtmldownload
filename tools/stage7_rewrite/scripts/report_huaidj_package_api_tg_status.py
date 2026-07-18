@@ -28,9 +28,20 @@ TZ = timezone(timedelta(hours=8))
 DEFAULT_CLOUDRUN_BASE = "https://weekly-api-255880-4-1371956557.sh.run.tcloudbase.com"
 DEFAULT_STATUS_JSON = REPO / "tools/stage7_rewrite/reports/sanji_twice_daily_7day/latest_status.json"
 DEFAULT_PUBLISH_REPORT_ROOT = REPO / "tools/stage7_rewrite/reports"
-DEFAULT_LOCAL_DEPLOY_DIR = (
-    REPO / "services/weekly_activity_cloudrun/tmp/cloudrun_deploy_context/data/current_release"
+DEFAULT_RUNTIME_DATA_ROOT = Path(
+    r"F:\DevData\HuaidjRuntime\state\weekly_activity_cloudrun\data"
 )
+
+
+def default_local_deploy_dir() -> Path:
+    configured_current = os.environ.get("HUAIDJ_CURRENT_RELEASE_DIR", "").strip()
+    if configured_current:
+        return Path(configured_current)
+    configured_data = os.environ.get("HUAIDJ_CLOUDRUN_DATA_ROOT", "").strip()
+    return Path(configured_data or DEFAULT_RUNTIME_DATA_ROOT) / "current_release"
+
+
+DEFAULT_LOCAL_DEPLOY_DIR = default_local_deploy_dir()
 DEFAULT_JSON_OUT = REPO / "tools/stage7_rewrite/reports/huaidj_package_api_tg_status/latest.json"
 DEFAULT_STATE_FILE = (
     Path(os.environ.get("USERPROFILE", r"C:\Users\pc"))

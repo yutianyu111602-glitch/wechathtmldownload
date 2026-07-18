@@ -21,6 +21,10 @@ param(
     [string]$NowOverrideBjt = "",
     [int]$RecentPublishCooldownMinutes = 45,
     [int]$LockTimeoutMinutes = 240,
+    [string]$IncrementalBaseApiDir = "",
+    [string]$PublishedApiDir = "",
+    [string]$CloudRunDataRoot = "",
+    [string]$CloudRunWorkRoot = "",
     [string]$SanjiExportOutRoot = "",
     [string]$SanjiRoot = "",
     [string]$SanjiHotArticlesRoot = "",
@@ -69,7 +73,37 @@ $SanjiRoot = Resolve-ConfiguredPath -Value $SanjiRoot -EnvironmentVariableName "
 $SanjiHotArticlesRoot = Resolve-ConfiguredPath -Value $SanjiHotArticlesRoot -EnvironmentVariableName "SANJI_HOT_ARTICLES_ROOT" -Default "E:\sanji_hot\articles"
 $SanjiColdArchiveRoot = Resolve-ConfiguredPath -Value $SanjiColdArchiveRoot -EnvironmentVariableName "SANJI_COLD_ARCHIVE_ROOT" -Default "D:\sanji_cold_archive"
 $QueuePath = Join-Path $SanjiExportOutRoot "latest_queue.jsonl"
-$ApiDir = Join-Path $Repo "services\weekly_activity_cloudrun\data\current_release"
+$DefaultRuntimeDataRoot = "F:\DevData\HuaidjRuntime\state\weekly_activity_cloudrun\data"
+$IncrementalBaseApiDir = Resolve-ConfiguredPath -Value $IncrementalBaseApiDir -EnvironmentVariableName "HUAIDJ_CURRENT_RELEASE_DIR" -Default ""
+$CloudRunDataRoot = Resolve-ConfiguredPath -Value $CloudRunDataRoot -EnvironmentVariableName "HUAIDJ_CLOUDRUN_DATA_ROOT" -Default ""
+if ([string]::IsNullOrWhiteSpace($CloudRunDataRoot) -and -not [string]::IsNullOrWhiteSpace($IncrementalBaseApiDir)) {
+    $CloudRunDataRoot = Split-Path -Parent $IncrementalBaseApiDir
+}
+if ([string]::IsNullOrWhiteSpace($CloudRunDataRoot)) {
+    $CloudRunDataRoot = $DefaultRuntimeDataRoot
+}
+if ([string]::IsNullOrWhiteSpace($IncrementalBaseApiDir)) {
+    $IncrementalBaseApiDir = Join-Path $CloudRunDataRoot "current_release"
+}
+$PublishedApiDir = Resolve-ConfiguredPath `
+    -Value $PublishedApiDir `
+    -EnvironmentVariableName "HUAIDJ_PUBLISHED_API_DIR" `
+    -Default $IncrementalBaseApiDir
+$CloudRunWorkRoot = Resolve-ConfiguredPath `
+    -Value $CloudRunWorkRoot `
+    -EnvironmentVariableName "HUAIDJ_CLOUDRUN_WORK_ROOT" `
+    -Default (Join-Path (Split-Path -Parent $CloudRunDataRoot) "work")
+$ApiDir = $IncrementalBaseApiDir
+if ($DryRun -and -not (Test-Path -LiteralPath $ApiDir -PathType Container)) {
+    $CloudRunDataRoot = Join-Path $Repo "services\weekly_activity_cloudrun\data"
+    $ApiDir = Join-Path $CloudRunDataRoot "current_release"
+    $IncrementalBaseApiDir = $ApiDir
+    $PublishedApiDir = $ApiDir
+    $CloudRunWorkRoot = Join-Path $Repo "services\weekly_activity_cloudrun\tmp"
+}
+if (-not (Test-Path -LiteralPath (Join-Path $ApiDir "current.json") -PathType Leaf)) {
+    throw "Authoritative runtime current_release is not ready for fast watch: $ApiDir"
+}
 $LockDir = Join-Path $Repo ".locks"
 $LockPath = Join-Path $LockDir "huaidj_sanji_rss_fast_watch.lock"
 
@@ -334,7 +368,11 @@ try {
         "-SanjiExportOutRoot", $SanjiExportOutRoot,
         "-SanjiRoot", $SanjiRoot,
         "-SanjiHotArticlesRoot", $SanjiHotArticlesRoot,
-        "-SanjiColdArchiveRoot", $SanjiColdArchiveRoot
+        "-SanjiColdArchiveRoot", $SanjiColdArchiveRoot,
+        "-IncrementalBaseApiDir", $IncrementalBaseApiDir,
+        "-PublishedApiDir", $PublishedApiDir,
+        "-CloudRunDataRoot", $CloudRunDataRoot,
+        "-CloudRunWorkRoot", $CloudRunWorkRoot
     )
     if (-not $NoDeployBackend) { $publishArgs += "-DeployBackend" }
     if ($UploadFrontend) { $publishArgs += "-UploadFrontend" }

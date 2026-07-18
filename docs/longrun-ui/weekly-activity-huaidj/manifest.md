@@ -348,7 +348,7 @@ Story `HUAIDJ-DATA-INGEST-002`: refresh the preview from the 64-account Docker e
 
 Done in this slice:
 
-- Diagnosed the mismatch between the web UI login countdown and CLI failure: Docker had three server-side auth-key files, and the CLI default key `7b3d6796c1ef418ea985b711508047e3` was stale even though newer keys were valid.
+- Diagnosed the mismatch between the web UI login countdown and CLI failure: Docker had three server-side auth-key files, and the CLI default key `<redacted-stale-key>` was stale even though newer keys were valid.
 - Verified the current Docker keys by API behavior without printing cookie contents.
 - Reran `prefetch-account-urls` with the current valid Docker auth key and `D:\DDownload\公众号 (1).json`.
 - Built a May 1 onward weekly queue from the successful 64-account prefetch.

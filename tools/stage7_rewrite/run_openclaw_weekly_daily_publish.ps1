@@ -48,7 +48,10 @@ param(
     [switch]$SkipInternalPosterGate,
     [int]$IncrementalMinExpectedItems = 1,
     [string]$IncrementalBaseApiDir = "",
+    [string]$PublishedApiDir = "",
     [string]$IncrementalMergedApiDir = "",
+    [string]$CloudRunDataRoot = "",
+    [string]$CloudRunWorkRoot = "",
     [string]$Version = "",
     [string]$Desc = "",
     [switch]$EnablePosterCloudBaseMigration,
@@ -65,6 +68,7 @@ param(
     [int]$SanjiGapMinCandidateEventLike = 25,
     [double]$SanjiGapMaxQueueStalenessHours = 36.0,
     [string]$PublicApiBase = "https://weekly-api-255880-4-1371956557.sh.run.tcloudbase.com",
+    [string]$ProxyUrl = "",
     [string]$ReleaseGuardPath = ""
 )
 
@@ -72,6 +76,24 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $env:PYTHONUTF8 = "1"
 $env:PYTHONIOENCODING = "utf-8"
+
+function Resolve-ConfiguredPathValue {
+    param(
+        [string]$Value,
+        [Parameter(Mandatory = $true)][string]$EnvironmentVariableName,
+        [string]$Default = ""
+    )
+    if (-not [string]::IsNullOrWhiteSpace($Value)) {
+        return $Value
+    }
+    foreach ($scope in @("Process", "User")) {
+        $configured = [Environment]::GetEnvironmentVariable($EnvironmentVariableName, $scope)
+        if (-not [string]::IsNullOrWhiteSpace($configured)) {
+            return $configured
+        }
+    }
+    return $Default
+}
 
 # Resolve one project-owned Python runtime for every nested helper.  The script
 # historically used bare `python` calls, which made the runtime depend on the
@@ -120,6 +142,49 @@ $Longrun = "E:\weekly_activity_pipeline\longrun"
 $Reports = Join-Path $Stage7 "reports"
 $CloudRun = Join-Path $Repo "services\weekly_activity_cloudrun"
 $MiniProgram = Join-Path $Repo "apps\weekly_activity_miniprogram"
+$DefaultRuntimeDataRoot = "F:\DevData\HuaidjRuntime\state\weekly_activity_cloudrun\data"
+$CloudRunDataRoot = Resolve-ConfiguredPathValue `
+    -Value $CloudRunDataRoot `
+    -EnvironmentVariableName "HUAIDJ_CLOUDRUN_DATA_ROOT" `
+    -Default ""
+$IncrementalBaseApiDir = Resolve-ConfiguredPathValue `
+    -Value $IncrementalBaseApiDir `
+    -EnvironmentVariableName "HUAIDJ_CURRENT_RELEASE_DIR" `
+    -Default ""
+if ([string]::IsNullOrWhiteSpace($CloudRunDataRoot) -and -not [string]::IsNullOrWhiteSpace($IncrementalBaseApiDir)) {
+    $CloudRunDataRoot = Split-Path -Parent $IncrementalBaseApiDir
+}
+if ([string]::IsNullOrWhiteSpace($CloudRunDataRoot)) {
+    $CloudRunDataRoot = $DefaultRuntimeDataRoot
+}
+if ([string]::IsNullOrWhiteSpace($IncrementalBaseApiDir)) {
+    $IncrementalBaseApiDir = Join-Path $CloudRunDataRoot "current_release"
+}
+$CloudRunWorkRoot = Resolve-ConfiguredPathValue `
+    -Value $CloudRunWorkRoot `
+    -EnvironmentVariableName "HUAIDJ_CLOUDRUN_WORK_ROOT" `
+    -Default (Join-Path (Split-Path -Parent $CloudRunDataRoot) "work")
+if (-not $DeployBackend -and -not (Test-Path -LiteralPath $IncrementalBaseApiDir -PathType Container)) {
+    # Keep source checkouts usable for offline development. Production deploys
+    # must never silently fall back to the bundled package.
+    $CloudRunDataRoot = Join-Path $CloudRun "data"
+    $IncrementalBaseApiDir = Join-Path $CloudRunDataRoot "current_release"
+    $CloudRunWorkRoot = Join-Path $CloudRun "tmp"
+    Write-Warning "Authoritative runtime package is unavailable; using checkout data for non-deploy development only."
+}
+$PublishedApiDir = Resolve-ConfiguredPathValue `
+    -Value $PublishedApiDir `
+    -EnvironmentVariableName "HUAIDJ_PUBLISHED_API_DIR" `
+    -Default $IncrementalBaseApiDir
+$CloudRunDeployContextDir = Join-Path $CloudRunWorkRoot "cloudrun_deploy_context"
+$ProxyUrl = Resolve-ConfiguredPathValue `
+    -Value $ProxyUrl `
+    -EnvironmentVariableName "HUAIDJ_PROXY_URL" `
+    -Default "http://127.0.0.1:7890"
+$env:HUAIDJ_CURRENT_RELEASE_DIR = $IncrementalBaseApiDir
+$env:HUAIDJ_PUBLISHED_API_DIR = $PublishedApiDir
+$env:HUAIDJ_CLOUDRUN_DATA_ROOT = $CloudRunDataRoot
+$env:HUAIDJ_CLOUDRUN_WORK_ROOT = $CloudRunWorkRoot
 $HermesRoot = [Environment]::GetEnvironmentVariable("HERMES_HOME", "Process")
 if ([string]::IsNullOrWhiteSpace($HermesRoot)) {
     $HermesRoot = [Environment]::GetEnvironmentVariable("HERMES_HOME", "User")
@@ -180,6 +245,7 @@ $CurrentResourceRepairScript = Join-Path $Scripts "repair_weekly_current_resourc
 $GeocodePlacesScript = Join-Path $Scripts "geocode_weekly_activity_places.py"
 $ApplyGeocodesScript = Join-Path $Scripts "apply_weekly_geocodes_to_api_package.py"
 $SanjiGapAuditScript = Join-Path $Scripts "audit_weekly_sanji_queue_package_gap.py"
+$AuthoritativeBaseValidatorScript = Join-Path $Scripts "validate_weekly_authoritative_base.py"
 
 if ([string]::IsNullOrWhiteSpace($WeekStart)) {
     $WeekStart = (Get-Date).ToString("yyyy-MM-dd")
@@ -196,9 +262,6 @@ if ([string]::IsNullOrWhiteSpace($Version)) {
 }
 if ([string]::IsNullOrWhiteSpace($Desc)) {
     $Desc = "OpenClaw daily source-gated $WeekTag"
-}
-if ([string]::IsNullOrWhiteSpace($IncrementalBaseApiDir)) {
-    $IncrementalBaseApiDir = Join-Path $CloudRun "data\current_release"
 }
 if ([string]::IsNullOrWhiteSpace($IncrementalMergedApiDir)) {
     $IncrementalMergedApiDir = "${ApiDir}_MERGED_CURRENT"
@@ -246,6 +309,8 @@ $fullIncrementalPreflightGateGeneratedReportPath = Join-Path $RunReportDir "open
 $fullIncrementalPreflightGateGeneratedScorecardPath = Join-Path $RunReportDir "openclaw_weekly_full_incremental_preflight_gate.md"
 $sanjiLatestExportReadyReportPath = Join-Path $RunReportDir "sanji_latest_export_ready.json"
 $releaseConflictRepairReportPath = Join-Path $RunReportDir "release_conflict_repair.json"
+$authoritativeBaseValidationReportPath = Join-Path $RunReportDir "authoritative_base_validation.json"
+$script:AuthoritativeOnlineItemCount = 0
 
 function Invoke-RunStep {
     param(
@@ -270,6 +335,60 @@ function Assert-NativeSuccess {
     param([string]$Label)
     if ($LASTEXITCODE -ne 0) {
         throw "$Label failed (exit $LASTEXITCODE)"
+    }
+}
+
+function Assert-AuthoritativeBasePackage {
+    if (-not (Test-Path -LiteralPath $AuthoritativeBaseValidatorScript -PathType Leaf)) {
+        throw "Authoritative base validator not found: $AuthoritativeBaseValidatorScript"
+    }
+    $validatorArgs = @(
+        $AuthoritativeBaseValidatorScript,
+        "--api-dir", $IncrementalBaseApiDir,
+        "--data-root", $CloudRunDataRoot,
+        "--repo-root", $Repo,
+        "--min-items", $MinExpectedItems,
+        "--report", $authoritativeBaseValidationReportPath
+    )
+    if ($DeployBackend) {
+        $remoteManifest = Invoke-RestMethod `
+            -Uri ($PublicApiBase.TrimEnd("/") + "/api/v1/weekly/manifest") `
+            -Proxy $ProxyUrl `
+            -TimeoutSec 30
+        $script:AuthoritativeOnlineItemCount = [int]$remoteManifest.item_count
+        if ($script:AuthoritativeOnlineItemCount -le 0) {
+            throw "Public weekly manifest did not provide a positive item_count; deployment is blocked."
+        }
+        $validatorArgs += @(
+            "--require-external-runtime",
+            "--expected-online-item-count", $script:AuthoritativeOnlineItemCount
+        )
+    }
+    python @validatorArgs
+    Assert-NativeSuccess "Authoritative current_release validation"
+
+    foreach ($publishedFile in @("current.json", "manifest.json")) {
+        $publishedPath = Join-Path $PublishedApiDir $publishedFile
+        if (-not (Test-Path -LiteralPath $publishedPath -PathType Leaf)) {
+            throw "Published API package used for VL delta is incomplete: $publishedPath"
+        }
+    }
+    $publishedManifest = Get-Content -Raw -LiteralPath (Join-Path $PublishedApiDir "manifest.json") | ConvertFrom-Json
+    $publishedCurrent = Get-Content -Raw -LiteralPath (Join-Path $PublishedApiDir "current.json") | ConvertFrom-Json
+    $publishedItems = @($publishedCurrent.items)
+    $publishedCount = $publishedItems.Count
+    if ([int]$publishedManifest.item_count -ne $publishedCount) {
+        throw "Published API package manifest/current counts differ: manifest=$($publishedManifest.item_count) current=$publishedCount"
+    }
+    if ($DeployBackend) {
+        $resolvedPublished = [System.IO.Path]::GetFullPath($PublishedApiDir)
+        $resolvedRepoPrefix = [System.IO.Path]::GetFullPath($Repo).TrimEnd("\", "/") + [System.IO.Path]::DirectorySeparatorChar
+        if ($resolvedPublished.StartsWith($resolvedRepoPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+            throw "Published API package for deployment must be outside the source checkout: $resolvedPublished"
+        }
+        if ($publishedCount -lt $script:AuthoritativeOnlineItemCount) {
+            throw "Published API package is behind online item coverage: published=$publishedCount online=$($script:AuthoritativeOnlineItemCount)"
+        }
     }
 }
 
@@ -821,7 +940,7 @@ function Write-PublishSummary {
         poster_vl_max_images = $PosterVlMaxImages
         poster_vl_limit = $PosterVlLimit
         poster_vl_concurrency = $PosterVlConcurrency
-        published_api_dir_for_vl_delta = $IncrementalBaseApiDir
+        published_api_dir_for_vl_delta = $PublishedApiDir
         deepseek_concurrency = $DeepSeekConcurrency
         item_count = $summaryItemCount
         requested_min_expected_items = $MinExpectedItems
@@ -1101,7 +1220,7 @@ function Write-FullIncrementalPreflightBlockedSummary {
         poster_vl_max_images = $PosterVlMaxImages
         poster_vl_limit = $PosterVlLimit
         poster_vl_concurrency = $PosterVlConcurrency
-        published_api_dir_for_vl_delta = $IncrementalBaseApiDir
+        published_api_dir_for_vl_delta = $PublishedApiDir
         deepseek_concurrency = $DeepSeekConcurrency
         item_count = 0
         requested_min_expected_items = $MinExpectedItems
@@ -1331,6 +1450,12 @@ if (-not $DryRun -and $SourceMode -eq "docker_exporter") {
 
 Assert-FullIncrementalPreflightGate
 
+if (-not $DisableIncrementalMerge -or $DeployBackend) {
+    Invoke-RunStep "Validate authoritative current release baseline" {
+        Assert-AuthoritativeBasePackage
+    }
+}
+
 if ($SourceMode -eq "sanji_desktop_rss") {
     Invoke-RunStep "Freeze Sanji source snapshot before build" {
         Assert-SanjiLatestExportReady `
@@ -1365,7 +1490,7 @@ if (-not $SkipBuild) {
             PrefetchBodyBackfillTimeoutSec = $PrefetchBodyBackfillTimeoutSec
             PackDeepSeekDir = $PackDir
             ApiDir = $ApiDir
-            PublishedApiDir = $IncrementalBaseApiDir
+            PublishedApiDir = $PublishedApiDir
         }
         # Auto-resume VL enrichment from complete package first; otherwise reuse partial evidence.
         $vlDir = Join-Path $Longrun "WEEKLY_ACTIVITY_RECOMMENDATION_PACK_VL_$WeekTag"
@@ -2202,6 +2327,9 @@ $itemCount = 0
 if (-not $DryRun) {
     $manifest = Get-Content -Raw -LiteralPath (Join-Path $ApiDir "manifest.json") | ConvertFrom-Json
     $itemCount = [int]$manifest.item_count
+    if ($DeployBackend -and $script:AuthoritativeOnlineItemCount -gt 0 -and $itemCount -lt $script:AuthoritativeOnlineItemCount) {
+        throw "Candidate package would roll back online item coverage: candidate=$itemCount online=$($script:AuthoritativeOnlineItemCount)."
+    }
 }
 
 $BioPromotionScript = Join-Path $Scripts "promote_dj_bio_atoms.py"
@@ -2220,6 +2348,9 @@ if ($DeployBackend) {
         python (Join-Path $CloudRun "scripts\bake_and_deploy.py") `
             --release-dir $ApiDir `
             --source-url-map (Join-Path $ApiDir "source_actions\source_url_map.json") `
+            --data-root $CloudRunDataRoot `
+            --current-release-dir $IncrementalBaseApiDir `
+            --work-root $CloudRunWorkRoot `
             --prepare-only `
             --no-qr `
             --desc $Desc
@@ -2235,7 +2366,7 @@ if ($DeployBackend) {
     }
     Invoke-RunStep "Deploy CloudRun by direct CloudBase API" {
         python (Join-Path $CloudRun "scripts\direct_cloudbase_deploy.py") `
-            --context-dir (Join-Path $CloudRun "tmp\cloudrun_deploy_context") `
+            --context-dir $CloudRunDeployContextDir `
             --out-dir $DeployReportDir `
             --no-timeout `
             --allow-unverified-task-poll

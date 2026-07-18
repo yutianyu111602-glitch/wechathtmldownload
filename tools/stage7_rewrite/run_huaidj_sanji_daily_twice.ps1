@@ -25,6 +25,10 @@ param(
     [int]$LockTimeoutMinutes = 180,
     [switch]$SkipSanjiExport,
     [switch]$SkipNotify,
+    [string]$IncrementalBaseApiDir = "",
+    [string]$PublishedApiDir = "",
+    [string]$CloudRunDataRoot = "",
+    [string]$CloudRunWorkRoot = "",
     [string]$SanjiExportOutRoot = "",
     [string]$SanjiRoot = "",
     [string]$SanjiHotArticlesRoot = "",
@@ -75,6 +79,36 @@ $ReportRoot = Join-Path $Stage7 "reports\sanji_twice_daily_7day"
 $Longrun = "E:\weekly_activity_pipeline\longrun"
 $LockDir = Join-Path $Repo ".locks"
 $LockPath = Join-Path $LockDir "huaidj_sanji_daily_publish.lock"
+$DefaultRuntimeDataRoot = "F:\DevData\HuaidjRuntime\state\weekly_activity_cloudrun\data"
+$IncrementalBaseApiDir = Resolve-ConfiguredPath -Value $IncrementalBaseApiDir -EnvironmentVariableName "HUAIDJ_CURRENT_RELEASE_DIR" -Default ""
+$CloudRunDataRoot = Resolve-ConfiguredPath -Value $CloudRunDataRoot -EnvironmentVariableName "HUAIDJ_CLOUDRUN_DATA_ROOT" -Default ""
+if ([string]::IsNullOrWhiteSpace($CloudRunDataRoot) -and -not [string]::IsNullOrWhiteSpace($IncrementalBaseApiDir)) {
+    $CloudRunDataRoot = Split-Path -Parent $IncrementalBaseApiDir
+}
+if ([string]::IsNullOrWhiteSpace($CloudRunDataRoot)) {
+    $CloudRunDataRoot = $DefaultRuntimeDataRoot
+}
+if ([string]::IsNullOrWhiteSpace($IncrementalBaseApiDir)) {
+    $IncrementalBaseApiDir = Join-Path $CloudRunDataRoot "current_release"
+}
+$PublishedApiDir = Resolve-ConfiguredPath `
+    -Value $PublishedApiDir `
+    -EnvironmentVariableName "HUAIDJ_PUBLISHED_API_DIR" `
+    -Default $IncrementalBaseApiDir
+$CloudRunWorkRoot = Resolve-ConfiguredPath `
+    -Value $CloudRunWorkRoot `
+    -EnvironmentVariableName "HUAIDJ_CLOUDRUN_WORK_ROOT" `
+    -Default (Join-Path (Split-Path -Parent $CloudRunDataRoot) "work")
+if ($DeployBackend) {
+    foreach ($authoritativeDir in @($IncrementalBaseApiDir, $PublishedApiDir)) {
+        foreach ($requiredBaseFile in @("current.json", "manifest.json")) {
+            $requiredBasePath = Join-Path $authoritativeDir $requiredBaseFile
+            if (-not (Test-Path -LiteralPath $requiredBasePath -PathType Leaf)) {
+                throw "Authoritative runtime base is not ready for deployment: $requiredBasePath"
+            }
+        }
+    }
+}
 $DefaultSanjiExportRoot = 'E:\' + (-join @([char]0x516C, [char]0x4F17, [char]0x53F7)) + '\sanji-daily-export'
 $SanjiExportOutRoot = Resolve-ConfiguredPath -Value $SanjiExportOutRoot -EnvironmentVariableName "SANJI_EXPORT_OUT_ROOT" -Default $DefaultSanjiExportRoot
 $SanjiRoot = Resolve-ConfiguredPath -Value $SanjiRoot -EnvironmentVariableName "SANJI_ROOT" -Default (Join-Path $env:APPDATA "sanji")
@@ -116,6 +150,10 @@ function New-RunStatus {
         sanji_cold_archive_root = $SanjiColdArchiveRoot
         sanji_summary_path = $SanjiSummaryPath
         sanji_latest_path = $SanjiLatestPath
+        incremental_base_api_dir = $IncrementalBaseApiDir
+        published_api_dir = $PublishedApiDir
+        cloudrun_data_root = $CloudRunDataRoot
+        cloudrun_work_root = $CloudRunWorkRoot
         atlas_v2_import_triggered = $false
         atlas_v2_import_note = "AtlasV2 is a separate Hermes nightly state machine; this weekly publish wrapper never launches it."
         log_path = $LogPath
@@ -433,7 +471,11 @@ try {
         "-PosterVlFallback", $PosterVlFallback,
         "-PosterVlTimeoutSec", $PosterVlTimeoutSec,
         "-PosterVlConcurrency", $PosterVlConcurrency,
-        "-DeepSeekConcurrency", $DeepSeekConcurrency
+        "-DeepSeekConcurrency", $DeepSeekConcurrency,
+        "-IncrementalBaseApiDir", $IncrementalBaseApiDir,
+        "-PublishedApiDir", $PublishedApiDir,
+        "-CloudRunDataRoot", $CloudRunDataRoot,
+        "-CloudRunWorkRoot", $CloudRunWorkRoot
     )
     if ($DeployBackend) { $publishArgs += "-DeployBackend" }
     if ($UploadFrontend) { $publishArgs += "-UploadFrontend" }

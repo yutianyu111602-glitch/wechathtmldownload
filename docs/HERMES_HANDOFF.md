@@ -34,13 +34,17 @@ CloudBase:
 ## 2. 每日管线（一条命令）
 
 ```powershell
-$env:MPTEXT_AUTH_KEY = "ec9dd7f24326400eb8878fcb3d9d3640"
+$env:MPTEXT_AUTH_KEY = "<discover from the current Docker exporter session; never persist here>"
 cd C:\code\githubstar\wechathtmldownload
 .\tools\stage7_rewrite\run_openclaw_weekly_daily_publish.ps1 `
     -WeekStart (Get-Date -Format "yyyy-MM-dd") `
     -WindowDays 8 `
     -MinExpectedItems 30
 ```
+
+`MPTEXT_AUTH_KEY` 是 Docker exporter/mptext 当前登录会话产生的短期凭证。
+运行前必须从当前容器的最新 cookie/auth discovery 结果验证并注入进程环境；
+不得复用文档、脚本或旧 checkpoint 中的值，也不得把值提交到 Git。
 
 **执行流程**（约 30-60 分钟）：
 ```

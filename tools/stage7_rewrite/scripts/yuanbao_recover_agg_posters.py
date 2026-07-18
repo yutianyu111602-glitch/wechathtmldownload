@@ -70,7 +70,9 @@ def yuanbao_read_article(url, account_hint=""):
 
 def find_poster_url_from_html(article_url, poster_desc=""):
     """Download article HTML and find the poster image matching the description."""
-    API_KEY = "ec9dd7f24326400eb8878fcb3d9d3640"
+    API_KEY = os.environ.get("MPTEXT_AUTH_KEY", "").strip()
+    if not API_KEY:
+        raise RuntimeError("MPTEXT_AUTH_KEY must come from the current exporter session")
     api_url = "http://127.0.0.1:17300/api/public/v1/download?url={}&format=html".format(article_url)
     try:
         req = Request(api_url, headers={"X-Auth-Key": API_KEY})
@@ -147,7 +149,9 @@ def main():
     
     # Step 1: Search exporter for overview articles
     print("\n=== Step 1: Search for overview articles ===")
-    API_KEY = "ec9dd7f24326400eb8878fcb3d9d3640"
+    API_KEY = os.environ.get("MPTEXT_AUTH_KEY", "").strip()
+    if not API_KEY:
+        raise RuntimeError("MPTEXT_AUTH_KEY must come from the current exporter session")
     ENDPOINT = "http://127.0.0.1:17300"
     
     # Use the download queue to find URLs for target account nicknames

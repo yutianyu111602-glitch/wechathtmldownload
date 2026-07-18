@@ -21,7 +21,7 @@ OCR_STATUS = WTR_BASE / "ocr_FULL_MAP_SMART_BACKFILL_20260509_status.json"
 RUN_STATUS = WTR_BASE / "post_archive_run_status.json"
 
 PWSH = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
-AUTH_KEY = "11a264996ec44c49927ebd49e72e2647"
+AUTH_KEY = os.environ.get("MPTEXT_AUTH_KEY", "").strip()
 
 
 def now() -> str:
@@ -77,7 +77,6 @@ def run_ocr_step() -> bool:
     """Trigger OCR via PowerShell. Returns True if started."""
     cmd = f'''
 Set-Location C:\\code\\githubstar\\wechathtmldownload
-[Environment]::SetEnvironmentVariable('MPTEXT_AUTH_KEY', '{AUTH_KEY}')
 [Environment]::SetEnvironmentVariable('WECHAT_OCR_COMMAND', 'wsl python3 /mnt/c/code/githubstar/wechathtmldownload/tools/stage7_rewrite/scripts/ocr_gpu.py')
 $BATCH = 'FULL_MAP_SMART_BACKFILL_20260509'
 $ROOT = 'D:\\downstream_results\\stage7_rewrite\\longrun\\WHERE_TO_RAVE_WECHAT_SYNC_20260508\\' + $BATCH
@@ -91,7 +90,10 @@ Write-Host ('OCR_EXIT:' + $LASTEXITCODE)
     try:
         result = subprocess.run(
             [PWSH, "-NoProfile", "-Command", cmd],
-            capture_output=True, text=True, timeout=600
+            capture_output=True,
+            text=True,
+            timeout=600,
+            env={**os.environ, "MPTEXT_AUTH_KEY": AUTH_KEY},
         )
         output = result.stdout + result.stderr
         if "OCR_EXIT:0" in output:
@@ -115,19 +117,23 @@ def wait_and_retry_ocr(asset_status: dict) -> bool:
         # Restart asset download
         cmd = f'''
 Set-Location C:\\code\\githubstar\\wechathtmldownload
-[Environment]::SetEnvironmentVariable('MPTEXT_AUTH_KEY', '{AUTH_KEY}')
 $ROOT = 'D:\\downstream_results\\stage7_rewrite\\longrun\\WHERE_TO_RAVE_WECHAT_SYNC_20260508\\FULL_MAP_SMART_BACKFILL_20260509'
 $ARCHIVE = $ROOT + '\\mptext_archive_FULL_MAP_SMART_BACKFILL_20260509'
 $QUEUE = $ROOT + '\\download_ready_queue_FULL_MAP_SMART_BACKFILL_20260509.jsonl'
 npx tsx src/cli.ts download-archive-assets-batch --inputDir $ARCHIVE --manifestPath $QUEUE --resume
 Write-Host ('RESTART_EXIT:' + $LASTEXITCODE)
 '''
-        subprocess.Popen([PWSH, "-NoProfile", "-Command", cmd])
+        subprocess.Popen(
+            [PWSH, "-NoProfile", "-Command", cmd],
+            env={**os.environ, "MPTEXT_AUTH_KEY": AUTH_KEY},
+        )
         return False
     return False
 
 
 def main():
+    if not AUTH_KEY:
+        raise SystemExit("MPTEXT_AUTH_KEY must come from the current exporter session")
     log("Autonomous supervisor started. Monitoring all pipelines.", "start")
 
     ocr_triggered = False

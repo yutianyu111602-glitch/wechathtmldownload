@@ -4,7 +4,9 @@ from urllib.error import HTTPError
 
 MIMO_KEY = os.environ.get("MIMO_VISION_API_KEY") or os.environ.get("MIMO_API_KEY") or ""
 ENDPOINT = "http://127.0.0.1:17300"
-API_KEY = "ec9dd7f24326400eb8878fcb3d9d3640"
+API_KEY = os.environ.get("MPTEXT_AUTH_KEY", "").strip()
+if not API_KEY:
+    raise SystemExit("MPTEXT_AUTH_KEY must come from the current exporter session")
 OUT_DIR = pathlib.Path(r"D:\downstream_results\stage7_rewrite\longrun\agg_child_recovery_20260607")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
