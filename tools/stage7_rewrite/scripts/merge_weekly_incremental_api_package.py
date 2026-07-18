@@ -71,6 +71,20 @@ USAGE_SIDECAR_FILENAMES = (
     "poster_vl_usage_details.jsonl",
 )
 CLUB_OVERVIEWS_SCHEMA_VERSION = "club_overviews.v1"
+STABLE_IDENTITY_FIELDS = (
+    "id",
+    "event_id",
+    "article_id",
+    "queue_id",
+    "account_key",
+    "source_account_key",
+    "detail_path",
+    "detail_url",
+)
+SOURCE_MAP_EVENT_ID_FIELDS = (
+    "event_id",
+    "source_event_id",
+)
 
 
 def is_blank(value: Any) -> bool:
@@ -264,9 +278,55 @@ def merge_manifest_window(base_manifest: dict[str, Any], incremental_manifest: d
     }
 
 
-def merge_replacement_item(base_item: dict[str, Any], incremental_item: dict[str, Any]) -> tuple[dict[str, Any], list[str]]:
+def source_hash_of(item: dict[str, Any]) -> str:
+    source_action = item.get("source_action") if isinstance(item.get("source_action"), dict) else {}
+    source_article = item.get("source_article") if isinstance(item.get("source_article"), dict) else {}
+    return str(
+        source_action.get("url_hash")
+        or source_article.get("url_hash")
+        or item.get("source_url_hash")
+        or item.get("source_hash")
+        or ""
+    ).strip()
+
+
+def identity_aliases(item: dict[str, Any]) -> list[str]:
+    """Return conservative aliases for one source event.
+
+    Sanji account display names can drift independently from their stable account
+    keys (for example ``Cs Bar`` versus ``cs_bar``).  The source URL hash and the
+    suffix after that hash identify the event without collapsing sibling schedule
+    rows extracted from the same article.
+    """
+
+    key = item_id(item)
+    if not key:
+        return []
+    folded_key = key.casefold()
+    aliases = {f"id-casefold:{folded_key}"}
+    source_hash = source_hash_of(item)
+    if source_hash:
+        folded_hash = source_hash.casefold()
+        hash_at = folded_key.find(folded_hash)
+        if hash_at >= 0:
+            suffix = folded_key[hash_at + len(folded_hash) :]
+            aliases.add(f"source-event:{folded_hash}:{suffix}")
+    return sorted(aliases)
+
+
+def merge_replacement_item(
+    base_item: dict[str, Any],
+    incremental_item: dict[str, Any],
+) -> tuple[dict[str, Any], list[str], list[str]]:
     merged = deepcopy(incremental_item)
-    preserved: list[str] = []
+    preserved_place_fields: list[str] = []
+    preserved_identity_fields: list[str] = []
+    for field in STABLE_IDENTITY_FIELDS:
+        if is_blank(base_item.get(field)):
+            continue
+        if merged.get(field) != base_item.get(field):
+            merged[field] = deepcopy(base_item.get(field))
+            preserved_identity_fields.append(field)
     locked = has_verified_place_lock(base_item) and not wants_locked_place_override(incremental_item)
     for field in PLACE_LOCK_FIELDS:
         if field not in base_item:
@@ -274,14 +334,14 @@ def merge_replacement_item(base_item: dict[str, Any], incremental_item: dict[str
         should_preserve = locked or (is_blank(merged.get(field)) and not is_blank(base_item.get(field)))
         if should_preserve and merged.get(field) != base_item.get(field):
             merged[field] = deepcopy(base_item.get(field))
-            preserved.append(field)
-    if preserved:
+            preserved_place_fields.append(field)
+    if preserved_place_fields:
         merged.setdefault("protected_field_merge", {
             "schema_version": SCHEMA_VERSION + ".protected_fields",
-            "preserved_fields": sorted(set(preserved)),
+            "preserved_fields": sorted(set(preserved_place_fields)),
             "reason": "base row carried verified place fields; incremental row did not request explicit override",
         })
-    return merged, preserved
+    return merged, preserved_place_fields, preserved_identity_fields
 
 
 def source_map_path(api_dir: Path) -> Path:
@@ -316,7 +376,13 @@ def load_items(api_dir: Path) -> tuple[dict[str, Any], list[dict[str, Any]], dic
 def merge_items(base_items: list[dict[str, Any]], incremental_items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     merged = [deepcopy(item) for item in base_items]
     index: dict[str, int] = {}
+    alias_index: dict[str, set[int]] = {}
     duplicate_base_ids: list[str] = []
+
+    def register_aliases(item: dict[str, Any], pos: int) -> None:
+        for alias in identity_aliases(item):
+            alias_index.setdefault(alias, set()).add(pos)
+
     for pos, item in enumerate(merged):
         key = item_id(item)
         if not key:
@@ -325,10 +391,14 @@ def merge_items(base_items: list[dict[str, Any]], incremental_items: list[dict[s
             duplicate_base_ids.append(key)
             continue
         index[key] = pos
+        register_aliases(item, pos)
 
     replaced: list[str] = []
     added: list[str] = []
     protected_replacements: dict[str, list[str]] = {}
+    protected_identity_replacements: dict[str, list[str]] = {}
+    identity_alias_replacements: list[dict[str, str]] = []
+    incremental_id_aliases: dict[str, str] = {}
     duplicate_incremental_ids: list[str] = []
     seen_incremental: set[str] = set()
     for item in incremental_items:
@@ -338,15 +408,54 @@ def merge_items(base_items: list[dict[str, Any]], incremental_items: list[dict[s
         if key in seen_incremental:
             duplicate_incremental_ids.append(key)
         seen_incremental.add(key)
-        if key in index:
-            replacement, preserved = merge_replacement_item(merged[index[key]], item)
-            merged[index[key]] = replacement
+        target_pos = index.get(key)
+        matched_alias = ""
+        if target_pos is None:
+            aliases = identity_aliases(item)
+            matching_positions = {
+                pos
+                for alias in aliases
+                for pos in alias_index.get(alias, set())
+            }
+            if len(matching_positions) > 1:
+                candidate_ids = sorted(item_id(merged[pos]) for pos in matching_positions)
+                raise SystemExit(
+                    "Incremental event identity is ambiguous; refusing to choose a base row: "
+                    f"incremental_id={key!r} base_ids={candidate_ids!r}"
+                )
+            if matching_positions:
+                target_pos = next(iter(matching_positions))
+                matched_alias = next(
+                    alias
+                    for alias in aliases
+                    if target_pos in alias_index.get(alias, set())
+                )
+
+        if target_pos is not None:
+            retained_id = item_id(merged[target_pos])
+            replacement, preserved, preserved_identity = merge_replacement_item(merged[target_pos], item)
+            merged[target_pos] = replacement
+            index[key] = target_pos
+            register_aliases(item, target_pos)
+            register_aliases(replacement, target_pos)
             if preserved:
-                protected_replacements[key] = sorted(set(preserved))
-            replaced.append(key)
+                protected_replacements[retained_id] = sorted(set(preserved))
+            if preserved_identity:
+                protected_identity_replacements[retained_id] = sorted(set(preserved_identity))
+            if matched_alias and key != retained_id:
+                incremental_id_aliases[key] = retained_id
+                identity_alias_replacements.append(
+                    {
+                        "incremental_id": key,
+                        "retained_id": retained_id,
+                        "matched_alias": matched_alias,
+                    }
+                )
+            replaced.append(retained_id)
         else:
             index[key] = len(merged)
             merged.append(deepcopy(item))
+            register_aliases(item, index[key])
             added.append(key)
 
     report = {
@@ -361,11 +470,25 @@ def merge_items(base_items: list[dict[str, Any]], incremental_items: list[dict[s
         "duplicate_incremental_ids": duplicate_incremental_ids,
         "protected_replacement_count": len(protected_replacements),
         "protected_replacements": protected_replacements,
+        "protected_identity_replacement_count": len(protected_identity_replacements),
+        "protected_identity_replacements": protected_identity_replacements,
+        "identity_alias_replacement_count": len(identity_alias_replacements),
+        "identity_alias_replacements": identity_alias_replacements,
+        "incremental_id_aliases": incremental_id_aliases,
+        "ambiguous_base_identity_aliases": sorted(
+            alias for alias, positions in alias_index.items() if len(positions) > 1
+        ),
     }
     return sort_items(merged), report
 
 
-def merge_source_maps(base_dir: Path, incremental_dir: Path, out_dir: Path, generated_at: str) -> dict[str, Any]:
+def merge_source_maps(
+    base_dir: Path,
+    incremental_dir: Path,
+    out_dir: Path,
+    generated_at: str,
+    incremental_id_aliases: dict[str, str] | None = None,
+) -> dict[str, Any]:
     base_path = source_map_path(base_dir)
     incremental_path = source_map_path(incremental_dir)
     out_path = source_map_path(out_dir)
@@ -373,7 +496,28 @@ def merge_source_maps(base_dir: Path, incremental_dir: Path, out_dir: Path, gene
     incremental_map = read_json(incremental_path) if incremental_path.exists() else {}
 
     base_sources = base_map.get("sources") if isinstance(base_map.get("sources"), dict) else {}
-    incremental_sources = incremental_map.get("sources") if isinstance(incremental_map.get("sources"), dict) else {}
+    incremental_sources = deepcopy(
+        incremental_map.get("sources") if isinstance(incremental_map.get("sources"), dict) else {}
+    )
+    id_aliases = incremental_id_aliases or {}
+    remapped_event_id_fields: list[dict[str, str]] = []
+    for source_key, entry in incremental_sources.items():
+        if not isinstance(entry, dict):
+            continue
+        for field in SOURCE_MAP_EVENT_ID_FIELDS:
+            source_event_id = str(entry.get(field) or "").strip()
+            retained_id = id_aliases.get(source_event_id)
+            if not retained_id:
+                continue
+            entry[field] = retained_id
+            remapped_event_id_fields.append(
+                {
+                    "source_key": str(source_key),
+                    "field": field,
+                    "incremental_id": source_event_id,
+                    "retained_id": retained_id,
+                }
+            )
     merged_sources = deepcopy(base_sources)
     replaced_keys = sorted(set(merged_sources).intersection(incremental_sources))
     added_keys = sorted(set(incremental_sources).difference(merged_sources))
@@ -391,6 +535,8 @@ def merge_source_maps(base_dir: Path, incremental_dir: Path, out_dir: Path, gene
         "merged_source_count": len(merged_sources),
         "added_source_keys": added_keys,
         "replaced_source_keys": replaced_keys,
+        "remapped_event_id_field_count": len(remapped_event_id_fields),
+        "remapped_event_id_fields": remapped_event_id_fields,
         "base_source_map": str(base_path),
         "incremental_source_map": str(incremental_path),
     }
@@ -418,6 +564,7 @@ def merge_llm_enrichment_index(
     out_dir: Path,
     merged_items: list[dict[str, Any]],
     generated_at: str,
+    incremental_id_aliases: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     base_path = enrichment_index_path(base_dir)
     incremental_path = enrichment_index_path(incremental_dir)
@@ -451,31 +598,58 @@ def merge_llm_enrichment_index(
     replaced_ids: list[str] = []
     copied_files: list[str] = []
     skipped_stale_ids: list[str] = []
+    remapped_enrichment_ids: list[dict[str, str]] = []
+    id_aliases = incremental_id_aliases or {}
     for entry in incremental_entries:
         if not isinstance(entry, dict):
             continue
-        eid = entry_id(entry)
-        if not eid:
+        incremental_eid = entry_id(entry)
+        if not incremental_eid:
             continue
+        eid = id_aliases.get(incremental_eid, incremental_eid)
         if eid not in merged_id_set:
-            skipped_stale_ids.append(eid)
+            skipped_stale_ids.append(incremental_eid)
             continue
+        existing_entry = by_id.get(eid)
         if eid in by_id:
             replaced_ids.append(eid)
         else:
             added_ids.append(eid)
 
-        rel = safe_relative_path(entry.get("path"))
-        if rel is None:
-            raise SystemExit(f"Incremental enrichment entry has no path: {eid}")
-        src = incremental_dir / rel
-        dst = out_dir / rel
+        source_rel = safe_relative_path(entry.get("path"))
+        if source_rel is None:
+            raise SystemExit(f"Incremental enrichment entry has no path: {incremental_eid}")
+        destination_rel = source_rel
+        if incremental_eid != eid and isinstance(existing_entry, dict):
+            stable_rel = safe_relative_path(existing_entry.get("path"))
+            if stable_rel is not None:
+                destination_rel = stable_rel
+        src = incremental_dir / source_rel
+        dst = out_dir / destination_rel
         if not src.exists() or not src.is_file():
-            raise SystemExit(f"Incremental enrichment file not found for {eid}: {src}")
+            raise SystemExit(f"Incremental enrichment file not found for {incremental_eid}: {src}")
         dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(src, dst)
-        copied_files.append(str(rel).replace("\\", "/"))
-        by_id[eid] = deepcopy(entry)
+        merged_entry = deepcopy(entry)
+        merged_entry["id"] = eid
+        merged_entry["path"] = str(destination_rel).replace("\\", "/")
+        if incremental_eid != eid:
+            enrichment_payload = read_json(src)
+            if not isinstance(enrichment_payload, dict):
+                raise SystemExit(f"Incremental enrichment payload must be an object: {src}")
+            enrichment_payload["id"] = eid
+            write_json(dst, enrichment_payload)
+            remapped_enrichment_ids.append(
+                {
+                    "incremental_id": incremental_eid,
+                    "retained_id": eid,
+                    "source_path": str(source_rel).replace("\\", "/"),
+                    "destination_path": str(destination_rel).replace("\\", "/"),
+                }
+            )
+        else:
+            shutil.copy2(src, dst)
+        copied_files.append(str(destination_rel).replace("\\", "/"))
+        by_id[eid] = merged_entry
 
     payload = deepcopy(base_payload) if isinstance(base_payload, dict) else {}
     payload["schemaVersion"] = (
@@ -495,6 +669,8 @@ def merge_llm_enrichment_index(
         "replaced_enrichment_ids": replaced_ids,
         "copied_enrichment_files": copied_files,
         "skipped_stale_incremental_ids": skipped_stale_ids,
+        "remapped_enrichment_id_count": len(remapped_enrichment_ids),
+        "remapped_enrichment_ids": remapped_enrichment_ids,
         "base_enrichment_index": str(base_path),
         "incremental_enrichment_index": str(incremental_path),
     }
@@ -590,8 +766,22 @@ def merge_package(base_dir: Path, incremental_dir: Path, out_dir: Path, report_p
         "incremental_merge": deepcopy(merged_current["incremental_merge"]),
     }
     rebuild_release_files(out_dir, merged_current, merged_items, repair_report)
-    source_merge = merge_source_maps(base_dir, incremental_dir, out_dir, generated_at)
-    llm_enrichment_merge = merge_llm_enrichment_index(base_dir, incremental_dir, out_dir, merged_items, generated_at)
+    incremental_id_aliases = item_merge.get("incremental_id_aliases") or {}
+    source_merge = merge_source_maps(
+        base_dir,
+        incremental_dir,
+        out_dir,
+        generated_at,
+        incremental_id_aliases,
+    )
+    llm_enrichment_merge = merge_llm_enrichment_index(
+        base_dir,
+        incremental_dir,
+        out_dir,
+        merged_items,
+        generated_at,
+        incremental_id_aliases,
+    )
 
     report = {
         "schema_version": SCHEMA_VERSION,
