@@ -43,6 +43,20 @@ if str(SCRIPT_DIR) not in sys.path:
 from repair_weekly_release_conflicts import rebuild_release_files, write_json  # noqa: E402
 
 
+def portable_path_label(path: Path, *, repo_root: Path = ROOT) -> str:
+    """Render repository paths relatively and external runtime paths absolutely."""
+
+    candidate = Path(path)
+    try:
+        resolved = candidate.resolve()
+    except OSError:
+        resolved = candidate.absolute()
+    try:
+        return resolved.relative_to(repo_root.resolve()).as_posix()
+    except (OSError, ValueError):
+        return resolved.as_posix()
+
+
 KNOWN_VENUE_CORRECTIONS: dict[str, dict[str, Any]] = {
     "loopy_hangzhou": {
         "canonical_name": "loopy Club",
@@ -1256,7 +1270,7 @@ def repair_package(
         manifest["field_resource_repair"] = {
             "schema_version": report["schema_version"],
             "repaired_at": report["repaired_at"],
-            "report_path": str((report_dir / "weekly_resource_field_repair_report.json").relative_to(ROOT)),
+            "report_path": portable_path_label(report_dir / "weekly_resource_field_repair_report.json"),
             "item_change_count": report["item_change_count"],
             "change_counts": report["change_counts"],
         }

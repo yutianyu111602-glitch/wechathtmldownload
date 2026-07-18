@@ -132,6 +132,53 @@ def test_python_report_defaults_honor_explicit_external_root(monkeypatch: pytest
     assert watcher.DEFAULT_REPORT.is_relative_to(report_root)
 
 
+def load_resource_field_repair_module():
+    script = ROOT / "scripts" / "repair_weekly_current_resource_fields.py"
+    spec = importlib.util.spec_from_file_location("weekly_resource_field_repair_path_test", script)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_resource_field_repair_path_label_is_repo_relative_or_external_absolute(tmp_path: Path) -> None:
+    repair = load_resource_field_repair_module()
+
+    in_repo = REPO / "tools" / "stage7_rewrite" / "reports" / "repair.json"
+    external = tmp_path / "runtime-reports" / "repair.json"
+
+    assert repair.portable_path_label(in_repo) == "tools/stage7_rewrite/reports/repair.json"
+    assert repair.portable_path_label(external) == external.resolve().as_posix()
+
+
+def test_resource_field_repair_writes_external_report_path_to_manifest(tmp_path: Path) -> None:
+    repair = load_resource_field_repair_module()
+    api_dir = tmp_path / "candidate"
+    report_dir = tmp_path / "runtime-reports" / "weekly-run"
+    registry = tmp_path / "weekly_venues_seed.json"
+    format_js = tmp_path / "mapLocationBook.js"
+    api_dir.mkdir()
+    (api_dir / "current.json").write_text(json.dumps({"items": []}), encoding="utf-8")
+    (api_dir / "manifest.json").write_text(json.dumps({"item_count": 0}), encoding="utf-8")
+    registry.write_text(json.dumps({"venues": []}), encoding="utf-8")
+    format_js.write_text("const VERIFIED_MAP_LOCATION_BOOK = [];", encoding="utf-8")
+
+    repair.repair_package(
+        api_dir=api_dir,
+        registry_path=registry,
+        format_js=format_js,
+        history_paths=[],
+        report_dir=report_dir,
+        dry_run=False,
+        update_registry=False,
+    )
+
+    manifest = json.loads((api_dir / "manifest.json").read_text(encoding="utf-8"))
+    expected = (report_dir / "weekly_resource_field_repair_report.json").resolve().as_posix()
+    assert manifest["field_resource_repair"]["report_path"] == expected
+
+
 def test_installer_templates_make_health_canary_checkout_read_only(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
