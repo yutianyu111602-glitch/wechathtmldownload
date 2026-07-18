@@ -19,6 +19,7 @@ from typing import Any
 
 
 SCHEMA_VERSION = "openclaw_weekly_daily_readiness.v1"
+SOURCE_MODES = ("docker_exporter", "sanji_desktop_rss")
 POSTER_OCR_CANARY_SCHEMA_VERSION = "weekly_aggregate_child_poster_ocr_recovery_worker_canary.v1"
 POSTER_OCR_CANARY_READY_DECISION = "weekly_aggregate_child_poster_ocr_recovery_worker_canary_ready_report_local_no_ocr_no_write"
 POSTER_OCR_CANARY_PROFILE = "openclaw-poster-ocr-recovery"
@@ -627,7 +628,7 @@ def require_path(path: Path, label: str) -> Path:
     return path
 
 
-def resolve_input_paths(args: argparse.Namespace) -> dict[str, Path]:
+def resolve_input_paths(args: argparse.Namespace) -> dict[str, Path | None]:
     publish_dir = args.publish_report_dir
     reports_root = args.reports_root
     if publish_dir:
@@ -650,7 +651,23 @@ def resolve_input_paths(args: argparse.Namespace) -> dict[str, Path]:
     poster_write_gate = args.poster_write_gate_report or (
         publish_dir / "poster_cloudbase_migration_write_gate.json" if publish_dir else None
     )
-    docker = args.docker_smoke_report or latest_docker_smoke_report(reports_root)
+    uses_legacy_exporter_evidence = args.source_mode == "docker_exporter"
+    if uses_legacy_exporter_evidence:
+        docker = args.docker_smoke_report or latest_docker_smoke_report(reports_root)
+    else:
+        if args.docker_smoke_report is not None:
+            raise ValueError("--docker-smoke-report is not applicable when --source-mode sanji_desktop_rss")
+        if args.vision_batch_report is not None:
+            raise ValueError("--vision-batch-report is not applicable when --source-mode sanji_desktop_rss")
+        if args.exporter_freshness_preflight_report is not None:
+            raise ValueError(
+                "--exporter-freshness-preflight-report is not applicable when --source-mode sanji_desktop_rss"
+            )
+        if args.exporter_auth_recovery_preflight_report is not None:
+            raise ValueError(
+                "--exporter-auth-recovery-preflight-report is not applicable when --source-mode sanji_desktop_rss"
+            )
+        docker = None
     poster_ocr_contract = publish_dir / "aggregate_child_poster_ocr_worker_contract.json" if publish_dir else None
     poster_ocr_execution_preflight = args.poster_ocr_execution_preflight_report or (
         publish_dir / "aggregate_child_poster_ocr_execution_preflight.json" if publish_dir else None
@@ -664,21 +681,52 @@ def resolve_input_paths(args: argparse.Namespace) -> dict[str, Path]:
     poster_ocr_source_material_preflight = args.poster_ocr_source_material_preflight_report or (
         publish_dir / "aggregate_child_poster_ocr_source_material_preflight.json" if publish_dir else None
     )
-    exporter_freshness_preflight = args.exporter_freshness_preflight_report or (
-        publish_dir / "weekly_exporter_freshness_preflight.json" if publish_dir else None
-    )
-    exporter_auth_recovery_preflight = args.exporter_auth_recovery_preflight_report or (
-        publish_dir / "weekly_exporter_auth_recovery_preflight.json" if publish_dir else None
-    )
+    if not uses_legacy_exporter_evidence:
+        legacy_poster_args = {
+            "--poster-recovery-split-controller-packet-report": args.poster_recovery_split_controller_packet_report,
+            "--public-poster-upload-candidate-review-packet-report": args.public_poster_upload_candidate_review_packet_report,
+            "--poster-ocr-canary-report": args.poster_ocr_canary_report,
+            "--poster-ocr-execution-preflight-report": args.poster_ocr_execution_preflight_report,
+            "--poster-ocr-controller-release-packet-report": args.poster_ocr_controller_release_packet_report,
+            "--poster-ocr-runtime-release-preflight-report": args.poster_ocr_runtime_release_preflight_report,
+            "--poster-ocr-source-material-preflight-report": args.poster_ocr_source_material_preflight_report,
+        }
+        explicit_legacy_poster_args = [name for name, value in legacy_poster_args.items() if value is not None]
+        if explicit_legacy_poster_args:
+            raise ValueError(
+                f"{', '.join(explicit_legacy_poster_args)} not applicable when --source-mode sanji_desktop_rss"
+            )
+        poster_recovery_split = None
+        public_poster_upload_review = None
+        poster_ocr_execution_preflight = None
+        poster_ocr_controller_packet = None
+        poster_ocr_runtime_preflight = None
+        poster_ocr_source_material_preflight = None
+    if uses_legacy_exporter_evidence:
+        exporter_freshness_preflight = args.exporter_freshness_preflight_report or (
+            publish_dir / "weekly_exporter_freshness_preflight.json" if publish_dir else None
+        )
+        exporter_auth_recovery_preflight = args.exporter_auth_recovery_preflight_report or (
+            publish_dir / "weekly_exporter_auth_recovery_preflight.json" if publish_dir else None
+        )
+    else:
+        exporter_freshness_preflight = None
+        exporter_auth_recovery_preflight = None
     if args.poster_ocr_canary_report:
         poster_ocr_canary = args.poster_ocr_canary_report
-    elif poster_ocr_contract and poster_ocr_contract.is_file():
+    elif uses_legacy_exporter_evidence and poster_ocr_contract and poster_ocr_contract.is_file():
         poster_ocr_canary = latest_poster_ocr_canary_report(reports_root, contract_path=poster_ocr_contract)
     else:
         poster_ocr_canary = None
-    vision = args.vision_batch_report or latest_vision_batch_report(reports_root)
+    vision = (
+        args.vision_batch_report or latest_vision_batch_report(reports_root)
+        if uses_legacy_exporter_evidence
+        else None
+    )
     if args.fallback_summary:
         fallback = args.fallback_summary
+    elif not uses_legacy_exporter_evidence:
+        fallback = publish_dir / "openclaw_weekly_daily_publish_summary.json" if publish_dir else None
     else:
         try:
             fallback = latest_fallback_summary(reports_root, publish_dir=publish_dir)
@@ -695,6 +743,7 @@ def resolve_input_paths(args: argparse.Namespace) -> dict[str, Path]:
         for label, path in (
             ("quality report", quality),
             ("poster migration report", poster_migration),
+            ("fallback summary", fallback),
             ("output report", report),
         )
         if path is None
@@ -725,7 +774,7 @@ def resolve_input_paths(args: argparse.Namespace) -> dict[str, Path]:
         "poster_write_gate_report": require_path(poster_write_gate, "poster write gate report")
         if poster_write_gate is not None and poster_write_gate.is_file()
         else None,
-        "docker_smoke_report": require_path(docker, "docker smoke report"),
+        "docker_smoke_report": require_path(docker, "docker smoke report") if docker is not None else None,
         "poster_ocr_canary_report": require_path(poster_ocr_canary, "poster OCR canary report")
         if poster_ocr_canary is not None
         else None,
@@ -759,7 +808,7 @@ def resolve_input_paths(args: argparse.Namespace) -> dict[str, Path]:
         )
         if exporter_auth_recovery_preflight is not None and exporter_auth_recovery_preflight.is_file()
         else None,
-        "vision_batch_report": require_path(vision, "vision batch report"),
+        "vision_batch_report": require_path(vision, "vision batch report") if vision is not None else None,
         "fallback_summary": require_path(fallback, "fallback summary"),
         "report": report,
     }
@@ -979,7 +1028,20 @@ def summarize_poster_gate(gate: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def summarize_docker(docker: dict[str, Any]) -> dict[str, Any]:
+def summarize_docker(docker: dict[str, Any] | None, *, required: bool) -> dict[str, Any]:
+    if docker is None:
+        return {
+            "required": required,
+            "present": False,
+            "applicable": required,
+            "ok": not required,
+            "profile_count": 0,
+            "profiles_ok_count": 0,
+            "failed_profiles": [],
+            "safety": {},
+            "safety_failures": [],
+            "secret_like_diagnostic_leak_count": 0,
+        }
     safety = as_dict(docker.get("safety"))
     secret_like_leak_count = secret_like_diagnostic_leak_count(docker)
     safety_failures: list[str] = []
@@ -997,6 +1059,9 @@ def summarize_docker(docker: dict[str, Any]) -> dict[str, Any]:
         safety_failures.append("docker_secret_diagnostic_leak")
     ok = bool(docker.get("ok")) and not as_list(docker.get("failed_profiles")) and not safety_failures
     return {
+        "required": required,
+        "present": True,
+        "applicable": required,
         "ok": ok,
         "profile_count": int_value(docker.get("profile_count")),
         "profiles_ok_count": int_value(docker.get("profiles_ok_count")),
@@ -1792,7 +1857,29 @@ def provider_by_name(vision: dict[str, Any], provider: str) -> dict[str, Any]:
     return {}
 
 
-def summarize_vision(vision: dict[str, Any]) -> dict[str, Any]:
+def summarize_vision(vision: dict[str, Any] | None, *, required: bool) -> dict[str, Any]:
+    if vision is None:
+        return {
+            "required": required,
+            "present": False,
+            "applicable": required,
+            "ok": not required,
+            "report_ok": not required,
+            "outcome": {},
+            "outcome_hard_failure_count": 0,
+            "outcome_malformed_output_count": 0,
+            "fixture_count": 0,
+            "stepfun": {},
+            "local_ocr": {},
+            "mimo": {},
+            "safety": {},
+            "safety_failures": [],
+            "contract_failures": [],
+            "secret_like_diagnostic_leak_count": 0,
+            "stepfun_complete": False,
+            "horizontal_provider_count": 0,
+            "mimo_configured": False,
+        }
     safety = as_dict(vision.get("safety"))
     outcome = as_dict(vision.get("outcome"))
     stepfun = provider_by_name(vision, "stepfun")
@@ -1827,6 +1914,9 @@ def summarize_vision(vision: dict[str, Any]) -> dict[str, Any]:
     stepfun_complete = stepfun_fixture_count >= 3 and stepfun_ok_count == stepfun_fixture_count
     ok = stepfun_complete and not safety_failures and not contract_failures
     return {
+        "required": required,
+        "present": True,
+        "applicable": required,
         "ok": ok,
         "report_ok": report_ok,
         "outcome": outcome,
@@ -1968,8 +2058,10 @@ def scorecard(
     poster_gate_summary: dict[str, Any],
     fallback_summary: dict[str, Any],
 ) -> dict[str, Any]:
+    docker_contract_satisfied = not docker_summary["required"] or docker_summary["ok"]
+    vision_contract_satisfied = not vision_summary["required"] or vision_summary["ok"]
     docker_ready = (
-        docker_summary["ok"]
+        docker_contract_satisfied
         and poster_ocr_canary_summary["ok"]
         and poster_ocr_execution_preflight_summary["ok"]
         and poster_ocr_controller_packet_summary["ok"]
@@ -1977,12 +2069,18 @@ def scorecard(
         and poster_recovery_split_packet_summary["ok"]
         and public_poster_upload_review_packet_summary["ok"]
     )
-    docker_score = 5 if docker_ready and docker_summary["profiles_ok_count"] >= 7 else 2 if docker_summary["ok"] else 0
-    vision_score = 5 if vision_summary["ok"] and vision_summary.get("mimo_configured") else 4 if vision_summary["ok"] else 1
+    if not docker_summary["required"]:
+        docker_score = 5
+    else:
+        docker_score = 5 if docker_ready and docker_summary["profiles_ok_count"] >= 7 else 2 if docker_summary["ok"] else 0
+    if not vision_summary["required"]:
+        vision_score = 5
+    else:
+        vision_score = 5 if vision_summary["ok"] and vision_summary.get("mimo_configured") else 4 if vision_summary["ok"] else 1
     checkpoint_score = 5 if poster_gate_summary["write_gate_ready"] and not poster_gate_summary["execute_allowed_now"] else 3
     write_boundary_score = (
         5
-        if docker_summary["ok"]
+        if docker_contract_satisfied
         and poster_ocr_canary_summary["ok"]
         and poster_ocr_execution_preflight_summary["ok"]
         and poster_ocr_controller_packet_summary["ok"]
@@ -1996,14 +2094,14 @@ def scorecard(
     )
     tested_score = (
         5
-        if docker_summary["ok"]
+        if docker_contract_satisfied
         and poster_ocr_canary_summary["ok"]
         and poster_ocr_execution_preflight_summary["ok"]
         and poster_ocr_controller_packet_summary["ok"]
         and poster_ocr_runtime_preflight_summary["ok"]
         and poster_recovery_split_packet_summary["ok"]
         and public_poster_upload_review_packet_summary["ok"]
-        and vision_summary["ok"]
+        and vision_contract_satisfied
         and fallback_summary["preflight_ok"]
         else 3
     )
@@ -2011,7 +2109,9 @@ def scorecard(
     stepfun_ok = int_value(as_dict(as_dict(vision_summary.get("stepfun")).get("status_counts")).get("ok"))
     mimo_ok = int_value(as_dict(as_dict(vision_summary.get("mimo")).get("status_counts")).get("ok"))
     local_ocr_ok = int_value(as_dict(as_dict(vision_summary.get("local_ocr")).get("status_counts")).get("ok"))
-    if vision_score == 5:
+    if not vision_summary["required"]:
+        vision_evidence = "not applicable for source_mode=sanji_desktop_rss"
+    elif vision_score == 5:
         vision_evidence = f"StepFun ok={stepfun_ok}; MiMo ok={mimo_ok}; local OCR ok={local_ocr_ok}"
     elif vision_score == 4:
         vision_evidence = "StepFun batch ok; local OCR baseline present; MiMo remains not_configured"
@@ -2021,19 +2121,25 @@ def scorecard(
         "docker_arsenal_contract": {
             "score": docker_score,
             "max": 5,
+            "applicable": docker_summary["required"],
             "evidence": (
-                f"{docker_summary['profiles_ok_count']}/{docker_summary['profile_count']} profiles ok; "
-                f"poster OCR canary ok={poster_ocr_canary_summary['ok']}; "
-                f"execution preflight ok={poster_ocr_execution_preflight_summary['ok']}; "
-                f"controller packet ok={poster_ocr_controller_packet_summary['ok']}; "
-                f"runtime preflight ok={poster_ocr_runtime_preflight_summary['ok']}; "
-                f"split packet ok={poster_recovery_split_packet_summary['ok']}; "
-                f"public review packet ok={public_poster_upload_review_packet_summary['ok']}"
+                "not applicable for source_mode=sanji_desktop_rss"
+                if not docker_summary["required"]
+                else (
+                    f"{docker_summary['profiles_ok_count']}/{docker_summary['profile_count']} profiles ok; "
+                    f"poster OCR canary ok={poster_ocr_canary_summary['ok']}; "
+                    f"execution preflight ok={poster_ocr_execution_preflight_summary['ok']}; "
+                    f"controller packet ok={poster_ocr_controller_packet_summary['ok']}; "
+                    f"runtime preflight ok={poster_ocr_runtime_preflight_summary['ok']}; "
+                    f"split packet ok={poster_recovery_split_packet_summary['ok']}; "
+                    f"public review packet ok={public_poster_upload_review_packet_summary['ok']}"
+                )
             ),
         },
         "vision_horizontal_vertical_eval": {
             "score": vision_score,
             "max": 5,
+            "applicable": vision_summary["required"],
             "evidence": vision_evidence,
         },
         "explicit_checkpoints": {
@@ -2060,11 +2166,12 @@ def build_readiness(
     quality: dict[str, Any],
     poster_migration: dict[str, Any],
     poster_write_gate: dict[str, Any],
-    docker: dict[str, Any],
+    docker: dict[str, Any] | None,
     vision: dict[str, Any],
     fallback: dict[str, Any],
     expected_min_items: int,
     paths: dict[str, str],
+    source_mode: str,
     poster_ocr_canary: dict[str, Any] | None = None,
     poster_ocr_execution_preflight: dict[str, Any] | None = None,
     poster_ocr_controller_packet: dict[str, Any] | None = None,
@@ -2076,11 +2183,13 @@ def build_readiness(
     public_poster_upload_review_packet: dict[str, Any] | None = None,
     poster_recovery: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    if source_mode not in SOURCE_MODES:
+        raise ValueError(f"unsupported source_mode: {source_mode}")
     quality_summary = summarize_quality(quality, expected_min_items)
     poster_summary = summarize_poster_migration(poster_migration)
     poster_recovery_summary = summarize_poster_recovery(poster_recovery)
     poster_gate_summary = summarize_poster_gate(poster_write_gate)
-    docker_summary = summarize_docker(docker)
+    docker_summary = summarize_docker(docker, required=source_mode == "docker_exporter")
     poster_ocr_canary_summary = summarize_poster_ocr_canary(poster_ocr_canary)
     poster_ocr_execution_preflight_summary = summarize_poster_ocr_execution_preflight(poster_ocr_execution_preflight)
     poster_ocr_controller_packet_summary = summarize_poster_ocr_controller_packet(poster_ocr_controller_packet)
@@ -2098,11 +2207,13 @@ def build_readiness(
     public_poster_upload_review_packet_summary = summarize_public_poster_upload_candidate_review_packet(
         public_poster_upload_review_packet
     )
-    vision_summary = summarize_vision(vision)
+    vision_summary = summarize_vision(vision, required=source_mode == "docker_exporter")
     fallback_summary = summarize_fallback(fallback)
-    uses_sanji_source = (
-        fallback_summary.get("source") == "publish_summary"
-        and fallback_summary.get("source_mode") == "sanji_desktop_rss"
+    uses_sanji_source = source_mode == "sanji_desktop_rss"
+    fallback_declares_source_mode = fallback_summary.get("source") == "publish_summary"
+    source_mode_matches_fallback = (
+        not fallback_declares_source_mode
+        or fallback_summary.get("source_mode") == source_mode
     )
     quality_green = quality_summary["ok"] and not quality_summary["hard_failures"]
     poster_migration_write_failure_ids = {
@@ -2155,9 +2266,7 @@ def build_readiness(
     ]
     poster_migration_accepted = poster_summary["dry_run_write_free"] or authorized_poster_storage_migration
     fallback_preflight_accepted = fallback_summary["preflight_ok"] or authorized_publish_storage_summary
-    exporter_gate_blocked = (
-        not uses_sanji_source
-        and
+    exporter_gate_blocked = not uses_sanji_source and (
         (
             exporter_freshness_preflight_summary["present"]
             and not exporter_freshness_preflight_summary["freshness_ready"]
@@ -2201,8 +2310,10 @@ def build_readiness(
         failed_check_ids.append("quality_non_poster_hard_failure")
     if quality_summary["hard_drift_count"]:
         failed_check_ids.append("quality_route_or_schema_drift")
-    if not docker_summary["ok"]:
+    if docker_summary["required"] and not docker_summary["ok"]:
         failed_check_ids.append("docker_profiles_or_contract_not_ok")
+    if not source_mode_matches_fallback:
+        failed_check_ids.append("fallback_source_mode_mismatch")
     if not poster_ocr_canary_summary["ok"]:
         failed_check_ids.append("poster_ocr_canary_not_ok")
     if not poster_ocr_execution_preflight_summary["ok"]:
@@ -2240,7 +2351,7 @@ def build_readiness(
         failed_check_ids.append("poster_recovery_split_controller_packet_not_ok")
     if not public_poster_upload_review_packet_summary["ok"]:
         failed_check_ids.append("public_poster_upload_candidate_review_packet_not_ok")
-    if not vision_summary["stepfun_complete"]:
+    if vision_summary["required"] and not vision_summary["stepfun_complete"]:
         failed_check_ids.append("vision_stepfun_batch_not_ok")
     if not fallback_preflight_accepted:
         failed_check_ids.append("fallback_preflight_not_ok")
@@ -2297,6 +2408,7 @@ def build_readiness(
         and public_poster_upload_review_packet_summary["ok"]
         and vision_summary["ok"]
         and fallback_preflight_accepted
+        and source_mode_matches_fallback
     )
     package_candidate_ready = (
         not hard_safety_failure
@@ -2353,6 +2465,16 @@ def build_readiness(
     report = {
         "schema_version": SCHEMA_VERSION,
         "generated_at": now_iso(),
+        "source_mode": source_mode,
+        "source_mode_matches_fallback": source_mode_matches_fallback,
+        "legacy_evidence_applicability": {
+            "docker_smoke": "required" if source_mode == "docker_exporter" else "not_applicable",
+            "poster_vision_batch": "required" if source_mode == "docker_exporter" else "not_applicable",
+            "exporter_preflights": "source_specific" if source_mode == "docker_exporter" else "not_applicable",
+            "poster_ocr_recovery_bundle": "source_specific"
+            if source_mode == "docker_exporter"
+            else "not_applicable",
+        },
         "decision": decision,
         "ok": decision in {
             "blocked_on_cloudbase_poster_migration_write_gate",
@@ -2408,7 +2530,11 @@ def build_readiness(
         },
         "vertical_gate_chain": [
             {"gate": "fallback_preflight", "ok": fallback_summary["preflight_ok"]},
-            {"gate": "docker_all_profiles", "ok": docker_summary["ok"]},
+            {
+                "gate": "docker_all_profiles",
+                "ok": docker_summary["ok"],
+                "required": docker_summary["required"],
+            },
             {
                 "gate": "poster_ocr_execution_preflight",
                 "ok": poster_ocr_execution_preflight_summary["ok"],
@@ -2495,7 +2621,11 @@ def build_readiness(
                 ],
             },
             {"gate": "poster_ocr_recovery_canary", "ok": poster_ocr_canary_summary["ok"], "required": poster_ocr_canary_summary["required"]},
-            {"gate": "vision_batch", "ok": vision_summary["ok"]},
+            {
+                "gate": "vision_batch",
+                "ok": vision_summary["ok"],
+                "required": vision_summary["required"],
+            },
             {"gate": "release_package_quality", "ok": quality_summary["ok"], "hard_failures": quality_summary["hard_failures"]},
             {
                 "gate": "poster_recovery_work_orders",
@@ -2531,6 +2661,12 @@ def build_readiness(
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--source-mode",
+        choices=SOURCE_MODES,
+        default="docker_exporter",
+        help="Select source-specific readiness contracts. Docker smoke remains mandatory for docker_exporter and is not applicable to Sanji desktop RSS.",
+    )
     parser.add_argument("--publish-report-dir", type=Path, help="Infer quality/poster/write-gate/output paths from this daily publish report dir.")
     parser.add_argument(
         "--reports-root",
@@ -2613,7 +2749,9 @@ def run(args: argparse.Namespace) -> int:
         poster_write_gate=read_json(resolved["poster_write_gate_report"])
         if resolved["poster_write_gate_report"]
         else {},
-        docker=read_json(resolved["docker_smoke_report"]),
+        docker=read_json(resolved["docker_smoke_report"])
+        if resolved["docker_smoke_report"]
+        else None,
         poster_ocr_canary=read_json(resolved["poster_ocr_canary_report"])
         if resolved["poster_ocr_canary_report"]
         else None,
@@ -2639,10 +2777,13 @@ def run(args: argparse.Namespace) -> int:
         exporter_auth_recovery_preflight=read_json(resolved["exporter_auth_recovery_preflight_report"])
         if resolved["exporter_auth_recovery_preflight_report"]
         else None,
-        vision=read_json(resolved["vision_batch_report"]),
+        vision=read_json(resolved["vision_batch_report"])
+        if resolved["vision_batch_report"]
+        else None,
         fallback=read_json(resolved["fallback_summary"]),
         expected_min_items=args.expected_min_items,
         paths=paths,
+        source_mode=args.source_mode,
     )
     write_json(resolved["report"], report)
     print(

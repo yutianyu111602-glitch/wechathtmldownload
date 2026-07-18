@@ -1234,6 +1234,7 @@ function Write-OpenClawReadinessAndNextAction {
         Write-Host "▶ Build OpenClaw weekly daily readiness summary" -ForegroundColor Yellow
         $readinessArgs = @(
             $ReadinessSummaryScript,
+            "--source-mode", $SourceMode,
             "--publish-report-dir", $RunReportDir,
             "--reports-root", $HuaidjReportRoot,
             "--report", $readinessSummaryReportPath,
@@ -1256,39 +1257,39 @@ function Write-OpenClawReadinessAndNextAction {
             $readinessArgs += "--poster-recovery-report"
             $readinessArgs += $missingPosterRecoveryReportPath
         }
-        if (Test-Path -LiteralPath $posterRecoverySplitControllerPacketReportPath) {
+        if ($SourceMode -eq "docker_exporter" -and (Test-Path -LiteralPath $posterRecoverySplitControllerPacketReportPath)) {
             $readinessArgs += "--poster-recovery-split-controller-packet-report"
             $readinessArgs += $posterRecoverySplitControllerPacketReportPath
         }
-        if (Test-Path -LiteralPath $publicPosterUploadCandidateReviewPacketReportPath) {
+        if ($SourceMode -eq "docker_exporter" -and (Test-Path -LiteralPath $publicPosterUploadCandidateReviewPacketReportPath)) {
             $readinessArgs += "--public-poster-upload-candidate-review-packet-report"
             $readinessArgs += $publicPosterUploadCandidateReviewPacketReportPath
         }
-        if (Test-Path -LiteralPath $aggregateChildPosterOcrWorkerContractReportPath) {
+        if ($SourceMode -eq "docker_exporter" -and (Test-Path -LiteralPath $aggregateChildPosterOcrWorkerContractReportPath)) {
             $readinessArgs += "--poster-ocr-canary-report"
             $readinessArgs += $aggregateChildPosterOcrWorkerContractReportPath
         }
-        if (Test-Path -LiteralPath $aggregateChildPosterOcrExecutionPreflightReportPath) {
+        if ($SourceMode -eq "docker_exporter" -and (Test-Path -LiteralPath $aggregateChildPosterOcrExecutionPreflightReportPath)) {
             $readinessArgs += "--poster-ocr-execution-preflight-report"
             $readinessArgs += $aggregateChildPosterOcrExecutionPreflightReportPath
         }
-        if (Test-Path -LiteralPath $aggregateChildPosterOcrControllerReleasePacketReportPath) {
+        if ($SourceMode -eq "docker_exporter" -and (Test-Path -LiteralPath $aggregateChildPosterOcrControllerReleasePacketReportPath)) {
             $readinessArgs += "--poster-ocr-controller-release-packet-report"
             $readinessArgs += $aggregateChildPosterOcrControllerReleasePacketReportPath
         }
-        if (Test-Path -LiteralPath $aggregateChildPosterOcrRuntimeReleasePreflightReportPath) {
+        if ($SourceMode -eq "docker_exporter" -and (Test-Path -LiteralPath $aggregateChildPosterOcrRuntimeReleasePreflightReportPath)) {
             $readinessArgs += "--poster-ocr-runtime-release-preflight-report"
             $readinessArgs += $aggregateChildPosterOcrRuntimeReleasePreflightReportPath
         }
-        if (Test-Path -LiteralPath $aggregateChildPosterOcrSourceMaterialPreflightReportPath) {
+        if ($SourceMode -eq "docker_exporter" -and (Test-Path -LiteralPath $aggregateChildPosterOcrSourceMaterialPreflightReportPath)) {
             $readinessArgs += "--poster-ocr-source-material-preflight-report"
             $readinessArgs += $aggregateChildPosterOcrSourceMaterialPreflightReportPath
         }
-        if (Test-Path -LiteralPath $exporterFreshnessPreflightReportPath) {
+        if ($SourceMode -eq "docker_exporter" -and (Test-Path -LiteralPath $exporterFreshnessPreflightReportPath)) {
             $readinessArgs += "--exporter-freshness-preflight-report"
             $readinessArgs += $exporterFreshnessPreflightReportPath
         }
-        if (Test-Path -LiteralPath $exporterAuthRecoveryPreflightReportPath) {
+        if ($SourceMode -eq "docker_exporter" -and (Test-Path -LiteralPath $exporterAuthRecoveryPreflightReportPath)) {
             $readinessArgs += "--exporter-auth-recovery-preflight-report"
             $readinessArgs += $exporterAuthRecoveryPreflightReportPath
         }
