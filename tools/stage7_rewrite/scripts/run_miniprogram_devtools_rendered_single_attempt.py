@@ -40,7 +40,61 @@ ALLOWED_SCRIPTS = {
     "devtools-loading-fallback.cjs",
     "devtools-haptics.cjs",
     "devtools-extreme.cjs",
+    "devtools-atlas-neighborhood-rendered.cjs",
+    "devtools-artist-max-richness-rendered.cjs",
+    "devtools-city-guide-rendered.cjs",
+    "devtools-sound-rendered.cjs",
 }
+BUILTIN_RUN_ORDER = [
+    {
+        "script": "devtools-current-package-rendered.cjs",
+        "current_pass": False,
+        "pass_contract": "Render the current package and verify feed, city/date facets, interactions, posters, and runtime exceptions.",
+        "expected_artifact_dir_glob": "devtools-current-package-rendered-*",
+    },
+    {
+        "script": "devtools-loading-fallback.cjs",
+        "current_pass": False,
+        "pass_contract": "Verify loading, timeout, retry, and static fallback states without a stuck spinner.",
+        "expected_artifact_dir_glob": "devtools-loading-fallback-*",
+    },
+    {
+        "script": "devtools-haptics.cjs",
+        "current_pass": False,
+        "pass_contract": "Verify bounded haptic interaction handlers and absence of runtime exceptions.",
+        "expected_artifact_dir_glob": "devtools-haptics-*",
+    },
+    {
+        "script": "devtools-extreme.cjs",
+        "current_pass": False,
+        "pass_contract": "Verify extreme viewport and interaction scenarios without render or runtime failures.",
+        "expected_artifact_dir_glob": "devtools-extreme-*",
+    },
+    {
+        "script": "devtools-atlas-neighborhood-rendered.cjs",
+        "current_pass": False,
+        "pass_contract": "Render an Atlas neighborhood and verify generation-bound graph expansion without runtime exceptions.",
+        "expected_artifact_dir_glob": "devtools-atlas-neighborhood-rendered-*",
+    },
+    {
+        "script": "devtools-artist-max-richness-rendered.cjs",
+        "current_pass": False,
+        "pass_contract": "Render the richest artist surface and verify its complete evidence-backed sections.",
+        "expected_artifact_dir_glob": "devtools-artist-max-richness-rendered-*",
+    },
+    {
+        "script": "devtools-city-guide-rendered.cjs",
+        "current_pass": False,
+        "pass_contract": "Render the city guide, select a city, and verify its decision and venue routes.",
+        "expected_artifact_dir_glob": "devtools-city-guide-rendered-*",
+    },
+    {
+        "script": "devtools-sound-rendered.cjs",
+        "current_pass": False,
+        "pass_contract": "Render the safe empty Sound form and prove validation stops before upload or persistence.",
+        "expected_artifact_dir_glob": "devtools-sound-rendered-*",
+    },
+]
 SECRET_ASSIGNMENT_RE = re.compile(
     r"(?i)\b(api[_-]?key|secret|token|password|cookie|authorization|bearer|sk)\s*[:=]\s*([^\s\"'<>]+)"
 )
@@ -61,6 +115,15 @@ def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def builtin_preflight() -> dict[str, Any]:
+    """Return the versioned portable run contract for a clean checkout."""
+    return {
+        "schema_version": "weekly_miniprogram_devtools_rendered_run_preflight.builtin.v1",
+        "decision": "portable_builtin_run_contract",
+        "run_order": [dict(step) for step in BUILTIN_RUN_ORDER],
+    }
+
+
 def latest_report_json(prefix: str, filename: str, fallback: Path) -> Path:
     reports_root = REPO_ROOT / "tools" / "stage7_rewrite" / "reports"
     candidates = [
@@ -71,6 +134,24 @@ def latest_report_json(prefix: str, filename: str, fallback: Path) -> Path:
     if not candidates:
         return fallback
     return max(candidates, key=lambda path: (path.stat().st_mtime_ns, str(path)))
+
+
+def resolve_preflight(
+    explicit: Path | None,
+    *,
+    fallback: Path = DEFAULT_PREFLIGHT_JSON,
+) -> tuple[dict[str, Any], str]:
+    """Resolve optional discovery evidence without making it a runtime dependency."""
+    if explicit is not None:
+        return load_json(explicit), str(explicit)
+    candidate = latest_report_json(
+        "weekly_miniprogram_devtools_run_preflight_",
+        "weekly_miniprogram_devtools_rendered_run_preflight.json",
+        fallback,
+    )
+    if candidate.exists():
+        return load_json(candidate), str(candidate)
+    return builtin_preflight(), "builtin"
 
 
 def sanitize_log(value: str, limit: int = 200_000) -> str:
@@ -102,6 +183,72 @@ def choose_execution_port(port: int, *, avoid_busy_port: bool, max_scan: int = 5
     }
 
 
+def choose_ide_http_port(
+    environment_report: dict[str, Any],
+    *,
+    automator_port: int,
+    explicit: str,
+) -> int:
+    """Reuse an existing IDE HTTP server while keeping the automator WS port independent."""
+    explicit_value = str(explicit or "").strip()
+    if explicit_value:
+        port = int(explicit_value)
+        if port <= 0:
+            raise ValueError("MINIPROGRAM_DEVTOOLS_IDE_PORT must be a positive integer")
+        return port
+    summary = environment_report.get("summary", {})
+    detected = sorted(
+        {
+            int(value)
+            for value in summary.get("ide_http_ports", [])
+            if str(value).isdigit() and int(value) > 0
+        }
+    )
+    if len(detected) == 1:
+        return detected[0]
+    if len(detected) > 1:
+        raise RuntimeError(f"multiple WeChat DevTools IDE HTTP ports detected: {detected}")
+    if int(summary.get("process_count") or 0) > 0:
+        raise RuntimeError("WeChat DevTools is running but its IDE HTTP port could not be detected")
+    return int(automator_port)
+
+
+def choose_devtools_local_app_data(environment_report: dict[str, Any], *, explicit: str) -> str:
+    explicit_value = str(explicit or "").strip()
+    if explicit_value:
+        return explicit_value
+    detected = sorted(
+        {
+            str(value).strip()
+            for value in environment_report.get("summary", {}).get("devtools_local_app_data_paths", [])
+            if str(value).strip()
+        },
+        key=str.lower,
+    )
+    if len(detected) == 1:
+        return detected[0]
+    if len(detected) > 1:
+        raise RuntimeError(f"multiple WeChat DevTools LocalAppData roots detected: {detected}")
+    return ""
+
+
+def devtools_profile_environment(local_app_data: str) -> dict[str, str]:
+    value = str(local_app_data or "").strip()
+    if not value:
+        return {}
+    local_path = Path(value)
+    if local_path.name.lower() != "local" or local_path.parent.name.lower() != "appdata":
+        raise RuntimeError(
+            "WeChat DevTools LocalAppData must use a complete <profile>\\AppData\\Local layout"
+        )
+    profile_root = local_path.parent.parent
+    return {
+        "USERPROFILE": str(profile_root),
+        "LOCALAPPDATA": str(local_path),
+        "APPDATA": str(local_path.parent / "Roaming"),
+    }
+
+
 def audit_devtools_environment(target_ports: list[int]) -> dict[str, Any]:
     """Run the local report-only DevTools environment audit in-process."""
     audit_path = Path(__file__).with_name("audit_miniprogram_devtools_environment.py")
@@ -127,13 +274,20 @@ def audit_devtools_environment(target_ports: list[int]) -> dict[str, Any]:
 
 def choose_step(preflight: dict[str, Any], script_name: str | None) -> dict[str, Any]:
     steps = [step for step in preflight.get("run_order", []) if step.get("script") in ALLOWED_SCRIPTS]
-    if not steps:
-        raise ValueError("preflight has no allowed rendered run steps")
     if script_name:
         for step in steps:
             if step.get("script") == script_name:
                 return step
+        # Discovery reports are historical evidence and can legitimately
+        # predate a newly required release scenario. An explicit allowed
+        # scenario uses the versioned built-in contract instead of becoming
+        # impossible to run because the latest old report omitted it.
+        for step in BUILTIN_RUN_ORDER:
+            if step.get("script") == script_name:
+                return dict(step)
         raise ValueError(f"script is not in preflight run_order: {script_name}")
+    if not steps:
+        raise ValueError("preflight has no allowed rendered run steps")
     for step in steps:
         if not step.get("current_pass"):
             return step
@@ -175,6 +329,10 @@ def build_packet(
         "environment_overrides": {
             "MINIPROGRAM_AUTOMATOR_LAUNCH": "1",
             "MINIPROGRAM_AUTOMATOR_PORT": str(port_selection["selected_port"]),
+            "MINIPROGRAM_DEVTOOLS_IDE_PORT": "<auto>",
+            "MINIPROGRAM_DEVTOOLS_LOCALAPPDATA": "<inherit-or-auto>",
+            "MINIPROGRAM_DEVTOOLS_USERPROFILE": "<inherit-or-auto>",
+            "MINIPROGRAM_DEVTOOLS_APPDATA": "<inherit-or-auto>",
             "MINIPROGRAM_AUTOMATOR_WS": "<unset>",
         },
         "environment_guard": {
@@ -255,9 +413,40 @@ def run_packet(
         summary_path.write_text(json.dumps(packet, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
         return packet
 
+    try:
+        ide_http_port = choose_ide_http_port(
+            environment_report,
+            automator_port=int(packet["environment_overrides"]["MINIPROGRAM_AUTOMATOR_PORT"]),
+            explicit=os.environ.get("MINIPROGRAM_DEVTOOLS_IDE_PORT", ""),
+        )
+        devtools_local_app_data = choose_devtools_local_app_data(
+            environment_report,
+            explicit=os.environ.get("MINIPROGRAM_DEVTOOLS_LOCALAPPDATA", ""),
+        )
+        devtools_profile_env = devtools_profile_environment(devtools_local_app_data)
+    except (TypeError, ValueError, RuntimeError) as error:
+        packet["decision"] = "weekly_miniprogram_devtools_rendered_single_attempt_blocked_ide_port"
+        packet["executed"] = False
+        packet["environment_guard"]["blocked_reason"] = str(error)
+        summary_path = REPO_ROOT / packet["execution_summary_json"]
+        summary_path.write_text(json.dumps(packet, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        return packet
+    packet["environment_overrides"]["MINIPROGRAM_DEVTOOLS_IDE_PORT"] = str(ide_http_port)
+    packet["environment_overrides"]["MINIPROGRAM_DEVTOOLS_LOCALAPPDATA"] = (
+        devtools_local_app_data or "<inherit>"
+    )
+    packet["environment_overrides"]["MINIPROGRAM_DEVTOOLS_USERPROFILE"] = (
+        devtools_profile_env.get("USERPROFILE") or "<inherit>"
+    )
+    packet["environment_overrides"]["MINIPROGRAM_DEVTOOLS_APPDATA"] = (
+        devtools_profile_env.get("APPDATA") or "<inherit>"
+    )
+
     env = os.environ.copy()
     env["MINIPROGRAM_AUTOMATOR_LAUNCH"] = packet["environment_overrides"]["MINIPROGRAM_AUTOMATOR_LAUNCH"]
     env["MINIPROGRAM_AUTOMATOR_PORT"] = packet["environment_overrides"]["MINIPROGRAM_AUTOMATOR_PORT"]
+    env["MINIPROGRAM_DEVTOOLS_IDE_PORT"] = packet["environment_overrides"]["MINIPROGRAM_DEVTOOLS_IDE_PORT"]
+    env.update(devtools_profile_env)
     env.pop("MINIPROGRAM_AUTOMATOR_WS", None)
     try:
         completed = runner(
@@ -319,8 +508,9 @@ def render_markdown(packet: dict[str, Any]) -> str:
         "## Command",
         "",
         "```powershell",
-        "$env:MINIPROGRAM_AUTOMATOR_LAUNCH='1'; $env:MINIPROGRAM_AUTOMATOR_PORT='{port}'; node {script}".format(
+        "$env:MINIPROGRAM_AUTOMATOR_LAUNCH='1'; $env:MINIPROGRAM_AUTOMATOR_PORT='{port}'; $env:MINIPROGRAM_DEVTOOLS_IDE_PORT='{ide_port}'; node {script}".format(
             port=packet["environment_overrides"]["MINIPROGRAM_AUTOMATOR_PORT"],
+            ide_port=packet["environment_overrides"]["MINIPROGRAM_DEVTOOLS_IDE_PORT"],
             script=packet["command"][1],
         ),
         "```",
@@ -379,19 +569,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--timeout-sec", type=int, default=180)
     parser.add_argument("--execute", action="store_true")
-    args = parser.parse_args(argv)
-    if args.preflight_json is None:
-        args.preflight_json = latest_report_json(
-            "weekly_miniprogram_devtools_run_preflight_",
-            "weekly_miniprogram_devtools_rendered_run_preflight.json",
-            DEFAULT_PREFLIGHT_JSON,
-        )
-    return args
+    return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    preflight = load_json(args.preflight_json)
+    preflight, preflight_source = resolve_preflight(args.preflight_json)
     packet = build_packet(
         preflight=preflight,
         script_name=args.script,
@@ -401,6 +584,7 @@ def main(argv: list[str] | None = None) -> int:
         execute=args.execute,
         timeout_sec=args.timeout_sec,
     )
+    packet["preflight_source"] = preflight_source
     if args.execute:
         packet = run_packet(packet, allow_dirty_devtools_environment=args.allow_dirty_devtools_environment)
     paths = write_outputs(packet, args.out_dir)

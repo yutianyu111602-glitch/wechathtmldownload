@@ -123,8 +123,19 @@ function loadCityPage({ requestApi } = {}) {
       pageConfig = config;
     },
     require(request) {
-      if (request.endsWith("/api")) return { requestApi: requestApi || (async () => ({ cities: [] })) };
+      if (request.endsWith("/api")) {
+        const handler = requestApi || (async () => ({ cities: [] }));
+        return {
+          requestApi: handler,
+          fetchAllCurrentItems: async (query) => {
+            const response = await handler("/api/v1/weekly/current", { ...(query || {}), cursor: 0 });
+            return response.items || [];
+          },
+        };
+      }
+      if (request.endsWith("/businessDate")) return { currentShanghaiBusinessDateKey: () => "2026-06-26" };
       if (request.endsWith("/cityGuide")) return require(path.join(root, "utils", "cityGuide.js"));
+      if (request.endsWith("/homeFilters")) return require(path.join(root, "services", "homeFilters.js"));
       if (request.endsWith("/format")) return {
         compactItem: (item) => item,
         dedupeItems: (items) => items,
@@ -209,7 +220,7 @@ test("city page loadGuide derives counts from the exact current item set", async
               styleLabel: "Techno",
             },
           ],
-          page: { nextCursor: null },
+          page: { nextCursor: null, total: 1 },
         };
       }
       throw new Error(`unexpected endpoint ${endpoint}`);
@@ -221,6 +232,39 @@ test("city page loadGuide derives counts from the exact current item set", async
   assert.equal(pageConfig.data.loading, false);
   assert.equal(pageConfig.data.cities.length, 1);
   assert.equal(pageConfig.data.cities[0].key, "hangzhou");
+  assert.equal(pageConfig.data.cities[0].itemCount, 1);
+});
+
+test("city page keeps the current feed when the optional city-label endpoint fails", async () => {
+  const { pageConfig } = loadCityPage({
+    requestApi: async (endpoint) => {
+      if (endpoint === "/api/v1/weekly/cities") throw new Error("facet unavailable");
+      if (endpoint === "/api/v1/weekly/current") {
+        return {
+          items: [
+            {
+              id: "sh-1",
+              city_key: "shanghai",
+              city: ["上海"],
+              title: "Shanghai techno",
+              date: "2026-06-26",
+              venueLabel: "SYSTEM",
+              styleLabel: "Techno",
+            },
+          ],
+          page: { nextCursor: null, total: 1 },
+        };
+      }
+      throw new Error(`unexpected endpoint ${endpoint}`);
+    },
+  });
+
+  await pageConfig.loadGuide("");
+
+  assert.equal(pageConfig.data.loading, false);
+  assert.equal(pageConfig.data.error, "");
+  assert.equal(pageConfig.data.cities.length, 1);
+  assert.equal(pageConfig.data.cities[0].key, "shanghai");
   assert.equal(pageConfig.data.cities[0].itemCount, 1);
 });
 

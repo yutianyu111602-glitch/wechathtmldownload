@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 import sqlite3
 import sys
@@ -10,15 +11,24 @@ from typing import Any
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
+ATLAS_REBUILD_DIR = SCRIPT_DIR.parents[1] / "atlas_rebuild"
+if str(ATLAS_REBUILD_DIR) not in sys.path:
+    sys.path.insert(0, str(ATLAS_REBUILD_DIR))
 
-from atlas_core_common import connect_readonly, integer, json_loads, row_count, text, write_gzip_json, write_json, json_dumps  # noqa: E402
+from atlas_core_common import connect_readonly, ensure_parent, integer, json_loads, row_count, text, write_json, json_dumps  # noqa: E402
+from atlas_dataset_identity import resolve_dataset_id  # noqa: E402
 
 
 def norm_key(value: str) -> str:
     return " ".join(text(value).casefold().split())
 
 
-def export_index(miniapp_db: Path, out: Path) -> dict[str, Any]:
+def export_index(
+    miniapp_db: Path,
+    out: Path,
+    dataset_id: str | None = None,
+) -> dict[str, Any]:
+    resolved_dataset_id = resolve_dataset_id(miniapp_db, dataset_id)
     conn = connect_readonly(miniapp_db)
     try:
         subjects = []
@@ -135,7 +145,8 @@ def export_index(miniapp_db: Path, out: Path) -> dict[str, Any]:
             collabs[dj].append({"di": row["dst_dj_id"], "n": subject_names.get(row["dst_dj_id"], row["dst_dj_id"]), "ec": integer(row["same_event_count"])})
 
         payload = {
-            "v": 4,
+            "v": 5,
+            "datasetId": resolved_dataset_id,
             "subjects": subjects,
             "profiles": profiles,
             "events": events,
@@ -145,11 +156,13 @@ def export_index(miniapp_db: Path, out: Path) -> dict[str, Any]:
             "collabs": collabs,
             "source_refs": source_refs,
         }
-        write_gzip_json(out, payload)
+        ensure_parent(out)
+        raw = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+        out.write_bytes(gzip.compress(raw, compresslevel=9, mtime=0))
         report = {
             "decision": "atlas_core_miniapp_index_export_ready_candidate",
-            "miniapp_db": str(miniapp_db),
-            "out": str(out),
+            "datasetId": resolved_dataset_id,
+            "artifact": out.name,
             "counts": {
                 "subjects": len(subjects),
                 "profiles": len(profiles),
@@ -169,12 +182,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Export candidate atlas_index.json.gz from atlas_miniapp.sqlite.")
     parser.add_argument("--miniapp-db", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--dataset-id", help="Shared public ATLAS generation id; defaults to the miniapp DB SHA256")
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> dict[str, Any]:
     args = parse_args(argv)
-    return export_index(args.miniapp_db, args.out)
+    return export_index(args.miniapp_db, args.out, args.dataset_id)
 
 
 if __name__ == "__main__":

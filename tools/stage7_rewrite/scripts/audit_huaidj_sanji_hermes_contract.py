@@ -9,13 +9,15 @@ not split across Hermes, Windows Task Scheduler, and Codex automation.
 from __future__ import annotations
 
 import argparse
+import contextlib
+import importlib
 import json
 import os
 import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 
 REPO = Path(__file__).resolve().parents[3]
@@ -41,6 +43,25 @@ LAUNCHER_REPO_DEFAULT_PATTERN = re.compile(
     r'^INSTALLER_REPO = Path\(r"(?P<path>[^"]+)"\)$',
     re.MULTILINE,
 )
+
+
+def _normalized_path(path: Path) -> str:
+    return os.path.normcase(os.path.normpath(str(path.expanduser().resolve(strict=False))))
+
+
+@contextlib.contextmanager
+def _forced_hermes_home(hermes_home: Path) -> Iterator[Path]:
+    requested = hermes_home.expanduser().resolve(strict=False)
+    previous = os.environ.get("HERMES_HOME")
+    had_previous = "HERMES_HOME" in os.environ
+    os.environ["HERMES_HOME"] = str(requested)
+    try:
+        yield requested
+    finally:
+        if had_previous:
+            os.environ["HERMES_HOME"] = previous or ""
+        else:
+            os.environ.pop("HERMES_HOME", None)
 
 
 def resolve_hermes_runtime_root() -> Path:
@@ -714,14 +735,41 @@ def audit_docs(checks: list[dict[str, Any]]) -> None:
 
 
 def load_hermes_jobs(hermes_home: Path, hermes_agent: Path) -> tuple[list[dict[str, Any]], str]:
-    sys.path.insert(0, str(hermes_agent))
-    os.environ.setdefault("HERMES_HOME", str(hermes_home))
+    requested_home = hermes_home.expanduser().resolve(strict=False)
+    requested_agent = hermes_agent.expanduser().resolve(strict=False)
+    inserted = str(requested_agent)
+    sys.path.insert(0, inserted)
     try:
-        from cron.jobs import load_jobs  # type: ignore
+        with _forced_hermes_home(requested_home):
+            jobs_module = importlib.import_module("cron.jobs")
     except Exception as exc:
         return [], f"cannot import Hermes cron.jobs: {exc}"
+    finally:
+        if sys.path and sys.path[0] == inserted:
+            sys.path.pop(0)
+
+    module_file = Path(str(getattr(jobs_module, "__file__", ""))).resolve(strict=False)
     try:
-        return list(load_jobs()), ""
+        module_file.relative_to(requested_agent)
+    except (OSError, ValueError):
+        return [], f"Hermes cron API runtime mismatch: actual={module_file} expected_under={requested_agent}"
+
+    use_cron_store = getattr(jobs_module, "use_cron_store", None)
+    current_store = getattr(jobs_module, "_current_cron_store", None)
+    if not callable(use_cron_store) or not callable(current_store):
+        return [], "Hermes cron API cannot verify an explicit cron store"
+    expected_jobs_file = requested_home / "cron" / "jobs.json"
+    try:
+        with _forced_hermes_home(requested_home):
+            with use_cron_store(requested_home):
+                actual_jobs_file = Path(str(getattr(current_store(), "jobs_file", "")))
+                if _normalized_path(actual_jobs_file) != _normalized_path(expected_jobs_file):
+                    return [], (
+                        "Hermes cron store mismatch: "
+                        f"actual={actual_jobs_file.resolve(strict=False)} "
+                        f"expected={expected_jobs_file.resolve(strict=False)}"
+                    )
+                return list(jobs_module.load_jobs()), ""
     except Exception as exc:
         return [], f"cannot load Hermes jobs: {exc}"
 

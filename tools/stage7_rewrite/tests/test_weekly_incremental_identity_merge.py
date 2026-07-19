@@ -191,6 +191,39 @@ def test_source_event_identity_keeps_sibling_schedule_rows_distinct() -> None:
     assert report["identity_alias_replacement_count"] == 0
 
 
+def test_incremental_merge_scrubs_internal_paths_from_retained_base_items() -> None:
+    merger = load_merger("weekly_incremental_public_projection_test")
+    retained = event("base:public-probe", "base", fresh=False)
+    retained.update(
+        {
+            "poster_vl_images": [{"path": r"C:\Users\win\private\poster.png"}],
+            "source_evidence_path": "/home/win/private/source.md",
+            "emergency_qwen36_lineup_patch": {"path": "/srv/huaidj/private.json"},
+        }
+    )
+    retained["poster_selection_evidence"]["visible_text_lines"] = [
+        "DJ Safe / 22:00",
+        "/mnt/c/private/source.md",
+    ]
+    incoming = event("new:public-probe", "new", fresh=True)
+
+    merged, _report = merger.merge_items([retained], [incoming])
+    serialized = json.dumps(merged, ensure_ascii=False)
+
+    kept = next(item for item in merged if item["id"] == "base:public-probe")
+    assert kept["poster_selection_evidence"]["visible_text_lines"] == ["DJ Safe / 22:00"]
+    for key in (
+        "poster_vl_images",
+        "source_evidence_path",
+        "emergency_qwen36_lineup_patch",
+    ):
+        assert key not in kept
+    assert "C:\\Users" not in serialized
+    assert "/home/" not in serialized
+    assert "/mnt/" not in serialized
+    assert "/srv/" not in serialized
+
+
 def test_merge_package_retargets_source_map_and_fresh_enrichment_to_stable_id(tmp_path: Path) -> None:
     merger = load_merger("weekly_incremental_identity_merge_package_test")
     stable_id = "cs_bar:0a6e84afd98070be"
@@ -216,15 +249,34 @@ def test_merge_package_retargets_source_map_and_fresh_enrichment_to_stable_id(tm
     report = merger.merge_package(base, incremental, output, None, overwrite=False)
 
     current = json.loads((output / "current.json").read_text(encoding="utf-8"))
+    manifest = json.loads((output / "manifest.json").read_text(encoding="utf-8"))
     assert current["item_count"] == 1
     assert current["items"][0]["id"] == stable_id
     assert current["items"][0]["poster_selection_evidence"]["fresh"] is True
+    assert current["source_pack_name"] == incremental.name
+    assert manifest["source_pack_name"] == incremental.name
+    assert manifest["source_base_release_name"] == base.name
+    assert manifest["source_incremental_release_name"] == incremental.name
+    for forbidden_key in (
+        "source_pack_dir",
+        "out_dir",
+        "source_url_map_path",
+        "static_source_url_map_path",
+        "source_base_api_dir",
+        "source_incremental_api_dir",
+    ):
+        assert forbidden_key not in manifest
+    merger.assert_public_payload(current, label="test merged current")
+    merger.assert_public_payload(manifest, label="test merged manifest")
 
     source_map = json.loads(
         (output / "source_actions" / "source_url_map.json").read_text(encoding="utf-8")
     )
     assert source_map["sources"]["0a6e84afd98070be"]["event_id"] == stable_id
     assert source_map["sources"]["0a6e84afd98070be"]["source_event_id"] == stable_id
+    assert source_map["incremental_merge"]["base_release_name"] == base.name
+    assert source_map["incremental_merge"]["incremental_release_name"] == incremental.name
+    merger.assert_public_payload(source_map, label="test merged source map")
 
     enrichment_index = json.loads(
         (output / "llm" / "enrichment_index.json").read_text(encoding="utf-8")
@@ -237,6 +289,14 @@ def test_merge_package_retargets_source_map_and_fresh_enrichment_to_stable_id(tm
             "path": stable_enrichment_path,
         }
     ]
+    assert enrichment_index["incremental_merge"]["base_release_name"] == base.name
+    assert enrichment_index["incremental_merge"]["incremental_release_name"] == incremental.name
+    merger.assert_public_payload(enrichment_index, label="test merged enrichment index")
+    public_outputs = json.dumps(
+        [current, manifest, source_map, enrichment_index],
+        ensure_ascii=False,
+    )
+    assert str(tmp_path) not in public_outputs
     enrichment = json.loads((output / stable_enrichment_path).read_text(encoding="utf-8"))
     assert enrichment["id"] == stable_id
     assert enrichment["sourceItemHash"] == "fresh-hash"

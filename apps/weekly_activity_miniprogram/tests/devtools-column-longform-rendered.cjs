@@ -25,7 +25,9 @@ const expectedCount = Number(process.env.MINIPROGRAM_COLUMN_EXPECTED_COUNT || "1
 const expectedMinBodyLen = Number(process.env.MINIPROGRAM_COLUMN_EXPECTED_MIN_BODY_LEN || "250");
 const expectedMinParagraphs = Number(process.env.MINIPROGRAM_COLUMN_EXPECTED_MIN_PARAGRAPHS || "4");
 const expectedStyle = process.env.MINIPROGRAM_COLUMN_EXPECTED_STYLE || "electronic-column-source-backed-dj-profiles.v1";
-const artifactRoot = path.resolve(__dirname, "../test-artifacts");
+const artifactRoot = process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT
+  ? path.resolve(process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT)
+  : path.resolve(__dirname, "../test-artifacts");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const artifactDir = path.join(artifactRoot, `devtools-column-longform-rendered-${stamp}`);
 const screenshotEnabled = process.env.MINIPROGRAM_SCREENSHOTS === "1";

@@ -1,8 +1,125 @@
 # CLI Reference
 
-Updated: 2026-06-05
+Updated: 2026-07-19
 
 The main CLI is implemented in `src/cli.ts`; history URL fetching is implemented in `src/historyCli.ts`; package scripts are declared in `package.json`.
+
+## 2026-07-19 HUAIDJ weekly/miniprogram commands
+
+Run commands from the final integration/release root and write reports to an
+absolute repository-external directory. These commands are entrypoints, not
+evidence that their write/deploy form has been executed.
+
+### Local and real-DevTools verification
+
+```powershell
+npm run test:miniprogram
+npm run test:cloudrun
+
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File apps\weekly_activity_miniprogram\scripts\run_devtools_release_suite_windows.ps1 `
+  -StaticPackageDir <verified-current-package> `
+  -OutRoot <external-report-dir> `
+  -Screenshots -Execute
+```
+
+`run_devtools_release_suite_windows.ps1` fingerprints and snapshots the selected
+static package, verifies the official DevTools CLI/login response, allocates
+automator ports, and writes a manifest plus scenario reports. Use a new output
+directory for every attempt. A prior or partially failed directory is not a
+passing release report.
+
+Mini-program upload is separately fail-closed:
+
+```powershell
+# Preview only
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File apps\weekly_activity_miniprogram\scripts\upload_devtools_cli_windows.ps1 `
+  -Version 2026.07.19.001 -Desc '<approved-description>' `
+  -SuiteSummaryPath <fresh-suite-root>\suite-summary.json `
+  -StaticPackageDir <same-verified-current-package> -WhatIf
+
+# Write action only after all gates are green
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File apps\weekly_activity_miniprogram\scripts\upload_devtools_cli_windows.ps1 `
+  -Version 2026.07.19.001 -Desc '<approved-description>' `
+  -SuiteSummaryPath <fresh-suite-root>\suite-summary.json `
+  -StaticPackageDir <same-verified-current-package> -ConfirmUpload
+```
+
+Real upload refuses missing, failed, partial, or stale eight-scenario evidence.
+It recomputes the tested source/package identities, copies only the shared
+runtime-entry allowlist, permits only the requested version/date rewrite in
+`config/buildIdentity.js`, and records the final staging byte fingerprint.
+Upload is a developer-version action only; it does not submit review or make a
+public release.
+
+### Package identity and Atlas candidate
+
+```powershell
+python tools\stage7_rewrite\scripts\stamp_weekly_api_generation.py `
+  --api-dir <candidate-api-dir> --report <external-report-json>
+
+python tools\atlas_rebuild\build_atlas_serving_triplet.py `
+  --miniapp-db <frozen-atlas-miniapp-sqlite> `
+  --out-dir <new-external-candidate-dir>
+```
+
+The Atlas builder requires a new absolute external output directory, hashes its
+inputs and generator sources, and emits a candidate only. `--v2` and
+`--serving` are an optional pair and require compatible subject identities plus
+one frozen generation declaration. No form of this command deploys or changes
+a serving pointer.
+
+### Hermes dry-run, apply, and audit
+
+```powershell
+# Default is read-only dry-run
+python tools\stage7_rewrite\scripts\install_huaidj_sanji_hermes_jobs.py `
+  --hermes-home F:\DevData\Hermes `
+  --hermes-agent <immutable-hermes-runtime> `
+  --backup-root <external-backup-dir> `
+  --json-out <external-dry-run-json>
+
+# Apply only after the new HUAIDJ repo is a clean immutable release
+python tools\stage7_rewrite\scripts\install_huaidj_sanji_hermes_jobs.py `
+  --apply --hermes-home F:\DevData\Hermes `
+  --hermes-agent <immutable-hermes-runtime> `
+  --backup-root <external-backup-dir> `
+  --json-out <external-apply-json>
+
+python tools\stage7_rewrite\scripts\audit_huaidj_sanji_hermes_contract.py `
+  --hermes-home F:\DevData\Hermes `
+  --hermes-agent <immutable-hermes-runtime> `
+  --json-out <external-audit-json>
+```
+
+After apply, repeat installer dry-run and require no changes, then verify the
+Gateway's real child command. The installer does not run Sanji or deploy.
+
+### 744-hour Sanji/model candidate
+
+After immutable-release cutover and a fresh missing-HTML ledger/digest with
+`unresolved=0`, the maintained wrapper accepts the full recovery window:
+
+```powershell
+pwsh -File tools\stage7_rewrite\run_huaidj_sanji_daily_twice.ps1 `
+  -Slot manual `
+  -SanjiRefreshCutoffHours 744 `
+  -SanjiSummaryMaxAgeHours 12 `
+  -PosterExtractionMode vl_direct_qwen `
+  -PosterVlModel qwen3.6-plus `
+  -PosterVlMaxImages 0 `
+  -PosterVlLimit 0 `
+  -PosterVlConcurrency 4 `
+  -DeepSeekConcurrency 4 `
+  -SkipNotify
+```
+
+Without `-DeployBackend` this is a candidate run, not a backend publication.
+Do not add `-UploadFrontend` to the data run; frontend upload remains a separate
+release action. The wrapper's OS-backed lease is authoritative; lock-file age
+must not be used to steal an active run.
 
 ## Stage7 report-only utility scripts
 

@@ -7,9 +7,12 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const WebSocket = require("ws");
+const { connectRawDevtools } = require("./devtools-raw-session.cjs");
 
-const endpoint = String(process.env.MINIPROGRAM_AUTOMATOR_WS || "ws://[::1]:9420").trim();
-const artifactRoot = path.resolve(__dirname, "../test-artifacts");
+const endpoint = String(process.env.MINIPROGRAM_AUTOMATOR_WS || "").trim();
+const artifactRoot = process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT
+  ? path.resolve(process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT)
+  : path.resolve(__dirname, "../test-artifacts");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const artifactDir = path.join(artifactRoot, `devtools-city-guide-rendered-${stamp}`);
 const reportPath = path.join(artifactDir, "report.json");
@@ -68,21 +71,7 @@ async function step(label, run) {
 }
 
 function connectDevtools(url) {
-  return new Promise((resolve, reject) => {
-    const ws = new WebSocket(url);
-    const timer = setTimeout(() => {
-      try { ws.close(); } catch { /* noop */ }
-      reject(new Error(`DevTools websocket open timed out: ${url}`));
-    }, 10000);
-    ws.on("open", () => {
-      clearTimeout(timer);
-      resolve(ws);
-    });
-    ws.on("error", (error) => {
-      clearTimeout(timer);
-      reject(error);
-    });
-  });
+  return connectRawDevtools({ endpoint: url, timeoutMs: 120000 });
 }
 
 function send(ws, method, params = {}, timeoutMs = 15000) {

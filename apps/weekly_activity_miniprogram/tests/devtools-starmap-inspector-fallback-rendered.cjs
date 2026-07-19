@@ -11,7 +11,9 @@ const path = require("node:path");
 const WebSocket = require("ws");
 
 const wsEndpoint = String(process.env.MINIPROGRAM_AUTOMATOR_WS || "").trim();
-const artifactRoot = path.resolve(__dirname, "../test-artifacts");
+const artifactRoot = process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT
+  ? path.resolve(process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT)
+  : path.resolve(__dirname, "../test-artifacts");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const artifactDir = path.join(artifactRoot, `starmap-inspector-fallback-rendered-${stamp}`);
 const targetFocusId = String(process.env.ATLAS_RENDER_FOCUS_ID || "dj:duanluoo").trim();

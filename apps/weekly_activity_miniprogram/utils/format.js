@@ -63,6 +63,46 @@ function mergeNonEmpty(...sources) {
   return output;
 }
 
+function itemCityKeys(item = {}) {
+  return Array.from(new Set(
+    [item.city_key, item.cityKey]
+      .concat(Array.isArray(item.city_keys) ? item.city_keys : [])
+      .concat(Array.isArray(item.cityKeys) ? item.cityKeys : [])
+      .map((value) => String(value || "").trim().toLowerCase())
+      .filter(Boolean),
+  ));
+}
+
+function mergeDuplicateCityFields(fallbackItem, preferredItem, mergedItem) {
+  const preferredKeys = itemCityKeys(preferredItem);
+  const fallbackKeys = itemCityKeys(fallbackItem);
+  const keys = Array.from(new Set(preferredKeys.concat(fallbackKeys)));
+  if (!keys.length) return mergedItem;
+  const labelsByKey = new Map();
+  for (const source of [fallbackItem, preferredItem]) {
+    const sourceKeys = itemCityKeys(source);
+    const sourceLabels = Array.isArray(source?.city) ? source.city : [source?.city];
+    sourceKeys.forEach((key, index) => {
+      const label = String(sourceLabels[index] || (index === 0 ? (source?.cityLabel || source?.city_name || source?.cityName) : "") || key).trim();
+      if (label) labelsByKey.set(key, label);
+    });
+  }
+  const primaryKey = String(preferredItem?.city_key || preferredItem?.cityKey || keys[0]).trim().toLowerCase();
+  const orderedKeys = primaryKey && keys.includes(primaryKey)
+    ? [primaryKey, ...keys.filter((key) => key !== primaryKey)]
+    : keys;
+  return {
+    ...mergedItem,
+    city_key: primaryKey || orderedKeys[0],
+    city_keys: orderedKeys,
+    city: orderedKeys.map((key) => labelsByKey.get(key) || key),
+    ...(Object.prototype.hasOwnProperty.call(fallbackItem || {}, "cityKeys")
+      || Object.prototype.hasOwnProperty.call(preferredItem || {}, "cityKeys")
+      ? { cityKeys: orderedKeys }
+      : {}),
+  };
+}
+
 function canonicalizeItemFields(rawItem = {}) {
   const item = mergeNonEmpty(rawItem);
   const venue = meaningfulArray(firstMeaningful(item.venue, item.venues, item.venue_names));
@@ -2122,9 +2162,17 @@ function dedupeItems(items) {
       continue;
     }
     if (itemQualityScore(item) > itemQualityScore(output[duplicateIndex])) {
-      output[duplicateIndex] = mergeNonEmpty(output[duplicateIndex], item);
+      output[duplicateIndex] = mergeDuplicateCityFields(
+        output[duplicateIndex],
+        item,
+        mergeNonEmpty(output[duplicateIndex], item),
+      );
     } else {
-      output[duplicateIndex] = mergeNonEmpty(item, output[duplicateIndex]);
+      output[duplicateIndex] = mergeDuplicateCityFields(
+        item,
+        output[duplicateIndex],
+        mergeNonEmpty(item, output[duplicateIndex]),
+      );
     }
   }
   return output;

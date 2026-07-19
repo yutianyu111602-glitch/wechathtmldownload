@@ -25,7 +25,7 @@ async function listen(serverInstance) {
   return `http://127.0.0.1:${address.port}`;
 }
 
-function loadArtistPage({ requestApi, navigateMode = "success", reLaunchMode = "success", switchTabMode = "success", discoverySections = [] } = {}) {
+function loadArtistPage({ requestApi, fetchAllCurrentItems, navigateMode = "success", reLaunchMode = "success", switchTabMode = "success", discoverySections = [] } = {}) {
   const filename = path.join(root, "pages", "artist", "artist.js");
   const code = fs.readFileSync(filename, "utf8");
   let pageConfig = null;
@@ -48,6 +48,13 @@ function loadArtistPage({ requestApi, navigateMode = "success", reLaunchMode = "
             apiCalls.push({ route, params });
             if (requestApi) return requestApi(route, params);
             return { found: false };
+          },
+          fetchAllCurrentItems: async (params) => {
+            if (fetchAllCurrentItems) return fetchAllCurrentItems(params);
+            apiCalls.push({ route: "/api/v1/weekly/current", params });
+            if (!requestApi) return [];
+            const response = await requestApi("/api/v1/weekly/current", params);
+            return Array.isArray(response && response.items) ? response.items : [];
           },
         };
       }
@@ -155,7 +162,7 @@ function loadArtistPage({ requestApi, navigateMode = "success", reLaunchMode = "
   return { pageConfig, apiCalls, navigateCalls, reLaunchCalls, switchTabCalls, copyCalls, toastCalls, storage };
 }
 
-test("artist page prefers subjectId Atlas lookup with full relation limits", async () => {
+test("artist page prefers subjectId Atlas lookup with bounded relation pages", async () => {
   const { pageConfig, apiCalls } = loadArtistPage({
     requestApi: async (route) => route === "/api/v1/weekly/atlas/artist"
       ? { found: true, profile: { displayName: "Cocoonics" }, events: [], venues: [], collaborators: [] }
@@ -170,9 +177,37 @@ test("artist page prefers subjectId Atlas lookup with full relation limits", asy
   assert.equal(apiCalls[0].route, "/api/v1/weekly/atlas/artist");
   assert.equal(apiCalls[0].params.subjectId, "dj:cocoonics");
   assert.equal(apiCalls[0].params.eventLimit, 100);
-  assert.equal(apiCalls[0].params.collaboratorLimit, 1500);
-  assert.equal(apiCalls[0].params.venueLimit, 500);
+  assert.equal(apiCalls[0].params.collaboratorLimit, 200);
+  assert.equal(apiCalls[0].params.venueLimit, 100);
   assert.equal(apiCalls.some((call) => call.route.includes("/dj-profile/")), false);
+});
+
+test("artist page uses server pagination totals instead of truncated array lengths", async () => {
+  const { pageConfig } = loadArtistPage({
+    requestApi: async (route) => route === "/api/v1/weekly/atlas/artist"
+      ? {
+        found: true,
+        profile: { displayName: "Cocoonics" },
+        events: [{ eventId: "e1", title: "One" }],
+        venues: [{ venueName: "V1", eventCount: 1 }],
+        collaborators: [{ djId: "d1", displayName: "D1", sameEventCount: 1 }],
+        pagination: {
+          events: { total: 1435, availableTotal: 100, truncated: true },
+          venues: { total: 71, availableTotal: 20, truncated: true },
+          collaborators: { total: 691, availableTotal: 30, truncated: true },
+        },
+      }
+      : { items: [], page: { nextCursor: null } },
+  });
+  pageConfig.name = "Cocoonics";
+  pageConfig.lang = "zh";
+  pageConfig.data = { ...pageConfig.data, t: { loadFailed: "加载失败" } };
+
+  await pageConfig.loadArtist.call(pageConfig);
+
+  assert.equal(pageConfig.data.atlasProfile.eventCount, 1435);
+  assert.equal(pageConfig.data.atlasProfile.venueCount, 71);
+  assert.equal(pageConfig.data.atlasProfile.collaboratorCount, 691);
 });
 
 test("artist page share preserves subjectId for direct profile reopen", () => {

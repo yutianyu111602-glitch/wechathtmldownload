@@ -39,6 +39,205 @@ def read_json(path: Path):
 
 
 class WeeklyActivityMiniProgramApiTests(unittest.TestCase):
+    def test_public_evidence_drops_internal_paths_and_keys(self):
+        row = {
+            "article_id": "public-evidence-probe",
+            "queue_id": "public-evidence-probe",
+            "account_key": "Public Probe",
+            "title": "7月19日 Public Probe",
+            "source_url": "https://mp.weixin.qq.com/s/public-evidence-probe",
+            "post_date": "2026-07-18",
+            "event_date_text": ["2026-07-19"],
+            "event_time_text": "22:00",
+            "city": ["上海"],
+            "venue": ["Public Probe"],
+            "address": "上海市黄浦区测试路1号",
+            "lineup": ["DJ Safe"],
+            "evidence": ["DJ Safe / 22:00"],
+            "poster_vl_images": [{"path": r"C:\\Users\\win\\private\\poster.png"}],
+            "source_evidence_path": "/home/runner/private/source.md",
+            "emergency_qwen36_lineup_patch": {"input": "/srv/huaidj/private.json"},
+            "poster_selection_evidence": {
+                "schema_version": "weekly_poster_selection_evidence.vl_direct.v1",
+                "model": "qwen3.6-plus",
+                "visible_text_lines": [
+                    "DJ Safe / 22:00",
+                    r"C:\\Users\\win\\private\\poster.png",
+                    "/opt/huaidj/private/source.md",
+                ],
+                "source_evidence_path": "/mnt/c/private/source.md",
+                "risk_flags": ["source_grounded"],
+            },
+        }
+
+        item = mini_api.build_item(
+            row,
+            evidence_limit=5,
+            base_url="",
+            venue_registry=[],
+            account_registry=[],
+        )
+        # Simulate an enrichment caller handing the builder extra internal
+        # fields; the canonical public projection must fail closed.
+        item.update(
+            {
+                "poster_vl_images": row["poster_vl_images"],
+                "source_evidence_path": row["source_evidence_path"],
+                "emergency_qwen36_lineup_patch": row["emergency_qwen36_lineup_patch"],
+            }
+        )
+        public_item = mini_api.project_public_items([item])[0]
+        serialized = json.dumps(public_item, ensure_ascii=False)
+
+        self.assertEqual(
+            public_item["poster_selection_evidence"]["visible_text_lines"],
+            ["DJ Safe / 22:00"],
+        )
+        for key in (
+            "poster_vl_images",
+            "source_evidence_path",
+            "emergency_qwen36_lineup_patch",
+        ):
+            self.assertNotIn(key, public_item)
+        for marker in ("C:\\\\Users", "/home/", "/mnt/", "/srv/", "/opt/"):
+            self.assertNotIn(marker, serialized)
+
+    def test_explicit_city_wins_over_a_single_city_named_road_alias(self):
+        self.assertEqual(
+            mini_api.infer_cities(
+                {
+                    "address": "北京路123号",
+                    "city": ["广州"],
+                }
+            ),
+            [{"key": "guangzhou", "label": "广州"}],
+        )
+
+    def test_city_named_road_without_any_city_anchor_does_not_guess_a_city(self):
+        self.assertEqual(
+            mini_api.infer_cities({"address": "北京路123号"}),
+            [],
+        )
+
+    def test_city_resolution_priority_preserves_admin_prefixes_and_true_multi_city_evidence(self):
+        cases = [
+            (
+                {"address": "南京西路100号", "city": ["上海"]},
+                [{"key": "shanghai", "label": "上海"}],
+            ),
+            (
+                {"address": "乌鲁木齐北路505号", "city": ["上海"]},
+                [{"key": "shanghai", "label": "上海"}],
+            ),
+            (
+                {"address": "Beijing Road 123", "city": ["广州"]},
+                [{"key": "guangzhou", "label": "广州"}],
+            ),
+            (
+                {"address": "Nanjing West Road 100", "city": ["上海"]},
+                [{"key": "shanghai", "label": "上海"}],
+            ),
+            (
+                {"address": "Urumqi North Road 505", "city": ["上海"]},
+                [{"key": "shanghai", "label": "上海"}],
+            ),
+            (
+                {"address": "北京市朝阳区测试街1号", "city": ["广州"]},
+                [{"key": "beijing", "label": "北京"}],
+            ),
+            (
+                {"address": "南京市鼓楼区测试街1号", "city": ["上海"]},
+                [{"key": "nanjing", "label": "南京"}],
+            ),
+            (
+                {"address": "乌鲁木齐市沙依巴克区测试街1号", "city": ["上海"]},
+                [{"key": "urumqi", "label": "乌鲁木齐"}],
+            ),
+            (
+                {"address": "上海站 / 郑州站", "city": ["广州"]},
+                [
+                    {"key": "shanghai", "label": "上海"},
+                    {"key": "zhengzhou", "label": "郑州"},
+                ],
+            ),
+        ]
+
+        for row, expected in cases:
+            with self.subTest(row=row):
+                self.assertEqual(mini_api.infer_cities(row), expected)
+
+    def test_explicit_multi_city_is_not_collapsed_when_title_confirms_every_city(self):
+        self.assertEqual(
+            mini_api.infer_cities(
+                {
+                    "account_key": "上海俱乐部",
+                    "title": "上海郑州双城巡演",
+                    "address": "",
+                    "city": ["上海", "郑州"],
+                }
+            ),
+            [
+                {"key": "shanghai", "label": "上海"},
+                {"key": "zhengzhou", "label": "郑州"},
+            ],
+        )
+
+    def test_trusted_venue_registry_city_overrides_conflicting_address_and_explicit_city(self):
+        row = {
+            "article_id": "trusted-venue-city",
+            "queue_id": "trusted-venue-city",
+            "account_key": "TOTE",
+            "title": "TOTE Night",
+            "source_url": "https://mp.weixin.qq.com/s/trusted-venue-city",
+            "post_date": "2026-07-10",
+            "event_date_text": ["2026-07-12"],
+            "event_time_text": "22:00",
+            "city": ["上海"],
+            "venue": ["TOTE"],
+            "address": "北京市朝阳区测试街1号",
+        }
+        venue_registry = [
+            {
+                "venue_id": "tote_guangzhou",
+                "canonical_name": "TOTE",
+                "aliases": ["TOTE"],
+                "city_key": "guangzhou",
+                "city_name": "广州",
+                "address_full": "广州市越秀区测试街1号",
+                "normalized_keys": ["tote"],
+                "allow_city_override": True,
+            }
+        ]
+
+        item = mini_api.build_item(
+            row,
+            evidence_limit=5,
+            base_url="",
+            venue_registry=venue_registry,
+            account_registry=[],
+        )
+
+        self.assertEqual(item["city_key"], "guangzhou")
+        self.assertEqual(item["city_name"], "广州")
+        self.assertEqual(item["address_full"], "广州市越秀区测试街1号")
+
+    def test_address_city_inference_does_not_treat_city_named_street_as_a_second_city(self):
+        self.assertEqual(
+            mini_api.infer_cities({"address": "上海市静安区乌鲁木齐北路505号"}),
+            [{"key": "shanghai", "label": "上海"}],
+        )
+        self.assertEqual(
+            mini_api.infer_cities({"address": "上海站 / 郑州站"}),
+            [
+                {"key": "shanghai", "label": "上海"},
+                {"key": "zhengzhou", "label": "郑州"},
+            ],
+        )
+        self.assertEqual(
+            mini_api.infer_cities({"address": "乌鲁木齐市沙依巴克区测试街1号"}),
+            [{"key": "urumqi", "label": "乌鲁木齐"}],
+        )
+
     def test_infers_compact_mmdd_title_dates(self):
         row = {
             "title": "0516｜法式Melodic House领航者Citadelle",
@@ -1086,6 +1285,7 @@ class WeeklyActivityMiniProgramApiTests(unittest.TestCase):
             self.assertEqual(exit_code, 0)
             manifest = read_json(out_dir / "manifest.json")
             self.assertEqual(manifest["schema_version"], "weekly_activity_miniprogram_api.v1")
+            self.assertRegex(manifest["generation_id"], r"^sha256:[a-f0-9]{64}$")
             self.assertEqual(manifest["item_count"], 1)
             self.assertEqual(manifest["routes"]["current"], "https://static.example.com/weekly/current.json")
             self.assertEqual(
@@ -1097,12 +1297,19 @@ class WeeklyActivityMiniProgramApiTests(unittest.TestCase):
             self.assertTrue((out_dir / "poster_vl_usage_summary.json").exists())
             self.assertIn("poster_vl_usage_summary.json", manifest["usage_sidecars"])
             current = read_json(out_dir / "current.json")
+            self.assertEqual(current["generation_id"], manifest["generation_id"])
             self.assertTrue((out_dir / "source_actions" / "source_url_map.json").exists())
             source_map = read_json(out_dir / "source_actions" / "source_url_map.json")
             self.assertEqual(source_map["source_count"], 1)
             self.assertIn(current_hash := current["items"][0]["source_action"]["url_hash"], source_map["sources"])
             self.assertEqual(source_map["sources"][current_hash]["url"], "https://mp.weixin.qq.com/s/a1")
+            mini_api.assert_public_payload(source_map, label="test full-build source map")
+            dispositions = read_json(out_dir / "build_filter_dispositions.json")
+            self.assertEqual(dispositions["source_pack_name"], pack_dir.name)
+            self.assertNotIn("source_pack_dir", dispositions)
+            mini_api.assert_public_payload(dispositions, label="test full-build filter dispositions")
             snapshot = read_json(out_dir / "weekly_entity_snapshot.json")
+            self.assertEqual(snapshot["generation_id"], manifest["generation_id"])
             self.assertEqual(snapshot["artist_profiles"][0]["artist_id"], "dj_a")
             self.assertEqual(snapshot["lineup_resolved"][0]["event_id"], "q1")
             self.assertEqual(snapshot["lineup_resolved"][0]["match_method"], "alias_exact")
@@ -1133,16 +1340,61 @@ class WeeklyActivityMiniProgramApiTests(unittest.TestCase):
             self.assertEqual(published_validator.validate_current_payload(current), [])
 
             city_index = read_json(out_dir / "by-city" / "index.json")
+            self.assertEqual(city_index["generation_id"], manifest["generation_id"])
             self.assertEqual(city_index["city_count"], 1)
             city_paths = {row["city_key"]: row["path"] for row in city_index["cities"]}
             self.assertEqual(city_paths["shanghai"], "by-city/shanghai.json")
             self.assertTrue((out_dir / city_paths["shanghai"]).exists())
 
             date_index = read_json(out_dir / "by-date" / "index.json")
+            self.assertEqual(date_index["generation_id"], manifest["generation_id"])
             self.assertEqual(date_index["date_count"], 1)
             date_paths = {row["date"]: row["path"] for row in date_index["dates"]}
-            self.assertEqual(read_json(out_dir / date_paths["2026-05-09"])["items"][0]["id"], "q1")
+            date_route = read_json(out_dir / date_paths["2026-05-09"])
+            self.assertEqual(date_route["generation_id"], manifest["generation_id"])
+            self.assertEqual(date_route["items"][0]["id"], "q1")
             self.assertTrue((out_dir / "by-id" / "q1.json").exists())
+            self.assertEqual(read_json(out_dir / "by-id" / "q1.json")["generation_id"], manifest["generation_id"])
+
+    def test_generation_id_is_deterministic_and_changes_only_with_semantic_package_content(self):
+        items = [
+            {
+                "id": "event-a",
+                "title": "Techno A",
+                "event_date_start": "2026-07-24",
+                "city_keys": ["shanghai"],
+            }
+        ]
+        sources = {
+            "a" * 16: {
+                "type": "wechat_article",
+                "url": "https://mp.weixin.qq.com/s/a",
+                "event_id": "event-a",
+            }
+        }
+
+        first = mini_api.compute_generation_id(
+            items=items,
+            source_map=sources,
+            window_start="2026-07-19",
+            window_end="2026-08-17",
+        )
+        reordered = mini_api.compute_generation_id(
+            items=list(reversed(items)),
+            source_map=dict(reversed(list(sources.items()))),
+            window_start="2026-07-19",
+            window_end="2026-08-17",
+        )
+        changed = mini_api.compute_generation_id(
+            items=[{**items[0], "title": "Techno B"}],
+            source_map=sources,
+            window_start="2026-07-19",
+            window_end="2026-08-17",
+        )
+
+        self.assertRegex(first, r"^sha256:[a-f0-9]{64}$")
+        self.assertEqual(reordered, first)
+        self.assertNotEqual(changed, first)
 
     def test_skips_publish_blocked_aggregate_parent_rows(self):
         with tempfile.TemporaryDirectory() as td:
@@ -1811,6 +2063,81 @@ class WeeklyActivityMiniProgramApiTests(unittest.TestCase):
             self.assertEqual(item["poster_file_id"], "")
             source_map = read_json(out_dir / "source_actions" / "source_url_map.json")
             self.assertEqual(source_map["source_count"], 0)
+
+    def test_aggregate_child_exact_qwen_poster_survives_api_build_for_cloudbase_migration(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            pack_dir = root / "pack"
+            out_dir = root / "api"
+            pack_dir.mkdir()
+            (pack_dir / "summary.json").write_text("{}", encoding="utf-8")
+            selected_url = "https://mmbiz.qpic.cn/mmbiz_jpg/exact-child/640?wx_fmt=jpeg"
+            row = {
+                "article_id": "agg-child-qwen-exact",
+                "queue_id": "agg-child-qwen-exact",
+                "account_key": "reactor_shanghai",
+                "title": "Exact Child Event",
+                "source_url": "https://mp.weixin.qq.com/s/parent-overview",
+                "post_date": "2026-07-18",
+                "event_date_text": ["2026-07-19"],
+                "event_time_text": "22:00",
+                "city": ["上海"],
+                "venue": ["REACTOR Shanghai"],
+                "address": "上海市黄浦区测试路1号",
+                "lineup": ["DJ Exact"],
+                "evidence": ["2026-07-19 Exact Child Event REACTOR Shanghai"],
+                "confidence": 0.95,
+                "aggregation_child": True,
+                "poster_vl_status": "enriched",
+                "cover_url": selected_url,
+                "poster_url": selected_url,
+                "poster_source": "sanji_article_body_vl_aggregate_child_exact",
+                "poster_selection_evidence": {
+                    "schema_version": "weekly_poster_selection_evidence.vl_direct.v1",
+                    "selected_by": "qwen_vl_direct_sanji_article_assets",
+                    "provider": "qwen3_vl",
+                    "model": "qwen3.6-plus",
+                    "main_poster_image_index": 3,
+                    "selected_source_url": selected_url,
+                    "selected_sha": "exact-child-sha",
+                    "selection_scope": "aggregate_child_exact_event",
+                    "visible_text_lines": ["2026-07-19 Exact Child Event"],
+                },
+            }
+            (pack_dir / "weekly_activity_recommendation_candidates.jsonl").write_text(
+                json.dumps(row, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+            (pack_dir / "weekly_activity_recommendation_review_candidates.jsonl").write_text("", encoding="utf-8")
+
+            exit_code = mini_api.main(
+                [
+                    "--pack-dir",
+                    str(pack_dir),
+                    "--out-dir",
+                    str(out_dir),
+                    "--window-start",
+                    "2026-07-18",
+                    "--window-days",
+                    "2",
+                    "--venue-registry",
+                    str(ROOT / "registries" / "weekly_venues_seed.json"),
+                ]
+            )
+
+            self.assertEqual(exit_code, 0)
+            item = read_json(out_dir / "current.json")["items"][0]
+            self.assertTrue(item["aggregation_child"])
+            self.assertFalse(item["source_action"]["available"])
+            self.assertEqual(item["source_action"]["url_hash"], "")
+            self.assertEqual(item["cover_url"], selected_url)
+            self.assertEqual(item["cover_image_url"], selected_url)
+            self.assertEqual(item["poster_source"], "sanji_article_body_vl_aggregate_child_exact")
+            self.assertEqual(
+                item["poster_selection_evidence"]["selection_scope"],
+                "aggregate_child_exact_event",
+            )
+            self.assertNotIn("selected_source_url", item["poster_selection_evidence"])
 
     def test_deduped_items_keep_all_source_url_map_aliases(self):
         with tempfile.TemporaryDirectory() as td:

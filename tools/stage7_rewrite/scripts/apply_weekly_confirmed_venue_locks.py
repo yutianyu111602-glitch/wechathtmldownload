@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import shutil
+import sys
 from copy import deepcopy
 from datetime import datetime, timezone
 from pathlib import Path
@@ -14,6 +15,13 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[3]
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from weekly_city_routes import group_items_by_city
+
+
 DEFAULT_REGISTRY = ROOT / "tools" / "stage7_rewrite" / "registries" / "weekly_venues_seed.json"
 DEFAULT_API_DIR = ROOT / "services" / "weekly_activity_cloudrun" / "data" / "current_release"
 DEFAULT_REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\DevData\HuaidjRuntime\state\reports"))
@@ -646,13 +654,7 @@ def rebuild_city_routes(api_dir: Path, current_payload: dict[str, Any]) -> None:
     city_dir = api_dir / "by-city"
     city_dir.mkdir(parents=True, exist_ok=True)
     generated_at = current_payload.get("generated_at") or now_cst()
-    grouped: dict[str, dict[str, Any]] = {}
-    for item in current_payload.get("items") or []:
-        if not isinstance(item, dict):
-            continue
-        city = first(item.get("city"), first(item.get("city_name"))) or "未知"
-        city_key = first(item.get("city_key"), first(item.get("city_keys"))) or city
-        grouped.setdefault(city_key, {"city": city, "items": []})["items"].append(item)
+    grouped = group_items_by_city(current_payload.get("items") or [])
     for path in city_dir.glob("*.json"):
         if path.name != "index.json":
             path.unlink()

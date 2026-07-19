@@ -2,13 +2,27 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const WebSocket = require("ws");
+const { connectRawDevtools } = require("./devtools-raw-session.cjs");
 
 const wsEndpoint = String(process.env.MINIPROGRAM_AUTOMATOR_WS || "").trim();
 const projectPath = process.env.MINIPROGRAM_PROJECT_PATH || path.resolve(__dirname, "..");
-const artifactRoot = path.resolve(__dirname, "../test-artifacts");
+const starmapBundle = require(path.join(projectPath, "data/atlas_starmap.js"));
+const neighborhoodCenter = (starmapBundle.nodes || []).find((node) => node && node.t === "venue" && node.n === "OIL");
+const richDj = (starmapBundle.nodes || []).find((node) => node && node.t === "dj" && node.n === "Knopha");
+assert.ok(neighborhoodCenter && neighborhoodCenter.u, "guarded starmap must contain the OIL venue center");
+assert.ok(richDj && richDj.u, "guarded starmap must contain the Knopha DJ node");
+const neighborhoodCenterId = neighborhoodCenter.u;
+const richDjId = richDj.u;
+const artifactRoot = process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT
+  ? path.resolve(process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT)
+  : path.resolve(__dirname, "../test-artifacts");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const artifactDir = path.join(artifactRoot, `atlas-neighborhood-rendered-${stamp}`);
 const screenshotEnabled = process.env.MINIPROGRAM_SCREENSHOTS === "1";
+const atlasDataDir = path.resolve(
+  process.env.HUAIDJ_ATLAS_MINIAPP_DATA_DIR
+    || path.resolve(__dirname, "../../../services/weekly_activity_cloudrun/data"),
+);
 const steps = [];
 
 fs.mkdirSync(artifactDir, { recursive: true });
@@ -51,26 +65,8 @@ async function step(label, run) {
   }
 }
 
-function connectDevtools(endpoint, timeoutMs = 30000) {
-  return new Promise((resolve, reject) => {
-    const ws = new WebSocket(endpoint);
-    const timer = setTimeout(() => {
-      try {
-        ws.close();
-      } catch {
-        // ignore cleanup errors
-      }
-      reject(new Error(`DevTools websocket open timed out after ${timeoutMs}ms`));
-    }, timeoutMs);
-    ws.on("open", () => {
-      clearTimeout(timer);
-      resolve(ws);
-    });
-    ws.on("error", (error) => {
-      clearTimeout(timer);
-      reject(error);
-    });
-  });
+function connectDevtools(endpoint, timeoutMs = 120000) {
+  return connectRawDevtools({ endpoint, timeoutMs, projectPath });
 }
 
 function sendProtocol(ws, method, params = {}, timeoutMs = 30000) {
@@ -109,6 +105,28 @@ async function callAppFunction(ws, fn, args = [], timeoutMs = 30000) {
   return response.result;
 }
 
+async function waitForAppRuntime(ws, timeoutMs = 60000) {
+  const started = Date.now();
+  let lastError = "";
+  while (Date.now() - started <= timeoutMs) {
+    try {
+      const state = await callAppFunction(ws, function probeAppRuntime() {
+        const app = typeof getApp === "function" ? getApp() : null;
+        return {
+          ready: Boolean(app && app.globalData && app.globalData.cloud),
+          pageCount: typeof getCurrentPages === "function" ? getCurrentPages().length : 0,
+        };
+      }, [], 15000);
+      if (state && state.ready) return state;
+      lastError = `runtime not ready: ${JSON.stringify(state)}`;
+    } catch (error) {
+      lastError = error && error.message ? error.message : String(error);
+    }
+    await sleep(800);
+  }
+  throw new Error(`App runtime did not become callable after ${timeoutMs}ms; last=${lastError}`);
+}
+
 async function pollUntil(label, timeoutMs, intervalMs, read, done) {
   const started = Date.now();
   let last;
@@ -145,11 +163,9 @@ function scoreHintRank(value) {
 }
 
 async function main() {
-  if (!wsEndpoint) throw new Error("MINIPROGRAM_AUTOMATOR_WS is required for connect mode");
-
   process.env.ATLAS_MINIAPP_PRELOAD = "0";
-  process.env.ATLAS_MINIAPP_INDEX = path.resolve(__dirname, "../../../services/weekly_activity_cloudrun/data/atlas_index.json.gz");
-  process.env.ATLAS_NEIGHBORHOOD_BUNDLE = path.resolve(__dirname, "../../../services/weekly_activity_cloudrun/data/atlas_neighborhood.json.gz");
+  process.env.ATLAS_MINIAPP_INDEX = path.join(atlasDataDir, "atlas_index.json.gz");
+  process.env.ATLAS_NEIGHBORHOOD_BUNDLE = path.join(atlasDataDir, "atlas_neighborhood.json.gz");
 
   const { createServer } = await import("../../../services/weekly_activity_cloudrun/src/server.mjs");
   let server;
@@ -216,7 +232,8 @@ async function main() {
       env: { ...process.env, ATLAS_REQUIRE_SESSION: "false" },
     });
     const baseUrl = await listen(server);
-    ws = await step("connect DevTools websocket", () => withTimeout(connectDevtools(wsEndpoint), 40000, "DevTools websocket connect"));
+    ws = await step("connect or launch DevTools", () => withTimeout(connectDevtools(wsEndpoint), 140000, "DevTools session"));
+    await step("wait App runtime callable", () => waitForAppRuntime(ws, 60000));
     originalCloudConfig = await step("snapshot DevTools backend", snapshotDevtoolsBackend);
 
     function configureLocalBackend() {
@@ -374,24 +391,24 @@ async function main() {
     assert.deepEqual(ready.typeShapes, ["circle", "diamond", "hexagon", "ring"], "base bundle should resolve all four entity shapes");
 
     const interaction = await step("interact starmap neighborhood", async () => {
-      const center = await callAppFunction(ws, function selectLoopy() {
+      const center = await callAppFunction(ws, function selectNeighborhoodCenter(centerIdArg) {
         if (typeof getCurrentPages !== "function") return { ok: false, reason: "getCurrentPages_not_ready" };
         const page = getCurrentPages()[getCurrentPages().length - 1];
-        const centerIndex = page && page._nodeIndexById ? page._nodeIndexById["venue:loopyclub"] : undefined;
-        if (centerIndex === undefined) return { ok: false, reason: "loopy_not_found" };
+        const centerIndex = page && page._nodeIndexById ? page._nodeIndexById[centerIdArg] : undefined;
+        if (centerIndex === undefined) return { ok: false, reason: "center_not_found", centerId: centerIdArg };
         page.selectNode(centerIndex);
         return { ok: true, centerIndex, selected: page.data.selected || null };
-      }, [], 8000);
+      }, [neighborhoodCenterId], 8000);
       if (!center.ok) return center;
 
       const child = await pollUntil(
         "wait first L1 child",
         12000,
         500,
-        () => callAppFunction(ws, function selectFirstLoopyChild() {
+        () => callAppFunction(ws, function selectFirstNeighborhoodChild(centerIdArg) {
           if (typeof getCurrentPages !== "function") return { ok: false, reason: "getCurrentPages_not_ready" };
           const page = getCurrentPages()[getCurrentPages().length - 1];
-          const children = ((page && page._expansionChildren) || {})["venue:loopyclub"] || [];
+          const children = ((page && page._expansionChildren) || {})[centerIdArg] || [];
           const childId = children[0];
           const childIndex = childId && page._nodeIndexById ? page._nodeIndexById[childId] : undefined;
           if (childIndex === undefined) {
@@ -399,7 +416,7 @@ async function main() {
           }
           page.selectNode(childIndex);
           return { ok: true, childId, childIndex, selected: page.data.selected || null };
-        }, [], 8000),
+        }, [neighborhoodCenterId], 8000),
         (state) => state && state.ok === true && state.childId,
       );
 
@@ -407,7 +424,7 @@ async function main() {
         "wait remote neighborhood",
         30000,
         700,
-        () => callAppFunction(ws, function readSelectedNeighborhoodState(childIdArg, childIndexArg) {
+        () => callAppFunction(ws, function readSelectedNeighborhoodState(centerIdArg, childIdArg, childIndexArg) {
           if (typeof getCurrentPages !== "function") {
             return { ok: false, reason: "getCurrentPages_not_ready", loading: true };
           }
@@ -418,7 +435,7 @@ async function main() {
           const inspectorStatus = inspector && inspector.status ? String(inspector.status) : "";
           return {
             ok: true,
-            center: "venue:loopyclub",
+            center: centerIdArg,
             childId: selected.id || childIdArg,
             childIndex: childIndexArg,
             selected,
@@ -427,7 +444,7 @@ async function main() {
             visibleNodeCount: page && page.data ? page.data.nodeCount : 0,
             loading: hint.indexOf("正在加载") !== -1 || inspectorStatus === "loading",
           };
-        }, [child.childId, child.childIndex], 8000),
+        }, [neighborhoodCenterId, child.childId, child.childIndex], 8000),
         (state) => state && state.loading === false && state.inspectorStatus && state.inspectorStatus !== "loading",
       );
     });
@@ -439,14 +456,14 @@ async function main() {
     assert.notEqual(interaction.inspectorStatus, "loading", "selected DJ inspector still loading");
 
     const richInspector = await step("verify rich DJ inspector", async () => {
-      const selected = await callAppFunction(ws, function selectKnownRichDj() {
+      const selected = await callAppFunction(ws, function selectKnownRichDj(richDjIdArg) {
         if (typeof getCurrentPages !== "function") return { ok: false, reason: "getCurrentPages_not_ready" };
         const page = getCurrentPages()[getCurrentPages().length - 1];
-        const index = page && page._nodeIndexById ? page._nodeIndexById["dj:knopha"] : undefined;
+        const index = page && page._nodeIndexById ? page._nodeIndexById[richDjIdArg] : undefined;
         if (index === undefined) return { ok: false, reason: "knopha_not_found" };
         page.selectNode(index);
         return { ok: true, index, selected: page.data.selected || null };
-      }, [], 8000);
+      }, [richDjId], 8000);
       if (!selected.ok) return selected;
       return await pollUntil(
         "wait rich inspector",
@@ -480,7 +497,7 @@ async function main() {
             collaboratorLine: inspector && inspector.collaboratorLine ? String(inspector.collaboratorLine) : "",
           };
         }, [], 8000),
-        (state) => state && state.selected && state.selected.id === "dj:knopha"
+        (state) => state && state.selected && state.selected.id === richDjId
           && state.inspectorStatus === "ready"
           && Boolean(state.cityLine || state.venueLine || state.collaboratorLine),
       );
@@ -495,9 +512,9 @@ async function main() {
     }
     assert.match(richInspector.neighborhoodStatus, /^(概览邻域|全库邻域)\s+\d+\s+条$/, "expected selected card to expose neighborhood source/scale status");
     assert.match(String(richInspector.shareAppMessage?.title || ""), /Knopha/, "expected send-to-friend share title to name the selected node");
-    assert.match(String(richInspector.shareAppMessage?.path || ""), /focusId=dj%3Aknopha/, "expected send-to-friend share path to preserve selected node focusId");
+    assert.ok(String(richInspector.shareAppMessage?.path || "").includes(`focusId=${encodeURIComponent(richDjId)}`), "expected send-to-friend share path to preserve selected node focusId");
     assert.match(String(richInspector.shareTimeline?.title || ""), /Knopha/, "expected timeline share title to name the selected node");
-    assert.match(String(richInspector.shareTimeline?.query || ""), /focusId=dj%3Aknopha/, "expected timeline share query to preserve selected node focusId");
+    assert.ok(String(richInspector.shareTimeline?.query || "").includes(`focusId=${encodeURIComponent(richDjId)}`), "expected timeline share query to preserve selected node focusId");
     assert.ok(Array.isArray(richInspector.selected?.relatedFilters), "expected rich inspector to expose relatedFilters");
     assert.ok(richInspector.selected.relatedFilters.some((item) => item && item.k === "all" && item.on === true), "expected all related filter to be active by default");
     assert.ok(Array.isArray(richInspector.selected?.relatedPreview), "expected rich inspector to expose relatedPreview rows");
@@ -586,6 +603,9 @@ async function main() {
       artifactDir,
       wsEndpoint,
       baseUrl,
+      datasetId: starmapBundle.datasetId,
+      neighborhoodCenter: { id: neighborhoodCenterId, name: neighborhoodCenter.n },
+      richDj: { id: richDjId, name: richDj.n },
       route: page.path,
       ready,
       interaction,

@@ -6,6 +6,7 @@
   "scripts": {
     "patch:automator-devtools": "node scripts/patch_miniprogram_automator_devtools_cli.cjs",
     "debug:cloud-ai": "node scripts/debug_cloud_ai_automator.cjs",
+    "gate:sound-release": "node scripts/sound_release_gate.cjs",
     "sync:cloud-db": "node scripts/sync_cloudbase_database.cjs",
     "sync:cloud-db:admin": "node scripts/run_cloudbase_hot_sync_admin.cjs"
   },

@@ -194,10 +194,13 @@ $env:APPDATA = 'F:\DevData\WeChatDevTools\Profile\AppData\Roaming'
 
 正式上传默认走 `apps/weekly_activity_miniprogram/scripts/upload_devtools_cli_windows.ps1`，使用已安装、已登录的真实微信开发者工具 CLI，同时保留干净 staging、包边界和灾备种子哈希门。`upload_native_windows.ps1` 只有在固定版本 `miniprogram-ci` 和私钥均已验证时才作为备用。上传必须记录：
 
+正式上传还必须显式传入本轮完整八场景 `suite-summary.json` 和同一 `current_release` 活动包。上传入口会重新计算被测前端源码、活动包、suite 绑定副本和最终 clean staging 的完整指纹；staging 与被测 RuntimeEntries 必须逐文件相同，唯一例外是按本次版本号和日期生成、内容严格匹配的 `config/buildIdentity.js`。缺失、失败、场景不全、源码漂移、包漂移或 staging 漂移一律在 CLI upload 前阻断。
+
 - 版本号与描述
 - 工具/基础库版本
 - CLI 退出码
 - `upload-info.json`
+- suite summary 哈希、被测源码/活动包指纹与最终 staging 字节指纹
 - 对应 Git commit 和 CloudRun/CloudBase 数据身份
 
 开发版本上传成功之后仍需单独证明提审、审核通过和公开发布。

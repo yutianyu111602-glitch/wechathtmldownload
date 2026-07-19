@@ -10,13 +10,23 @@ const path = require("node:path");
 const WebSocket = require("ws");
 
 const wsEndpoint = String(process.env.MINIPROGRAM_AUTOMATOR_WS || "").trim();
-const artifactRoot = path.resolve(__dirname, "../test-artifacts");
+const starmapBundle = require(path.resolve(__dirname, "../data/atlas_starmap.js"));
+const artifactRoot = process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT
+  ? path.resolve(process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT)
+  : path.resolve(__dirname, "../test-artifacts");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const artifactDir = path.join(artifactRoot, `starmap-path-rendered-${stamp}`);
-const fromId = String(process.env.ATLAS_PATH_FROM || "dj:knopha").trim();
 const fromName = String(process.env.ATLAS_PATH_FROM_NAME || "Knopha").trim();
-const toId = String(process.env.ATLAS_PATH_TO || "dj:cocoonics").trim();
 const toName = String(process.env.ATLAS_PATH_TO_NAME || "Cocoonics").trim();
+function bundledSubjectId(name) {
+  const normalized = String(name || "").trim().toLowerCase();
+  const node = (starmapBundle.nodes || []).find((item) => String(item && item.n || "").trim().toLowerCase() === normalized);
+  return node && node.u ? String(node.u) : "";
+}
+const fromId = String(process.env.ATLAS_PATH_FROM || bundledSubjectId(fromName)).trim();
+const toId = String(process.env.ATLAS_PATH_TO || bundledSubjectId(toName)).trim();
+assert.ok(fromId, `guarded starmap does not contain from node ${fromName}`);
+assert.ok(toId, `guarded starmap does not contain to node ${toName}`);
 const steps = [];
 let lastFailureContext = {};
 const runtimeContext = {};

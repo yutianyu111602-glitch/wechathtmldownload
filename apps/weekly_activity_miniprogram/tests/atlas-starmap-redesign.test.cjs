@@ -105,6 +105,12 @@ test("canvas runtime preserves weighted edges and uses the visual helpers", () =
   assert.match(source, /_scheduleDraw/);
 });
 
+test("starmap seed discovery uses the strict full-current paginator", () => {
+  const source = fs.readFileSync(path.join(root, "pages/atlas-starmap/atlas-starmap.js"), "utf8");
+  assert.match(source, /fetchAllCurrentItems/);
+  assert.doesNotMatch(source, /requestApi\("\/api\/v1\/weekly\/current",\s*\{\s*limit:\s*60\s*\}\)/);
+});
+
 test("progressive exploration state starts hidden and has bounded transitions", () => {
   const page = loadPage();
   assert.equal(page.data.sheetState, "hidden");

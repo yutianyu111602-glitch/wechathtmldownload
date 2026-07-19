@@ -63,12 +63,19 @@ def test_quality_defaults_use_stronger_model_and_unlimited_images():
     assert vl.provider_extra_body(vl.provider_config("qwen3_vl", "qwen3.6-plus")) == {"enable_thinking": False}
     prompt = vl.build_prompt(
         {"title": "6.21 single event", "event_date_text": ["2026-06-21"]},
-        {"title": "source", "body_text": "lineup: A / B / C"},
+        {
+            "title": "source",
+            "body_text": "lineup: A / B / C",
+            "article_dir": r"C:\Users\win\private\article",
+        },
         [],
     )
     assert "Inspect every attached image" in prompt
     assert "month/week/holiday calendars" in prompt
     assert "full visible DJ/live lineup from all attached images plus the body excerpt" in prompt
+    assert "article_dir" in prompt  # only the explicit do-not-return instruction
+    assert r"C:\Users\win\private\article" not in prompt
+    assert "do not request, infer, repeat, or return" in prompt
 
 
 def test_max_images_zero_selects_all_images(tmp_path):
@@ -908,6 +915,328 @@ def test_missing_sanji_assets_is_nonfatal_and_keeps_candidate(tmp_path):
     summary = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
     assert summary["missing_assets"] == 1
     assert summary["failures"] == 0
+
+
+def test_aggregate_child_scope_resolves_parent_assets_and_selects_each_child_with_limit_zero(tmp_path):
+    article_dir = tmp_path / "parent-article"
+    assets_dir = article_dir / "assets"
+    assets_dir.mkdir(parents=True)
+    html = []
+    for index in range(2):
+        image = assets_dir / f"{index}.png"
+        image.write_bytes(b"x" * 20000)
+        (image.with_name(image.name + ".meta.json")).write_text(
+            json.dumps(
+                {
+                    "sourceUrl": f"https://mmbiz.qpic.cn/exact-child-{index}.png",
+                    "sha": f"child-sha-{index}",
+                }
+            ),
+            encoding="utf-8",
+        )
+        html.append(f'<img src="assets/{index}.png">')
+    (article_dir / "index.html").write_text("".join(html), encoding="utf-8")
+
+    parent_id = "reactor_shanghai:d1d47a78a1e7df87"
+    child_ids = ["agg-child-first", "agg-child-second"]
+    queue_path = tmp_path / "queue.jsonl"
+    pack_dir = tmp_path / "pack"
+    out_dir = tmp_path / "out"
+    mock_path = tmp_path / "mock.json"
+    write_jsonl(
+        queue_path,
+        [
+            {
+                "queue_id": parent_id,
+                "token": parent_id,
+                "account_key": "reactor_shanghai",
+                "article_dir": str(article_dir),
+                "title": "REACTOR weekly overview",
+                "body_text": "7/18 First Child; 7/19 Second Child",
+            }
+        ],
+    )
+    write_jsonl(
+        pack_dir / CANDIDATE_FILE,
+        [
+            {
+                "queue_id": "ordinary-row",
+                "title": "ordinary row",
+                "event_date_text": ["2026-07-18"],
+                "include_in_activity_feed": True,
+            },
+            {
+                "queue_id": child_ids[0],
+                "aggregation_child": True,
+                "aggregation_parent_article_id": parent_id,
+                "title": "First Child",
+                "event_date_text": ["2026-07-18"],
+                "include_in_activity_feed": True,
+                "cover_url": "https://mmbiz.qpic.cn/parent-overview.png",
+                "cover_source": "aggregate_parent_cover",
+            },
+            {
+                "queue_id": child_ids[1],
+                "aggregation_child": True,
+                "aggregation_parent_article_id": parent_id,
+                "title": "Second Child",
+                "event_date_text": ["2026-07-19"],
+                "include_in_activity_feed": True,
+                "cover_url": "https://mmbiz.qpic.cn/parent-overview.png",
+                "cover_source": "aggregate_parent_cover",
+            },
+        ],
+    )
+    write_jsonl(pack_dir / REVIEW_FILE, [])
+    mock_path.write_text(
+        json.dumps(
+            {
+                child_ids[0]: {
+                    "is_event": True,
+                    "event_title": "First Child",
+                    "date_start": "2026-07-18",
+                    "main_poster_image_index": 0,
+                    "visible_text_lines": ["7/18 First Child"],
+                    "evidence": ["exact first child match"],
+                },
+                child_ids[1]: {
+                    "is_event": True,
+                    "event_title": "Second Child",
+                    "date_start": "2026-07-19",
+                    "main_poster_image_index": 1,
+                    "visible_text_lines": ["7/19 Second Child"],
+                    "evidence": ["exact second child match"],
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--pack-dir", str(pack_dir),
+            "--weekly-queue", str(queue_path),
+            "--out-dir", str(out_dir),
+            "--window-start", "2026-07-18",
+            "--window-days", "2",
+            "--max-images", "0",
+            "--limit", "0",
+            "--only-aggregate-children",
+            "--require-selected-poster",
+            "--mock-response", str(mock_path),
+            "--execute",
+        ],
+        cwd=str(ROOT),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr + result.stdout
+    rows = [json.loads(line) for line in (out_dir / CANDIDATE_FILE).read_text(encoding="utf-8").splitlines()]
+    assert "poster_selection_evidence" not in rows[0]
+    assert rows[1]["cover_url"] == "https://mmbiz.qpic.cn/exact-child-0.png"
+    assert rows[2]["cover_url"] == "https://mmbiz.qpic.cn/exact-child-1.png"
+    for row in rows[1:]:
+        assert row["poster_source"] == "sanji_article_body_vl_aggregate_child_exact"
+        assert row["poster_selection_evidence"]["selection_scope"] == "aggregate_child_exact_event"
+        assert row["poster_selection_evidence"]["aggregation_parent_article_id"] == parent_id
+        assert row["cover_source"] != "aggregate_parent_cover"
+        assert len(row["poster_vl_images"]) == 2
+        assert Path(row["source_evidence_path"]).exists()
+    summary = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+    assert summary["max_images"] == 0
+    assert summary["aggregate_child_target_count"] == 2
+    assert summary["processed"] == 2
+    assert summary["aggregate_child_selected_poster_count"] == 2
+    assert summary["aggregate_child_missing_selected_poster_count"] == 0
+    assert summary["strict_gate_ok"] is True
+    assert summary["hard_failures"] == []
+
+
+def test_aggregate_child_strict_gate_reports_and_blocks_missing_exact_poster(tmp_path):
+    article_dir = make_sanji_article(tmp_path)
+    parent_id = "oil:c1d70da2a166536f"
+    child_id = "agg-child-no-exact-poster"
+    queue_path = tmp_path / "queue.jsonl"
+    pack_dir = tmp_path / "pack"
+    out_dir = tmp_path / "out"
+    mock_path = tmp_path / "mock.json"
+    write_jsonl(queue_path, [{"queue_id": parent_id, "article_dir": str(article_dir)}])
+    write_jsonl(
+        pack_dir / CANDIDATE_FILE,
+        [
+            {
+                "queue_id": child_id,
+                "aggregation_child": True,
+                "aggregation_parent_article_id": parent_id,
+                "title": "Child without a matching poster",
+                "event_date_text": ["2026-07-18"],
+                "cover_url": "https://mmbiz.qpic.cn/parent-overview.png",
+                "cover_source": "aggregate_parent_cover",
+            }
+        ],
+    )
+    write_jsonl(pack_dir / REVIEW_FILE, [])
+    mock_path.write_text(
+        json.dumps(
+            {
+                "is_event": True,
+                "event_title": "Child without a matching poster",
+                "date_start": "2026-07-18",
+                "main_poster_image_index": None,
+                "risk_flags": ["no_exact_aggregate_child_poster_visible"],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--pack-dir", str(pack_dir),
+            "--weekly-queue", str(queue_path),
+            "--out-dir", str(out_dir),
+            "--window-start", "2026-07-18",
+            "--window-days", "1",
+            "--only-aggregate-children",
+            "--require-selected-poster",
+            "--mock-response", str(mock_path),
+            "--execute",
+        ],
+        cwd=str(ROOT),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 4, result.stderr + result.stdout
+    row = json.loads((out_dir / CANDIDATE_FILE).read_text(encoding="utf-8").strip())
+    assert not row.get("cover_url")
+    assert row["cover_source"] == ""
+    summary = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+    assert summary["aggregate_child_target_count"] == 1
+    assert summary["aggregate_child_selected_poster_count"] == 0
+    assert summary["aggregate_child_missing_selected_poster_count"] == 1
+    assert summary["aggregate_child_missing_selected_poster_items"][0]["queue_id"] == child_id
+    assert summary["aggregate_child_missing_selected_poster_items"][0]["reason"] == "missing_main_poster_image_index"
+    assert summary["strict_gate_ok"] is False
+    assert summary["hard_failures"] == ["aggregate_child_selected_poster_incomplete"]
+
+
+def test_aggregate_child_sibling_identity_mismatch_is_frozen_and_fails_closed(tmp_path):
+    article_dir = make_sanji_article(tmp_path)
+    parent_id = "reactor_shanghai:sibling-parent"
+    child_id = "agg-child-first-night"
+    queue_path = tmp_path / "queue.jsonl"
+    pack_dir = tmp_path / "pack"
+    out_dir = tmp_path / "out"
+    mock_path = tmp_path / "mock.json"
+    write_jsonl(queue_path, [{"queue_id": parent_id, "article_dir": str(article_dir)}])
+    write_jsonl(
+        pack_dir / CANDIDATE_FILE,
+        [
+            {
+                "queue_id": child_id,
+                "aggregation_child": True,
+                "aggregation_parent_article_id": parent_id,
+                "title": "First Night",
+                "event_title": "First Night",
+                "event_date_text": ["2026-07-18"],
+                "date_text": ["2026-07-18"],
+                "venue": ["REACTOR Shanghai"],
+                "lineup": ["DJ First"],
+                "cover_url": "https://mmbiz.qpic.cn/parent-overview.png",
+                "cover_source": "aggregate_parent_cover",
+            }
+        ],
+    )
+    write_jsonl(pack_dir / REVIEW_FILE, [])
+    mock_path.write_text(
+        json.dumps(
+            {
+                "is_event": True,
+                "event_title": "Second Night",
+                "date_start": "2026-07-19",
+                "venue": ["Sibling Club"],
+                "lineup": ["DJ Second"],
+                "main_poster_image_index": 0,
+                "visible_text_lines": ["7/19 Second Night · Sibling Club"],
+                "evidence": ["sibling poster"],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--pack-dir", str(pack_dir),
+            "--weekly-queue", str(queue_path),
+            "--out-dir", str(out_dir),
+            "--window-start", "2026-07-18",
+            "--window-days", "2",
+            "--only-aggregate-children",
+            "--require-selected-poster",
+            "--mock-response", str(mock_path),
+            "--execute",
+        ],
+        cwd=str(ROOT),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 4, result.stderr + result.stdout
+    row = json.loads((out_dir / CANDIDATE_FILE).read_text(encoding="utf-8").strip())
+    assert row["event_title"] == "First Night"
+    assert row["event_date_text"] == ["2026-07-18"]
+    assert row["date_text"] == ["2026-07-18"]
+    assert row["venue"] == ["REACTOR Shanghai"]
+    assert row["lineup"] == ["DJ First"]
+    assert not row.get("cover_url")
+    assert not row.get("poster_url")
+    assert row["poster_vl_status"] == "aggregate_child_identity_mismatch"
+    assert row["poster_vl_identity_error_code"] == "aggregate_child_identity_date_mismatch"
+    summary = json.loads((out_dir / "summary.json").read_text(encoding="utf-8"))
+    issue = summary["aggregate_child_missing_selected_poster_items"][0]
+    assert issue["queue_id"] == child_id
+    assert issue["reason"] == "aggregate_child_identity_date_mismatch"
+    assert summary["strict_gate_ok"] is False
+
+
+def test_aggregate_child_identity_validation_rejects_each_controlled_sibling_field():
+    vl = load_vl_module()
+    candidate = {
+        "aggregation_child": True,
+        "title": "First Night",
+        "event_date_text": ["2026-07-18"],
+        "venue": ["REACTOR Shanghai"],
+        "lineup": ["DJ First"],
+    }
+    base = {
+        "is_event": True,
+        "event_title": "First Night",
+        "date_start": "2026-07-18",
+        "venue": ["REACTOR Shanghai"],
+        "lineup": ["DJ First"],
+        "main_poster_image_index": 0,
+        "visible_text_lines": ["7/18 First Night · REACTOR Shanghai · DJ First"],
+    }
+    cases = [
+        ({"date_start": "2026-07-19"}, "aggregate_child_identity_date_mismatch"),
+        ({"event_title": "Second Night"}, "aggregate_child_identity_title_mismatch"),
+        ({"venue": ["Sibling Club"]}, "aggregate_child_identity_venue_mismatch"),
+        ({"lineup": ["DJ Second"]}, "aggregate_child_identity_lineup_mismatch"),
+    ]
+    for override, expected_error in cases:
+        parsed = {**base, **override}
+        error, _validation = vl.aggregate_child_identity_validation(candidate, parsed)
+        assert error == expected_error
 
 
 def test_parallel_resume_reuses_valid_evidence_without_api_call(tmp_path, monkeypatch):

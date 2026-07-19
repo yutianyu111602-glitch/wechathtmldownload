@@ -977,8 +977,15 @@ def child_candidate_from_event(
         "account_key": account,
         "title": title,
         "source_url": url,
-        "cover_url": first_text(parent.get("cover_url"), parent.get("cover"), parent.get("article_cover_url")),
-        "cover_source": "aggregate_parent_cover" if first_text(parent.get("cover_url"), parent.get("cover"), parent.get("article_cover_url")) else "",
+        # A parent overview cover is not evidence for any one extracted child.
+        # The post-expansion Qwen pass must select an image tied to this exact
+        # child event before the candidate can reach poster migration.
+        "cover_url": "",
+        "cover_source": "",
+        "poster_selection_required": "qwen_vl_aggregate_child_exact_event",
+        "aggregate_parent_cover_rejected": bool(
+            first_text(parent.get("cover_url"), parent.get("cover"), parent.get("article_cover_url"))
+        ),
         "post_date": first_text(parent.get("post_date"), parent.get("publish_date"), (queue_row or {}).get("post_date")),
         "event_date_text": dates,
         "date_text": dates,

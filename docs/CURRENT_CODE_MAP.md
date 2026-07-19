@@ -1,8 +1,47 @@
 # Current Code Map
 
-Updated: 2026-05-31 09:16 CST
+Updated: 2026-07-19 CST
 
 Generated from current tree at `C:\code\githubstar\wechathtmldownload`.
+
+## 2026-07-19 HUAIDJ weekly visibility candidate map
+
+The active integration copy is
+`F:\DevData\HuaidjRuntime\build\weekly-visibility-20260719`. It is a dirty
+candidate based on `0b97884db33c`, not the live Hermes release. The discovery
+tree at `F:\code\githubstar\wechathtmldownload` and other worktrees remain
+protected evidence/donors; see `WORKTREE_CONSOLIDATION_PLAN_20260719.md`.
+
+| Layer | Current candidate authority | Responsibility |
+| --- | --- | --- |
+| Mini-program date semantics | `apps/weekly_activity_miniprogram/utils/businessDate.js`, `utils/dateVisibility.js`, `utils/datePreview.js`, `services/homeFilters.js` | Asia/Shanghai business day, exact date, tonight, and Friday-Sunday range state |
+| Mini-program data identity | `apps/weekly_activity_miniprogram/utils/api.js`, `services/generationContract.js`, `services/facetContract.js` | complete pagination, cache transaction, generation/scope checks, same-visible-set facets |
+| Home/render consumers | `apps/weekly_activity_miniprogram/pages/index/index.js` and entity/detail/Atlas pages | preserve filter mode, load current rows, and expose consistent totals/posters/facets |
+| CloudBase hot path | `apps/weekly_activity_miniprogram/cloudfunctions/weeklyDataSync/index.js`, `cloudfunctions/weeklyDataSync/dateVisibility.js`, `scripts/run_cloudbase_hot_sync_admin.cjs` | write/validate a new generation, then switch the active config pointer |
+| CloudRun weekly API | `services/weekly_activity_cloudrun/src/dataStore.mjs`, `src/dateVisibility.cjs`, `src/server.mjs` | current/package projection, exact/range/city filters, pagination and public identity |
+| Model/runtime adapters | `services/weekly_activity_cloudrun/src/qwenVlClient.mjs`, `src/deepSeekClient.mjs` | bounded safe errors/model routing; no client-side credentials |
+| Sound lane | `services/weekly_activity_cloudrun/src/soundIngress.mjs`, `src/soundEvidence.mjs`, `src/soundStore.mjs`, `apps/weekly_activity_miniprogram/cloudfunctions/soundSubmissionGateway/` | ingress validation, private evidence boundary, redacted public responses |
+| Package generation | `tools/stage7_rewrite/scripts/weekly_public_projection.py`, `weekly_city_routes.py`, `stamp_weekly_api_generation.py` | one public projection, contained route generation, generation stamp and leak gate |
+| Daily orchestration | `tools/stage7_rewrite/run_huaidj_sanji_daily_twice.ps1`, `run_openclaw_weekly_daily_publish.ps1` | 744-hour Sanji window, OS-backed single-run lease, Qwen-VL/DeepSeek candidate, optional explicit deploy |
+| Release/deploy | `services/weekly_activity_cloudrun/scripts/bake_and_deploy.py`, `direct_cloudbase_deploy.py`, mini-program staging/upload scripts | transactional prepare/deploy/readback and fail-closed upload confirmation |
+| Hermes control plane | `tools/stage7_rewrite/scripts/install_huaidj_sanji_hermes_jobs.py`, `audit_huaidj_sanji_hermes_contract.py` | render seven canonical launchers/nine jobs, bind immutable repo/Python/report root, audit drift |
+| Atlas dataset identity | `tools/atlas_rebuild/build_atlas_serving_triplet.py`, `atlas_dataset_identity.py`, mini-program Atlas bundles, CloudRun Atlas API | derive immutable `datasetId`, reject mismatched graph/index/neighborhood generations |
+| Real-tool acceptance | `apps/weekly_activity_miniprogram/scripts/run_devtools_release_suite_windows.ps1` and `tests/devtools-*.cjs` | bind a verified static package snapshot and run rendered release scenarios |
+
+The main cross-layer invariant is:
+
+```text
+complete generation-verified current pages
+  -> one date/city visible set
+  -> list + total + poster pool + city/date facets
+  -> CloudRun/CloudBase/client readback with the same identity
+```
+
+Static bundled activity data remains disaster fallback only. Atlas triplet
+output is repository-external candidate data; building it does not deploy or
+change a serving pointer. None of the 2026-07-19 candidate modules above proves
+CloudRun/CloudBase deployment, mini-program upload/public release, Hermes
+cutover, the 744-hour run, or Atlas promotion.
 
 ## 2026-05-31 User Command Recall / Current Execution Ledger
 

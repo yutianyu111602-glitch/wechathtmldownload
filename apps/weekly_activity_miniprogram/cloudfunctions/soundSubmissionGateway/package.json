@@ -1,0 +1,13 @@
+{
+  "name": "sound-submission-gateway",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "description": "Signed mini-program identity gateway for private HUAIDJ sound submissions",
+  "engines": {
+    "node": ">=16"
+  },
+  "dependencies": {
+    "@cloudbase/js-sdk": "3.6.3"
+  }
+}

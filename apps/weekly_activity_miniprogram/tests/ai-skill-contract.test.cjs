@@ -115,3 +115,61 @@ test("searchEvents handles no-result queries without fabricating events", async 
   assert.deepEqual(result.structuredContent.events, []);
   assert.match(result.content[0].text, /没有匹配到可确认活动/);
 });
+
+function pagedPayload(total, cursor, options = {}) {
+  const start = Number(cursor || 0);
+  const limit = 100;
+  const count = Math.min(limit, total - start);
+  return {
+    generatedAt: options.generatedAt || "2026-07-19T08:00:00Z",
+    filters: { scope: options.scope || "current" },
+    items: Array.from({ length: count }, (_, index) => ({ id: `event-${start + index}` })),
+    page: {
+      cursor: String(start),
+      nextCursor: start + count < total ? String(start + count) : null,
+      total,
+    },
+  };
+}
+
+for (const total of [601, 2001]) {
+  test(`AI search pagination consumes the complete ${total}-event generation`, async () => {
+    const searchEvents = require("../ai_packages/weekly/weekly-events-skill/apis/searchEvents");
+    const cursors = [];
+    const items = await searchEvents._private.fetchAllCurrentPages(async (cursor) => {
+      cursors.push(Number(cursor || 0));
+      return pagedPayload(total, cursor);
+    });
+
+    assert.equal(items.length, total);
+    assert.equal(cursors.length, Math.ceil(total / 100));
+    assert.equal(items.at(-1).id, `event-${total - 1}`);
+  });
+}
+
+test("AI search pagination fails closed on cursor loops, scope drift, and generation drift", async (t) => {
+  const searchEvents = require("../ai_packages/weekly/weekly-events-skill/apis/searchEvents");
+  await t.test("cursor loop", async () => {
+    await assert.rejects(
+      searchEvents._private.fetchAllCurrentPages(async () => ({
+        ...pagedPayload(101, 0),
+        page: { cursor: "0", nextCursor: "0", total: 101 },
+      })),
+      /AI_CURRENT_CURSOR_INVALID/,
+    );
+  });
+  await t.test("scope drift", async () => {
+    await assert.rejects(
+      searchEvents._private.fetchAllCurrentPages(async () => pagedPayload(1, 0, { scope: "package" })),
+      /AI_CURRENT_SCOPE_INVALID/,
+    );
+  });
+  await t.test("generation drift", async () => {
+    await assert.rejects(
+      searchEvents._private.fetchAllCurrentPages(async (cursor) => pagedPayload(101, cursor, {
+        generatedAt: Number(cursor || 0) === 0 ? "2026-07-19T08:00:00Z" : "2026-07-19T09:00:00Z",
+      })),
+      /AI_CURRENT_GENERATION_DRIFT/,
+    );
+  });
+});

@@ -1,8 +1,12 @@
+const {
+  addDaysToDateKey,
+  currentShanghaiBusinessDateKey,
+  weekendDateRangeFromDateKey,
+} = require("../../shared/businessDate");
+
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 20;
 const PAGE_LIMIT = 100;
-const MAX_PAGES = 6;
-const LATE_NIGHT_CUTOFF_HOUR = 7;
 
 function safeText(value) {
   if (Array.isArray(value)) return value.map(safeText).filter(Boolean).join(" ");
@@ -17,26 +21,15 @@ function isoDate(value) {
 }
 
 function addDays(dateKey, days) {
-  const date = new Date(`${dateKey}T12:00:00+08:00`);
-  date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
+  return addDaysToDateKey(dateKey, days);
 }
 
 function currentLocalDateKey(now = new Date()) {
-  const date = new Date(now.getTime());
-  if (date.getHours() < LATE_NIGHT_CUTOFF_HOUR) date.setDate(date.getDate() - 1);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return currentShanghaiBusinessDateKey(now);
 }
 
 function weekendRange(referenceDate) {
-  const date = new Date(`${referenceDate}T12:00:00+08:00`);
-  const day = date.getDay();
-  const fridayOffset = day <= 5 ? 5 - day : 6;
-  const friday = addDays(referenceDate, fridayOffset);
-  return { dateFrom: friday, dateTo: addDays(friday, 2) };
+  return weekendDateRangeFromDateKey(referenceDate);
 }
 
 function resolveDateRange(input, now) {
@@ -231,21 +224,66 @@ function buildApiUrl(baseUrl, cursor) {
   return `${String(baseUrl).replace(/\/+$/, "")}/api/v1/weekly/current?${params.join("&")}`;
 }
 
+async function fetchAllCurrentPages(requestPage) {
+  let cursor = 0;
+  const all = [];
+  const seenIds = new Set();
+  const seenCursors = new Set();
+  let expectedTotal = null;
+  let expectedGeneration = "";
+  for (let page = 0; ; page += 1) {
+    if (seenCursors.has(cursor)) throw new Error(`AI_CURRENT_CURSOR_LOOP:${cursor}`);
+    seenCursors.add(cursor);
+    const payload = await requestPage(cursor);
+    const generation = safeText(payload && (payload.generatedAt || payload.generated_at || payload.syncId));
+    if (!generation) throw new Error("AI_CURRENT_GENERATION_MISSING");
+    if (!expectedGeneration) expectedGeneration = generation;
+    else if (generation !== expectedGeneration) throw new Error(`AI_CURRENT_GENERATION_DRIFT:${expectedGeneration}->${generation}`);
+    const scope = safeText(payload && payload.filters && payload.filters.scope).toLowerCase();
+    if (scope !== "current") throw new Error(`AI_CURRENT_SCOPE_INVALID:${scope || "missing"}`);
+    const total = Number(payload && payload.page && payload.page.total);
+    if (!Number.isFinite(total) || total < 0 || !Number.isInteger(total)) {
+      throw new Error(`AI_CURRENT_TOTAL_INVALID:${payload && payload.page && payload.page.total}`);
+    }
+    if (expectedTotal === null) expectedTotal = total;
+    else if (total !== expectedTotal) throw new Error(`AI_CURRENT_TOTAL_DRIFT:${expectedTotal}->${total}`);
+    const declaredCursor = payload && payload.page && payload.page.cursor;
+    if (declaredCursor !== undefined && declaredCursor !== null && declaredCursor !== "" && Number(declaredCursor) !== cursor) {
+      throw new Error(`AI_CURRENT_CURSOR_MISMATCH:${declaredCursor}!=${cursor}`);
+    }
+    for (const item of normalizeCurrentPayload(payload)) {
+      const id = safeText(item && (item.id || item.event_id || item.eventId));
+      if (!id) throw new Error("AI_CURRENT_EVENT_ID_MISSING");
+      if (seenIds.has(id)) throw new Error(`AI_CURRENT_DUPLICATE_ID:${id}`);
+      seenIds.add(id);
+      all.push(item);
+    }
+    if (all.length > expectedTotal) throw new Error(`AI_CURRENT_TOTAL_OVERFLOW:${all.length}>${expectedTotal}`);
+    const nextCursor = payload && payload.page && payload.page.nextCursor;
+    if (nextCursor === null || nextCursor === undefined || nextCursor === "") {
+      if (all.length !== expectedTotal) throw new Error(`AI_CURRENT_TOTAL_MISMATCH:${all.length}!=${expectedTotal}`);
+      return all;
+    }
+    const parsedNext = Number(nextCursor);
+    if (!Number.isFinite(parsedNext) || !Number.isInteger(parsedNext) || parsedNext <= cursor) {
+      throw new Error(`AI_CURRENT_CURSOR_INVALID:${nextCursor}`);
+    }
+    const expectedPageCount = Math.max(1, Math.ceil(expectedTotal / PAGE_LIMIT));
+    if (page + 1 >= expectedPageCount) {
+      throw new Error(`AI_CURRENT_PAGE_LIMIT_EXCEEDED:${expectedPageCount}`);
+    }
+    cursor = parsedNext;
+  }
+}
+
 async function fetchCurrentFromPublicApi() {
   const app = typeof getApp === "function" ? getApp() : null;
   const cloud = (app && app.globalData && app.globalData.cloud) || {};
   const baseUrl = cloud.useMock ? cloud.mockBaseUrl : cloud.publicBaseUrl;
   if (!baseUrl) throw new Error("NO_PUBLIC_BASE_URL");
-  let cursor = "";
-  const all = [];
-  for (let page = 0; page < MAX_PAGES; page += 1) {
-    const payload = await requestJson(buildApiUrl(baseUrl, cursor), cloud.requestTimeoutMs || 8000);
-    all.push(...normalizeCurrentPayload(payload));
-    const nextCursor = payload && payload.page && payload.page.nextCursor;
-    if (!nextCursor) break;
-    cursor = nextCursor;
-  }
-  return all;
+  return fetchAllCurrentPages((cursor) => (
+    requestJson(buildApiUrl(baseUrl, cursor), cloud.requestTimeoutMs || 8000)
+  ));
 }
 
 function filterEvents(items, input, now) {
@@ -341,6 +379,7 @@ async function searchEvents(input = {}, options = {}) {
 
 searchEvents._private = {
   filterEvents,
+  fetchAllCurrentPages,
   resolveDateRange,
   toPublicEvent,
   currentLocalDateKey,

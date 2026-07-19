@@ -64,7 +64,8 @@ test("home feed loading keeps one active request and queues retries", () => {
   assert.match(apiJs, /requestContainerOrFallback/);
   assert.match(apiJs, /setTimeout\(startFallback,\s*delayMs\)/);
   assert.match(apiJs, /setTimeout\(startFastSnapshot,\s*snapshotDelayMs\)/);
-  assert.match(apiJs, /shouldSkipStoredFallback\(data\)/);
+  assert.match(apiJs, /shouldBypassStoredRead\(data\)/);
+  assert.match(apiJs, /shouldSkipStoredWrite\(data\)/);
   assert.match(apiJs, /shouldRequireLiveResponse\(data\)/);
   assert.match(apiJs, /const inflightRequests = new Map\(\)/);
   assert.match(apiJs, /buildInflightKey\(path, data\)/);
@@ -93,7 +94,7 @@ test("home feed loading keeps one active request and queues retries", () => {
   assert.match(indexJs, /const dateQuery = dateSelectionQuery\(dateSelection\)/);
   assert.match(indexJs, /requestApi\("\/api\/v1\/weekly\/manifest",\s*\{\s*__skipCache:\s*true,\s*__liveOnly:\s*true\s*\}\)/);
   assert.match(indexJs, /currentFeedBehindManifest\(manifest,\s*current\)/);
-  assert.match(indexJs, /const currentFetchOptions = \{\s*cityKey:\s*"",\s*date:\s*"",\s*lookbackDays:\s*0,\s*loadSeq,\s*skipCache:\s*backgroundRefresh,\s*liveOnly:\s*backgroundRefresh,\s*\}/s);
+  assert.match(indexJs, /const currentFetchOptions = \{\s*cityKey:\s*"",\s*date:\s*"",\s*lookbackDays:\s*0,\s*loadSeq,\s*skipCache:\s*opts\.skipCache === true,\s*liveOnly:\s*opts\.liveOnly === true,\s*liveRefresh:\s*backgroundRefresh \|\| opts\.liveRefresh === true,\s*\}/s);
   assert.match(i18nJs, /loadingRefreshing:\s*"正在同步最新活动包"/);
   assert.match(i18nJs, /loadingRefreshingHint:\s*"检测到活动包已更新，先同步新数据，避免显示旧活动。"/);
   assert.match(indexJs, /skipCache:\s*true/);
@@ -108,5 +109,5 @@ test("home feed loading keeps one active request and queues retries", () => {
   assert.match(indexJs, /backgroundRefresh:\s*true/);
   assert.match(indexJs, /silentRetryCount/);
   assert.match(indexJs, /LOAD_RETRY_DELAYS_MS/);
-  assert.match(indexJs, /setTimeout\(\(\) => this\.loadData\(retryOptions\), retryDelay\)/);
+  assert.match(indexJs, /if \(!this\.destroyed && loadSeq === this\.loadSeq\) this\.loadData\(retryOptions\)/);
 });

@@ -55,7 +55,7 @@ test("atlas search page calls the global subject search endpoint and routes resu
   assert.match(wxml, /wx:for="\{\{results\}\}"/, "search page renders a result list");
 });
 
-test("starmap bundles and L1 expansion contract are wired locally", () => {
+test("starmap bundles and generation-safe expansion contract are wired locally", () => {
   const overview = JSON.parse(read("data/atlas_starmap.json"));
   const neighbors = JSON.parse(read("data/atlas_starmap_neighbors.json"));
   const overviewJs = read("data/atlas_starmap.js");
@@ -65,16 +65,19 @@ test("starmap bundles and L1 expansion contract are wired locally", () => {
 
   assert.ok(Array.isArray(overview.nodes) && overview.nodes.length > 0, "overview bundle has nodes");
   assert.equal(overview.schemaVersion, "atlas.mp.starmap.v2", "overview bundle uses the V2 visual contract");
+  assert.match(overview.datasetId || "", /^atlas-miniapp-sha256-[0-9a-f]{64}$/, "overview bundle declares its source generation");
   assert.ok(overview.nodes.every((node) => ["ec", "rc", "sc", "fs", "ls"].every((key) => key in node)), "overview nodes carry compact V2 metrics");
   assert.ok(overview.edges.every((edge) => edge.length === 4 && Number.isFinite(edge[3])), "overview edges carry numeric weight in the fourth position");
   assert.ok(neighbors.byNode && typeof neighbors.byNode === "object", "neighbor bundle has byNode index");
   assert.match(overviewJs, /module\.exports\s*=/, "overview bundle has a WeChat runtime JS wrapper");
   assert.match(neighborsJs, /module\.exports\s*=/, "neighbor bundle has a WeChat runtime JS wrapper");
-  const sample = overview.nodes.find((node) => node.u && Array.isArray(neighbors.byNode[node.u]) && neighbors.byNode[node.u].length);
-  assert.ok(sample, "at least one overview node has L1 neighbors");
-  assert.ok(neighbors.byNode[sample.u][0].u, "neighbor rows carry subject id");
+  assert.equal(neighbors.datasetId, undefined, "legacy slug neighbors are not falsely stamped as the current generation");
+  const legacyOverlap = overview.nodes.find((node) => node.u && Array.isArray(neighbors.byNode[node.u]) && neighbors.byNode[node.u].length);
+  assert.equal(legacyOverlap, undefined, "hash-id overview nodes never join against legacy slug neighbors");
 
   assert.match(js, /atlas_starmap_neighbors\.js/, "starmap requires the WeChat runtime neighbor bundle");
+  assert.match(js, /_neighborBundleMatchesDataset/, "starmap validates a local neighbor generation before using it");
+  assert.match(js, /_localNeighborRows/, "starmap centralizes generation-safe local neighbor lookup");
   assert.doesNotMatch(js, /require\([^)]*atlas_starmap(?:_neighbors)?\.json/, "starmap does not require raw JSON at runtime");
   assert.match(js, /\/api\/v1\/weekly\/atlas\/neighborhood/, "starmap can fetch server-side full-library neighborhoods");
   assert.match(js, /_expandNodeRemote/, "starmap implements remote expansion fallback");
@@ -175,6 +178,9 @@ test("starmap share payload preserves the selected node focus", () => {
 });
 
 test("starmap can restore the selected node from shared focusId", () => {
+  const overview = JSON.parse(read("data/atlas_starmap.json"));
+  const knopha = overview.nodes.find((node) => node.n === "Knopha");
+  assert.ok(knopha && knopha.u, "current guarded overview contains Knopha");
   const page = loadStarmapPage();
   page.data = {};
   page.setData = function setData(update) {
@@ -187,17 +193,17 @@ test("starmap can restore the selected node from shared focusId", () => {
   page._loadSelectedInspector = function loadSelectedInspector() {};
   page._expandNode = function expandNode() { return false; };
 
-  page.onLoad({ lens: "entity", q: "Knopha", focusId: "dj%3Aknopha" });
+  page.onLoad({ lens: "entity", q: "Knopha", focusId: encodeURIComponent(knopha.u) });
   assert.equal(page._initialQuery, "Knopha");
-  assert.equal(page._initialFocusId, "dj:knopha");
+  assert.equal(page._initialFocusId, knopha.u);
   assert.equal(page.data.viewLens, "structure", "legacy entity lens restores as structure");
 
   const hit = page._findNode(page._initialFocusId, page._initialQuery);
   assert.ok(hit >= 0, "shared focusId resolves to an overview node");
-  assert.equal(page._nodes[hit].u, "dj:knopha");
+  assert.equal(page._nodes[hit].u, knopha.u);
 
   page._focusInitial();
-  assert.equal(page.data.selected.id, "dj:knopha");
+  assert.equal(page.data.selected.id, knopha.u);
   assert.equal(page.data.selected.name, "Knopha");
   assert.equal(page._flewTo, hit);
 });

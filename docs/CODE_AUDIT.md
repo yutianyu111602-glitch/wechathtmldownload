@@ -1,10 +1,74 @@
 # Code Audit
 
-Updated: 2026-05-27
+Updated: 2026-07-19
 
 ## Scope
 
 Audited current code structure and the 93k Stage7 recovery path without reading private runtime secrets.
+
+## 2026-07-19 HUAIDJ weekly/miniprogram systemic audit
+
+Scope: the dirty integration candidate at
+`F:\DevData\HuaidjRuntime\build\weekly-visibility-20260719`, plus read-only
+public weekly API reproduction. Secrets, Sanji credential tables, production
+write paths, review submission, and serving-pointer mutation were excluded.
+
+### Root cause proven
+
+The production symptom is a three-layer contract split, not a visual-only bug:
+
+1. the old mini-program reduced `本周末` to the first Friday and sent one
+   `selectedDate`;
+2. the old `/current` accepted exact `date` but ignored `dateStart/dateEnd`;
+3. the old `/cities` returned package-wide counts without scope/date/generation
+   identity, while client pagination/cache could silently retain only a first
+   page.
+
+On 2026-07-19 the public API returned package `626`, current `64`, Shanghai
+current `13`, Shanghai exact `2026-07-24` `3`, and Shanghai cities count `131`
+for both exact and weekend-range queries. See
+`HUAIDJ_MINIPROGRAM_LOADING_ROOT_CAUSE_20260719.md` for the query table.
+
+### Candidate repair shape
+
+- Shared Asia/Shanghai date visibility exists across mini-program, CloudBase
+  sync, CloudRun, and package generation. Weekend state is an explicit
+  Friday-Sunday range; long ranges use interval intersection rather than a
+  capped list of enumerated days.
+- Client current loading validates every page, total, unique ID, cursor and
+  generation before atomically replacing the last-good cache. Facets are used
+  only when their generation/scope/item count/buckets match the same visible
+  set; otherwise the client recomputes them from that set.
+- CloudBase hot sync stages and validates a new generation before the config
+  pointer switch. Package stamping and route generation have contained-path
+  and public-projection gates.
+- The maintained daily wrapper uses an OS-backed lease; stale metadata age is
+  not authority to delete/steal a live run. Hermes installer output binds repo,
+  Python and report root and is designed for dry-run/apply/idempotence audit.
+- Sound ingress/evidence paths separate private evidence from public response
+  fields and add first-write/concurrency/error-path coverage.
+- Atlas graph/index/neighborhood artifacts share a snapshot-derived
+  `datasetId`; missing or mismatched IDs fail closed. The triplet builder writes
+  only a new external candidate and hashes inputs/source before and after.
+
+### Remaining release risks and gates
+
+| Risk | Required gate before release claim |
+| --- | --- |
+| A late edit reintroduces a local path, private source map, file URL, or secret into a public package/response | final tracked-secret and public-artifact leak scans plus real package validation |
+| Pagination/facet tests pass on fixtures but DevTools loads a stale cache or wrong static package | fresh uniquely named eight-scenario DevTools suite bound to one package fingerprint |
+| Candidate tests pass but runtime still launches an older checkout | clean commit/push, correctly named detached release, installer second dry-run no-change, contract audit, real Gateway child command |
+| Sanji database is fresh only for the prior 96-hour lane | new Desktop-driven 744-hour summary, frozen snapshot, missing-HTML digest `unresolved=0` before paid models |
+| Local package is correct but online/CloudBase/client generations diverge | CloudRun full pagination and facet readback, then CloudBase same-`syncId` readback |
+| Development upload is mistaken for user-visible repair | separate upload, review-submitted, approved, public-release and public-device evidence |
+| Atlas candidate generation is mistaken for promotion | SQLite/digest/identity candidate evidence plus explicit unchanged/promotion pointer report |
+
+Intermediate test runs are useful debugging evidence but are not final
+acceptance after concurrent edits. The final Node, Python, PowerShell, leak-scan
+and real-DevTools suites must be rerun from the commit that becomes the release.
+No 2026-07-19 CloudRun deploy, CloudBase hot sync, mini-program upload/review/
+public release, Hermes cutover, 744-hour run, or Atlas serving promotion is
+claimed by this audit.
 
 2026-05-27 atlas final local candidate preflight and T6 year-context review:
 

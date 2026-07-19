@@ -109,6 +109,11 @@ async function createFixture() {
       event_date_iso_guesses: ["2026-05-09"],
       quality_status: "READY",
       promoter: "Club A",
+      aggregation_source_kind: "wechat_article",
+      dedupe_key: "fixture:item-a",
+      discovery_source: "sanji_desktop_rss",
+      extraction_model: "qwen-vl-fixture",
+      metadata_enriched_at: "2026-05-07T10:00:00+08:00",
       cover_url: "https://mmbiz.qpic.cn/example/item-a.jpg",
       cover_image_url: "https://mmbiz.qpic.cn/example/item-a.jpg",
       source_article: {
@@ -137,9 +142,21 @@ async function createFixture() {
         "Line 5 from public source that should be reserved for detail only",
       ],
       merge_provenance: [{ source: "aggregate-child", note: "x".repeat(2000) }],
-      field_evidence_refs: { title: [{ ref: "ocr-span", text: "x".repeat(1000) }] },
+      field_evidence_refs: {
+        title: [{ ref: "ocr-span", text: "x".repeat(1000) }],
+        "/home/private/evidence.json": [{ ref: "must-not-leak" }],
+        "C:\\Users\\win\\private\\evidence.json": [{ ref: "must-not-leak" }],
+      },
       address_verification: { provider: "fixture", trace: "x".repeat(1000) },
       geo_reverse_address: "fixture reverse address",
+      poster_vl_images: [{ path: "C:\\Users\\win\\private\\poster.png" }],
+      source_evidence_path: "/home/win/private/source.md",
+      emergency_qwen36_lineup_patch: { path: "/srv/huaidj/private.json" },
+      poster_selection_evidence: {
+        schema_version: "weekly_poster_selection_evidence.vl_direct.v1",
+        visible_text_lines: ["DJ A / 22:00", "/mnt/c/private/source.md"],
+        source_evidence_path: "/opt/huaidj/private.md",
+      },
     },
     {
       id: "item-a-duplicate",
@@ -248,13 +265,18 @@ async function createFixture() {
   await writeJson(path.join(sourceMapDir, "source_url_map.json"), {
     schema_version: "weekly_activity_source_url_map.v1",
     generated_at: "2026-05-07T09:48:35",
-    source_count: 1,
+    source_count: 2,
     sources: {
       aaaaaaaaaaaaaaaa: {
         type: "wechat_article",
         url: "https://mp.weixin.qq.com/s/item-a",
         account_name: "Club A",
         published_at: "2026-05-07",
+        event_id: "item-a",
+      },
+      cccccccccccccccc: {
+        type: "wechat_article",
+        url: "file:///home/win/private/article.html",
         event_id: "item-a",
       },
     },
@@ -312,7 +334,9 @@ async function createFixture() {
       style_distribution: { house: 1 },
       editor_note_zh: "本周测试摘要。",
       editor_note_en: "Fixture weekly summary.",
+      source_evidence_path: "/home/private/weekly-summary.md",
     },
+    article_dir: "C:\\Users\\win\\private\\weekly-summary",
   });
   await writeJson(path.join(dir, "llm", "enrichment_index.json"), {
     schemaVersion: "weekly_activity_api.materialized_enrichment_index.v1",
@@ -325,6 +349,10 @@ async function createFixture() {
       { id: "item-a", sourceItemHash: "fixture", path: "llm/enrichments/item-a.json" },
       { id: "club:abc123", sourceItemHash: "fixture-colon", path: "llm/enrichments/clubu3aabc123.json" },
     ],
+    incremental_merge: {
+      base_enrichment_index: "/srv/huaidj/base/llm/enrichment_index.json",
+      incremental_enrichment_index: "/opt/huaidj/incremental/llm/enrichment_index.json",
+    },
   });
   await writeJson(path.join(dir, "llm", "enrichments", "item-a.json"), {
     schemaVersion: "weekly_activity_api.materialized_enrichment.v1",
@@ -334,7 +362,11 @@ async function createFixture() {
     enriched: {
       provider: "deepseek",
       model: "deepseek-v4-pro",
-      enrichment: { schema_version: "weekly_activity_llm_enrichment.v1", title_display: "上海 Club A" },
+      enrichment: {
+        schema_version: "weekly_activity_llm_enrichment.v1",
+        title_display: "上海 Club A",
+        poster_vl_images: [{ path: "/mnt/c/private/poster.png" }],
+      },
     },
   });
   await writeJson(path.join(dir, "llm", "enrichments", "clubu3aabc123.json"), {
@@ -841,6 +873,10 @@ test("serves materialized LLM summary without triggering provider calls", async 
   assert.equal(body.provider, "deepseek");
   assert.equal(body.thinking, "disabled");
   assert.equal(body.summary.highlight_events[0].title, "上海 Club A");
+  assert.equal(Object.hasOwn(body, "article_dir"), false);
+  assert.equal(Object.hasOwn(body.summary, "source_evidence_path"), false);
+  assert.equal(JSON.stringify(body).includes("/home/"), false);
+  assert.equal(JSON.stringify(body).includes("C:\\\\Users"), false);
 });
 
 test("serves materialized LLM enrichment index and detail", async () => {
@@ -849,12 +885,16 @@ test("serves materialized LLM enrichment index and detail", async () => {
   const index = await indexRes.json();
   assert.equal(index.schemaVersion, "weekly_activity_api.materialized_enrichment_index.v1");
   assert.equal(index.enrichments[0].id, "item-a");
+  assert.equal(JSON.stringify(index).includes("/srv/"), false);
+  assert.equal(JSON.stringify(index).includes("/opt/"), false);
 
   const detailRes = await fetch(`${baseUrl}/api/v1/weekly/llm/materialized-enrichments/item-a`);
   assert.equal(detailRes.status, 200);
   const detail = await detailRes.json();
   assert.equal(detail.schemaVersion, "weekly_activity_api.materialized_enrichment.v1");
   assert.equal(detail.enriched.enrichment.title_display, "上海 Club A");
+  assert.equal(Object.hasOwn(detail.enriched.enrichment, "poster_vl_images"), false);
+  assert.equal(JSON.stringify(detail).includes("/mnt/"), false);
 
   const colonDetailRes = await fetch(`${baseUrl}/api/v1/weekly/llm/materialized-enrichments/${encodeURIComponent("club:abc123")}`);
   assert.equal(colonDetailRes.status, 200);
@@ -1364,6 +1404,37 @@ test("returns club profile contract on batch detail items", async () => {
   assert.equal(body.items[1].organizer_key, "clubcolon");
 });
 
+test("detail and batch apply public item projection", async () => {
+  const detailRes = await fetch(`${baseUrl}/api/v1/weekly/items/item-a`);
+  assert.equal(detailRes.status, 200);
+  const detail = await detailRes.json();
+  assert.equal(detail.address_verification.provider, "fixture");
+  assert.equal(detail.source_action.url, "https://mp.weixin.qq.com/s/item-a");
+  assert.deepEqual(detail.poster_selection_evidence.visible_text_lines, ["DJ A / 22:00"]);
+  assert.equal(detail.aggregation_source_kind, "wechat_article");
+  assert.equal(detail.dedupe_key, "fixture:item-a");
+  assert.equal(detail.discovery_source, "sanji_desktop_rss");
+  assert.equal(detail.extraction_model, "qwen-vl-fixture");
+  assert.equal(detail.metadata_enriched_at, "2026-05-07T10:00:00+08:00");
+  assert.equal(Object.hasOwn(detail.field_evidence_refs, "/home/private/evidence.json"), false);
+  assert.equal(Object.hasOwn(detail.field_evidence_refs, "C:\\Users\\win\\private\\evidence.json"), false);
+
+  const batchRes = await fetch(`${baseUrl}/api/v1/weekly/items/batch?ids=item-a`);
+  assert.equal(batchRes.status, 200);
+  const batch = await batchRes.json();
+  assert.equal(batch.items.length, 1);
+
+  for (const item of [detail, batch.items[0]]) {
+    for (const key of ["poster_vl_images", "source_evidence_path", "emergency_qwen36_lineup_patch"]) {
+      assert.equal(Object.hasOwn(item, key), false);
+    }
+    const serialized = JSON.stringify(item);
+    for (const marker of ["C:\\\\Users", "/home/", "/mnt/", "/srv/", "/opt/"]) {
+      assert.equal(serialized.includes(marker), false);
+    }
+  }
+});
+
 test("returns source action by hash without exposing it in current list", async () => {
   const currentRes = await fetch(`${baseUrl}/api/v1/weekly/current?cityKey=shanghai`);
   const current = await currentRes.json();
@@ -1375,6 +1446,11 @@ test("returns source action by hash without exposing it in current list", async 
   assert.equal(body.schemaVersion, "weekly_activity_api.source_action.v1");
   assert.equal(body.mode, "webview");
   assert.equal(body.url, "https://mp.weixin.qq.com/s/item-a");
+});
+
+test("source action rejects file and machine-local URLs at the API boundary", async () => {
+  const res = await fetch(`${baseUrl}/api/v1/weekly/source/cccccccccccccccc`);
+  assert.equal(res.status, 404);
 });
 
 test("returns weekly atlas event snapshot without exposing fuzzy candidate ids", async () => {
@@ -1400,51 +1476,75 @@ test("uses unified error shape", async () => {
   assert.equal(body.error.code, "ITEM_NOT_FOUND");
 });
 
-test("llm enrich disabled by default", async () => {
+test("llm enrich rejects public GET even when disabled", async () => {
   const res = await fetch(`${baseUrl}/api/v1/weekly/llm/enrich?id=item-a`);
-  assert.equal(res.status, 403);
+  assert.equal(res.status, 405);
   const body = await res.json();
-  assert.equal(body.error.code, "LLM_DISABLED");
+  assert.equal(body.error.code, "METHOD_NOT_ALLOWED");
 });
 
-test("llm enrich requires id parameter", async () => {
+test("llm enrich fails closed when private review token is not configured", async () => {
   testEnv.DEEPSEEK_ENRICH_ENABLED = "true";
   testEnv.DEEPSEEK_API_KEY = "sk-test";
-  const res = await fetch(`${baseUrl}/api/v1/weekly/llm/enrich`);
+  const res = await fetch(`${baseUrl}/api/v1/weekly/llm/enrich?id=item-a`, { method: "POST" });
+  assert.equal(res.status, 503);
+  const body = await res.json();
+  assert.equal(body.error.code, "ADMIN_TOKEN_NOT_CONFIGURED");
+  delete testEnv.DEEPSEEK_ENRICH_ENABLED;
+  delete testEnv.DEEPSEEK_API_KEY;
+});
+
+test("llm enrich requires private review authorization", async () => {
+  testEnv.DEEPSEEK_ENRICH_ENABLED = "true";
+  testEnv.DEEPSEEK_API_KEY = "sk-test";
+  testEnv.WEEKLY_REVIEW_ADMIN_TOKEN = "test-review-token";
+  const res = await fetch(`${baseUrl}/api/v1/weekly/llm/enrich?id=item-a`, { method: "POST" });
+  assert.equal(res.status, 403);
+  const body = await res.json();
+  assert.equal(body.error.code, "ADMIN_AUTH_REQUIRED");
+  delete testEnv.DEEPSEEK_ENRICH_ENABLED;
+  delete testEnv.DEEPSEEK_API_KEY;
+  delete testEnv.WEEKLY_REVIEW_ADMIN_TOKEN;
+});
+
+test("llm enrich requires id after private authorization", async () => {
+  testEnv.DEEPSEEK_ENRICH_ENABLED = "true";
+  testEnv.DEEPSEEK_API_KEY = "sk-test";
+  testEnv.WEEKLY_REVIEW_ADMIN_TOKEN = "test-review-token";
+  const res = await fetch(`${baseUrl}/api/v1/weekly/llm/enrich`, {
+    method: "POST",
+    headers: { "x-weekly-review-token": "test-review-token" },
+  });
   assert.equal(res.status, 400);
   const body = await res.json();
   assert.equal(body.error.code, "MISSING_ID");
   delete testEnv.DEEPSEEK_ENRICH_ENABLED;
   delete testEnv.DEEPSEEK_API_KEY;
+  delete testEnv.WEEKLY_REVIEW_ADMIN_TOKEN;
 });
 
-test("llm enrich returns 404 for unknown id", async () => {
+test("llm enrich returns 404 for unknown id after private authorization", async () => {
   testEnv.DEEPSEEK_ENRICH_ENABLED = "true";
   testEnv.DEEPSEEK_API_KEY = "sk-test";
-  const res = await fetch(`${baseUrl}/api/v1/weekly/llm/enrich?id=unknown-item`);
+  testEnv.WEEKLY_REVIEW_ADMIN_TOKEN = "test-review-token";
+  const res = await fetch(`${baseUrl}/api/v1/weekly/llm/enrich?id=unknown-item`, {
+    method: "POST",
+    headers: { "x-weekly-review-token": "test-review-token" },
+  });
   assert.equal(res.status, 404);
   const body = await res.json();
   assert.equal(body.error.code, "ITEM_NOT_FOUND");
   delete testEnv.DEEPSEEK_ENRICH_ENABLED;
   delete testEnv.DEEPSEEK_API_KEY;
+  delete testEnv.WEEKLY_REVIEW_ADMIN_TOKEN;
 });
 
-test("llm weekly-summary disabled by default", async () => {
-  const res = await fetch(`${baseUrl}/api/v1/weekly/llm/weekly-summary`);
-  assert.equal(res.status, 403);
-  const body = await res.json();
-  assert.equal(body.error.code, "LLM_DISABLED");
-});
-
-test("llm weekly-summary falls back to materialized summary when live provider fails", async () => {
-  testEnv.DEEPSEEK_ENRICH_ENABLED = "true";
+test("llm weekly-summary serves materialized data without live provider execution", async () => {
   const res = await fetch(`${baseUrl}/api/v1/weekly/llm/weekly-summary`);
   assert.equal(res.status, 200);
   const body = await res.json();
   assert.equal(body.schemaVersion, "weekly_activity_api.llm_summary.v1");
-  assert.equal(body.source, "materialized-summary-fallback");
-  assert.equal(body.fallbackUsed, true);
+  assert.equal(body.source, "materialized-summary");
+  assert.equal(body.liveGenerationExecuted, false);
   assert.equal(body.summary.highlight_events[0].title, "上海 Club A");
-  assert.match(body.fallbackReason, /generateWeeklySummary/);
-  delete testEnv.DEEPSEEK_ENRICH_ENABLED;
 });

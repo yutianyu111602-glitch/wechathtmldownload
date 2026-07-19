@@ -1,6 +1,56 @@
 # wechathtmldownload Agent Rules
 
-Updated: 2026-05-27
+Updated: 2026-07-19
+
+## 2026-07-19 HUAIDJ weekly/miniprogram recovery override
+
+For HUAIDJ weekly activity, mini-program, Sanji, AtlasV2, CloudRun/CloudBase,
+or Hermes work, read these current entries before the older atlas/thread notes:
+
+- `docs/HUAIDJ_DISASTER_RECOVERY_MASTER_PROMPT_20260719.md`
+- `docs/HUAIDJ_FULL_RECOVERY_EXECUTION_PLAN_20260719.md`
+- `docs/HUAIDJ_MINIPROGRAM_LOADING_ROOT_CAUSE_20260719.md`
+- `docs/HUAIDJ_PIPELINE_SSOT_20260717.md` (including its 2026-07-19 overlay)
+- `docs/ATLAS_DATASET_GENERATION_HANDSHAKE_20260719.md`
+- `docs/ATLAS_TRIPLET_INPUT_PREFLIGHT_20260719.md`
+- `docs/WORKTREE_CONSOLIDATION_PLAN_20260719.md`
+
+Current integration authority is
+`F:\DevData\HuaidjRuntime\build\weekly-visibility-20260719`, branch
+`codex/weekly-visibility-20260719`, based on `0b97884db33c`. Its uncommitted
+changes are a local candidate only. Do not point Hermes, deploy CloudRun,
+hot-sync CloudBase, upload the mini-program, or promote Atlas from that tree.
+Only a clean, pushed commit in a correctly named detached release can become
+`HUAIDJ_REPO`; preserve the previous accepted release as rollback.
+
+Weekly/miniprogram contracts:
+
+- Activity data is online-first. The bundled static data is a first-install or
+  disaster seed, not the normal incremental-update transport.
+- Current rows, totals, posters, city/date facets, and exact/range queries must
+  derive from one complete visible set. `本周末` is an Asia/Shanghai
+  Friday-through-Sunday closed interval; changing city must preserve date mode.
+- Every response family must prove compatible scope and generation identity.
+  Duplicate IDs, cursor loops/non-monotonic cursors, total drift, page-limit
+  exhaustion, or cross-page generation drift must fail closed.
+- CloudBase hot sync writes and validates a new generation before changing the
+  active config pointer. A partial generation must never become active.
+- Public packages/responses must not contain local paths, source-action maps,
+  management secrets, payment evidence, cookies, keys, or private file IDs.
+- A 744-hour Sanji recovery is a real Desktop refresh/export window. Missing
+  HTML ledger/digest must be fresh and `unresolved=0` before paid Qwen-VL or
+  DeepSeek work. `PosterVlMaxImages=0` means all usable Sanji images.
+- Hermes Gateway remains the only wall-clock owner. Installer dry-run/apply,
+  second dry-run, contract audit, and real child-command evidence are all
+  required before a scheduler-aligned claim. Do not create a second timer.
+- CloudRun deploy, CloudBase hot sync, mini-program development upload, review
+  submission, public release, Atlas source candidate, Atlas serving promotion,
+  and Hermes cutover are separate states. Never collapse them into “released”.
+
+Keep reports, locks, caches, deploy workdirs, candidates, and hydrated test data
+under repository-external `F:\DevData\HuaidjRuntime\state` roots. Use the
+temporary process-scoped proxy `HUAIDJ_PROXY_URL=http://127.0.0.1:7890` when
+required; do not modify the older network SSOT. Never print secret values.
 
 ## 2026-05-19 electronic-music atlas / graph thread override
 

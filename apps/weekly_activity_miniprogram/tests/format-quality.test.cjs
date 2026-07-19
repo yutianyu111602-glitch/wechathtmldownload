@@ -766,6 +766,30 @@ test("dedupe keeps non-empty fields from the lower-score duplicate", () => {
   assert.equal(deduped[0].sourceHash, "src:keep");
 });
 
+test("dedupe unions secondary city aliases from duplicate tour records", () => {
+  const first = compactItem(baseItem({
+    id: "tour-city-a",
+    title: "Three City Techno Tour",
+    city_key: "shanghai",
+    city_keys: ["shanghai", "beijing"],
+    city: ["上海", "北京"],
+  }));
+  const second = compactItem(baseItem({
+    id: "tour-city-b",
+    title: "Three City Techno Tour",
+    city_key: "shanghai",
+    city_keys: ["shanghai", "guangzhou"],
+    city: ["上海", "广州"],
+    event_time_text: "22:00 - Late",
+    event_time_source: "source_text",
+  }));
+
+  const deduped = dedupeItems([first, second]);
+  assert.equal(deduped.length, 1);
+  assert.deepEqual([...deduped[0].city_keys].sort(), ["beijing", "guangzhou", "shanghai"]);
+  assert.deepEqual([...deduped[0].city].sort(), ["上海", "北京", "广州"].sort());
+});
+
 test("atlas event adapter emits the same canonical source fields as weekly items", () => {
   const item = atlasEventToWeeklyItem({
     eventId: "event:heim",

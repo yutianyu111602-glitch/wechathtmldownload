@@ -1,7 +1,7 @@
-const VERSION = "0.5.15";
-const BUILD_DATE = "2026-06-11";
 const ATLAS_BETA_URL = "https://huaidj.club/atlas/starmap";
 const ABOUT_TAB_INDEX = 3;
+const SOUND_NOTICE_SEEN_KEY = "weeklySoundAtlasNoticeSeen:v1";
+const BUILD_IDENTITY = require("../../config/buildIdentity");
 const { HAPTIC, vibrateLight } = require("../../utils/haptics");
 const { applyLanguageChrome, normalizeLang, text } = require("../../utils/i18n");
 const { buildSimpleShare, buildSimpleTimeline, enableShareMenu } = require("../../utils/share");
@@ -10,8 +10,8 @@ Page({
   data: {
     lang: "zh",
     t: text("about", "zh"),
-    version: VERSION,
-    buildDate: BUILD_DATE,
+    version: BUILD_IDENTITY.version,
+    buildDate: BUILD_IDENTITY.buildDate,
     year: new Date().getFullYear(),
   },
   lastHapticAt: 0,
@@ -25,8 +25,8 @@ Page({
 
   onLoad() {
     enableShareMenu();
-    wx.removeStorageSync("weeklySoundAtlasNoticeSeen:v1");
-    wx.hideTabBarRedDot({ index: ABOUT_TAB_INDEX });
+    try { wx.setStorageSync(SOUND_NOTICE_SEEN_KEY, true); } catch (_) {}
+    try { wx.hideTabBarRedDot({ index: ABOUT_TAB_INDEX }); } catch (_) {}
     const lang = normalizeLang(wx.getStorageSync("weeklyActivityLang"));
     applyLanguageChrome("about", lang);
     this.setData({
@@ -93,25 +93,11 @@ Page({
     });
   },
 
-  onLogoLongpress() {
-    this.lightHaptic();
-    wx.showModal({
-      title: "管理员验证",
-      content: "",
-      editable: true,
-      placeholderText: "请输入管理员密码",
-      success(res) {
-        if (res.confirm && res.content === "196823") {
-          wx.navigateTo({
-            url: "/pages/admin/admin",
-            fail() {
-              wx.showToast({ title: "页面加载失败", icon: "none" });
-            },
-          });
-        } else if (res.confirm) {
-          wx.showToast({ title: "密码错误", icon: "none" });
-        }
-      },
+  openSound() {
+    this.lightHaptic(HAPTIC.tabInterval);
+    wx.navigateTo({
+      url: "/pages/sound/sound",
+      fail: () => wx.reLaunch({ url: "/pages/sound/sound" }),
     });
   },
 });

@@ -2,6 +2,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
+const { cityKeysForItem } = require("../services/homeFilters");
 
 const appJs = fs.readFileSync(path.resolve(__dirname, "../app.js"), "utf8");
 const appJson = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../app.json"), "utf8"));
@@ -85,9 +86,10 @@ test("home feed uses all current items unless an explicit date mode is selected"
   assert.doesNotMatch(indexJs, /lookbackDays:\s*45/);
 });
 
-test("home city filters accept API facets only when they match the visible date scope", () => {
+test("home facets accept API metadata only when generation and visible item set match", () => {
   assert.match(indexJs, /function buildCityFiltersFromIndex\(payload, lang, allCitiesLabel\)/);
-  assert.match(indexJs, /cityFacetPayloadMatchesItems\(citiesResult\.value, cityFilterSourceItems\)/);
+  assert.match(indexJs, /facetPayloadMatchesVisibleSet\(citiesResult\.value, cityFilterSourceItems, current, "cities"\)/);
+  assert.match(indexJs, /facetPayloadMatchesVisibleSet\(datesResult\.value, dateFilterSourceItems, current, "dates"\)/);
   assert.match(indexJs, /const cityFilters = cityIndexFilters \|\| buildCityFiltersFallback\(cityFilterSourceItems, lang, this\.data\.t\.allCities\)/);
   assert.match(indexJs, /entry\?\.count \?\? entry\?\.item_count \?\? entry\?\.eventCount/);
 });
@@ -106,9 +108,9 @@ test("current city facets exactly match the strict home feed while package scope
   ]).filter(([key, count]) => key && Number.isFinite(count) && count > 0));
   const strictCounts = new Map();
   for (const item of strictItems) {
-    const key = String(item.city_key || "").trim();
-    if (!key) continue;
-    strictCounts.set(key, (strictCounts.get(key) || 0) + 1);
+    for (const key of cityKeysForItem(item)) {
+      strictCounts.set(key, (strictCounts.get(key) || 0) + 1);
+    }
   }
   assert.ok(strictItems.length > 0, "strict home feed must have current/future rows");
   assert.equal(cityIndex.scope, "current");
@@ -135,7 +137,7 @@ test("approved fuzzy location build declares getFuzzyLocation and applies city p
   assert.match(indexJs, /readLocatedCityKey\(\)[\s\S]*userLocationCityKey[\s\S]*readStoredString\(LOCATION_CITY_KEY\)/);
   assert.match(indexJs, /const PREFERRED_CITY_KEY = "weeklyActivityPreferredCity"/);
   assert.match(indexJs, /readLocalCityKey\(\)[\s\S]*readLocatedCityKey\(\)[\s\S]*globalData\.preferredCityKey[\s\S]*readStoredString\(PREFERRED_CITY_KEY\)/);
-  assert.match(indexJs, /waitForLocationCityBeforeInitialLoad\(selectedCity\)[\s\S]*\.then\(\(\) => this\.loadData\(\)\)/);
+  assert.match(indexJs, /waitForLocationCityBeforeInitialLoad\(selectedCity\)[\s\S]*\.then\(\(\) => \(this\.destroyed \? null : this\.loadData\(\)\)\)/);
   assert.match(indexJs, /app\.requestLocationCity\(\)/);
   assert.match(indexJs, /applyLocatedCityKey\(key\)/);
   assert.match(indexJs, /refreshViewItems\(\)/);

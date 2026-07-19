@@ -68,6 +68,105 @@ async function loadIndex() {
 
 function text(v) { return String(v ?? "").trim(); }
 function normKey(s) { return text(s).toLowerCase().replace(/[^a-z0-9一-鿿]/g, ""); }
+
+const ARTIST_LIST_PAGE_LIMITS = Object.freeze({
+  events: Object.freeze({ defaultLimit: 50, hardLimit: 100 }),
+  venues: Object.freeze({ defaultLimit: 10, hardLimit: 100 }),
+  collaborators: Object.freeze({ defaultLimit: 15, hardLimit: 200 }),
+});
+
+function positivePageLimit(value, { defaultLimit, hardLimit }) {
+  const parsed = Number(text(value));
+  if (!Number.isFinite(parsed) || parsed <= 0) return defaultLimit;
+  return Math.min(Math.floor(parsed), hardLimit);
+}
+
+function nonNegativePageOffset(value, total) {
+  const parsed = Number(text(value));
+  if (!Number.isFinite(parsed) || parsed < 0) return 0;
+  return Math.min(Math.floor(parsed), total);
+}
+
+function knownListTotal(value, availableTotal) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < 0) return availableTotal;
+  return Math.max(availableTotal, Math.min(Math.floor(parsed), Number.MAX_SAFE_INTEGER));
+}
+
+function artistListPage(rows, requestedLimit, requestedOffset, policy, knownTotal) {
+  const source = Array.isArray(rows) ? rows : [];
+  const availableTotal = source.length;
+  const total = knownListTotal(knownTotal, availableTotal);
+  const limit = positivePageLimit(requestedLimit, policy);
+  const offset = nonNegativePageOffset(requestedOffset, availableTotal);
+  const items = source.slice(offset, offset + limit);
+  const returned = items.length;
+  const hasMore = offset + returned < availableTotal;
+  const sourceTruncated = total > availableTotal;
+  return {
+    items,
+    pagination: {
+      offset,
+      limit,
+      hardLimit: policy.hardLimit,
+      total,
+      availableTotal,
+      returned,
+      truncated: offset > 0 || hasMore || sourceTruncated,
+      sourceTruncated,
+      hasMore,
+      nextOffset: hasMore ? offset + returned : null,
+    },
+  };
+}
+
+function artifactDatasetId(artifact) {
+  return text(artifact?.datasetId);
+}
+
+function atlasDatasetHandshake(idx, bundle) {
+  const indexDatasetId = artifactDatasetId(idx);
+  const neighborhoodDatasetId = artifactDatasetId(bundle);
+  if (!indexDatasetId || !neighborhoodDatasetId) {
+    return { ok: false, reason: "dataset_id_missing", indexDatasetId, neighborhoodDatasetId };
+  }
+  if (indexDatasetId !== neighborhoodDatasetId) {
+    return { ok: false, reason: "dataset_mismatch", indexDatasetId, neighborhoodDatasetId };
+  }
+  return { ok: true, reason: "", indexDatasetId, neighborhoodDatasetId };
+}
+
+function publicAtlasGeneration(idx, bundle = null) {
+  const result = {};
+  const datasetId = artifactDatasetId(idx);
+  if (datasetId) result.datasetId = datasetId;
+  result.subjectCount = Array.isArray(idx?.subjects) ? idx.subjects.length : 0;
+  result.profileCount = idx?.profiles && typeof idx.profiles === "object"
+    ? Object.keys(idx.profiles).length
+    : 0;
+
+  if (bundle && atlasDatasetHandshake(idx, bundle).ok) {
+    const generation = bundle.generation || {};
+    const numericFields = ["nodeCount", "relationCount", "edgeCount", "perSubjectLimit"];
+    for (const field of numericFields) {
+      const value = Number(generation[field]);
+      if (Number.isFinite(value) && value >= 0) result[field] = value;
+    }
+    const neighborhoodSubjectCount = Number(generation.subjectCount);
+    if (Number.isFinite(neighborhoodSubjectCount) && neighborhoodSubjectCount >= 0) {
+      result.neighborhoodSubjectCount = neighborhoodSubjectCount;
+    }
+  }
+  return result;
+}
+
+async function loadAlignedNeighborhoodBundle(idx) {
+  const bundle = await loadNeighborhoodBundle();
+  const handshake = atlasDatasetHandshake(idx, bundle);
+  if (!handshake.ok) return null;
+  return bundle;
+}
+
 function usableSubjectKey(key) {
   const value = text(key);
   return /[一-鿿]/.test(value) ? value.length >= 2 : value.length >= 3;
@@ -1254,11 +1353,20 @@ function similarDjsFromBundle(idx, bundle, djId, limit = 8) {
 }
 
 async function similarDjsForDj(djId, limit = 8) {
-  const [idx, bundle] = await Promise.all([loadIndex(), loadNeighborhoodBundle()]);
+  const idx = await loadIndex();
+  const bundle = idx ? await loadAlignedNeighborhoodBundle(idx) : null;
   return similarDjsFromBundle(idx, bundle, djId, limit);
 }
 
-export async function getArtist({ name, eventLimit, collaboratorLimit, venueLimit } = {}) {
+export async function getArtist({
+  name,
+  eventLimit,
+  eventOffset,
+  collaboratorLimit,
+  collaboratorOffset,
+  venueLimit,
+  venueOffset,
+} = {}) {
   const idx = await loadIndex();
   if (!idx) return { found: false, query: name, reason: "index_unavailable" };
 
@@ -1284,7 +1392,7 @@ export async function getArtist({ name, eventLimit, collaboratorLimit, venueLimi
     loadBioCandidates(),
     loadBioSnippets(),
     loadSceneClusters(),
-    loadNeighborhoodBundle(),
+    loadAlignedNeighborhoodBundle(idx),
   ]);
   profile.radioPrograms = radioPrograms;
   if (relationTrajectory) profile.relationTrajectory = relationTrajectory;
@@ -1304,22 +1412,38 @@ export async function getArtist({ name, eventLimit, collaboratorLimit, venueLimi
   profile.residentVenues = residentVenuesForDj(idx, nb, lookupIds, 4);
   profile.labelAffiliations = labelAffiliationsForDj(idx, nb, lookupIds, 3);
 
-  const evts = (idx.events[djId] || []).slice(0, parseInt(eventLimit) || 50);
-  const vens = (idx.dj_venues[djId] || []).slice(0, parseInt(venueLimit) || 10);
-  const cols = (idx.collabs[djId] || []).slice(0, parseInt(collaboratorLimit) || 15);
+  const eventPage = artistListPage(
+    idx.events[djId], eventLimit, eventOffset, ARTIST_LIST_PAGE_LIMITS.events, profile.eventCount,
+  );
+  const venuePage = artistListPage(
+    idx.dj_venues[djId], venueLimit, venueOffset, ARTIST_LIST_PAGE_LIMITS.venues, profile.venueCount,
+  );
+  const collaboratorPage = artistListPage(
+    idx.collabs[djId],
+    collaboratorLimit,
+    collaboratorOffset,
+    ARTIST_LIST_PAGE_LIMITS.collaborators,
+    profile.collaboratorCount,
+  );
 
   return {
     schemaVersion: "atlas_miniapp.artist_response.v1",
     query: artistName, found: true, subjectId: djId, canonicalSubjectId: djId, resolvedVia: "name",
     profile,
-    events: evts.map(e => ({ eventId: e.eid, title: e.t, date: e.d || null, venueName: e.v || null, city: e.ci || null, ...publicSourceFields(idx, e.sr) })),
-    venues: vens.map(v => ({ venueName: v.vn, eventCount: v.ec })),
-    collaborators: cols.map(c => ({ djId: c.di, displayName: c.n, sameEventCount: c.ec })),
+    events: eventPage.items.map(e => ({ eventId: e.eid, title: e.t, date: e.d || null, venueName: e.v || null, city: e.ci || null, ...publicSourceFields(idx, e.sr) })),
+    venues: venuePage.items.map(v => ({ venueName: v.vn, eventCount: v.ec })),
+    collaborators: collaboratorPage.items.map(c => ({ djId: c.di, displayName: c.n, sameEventCount: c.ec })),
+    pagination: {
+      events: eventPage.pagination,
+      venues: venuePage.pagination,
+      collaborators: collaboratorPage.pagination,
+    },
     social,
     bioAtoms,
     relatedColumns,
     radioPrograms,
     relationTrajectory,
+    generation: publicAtlasGeneration(idx, nb),
     alternatives: subjects.slice(1, 4).map(s => ({ subjectId: s.i, displayName: s.n })),
   };
 }
@@ -1370,6 +1494,8 @@ export async function getNeighborhood({ subjectId, q, limit, depth } = {}) {
   const [idx, bundle] = await Promise.all([loadIndex(), loadNeighborhoodBundle()]);
   if (!idx) return empty("index_unavailable");
   if (!bundle?.byNode) return empty("neighborhood_unavailable");
+  const handshake = atlasDatasetHandshake(idx, bundle);
+  if (!handshake.ok) return empty(handshake.reason, { generation: publicAtlasGeneration(idx) });
 
   const requestedSubjectId = text(subjectId);
   let centerId = requestedSubjectId;
@@ -1428,7 +1554,7 @@ export async function getNeighborhood({ subjectId, q, limit, depth } = {}) {
       : center,
     neighbors,
     edges,
-    generation: bundle.generation || null,
+    generation: publicAtlasGeneration(idx, bundle),
   };
 }
 
@@ -1445,6 +1571,8 @@ export async function getPath({ from, to, fromName, toName, maxDepth } = {}) {
   const [idx, bundle] = await Promise.all([loadIndex(), loadNeighborhoodBundle()]);
   if (!idx) return empty("index_unavailable");
   if (!bundle?.byNode) return empty("neighborhood_unavailable");
+  const handshake = atlasDatasetHandshake(idx, bundle);
+  if (!handshake.ok) return empty(handshake.reason, { generation: publicAtlasGeneration(idx) });
 
   const requestedFrom = text(from);
   const requestedTo = text(to);
@@ -1545,7 +1673,7 @@ export async function getPath({ from, to, fromName, toName, maxDepth } = {}) {
       requestedTo: requestedTo && requestedTo !== toId ? requestedTo : undefined,
     }, found: true,
     hops: edges.length, path, edges,
-    generation: bundle.generation || null,
+    generation: publicAtlasGeneration(idx, bundle),
   };
 }
 
@@ -1897,7 +2025,14 @@ export async function resolveCrossDbEntity(eid) {
  */
 
 // ── Direct DJ ID lookup (by subject ID, not name search) ──
-export async function getArtistById(djId, { eventLimit, collaboratorLimit, venueLimit } = {}) {
+export async function getArtistById(djId, {
+  eventLimit,
+  eventOffset,
+  collaboratorLimit,
+  collaboratorOffset,
+  venueLimit,
+  venueOffset,
+} = {}) {
   const idx = await loadIndex();
   if (!idx) return { found: false, query: djId, reason: "index_unavailable" };
 
@@ -1923,7 +2058,7 @@ export async function getArtistById(djId, { eventLimit, collaboratorLimit, venue
     loadBioCandidates(),
     loadBioSnippets(),
     loadSceneClusters(),
-    loadNeighborhoodBundle(),
+    loadAlignedNeighborhoodBundle(idx),
   ]);
   profile.radioPrograms = radioPrograms;
   if (relationTrajectory) profile.relationTrajectory = relationTrajectory;
@@ -1943,13 +2078,19 @@ export async function getArtistById(djId, { eventLimit, collaboratorLimit, venue
   profile.residentVenues = residentVenuesForDj(idx, nb, lookupIds, 4);
   profile.labelAffiliations = labelAffiliationsForDj(idx, nb, lookupIds, 3);
 
-  const maxEvents = parseInt(eventLimit) || 50;
-  const maxVenues = parseInt(venueLimit) || 10;
-  const maxCollabs = parseInt(collaboratorLimit) || 15;
-
-  const evts = (idx.events[canonicalId] || []).slice(0, maxEvents);
-  const vens = (idx.dj_venues[canonicalId] || []).slice(0, maxVenues);
-  const cols = (idx.collabs[canonicalId] || []).slice(0, maxCollabs);
+  const eventPage = artistListPage(
+    idx.events[canonicalId], eventLimit, eventOffset, ARTIST_LIST_PAGE_LIMITS.events, profile.eventCount,
+  );
+  const venuePage = artistListPage(
+    idx.dj_venues[canonicalId], venueLimit, venueOffset, ARTIST_LIST_PAGE_LIMITS.venues, profile.venueCount,
+  );
+  const collaboratorPage = artistListPage(
+    idx.collabs[canonicalId],
+    collaboratorLimit,
+    collaboratorOffset,
+    ARTIST_LIST_PAGE_LIMITS.collaborators,
+    profile.collaboratorCount,
+  );
 
   return {
     schemaVersion: "atlas_miniapp.artist_response.v1",
@@ -1959,14 +2100,20 @@ export async function getArtistById(djId, { eventLimit, collaboratorLimit, venue
     requestedSubjectId: id !== canonicalId ? id : undefined,
     resolvedVia: resolved?.resolvedVia,
     profile,
-    events: evts.map(e => ({ eventId: e.eid, title: e.t, date: e.d || null, venueName: e.v || null, city: e.ci || null, ...publicSourceFields(idx, e.sr) })),
-    venues: vens.map(v => ({ venueName: v.vn, eventCount: v.ec })),
-    collaborators: cols.map(c => ({ djId: c.di, displayName: c.n, sameEventCount: c.ec })),
+    events: eventPage.items.map(e => ({ eventId: e.eid, title: e.t, date: e.d || null, venueName: e.v || null, city: e.ci || null, ...publicSourceFields(idx, e.sr) })),
+    venues: venuePage.items.map(v => ({ venueName: v.vn, eventCount: v.ec })),
+    collaborators: collaboratorPage.items.map(c => ({ djId: c.di, displayName: c.n, sameEventCount: c.ec })),
+    pagination: {
+      events: eventPage.pagination,
+      venues: venuePage.pagination,
+      collaborators: collaboratorPage.pagination,
+    },
     social,
     bioAtoms,
     relatedColumns,
     radioPrograms,
     relationTrajectory,
+    generation: publicAtlasGeneration(idx, nb),
     alternatives: [],
   };
 }

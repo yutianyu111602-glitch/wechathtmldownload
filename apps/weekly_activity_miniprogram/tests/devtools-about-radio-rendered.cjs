@@ -21,9 +21,10 @@ const projectPath = process.env.MINIPROGRAM_PROJECT_PATH || path.resolve(__dirna
 const cliPath = process.env.MINIPROGRAM_DEVTOOLS_CLI || "C:/Program Files (x86)/Tencent/微信web开发者工具/cli.bat";
 const launchPort = Number(process.env.MINIPROGRAM_AUTOMATOR_PORT || "9424");
 const idePort = Number(process.env.MINIPROGRAM_DEVTOOLS_IDE_PORT || "54272");
-const cliArgs = Number.isFinite(idePort) && idePort > 0 ? ["--port", String(idePort)] : [];
 const launchTimeoutMs = Number(process.env.MINIPROGRAM_AUTOMATOR_LAUNCH_TIMEOUT_MS || "180000");
-const artifactRoot = path.resolve(__dirname, "../test-artifacts");
+const artifactRoot = process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT
+  ? path.resolve(process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT)
+  : path.resolve(__dirname, "../test-artifacts");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const artifactDir = path.join(artifactRoot, `about-radio-rendered-${stamp}`);
 const expectedStationKeys = String(process.env.MINIPROGRAM_EXPECTED_RADIO_KEYS || "byyb,baihui,shcr,cdcr,hoer,hzcr")
@@ -164,7 +165,6 @@ async function run() {
         projectPath,
         cliPath,
         port: launchPort,
-        args: cliArgs,
         idePort,
         trustProject: true,
         timeout: launchTimeoutMs,

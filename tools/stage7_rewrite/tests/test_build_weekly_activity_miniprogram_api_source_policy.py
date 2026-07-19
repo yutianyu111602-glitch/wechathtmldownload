@@ -113,7 +113,8 @@ def test_cli_source_policy_filters_blocked_account_and_reports_reason(tmp_path: 
     assert manifest["item_count"] == 1
     assert manifest["filtered_counts"]["source_policy_blocked_account"] == 2
     assert manifest["filtered_counts"]["source_policy_blocked_source_hash"] == 1
-    assert manifest["source_policy_path"] == str(policy_path)
+    assert "source_policy_path" not in manifest
+    assert manifest["source_policy_name"] == policy_path.name
 
 
 def test_pipeline_registries_are_versioned_runtime_contracts() -> None:

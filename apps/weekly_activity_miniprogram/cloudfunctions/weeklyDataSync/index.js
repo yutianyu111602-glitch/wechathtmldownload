@@ -2,6 +2,16 @@ const crypto = require("node:crypto");
 const https = require("node:https");
 const { URL } = require("node:url");
 const tcb = require("@cloudbase/node-sdk");
+const dateVisibility = require("./dateVisibility");
+
+const {
+  isoDate,
+  itemDateKeys,
+  itemIsCurrentOrFuture,
+  itemMatchesDateKey,
+  itemMatchesDateWindow,
+  normalizeDateWindow,
+} = dateVisibility;
 
 const DEFAULT_BASE_URL = "https://weekly-api-255880-4-1371956557.sh.run.tcloudbase.com";
 const DEFAULT_ENV_ID = "huaidjweekly-d8g1go7-d0a07863e3e";
@@ -21,6 +31,9 @@ const _ = db.command;
 const DB_WRITE_BATCH_SIZE = Math.max(1, Math.min(10, Number(process.env.WEEKLY_DATA_SYNC_WRITE_BATCH_SIZE || 2)));
 const DB_WRITE_BATCH_DELAY_MS = Math.max(0, Math.min(3000, Number(process.env.WEEKLY_DATA_SYNC_WRITE_BATCH_DELAY_MS || 400)));
 const DB_RETRY_LIMIT = Math.max(0, Math.min(5, Number(process.env.WEEKLY_DATA_SYNC_DB_RETRY_LIMIT || 3)));
+const MAX_BATCH_DETAIL_IDS = 100;
+const MAX_BATCH_DETAIL_REQUEST_UTF8_BYTES = 16 * 1024;
+const MAX_BATCH_DETAIL_RESPONSE_UTF8_BYTES = 2 * 1024 * 1024;
 const ADMIN_ACTIONS = new Set(["sync", "diagnose", "probe"]);
 // Warm-container cache for the live container build freshness, so the self-healing read-through
 // check costs at most one tiny manifest GET per TTL window instead of one per current-read.
@@ -118,75 +131,113 @@ function normalizeCursor(value) {
   return Number.isFinite(cursor) ? cursor : 0;
 }
 
-function isoDate(value) {
-  const match = String(value || "").match(/\d{4}-\d{2}-\d{2}/);
-  return match ? match[0] : "";
+function utf8ByteLength(value) {
+  let bytes = 0;
+  for (const char of String(value ?? "")) {
+    const codePoint = char.codePointAt(0);
+    if (codePoint <= 0x7f) bytes += 1;
+    else if (codePoint <= 0x7ff) bytes += 2;
+    else if (codePoint <= 0xffff) bytes += 3;
+    else bytes += 4;
+  }
+  return bytes;
 }
 
-function dateFromKey(value) {
-  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!match) return null;
-  const date = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
-function addDateRangeKeys(keys, startKey, endKey, limit = 64) {
-  const start = dateFromKey(startKey);
-  const end = dateFromKey(endKey);
-  if (!start || !end || end < start) return;
-  for (let date = new Date(start); date <= end && keys.size < limit; date.setUTCDate(date.getUTCDate() + 1)) {
-    keys.add(date.toISOString().slice(0, 10));
+function decodeId(value) {
+  try {
+    return decodeURIComponent(String(value || "")).trim();
+  } catch {
+    return String(value || "").trim();
   }
 }
 
-function itemDateKeys(item, expandRanges = false) {
-  const keys = new Set();
-  const candidates = []
-    .concat(item.event_date_start || [])
-    .concat(item.event_date_end || [])
-    .concat(item.event_date_iso_guess || [])
-    .concat(item.event_date_iso_guesses || [])
-    .concat(item.event_date_text || []);
-  for (const entry of candidates) {
-    const key = isoDate(entry);
-    if (key) keys.add(key);
+function batchIdsFromQuery(query = {}) {
+  const rawIds = String(query.ids || "");
+  const requestBytes = utf8ByteLength(rawIds);
+  if (requestBytes > MAX_BATCH_DETAIL_REQUEST_UTF8_BYTES) {
+    throw Object.assign(new Error("weekly batch request exceeds the UTF-8 byte budget"), {
+      code: "HOT_DB_BATCH_REQUEST_TOO_LARGE",
+      requestBytes,
+      maxRequestBytes: MAX_BATCH_DETAIL_REQUEST_UTF8_BYTES,
+    });
   }
-  if (expandRanges) {
-    addDateRangeKeys(keys, isoDate(item.event_date_start), isoDate(item.event_date_end));
+  const ids = rawIds.split(",").map(decodeId).filter(Boolean);
+  if (ids.length < 1 || ids.length > MAX_BATCH_DETAIL_IDS) {
+    throw Object.assign(new Error(`weekly batch requires 1-${MAX_BATCH_DETAIL_IDS} ids`), {
+      code: "HOT_DB_BATCH_ID_LIMIT",
+      idCount: ids.length,
+      maxIds: MAX_BATCH_DETAIL_IDS,
+    });
   }
-  return Array.from(keys).sort();
+  return ids;
 }
 
-function itemMatchesDate(item, date) {
-  const target = isoDate(date);
-  if (!target) return true;
-  const keys = itemDateKeys(item, false);
-  if (keys.includes(target)) return true;
-  const start = isoDate(item.event_date_start) || keys[0] || "";
-  const end = isoDate(item.event_date_end) || keys[keys.length - 1] || start;
-  return Boolean(start && end && start <= target && target <= end);
+function richDetailUnavailable(path, details = {}) {
+  return {
+    error: {
+      code: "HOT_DB_RICH_DETAIL_UNAVAILABLE",
+      message: "CloudBase stores compact list rows only; use the CloudRun rich-detail route.",
+      path,
+      fallback: "cloudrun",
+      maxBatchIds: MAX_BATCH_DETAIL_IDS,
+      maxBatchRequestUtf8Bytes: MAX_BATCH_DETAIL_REQUEST_UTF8_BYTES,
+      maxBatchResponseUtf8Bytes: MAX_BATCH_DETAIL_RESPONSE_UTF8_BYTES,
+      ...details,
+    },
+  };
 }
 
-function normalizeDateWindow(dateStart, dateEnd) {
-  const left = isoDate(dateStart);
-  const right = isoDate(dateEnd);
-  if (!left && !right) return { dateStart: "", dateEnd: "" };
-  const start = left || right;
-  const end = right || left;
-  return start <= end
-    ? { dateStart: start, dateEnd: end }
-    : { dateStart: end, dateEnd: start };
+function generationIdOf(value) {
+  return String(value && (value.generationId || value.generation_id) || "").trim();
 }
 
-function itemMatchesDateWindow(item, dateStart, dateEnd) {
-  const window = normalizeDateWindow(dateStart, dateEnd);
-  if (!window.dateStart) return true;
-  const keys = itemDateKeys(item, false);
-  const start = isoDate(item.event_date_start) || keys[0] || "";
-  const end = isoDate(item.event_date_end) || keys[keys.length - 1] || start;
-  if (!start && !end) return false;
-  return (start || end) <= window.dateEnd && (end || start) >= window.dateStart;
+function generatedAtOf(value) {
+  return String(value && (value.generatedAt || value.generated_at || value.syncedAt) || "").trim();
 }
+
+function assertGenerationHandshake(left, right, code = "GENERATION_HANDSHAKE_FAILED") {
+  const leftId = generationIdOf(left);
+  const rightId = generationIdOf(right);
+  if (leftId || rightId) {
+    if (!leftId || !rightId || leftId !== rightId) {
+      throw Object.assign(
+        new Error(`weekly generationId mismatch: ${leftId || "<missing>"} != ${rightId || "<missing>"}`),
+        { code },
+      );
+    }
+    return { mode: "exact", generationId: leftId, generatedAt: generatedAtOf(left) || generatedAtOf(right) || null };
+  }
+  const leftAt = generatedAtOf(left);
+  const rightAt = generatedAtOf(right);
+  if (!leftAt || !rightAt || leftAt !== rightAt) {
+    throw Object.assign(
+      new Error(`weekly legacy generatedAt mismatch: ${leftAt || "<missing>"} != ${rightAt || "<missing>"}`),
+      { code },
+    );
+  }
+  return { mode: "legacy", generationId: null, generatedAt: leftAt };
+}
+
+function assertRequestedGeneration(config, query = {}) {
+  const requested = String(query.generationId || query.generation_id || "").trim();
+  const active = generationIdOf(config);
+  if (requested && (!active || active !== requested)) {
+    throw Object.assign(
+      new Error(`weekly requested generation mismatch: ${requested} != ${active || "<legacy>"}`),
+      { code: "WEEKLY_REQUEST_GENERATION_MISMATCH" },
+    );
+  }
+  const requestedAt = String(query.generatedAt || query.generated_at || "").trim();
+  const activeAt = generatedAtOf(config);
+  if (requestedAt && (active || !activeAt || requestedAt !== activeAt)) {
+    throw Object.assign(
+      new Error(`weekly requested generation mismatch: ${requestedAt} != ${active || activeAt || "<missing>"}`),
+      { code: "WEEKLY_REQUEST_GENERATION_MISMATCH" },
+    );
+  }
+}
+
+const itemMatchesDate = itemMatchesDateKey;
 
 function addDays(dateKey, days) {
   const match = String(dateKey || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -209,12 +260,20 @@ function syncLookbackDaysFromEvent(event = {}) {
 
 function buildCurrentFetchPath(cursor, options = {}) {
   const limit = Math.max(1, Math.min(100, Number.parseInt(options.limit ?? "100", 10) || 100));
-  return `/api/v1/weekly/current?scope=current&limit=${limit}&lookbackDays=0&cursor=${encodeURIComponent(cursor)}`;
+  const lookbackDays = normalizeLookbackDays(options.lookbackDays, 0);
+  return `/api/v1/weekly/current?scope=current&limit=${limit}&lookbackDays=${lookbackDays}&cursor=${encodeURIComponent(cursor)}`;
 }
 
-function itemIsCurrentOrFuture(item, today) {
-  const end = String(item.event_date_end || item.event_date_start || item.event_date_iso_guess || "").slice(0, 10);
-  return !end || !today || end >= today;
+function itemCityKeys(item = {}) {
+  const values = [item.city_key, item.cityKey]
+    .concat(Array.isArray(item.city_keys) ? item.city_keys : [])
+    .concat(Array.isArray(item.cityKeys) ? item.cityKeys : []);
+  return Array.from(new Set(values.map((value) => String(value || "").trim().toLowerCase()).filter(Boolean)));
+}
+
+function itemCityLabel(item, key, index) {
+  const labels = Array.isArray(item.city) ? item.city : [item.city];
+  return String(labels[index] || (index === 0 ? (item.city_name || item.cityName) : "") || key);
 }
 
 function todayKey(now = new Date()) {
@@ -256,9 +315,9 @@ function projectItems(currentDoc, query = {}, options = {}) {
   const includeCity = options.includeCity !== false;
   const allItems = Array.isArray(currentDoc && currentDoc.items) ? currentDoc.items : [];
   const items = allItems.filter((item) => {
-    const cityKeys = Array.isArray(item.city_keys) ? item.city_keys : [];
+    const cityKeys = itemCityKeys(item);
     const cityOk = !includeCity || !filters.cityKey || filters.cityKey === "all"
-      || item.city_key === filters.cityKey || item.cityKey === filters.cityKey || cityKeys.includes(filters.cityKey);
+      || cityKeys.includes(String(filters.cityKey).trim().toLowerCase());
     const dateOk = filters.date
       ? itemMatchesDate(item, filters.date)
       : filters.dateStart
@@ -280,6 +339,7 @@ function currentResponseFromItems(currentDoc, query = {}) {
   return {
     schemaVersion: "weekly_activity_api.current_response.v1",
     generatedAt: currentDoc.generatedAt || currentDoc.generated_at || currentDoc.syncedAt,
+    generationId: generationIdOf(currentDoc) || null,
     syncId: currentDoc.syncId || null,
     syncedAt: currentDoc.syncedAt || null,
     filters,
@@ -298,22 +358,26 @@ function cityIndexFromItems(currentDoc, query = {}) {
   const projection = projectItems(currentDoc, query, { includeCity: false });
   const bucket = new Map();
   for (const item of projection.items) {
-    const key = item.city_key || item.cityKey || (item.city_keys || [])[0] || "unknown";
-    const rawCity = Array.isArray(item.city) ? item.city[0] : item.city;
-    const current = bucket.get(key) || {
-      city_key: key,
-      city: rawCity || key,
-      count: 0,
-      item_count: 0,
-    };
-    current.item_count += 1;
-    current.count = current.item_count;
-    bucket.set(key, current);
+    const cityKeys = itemCityKeys(item);
+    for (let index = 0; index < cityKeys.length; index += 1) {
+      const key = cityKeys[index];
+      const current = bucket.get(key) || {
+        city_key: key,
+        city: itemCityLabel(item, key, index),
+        count: 0,
+        item_count: 0,
+      };
+      current.item_count += 1;
+      current.count = current.item_count;
+      bucket.set(key, current);
+    }
   }
   const cities = Array.from(bucket.values()).sort((left, right) => right.item_count - left.item_count || left.city_key.localeCompare(right.city_key));
   return {
     schema_version: "weekly_activity_miniprogram_city_index.v2",
     generated_at: currentDoc && (currentDoc.generatedAt || currentDoc.generated_at || currentDoc.syncedAt) || null,
+    generation_id: generationIdOf(currentDoc) || null,
+    generationId: generationIdOf(currentDoc) || null,
     syncId: currentDoc && currentDoc.syncId || null,
     syncedAt: currentDoc && currentDoc.syncedAt || null,
     scope: projection.filters.scope,
@@ -332,7 +396,7 @@ function dateIndexFromItems(currentDoc, query = {}) {
     ? (projection.filters.lookbackDays ? addDays(projection.filters.today, -projection.filters.lookbackDays) : projection.filters.today)
     : null;
   for (const item of projection.items) {
-    for (const key of itemDateKeys(item || {}, true)) {
+    for (const key of itemDateKeys(item || {})) {
       if (projection.filters.dateStart && (key < projection.filters.dateStart || key > projection.filters.dateEnd)) continue;
       if (floor && key < floor) continue;
       const current = bucket.get(key) || { date: key, count: 0, item_count: 0 };
@@ -345,6 +409,8 @@ function dateIndexFromItems(currentDoc, query = {}) {
   return {
     schema_version: "weekly_activity_miniprogram_date_index.v2",
     generated_at: currentDoc && (currentDoc.generatedAt || currentDoc.generated_at || currentDoc.syncedAt) || null,
+    generation_id: generationIdOf(currentDoc) || null,
+    generationId: generationIdOf(currentDoc) || null,
     syncId: currentDoc && currentDoc.syncId || null,
     syncedAt: currentDoc && currentDoc.syncedAt || null,
     scope: projection.filters.scope,
@@ -357,11 +423,11 @@ function dateIndexFromItems(currentDoc, query = {}) {
 }
 
 function shouldSkipContainerFreshness(event = {}, query = {}) {
-  return (
-    String(event.source || "") === "miniprogram-hot-db" ||
-    String(query.skipFreshness || "") === "1" ||
-    query.skipFreshness === true
-  );
+  // `event` and `query` are client-controlled cloud-function input. Never let
+  // either one bypass the active-generation comparison.
+  void event;
+  void query;
+  return false;
 }
 
 async function setDoc(collectionName, id, data) {
@@ -483,12 +549,15 @@ async function cleanupPreviousGeneration(previousSyncId, activeSyncId) {
 }
 
 async function fetchAllCurrent(options = {}) {
+  const requestedLookbackDays = normalizeLookbackDays(options.lookbackDays, 0);
   const allItems = [];
   const seenCursors = new Set();
   const seenEventIds = new Set();
   let cursor = "0";
   let firstPayload = null;
   let expectedGeneratedAt = null;
+  let expectedGenerationId = null;
+  let generationMode = null;
   let expectedTotal = null;
   let complete = false;
   for (let guard = 0; guard < 100; guard += 1) {
@@ -501,13 +570,14 @@ async function fetchAllCurrent(options = {}) {
       throw Object.assign(new Error("weekly current page contract is invalid"), { code: "CURRENT_PAGE_INVALID" });
     }
     const generatedAt = String(payload.generatedAt || payload.generated_at || "").trim();
+    const generationId = generationIdOf(payload);
     const schemaVersion = String(payload.schemaVersion || payload.schema_version || "").trim();
     const total = Number(payload.page.total);
     const responseCursor = String(payload.page.cursor ?? cursor);
     const responseScope = String(payload.filters && payload.filters.scope || "").toLowerCase();
     const responseLookback = payload.filters && payload.filters.lookbackDays;
-    if (!generatedAt) {
-      throw Object.assign(new Error("weekly current generatedAt is missing"), { code: "CURRENT_GENERATED_AT_MISSING" });
+    if (!generationId && !generatedAt) {
+      throw Object.assign(new Error("weekly current generation identity is missing"), { code: "CURRENT_GENERATION_MISSING" });
     }
     if (
       schemaVersion !== "weekly_activity_api.current_response.v1" ||
@@ -515,15 +585,21 @@ async function fetchAllCurrent(options = {}) {
       total < 0 ||
       responseCursor !== cursor ||
       responseScope !== "current" ||
-      !(responseLookback === null || responseLookback === undefined || Number(responseLookback) === 0)
+      Number(responseLookback ?? 0) !== requestedLookbackDays
     ) {
       throw Object.assign(new Error("weekly current page metadata is inconsistent"), { code: "CURRENT_PAGE_METADATA_MISMATCH" });
     }
     if (!firstPayload) {
       firstPayload = payload;
       expectedGeneratedAt = generatedAt;
+      expectedGenerationId = generationId;
+      generationMode = generationId ? "exact" : "legacy";
       expectedTotal = total;
-    } else if (generatedAt !== expectedGeneratedAt || total !== expectedTotal) {
+    } else if (total !== expectedTotal) {
+      throw Object.assign(new Error("weekly current total changed during pagination"), { code: "CURRENT_GENERATION_CHANGED" });
+    } else if (generationMode === "exact" && (!generationId || generationId !== expectedGenerationId)) {
+      throw Object.assign(new Error("weekly current generationId changed during pagination"), { code: "CURRENT_GENERATION_ID_CHANGED" });
+    } else if (generationMode === "legacy" && (generationId || generatedAt !== expectedGeneratedAt)) {
       throw Object.assign(new Error("weekly current generation changed during pagination"), { code: "CURRENT_GENERATION_CHANGED" });
     }
     for (const item of payload.items) {
@@ -582,6 +658,7 @@ async function getContainerFreshness() {
   // and would mark the DB perpetually stale (defeating the DB-first cost guard).
   const value = {
     generatedAt: manifest.generated_at || manifest.generatedAt || null,
+    generationId: generationIdOf(manifest) || null,
   };
   containerFreshnessCache = { value, checkedAt: now };
   return value;
@@ -597,12 +674,8 @@ async function syncData(event = {}) {
   const previousSyncId = previousConfig && previousConfig.syncId || null;
 
   const current = await fetchAllCurrent({ scope: "current", lookbackDays: syncLookbackDays });
-  let manifest = null;
-  try {
-    manifest = await requestJson("/api/v1/weekly/manifest");
-  } catch (_) {
-    manifest = null;
-  }
+  const manifest = await requestJson("/api/v1/weekly/manifest");
+  const remoteGeneration = assertGenerationHandshake(current, manifest, "CURRENT_MANIFEST_GENERATION_MISMATCH");
   let aiSummary = null;
   let aiSummaryError = null;
   try {
@@ -622,6 +695,7 @@ async function syncData(event = {}) {
     sourceBaseUrl: baseUrl,
     schemaVersion: current.schemaVersion || current.schema_version || "weekly_activity_api.current_response.v1",
     generatedAt: current.generatedAt || current.generated_at || null,
+    generationId: remoteGeneration.generationId,
     itemCount: (current.items || []).length,
     currentItemCount: (current.items || []).length,
     packageItemCount: Number(manifest && (manifest.item_count ?? manifest.items_total)) || null,
@@ -643,6 +717,8 @@ async function syncData(event = {}) {
       data: {
         syncId,
         syncedAt,
+        generatedAt: currentDoc.generatedAt,
+        generationId: remoteGeneration.generationId,
         eventId: item.id,
         cityKey: item.city_key || item.cityKey || "",
         eventDateStart: item.event_date_start || "",
@@ -663,6 +739,7 @@ async function syncData(event = {}) {
       data: {
         syncId,
         syncedAt,
+        generationId: remoteGeneration.generationId,
         ...city,
       },
     });
@@ -689,6 +766,7 @@ async function syncData(event = {}) {
       aiSummary: aiSummary ? 1 : 0,
     },
     generatedAt: current.generatedAt || current.generated_at || null,
+    generationId: remoteGeneration.generationId,
     syncLookbackDays,
     facetScope: "current",
     currentDocId,
@@ -696,6 +774,7 @@ async function syncData(event = {}) {
     routesDocId,
     eventDocIdScheme: "sync-prefixed-v1",
     cityDocIdScheme: "sync-prefixed-v1",
+    richDetailGenerationComplete: false,
     aiSummaryError,
   };
   await setDoc(COLLECTIONS.config, routesDocId, {
@@ -706,10 +785,12 @@ async function syncData(event = {}) {
       "/api/v1/weekly/current",
       "/api/v1/weekly/cities",
       "/api/v1/weekly/dates",
-      "/api/v1/weekly/items/batch",
-      "/api/v1/weekly/items/:id",
       "/api/v1/weekly/llm/materialized-summary",
     ],
+    deferredPaths: {
+      "/api/v1/weekly/items/batch": "cloudrun-rich-detail-required",
+      "/api/v1/weekly/items/:id": "cloudrun-rich-detail-required",
+    },
   });
   // This singleton write is the atomic generation switch. Every generation
   // artifact above is immutable and fully staged before readers can select it.
@@ -726,6 +807,7 @@ async function syncData(event = {}) {
       syncId,
       syncedAt,
       generatedAt: config.generatedAt,
+      generationId: config.generationId,
       counts: config.counts,
       collections: COLLECTIONS,
       aiSummaryError,
@@ -746,6 +828,7 @@ async function syncData(event = {}) {
     syncId,
     syncedAt,
     generatedAt: config.generatedAt,
+    generationId: config.generationId,
     counts: config.counts,
     collections: COLLECTIONS,
     aiSummaryError,
@@ -828,23 +911,33 @@ async function currentDocForRead(event = {}, query = {}) {
       live = null;
     }
   }
-  const dbGeneratedAt = (current && (current.generatedAt || current.generated_at)) || null;
-  const dbBehindContainer = Boolean(
-    live && live.generatedAt && (!dbGeneratedAt || String(live.generatedAt) !== String(dbGeneratedAt)),
-  );
+  let dbBehindContainer = false;
+  if (live) {
+    try {
+      assertGenerationHandshake(current, live, "HOT_DB_CONTAINER_GENERATION_MISMATCH");
+    } catch (_) {
+      dbBehindContainer = true;
+    }
+  }
   const requestedLookback = normalizeLookbackDays(query.lookbackDays, 0);
   const storedLookback = normalizeLookbackDays(current && current.syncLookbackDays, 0);
   const dbWindowTooNarrow = requestedLookback > storedLookback;
   if (!current || dbBehindContainer || dbWindowTooNarrow) {
     try {
       const fresh = await fetchAllCurrent({ lookbackDays: requestedLookback });
+      if (live) {
+        assertGenerationHandshake(fresh, live, "READTHROUGH_MANIFEST_GENERATION_MISMATCH");
+      }
       return {
         doc: fresh,
         source: "container-readthrough",
         staleReason: !current ? "db-empty" : dbBehindContainer ? "db-behind-container" : "db-window-too-narrow",
       };
     } catch (error) {
-      if (!current) throw error;
+      // Never relabel a narrow persisted window as a wider query result. A
+      // stale same-window document may remain useful when the container is
+      // temporarily unavailable, but it cannot satisfy historical lookback.
+      if (!current || dbWindowTooNarrow) throw error;
     }
   }
   return { doc: current, source: "cloudbase-database", staleReason: null };
@@ -918,35 +1011,18 @@ async function readData(event = {}) {
   }
   if (path === "/api/v1/weekly/items/batch") {
     const config = await activeConfig();
-    const activeSyncId = config && config.syncId || null;
-    const ids = String(query.ids || "")
-      .split(",")
-      .map((id) => decodeURIComponent(id).trim())
-      .filter(Boolean);
-    const docs = [];
-    for (const id of ids) {
-      const doc = await getDoc(COLLECTIONS.events, eventDocIdForConfig(config, id));
-      if (activeSyncId && doc && doc.item && doc.syncId === activeSyncId) docs.push(doc.item);
-    }
-    return {
-      items: docs,
-      syncId: activeSyncId,
-      source: "cloudbase-database",
-    };
+    assertRequestedGeneration(config, query);
+    const ids = batchIdsFromQuery(query);
+    // Deliberately no per-id database reads here. Until a sync generation
+    // contains validated rich by-id DTOs, the mini-program performs one
+    // bounded CloudRun batch request instead of an N+1 CloudBase loop.
+    return richDetailUnavailable(path, { idCount: ids.length });
   }
   if (path.indexOf("/api/v1/weekly/items/") === 0) {
     const config = await activeConfig();
-    const activeSyncId = config && config.syncId || null;
-    const id = decodeURIComponent(path.replace("/api/v1/weekly/items/", "")).trim();
-    const doc = await getDoc(COLLECTIONS.events, eventDocIdForConfig(config, id));
-    if (!activeSyncId || !doc || !doc.item || doc.syncId !== activeSyncId) {
-      return { error: { code: "HOT_DB_ITEM_NOT_FOUND", path, id } };
-    }
-    return {
-      ...doc.item,
-      syncId: activeSyncId,
-      source: "cloudbase-database",
-    };
+    assertRequestedGeneration(config, query);
+    const id = decodeId(path.replace("/api/v1/weekly/items/", ""));
+    return richDetailUnavailable(path, { id });
   }
   return {
     error: {
@@ -1000,6 +1076,7 @@ exports.__test = {
   itemDateKeys,
   itemMatchesDate,
   itemMatchesDateWindow,
+  itemCityKeys,
   projectItems,
   shouldSkipContainerFreshness,
   syncLookbackDaysFromEvent,

@@ -147,3 +147,20 @@ test("city guide degrades safely when event fields are sparse", () => {
   assert.equal(guide.decisionCards[0].item.title, "厦门电子夜");
   assert.match(guide.decisionCards[0].item.reason, /风格|基础活动线索/);
 });
+
+test("tonight guide excludes later dates from the selected Shanghai business day", () => {
+  const guide = buildCityGuide({
+    cities: [{ city_key: "zhengzhou", city: "郑州", item_count: 2 }],
+    items: [
+      { id: "tonight", city_keys: ["kaifeng", "zhengzhou"], title: "郑州 techno", event_date_start: "2026-07-19", styleLabel: "Techno" },
+      { id: "future", cityKey: "zhengzhou", cityKeys: ["zhengzhou"], title: "明天 techno", event_date_start: "2026-07-20", styleLabel: "Techno" },
+    ],
+    selectedCityKey: "zhengzhou",
+    businessDateKey: "2026-07-19",
+    lang: "zh",
+  });
+
+  assert.deepEqual(guide.items.map((item) => item.id), ["tonight"]);
+  assert.equal(guide.eventCount, 1);
+  assert.equal(cityMatches(guide.items[0], "zhengzhou"), true);
+});

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import socket
 import subprocess
 import sys
@@ -19,6 +20,10 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_OUT_DIR = (
     REPO_ROOT / "tools" / "stage7_rewrite" / "reports" / "weekly_miniprogram_devtools_environment_s55_20260531"
+)
+USER_DATA_DIR_RE = re.compile(
+    r'--user-data-dir=(?:"(?P<quoted>[^"]+)"|(?P<bare>.+?))(?=\s+(?:"?--|/prefetch:)|$)',
+    re.IGNORECASE,
 )
 
 
@@ -51,8 +56,15 @@ def run_powershell_json(command: str, timeout_sec: int = 20) -> Any:
 
 def collect_windows_state(target_ports: list[int]) -> dict[str, Any]:
     process_command = (
-        "Get-Process | Where-Object { $_.ProcessName -match 'wechatdevtools|微信开发者工具' } | "
-        "Select-Object ProcessName,Id,StartTime,Path | ConvertTo-Json -Compress"
+        "$rows = Get-CimInstance Win32_Process | "
+        "Where-Object { $_.Name -match 'wechatdevtools|微信开发者工具' } | "
+        "ForEach-Object { "
+        "$match = [regex]::Match([string]$_.CommandLine, '--ide-http-port(?:=|\\s+)(?<port>\\d+)'); "
+        "$idePort = $null; if ($match.Success) { $idePort = [int]$match.Groups['port'].Value }; "
+        "[pscustomobject]@{ ProcessName = [IO.Path]::GetFileNameWithoutExtension($_.Name); "
+        "Id = [int]$_.ProcessId; StartTime = $_.CreationDate; Path = $_.ExecutablePath; "
+        "IdeHttpPort = $idePort; CommandLine = $_.CommandLine } "
+        "}; $rows | ConvertTo-Json -Compress"
     )
     port_list = ",".join(str(int(port)) for port in target_ports)
     port_command = (
@@ -60,10 +72,28 @@ def collect_windows_state(target_ports: list[int]) -> dict[str, Any]:
         f"Get-NetTCPConnection -State Listen | Where-Object {{ $_.LocalPort -in {port_list} -or $_.OwningProcess -in $devIds }} | "
         "Select-Object LocalAddress,LocalPort,OwningProcess,State | Sort-Object LocalPort | ConvertTo-Json -Compress"
     )
+    process_rows = normalize_json_list(run_powershell_json(process_command))
+    for row in process_rows:
+        command_line = str(row.pop("CommandLine", "") or "")
+        local_app_data = devtools_local_app_data_from_command_line(command_line)
+        if local_app_data:
+            row["DevToolsLocalAppData"] = local_app_data
     return {
-        "processes": normalize_json_list(run_powershell_json(process_command)),
+        "processes": process_rows,
         "listening_ports": normalize_json_list(run_powershell_json(port_command)),
     }
+
+
+def devtools_local_app_data_from_command_line(command_line: str) -> str:
+    match = USER_DATA_DIR_RE.search(str(command_line or ""))
+    if not match:
+        return ""
+    user_data_dir = Path((match.group("quoted") or match.group("bare") or "").strip().strip('"'))
+    if user_data_dir.name == "" or len(user_data_dir.parents) < 3:
+        return ""
+    if user_data_dir.parent.name.lower() != "user data":
+        return ""
+    return str(user_data_dir.parent.parent.parent)
 
 
 def normalize_json_list(value: Any) -> list[dict[str, Any]]:
@@ -97,6 +127,21 @@ def build_report(
         }
     )
     process_count = len([row for row in process_rows if row.get("Id")])
+    ide_http_ports = sorted(
+        {
+            int(row.get("IdeHttpPort"))
+            for row in process_rows
+            if str(row.get("IdeHttpPort") or "").isdigit() and int(row.get("IdeHttpPort")) > 0
+        }
+    )
+    devtools_local_app_data_paths = sorted(
+        {
+            str(row.get("DevToolsLocalAppData"))
+            for row in process_rows
+            if str(row.get("DevToolsLocalAppData") or "").strip()
+        },
+        key=str.lower,
+    )
     findings: list[dict[str, Any]] = []
     if process_count:
         findings.append({"code": "wechat_devtools_processes_running", "count": process_count})
@@ -121,6 +166,8 @@ def build_report(
             "target_ports": target_ports,
             "busy_target_ports": busy_target_ports,
             "devtools_listener_ports": devtools_listener_ports,
+            "ide_http_ports": ide_http_ports,
+            "devtools_local_app_data_paths": devtools_local_app_data_paths,
             "finding_count": len(findings),
         },
         "processes": process_rows,
@@ -163,6 +210,8 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Target ports: `{', '.join(str(port) for port in summary['target_ports'])}`",
         f"- Busy target ports: `{', '.join(str(port) for port in summary['busy_target_ports']) or '<none>'}`",
         f"- DevTools listener ports: `{', '.join(str(port) for port in summary['devtools_listener_ports']) or '<none>'}`",
+        f"- IDE HTTP ports: `{', '.join(str(port) for port in summary.get('ide_http_ports', [])) or '<none>'}`",
+        f"- DevTools LocalAppData roots: `{', '.join(summary.get('devtools_local_app_data_paths', [])) or '<inherit current process>'}`",
         f"- Findings: `{summary['finding_count']}`",
         "",
         "## Findings",

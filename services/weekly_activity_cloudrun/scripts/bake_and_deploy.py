@@ -33,6 +33,8 @@ python scripts/bake_and_deploy.py --release-dir ... --dry-run
 python scripts/bake_and_deploy.py --release-dir ... --no-qr
 """
 import argparse
+import contextlib
+import gzip
 import hashlib
 import json
 import os
@@ -41,6 +43,8 @@ import shutil
 import subprocess
 import sys
 import time
+import urllib.error
+import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -63,6 +67,14 @@ if str(_STAGE7_SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(_STAGE7_SCRIPTS_DIR))
 
 from verify_weekly_club_overviews_remote import build_snapshot as build_club_overviews_snapshot  # noqa: E402
+from stamp_weekly_api_generation import validate_derived_route_closure  # noqa: E402
+from weekly_public_projection import assert_public_payload, scrub_public_package_payload  # noqa: E402
+from promote_dj_bio_atoms import (  # noqa: E402
+    DB_NAME as DJ_BIO_ATLAS_DB_NAME,
+    INDEX_NAME as DJ_BIO_ATLAS_INDEX_NAME,
+    REPORT_SCHEMA_VERSION as DJ_BIO_PROMOTION_SCHEMA_VERSION,
+    promote_dj_bio_atoms as apply_dj_bio_promotion,
+)
 
 MINIPROGRAM_DIR = _REPO_ROOT / "apps" / "weekly_activity_miniprogram"
 DEFAULT_RUNTIME_DATA_ROOT = Path(
@@ -77,6 +89,7 @@ DEPLOY_CONTEXT_DIR = WORK_ROOT / "cloudrun_deploy_context"
 DEPLOY_CONTEXT_MANIFEST = "deploy_context_manifest.json"
 PUBLISH_TRANSACTIONS_DIR = "publish_transactions"
 PUBLISH_TRANSACTION_REPORT = "publish_transaction.json"
+DJ_BIO_PROMOTION_REPORT_ITEM = "dj_bio_promotion.json"
 DEPLOY_CONTEXT_TOP_ITEMS = ["package.json", "package-lock.json", "Dockerfile", "assets", "src", "scripts"]
 MINIAPP_ATLAS_INDEX_ITEMS = [
     "atlas_index.json.gz",
@@ -111,9 +124,159 @@ OPTIONAL_RELEASE_ITEMS = [
     "weekly_entity_observations.jsonl",
 ]
 CLUB_OVERVIEWS_SCHEMA_VERSION = "club_overviews.v1"
-CLUB_OVERVIEWS_REPORT_SCHEMA_VERSION = "cloudrun_club_overviews_reconciliation.v1"
+DIRECT_DEPLOY_REPORT_SCHEMA_VERSION = "cloudrun_direct_api_deploy.v2"
+SMOKE_REPORT_SCHEMA_VERSION = "stage7_cloudrun_weekly_production_smoke.v2"
+PAGINATION_REPORT_SCHEMA_VERSION = "cloudrun_remote_pagination.v2"
+CLUB_OVERVIEWS_REPORT_SCHEMA_VERSION = "cloudrun_club_overviews_reconciliation.v2"
 CLUB_OVERVIEWS_REPORT_DECISION = "cloudrun_club_overviews_reconciled"
+EVIDENCE_BINDING_CORE_FIELDS = (
+    "transaction_id",
+    "env_id",
+    "service_name",
+    "deploy_context_fingerprint",
+    "deploy_zip_sha256",
+    "expected_generation_id",
+    "publish_lease_token_sha256",
+)
 CLUB_OVERVIEWS_DIGEST_ALGORITHM = "sha256(canonical_backend_normalized_club_overviews_json)"
+
+
+class PublishPromotionLockError(RuntimeError):
+    """Another process owns the local authoritative promotion lane."""
+
+
+SERVICE_PUBLISH_LEASE_SCHEMA_VERSION = "weekly_cloudrun_service_publish_lease.v1"
+
+
+def _safe_lease_segment(value: str) -> str:
+    normalized = re.sub(r"[^A-Za-z0-9._-]+", "_", str(value or "").strip()).strip("._-")
+    if not normalized:
+        raise ValueError("service publish lease scope cannot be empty")
+    return normalized.lower()
+
+
+def service_publish_lease_path(data_root: Path, env_id: str, service_name: str) -> Path:
+    """Return the one kernel-lock lane for a CloudRun env/service pair."""
+
+    env_scope = _safe_lease_segment(env_id)
+    service_scope = _safe_lease_segment(service_name)
+    return _resolved(Path(data_root)) / ".locks" / f"cloudrun_publish_{env_scope}_{service_scope}.lease"
+
+
+def service_publish_lease_metadata_path(lease_path: Path) -> Path:
+    selected = Path(lease_path)
+    return selected.with_name(selected.name + ".json")
+
+
+def validate_held_service_publish_lease(
+    *,
+    lease_path: Path,
+    lease_token: str,
+    transaction_id: str,
+    env_id: str,
+    service_name: str,
+    data_root: Path,
+) -> dict:
+    """Validate that the wrapper still owns the exact service-scoped OS lease.
+
+    The coordination token is stored in a sidecar only after the wrapper has
+    obtained the byte-range lock.  A contender cannot publish a new sidecar
+    without first owning that same lock.  This function deliberately attempts
+    the non-blocking lock and succeeds only when another process still holds it.
+    """
+
+    transaction_id = validate_transaction_id(transaction_id)
+    token = str(lease_token or "").strip()
+    if not re.fullmatch(r"[A-Fa-f0-9]{32,128}", token):
+        raise ValueError("service publish lease token must be a 32-128 character hex nonce")
+    selected = _resolved(Path(lease_path))
+    expected = service_publish_lease_path(Path(data_root), env_id, service_name)
+    if selected != expected:
+        raise ValueError(f"service publish lease path mismatch: expected={expected} actual={selected}")
+    metadata_path = service_publish_lease_metadata_path(selected)
+    try:
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"service publish lease metadata missing or invalid: {metadata_path}") from exc
+    if not isinstance(metadata, dict):
+        raise ValueError("service publish lease metadata must be an object")
+    checks = {
+        "schema": metadata.get("schema_version") == SERVICE_PUBLISH_LEASE_SCHEMA_VERSION,
+        "token": metadata.get("lease_token") == token,
+        "transaction": metadata.get("transaction_id") == transaction_id,
+        "env": metadata.get("env_id") == env_id,
+        "service": metadata.get("service_name") == service_name,
+        "owner_pid": int(metadata.get("owner_pid") or 0) > 0,
+    }
+    failed = [name for name, passed in checks.items() if not passed]
+    if failed:
+        raise ValueError("service publish lease metadata mismatch: " + ", ".join(failed))
+
+    try:
+        with publish_promotion_lock(selected):
+            pass
+    except PublishPromotionLockError:
+        pass
+    else:
+        raise ValueError("service publish lease is not held by another process")
+
+    return {
+        "schema_version": SERVICE_PUBLISH_LEASE_SCHEMA_VERSION,
+        "lease_path": str(selected),
+        "lease_token_sha256": hashlib.sha256(token.encode("utf-8")).hexdigest(),
+        "transaction_id": transaction_id,
+        "env_id": env_id,
+        "service_name": service_name,
+        "owner_pid": int(metadata.get("owner_pid") or 0),
+    }
+
+
+@contextlib.contextmanager
+def publish_promotion_lock(lock_path: Path):
+    """Hold a kernel-enforced, non-blocking lock for one complete promotion."""
+
+    selected = _resolved(Path(lock_path))
+    selected.parent.mkdir(parents=True, exist_ok=True)
+    handle = selected.open("a+b")
+    acquired = False
+    try:
+        handle.seek(0, os.SEEK_END)
+        if handle.tell() == 0:
+            handle.write(b"\0")
+            handle.flush()
+            os.fsync(handle.fileno())
+        handle.seek(0)
+        try:
+            if os.name == "nt":
+                import msvcrt
+
+                msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+
+                fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            acquired = True
+        except (OSError, BlockingIOError) as exc:
+            raise PublishPromotionLockError(
+                f"publish promotion lock is already held: {selected}"
+            ) from exc
+        yield selected
+    finally:
+        if acquired:
+            try:
+                handle.seek(0)
+                if os.name == "nt":
+                    import msvcrt
+
+                    msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+                else:
+                    import fcntl
+
+                    fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+            finally:
+                handle.close()
+        else:
+            handle.close()
 
 
 def _resolved(path: Path) -> Path:
@@ -270,6 +433,188 @@ def detect_active_version() -> str:
     return str(normal[-1]["versionName"]) if normal else ""
 
 
+def describe_cloudrun_server_for_promotion(
+    env_id: str,
+    service_name: str,
+    *,
+    timeout_seconds: int = 30,
+) -> dict:
+    """Read the authoritative active CloudRun version immediately before promotion."""
+
+    cmd = TCB_CMD.split() + [
+        "api",
+        "tcbr",
+        "DescribeCloudRunServerDetail",
+        "--api-version",
+        "2022-02-17",
+        "--body",
+        json.dumps(
+            {"EnvId": env_id, "ServerName": service_name},
+            ensure_ascii=False,
+            separators=(",", ":"),
+        ),
+        "--json",
+    ]
+    resolved = shutil.which(cmd[0])
+    if resolved:
+        cmd = [resolved, *cmd[1:]]
+    result = subprocess.run(
+        cmd,
+        cwd=_PROJECT_DIR,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=timeout_seconds,
+    )
+    payload = parse_first_json_object((result.stdout or "") + "\n" + (result.stderr or ""))
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"CloudBase active-version revalidation failed with returncode={result.returncode}"
+        )
+    data = payload.get("data") if isinstance(payload.get("data"), dict) else payload
+    base = data.get("BaseInfo") if isinstance(data.get("BaseInfo"), dict) else {}
+    versions = data.get("OnlineVersionInfos") if isinstance(data.get("OnlineVersionInfos"), list) else []
+    normalized_versions = []
+    for item in versions:
+        if not isinstance(item, dict):
+            continue
+        normalized_versions.append(
+            {
+                "version_name": str(item.get("VersionName") or item.get("versionName") or ""),
+                "flow_ratio": item.get("FlowRatio", item.get("flowRatio", "")),
+            }
+        )
+    def is_full_flow(value: object) -> bool:
+        try:
+            return float(value) == 100.0
+        except (TypeError, ValueError):
+            return False
+
+    active = next(
+        (item for item in normalized_versions if is_full_flow(item.get("flow_ratio"))),
+        normalized_versions[0] if normalized_versions else {},
+    )
+    return {
+        "base_url": str(base.get("DefaultDomainName") or "").rstrip("/"),
+        "status": str(base.get("Status") or ""),
+        "active_version": str(active.get("version_name") or ""),
+        "active_flow_ratio": active.get("flow_ratio", ""),
+    }
+
+
+def read_remote_readyz_for_promotion(
+    base_url: str,
+    *,
+    proxy_url: str = "",
+    timeout_seconds: int = 30,
+) -> dict:
+    url = f"{str(base_url).rstrip('/')}/readyz"
+    handlers = []
+    if str(proxy_url or "").strip():
+        handlers.append(
+            urllib.request.ProxyHandler(
+                {"http": str(proxy_url).strip(), "https": str(proxy_url).strip()}
+            )
+        )
+    opener = urllib.request.build_opener(*handlers)
+    request = urllib.request.Request(
+        url,
+        headers={"Accept": "application/json", "User-Agent": "huaidj-promotion-revalidation/1.0"},
+    )
+    try:
+        with opener.open(request, timeout=timeout_seconds) as response:
+            raw = response.read(1_000_000)
+            status_code = int(response.status)
+    except urllib.error.HTTPError as exc:
+        raw = exc.read(256_000)
+        status_code = int(exc.code)
+    try:
+        payload = json.loads(raw.decode("utf-8", errors="replace"))
+    except json.JSONDecodeError:
+        payload = {}
+    return {
+        "status_code": status_code,
+        "payload": payload if isinstance(payload, dict) else {},
+    }
+
+
+def revalidate_remote_promotion_target(
+    *,
+    transaction_id: str,
+    evidence_binding: dict,
+    candidate_generation_id: str,
+    candidate_item_id_digest: str,
+    candidate_item_count: int,
+    proxy_url: str = "",
+    timeout_seconds: int = 30,
+) -> dict:
+    """Re-read version routing and /readyz as the last gate before local swap."""
+
+    server = describe_cloudrun_server_for_promotion(
+        ENV_ID,
+        SERVICE_NAME,
+        timeout_seconds=timeout_seconds,
+    )
+    bound_base_url = str(evidence_binding.get("base_url") or "").rstrip("/")
+    ready_response = read_remote_readyz_for_promotion(
+        bound_base_url,
+        proxy_url=proxy_url,
+        timeout_seconds=timeout_seconds,
+    )
+    ready = ready_response.get("payload") if isinstance(ready_response.get("payload"), dict) else {}
+    observed_generation = str(ready.get("generationId") or "")
+    observed_digest = str(ready.get("itemIdDigest") or "")
+    checks = {
+        "transaction_id_bound": evidence_binding.get("transaction_id") == transaction_id,
+        "env_id_bound": evidence_binding.get("env_id") == ENV_ID,
+        "service_name_bound": evidence_binding.get("service_name") == SERVICE_NAME,
+        "candidate_generation_bound": evidence_binding.get("expected_generation_id")
+        == candidate_generation_id,
+        "active_version_matches": bool(evidence_binding.get("active_version"))
+        and server.get("active_version") == evidence_binding.get("active_version"),
+        "active_flow_is_100": str(server.get("active_flow_ratio")) in {"100", "100.0"},
+        "server_is_normal": str(server.get("status") or "").lower() == "normal",
+        "base_url_matches": bool(bound_base_url)
+        and str(server.get("base_url") or "").rstrip("/") == bound_base_url,
+        "readyz_http_200": ready_response.get("status_code") == 200,
+        "readyz_ok": ready.get("ok") is True,
+        "readyz_service_matches": ready.get("service") == SERVICE_NAME,
+        "readyz_generation_matches": observed_generation == candidate_generation_id,
+        "readyz_item_digest_matches": observed_digest == candidate_item_id_digest,
+        "readyz_item_count_matches": int(ready.get("packageItemCount") or -1)
+        == int(candidate_item_count),
+    }
+    ok = all(checks.values())
+    return {
+        "schema_version": "cloudrun_remote_promotion_revalidation.v1",
+        "generated_at": now_iso(),
+        "ok": ok,
+        "decision": (
+            "cloudrun_remote_promotion_target_revalidated"
+            if ok
+            else "cloudrun_remote_promotion_target_changed"
+        ),
+        "checks": checks,
+        "evidence_binding": {
+            "transaction_id": transaction_id,
+            "env_id": ENV_ID,
+            "service_name": SERVICE_NAME,
+            "deploy_context_fingerprint": evidence_binding.get("deploy_context_fingerprint"),
+            "deploy_zip_sha256": evidence_binding.get("deploy_zip_sha256"),
+            "publish_lease_token_sha256": evidence_binding.get("publish_lease_token_sha256"),
+            "candidate_generation_id": candidate_generation_id,
+            "candidate_item_id_digest": candidate_item_id_digest,
+            "candidate_item_count": int(candidate_item_count),
+            "expected_active_version": evidence_binding.get("active_version"),
+            "observed_active_version": server.get("active_version"),
+            "base_url": bound_base_url,
+            "observed_readyz_generation_id": observed_generation,
+            "observed_readyz_item_id_digest": observed_digest,
+        },
+    }
+
+
 def copy_item(src: Path, dst: Path, dry_run: bool) -> None:
     if not src.exists():
         print(f"  SKIP (not found): {src}")
@@ -328,6 +673,14 @@ def validate_production_bake_input(release_dir: Path) -> tuple[bool, list[str]]:
     failures.extend(f"release_{item}" for item in release_failures)
     if base_count > 0 and release_count > 0 and release_count < base_count:
         failures.append("release_item_count_below_authoritative_base")
+    # Only inspect closure once the basic package/count contract is plausible;
+    # this keeps the primary blocker concise for obviously truncated releases.
+    if not release_failures and "release_item_count_below_authoritative_base" not in failures:
+        try:
+            validate_derived_route_closure(release_dir)
+        except (OSError, ValueError, json.JSONDecodeError) as error:
+            print(f"  ERROR: candidate derived route closure failed: {error}")
+            failures.append("release_derived_route_closure_failed")
     return not failures, sorted(set(failures))
 
 
@@ -569,12 +922,25 @@ def prepare_deploy_context(
     selected_source_actions = source_actions_dir or DATA_SOURCE_ACTIONS
     selected_stage7 = stage7_atlas_dir or DATA_STAGE7_ATLAS
     print(f"\n--- prepare deploy context: {selected_context} ---")
+    if not dry_run:
+        # The deploy context is the last filesystem boundary before source
+        # upload.  Refuse any raw item/debug path even when callers bypass the
+        # higher-level publish-transaction helper.
+        validate_derived_route_closure(selected_current)
     current_release_items = [
         *RELEASE_ITEMS,
         *[item for item in OPTIONAL_RELEASE_ITEMS if (selected_current / item).exists()],
     ]
+    atlas_context_items = [
+        *MINIAPP_ATLAS_INDEX_ITEMS,
+        *(
+            [DJ_BIO_PROMOTION_REPORT_ITEM]
+            if (selected_data / DJ_BIO_PROMOTION_REPORT_ITEM).is_file()
+            else []
+        ),
+    ]
     data_items = [
-        ("data", selected_data, MINIAPP_ATLAS_INDEX_ITEMS),
+        ("data", selected_data, atlas_context_items),
         ("data/current_release", selected_current, current_release_items),
         ("data/source_actions", selected_source_actions, ["source_url_map.json"]),
     ]
@@ -719,9 +1085,10 @@ def normalize_release_manifest_at(
     manifest = read_json_file(manifest_path)
     if not manifest:
         raise ValueError(f"manifest.json missing or invalid after staging: {manifest_path}")
-    manifest.setdefault("source_pack_dir", str(release_dir))
-    manifest["out_dir"] = str(deployed_current_release_dir)
-    manifest["deployed_current_release_dir"] = str(deployed_current_release_dir)
+    manifest["source_release_name"] = release_dir.name
+    manifest["deployed_release_name"] = deployed_current_release_dir.name
+    manifest = scrub_public_package_payload(manifest)
+    assert_public_payload(manifest, label="staged weekly manifest.json")
     write_json_atomic(manifest_path, manifest)
 
 
@@ -747,6 +1114,74 @@ def validate_transaction_id(transaction_id: str) -> str:
     return transaction_id
 
 
+def atlas_bio_asset_snapshot(data_root: Path, *, required: bool) -> dict:
+    """Digest the two local assets owned by an optional bio promotion."""
+
+    selected = Path(data_root)
+    assets = {}
+    for name in (DJ_BIO_ATLAS_INDEX_NAME, DJ_BIO_ATLAS_DB_NAME):
+        path = selected / name
+        if not path.is_file():
+            if required:
+                raise FileNotFoundError(f"DJ bio promotion requires runtime Atlas asset: {path}")
+            assets[name] = {"exists": False, "size": 0, "sha256": ""}
+            continue
+        assets[name] = {
+            "exists": True,
+            "size": path.stat().st_size,
+            "sha256": sha256_file(path),
+        }
+    fingerprint_input = json.dumps(assets, ensure_ascii=False, sort_keys=True).encode("utf-8")
+    return {
+        "fingerprint": hashlib.sha256(fingerprint_input).hexdigest(),
+        "assets": assets,
+    }
+
+
+def bind_dj_bio_evidence_to_release_manifest(
+    *,
+    current_release_dir: Path,
+    transaction_id: str,
+    report_sha256: str,
+    evidence: dict,
+) -> dict:
+    """Bind staged bio evidence into the candidate package manifest."""
+
+    manifest_path = Path(current_release_dir) / "manifest.json"
+    manifest = read_json_file(manifest_path)
+    if not manifest:
+        raise ValueError(f"candidate manifest missing before bio evidence binding: {manifest_path}")
+    binding = {
+        "schema_version": DJ_BIO_PROMOTION_SCHEMA_VERSION,
+        "transaction_id": transaction_id,
+        "report_item": DJ_BIO_PROMOTION_REPORT_ITEM,
+        "report_sha256": report_sha256,
+        "selected_count": int(evidence.get("selected_count") or 0),
+        "matched_count": int(evidence.get("matched_count") or 0),
+        "db_update_count": int(evidence.get("db_update_count") or 0),
+        "index_update_count": int(evidence.get("index_update_count") or 0),
+        "changed": evidence.get("changed") is True,
+        "atlas_index_sha256": str(
+            ((evidence.get("after") or {}).get(DJ_BIO_ATLAS_INDEX_NAME) or {}).get("sha256")
+            or ""
+        ),
+        "atlas_db_sha256": str(
+            ((evidence.get("after") or {}).get(DJ_BIO_ATLAS_DB_NAME) or {}).get("sha256")
+            or ""
+        ),
+    }
+    manifest.setdefault("publish_transaction_evidence", {})["dj_bio_promotion"] = binding
+    write_json_atomic(manifest_path, manifest)
+    return binding
+
+
+def deploy_context_file_entry(manifest: dict, destination: str) -> dict:
+    for row in manifest.get("files") or []:
+        if isinstance(row, dict) and row.get("dst") == destination:
+            return row
+    return {}
+
+
 def prepare_publish_transaction(
     *,
     release_dir: Path,
@@ -754,6 +1189,7 @@ def prepare_publish_transaction(
     transaction_id: str,
     include_stage7_atlas: bool,
     update_column_json: bool,
+    promote_dj_bio_atoms: bool = False,
 ) -> dict:
     """Stage one immutable publish candidate without changing the authoritative baseline."""
     transaction_id = validate_transaction_id(transaction_id)
@@ -765,6 +1201,7 @@ def prepare_publish_transaction(
     valid_bake, bake_failures = validate_production_bake_input(release_dir)
     if not valid_bake:
         raise ValueError("authoritative base/candidate validation failed: " + ", ".join(bake_failures))
+    bio_baseline = atlas_bio_asset_snapshot(DATA_ROOT, required=promote_dj_bio_atoms)
 
     transaction_dir = WORK_ROOT / PUBLISH_TRANSACTIONS_DIR / transaction_id
     if transaction_dir.exists():
@@ -794,8 +1231,11 @@ def prepare_publish_transaction(
         "release_dir": str(release_dir),
         "include_stage7_atlas": bool(include_stage7_atlas),
         "update_column_json": bool(update_column_json),
+        "promote_dj_bio_atoms": bool(promote_dj_bio_atoms),
         "baseline": baseline,
     }
+    if promote_dj_bio_atoms:
+        report["atlas_bio_baseline"] = bio_baseline
     write_json_atomic(report_path, report)
 
     try:
@@ -821,14 +1261,45 @@ def prepare_publish_transaction(
             staged_current / "source_actions" / "source_url_map.json",
         )
         normalize_release_manifest_at(staged_current, release_dir, DATA_CURRENT_RELEASE)
-        if not ensure_source_grounded_llm_materialized(False, staged_current):
-            raise RuntimeError("staged materialized LLM outputs are incomplete")
 
         for name in MINIAPP_ATLAS_INDEX_ITEMS:
             source = DATA_ROOT / name
             if not source.is_file():
                 raise FileNotFoundError(f"activity deploy context dependency missing: {source}")
             copy_context_item(source, staged_data / name)
+        bio_promotion = None
+        bio_manifest_binding = None
+        bio_report_sha256 = ""
+        if promote_dj_bio_atoms:
+            copy_context_item(
+                DATA_ROOT / DJ_BIO_ATLAS_DB_NAME,
+                staged_data / DJ_BIO_ATLAS_DB_NAME,
+            )
+            bio_report_path = staged_data / DJ_BIO_PROMOTION_REPORT_ITEM
+            bio_promotion = apply_dj_bio_promotion(
+                index_path=staged_data / DJ_BIO_ATLAS_INDEX_NAME,
+                db_path=staged_data / DJ_BIO_ATLAS_DB_NAME,
+                write=True,
+                transaction_id=transaction_id,
+                report_path=bio_report_path,
+            )
+            if bio_promotion.get("schema_version") != DJ_BIO_PROMOTION_SCHEMA_VERSION:
+                raise ValueError("DJ bio promotion returned an unsupported evidence schema")
+            if bio_promotion.get("committed") is not True and int(
+                bio_promotion.get("matched_count") or 0
+            ) > 0:
+                raise RuntimeError("DJ bio promotion matched profiles without committing staged assets")
+            bio_report_sha256 = sha256_file(bio_report_path)
+            bio_manifest_binding = bind_dj_bio_evidence_to_release_manifest(
+                current_release_dir=staged_current,
+                transaction_id=transaction_id,
+                report_sha256=bio_report_sha256,
+                evidence=bio_promotion,
+            )
+
+        validate_derived_route_closure(staged_current)
+        if not ensure_source_grounded_llm_materialized(False, staged_current):
+            raise RuntimeError("staged materialized LLM outputs are incomplete")
         if include_stage7_atlas:
             if not DATA_STAGE7_ATLAS.is_dir():
                 raise FileNotFoundError(f"Stage7 atlas package missing: {DATA_STAGE7_ATLAS}")
@@ -846,6 +1317,12 @@ def prepare_publish_transaction(
             stage7_atlas_dir=staged_stage7,
         )
         candidate = directory_snapshot(staged_current)
+        staged_manifest = read_json_file(staged_current / "manifest.json")
+        candidate_generation_id = str(
+            staged_manifest.get("generation_id") or staged_manifest.get("generationId") or ""
+        )
+        if not candidate_generation_id:
+            raise ValueError("staged candidate manifest is missing generation_id")
         item_count, item_failures = package_item_count(staged_current)
         if item_failures:
             raise ValueError("staged candidate package invalid: " + ", ".join(item_failures))
@@ -855,6 +1332,7 @@ def prepare_publish_transaction(
                 "updated_at": now_iso(),
                 "prepared_at": now_iso(),
                 "candidate": candidate,
+                "candidate_generation_id": candidate_generation_id,
                 "candidate_item_count": item_count,
                 "candidate_item_ids": package_item_id_snapshot(staged_current),
                 "candidate_club_overviews": candidate_club_overviews,
@@ -865,6 +1343,15 @@ def prepare_publish_transaction(
                 "deploy_context": read_deploy_context_manifest(context_dir),
             }
         )
+        if promote_dj_bio_atoms:
+            report["dj_bio_promotion"] = {
+                "requested": True,
+                "report_item": DJ_BIO_PROMOTION_REPORT_ITEM,
+                "report_sha256": bio_report_sha256,
+                "evidence": bio_promotion,
+                "manifest_binding": bio_manifest_binding,
+                "staged_assets": atlas_bio_asset_snapshot(staged_data, required=True),
+            }
         write_json_atomic(report_path, report)
         return report
     except Exception as exc:
@@ -904,8 +1391,72 @@ def promote_publish_transaction(
     smoke_report_path: Path,
     pagination_report_path: Path,
     club_overviews_report_path: Path,
+    held_lease_path: Path | None = None,
+    held_lease_token: str = "",
+    promotion_proxy_url: str = "",
+    promotion_timeout_seconds: int = 30,
 ) -> dict:
-    """Promote only a named, verified transaction; evidence failure is read-only."""
+    """Promote inside the wrapper's deploy-to-promotion service lease.
+
+    Direct callers without an external lease retain the narrow internal lock for
+    unit-level/local compatibility.  The production CLI requires the external
+    token so bake does not deadlock trying to reacquire its parent's lock.
+    """
+
+    if held_lease_path is not None or held_lease_token:
+        if held_lease_path is None or not held_lease_token:
+            raise ValueError("held service publish lease requires both path and token")
+        lease_evidence = validate_held_service_publish_lease(
+            lease_path=Path(held_lease_path),
+            lease_token=held_lease_token,
+            transaction_id=transaction_id,
+            env_id=ENV_ID,
+            service_name=SERVICE_NAME,
+            data_root=DATA_ROOT,
+        )
+        return _promote_publish_transaction_locked(
+            transaction_id=transaction_id,
+            deploy_report_path=deploy_report_path,
+            smoke_report_path=smoke_report_path,
+            pagination_report_path=pagination_report_path,
+            club_overviews_report_path=club_overviews_report_path,
+            lease_evidence=lease_evidence,
+            held_lease_path=Path(held_lease_path),
+            held_lease_token=held_lease_token,
+            promotion_proxy_url=promotion_proxy_url,
+            promotion_timeout_seconds=promotion_timeout_seconds,
+        )
+
+    lock_path = service_publish_lease_path(DATA_ROOT, ENV_ID, SERVICE_NAME)
+    with publish_promotion_lock(lock_path):
+        return _promote_publish_transaction_locked(
+            transaction_id=transaction_id,
+            deploy_report_path=deploy_report_path,
+            smoke_report_path=smoke_report_path,
+            pagination_report_path=pagination_report_path,
+            club_overviews_report_path=club_overviews_report_path,
+            lease_evidence=None,
+            held_lease_path=None,
+            held_lease_token="",
+            promotion_proxy_url=promotion_proxy_url,
+            promotion_timeout_seconds=promotion_timeout_seconds,
+        )
+
+
+def _promote_publish_transaction_locked(
+    *,
+    transaction_id: str,
+    deploy_report_path: Path,
+    smoke_report_path: Path,
+    pagination_report_path: Path,
+    club_overviews_report_path: Path,
+    lease_evidence: dict | None,
+    held_lease_path: Path | None,
+    held_lease_token: str,
+    promotion_proxy_url: str,
+    promotion_timeout_seconds: int,
+) -> dict:
+    """Promote only after the caller owns the process-wide promotion lock."""
     transaction_id = validate_transaction_id(transaction_id)
     transaction_dir = WORK_ROOT / PUBLISH_TRANSACTIONS_DIR / transaction_id
     report_path = transaction_dir / PUBLISH_TRANSACTION_REPORT
@@ -939,11 +1490,109 @@ def promote_publish_transaction(
         raise ValueError(reason)
 
     club_overviews_report = read_required_report(club_overviews_report_path, "club-overviews")
+    deploy_binding = (
+        deploy_report.get("evidence_binding")
+        if isinstance(deploy_report.get("evidence_binding"), dict)
+        else {}
+    )
+    smoke_binding = (
+        smoke_report.get("evidence_binding")
+        if isinstance(smoke_report.get("evidence_binding"), dict)
+        else {}
+    )
+    pagination_binding = (
+        pagination_report.get("evidence_binding")
+        if isinstance(pagination_report.get("evidence_binding"), dict)
+        else {}
+    )
+    club_binding = (
+        club_overviews_report.get("evidence_binding")
+        if isinstance(club_overviews_report.get("evidence_binding"), dict)
+        else {}
+    )
+    deploy_identity = (
+        deploy_report.get("deployment_identity")
+        if isinstance(deploy_report.get("deployment_identity"), dict)
+        else {}
+    )
+    post_update_identity = (
+        deploy_report.get("post_update_server_identity")
+        if isinstance(deploy_report.get("post_update_server_identity"), dict)
+        else {}
+    )
+    deploy_zip = deploy_report.get("zip") if isinstance(deploy_report.get("zip"), dict) else {}
+    expected_context_fingerprint = str((report.get("deploy_context") or {}).get("fingerprint") or "")
+    expected_generation_id = str(report.get("candidate_generation_id") or "")
+    active_version = str(smoke_binding.get("active_version") or "")
+    reported_version = str(deploy_identity.get("reported_version") or "")
+    observed_active_version = str(deploy_identity.get("observed_active_version") or "")
+    zip_path = Path(str(deploy_zip.get("zip_path") or ""))
+    zip_sha = str(deploy_binding.get("deploy_zip_sha256") or "")
+    binding_checks = {
+        "deploy_report_schema": deploy_report.get("schema_version")
+        == DIRECT_DEPLOY_REPORT_SCHEMA_VERSION,
+        "smoke_report_schema": smoke_report.get("schema_version") == SMOKE_REPORT_SCHEMA_VERSION,
+        "pagination_report_schema": pagination_report.get("schema_version")
+        == PAGINATION_REPORT_SCHEMA_VERSION,
+        "club_report_schema": club_overviews_report.get("schema_version")
+        == CLUB_OVERVIEWS_REPORT_SCHEMA_VERSION,
+        "transaction_id_matches": deploy_binding.get("transaction_id") == transaction_id,
+        "target_env_matches": deploy_binding.get("env_id") == ENV_ID,
+        "target_service_matches": deploy_binding.get("service_name") == SERVICE_NAME,
+        "context_fingerprint_matches_prepared": bool(expected_context_fingerprint)
+        and deploy_binding.get("deploy_context_fingerprint") == expected_context_fingerprint,
+        "generation_matches_prepared": bool(expected_generation_id)
+        and deploy_binding.get("expected_generation_id") == expected_generation_id,
+        "generation_format": bool(
+            re.fullmatch(r"sha256:[0-9a-f]{64}", expected_generation_id)
+        ),
+        "zip_sha_format": bool(re.fullmatch(r"[0-9a-f]{64}", zip_sha)),
+        "zip_report_digest_matches_binding": deploy_zip.get("zip_sha256") == zip_sha,
+        "zip_artifact_digest_matches_binding": zip_path.is_file()
+        and sha256_file(zip_path) == zip_sha,
+        "deploy_context_path_matches_transaction": _resolved(
+            Path(str(deploy_zip.get("context_dir") or "."))
+        )
+        == _resolved(transaction_dir / "deploy_context"),
+        "deploy_operation_bound": bool(
+            deploy_identity.get("task_id") or deploy_identity.get("request_id")
+        ),
+        "active_version_matches_deploy": bool(active_version)
+        and bool(reported_version)
+        and bool(observed_active_version)
+        and active_version == reported_version
+        and observed_active_version == reported_version,
+        "base_url_matches_deploy": bool(smoke_binding.get("base_url"))
+        and str(smoke_binding.get("base_url") or "").rstrip("/")
+        == str(post_update_identity.get("base_url") or "").rstrip("/"),
+        "remote_generation_matches_expected": smoke_binding.get("remote_generation_id")
+        == expected_generation_id,
+        "smoke_binding_extends_exact_deploy_core": all(
+            smoke_binding.get(field) == deploy_binding.get(field)
+            for field in EVIDENCE_BINDING_CORE_FIELDS
+        ),
+        "pagination_binding_matches_smoke": pagination_binding == smoke_binding,
+        "club_binding_matches_smoke": club_binding == smoke_binding,
+        "held_publish_lease_matches_deploy": lease_evidence is None
+        or (
+            deploy_binding.get("publish_lease_token_sha256")
+            == lease_evidence.get("lease_token_sha256")
+            and lease_evidence.get("transaction_id") == transaction_id
+            and lease_evidence.get("env_id") == ENV_ID
+            and lease_evidence.get("service_name") == SERVICE_NAME
+        ),
+    }
+    failed_binding_checks = [name for name, passed in binding_checks.items() if not passed]
+    if failed_binding_checks:
+        reason = "publish evidence binding failed: " + ", ".join(failed_binding_checks)
+        report["publish_evidence_binding_checks"] = binding_checks
+        block_publish_promotion(report_path, report, reason)
+        raise ValueError(reason)
+
     club_candidate_evidence = club_overviews_report.get("candidate") or {}
     club_remote_evidence = club_overviews_report.get("remote") or {}
     club_evidence_checks = {
-        "club_report_schema": club_overviews_report.get("schema_version")
-        == CLUB_OVERVIEWS_REPORT_SCHEMA_VERSION,
+        "club_report_schema": binding_checks["club_report_schema"],
         "club_report_ok": club_overviews_report.get("ok") is True,
         "club_report_decision": club_overviews_report.get("decision")
         == CLUB_OVERVIEWS_REPORT_DECISION,
@@ -984,6 +1633,80 @@ def promote_publish_transaction(
     staged_club_overviews = candidate_club_overviews_snapshot(staged_current)
     prepared_ids = report.get("candidate_item_ids") or {}
     prepared_club_overviews = report.get("candidate_club_overviews") or {}
+    bio_requested = report.get("promote_dj_bio_atoms") is True
+    bio_integrity_checks = {}
+    bio_evidence = {}
+    bio_staged_snapshot = {}
+    if bio_requested:
+        bio_transaction = report.get("dj_bio_promotion") or {}
+        bio_report_path = staged_data / DJ_BIO_PROMOTION_REPORT_ITEM
+        bio_evidence = read_json_file(bio_report_path)
+        bio_staged_snapshot = atlas_bio_asset_snapshot(staged_data, required=True)
+        bio_manifest = read_json_file(staged_current / "manifest.json")
+        bio_manifest_binding = (
+            (bio_manifest.get("publish_transaction_evidence") or {}).get("dj_bio_promotion")
+            or {}
+        )
+        context_manifest = report.get("deploy_context") or {}
+        context_bio_report = deploy_context_file_entry(
+            context_manifest, f"data/{DJ_BIO_PROMOTION_REPORT_ITEM}"
+        )
+        context_bio_index = deploy_context_file_entry(
+            context_manifest, f"data/{DJ_BIO_ATLAS_INDEX_NAME}"
+        )
+        expected_after = bio_evidence.get("after") or {}
+        expected_before = bio_evidence.get("before") or {}
+        prepared_bio_baseline = report.get("atlas_bio_baseline") or {}
+        prepared_bio_staged = bio_transaction.get("staged_assets") or {}
+        current_bio_snapshot = atlas_bio_asset_snapshot(DATA_ROOT, required=True)
+        selected_count = int(bio_evidence.get("selected_count") or 0)
+        matched_count = int(bio_evidence.get("matched_count") or 0)
+        db_update_count = int(bio_evidence.get("db_update_count") or 0)
+        index_update_count = int(bio_evidence.get("index_update_count") or 0)
+        bio_integrity_checks = {
+            "bio_evidence_schema": bio_evidence.get("schema_version")
+            == DJ_BIO_PROMOTION_SCHEMA_VERSION,
+            "bio_evidence_transaction": bio_evidence.get("transaction_id") == transaction_id,
+            "bio_evidence_report_digest_unchanged": bio_report_path.is_file()
+            and sha256_file(bio_report_path) == bio_transaction.get("report_sha256"),
+            "bio_evidence_bound_to_candidate_manifest": bio_manifest_binding
+            == bio_transaction.get("manifest_binding"),
+            "bio_evidence_bound_to_deploy_context": context_bio_report.get("sha256")
+            == bio_transaction.get("report_sha256"),
+            "bio_index_bound_to_deploy_context": context_bio_index.get("sha256")
+            == ((expected_after.get(DJ_BIO_ATLAS_INDEX_NAME) or {}).get("sha256")),
+            "bio_authoritative_baseline_unchanged": current_bio_snapshot.get("fingerprint")
+            == prepared_bio_baseline.get("fingerprint"),
+            "bio_staged_assets_unchanged": bio_staged_snapshot.get("fingerprint")
+            == prepared_bio_staged.get("fingerprint"),
+            "bio_index_before_matches_authoritative": (
+                (expected_before.get(DJ_BIO_ATLAS_INDEX_NAME) or {}).get("sha256")
+                == ((prepared_bio_baseline.get("assets") or {}).get(DJ_BIO_ATLAS_INDEX_NAME) or {}).get("sha256")
+            ),
+            "bio_db_before_matches_authoritative": (
+                (expected_before.get(DJ_BIO_ATLAS_DB_NAME) or {}).get("sha256")
+                == ((prepared_bio_baseline.get("assets") or {}).get(DJ_BIO_ATLAS_DB_NAME) or {}).get("sha256")
+            ),
+            "bio_index_after_matches_staged": (
+                (expected_after.get(DJ_BIO_ATLAS_INDEX_NAME) or {}).get("sha256")
+                == ((bio_staged_snapshot.get("assets") or {}).get(DJ_BIO_ATLAS_INDEX_NAME) or {}).get("sha256")
+            ),
+            "bio_db_after_matches_staged": (
+                (expected_after.get(DJ_BIO_ATLAS_DB_NAME) or {}).get("sha256")
+                == ((bio_staged_snapshot.get("assets") or {}).get(DJ_BIO_ATLAS_DB_NAME) or {}).get("sha256")
+            ),
+            "bio_match_counts_valid": (
+                0 <= db_update_count <= matched_count <= selected_count
+                and 0 <= index_update_count <= matched_count
+            ),
+            "bio_selected_candidates_have_database_match": selected_count == 0
+            or matched_count > 0,
+            "bio_matched_candidates_committed": matched_count == 0
+            or (
+                bio_evidence.get("committed") is True
+                and bio_evidence.get("write_applied") is True
+            ),
+        }
     evidence_checks = {
         "baseline_unchanged": authoritative_runtime_snapshot().get("fingerprint")
         == (report.get("baseline") or {}).get("fingerprint"),
@@ -1018,6 +1741,7 @@ def promote_publish_transaction(
         == prepared_club_overviews.get("overview_count"),
         "staged_source_url_map_unchanged": staged_source.is_file()
         and sha256_file(staged_source) == (report.get("source_url_map") or {}).get("sha256"),
+        **bio_integrity_checks,
     }
     failed_checks = [name for name, passed in evidence_checks.items() if not passed]
     if failed_checks:
@@ -1026,11 +1750,76 @@ def promote_publish_transaction(
         block_publish_promotion(report_path, report, reason)
         raise ValueError(reason)
 
+    try:
+        remote_revalidation = revalidate_remote_promotion_target(
+            transaction_id=transaction_id,
+            evidence_binding=smoke_binding,
+            candidate_generation_id=expected_generation_id,
+            candidate_item_id_digest=str(candidate_ids.get("item_id_digest") or ""),
+            candidate_item_count=int(candidate_ids.get("unique_item_id_count") or 0),
+            proxy_url=promotion_proxy_url,
+            timeout_seconds=promotion_timeout_seconds,
+        )
+    except Exception as exc:  # noqa: BLE001
+        remote_revalidation = {
+            "schema_version": "cloudrun_remote_promotion_revalidation.v1",
+            "generated_at": now_iso(),
+            "ok": False,
+            "decision": "cloudrun_remote_promotion_revalidation_failed",
+            "checks": {},
+            "error": f"{type(exc).__name__}: {str(exc)[:240]}",
+        }
+    report["remote_promotion_revalidation"] = remote_revalidation
+    if not remote_revalidation.get("ok"):
+        failed_remote_checks = [
+            name
+            for name, passed in (remote_revalidation.get("checks") or {}).items()
+            if not passed
+        ]
+        reason = "remote promotion revalidation failed"
+        if failed_remote_checks:
+            reason += ": " + ", ".join(failed_remote_checks)
+        block_publish_promotion(report_path, report, reason)
+        raise ValueError(reason)
+
+    if lease_evidence is not None:
+        lease_before_promotion = validate_held_service_publish_lease(
+            lease_path=Path(held_lease_path),
+            lease_token=held_lease_token,
+            transaction_id=transaction_id,
+            env_id=ENV_ID,
+            service_name=SERVICE_NAME,
+            data_root=DATA_ROOT,
+        )
+        if (
+            lease_before_promotion.get("lease_token_sha256")
+            != lease_evidence.get("lease_token_sha256")
+        ):
+            reason = "service publish lease changed before local promotion"
+            block_publish_promotion(report_path, report, reason)
+            raise ValueError(reason)
+        report["service_publish_lease_revalidated_before_promotion"] = {
+            **lease_before_promotion,
+            "validated_at": now_iso(),
+        }
+
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     backup_dir = DATA_ROOT / "publish_backups" / f"{timestamp}-{transaction_id}"
     rollback_current = DATA_ROOT / f".current_release.rollback-{transaction_id}"
     rollback_source = DATA_SOURCE_ACTIONS / f".source_url_map.rollback-{transaction_id}.json"
-    if backup_dir.exists() or rollback_current.exists() or rollback_source.exists():
+    bio_changed = bio_requested and bio_evidence.get("changed") is True
+    staged_bio_index = staged_data / DJ_BIO_ATLAS_INDEX_NAME
+    staged_bio_db = staged_data / DJ_BIO_ATLAS_DB_NAME
+    authoritative_bio_index = DATA_ROOT / DJ_BIO_ATLAS_INDEX_NAME
+    authoritative_bio_db = DATA_ROOT / DJ_BIO_ATLAS_DB_NAME
+    rollback_bio_index = DATA_ROOT / f".{DJ_BIO_ATLAS_INDEX_NAME}.rollback-{transaction_id}"
+    rollback_bio_db = DATA_ROOT / f".{DJ_BIO_ATLAS_DB_NAME}.rollback-{transaction_id}"
+    if (
+        backup_dir.exists()
+        or rollback_current.exists()
+        or rollback_source.exists()
+        or (bio_changed and (rollback_bio_index.exists() or rollback_bio_db.exists()))
+    ):
         reason = "promotion backup/rollback target already exists"
         block_publish_promotion(report_path, report, reason)
         raise ValueError(reason)
@@ -1040,6 +1829,7 @@ def promote_publish_transaction(
             "status": "promoting",
             "updated_at": now_iso(),
             "promotion_evidence_checks": evidence_checks,
+            "publish_evidence_binding_checks": binding_checks,
             "evidence": {
                 "deploy_report": str(Path(deploy_report_path).resolve()),
                 "smoke_report": str(Path(smoke_report_path).resolve()),
@@ -1047,6 +1837,21 @@ def promote_publish_transaction(
                 "club_overviews_report": str(Path(club_overviews_report_path).resolve()),
                 "remote_item_id_digest": pagination_report.get("remote_item_id_digest"),
                 "remote_club_overviews_digest": club_remote_evidence.get("summary_sha256"),
+                "evidence_binding": smoke_binding,
+                "service_publish_lease": lease_evidence,
+                "remote_promotion_revalidation": remote_revalidation,
+                "dj_bio_promotion": (
+                    {
+                        "report_sha256": (report.get("dj_bio_promotion") or {}).get("report_sha256"),
+                        "matched_count": bio_evidence.get("matched_count"),
+                        "db_update_count": bio_evidence.get("db_update_count"),
+                        "index_update_count": bio_evidence.get("index_update_count"),
+                        "changed": bio_evidence.get("changed") is True,
+                        "after": bio_evidence.get("after"),
+                    }
+                    if bio_requested
+                    else None
+                ),
             },
         }
     )
@@ -1061,6 +1866,10 @@ def promote_publish_transaction(
             DATA_SOURCE_ACTIONS / "source_url_map.json",
             backup_dir / "source_actions" / "source_url_map.json",
         )
+        if bio_changed:
+            (backup_dir / "atlas").mkdir(parents=True, exist_ok=False)
+            shutil.copy2(authoritative_bio_index, backup_dir / "atlas" / DJ_BIO_ATLAS_INDEX_NAME)
+            shutil.copy2(authoritative_bio_db, backup_dir / "atlas" / DJ_BIO_ATLAS_DB_NAME)
         backup_snapshot = directory_snapshot(backup_dir / "current_release")
         backup_source_sha = sha256_file(backup_dir / "source_actions" / "source_url_map.json")
         if backup_snapshot.get("fingerprint") != (
@@ -1071,6 +1880,12 @@ def promote_publish_transaction(
             report.get("baseline") or {}
         ).get("source_url_map", {}).get("sha256"):
             raise RuntimeError("versioned source_url_map backup digest mismatch")
+        if bio_changed:
+            backup_bio_snapshot = atlas_bio_asset_snapshot(backup_dir / "atlas", required=True)
+            if backup_bio_snapshot.get("fingerprint") != (
+                report.get("atlas_bio_baseline") or {}
+            ).get("fingerprint"):
+                raise RuntimeError("versioned Atlas bio asset backup digest mismatch")
         write_json_atomic(
             backup_dir / "backup_manifest.json",
             {
@@ -1078,6 +1893,7 @@ def promote_publish_transaction(
                 "transaction_id": transaction_id,
                 "created_at": now_iso(),
                 "baseline": report.get("baseline"),
+                "atlas_bio_baseline": report.get("atlas_bio_baseline") if bio_requested else None,
             },
         )
     except Exception as exc:
@@ -1094,6 +1910,8 @@ def promote_publish_transaction(
 
     current_swapped = False
     source_swapped = False
+    bio_db_swapped = False
+    bio_index_swapped = False
     try:
         os.replace(DATA_CURRENT_RELEASE, rollback_current)
         os.replace(staged_current, DATA_CURRENT_RELEASE)
@@ -1101,6 +1919,13 @@ def promote_publish_transaction(
         os.replace(DATA_SOURCE_ACTIONS / "source_url_map.json", rollback_source)
         os.replace(staged_source, DATA_SOURCE_ACTIONS / "source_url_map.json")
         source_swapped = True
+        if bio_changed:
+            os.replace(authoritative_bio_db, rollback_bio_db)
+            os.replace(staged_bio_db, authoritative_bio_db)
+            bio_db_swapped = True
+            os.replace(authoritative_bio_index, rollback_bio_index)
+            os.replace(staged_bio_index, authoritative_bio_index)
+            bio_index_swapped = True
 
         promoted_ids = package_item_id_snapshot(DATA_CURRENT_RELEASE)
         promoted_source_sha = sha256_file(DATA_SOURCE_ACTIONS / "source_url_map.json")
@@ -1108,8 +1933,29 @@ def promote_publish_transaction(
             raise RuntimeError("promoted current_release item ID digest mismatch")
         if promoted_source_sha != (report.get("source_url_map") or {}).get("sha256"):
             raise RuntimeError("promoted source_url_map digest mismatch")
+        if bio_changed:
+            promoted_bio = atlas_bio_asset_snapshot(DATA_ROOT, required=True)
+            if promoted_bio.get("fingerprint") != bio_staged_snapshot.get("fingerprint"):
+                raise RuntimeError("promoted Atlas bio asset digest mismatch")
     except Exception as exc:
         restore_errors = []
+        if bio_changed:
+            try:
+                if bio_index_swapped and authoritative_bio_index.exists():
+                    staged_bio_index.parent.mkdir(parents=True, exist_ok=True)
+                    os.replace(authoritative_bio_index, staged_bio_index)
+                if rollback_bio_index.exists():
+                    os.replace(rollback_bio_index, authoritative_bio_index)
+            except Exception as restore_exc:  # noqa: BLE001
+                restore_errors.append(f"atlas_index: {restore_exc}")
+            try:
+                if bio_db_swapped and authoritative_bio_db.exists():
+                    staged_bio_db.parent.mkdir(parents=True, exist_ok=True)
+                    os.replace(authoritative_bio_db, staged_bio_db)
+                if rollback_bio_db.exists():
+                    os.replace(rollback_bio_db, authoritative_bio_db)
+            except Exception as restore_exc:  # noqa: BLE001
+                restore_errors.append(f"atlas_miniapp_db: {restore_exc}")
         try:
             if source_swapped and (DATA_SOURCE_ACTIONS / "source_url_map.json").exists():
                 staged_source.parent.mkdir(parents=True, exist_ok=True)
@@ -1126,9 +1972,22 @@ def promote_publish_transaction(
         except Exception as restore_exc:  # noqa: BLE001
             restore_errors.append(f"current_release: {restore_exc}")
 
-        restored = not restore_errors and authoritative_runtime_snapshot().get("fingerprint") == (
-            report.get("baseline") or {}
-        ).get("fingerprint")
+        bio_baseline_restored = True
+        if bio_requested:
+            try:
+                bio_baseline_restored = (
+                    atlas_bio_asset_snapshot(DATA_ROOT, required=True).get("fingerprint")
+                    == (report.get("atlas_bio_baseline") or {}).get("fingerprint")
+                )
+            except Exception as restore_exc:  # noqa: BLE001
+                bio_baseline_restored = False
+                restore_errors.append(f"atlas_baseline_verification: {restore_exc}")
+        restored = (
+            not restore_errors
+            and authoritative_runtime_snapshot().get("fingerprint")
+            == (report.get("baseline") or {}).get("fingerprint")
+            and bio_baseline_restored
+        )
         report.update(
             {
                 "status": "promotion_failed_restored" if restored else "promotion_failed_restore_error",
@@ -1155,6 +2014,20 @@ def promote_publish_transaction(
             rollback_source.unlink()
     except OSError as exc:
         cleanup_warnings.append(f"rollback_source_cleanup: {exc}")
+    if bio_changed:
+        for label, path in (
+            ("rollback_bio_index_cleanup", rollback_bio_index),
+            ("rollback_bio_db_cleanup", rollback_bio_db),
+        ):
+            try:
+                if path.exists():
+                    path.unlink()
+            except OSError as exc:
+                cleanup_warnings.append(f"{label}: {exc}")
+
+    promoted_bio_snapshot = (
+        atlas_bio_asset_snapshot(DATA_ROOT, required=True) if bio_requested else None
+    )
 
     report.update(
         {
@@ -1164,6 +2037,20 @@ def promote_publish_transaction(
             "promotion": {
                 "backup_dir": str(backup_dir),
                 "candidate_item_id_digest": candidate_ids.get("item_id_digest"),
+                "dj_bio_promotion": (
+                    {
+                        "requested": True,
+                        "authoritative_changed": bio_changed,
+                        "selected_count": bio_evidence.get("selected_count"),
+                        "matched_count": bio_evidence.get("matched_count"),
+                        "db_update_count": bio_evidence.get("db_update_count"),
+                        "index_update_count": bio_evidence.get("index_update_count"),
+                        "report_sha256": (report.get("dj_bio_promotion") or {}).get("report_sha256"),
+                        "authoritative_after": promoted_bio_snapshot,
+                    }
+                    if bio_requested
+                    else None
+                ),
                 "cleanup_warnings": cleanup_warnings,
             },
         }
@@ -1205,9 +2092,10 @@ def normalize_current_release_manifest(release_dir: Path, dry_run: bool) -> bool
     if not isinstance(manifest, dict):
         print("  ERROR: manifest.json root must be an object")
         return False
-    manifest.setdefault("source_pack_dir", str(release_dir))
-    manifest["out_dir"] = str(DATA_CURRENT_RELEASE)
-    manifest["deployed_current_release_dir"] = str(DATA_CURRENT_RELEASE)
+    manifest["source_release_name"] = release_dir.name
+    manifest["deployed_release_name"] = DATA_CURRENT_RELEASE.name
+    manifest = scrub_public_package_payload(manifest)
+    assert_public_payload(manifest, label="baked weekly manifest.json")
     try:
         manifest_path.write_text(
             json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
@@ -1232,14 +2120,49 @@ def regenerate_neighborhood_bundle(dry_run: bool) -> bool:
     repo_root = MINIPROGRAM_DIR.parent.parent
     builder = repo_root / "tools" / "atlas_rebuild" / "build_neighbor_bundle_from_miniapp.py"
     miniapp_db = DATA_ROOT / "atlas_miniapp.sqlite"
+    index_gz = DATA_ROOT / "atlas_index.json.gz"
     out_gz = DATA_ROOT / "atlas_neighborhood.json.gz"
+
+    def read_dataset_id(artifact: Path) -> str:
+        with gzip.open(artifact, "rt", encoding="utf-8") as handle:
+            payload = json.load(handle)
+        return str(payload.get("datasetId") or "").strip()
+
+    try:
+        dataset_id = read_dataset_id(index_gz)
+    except (OSError, json.JSONDecodeError) as error:
+        print(f"  ERROR: cannot read ATLAS dataset identity from {index_gz.name}: {error}")
+        return False
+    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._:-]{7,127}", dataset_id):
+        print(f"  ERROR: {index_gz.name} has no valid public datasetId; refusing a mixed-generation rebuild")
+        return False
     if not miniapp_db.exists():
-        print(f"  SKIP neighborhood rebuild: no atlas_miniapp.sqlite at {miniapp_db}")
+        if not out_gz.exists():
+            print("  SKIP neighborhood rebuild: no atlas_miniapp.sqlite and no neighborhood artifact")
+            return True
+        try:
+            existing_dataset_id = read_dataset_id(out_gz)
+        except (OSError, json.JSONDecodeError) as error:
+            print(f"  ERROR: cannot verify {out_gz.name} without atlas_miniapp.sqlite: {error}")
+            return False
+        if existing_dataset_id != dataset_id:
+            print("  ERROR: existing index/neighborhood datasetId mismatch and no miniapp DB is available to rebuild")
+            return False
+        print("  SKIP neighborhood rebuild: existing index/neighborhood datasetId handshake is valid")
         return True
     if not builder.exists():
         print(f"  ERROR: neighborhood builder missing: {builder}")
         return False
-    cmd = [sys.executable, str(builder), "--miniapp-db", str(miniapp_db), "--out", str(out_gz)]
+    cmd = [
+        sys.executable,
+        str(builder),
+        "--miniapp-db",
+        str(miniapp_db),
+        "--out",
+        str(out_gz),
+        "--dataset-id",
+        dataset_id,
+    ]
     if dry_run:
         print(f"  [DRY-RUN] regenerate neighborhood bundle: {' '.join(cmd)}")
         return True
@@ -1247,6 +2170,14 @@ def regenerate_neighborhood_bundle(dry_run: bool) -> bool:
     result = subprocess.run(cmd, cwd=str(builder.parent))
     if result.returncode != 0:
         print(f"  ERROR: neighborhood bundle rebuild exited {result.returncode}")
+        return False
+    try:
+        rebuilt_dataset_id = read_dataset_id(out_gz)
+    except (OSError, json.JSONDecodeError) as error:
+        print(f"  ERROR: cannot verify rebuilt {out_gz.name}: {error}")
+        return False
+    if rebuilt_dataset_id != dataset_id:
+        print("  ERROR: rebuilt index/neighborhood datasetId handshake failed")
         return False
     print("  OK neighborhood bundle aligned with atlas_miniapp.sqlite")
     return True
@@ -1261,6 +2192,12 @@ def bake_data(
 ) -> bool:
     print(f"\n--- bake data: {release_dir.name} ---")
     ok = True
+
+    try:
+        validate_derived_route_closure(release_dir)
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        print(f"  ERROR: refusing to bake incoherent derived routes: {error}")
+        return False
 
     # 1. Copy release items into current_release
     for item in RELEASE_ITEMS:
@@ -1612,7 +2549,7 @@ def generate_qr(desc: str, dry_run: bool) -> Path | None:
 
 
 def main() -> int:
-    global ENV_ID  # noqa: PLW0603
+    global ENV_ID, SERVICE_NAME  # noqa: PLW0603
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--release-dir", default="", help="Path to the built release directory")
     parser.add_argument("--source-url-map", default=None, help="Path to source_url_map.json (optional, auto-detected from release)")
@@ -1632,6 +2569,11 @@ def main() -> int:
         help="Mutable deploy work root (or HUAIDJ_CLOUDRUN_WORK_ROOT).",
     )
     parser.add_argument("--env-id", default=ENV_ID, help=f"CloudBase env ID (default: {ENV_ID})")
+    parser.add_argument(
+        "--service-name",
+        default=SERVICE_NAME,
+        help=f"CloudBase Run service name (default: {SERVICE_NAME})",
+    )
     parser.add_argument("--no-qr", action="store_true", help="Skip QR generation")
     parser.add_argument("--dry-run", action="store_true", help="Print steps without making changes")
     parser.add_argument(
@@ -1653,6 +2595,27 @@ def main() -> int:
         default="",
         help="Successful exact club-overviews reconciliation report for --promote-transaction.",
     )
+    parser.add_argument(
+        "--publish-lease-path",
+        default="",
+        help="Service-scoped lease file already held by the parent release wrapper.",
+    )
+    parser.add_argument(
+        "--publish-lease-token",
+        default="",
+        help="Coordination nonce for the already-held service publish lease.",
+    )
+    parser.add_argument(
+        "--promotion-proxy-url",
+        default="",
+        help="Optional proxy used only for the final read-only /readyz revalidation.",
+    )
+    parser.add_argument(
+        "--promotion-timeout-seconds",
+        type=int,
+        default=30,
+        help="Bounded timeout for final active-version and /readyz revalidation.",
+    )
     parser.add_argument("--skip-patch-check", action="store_true", help="Skip tcb CLI patch verification")
     parser.add_argument("--require-stage7-atlas", action="store_true", help="Abort if data/stage7_atlas is incomplete")
     parser.add_argument("--include-stage7-atlas", action="store_true", help="Include data/stage7_atlas in the deploy context")
@@ -1660,6 +2623,15 @@ def main() -> int:
         "--update-column-json",
         action="store_true",
         help="Also replace current_release/column.json. Off by default so activity releases do not overwrite column articles.",
+    )
+    parser.add_argument(
+        "--promote-dj-bio-atoms",
+        action="store_true",
+        help=(
+            "Copy the runtime Atlas DB/index into this publish transaction, apply bio atoms only "
+            "to those staged copies, bind the evidence to the deploy context, and locally promote "
+            "them only after the same remote proof gates succeed."
+        ),
     )
     parser.add_argument(
         "--deploy-mode",
@@ -1675,6 +2647,7 @@ def main() -> int:
     args = parser.parse_args()
 
     ENV_ID = args.env_id
+    SERVICE_NAME = args.service_name
 
     try:
         configure_runtime_paths(
@@ -1699,6 +2672,8 @@ def main() -> int:
                 ("--smoke-report", args.smoke_report),
                 ("--pagination-report", args.pagination_report),
                 ("--club-overviews-report", args.club_overviews_report),
+                ("--publish-lease-path", args.publish_lease_path),
+                ("--publish-lease-token", args.publish_lease_token),
             )
             if not value
         ]
@@ -1712,6 +2687,10 @@ def main() -> int:
                 smoke_report_path=Path(args.smoke_report),
                 pagination_report_path=Path(args.pagination_report),
                 club_overviews_report_path=Path(args.club_overviews_report),
+                held_lease_path=Path(args.publish_lease_path),
+                held_lease_token=args.publish_lease_token,
+                promotion_proxy_url=args.promotion_proxy_url,
+                promotion_timeout_seconds=args.promotion_timeout_seconds,
             )
         except (OSError, ValueError, RuntimeError) as exc:
             print(f"ERROR: publish transaction promotion failed: {exc}")
@@ -1763,6 +2742,8 @@ def main() -> int:
             return 1
 
     if args.dry_run:
+        if args.promote_dj_bio_atoms:
+            atlas_bio_asset_snapshot(DATA_ROOT, required=True)
         if not bake_data(
             release_dir,
             Path(args.source_url_map) if args.source_url_map else None,
@@ -1782,6 +2763,7 @@ def main() -> int:
                 transaction_id=transaction_id,
                 include_stage7_atlas=args.include_stage7_atlas or args.require_stage7_atlas,
                 update_column_json=args.update_column_json,
+                promote_dj_bio_atoms=args.promote_dj_bio_atoms,
             )
         except (OSError, ValueError, RuntimeError) as exc:
             print(f"ERROR: publish transaction prepare failed: {exc}")

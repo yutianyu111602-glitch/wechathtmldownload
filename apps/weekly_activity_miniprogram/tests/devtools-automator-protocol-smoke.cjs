@@ -6,7 +6,10 @@ const endpoint = String(process.env.MINIPROGRAM_AUTOMATOR_WS || "ws://[::1]:9421
 const expectedVersion = String(process.env.MINIPROGRAM_EXPECT_DEVTOOLS_VERSION || "").trim();
 const navigationProbeEnabled = process.env.MINIPROGRAM_AUTOMATOR_NAV_PROBE !== "0";
 const navigationProbePath = String(process.env.MINIPROGRAM_AUTOMATOR_NAV_PATH || "/pages/index/index").trim() || "/pages/index/index";
-const artifactRoot = path.resolve(__dirname, "../test-artifacts");
+const artifactRoot = process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT
+  ? path.resolve(process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT)
+  : path.resolve(__dirname, "../test-artifacts");
+const artifactKind = String(process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_KIND || "live").trim() || "live";
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const artifactDir = path.join(artifactRoot, `devtools-automator-protocol-${stamp}`);
 const reportPath = path.join(artifactDir, "report.json");
@@ -14,6 +17,8 @@ fs.mkdirSync(artifactDir, { recursive: true });
 
 const report = {
   schemaVersion: "devtools_automator_protocol_smoke.v2",
+  artifactKind,
+  artifactDir,
   generatedAt: new Date().toISOString(),
   endpoint,
   expectedVersion,

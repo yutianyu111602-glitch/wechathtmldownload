@@ -1,5 +1,7 @@
-const { requestApi } = require("../../utils/api");
+const { fetchAllCurrentResponse, requestApi } = require("../../utils/api");
 const { compactItem, dedupeItems } = require("../../utils/format");
+const { facetPayloadMatchesVisibleSet } = require("../../services/facetContract");
+const { currentFeedBehindManifest: generationFeedBehindManifest } = require("../../services/generationContract");
 const { HAPTIC, createScrollHapticState, nextScrollHaptic, vibrateLight } = require("../../utils/haptics");
 const { applyLanguageChrome, compactDate, localizeItems, normalizeLang, text, translateCity, dateDisplay, weekdayLabel } = require("../../utils/i18n");
 const { buildPosterPool } = require("../../utils/posterPool");
@@ -8,6 +10,7 @@ const { withListLocationLabels } = require("../../utils/listDisplay");
 const { filterItemsByPreviewRange, itemDateBounds, itemMatchesDateKey, normalizeRange } = require("../../utils/datePreview");
 const {
   allCurrentDateSelection,
+  cityKeysForItem,
   dateKeysForFilter,
   dateSelectionQuery,
   exactDateSelection,
@@ -19,6 +22,7 @@ const {
   weekendDateSelection,
 } = require("../../services/homeFilters");
 const { filterItemsByElectronic } = require("../../utils/genreFilter");
+const { currentShanghaiBusinessDateKey } = require("../../utils/businessDate");
 const { buildIndexShare, buildIndexTimeline, enableShareMenu } = require("../../utils/share");
 const { posterFallbackState, posterImageErrorFallback, resolvePosterUrlsForItems } = require("../../utils/cloudPosterUrls");
 
@@ -104,34 +108,8 @@ function safeDecode(value) {
   }
 }
 
-function releaseGeneratedAt(payload) {
-  if (!payload || typeof payload !== "object") return "";
-  return payload.generatedAt || payload.generated_at || payload.generated_at_iso || "";
-}
-
-function parseReleaseTimeMs(value) {
-  const textValue = String(value || "").trim();
-  if (!textValue) return 0;
-  const parsed = Date.parse(textValue);
-  if (Number.isFinite(parsed)) return parsed;
-  const match = textValue.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})[ T](\d{1,2}):(\d{2})(?::(\d{2}))?/);
-  if (!match) return 0;
-  const year = Number(match[1]);
-  const month = Number(match[2]);
-  const day = Number(match[3]);
-  const hour = Number(match[4]);
-  const minute = Number(match[5]);
-  const second = Number(match[6] || 0);
-  if (![year, month, day, hour, minute, second].every(Number.isFinite)) return 0;
-  return Date.UTC(year, month - 1, day, hour - 8, minute, second);
-}
-
 function currentFeedBehindManifest(manifest, current) {
-  const manifestMs = parseReleaseTimeMs(releaseGeneratedAt(manifest));
-  if (!manifestMs) return false;
-  const currentMs = parseReleaseTimeMs(releaseGeneratedAt(current));
-  if (!currentMs) return Boolean(current && (current.fromCache || current.fromSnapshot));
-  return manifestMs - currentMs > RELEASE_FRESHNESS_GRACE_MS;
+  return generationFeedBehindManifest(manifest, current, RELEASE_FRESHNESS_GRACE_MS);
 }
 
 function isUnknownValue(value) {
@@ -184,15 +162,18 @@ function readLocalCityKey() {
 function buildCityFiltersFallback(items, lang, allCitiesLabel) {
   const bucket = new Map();
   for (const item of items || []) {
-    const key = String(item?.city_key || "").trim();
-    if (!key || isUnknownValue(key)) continue;
-    const rawLabel = String(item?.cityLabel || item?.city || key);
-    if (isUnknownValue(rawLabel)) continue;
-    const label = translateCity(rawLabel, lang, key);
-    const current = bucket.get(key) || { key, label, count: 0 };
-    current.count += 1;
-    if (!current.label || isUnknownValue(current.label)) current.label = label;
-    bucket.set(key, current);
+    const keys = cityKeysForItem(item);
+    for (let index = 0; index < keys.length; index += 1) {
+      const key = keys[index];
+      if (!key || isUnknownValue(key)) continue;
+      const rawLabel = index === 0 ? String(item?.cityLabel || item?.city || key) : key;
+      if (isUnknownValue(rawLabel)) continue;
+      const label = translateCity(rawLabel, lang, key);
+      const current = bucket.get(key) || { key, label, count: 0 };
+      current.count += 1;
+      if (!current.label || isUnknownValue(current.label)) current.label = label;
+      bucket.set(key, current);
+    }
   }
   const rows = Array.from(bucket.values()).sort((a, b) => b.count - a.count || String(a.label).localeCompare(String(b.label)));
   return [{ key: "", label: allCitiesLabel, count: "" }, ...rows.map((row) => ({ key: row.key, label: row.label, count: row.count }))];
@@ -292,10 +273,29 @@ function datePillLabel(selection, labels, lang) {
   return labels.allDates;
 }
 
-function cityFacetPayloadMatchesItems(payload, items) {
-  if (!payload || payload.scope !== "current" || !Array.isArray(payload.cities)) return false;
-  const expected = Array.isArray(items) ? items.length : 0;
-  return Number(payload.item_count) === expected;
+function lifecycleDateSelection(data, now = new Date()) {
+  const selection = pageDateSelection(data);
+  if (selection.mode === "this_weekend") return weekendDateSelection(0, now);
+  if (selection.mode === "next_weekend") return weekendDateSelection(1, now);
+  return selection;
+}
+
+function lifecycleRefreshSnapshot(data, now = new Date(), options = {}) {
+  const dateSelection = options.dateSelection
+    ? normalizeDateSelection(options.dateSelection)
+    : lifecycleDateSelection(data, now);
+  const businessDateKey = currentShanghaiBusinessDateKey(now);
+  return {
+    businessDateKey,
+    dateSelection,
+    key: [
+      businessDateKey,
+      dateSelection.mode,
+      dateSelection.exactDate,
+      dateSelection.startKey,
+      dateSelection.endKey,
+    ].join("|"),
+  };
 }
 
 function withFilterMetaTimeout(promise, label) {
@@ -524,9 +524,12 @@ Page({
   backgroundRefreshAttempts: 0,
   retryToastAt: 0,
   lastBackgroundRefreshAt: 0,
+  lifecycleRefreshKey: "",
   locationReadyUnsubscribe: null,
+  destroyed: false,
 
   onLoad(query = {}) {
+    this.destroyed = false;
     enableShareMenu();
     const lang = normalizeLang(query.lang || wx.getStorageSync("weeklyActivityLang"));
     const selectedCity = safeDecode(query.city || "");
@@ -552,6 +555,7 @@ Page({
       localCityKey: locKey,
       localCityLabel: locLabel,
     });
+    this.lifecycleRefreshKey = lifecycleRefreshSnapshot(this.data).key;
 
     try {
       const app = getApp();
@@ -561,8 +565,8 @@ Page({
     } catch (_) {}
 
     this.waitForLocationCityBeforeInitialLoad(selectedCity)
-      .then(() => this.loadData())
-      .catch(() => this.loadData());
+      .then(() => (this.destroyed ? null : this.loadData()))
+      .catch(() => (this.destroyed ? null : this.loadData()));
   },
 
   waitForLocationCityBeforeInitialLoad(selectedCity) {
@@ -579,7 +583,7 @@ Page({
         if (settled) return;
         settled = true;
         clearTimeout(timer);
-        if (cityKey) this.applyLocatedCityKey(cityKey);
+        if (cityKey && !this.destroyed) this.applyLocatedCityKey(cityKey);
         resolve(cityKey || "");
       };
       const timer = setTimeout(() => finish(""), LOCATION_READY_WAIT_MS);
@@ -592,19 +596,46 @@ Page({
   },
 
   onShow() {
+    if (this.destroyed) return;
     const pendingCity = safeDecode(wx.getStorageSync("weeklyActivityPendingCity") || "");
-    if (!pendingCity) return;
-    wx.removeStorageSync("weeklyActivityPendingCity");
-    if (pendingCity === this.data.selectedCity) return;
-    this.setData({
-      selectedCity: pendingCity,
-      draftCity: pendingCity,
-    });
-    this.persistPreferredCity(pendingCity);
-    this.loadData({ haptic: true });
+    let refreshOptions = null;
+    if (pendingCity) {
+      wx.removeStorageSync("weeklyActivityPendingCity");
+      if (pendingCity !== this.data.selectedCity) {
+        this.setData({
+          selectedCity: pendingCity,
+          draftCity: pendingCity,
+        });
+        this.persistPreferredCity(pendingCity);
+        refreshOptions = { haptic: true, cityKey: pendingCity };
+      }
+    }
+
+    const lifecycle = lifecycleRefreshSnapshot(this.data);
+    if (lifecycle.key !== this.lifecycleRefreshKey) {
+      const selection = lifecycle.dateSelection;
+      this.setData({
+        selectedDate: selection.exactDate,
+        dateMode: selection.mode,
+        selectedDateStart: selection.startKey,
+        selectedDateEnd: selection.endKey,
+        draftDate: selection.exactDate,
+      });
+      refreshOptions = {
+        ...(refreshOptions || {}),
+        dateSelection: selection,
+        skipCache: true,
+      };
+    }
+
+    if (refreshOptions) this.loadData(refreshOptions);
   },
 
   onUnload() {
+    this.destroyed = true;
+    this.loadSeq = (this.loadSeq || 0) + 1;
+    this.isLoadingRequest = false;
+    this.pendingLoadOptions = null;
     if (typeof this.locationReadyUnsubscribe === "function") {
       try {
         this.locationReadyUnsubscribe();
@@ -660,6 +691,7 @@ Page({
   },
 
   onPosterImageLoad(event) {
+    if (this.destroyed) return;
     const id = event.currentTarget?.dataset?.id || "";
     this.setData({
       posterImageLoadCount: Number(this.data.posterImageLoadCount || 0) + 1,
@@ -668,10 +700,13 @@ Page({
   },
 
   async onPosterImageError(event) {
+    if (this.destroyed) return;
+    const loadSeq = this.loadSeq;
     const id = String(event.currentTarget?.dataset?.id || "").trim();
     const src = event.currentTarget?.dataset?.src || "";
     const target = (this.data.popularItems || []).find((item) => id && String(item?.id || "") === id);
     const fallback = await posterImageErrorFallback(target, src);
+    if (this.destroyed || loadSeq !== this.loadSeq) return;
     let usedCloudFallback = false;
     let shouldMarkFailed = false;
     const popularItems = (this.data.popularItems || []).map((item) => {
@@ -715,46 +750,28 @@ Page({
   async fetchAllCurrentItems(labels, options) {
     const opts = options || {};
     const limit = 100;
-    let cursor = 0;
-    let total = 0;
-    let fromCache = false;
-    let fromSnapshot = false;
-    let generatedAt = "";
-    const allItems = [];
-    for (let pageIndex = 0; pageIndex < 20; pageIndex += 1) {
-      const current = await requestApi("/api/v1/weekly/current", {
-        scope: "current",
-        cityKey: opts.cityKey !== undefined ? opts.cityKey : this.data.selectedCity,
-        date: opts.date !== undefined ? opts.date : this.data.selectedDate,
-        dateStart: opts.dateStart !== undefined ? opts.dateStart : "",
-        dateEnd: opts.dateEnd !== undefined ? opts.dateEnd : "",
-        lookbackDays: opts.lookbackDays !== undefined ? opts.lookbackDays : 0,
-        limit,
-        cursor,
-        __skipCache: opts.skipCache === true,
-        __liveOnly: opts.liveOnly === true,
-      });
-      if (current.__fromCache) fromCache = true;
-      if (current.__fromSnapshot) fromSnapshot = true;
-      if (!generatedAt) generatedAt = releaseGeneratedAt(current);
-      const pageItems = current.items || [];
-      allItems.push(...pageItems);
-      total = Number(current.page?.total || total || allItems.length);
-      const loaded = total ? Math.min(allItems.length, total) : allItems.length;
+    return fetchAllCurrentResponse({
+      scope: "current",
+      cityKey: opts.cityKey !== undefined ? opts.cityKey : this.data.selectedCity,
+      date: opts.date !== undefined ? opts.date : this.data.selectedDate,
+      dateStart: opts.dateStart !== undefined ? opts.dateStart : "",
+      dateEnd: opts.dateEnd !== undefined ? opts.dateEnd : "",
+      lookbackDays: opts.lookbackDays !== undefined ? opts.lookbackDays : 0,
+      limit,
+      __maxPages: 100,
+      __skipCache: opts.skipCache === true,
+      __liveOnly: opts.liveOnly === true,
+      __liveRefresh: opts.liveRefresh === true,
+    }, requestApi, ({ loaded, total }) => {
       if (opts.updateProgress !== false) {
         const progress = 22 + Math.min(42, Math.round((loaded / Math.max(total || loaded || 1, 1)) * 42));
         this.setLoadingProgress(progress, `${labels.loadingEvents} ${loaded}/${total || loaded}`, opts.loadSeq);
       }
-      const nextCursor = current.page?.nextCursor;
-      if (nextCursor === null || nextCursor === undefined || nextCursor === "") break;
-      const parsedNext = Number(nextCursor);
-      if (!Number.isFinite(parsedNext) || parsedNext <= Number(cursor)) break;
-      cursor = parsedNext;
-    }
-    return { items: allItems, total: total || allItems.length, fromCache, fromSnapshot, generatedAt };
+    });
   },
 
   async loadData(options) {
+    if (this.destroyed) return { skipped: true };
     const opts = options || {};
     const backgroundRefresh = opts.backgroundRefresh === true;
     if (opts.haptic && !backgroundRefresh) {
@@ -767,7 +784,7 @@ Page({
       }
       this.pendingLoadOptions = { ...(this.pendingLoadOptions || {}), ...opts, haptic: false };
       this.showBusyToast();
-      if (opts.stopPullDownRefresh && wx.stopPullDownRefresh) {
+      if (!this.destroyed && opts.stopPullDownRefresh && wx.stopPullDownRefresh) {
         wx.stopPullDownRefresh();
       }
       return { skipped: true };
@@ -794,9 +811,11 @@ Page({
     }
     let retryOptions = null;
     let retryDelay = 0;
+    let requestLifecycleRefreshKey = "";
     try {
       const selectedCityKey = opts.cityKey !== undefined ? opts.cityKey : this.data.selectedCity;
       const dateSelection = pageDateSelection(this.data, opts);
+      requestLifecycleRefreshKey = lifecycleRefreshSnapshot(this.data, new Date(), { dateSelection }).key;
       const dateQuery = dateSelectionQuery(dateSelection);
       const manifestPromise = withFilterMetaTimeout(
         requestApi("/api/v1/weekly/manifest", { __skipCache: true, __liveOnly: true }),
@@ -807,8 +826,9 @@ Page({
         date: "",
         lookbackDays: 0,
         loadSeq,
-        skipCache: backgroundRefresh,
-        liveOnly: backgroundRefresh,
+        skipCache: opts.skipCache === true,
+        liveOnly: opts.liveOnly === true,
+        liveRefresh: backgroundRefresh || opts.liveRefresh === true,
       };
       const currentPromise = this.fetchAllCurrentItems(labels, currentFetchOptions);
       const facetMetaOptions = {
@@ -824,9 +844,16 @@ Page({
         cityKey: selectedCityKey,
         lookbackDays: 0,
       }), "dates");
+      // Attach rejection handlers immediately. The primary feed may fail before
+      // metadata is awaited, but optional facet failures must never surface as
+      // unhandled promise rejections.
+      const facetMetaPromise = Promise.allSettled([citiesPromise, datesPromise]);
       let current = await currentPromise;
-      const manifest = await manifestPromise;
-      if (loadSeq !== this.loadSeq) return null;
+      // A persisted/snapshot feed is already an explicitly stale fallback.
+      // Do not hold its first render behind a live-only manifest timeout; the
+      // scheduled background refresh will perform the online generation gate.
+      const manifest = (current.fromCache || current.fromSnapshot) ? null : await manifestPromise;
+      if (this.destroyed || loadSeq !== this.loadSeq) return null;
       if (currentFeedBehindManifest(manifest, current)) {
         this.setData({
           loading: true,
@@ -840,10 +867,16 @@ Page({
           skipCache: true,
           liveOnly: true,
         });
+        if (currentFeedBehindManifest(manifest, current)) {
+          throw new Error("CURRENT_MANIFEST_GENERATION_MISMATCH");
+        }
       }
       this.setLoadingProgress(78, labels.loadingClean, loadSeq, labels.loadingCleanHint);
-      const [citiesResult, datesResult] = await Promise.allSettled([citiesPromise, datesPromise]);
-      if (loadSeq !== this.loadSeq) return null;
+      const [citiesResult, datesResult] = await facetMetaPromise;
+      // A user filter action queued during this request is newer intent. Let
+      // finally start that request without allowing this captured selection to
+      // overwrite the controls or feed in the meantime.
+      if (this.destroyed || loadSeq !== this.loadSeq || this.pendingLoadOptions) return null;
       this.setLoadingProgress(84, labels.loadingClean, loadSeq, labels.loadingCleanHint);
       const lang = this.data.lang;
       const filterMetadataSlow = citiesResult.status !== "fulfilled" || datesResult.status !== "fulfilled";
@@ -863,7 +896,7 @@ Page({
           : (filterMetadataSlow ? labels.loadingFallbackHint : "");
       const cityFilterSourceItems = facetUniverse;
       const cityIndexFilters = citiesResult.status === "fulfilled"
-        && cityFacetPayloadMatchesItems(citiesResult.value, cityFilterSourceItems)
+        && facetPayloadMatchesVisibleSet(citiesResult.value, cityFilterSourceItems, current, "cities")
         ? buildCityFiltersFromIndex(citiesResult.value, lang, this.data.t.allCities)
         : null;
       const cityFilters = cityIndexFilters || buildCityFiltersFallback(cityFilterSourceItems, lang, this.data.t.allCities);
@@ -875,7 +908,8 @@ Page({
       const dateFilterSourceItems = resolvedCityKey
         ? filterItemsByCityKey(filterSourceItems, resolvedCityKey)
         : filterSourceItems;
-      const dateIndexKeys = datesResult.status === "fulfilled" && datesResult.value?.scope === "current"
+      const dateIndexKeys = datesResult.status === "fulfilled"
+        && facetPayloadMatchesVisibleSet(datesResult.value, dateFilterSourceItems, current, "dates")
         ? dateKeySetFromIndex(datesResult.value)
         : null;
       const dateFilters = buildDateFiltersFallback(dateFilterSourceItems, lang, this.data.t.allDates, dateIndexKeys);
@@ -897,15 +931,20 @@ Page({
       // Resolve posters with a short timeout to avoid blocking page render
       var resolvedViewData = nextViewData;
       try {
+        var posterResolveTimer = null;
         var posterTimeout = new Promise(function (_, reject) {
-          setTimeout(function () { reject(new Error("POSTER_RESOLVE_TIMEOUT")); }, POSTER_RESOLVE_TIMEOUT_MS);
+          posterResolveTimer = setTimeout(function () { reject(new Error("POSTER_RESOLVE_TIMEOUT")); }, POSTER_RESOLVE_TIMEOUT_MS);
         });
-        resolvedViewData = await Promise.race([resolveIndexViewPosters(nextViewData), posterTimeout]);
+        try {
+          resolvedViewData = await Promise.race([resolveIndexViewPosters(nextViewData), posterTimeout]);
+        } finally {
+          if (posterResolveTimer) clearTimeout(posterResolveTimer);
+        }
       } catch (e) {
         // Poster resolution timeout or error - proceed with unresolved URLs
         resolvedViewData = nextViewData;
       }
-      if (loadSeq !== this.loadSeq) return null;
+      if (this.destroyed || loadSeq !== this.loadSeq || this.pendingLoadOptions) return null;
       const { items: _unused, ...lightViewData } = resolvedViewData;
       this._fullItems = resolvedViewData.items || [];
       this.setData({
@@ -935,6 +974,7 @@ Page({
         posterImageErrorUrls: [],
         posterImageFailedIds: [],
       });
+      this.lifecycleRefreshKey = requestLifecycleRefreshKey;
       this.retryResolvePosters(nextViewData, loadSeq);
       warmPosterImages(resolvedViewData.popularItems);
       if (usedCache || usedSnapshot) {
@@ -944,16 +984,23 @@ Page({
         this.backgroundRefreshAttempts = 0;
       }
     } catch (error) {
-      if (loadSeq !== this.loadSeq) return null;
+      if (this.destroyed || loadSeq !== this.loadSeq || this.pendingLoadOptions) return null;
       console.error("[weekly] loadData failed", error);
       if (backgroundRefresh) {
-        this.scheduleBackgroundRefresh();
+        this.scheduleBackgroundRefresh({ retry: true });
         return null;
       }
       const retryCount = Math.max(0, Number(opts.silentRetryCount || 0));
       if (retryCount < MAX_SILENT_LOAD_RETRIES) {
         retryDelay = LOAD_RETRY_DELAYS_MS[retryCount] || LOAD_RETRY_DELAYS_MS[LOAD_RETRY_DELAYS_MS.length - 1];
-        retryOptions = { ...opts, haptic: false, stopPullDownRefresh: false, silentRetryCount: retryCount + 1 };
+        retryOptions = {
+          ...opts,
+          haptic: false,
+          stopPullDownRefresh: false,
+          silentRetryCount: retryCount + 1,
+          skipCache: true,
+          liveOnly: false,
+        };
         this.setData({
           loading: true,
           loadingProgress: Math.max(Number(this.data.loadingProgress) || 0, 18),
@@ -971,33 +1018,41 @@ Page({
       }
     } finally {
       this.clearLoadingHintTimers();
-      if (loadSeq === this.loadSeq) {
+      if (!this.destroyed && loadSeq === this.loadSeq) {
         this.isLoadingRequest = false;
       }
       const pending = this.pendingLoadOptions;
       this.pendingLoadOptions = null;
-      if (opts.stopPullDownRefresh && wx.stopPullDownRefresh) {
+      if (!this.destroyed && opts.stopPullDownRefresh && wx.stopPullDownRefresh) {
         wx.stopPullDownRefresh();
       }
-      if (pending && loadSeq === this.loadSeq) {
-        setTimeout(() => this.loadData(pending), 0);
-      } else if (retryOptions && loadSeq === this.loadSeq) {
-        setTimeout(() => this.loadData(retryOptions), retryDelay);
+      if (pending && !this.destroyed && loadSeq === this.loadSeq) {
+        setTimeout(() => {
+          if (!this.destroyed && loadSeq === this.loadSeq) this.loadData(pending);
+        }, 0);
+      } else if (retryOptions && !this.destroyed && loadSeq === this.loadSeq) {
+        setTimeout(() => {
+          if (!this.destroyed && loadSeq === this.loadSeq) this.loadData(retryOptions);
+        }, retryDelay);
       }
     }
   },
 
-  scheduleBackgroundRefresh() {
+  scheduleBackgroundRefresh(options = {}) {
+    if (this.destroyed) return;
     if (this.backgroundRefreshAttempts >= MAX_SILENT_LOAD_RETRIES) return;
     const now = Date.now();
-    if (now - this.lastBackgroundRefreshAt < MIN_BACKGROUND_REFRESH_INTERVAL_MS) return;
+    const isRetry = options.retry === true;
+    if (!isRetry && now - this.lastBackgroundRefreshAt < MIN_BACKGROUND_REFRESH_INTERVAL_MS) return;
     this.clearBackgroundRefreshTimer();
-    this.lastBackgroundRefreshAt = now;
+    if (!isRetry) this.lastBackgroundRefreshAt = now;
     const retryIndex = this.backgroundRefreshAttempts;
     const delay = LOAD_RETRY_DELAYS_MS[retryIndex] || LOAD_RETRY_DELAYS_MS[LOAD_RETRY_DELAYS_MS.length - 1];
     this.backgroundRefreshAttempts += 1;
+    const loadSeq = this.loadSeq;
     this.backgroundRefreshTimer = setTimeout(() => {
       this.backgroundRefreshTimer = null;
+      if (this.destroyed || loadSeq !== this.loadSeq) return;
       this.loadData({
         haptic: false,
         stopPullDownRefresh: false,
@@ -1011,7 +1066,7 @@ Page({
     if (!viewData || !Array.isArray(viewData.popularItems) || !viewData.popularItems.length) return;
     resolveIndexViewPosters(viewData)
       .then((resolvedViewData) => {
-        if (loadSeq && loadSeq !== this.loadSeq) return;
+        if (this.destroyed || (loadSeq && loadSeq !== this.loadSeq)) return;
         const merged = mergeResolvedPopularItems(this.data.popularItems, resolvedViewData.popularItems);
         if (!merged.changed) return;
         const resolvedIds = new Set(
@@ -1051,6 +1106,8 @@ Page({
   },
 
   refreshViewItems() {
+    if (this.destroyed) return;
+    const loadSeq = this.loadSeq;
     const nextViewData = applyPosterErrorMask(buildIndexViewData(
         this._fullItems,
         this._fullItems,
@@ -1062,13 +1119,17 @@ Page({
         this.data.localCityKey,
       ), this.data.posterImageFailedIds);
     resolveIndexViewPosters(nextViewData)
-      .then((resolvedViewData) => this.setData(resolvedViewData))
-      .catch(() => this.setData(nextViewData));
+      .then((resolvedViewData) => {
+        if (!this.destroyed && loadSeq === this.loadSeq) this.setData(resolvedViewData);
+      })
+      .catch(() => {
+        if (!this.destroyed && loadSeq === this.loadSeq) this.setData(nextViewData);
+      });
     this.retryResolvePosters(nextViewData, this.loadSeq);
   },
 
   setLoadingProgress(progress, step, loadSeq, hint) {
-    if (loadSeq && loadSeq !== this.loadSeq) return;
+    if (this.destroyed || (loadSeq && loadSeq !== this.loadSeq)) return;
     if (!this.data.loading) return;
     const nextProgress = Math.max(Number(progress) || 0, Number(this.data.loadingProgress) || 0);
     const patch = {
@@ -1116,6 +1177,8 @@ Page({
   },
 
   setTab(event) {
+    if (this.destroyed) return;
+    const loadSeq = this.loadSeq;
     const activeTab = event.currentTarget.dataset.tab || "all";
     if (activeTab !== this.data.activeTab) {
       this.lightHaptic(HAPTIC.tabInterval);
@@ -1134,7 +1197,9 @@ Page({
     this.setData({ activeTab, ...nextViewData });
     resolveIndexViewPosters(nextViewData)
       .then((resolvedViewData) => {
-        if (this.data.activeTab === activeTab) this.setData(resolvedViewData);
+        if (!this.destroyed && loadSeq === this.loadSeq && this.data.activeTab === activeTab) {
+          this.setData(resolvedViewData);
+        }
       })
       .catch(() => {});
     this.retryResolvePosters(nextViewData, this.loadSeq);
@@ -1159,6 +1224,7 @@ Page({
   noop() {},
 
   applyLocatedCityKey(key) {
+    if (this.destroyed) return;
     const cityKey = typeof key === "string" ? key.trim() : "";
     if (!cityKey || cityKey === this.data.localCityKey) return;
     this.setData({

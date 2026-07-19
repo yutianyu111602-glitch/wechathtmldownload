@@ -86,6 +86,7 @@ App({
       databaseCircuitBreakerMs: 30 * 60 * 1000,
       useCloudDatabaseFirst: false,
       atlasPlayerStateFunctionName: "atlasPlayerState",
+      soundSubmissionFunctionName: "soundSubmissionGateway",
       useMock: false,
       publicBaseUrl: "https://weekly-api-255880-4-1371956557.sh.run.tcloudbase.com",
       staticBaseUrl: "",
@@ -139,6 +140,8 @@ App({
     this.updateActivityTabIcon();
     if (!wx.getStorageSync("weeklySoundAtlasNoticeSeen:v1")) {
       wx.showTabBarRedDot({ index: ABOUT_TAB_INDEX });
+    } else {
+      wx.hideTabBarRedDot({ index: ABOUT_TAB_INDEX });
     }
   },
 

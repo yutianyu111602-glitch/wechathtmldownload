@@ -103,7 +103,7 @@ test("home filter handlers reload with explicit selected filter state", () => {
   assert.match(script, /const selectedCityKey = opts\.cityKey !== undefined \? opts\.cityKey : this\.data\.selectedCity/);
   assert.match(script, /const dateSelection = pageDateSelection\(this\.data, opts\)/);
   assert.match(script, /const dateQuery = dateSelectionQuery\(dateSelection\)/);
-  assert.match(script, /const currentFetchOptions = \{\s*cityKey: "",\s*date: "",\s*lookbackDays: 0,\s*loadSeq,\s*skipCache: backgroundRefresh,\s*liveOnly: backgroundRefresh,\s*\}/);
+  assert.match(script, /const currentFetchOptions = \{\s*cityKey: "",\s*date: "",\s*lookbackDays: 0,\s*loadSeq,\s*skipCache: opts\.skipCache === true,\s*liveOnly: opts\.liveOnly === true,\s*liveRefresh: backgroundRefresh \|\| opts\.liveRefresh === true,\s*\}/);
   assert.match(script, /this\.fetchAllCurrentItems\(labels, currentFetchOptions\)/);
   assert.match(script, /requestApi\("\/api\/v1\/weekly\/manifest", \{ __skipCache: true, __liveOnly: true \}\)/);
   assert.match(script, /currentFeedBehindManifest\(manifest, current\)/);
@@ -129,10 +129,10 @@ test("home first load does not wait on slow filter metadata before rendering eve
   assert.match(script, /FILTER_META_TIMEOUT_MS\s*=\s*\d+/);
   assert.match(script, /withFilterMetaTimeout\(requestApi\("\/api\/v1\/weekly\/cities", facetMetaOptions\)/);
   assert.match(script, /withFilterMetaTimeout\(requestApi\("\/api\/v1\/weekly\/dates", \{/);
-  assert.match(script, /cityFacetPayloadMatchesItems\(citiesResult\.value, cityFilterSourceItems\)/);
+  assert.match(script, /facetPayloadMatchesVisibleSet\(citiesResult\.value, cityFilterSourceItems, current, "cities"\)/);
   assert.match(script, /buildCityFiltersFromIndex\(citiesResult\.value, lang, this\.data\.t\.allCities\)/);
   assert.match(script, /cityIndexFilters \|\| buildCityFiltersFallback\(cityFilterSourceItems/);
-  assert.match(script, /datesResult\.value\?\.scope === "current"/);
+  assert.match(script, /facetPayloadMatchesVisibleSet\(datesResult\.value, dateFilterSourceItems, current, "dates"\)/);
   assert.match(script, /buildDateFiltersFallback\(dateFilterSourceItems, lang, this\.data\.t\.allDates, dateIndexKeys\)/);
 });
 

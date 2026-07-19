@@ -1,8 +1,57 @@
 # WeChat History HTML Pipeline
 
-Updated: 2026-05-26
+Updated: 2026-07-19
 
-This repository is the current `wechathtmldownload` / `wechat-ingest` working repo at `C:\code\githubstar\wechathtmldownload`.
+The canonical source repository is `F:\code\githubstar\wechathtmldownload`
+(`C:\code` is a junction to the active F: source root). That source tree is
+currently protected discovery evidence; use the explicit integration/release
+paths below for the 2026-07-19 recovery.
+
+## 2026-07-19 HUAIDJ recovery entry
+
+The active HUAIDJ weekly-activity repair is being integrated in
+`F:\DevData\HuaidjRuntime\build\weekly-visibility-20260719` on branch
+`codex/weekly-visibility-20260719`. It started from `0b97884db33c`; the working
+tree contains uncommitted candidate changes and is **not** an immutable runtime
+or a deployed release.
+
+Read these documents in order before changing the weekly/miniprogram lane:
+
+1. `docs/HUAIDJ_DISASTER_RECOVERY_MASTER_PROMPT_20260719.md` — authority,
+   state names, business contracts, and completion criteria.
+2. `docs/HUAIDJ_FULL_RECOVERY_EXECUTION_PLAN_20260719.md` — dependency-ordered
+   execution plan and still-open release steps.
+3. `docs/HUAIDJ_MINIPROGRAM_LOADING_ROOT_CAUSE_20260719.md` — reproduced
+   weekend/date/facet/pagination failure and the unified projection contract.
+4. `docs/HUAIDJ_PIPELINE_SSOT_20260717.md` — full Sanji/Qwen-VL/DeepSeek/
+   CloudRun/CloudBase/Atlas/Hermes system map plus the 2026-07-19 overlay.
+5. `docs/ATLAS_DATASET_GENERATION_HANDSHAKE_20260719.md` and
+   `docs/ATLAS_TRIPLET_INPUT_PREFLIGHT_20260719.md` — Atlas dataset identity and
+   current external candidate boundary.
+6. `docs/WORKTREE_CONSOLIDATION_PLAN_20260719.md` — protected-history and
+   exact-path worktree cleanup gates; the plan has not been executed.
+
+The weekly activity client is online-first. Routine activity refreshes update
+CloudRun and the CloudBase hot generation; they do not rewrite or ship the
+bundled static seed. List rows, totals, posters, city/date facets, exact dates,
+and the Asia/Shanghai Friday-through-Sunday weekend range must be projections
+of one complete, generation-verified visible set. Duplicate IDs, cursor loops,
+page-limit truncation, total drift, or generation drift fail closed.
+
+Local verification entrypoints for the candidate are:
+
+```powershell
+npm run test:miniprogram
+npm run test:cloudrun
+powershell -NoProfile -ExecutionPolicy Bypass -File apps\weekly_activity_miniprogram\scripts\run_devtools_release_suite_windows.ps1 `
+  -StaticPackageDir <verified-current-package> -OutRoot <external-report-dir> -Screenshots -Execute
+```
+
+The DevTools suite, clean Git commit, remote push, immutable release, Hermes
+cutover, 744-hour Sanji refresh, paid-model run, backend/CloudBase deployment,
+mini-program upload/review/public release, and Atlas serving promotion each
+require separate final evidence. A passing local test or an upload command does
+not imply any of those later states.
 
 It is a self-use pipeline for collecting WeChat history URLs, capturing article/archive bundles, retaining local assets, converting article HTML/archive bundles into Markdown and LLM-ready artifacts, running downstream LLM stages, and operating the PC UI / Electron workbench around those artifacts.
 
@@ -82,7 +131,11 @@ The repo also contains many historical handoffs and long-run logs. Treat generat
 
 ## Current SSOT docs
 
-- `docs/current-runtime.md` — 2026-05-17 current entry, latest safe verification, Stage7 authority split, and forbidden actions.
+- `docs/HUAIDJ_DISASTER_RECOVERY_MASTER_PROMPT_20260719.md` — current HUAIDJ full-system authority and completion contract.
+- `docs/HUAIDJ_FULL_RECOVERY_EXECUTION_PLAN_20260719.md` — current dependency-ordered recovery plan and open release phases.
+- `docs/HUAIDJ_MINIPROGRAM_LOADING_ROOT_CAUSE_20260719.md` — current weekend/date/facet/pagination diagnosis and fix contract.
+- `docs/HUAIDJ_PIPELINE_SSOT_20260717.md` — current full HUAIDJ pipeline map; read its 2026-07-19 overlay for live status.
+- `docs/current-runtime.md` — 2026-07-19 candidate/runtime/public state split and forbidden claims.
 - `AGENTS.md` — agent boundaries and safety rules.
 - `docs/CURRENT_CODE_MAP.md` — generated source/tree map.
 - `docs/CLI_REFERENCE.md` — generated CLI/package script map.

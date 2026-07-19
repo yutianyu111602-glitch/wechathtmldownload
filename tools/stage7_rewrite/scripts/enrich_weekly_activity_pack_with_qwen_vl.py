@@ -158,6 +158,11 @@ def base_queue_id(queue_id: str) -> str:
     return queue_id
 
 
+def is_aggregate_child_item(row: dict[str, Any]) -> bool:
+    row_id = str(row.get("queue_id") or row.get("article_id") or row.get("id") or "").strip()
+    return row.get("aggregation_child") is True or row_id.startswith("agg-child-")
+
+
 def env_first(names: Iterable[str]) -> str:
     for name in names:
         value = os.environ.get(name)
@@ -482,6 +487,14 @@ def load_queue_lookup(queue_path: Path) -> dict[str, dict[str, Any]]:
 def resolve_source_row(candidate: dict[str, Any], lookup: dict[str, dict[str, Any]]) -> dict[str, Any] | None:
     queue_id = str(candidate.get("queue_id") or candidate.get("id") or "")
     keys = [queue_id, base_queue_id(queue_id)]
+    if is_aggregate_child_item(candidate):
+        parent_id = str(
+            candidate.get("aggregation_parent_article_id")
+            or candidate.get("parent_article_id")
+            or ""
+        ).strip()
+        if parent_id:
+            keys.extend((parent_id, base_queue_id(parent_id)))
     account_key = str(candidate.get("account_key") or "")
     source_hash = str(candidate.get("source_url_hash") or candidate.get("source_hash") or "")
     if account_key and source_hash:
@@ -658,6 +671,14 @@ def should_process(candidate: dict[str, Any], window_start: dt.date, window_days
     return any(window_start <= item <= window_end for item in dates)
 
 
+def is_publishable_aggregate_child(candidate: dict[str, Any], window_start: dt.date, window_days: int) -> bool:
+    if not is_aggregate_child_item(candidate):
+        return False
+    if candidate.get("publish_blocked") is True or candidate.get("aggregation_child_review") is True:
+        return False
+    return should_process(candidate, window_start, window_days)
+
+
 def read_asset_meta(asset: Path) -> dict[str, Any]:
     meta_path = asset.with_name(asset.name + ".meta.json")
     if not meta_path.exists():
@@ -771,7 +792,6 @@ def compact_candidate_context(candidate: dict[str, Any], source_row: dict[str, A
         "post_date",
         "post_time",
         "source_url",
-        "article_dir",
         "body_text_chars",
     ]
     source_part = {key: source_row.get(key) for key in source_keys if key in source_row}
@@ -794,10 +814,22 @@ def build_prompt(candidate: dict[str, Any], source_row: dict[str, Any], assets: 
             }
         )
     context = compact_candidate_context(candidate, source_row)
+    aggregate_child_instruction = ""
+    if is_aggregate_child_item(candidate):
+        aggregate_child_instruction = (
+            "This candidate is one child event extracted from an aggregate/overview article. Select a poster only "
+            "when the image visibly matches this exact child event's date plus title, venue, or lineup. Never reuse "
+            "the parent article cover, overview/calendar image, or a sibling event poster. If no image can be tied "
+            "to this exact child event, return main_poster_image_index=null and add "
+            "no_exact_aggregate_child_poster_visible.\n"
+        )
     return (
         "You are extracting one China electronic music event from a WeChat article.\n"
         "Use the attached local article images directly. Inspect every attached image before choosing "
         "the main poster or lineup. Do not assume OCR text exists.\n"
+        "Local filesystem paths are private processing metadata: do not request, infer, repeat, or return any "
+        "drive, directory, filename path, article_dir, source_evidence_path, or other machine-local locator.\n"
+        f"{aggregate_child_instruction}"
         "Do not use Sanji post_time as event time unless it is visibly part of the event poster/body.\n"
         "Main poster selection: choose the image that is the strongest single-event poster for this candidate. "
         "It must visibly match the event date/title/venue/lineup when possible. Reject account covers, QR cards, "
@@ -1031,6 +1063,164 @@ def selected_asset(assets: list[ImageAsset], parsed: dict[str, Any]) -> ImageAss
     return assets[idx]
 
 
+def clear_inherited_aggregate_parent_poster(row: dict[str, Any]) -> None:
+    if not is_aggregate_child_item(row):
+        return
+    source_values = {
+        str(row.get("cover_source") or "").strip().lower(),
+        str(row.get("poster_source") or "").strip().lower(),
+    }
+    if "aggregate_parent_cover" not in source_values:
+        return
+    for key in (
+        "cover_url",
+        "poster_url",
+        "cover_image_url",
+        "poster_file_id",
+        "posterFileId",
+        "cloudFileId",
+    ):
+        row.pop(key, None)
+    row["cover_source"] = ""
+    row["poster_source"] = ""
+
+
+def normalize_identity_text(value: Any) -> str:
+    return re.sub(r"[^0-9a-z\u4e00-\u9fff]+", "", str(value or "").casefold())
+
+
+def identity_values_match(expected: list[str], observed: list[str]) -> bool:
+    expected_keys = [normalize_identity_text(value) for value in expected]
+    observed_keys = [normalize_identity_text(value) for value in observed]
+    for left in expected_keys:
+        if not left:
+            continue
+        for right in observed_keys:
+            if not right:
+                continue
+            if left == right or (min(len(left), len(right)) >= 2 and (left in right or right in left)):
+                return True
+    return False
+
+
+def aggregate_child_identity_validation(
+    candidate: dict[str, Any], parsed: dict[str, Any]
+) -> tuple[str, dict[str, Any]]:
+    if parsed.get("main_poster_image_index") in (None, ""):
+        return "", {"selection_present": False, "matched_identity_fields": []}
+    input_dates = sorted(set(candidate_dates(candidate)))
+    model_date = parse_yyyy_mm_dd(str(parsed.get("date_start") or ""))
+    validation: dict[str, Any] = {
+        "input_dates": [value.isoformat() for value in input_dates],
+        "model_date": model_date.isoformat() if model_date else "",
+        "matched_identity_fields": [],
+    }
+    if len(input_dates) != 1:
+        return "aggregate_child_identity_input_date_not_single", validation
+    input_date = input_dates[0]
+    if model_date is None:
+        return "aggregate_child_identity_model_date_missing", validation
+    if model_date != input_date:
+        return "aggregate_child_identity_date_mismatch", validation
+
+    input_title = [str(candidate.get("event_title") or candidate.get("title") or "").strip()]
+    input_title = [value for value in input_title if value]
+    model_title = [str(parsed.get("event_title") or "").strip()]
+    model_title = [value for value in model_title if value]
+    if input_title and not model_title:
+        return "aggregate_child_identity_model_title_missing", validation
+    if input_title and not identity_values_match(input_title, model_title):
+        return "aggregate_child_identity_title_mismatch", validation
+    if input_title:
+        validation["matched_identity_fields"].append("title")
+
+    controlled_fields = (
+        ("venue", as_string_list(candidate.get("venue")), as_string_list(parsed.get("venue"))),
+        ("lineup", clean_lineup_values(candidate.get("lineup")), clean_lineup_values(parsed.get("lineup"))),
+    )
+    for field, expected, observed in controlled_fields:
+        if expected and observed and not identity_values_match(expected, observed):
+            return f"aggregate_child_identity_{field}_mismatch", validation
+        if expected and observed:
+            validation["matched_identity_fields"].append(field)
+
+    evidence_lines = [
+        str(value).strip()
+        for field in ("visible_text_lines", "evidence", "lineup_evidence")
+        for value in normalize_list(parsed.get(field))
+        if str(value or "").strip()
+    ]
+    evidence_text = "\n".join(evidence_lines).casefold()
+    date_markers = {
+        input_date.isoformat(),
+        input_date.strftime("%Y/%m/%d"),
+        input_date.strftime("%Y.%m.%d"),
+        f"{input_date.month}/{input_date.day}",
+        input_date.strftime("%m/%d"),
+        f"{input_date.month}.{input_date.day}",
+        input_date.strftime("%m.%d"),
+        f"{input_date.month}月{input_date.day}日",
+        f"{input_date.year}年{input_date.month}月{input_date.day}日",
+    }
+    if not evidence_text or not any(marker.casefold() in evidence_text for marker in date_markers):
+        return "aggregate_child_identity_evidence_date_missing", validation
+
+    source_anchors = [
+        *input_title,
+        *as_string_list(candidate.get("venue")),
+        *clean_lineup_values(candidate.get("lineup")),
+    ]
+    if source_anchors and not identity_values_match(source_anchors, evidence_lines):
+        return "aggregate_child_identity_evidence_anchor_missing", validation
+    validation["source_evidence_matched"] = True
+    return "", validation
+
+
+def aggregate_child_poster_selection_issue(row: dict[str, Any]) -> str:
+    identity_error = str(row.get("poster_vl_identity_error_code") or "").strip()
+    if identity_error.startswith("aggregate_child_identity_"):
+        return identity_error
+    if str(row.get("poster_vl_status") or "") != "enriched":
+        return f"poster_vl_status_{str(row.get('poster_vl_status') or 'missing')}"
+    if not str(row.get("poster_vl_provider") or "").strip():
+        return "missing_poster_vl_provider"
+    if not str(row.get("poster_vl_model") or "").strip():
+        return "missing_poster_vl_model"
+    evidence = row.get("poster_selection_evidence")
+    if not isinstance(evidence, dict):
+        return "missing_poster_selection_evidence"
+    if evidence.get("selection_scope") != "aggregate_child_exact_event":
+        return "invalid_selection_scope"
+    if evidence.get("selected_by") != "qwen_vl_direct_sanji_article_assets":
+        return "invalid_selected_by"
+    if not str(evidence.get("provider") or "").strip():
+        return "missing_evidence_provider"
+    if not str(evidence.get("model") or "").strip():
+        return "missing_evidence_model"
+    if evidence.get("main_poster_image_index") in (None, ""):
+        return "missing_main_poster_image_index"
+    risk_flags = {str(value).strip().lower() for value in as_string_list(evidence.get("risk_flags"))}
+    if "no_exact_aggregate_child_poster_visible" in risk_flags:
+        return "no_exact_aggregate_child_poster_visible"
+    selected_url = str(evidence.get("selected_source_url") or "").strip()
+    if not selected_url:
+        return "missing_selected_source_url"
+    evidence_path = str(evidence.get("source_evidence_path") or "").strip()
+    if not evidence_path:
+        return "missing_source_evidence_path"
+    if not Path(evidence_path).is_file():
+        return "source_evidence_file_missing"
+    if str(row.get("cover_url") or "").strip() != selected_url:
+        return "cover_url_does_not_match_selected_source"
+    if str(row.get("poster_url") or "").strip() != selected_url:
+        return "poster_url_does_not_match_selected_source"
+    if str(row.get("poster_source") or "").strip() != "sanji_article_body_vl_aggregate_child_exact":
+        return "invalid_aggregate_child_poster_source"
+    if str(row.get("cover_source") or "").strip().lower() == "aggregate_parent_cover":
+        return "aggregate_parent_cover_inherited"
+    return ""
+
+
 def merge_vl_result(
     candidate: dict[str, Any],
     source_row: dict[str, Any],
@@ -1041,7 +1231,18 @@ def merge_vl_result(
     out_dir: Path,
 ) -> dict[str, Any]:
     row = copy.deepcopy(candidate)
+    clear_inherited_aggregate_parent_poster(row)
+    is_aggregate_child = is_aggregate_child_item(row)
+    identity_error = ""
+    identity_validation: dict[str, Any] = {}
+    if is_aggregate_child:
+        identity_error, identity_validation = aggregate_child_identity_validation(candidate, parsed)
     row["poster_vl_status"] = "enriched" if parsed.get("is_event", True) else "not_event"
+    if identity_error:
+        row["poster_vl_status"] = "aggregate_child_identity_mismatch"
+        row["poster_vl_identity_error_code"] = identity_error
+    else:
+        row.pop("poster_vl_identity_error_code", None)
     row["poster_vl_provider"] = provider.name
     row["poster_vl_model"] = provider.model
     row["poster_vl_fallback_used"] = fallback_used
@@ -1057,32 +1258,38 @@ def merge_vl_result(
         for idx, asset in enumerate(assets)
     ]
 
-    date_start = parse_yyyy_mm_dd(str(parsed.get("date_start") or ""))
-    if date_start:
-        row["event_date_text"] = [date_start.isoformat()]
-        row["date_text"] = [date_start.isoformat()]
-    set_if_text(row, "event_title", parsed.get("event_title"))
-    set_if_text(row, "event_time_text", parsed.get("time_text"))
-    set_if_text(row, "address", parsed.get("address"))
-    set_list_if_any(row, "city", parsed.get("city"))
-    set_list_if_any(row, "venue", parsed.get("venue"))
+    if not is_aggregate_child:
+        date_start = parse_yyyy_mm_dd(str(parsed.get("date_start") or ""))
+        if date_start:
+            row["event_date_text"] = [date_start.isoformat()]
+            row["date_text"] = [date_start.isoformat()]
+        set_if_text(row, "event_title", parsed.get("event_title"))
+        set_if_text(row, "event_time_text", parsed.get("time_text"))
+        set_if_text(row, "address", parsed.get("address"))
+        set_list_if_any(row, "city", parsed.get("city"))
+        set_list_if_any(row, "venue", parsed.get("venue"))
     lineup_values = clean_lineup_values(parsed.get("lineup"))
-    if lineup_values:
+    if lineup_values and not is_aggregate_child:
         row["lineup"] = lineup_values
         row["lineup_artists"] = lineup_values
         row["poster_vl_lineup"] = lineup_values
     lineup_evidence = as_string_list(parsed.get("lineup_evidence"))
-    if lineup_evidence:
+    if lineup_evidence and not is_aggregate_child:
         row["poster_vl_lineup_evidence"] = lineup_evidence
-    set_list_if_any(row, "music_styles", parsed.get("music_styles"))
-    set_list_if_any(row, "price", parsed.get("price"))
-    set_if_text(row, "ticketing_text", parsed.get("ticketing_text"))
+    if not is_aggregate_child:
+        set_list_if_any(row, "music_styles", parsed.get("music_styles"))
+        set_list_if_any(row, "price", parsed.get("price"))
+        set_if_text(row, "ticketing_text", parsed.get("ticketing_text"))
 
-    asset = selected_asset(assets, parsed)
+    asset = None if identity_error else selected_asset(assets, parsed)
     if asset and asset.source_url:
         row["cover_url"] = asset.source_url
         row["poster_url"] = asset.source_url
-        row["poster_source"] = "sanji_article_body_vl"
+        row["poster_source"] = (
+            "sanji_article_body_vl_aggregate_child_exact"
+            if is_aggregate_child_item(row)
+            else "sanji_article_body_vl"
+        )
 
     evidence_path = write_source_evidence(out_dir, candidate, source_row, assets, parsed)
     row["source_evidence_path"] = evidence_path
@@ -1099,11 +1306,17 @@ def merge_vl_result(
         "lineup_evidence": lineup_evidence,
         "cleaned_lineup": lineup_values,
         "evidence": as_string_list(parsed.get("evidence")),
-        "risk_flags": as_string_list(parsed.get("risk_flags")),
+        "risk_flags": list(dict.fromkeys([*as_string_list(parsed.get("risk_flags")), *([identity_error] if identity_error else [])])),
         "confidence": parsed.get("confidence"),
         "source_evidence_path": evidence_path,
         "generated_at": now_iso(),
     }
+    if is_aggregate_child:
+        row["poster_selection_evidence"]["selection_scope"] = "aggregate_child_exact_event"
+        row["poster_selection_evidence"]["aggregation_parent_article_id"] = str(
+            row.get("aggregation_parent_article_id") or ""
+        )
+        row["poster_selection_evidence"]["identity_validation"] = identity_validation
     return row
 
 
@@ -1126,6 +1339,21 @@ def process_rows(
     tasks: list[tuple[int, dict[str, Any], dict[str, Any], list[ImageAsset]]] = []
     for index, row in enumerate(rows):
         stats["rows_seen"] += 1
+        if args.only_aggregate_children and not is_publishable_aggregate_child(row, window_start, args.window_days):
+            stats["skipped_non_target_aggregate_child_scope"] += 1
+            output[index] = row
+            routing_rows.append(
+                {
+                    "queue_id": str(row.get("queue_id") or row.get("id") or ""),
+                    "bucket": "easy_rule",
+                    "reason": "outside_publishable_aggregate_child_scope",
+                    "required_model": "none",
+                    "source_hashes": sorted(source_hashes_from_row(row)),
+                }
+            )
+            continue
+        if args.only_aggregate_children:
+            stats["aggregate_child_target_count"] += 1
         if args.limit and stats["processed"] >= args.limit:
             stats["skipped_limit"] += 1
             output[index] = row
@@ -1426,6 +1654,15 @@ def run(args: argparse.Namespace) -> int:
         "skipped_limit": 0,
         "skipped_not_in_window_or_not_feed": 0,
         "resumed_from_evidence": 0,
+        "only_aggregate_children": bool(args.only_aggregate_children),
+        "require_selected_poster": bool(args.require_selected_poster),
+        "aggregate_child_target_count": 0,
+        "aggregate_child_selected_poster_count": 0,
+        "aggregate_child_missing_selected_poster_count": 0,
+        "aggregate_child_missing_selected_poster_items": [],
+        "skipped_non_target_aggregate_child_scope": 0,
+        "strict_gate_ok": True,
+        "hard_failures": [],
         "providers": {},
     }
 
@@ -1490,10 +1727,41 @@ def run(args: argparse.Namespace) -> int:
             f"fallback provider {fallback.name}/{fallback.model} handled {fallback_provider_count}/{processed_count} rows "
             f"({fallback_ratio:.1%}), above max_fallback_ratio={float(args.max_fallback_ratio):.1%}"
         )
+    if args.only_aggregate_children:
+        selection_issues: list[dict[str, Any]] = []
+        input_output_pairs = [
+            *zip(candidates, enriched_candidates),
+            *zip(reviews, enriched_reviews),
+        ]
+        window_start = dt.date.fromisoformat(args.window_start)
+        for input_row, output_row in input_output_pairs:
+            if not is_publishable_aggregate_child(input_row, window_start, args.window_days):
+                continue
+            reason = aggregate_child_poster_selection_issue(output_row)
+            if reason:
+                selection_issues.append(
+                    {
+                        "queue_id": str(input_row.get("queue_id") or input_row.get("id") or ""),
+                        "title": str(input_row.get("title") or input_row.get("event_title") or "")[:160],
+                        "reason": reason,
+                        "poster_vl_status": str(output_row.get("poster_vl_status") or ""),
+                    }
+                )
+        stats["aggregate_child_missing_selected_poster_count"] = len(selection_issues)
+        stats["aggregate_child_missing_selected_poster_items"] = selection_issues[:100]
+        stats["aggregate_child_selected_poster_count"] = max(
+            0,
+            int(stats["aggregate_child_target_count"]) - len(selection_issues),
+        )
+        if args.require_selected_poster and selection_issues:
+            stats["hard_failures"].append("aggregate_child_selected_poster_incomplete")
+            stats["strict_gate_ok"] = False
     write_json(out_dir / "summary.json", stats)
     print(json.dumps(stats, ensure_ascii=False, indent=2))
     if not stats["primary_provider_gate_ok"]:
         return 3
+    if not stats["strict_gate_ok"]:
+        return 4
     if args.execute and stats["failures"] > int(args.max_failures):
         return 2
     return 0
@@ -1594,12 +1862,16 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--execute", action="store_true")
     parser.add_argument("--mock-response", default="")
     parser.add_argument("--resume-from-evidence-dir", default="")
+    parser.add_argument("--only-aggregate-children", action="store_true")
+    parser.add_argument("--require-selected-poster", action="store_true")
     parser.add_argument("--selfcheck", action="store_true")
     args = parser.parse_args(argv)
     if not args.selfcheck:
         missing = [name for name in ("pack_dir", "weekly_queue", "out_dir") if not getattr(args, name)]
         if missing:
             parser.error("missing required arguments: " + ", ".join("--" + item.replace("_", "-") for item in missing))
+        if args.require_selected_poster and not args.only_aggregate_children:
+            parser.error("--require-selected-poster requires --only-aggregate-children")
         dt.date.fromisoformat(args.window_start)
     return args
 

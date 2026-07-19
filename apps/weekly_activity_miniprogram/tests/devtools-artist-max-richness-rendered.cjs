@@ -9,13 +9,20 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const WebSocket = require("ws");
+const { connectRawDevtools } = require("./devtools-raw-session.cjs");
 
 const wsEndpoint = String(process.env.MINIPROGRAM_AUTOMATOR_WS || "").trim();
-const artifactRoot = path.resolve(__dirname, "../test-artifacts");
+const artifactRoot = process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT
+  ? path.resolve(process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT)
+  : path.resolve(__dirname, "../test-artifacts");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const artifactDir = path.join(artifactRoot, `artist-max-richness-rendered-${stamp}`);
 const targetName = String(process.env.ATLAS_RENDER_ARTIST_NAME || "SULK").trim();
 const targetSubjectId = String(process.env.ATLAS_RENDER_ARTIST_SUBJECT_ID || "dj:sulk").trim();
+const atlasDataDir = path.resolve(
+  process.env.HUAIDJ_ATLAS_MINIAPP_DATA_DIR
+    || path.resolve(__dirname, "../../../services/weekly_activity_cloudrun/data"),
+);
 const steps = [];
 let lastFailureContext = {};
 const runtimeContext = {};
@@ -40,12 +47,7 @@ async function step(label, run) {
   catch (e) { item.ok = false; item.error = e && e.stack ? e.stack : String(e); item.finishedAt = new Date().toISOString(); throw e; }
 }
 function connectDevtools(endpoint) {
-  return new Promise((resolve, reject) => {
-    const ws = new WebSocket(endpoint);
-    const t = setTimeout(() => { ws.close(); reject(new Error("DevTools connect timeout")); }, 30000);
-    ws.on("open", () => { clearTimeout(t); resolve(ws); });
-    ws.on("error", (e) => { clearTimeout(t); reject(e); });
-  });
+  return connectRawDevtools({ endpoint, timeoutMs: 120000 });
 }
 function sendProtocol(ws, method, params = {}, timeoutMs = 30000) {
   return new Promise((resolve, reject) => {
@@ -83,15 +85,13 @@ function closeSocket(ws) {
 }
 
 async function main() {
-  if (!wsEndpoint) throw new Error("MINIPROGRAM_AUTOMATOR_WS required");
-
   process.env.ATLAS_MINIAPP_PRELOAD = "0";
-  process.env.ATLAS_MINIAPP_INDEX = path.resolve(__dirname, "../../../services/weekly_activity_cloudrun/data/atlas_index.json.gz");
-  process.env.ATLAS_DJ_EXTERNAL_LINKS = path.resolve(__dirname, "../../../services/weekly_activity_cloudrun/data/dj_external_links_accepted_candidate.json.gz");
-  process.env.ATLAS_RADIO_PROGRAMS = path.resolve(__dirname, "../../../services/weekly_activity_cloudrun/data/radio_programs_candidate.json.gz");
-  process.env.ATLAS_RADIO_PROGRAM_MATCH_REVIEW = path.resolve(__dirname, "../../../services/weekly_activity_cloudrun/data/radio_program_match_review.json.gz");
-  process.env.ATLAS_DJ_RELATION_TRAJECTORY_LENS = path.resolve(__dirname, "../../../services/weekly_activity_cloudrun/data/dj_relation_trajectory_lens.json.gz");
-  process.env.ATLAS_NEIGHBORHOOD_BUNDLE = path.resolve(__dirname, "../../../services/weekly_activity_cloudrun/data/atlas_neighborhood.json.gz");
+  process.env.ATLAS_MINIAPP_INDEX = path.join(atlasDataDir, "atlas_index.json.gz");
+  process.env.ATLAS_DJ_EXTERNAL_LINKS = path.join(atlasDataDir, "dj_external_links_accepted_candidate.json.gz");
+  process.env.ATLAS_RADIO_PROGRAMS = path.join(atlasDataDir, "radio_programs_candidate.json.gz");
+  process.env.ATLAS_RADIO_PROGRAM_MATCH_REVIEW = path.join(atlasDataDir, "radio_program_match_review.json.gz");
+  process.env.ATLAS_DJ_RELATION_TRAJECTORY_LENS = path.join(atlasDataDir, "dj_relation_trajectory_lens.json.gz");
+  process.env.ATLAS_NEIGHBORHOOD_BUNDLE = path.join(atlasDataDir, "atlas_neighborhood.json.gz");
 
   const { createServer } = await import("../../../services/weekly_activity_cloudrun/src/server.mjs");
   let server, ws;
@@ -105,7 +105,7 @@ async function main() {
     const baseUrl = await listen(server);
     runtimeContext.baseUrl = baseUrl;
 
-    ws = await step("connect DevTools", () => withTimeout(connectDevtools(wsEndpoint), 40000, "connect"));
+    ws = await step("connect or launch DevTools", () => withTimeout(connectDevtools(wsEndpoint), 140000, "DevTools session"));
 
     await step("inject local backend", () => withTimeout(callApp(ws, function inject(base) {
       const c = getApp().globalData.cloud;

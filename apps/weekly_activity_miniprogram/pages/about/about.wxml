@@ -1,5 +1,5 @@
 <view class="page about-page">
-  <image lazy-load class="brand-logo" src="/assets/brand/huaidj-logo-nav-512x128.png" mode="aspectFit" bindlongpress="onLogoLongpress"></image>
+  <image lazy-load class="brand-logo" src="/assets/brand/huaidj-logo-nav-512x128.png" mode="aspectFit"></image>
   <view class="section-title">{{t.title}}</view>
   <view class="copy">{{t.copy1}}</view>
   <view class="copy">{{t.copy2}}</view>
@@ -23,6 +23,14 @@
       <text>{{t.atlasAction}}</text>
       <text class="atlas-url">{{t.atlasUrlLabel}}</text>
     </view>
+  </view>
+  <view class="sound-panel" bindtap="openSound" hover-class="sound-panel-hover">
+    <view class="sound-panel-head">
+      <view class="sound-panel-title">{{t.soundTitle}}</view>
+      <view class="interview-arrow">›</view>
+    </view>
+    <view class="sound-full-access">{{t.soundAccess}}</view>
+    <view class="sound-review-note">{{t.soundReview}}</view>
   </view>
   <view class="interview-panel" bindtap="openInterview" hover-class="interview-panel-hover">
     <view class="interview-panel-head">

@@ -5,6 +5,8 @@ import path from "node:path";
 import test from "node:test";
 import { gzipSync } from "node:zlib";
 
+const TEST_DATASET_ID = "atlas-sha256-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc";
+
 test("miniapp Atlas API resolves legacy slug subject IDs to canonical hash IDs", async () => {
   const dir = await mkdtemp(path.join(os.tmpdir(), "miniapp-atlas-api-legacy-id-"));
   const previousEnv = {
@@ -33,6 +35,7 @@ test("miniapp Atlas API resolves legacy slug subject IDs to canonical hash IDs",
 
     await writeFile(indexPath, gzipSync(Buffer.from(JSON.stringify({
       v: 4,
+      datasetId: TEST_DATASET_ID,
       subjects: [
         { i: "dj:alpha", t: "dj", n: "ALPHA", nn: "alpha", a: ["Alpha"], c: "", ec: 1 },
         { i: "dj:hash-alpha", t: "dj", n: "Alpha", nn: "alpha", a: ["Alpha"], c: "上海", ec: 12 },
@@ -56,6 +59,7 @@ test("miniapp Atlas API resolves legacy slug subject IDs to canonical hash IDs",
     }), "utf8")));
     await writeFile(neighborhoodPath, gzipSync(Buffer.from(JSON.stringify({
       schemaVersion: "atlas.miniapp.neighborhood_bundle.v1",
+      datasetId: TEST_DATASET_ID,
       generation: { nodeCount: 3, edgeCount: 2 },
       byNode: {
         "dj:alpha": [{ u: "dj:nisip1d", rt: "collab", w: 10, rs: 6 }],

@@ -24,8 +24,18 @@ from typing import Any
 SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
+SCRIPTS_DIR = SCRIPT_DIR.parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
 
 from validate_weekly_event_published import raise_for_issues, validate_published_items  # noqa: E402
+from weekly_public_projection import (  # noqa: E402
+    assert_public_payload,
+    project_public_items,
+    project_public_source_map_payload,
+    scrub_public_package_payload,
+    scrub_public_value,
+)
 
 
 LONGRUN_ROOT = Path(r"D:\downstream_results\stage7_rewrite\longrun")
@@ -59,6 +69,7 @@ USAGE_SIDECAR_FILENAMES = (
     "qwen_vl_usage_summary.json",
     "poster_vl_usage_details.jsonl",
 )
+GENERATION_ID_SCHEMA = "weekly_activity_generation.v1"
 CITY_DEFS = [
     ("beijing", "北京", ["北京", "beijing", "bj"]),
     ("shanghai", "上海", ["上海", "shanghai", "长宁区"]),
@@ -300,6 +311,40 @@ def write_json(path: Path, value: dict[str, Any]) -> None:
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def _canonical_json(value: Any) -> str:
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+
+
+def compute_generation_id(
+    *,
+    items: list[dict[str, Any]],
+    source_map: dict[str, Any],
+    window_start: date | str,
+    window_end: date | str,
+) -> str:
+    """Build a stable identity from public package content, never wall time."""
+
+    canonical_items = sorted(
+        [dict(item) for item in items if isinstance(item, dict)],
+        key=lambda item: (
+            first_string(item.get("id"), item.get("event_id")),
+            _canonical_json(item),
+        ),
+    )
+    canonical_sources = {
+        str(key): source_map[key]
+        for key in sorted(source_map, key=lambda value: str(value))
+    }
+    payload = {
+        "schema_version": GENERATION_ID_SCHEMA,
+        "window_start": window_start.isoformat() if isinstance(window_start, date) else str(window_start or ""),
+        "window_end": window_end.isoformat() if isinstance(window_end, date) else str(window_end or ""),
+        "items": canonical_items,
+        "sources": canonical_sources,
+    }
+    return f"sha256:{hashlib.sha256(_canonical_json(payload).encode('utf-8')).hexdigest()}"
+
+
 def sha256_short(value: str) -> str:
     if not value:
         return ""
@@ -311,6 +356,7 @@ def write_summary_md(path: Path, summary: dict[str, Any]) -> None:
         "# Weekly Activity Mini Program API",
         "",
         f"- generated_at: `{summary['generated_at']}`",
+        f"- generation_id: `{summary.get('generation_id', '')}`",
         f"- source_pack_dir: `{summary['source_pack_dir']}`",
         f"- out_dir: `{summary['out_dir']}`",
         f"- items: `{summary['items']}`",
@@ -2000,6 +2046,27 @@ def row_is_aggregate_child(row: dict[str, Any], item_id: str = "") -> bool:
     )
 
 
+def row_has_exact_aggregate_child_qwen_poster(row: dict[str, Any], item_id: str = "") -> bool:
+    if not row_is_aggregate_child(row, item_id):
+        return False
+    evidence = row.get("poster_selection_evidence")
+    if not isinstance(evidence, dict):
+        return False
+    selected_url = first_string(evidence.get("selected_source_url"))
+    cover_url = first_string(row.get("cover_url"), row.get("poster_url"))
+    risk_flags = {value.strip().lower() for value in list_strings(evidence.get("risk_flags"))}
+    return bool(
+        first_string(row.get("poster_vl_status")) == "enriched"
+        and evidence.get("selection_scope") == "aggregate_child_exact_event"
+        and evidence.get("selected_by") == "qwen_vl_direct_sanji_article_assets"
+        and evidence.get("main_poster_image_index") not in (None, "")
+        and "no_exact_aggregate_child_poster_visible" not in risk_flags
+        and selected_url
+        and cover_url == selected_url
+        and first_string(row.get("poster_source")) == "sanji_article_body_vl_aggregate_child_exact"
+    )
+
+
 def row_is_longform_column_article(row: dict[str, Any]) -> bool:
     texts = [
         first_string(row.get("title")),
@@ -2161,7 +2228,12 @@ def artist_profiles_from_row(row: dict[str, Any]) -> list[dict[str, Any]]:
     return profiles
 
 
-def build_weekly_entity_snapshot(items: list[dict[str, Any]], generated_at: str, pack_dir: Path) -> dict[str, Any]:
+def build_weekly_entity_snapshot(
+    items: list[dict[str, Any]],
+    generated_at: str,
+    pack_dir: Path,
+    generation_id: str = "",
+) -> dict[str, Any]:
     profile_by_id: dict[str, dict[str, Any]] = {}
     resolved_rows: list[dict[str, Any]] = []
     for item in items:
@@ -2206,6 +2278,7 @@ def build_weekly_entity_snapshot(items: list[dict[str, Any]], generated_at: str,
     return {
         "schema_version": "weekly_atlas_entity.v1",
         "generated_at": generated_at,
+        "generation_id": generation_id or None,
         "publish_package": pack_dir.name,
         "artist_profiles": sorted(profile_by_id.values(), key=lambda profile: profile.get("artist_id", "")),
         "lineup_resolved": resolved_rows,
@@ -2594,6 +2667,69 @@ def canonical_city(value: str) -> dict[str, str] | None:
     return None
 
 
+CHINESE_CITY_ROAD_SUFFIX_RE = re.compile(r"^\s*(?:东|西|南|北|中)?(?:路|街|大道|公路|道|巷|弄|里|胡同|街道)")
+ASCII_CITY_ROAD_SUFFIX_RE = re.compile(
+    r"^\s+(?:(?:east|west|north|south|central)\s+)?"
+    r"(?:road|rd\.?|street|st\.?|avenue|ave\.?|boulevard|blvd\.?)\b",
+    re.I,
+)
+MULTI_CITY_EVIDENCE_RE = re.compile(r"双城|多城|两地|巡演|tour|\b站\b", re.I)
+
+
+def city_term_occurrences(value: str, term: str) -> list[tuple[int, int]]:
+    if not value or not term:
+        return []
+    if term.isascii():
+        pattern = re.compile(rf"(?<![A-Za-z0-9]){re.escape(term)}(?![A-Za-z0-9])", re.I)
+    else:
+        pattern = re.compile(re.escape(term))
+    return [(match.start(), match.end()) for match in pattern.finditer(value)]
+
+
+def city_occurs_only_as_road_name(value: str, city: dict[str, str]) -> bool:
+    city_def = CITY_BY_KEY.get(city.get("key", ""), {})
+    terms = [city.get("label", ""), *city_def.get("aliases", [])]
+    occurrence_count = 0
+    road_occurrence_count = 0
+    seen_terms: set[str] = set()
+    for term in terms:
+        term_key = str(term or "").casefold()
+        if not term_key or term_key in seen_terms:
+            continue
+        seen_terms.add(term_key)
+        for _start, end in city_term_occurrences(value, str(term)):
+            occurrence_count += 1
+            suffix = value[end:]
+            road_suffix = ASCII_CITY_ROAD_SUFFIX_RE if str(term).isascii() else CHINESE_CITY_ROAD_SUFFIX_RE
+            if road_suffix.search(suffix):
+                road_occurrence_count += 1
+    return occurrence_count > 0 and road_occurrence_count == occurrence_count
+
+
+def filter_address_city_matches(value: str, cities: list[dict[str, str]]) -> list[dict[str, str]]:
+    """Drop city-name street aliases only when another real city anchors the address.
+
+    Examples such as ``上海市...乌鲁木齐北路`` and ``上海市...南京西路``
+    contain a second city label as a road name, not a second event location.  A
+    true multi-city address such as ``上海站 / 郑州站`` keeps both entries.  If
+    every match is road-like, the function keeps the original candidates for
+    diagnostics; ``infer_cities`` rejects that unanchored set and the release
+    quality gate blocks legacy rows that already persisted it.
+    """
+
+    if len(cities) < 2:
+        return cities
+    road_only_keys = {
+        city.get("key", "")
+        for city in cities
+        if city_occurs_only_as_road_name(value, city)
+    }
+    anchored = [city for city in cities if city.get("key", "") not in road_only_keys]
+    if not anchored:
+        return cities
+    return anchored
+
+
 def cities_from_text(value: str) -> list[dict[str, str]]:
     text = value.strip()
     if not text:
@@ -2605,13 +2741,50 @@ def cities_from_text(value: str) -> list[dict[str, str]]:
             if key not in seen:
                 seen.add(key)
                 out.append({"key": key, "label": label})
-    return out
+    return filter_address_city_matches(text, out)
+
+
+def explicit_multi_city_is_source_backed(
+    row: dict[str, Any],
+    cities: list[dict[str, str]],
+) -> bool:
+    if len(cities) < 2:
+        return False
+    source_texts = [
+        first_string(row.get("title")),
+        *list_strings(row.get("venue")),
+        *list_strings(row.get("evidence"), limit=10),
+    ]
+    for text in source_texts:
+        if not MULTI_CITY_EVIDENCE_RE.search(text):
+            continue
+        if all(
+            any(
+                alias_matches(text, term)
+                for term in [
+                    city.get("label", ""),
+                    *CITY_BY_KEY.get(city.get("key", ""), {}).get("aliases", []),
+                ]
+                if term
+            )
+            for city in cities
+        ):
+            return True
+    return False
 
 
 def infer_cities(row: dict[str, Any]) -> list[dict[str, str]]:
-    address_cities = cities_from_text(first_string(row.get("address"), row.get("address_full")))
-    if address_cities:
-        return address_cities
+    """Resolve source city evidence without treating city-named roads as cities.
+
+    Pre-registry priority is: a non-road address anchor (an administrative
+    prefix such as ``南京市`` is the canonical strong form, and two such
+    address anchors preserve a true multi-city event), then source-extracted
+    explicit cities, then title/account/venue/evidence fallback.  A city term
+    that occurs only in ``北京路``/``南京西路``/``乌鲁木齐北路`` is never an
+    address anchor.  ``build_item`` applies a bounded, trusted venue-registry
+    match after this resolver, so a verified venue can still canonicalize the
+    final city.
+    """
 
     explicit = list_strings(row.get("city"))
     inferred: list[dict[str, str]] = []
@@ -2626,7 +2799,20 @@ def infer_cities(row: dict[str, Any]) -> list[dict[str, str]]:
     for value in explicit:
         canonical = canonical_city(value)
         add(canonical if canonical else {"key": slugify(value), "label": value})
+
+    address_text = first_string(row.get("address"), row.get("address_full"))
+    address_cities = cities_from_text(address_text)
+    if address_cities:
+        address_is_only_road_aliases = all(
+            city_occurs_only_as_road_name(address_text, city)
+            for city in address_cities
+        )
+        if not address_is_only_road_aliases:
+            return address_cities
+
     if inferred:
+        if explicit_multi_city_is_source_backed(row, inferred):
+            return inferred
         account_text = first_string(row.get("account_key"), row.get("account"), row.get("promoter"))
         account_matches = [
             city
@@ -2706,6 +2892,7 @@ def sanitize_poster_selection_evidence(value: Any) -> dict[str, Any]:
         "cleaned_lineup",
         "evidence",
         "risk_flags",
+        "selection_scope",
         "generated_at",
     }
     out: dict[str, Any] = {}
@@ -2719,7 +2906,8 @@ def sanitize_poster_selection_evidence(value: Any) -> dict[str, Any]:
                 out[key] = cleaned
         elif isinstance(child, (str, int, float, bool)):
             out[key] = child
-    return out
+    cleaned = scrub_public_value(out, key_path="$.poster_selection_evidence")
+    return cleaned if isinstance(cleaned, dict) else {}
 
 
 def copy_optional_release_evidence(item: dict[str, Any], row: dict[str, Any]) -> None:
@@ -2978,6 +3166,10 @@ def build_item(
         extra_signals=account_signals,
     )
     if registry_venue and registry_venue.get("city_key"):
+        # This match is already bounded by the resolved city, unless the
+        # registry explicitly opts into a cross-city override and an exact
+        # account signal confirms it.  It is therefore stronger than extracted
+        # address/explicit city text and becomes the final canonical venue city.
         venue_city = {
             "key": registry_venue["city_key"],
             "label": registry_venue.get("city_name") or registry_venue["city_key"],
@@ -3022,7 +3214,12 @@ def build_item(
     poster_file_id = first_string(row.get("poster_file_id"))
     has_internal_poster = bool(re.match(r"^cloud://[^/]+/weekly-posters/\d{8}/.+", poster_file_id, re.I))
     cover_url = first_string(row.get("cover_url"), row.get("cover"), row.get("article_cover_url"), row.get("poster_url"))
-    package_cover_url = poster_file_id if has_internal_poster else ("" if is_aggregate_child else cover_url)
+    has_exact_aggregate_child_qwen_poster = row_has_exact_aggregate_child_qwen_poster(row, item_id)
+    package_cover_url = (
+        poster_file_id
+        if has_internal_poster
+        else (cover_url if (not is_aggregate_child or has_exact_aggregate_child_qwen_poster) else "")
+    )
     item = {
         "schema_version": "weekly_event_published.v1",
         "content_type": "calendar_preview" if row_is_calendar_preview(row) else "event",
@@ -3057,7 +3254,15 @@ def build_item(
         "cover_url": package_cover_url,
         "cover_image_url": package_cover_url,
         "poster_file_id": poster_file_id,
-        "poster_source": "cloudbase_storage" if has_internal_poster else ("" if is_aggregate_child else ("wechat_article" if cover_url else "")),
+        "poster_source": (
+            "cloudbase_storage"
+            if has_internal_poster
+            else (
+                "sanji_article_body_vl_aggregate_child_exact"
+                if has_exact_aggregate_child_qwen_poster
+                else ("" if is_aggregate_child else ("wechat_article" if cover_url else ""))
+            )
+        ),
         "poster_suppressed": False,
         "poster_suppressed_reason": "",
         "event_date_text": source_date_texts,
@@ -3130,6 +3335,21 @@ def clean_generated_json_dirs(out_dir: Path) -> None:
         for path in target.glob("*.json"):
             if path.is_file() and path.parent == target:
                 path.unlink()
+
+
+def safe_public_route_target(out_dir: Path, route: str, expected_dir: str) -> Path:
+    output_root = out_dir.resolve(strict=False)
+    root = (out_dir / expected_dir).resolve(strict=False)
+    if root.parent != output_root:
+        raise ValueError(f"weekly public route directory escapes output root: {expected_dir}")
+    target = (out_dir / route).resolve(strict=False)
+    try:
+        target.relative_to(root)
+    except ValueError as error:
+        raise ValueError(f"weekly public route escapes {expected_dir}: {route}") from error
+    if target.parent != root or target.suffix.casefold() != ".json":
+        raise ValueError(f"weekly public route must be one flat JSON file in {expected_dir}: {route}")
+    return target
 
 
 def build_filter_disposition(row: dict[str, Any], reason: str, item: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -3322,55 +3542,91 @@ def build_static_api(
         item.pop("_source_url", None)
         item.pop("_source_aliases", None)
         item.pop("_score_confidence", None)
+    items = project_public_items(items)
     schema_issues = validate_published_items(items)
     raise_for_issues(schema_issues)
+    for item in items:
+        assert_public_payload(item, label=f"weekly public item {first_string(item.get('id'))}")
+    generated_at = datetime.now().isoformat(timespec="seconds")
+    source_map_payload = project_public_source_map_payload(
+        {
+            "schema_version": "weekly_activity_source_url_map.v1",
+            "generated_at": generated_at,
+            "source_count": len(source_map),
+            "sources": source_map,
+        }
+    )
+    source_map = source_map_payload["sources"]
 
     out_dir.mkdir(parents=True, exist_ok=True)
+    for dirname in ("by-city", "by-date", "by-id"):
+        safe_public_route_target(out_dir, f"{dirname}/.route-safety.json", dirname)
     clean_generated_json_dirs(out_dir)
 
     cities: dict[str, list[dict[str, Any]]] = defaultdict(list)
     dates: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for item in items:
-        item_city_keys = item.get("city_keys") if isinstance(item.get("city_keys"), list) else []
-        for city_key in item_city_keys:
-            if isinstance(city_key, str) and city_key:
+        raw_city_keys = item.get("city_keys") if isinstance(item.get("city_keys"), list) else []
+        safe_city_keys: list[str] = []
+        for raw_city_key in raw_city_keys:
+            city_key = slugify(first_string(raw_city_key), fallback="")
+            if city_key and city_key not in safe_city_keys:
+                safe_city_keys.append(city_key)
                 cities[city_key].append(item)
-        date_keys = item.get("event_date_iso_guesses") if isinstance(item.get("event_date_iso_guesses"), list) else []
+        item["city_keys"] = safe_city_keys
+        if safe_city_keys:
+            item["city_key"] = safe_city_keys[0]
+        date_keys = [
+            first_string(value)
+            for value in (
+                item.get("event_date_iso_guesses")
+                if isinstance(item.get("event_date_iso_guesses"), list)
+                else []
+            )
+            if parse_iso_date(first_string(value)) is not None
+        ]
+        date_keys = list(dict.fromkeys(date_keys))
+        item["event_date_iso_guesses"] = date_keys
         for date_key in date_keys:
-            if isinstance(date_key, str) and date_key:
-                dates[date_key].append(item)
+            dates[date_key].append(item)
 
-    generated_at = datetime.now().isoformat(timespec="seconds")
-    source_map_payload = {
-        "schema_version": "weekly_activity_source_url_map.v1",
-        "generated_at": generated_at,
-        "source_count": len(source_map),
-        "sources": source_map,
-    }
-    build_filter_dispositions = {
+    generation_id = compute_generation_id(
+        items=items,
+        source_map=source_map,
+        window_start=window_start,
+        window_end=window_end,
+    )
+    source_map_payload["generation_id"] = generation_id
+    source_map_payload = project_public_source_map_payload(source_map_payload)
+    build_filter_dispositions = scrub_public_package_payload({
         "schema_version": "weekly_activity_build_filter_dispositions.v1",
         "generated_at": generated_at,
-        "source_pack_dir": str(pack_dir),
+        "generation_id": generation_id,
+        "source_pack_name": pack_dir.name,
         "filtered_item_count": len(filtered_items),
         "filtered_counts": dict(sorted(filtered_counts.items())),
         "filtered_items": filtered_items,
-    }
+    })
+    assert_public_payload(build_filter_dispositions, label="weekly build_filter_dispositions.json")
     write_json(out_dir / "build_filter_dispositions.json", build_filter_dispositions)
     private_source_dir = out_dir.parent / "source_actions"
     static_source_dir = out_dir / "source_actions"
     write_json(private_source_dir / "source_url_map.json", source_map_payload)
     write_json(static_source_dir / "source_url_map.json", source_map_payload)
-    current = {
+    current = scrub_public_package_payload({
         "schema_version": "weekly_activity_miniprogram_current.v1",
         "generated_at": generated_at,
+        "generation_id": generation_id,
         "source_pack_schema_version": source_summary.get("schema_version", ""),
         "source_pack_generated_at": source_summary.get("generated_at", ""),
         "source_pack_dir": str(pack_dir),
+        "source_pack_name": pack_dir.name,
         "item_count": len(items),
         "items": items,
-    }
+    })
+    assert_public_payload(current, label="weekly current.json")
     write_json(out_dir / "current.json", current)
-    entity_snapshot = build_weekly_entity_snapshot(items, generated_at, pack_dir)
+    entity_snapshot = build_weekly_entity_snapshot(items, generated_at, pack_dir, generation_id)
     write_json(out_dir / "weekly_entity_snapshot.json", entity_snapshot)
 
     city_index_rows: list[dict[str, Any]] = []
@@ -3389,10 +3645,11 @@ def build_static_api(
             }
         )
         write_json(
-            out_dir / route,
+            safe_public_route_target(out_dir, route, "by-city"),
             {
                 "schema_version": "weekly_activity_miniprogram_city.v1",
                 "generated_at": generated_at,
+                "generation_id": generation_id,
                 "scope": "package",
                 "city_key": city_key,
                 "city": label,
@@ -3401,10 +3658,11 @@ def build_static_api(
             },
         )
     write_json(
-        out_dir / "by-city" / "index.json",
+        safe_public_route_target(out_dir, "by-city/index.json", "by-city"),
         {
             "schema_version": "weekly_activity_miniprogram_city_index.v1",
             "generated_at": generated_at,
+            "generation_id": generation_id,
             "scope": "package",
             "item_count": len(items),
             "window_start": window_start.isoformat(),
@@ -3426,10 +3684,11 @@ def build_static_api(
             }
         )
         write_json(
-            out_dir / route,
+            safe_public_route_target(out_dir, route, "by-date"),
             {
                 "schema_version": "weekly_activity_miniprogram_date.v1",
                 "generated_at": generated_at,
+                "generation_id": generation_id,
                 "scope": "package",
                 "date": date_key,
                 "item_count": len(date_items),
@@ -3437,10 +3696,11 @@ def build_static_api(
             },
         )
     write_json(
-        out_dir / "by-date" / "index.json",
+        safe_public_route_target(out_dir, "by-date/index.json", "by-date"),
         {
             "schema_version": "weekly_activity_miniprogram_date_index.v1",
             "generated_at": generated_at,
+            "generation_id": generation_id,
             "scope": "package",
             "item_count": len(items),
             "window_start": window_start.isoformat(),
@@ -3451,18 +3711,21 @@ def build_static_api(
     )
 
     for item in items:
+        detail_route = first_string(item.get("detail_path"))
         write_json(
-            out_dir / first_string(item.get("detail_path")),
+            safe_public_route_target(out_dir, detail_route, "by-id"),
             {
                 "schema_version": "weekly_activity_miniprogram_detail.v1",
                 "generated_at": generated_at,
+                "generation_id": generation_id,
                 "item": item,
             },
         )
 
-    manifest = {
+    manifest = scrub_public_package_payload({
         "schema_version": "weekly_activity_miniprogram_api.v1",
         "generated_at": generated_at,
+        "generation_id": generation_id,
         "source_pack_dir": str(pack_dir),
         "out_dir": str(out_dir),
         "source_url_map_path": str(private_source_dir / "source_url_map.json"),
@@ -3480,6 +3743,7 @@ def build_static_api(
         "deleted_source_registry_path": str(deleted_source_registry_path) if deleted_source_registry_path else "",
         "deleted_source_registry_count": len(deleted_source_registry),
         "source_policy_path": str(source_policy_path) if source_policy_path else "",
+        "source_policy_name": source_policy_path.name if source_policy_path else "",
         "source_queue_path": str(source_queue_path) if source_queue_path else "",
         "source_queue_match_count": source_queue_match_count,
         "venue_registry_path": str(venue_registry_path) if venue_registry_path else "",
@@ -3505,10 +3769,15 @@ def build_static_api(
             "source_rows_loaded": len(rows),
         },
         "usage_sidecars": usage_sidecars,
-    }
+        "source_pack_name": pack_dir.name,
+    })
+    if usage_sidecars:
+        manifest["usage_sidecars"] = {name: name for name in sorted(usage_sidecars)}
+    assert_public_payload(manifest, label="weekly manifest.json")
     write_json(out_dir / "manifest.json", manifest)
     summary = {
         "generated_at": generated_at,
+        "generation_id": generation_id,
         "source_pack_dir": str(pack_dir),
         "out_dir": str(out_dir),
         "items": len(items),

@@ -31,6 +31,7 @@ DEFAULT_TCB_CWD = REPO_ROOT / "services" / "weekly_activity_cloudrun"
 TCB_CMD = [shutil.which("npm") or "npm", "exec", "--yes", "--package", "@cloudbase/cli@3.3.1", "--", "tcb"]
 EXPECTED_MIN_READY_ITEMS = 50
 EXPECTED_MIN_CURRENT_ITEMS = 1
+MAX_CURRENT_PAGES = 1000
 
 
 def now_iso() -> str:
@@ -169,32 +170,64 @@ def get_paginated_current(
     limit: int = 100,
     lookback_days: int | None = None,
     scope: str | None = None,
+    max_pages: int = MAX_CURRENT_PAGES,
 ) -> dict[str, Any]:
     """Fetch a full current feed so LLM coverage is not judged from page 1 only."""
-    first_path = current_path(limit=limit, lookback_days=lookback_days, scope=scope)
-    first = get_json(base_url, first_path, timeout)
-    payload = first.get("payload") if isinstance(first.get("payload"), dict) else {}
-    if first.get("status_code") != 200 or not isinstance(payload.get("items"), list):
-        return first
+    if max_pages <= 0:
+        raise ValueError("max_pages must be positive")
+    first: dict[str, Any] | None = None
+    first_payload: dict[str, Any] | None = None
+    first_page: dict[str, Any] | None = None
+    all_items: list[Any] = []
+    seen_cursors: set[str] = set()
+    cursor: str | None = None
 
-    all_items = list(payload.get("items") or [])
-    page = payload.get("page") if isinstance(payload.get("page"), dict) else {}
-    next_cursor = page.get("nextCursor")
-    while next_cursor:
-        path = current_path(limit=limit, lookback_days=lookback_days, cursor=str(next_cursor), scope=scope)
+    for page_number in range(1, max_pages + 1):
+        cursor_key = "<first>" if cursor is None else cursor
+        if cursor_key in seen_cursors:
+            raise RuntimeError(f"pagination cursor repeated: {cursor_key}")
+        seen_cursors.add(cursor_key)
+        path = current_path(
+            limit=limit,
+            lookback_days=lookback_days,
+            cursor=cursor,
+            scope=scope,
+        )
         response = get_json(base_url, path, timeout)
-        next_payload = response.get("payload") if isinstance(response.get("payload"), dict) else {}
-        if response.get("status_code") != 200 or not isinstance(next_payload.get("items"), list):
-            break
-        all_items.extend(next_payload.get("items") or [])
-        next_page = next_payload.get("page") if isinstance(next_payload.get("page"), dict) else {}
-        next_cursor = next_page.get("nextCursor")
+        payload = response.get("payload") if isinstance(response.get("payload"), dict) else {}
+        if response.get("status_code") != 200 or not isinstance(payload.get("items"), list):
+            raise RuntimeError(
+                f"pagination page request failed: page={page_number} status={response.get('status_code')}"
+            )
+        page = payload.get("page") if isinstance(payload.get("page"), dict) else None
+        if page is None:
+            raise RuntimeError(f"pagination page metadata missing: page={page_number}")
+        if first is None:
+            first = response
+            first_payload = dict(payload)
+            first_page = dict(page)
+        all_items.extend(payload.get("items") or [])
+        raw_next = page.get("nextCursor")
+        if raw_next is None or str(raw_next) == "":
+            assert first is not None and first_payload is not None and first_page is not None
+            first_payload["items"] = all_items
+            first_payload["page"] = {
+                **first_page,
+                "limit": limit,
+                "cursor": "0",
+                "nextCursor": None,
+                "fetched": len(all_items),
+                "pagesFetched": page_number,
+            }
+            return {**first, "payload": first_payload}
+        next_cursor = str(raw_next)
+        if cursor is not None and next_cursor == cursor:
+            raise RuntimeError(f"pagination cursor did not advance: {cursor}")
+        if next_cursor in seen_cursors:
+            raise RuntimeError(f"pagination cursor repeated: {next_cursor}")
+        cursor = next_cursor
 
-    payload = dict(payload)
-    payload["items"] = all_items
-    if isinstance(page, dict):
-        payload["page"] = {**page, "limit": limit, "cursor": "0", "nextCursor": None, "fetched": len(all_items)}
-    return {**first, "payload": payload}
+    raise RuntimeError(f"pagination exceeded maximum page count: {max_pages}")
 
 
 def list_count(payload: dict[str, Any], key: str) -> int:
@@ -217,6 +250,17 @@ def endpoint_summary(name: str, response: dict[str, Any]) -> dict[str, Any]:
     if name == "healthz":
         llm = payload.get("llm") if isinstance(payload.get("llm"), dict) else {}
         summary.update({"ok_field": payload.get("ok"), "service": payload.get("service"), "llm_has_api_key": "apiKey" in llm})
+    elif name == "readyz":
+        summary.update(
+            {
+                "ok_field": payload.get("ok"),
+                "service": payload.get("service"),
+                "generation_id": payload.get("generationId"),
+                "package_item_count": payload.get("packageItemCount"),
+                "derived_detail_count": payload.get("derivedDetailCount"),
+                "item_id_digest": payload.get("itemIdDigest"),
+            }
+        )
     elif name == "manifest":
         summary.update(
             {
@@ -320,6 +364,16 @@ def endpoint_ok(
         return False
     if name == "healthz":
         return summary.get("ok_field") is True and summary.get("service") == SERVICE_NAME and not summary.get("llm_has_api_key")
+    if name == "readyz":
+        package_count = int(summary.get("package_item_count") or 0)
+        return (
+            summary.get("ok_field") is True
+            and summary.get("service") == SERVICE_NAME
+            and bool(summary.get("generation_id"))
+            and package_count >= expected_min_ready_items
+            and int(summary.get("derived_detail_count") or 0) == package_count
+            and len(str(summary.get("item_id_digest") or "")) == 64
+        )
     if name == "manifest":
         return (
             summary.get("schema_version") == "weekly_activity_miniprogram_api.v1"
@@ -355,6 +409,94 @@ def endpoint_ok(
 
 def by_name(endpoint_summaries: list[dict[str, Any]], name: str) -> dict[str, Any]:
     return next((item for item in endpoint_summaries if item.get("name") == name), {})
+
+
+def bind_report_to_deploy(
+    report: dict[str, Any],
+    deploy_report_path: Path,
+    *,
+    expected_env_id: str,
+    expected_service_name: str,
+) -> dict[str, Any]:
+    """Fail closed unless this smoke proves the exact named deploy candidate."""
+    blockers = list(report.get("blockers") or [])
+    try:
+        deploy = json.loads(Path(deploy_report_path).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        deploy = {}
+        blockers.append("deploy_evidence_missing_or_invalid")
+    binding = deploy.get("evidence_binding") if isinstance(deploy.get("evidence_binding"), dict) else {}
+    identity = deploy.get("deployment_identity") if isinstance(deploy.get("deployment_identity"), dict) else {}
+    ready = by_name(report.get("endpoints") or [], "readyz")
+    active_version = str((report.get("server") or {}).get("active_version") or "")
+    smoke_base_url = str((report.get("server") or {}).get("base_url") or "").rstrip("/")
+    deploy_base_url = str(
+        (deploy.get("post_update_server_identity") or {}).get("base_url") or ""
+    ).rstrip("/")
+    remote_generation_id = str(ready.get("generation_id") or "")
+    expected_generation_id = str(binding.get("expected_generation_id") or "")
+    fingerprint = str(binding.get("deploy_context_fingerprint") or "")
+    zip_sha = str(binding.get("deploy_zip_sha256") or "")
+    lease_hash = str(binding.get("publish_lease_token_sha256") or "")
+    reported_version = str(identity.get("reported_version") or "")
+    observed_active_version = str(identity.get("observed_active_version") or "")
+    checks = {
+        "deploy_report_schema": deploy.get("schema_version") == "cloudrun_direct_api_deploy.v2",
+        "deploy_report_ok": deploy.get("ok") is True,
+        "deploy_executed": bool((deploy.get("safety") or {}).get("cloud_deploy_executed")),
+        "transaction_id_present": bool(binding.get("transaction_id")),
+        "target_env_matches": binding.get("env_id") == expected_env_id,
+        "target_service_matches": binding.get("service_name") == expected_service_name,
+        "context_fingerprint_valid": len(fingerprint) == 64
+        and set(fingerprint.lower()) <= set("0123456789abcdef"),
+        "deploy_zip_sha_valid": len(zip_sha) == 64
+        and set(zip_sha.lower()) <= set("0123456789abcdef"),
+        "publish_lease_binding_valid": len(lease_hash) == 64
+        and set(lease_hash.lower()) <= set("0123456789abcdef"),
+        "deploy_expected_generation_matches": bool(expected_generation_id)
+        and remote_generation_id == expected_generation_id,
+        "active_version_bound_to_deploy": bool(active_version)
+        and bool(reported_version)
+        and bool(observed_active_version)
+        and active_version == reported_version
+        and observed_active_version == reported_version,
+        "base_url_bound_to_deploy": bool(smoke_base_url)
+        and bool(deploy_base_url)
+        and smoke_base_url == deploy_base_url,
+    }
+    blocker_names = {
+        "deploy_report_schema": "deploy_report_schema_mismatch",
+        "deploy_report_ok": "deploy_report_not_successful",
+        "deploy_executed": "deploy_execution_not_proven",
+        "transaction_id_present": "deploy_transaction_id_missing",
+        "target_env_matches": "deploy_target_env_mismatch",
+        "target_service_matches": "deploy_target_service_mismatch",
+        "context_fingerprint_valid": "deploy_context_fingerprint_invalid",
+        "deploy_zip_sha_valid": "deploy_zip_sha_invalid",
+        "publish_lease_binding_valid": "publish_lease_binding_invalid",
+        "deploy_expected_generation_matches": "deploy_expected_generation_mismatch",
+        "active_version_bound_to_deploy": "active_version_not_bound_to_deploy",
+        "base_url_bound_to_deploy": "base_url_not_bound_to_deploy",
+    }
+    blockers.extend(blocker_names[name] for name, passed in checks.items() if not passed)
+    blockers = list(dict.fromkeys(blockers))
+    report["schema_version"] = "stage7_cloudrun_weekly_production_smoke.v2"
+    report["deploy_evidence_path"] = str(Path(deploy_report_path).resolve())
+    report["deploy_evidence_checks"] = checks
+    report["evidence_binding"] = {
+        **binding,
+        "active_version": active_version,
+        "base_url": smoke_base_url,
+        "remote_generation_id": remote_generation_id,
+    }
+    report["blockers"] = blockers
+    report["ok"] = not blockers
+    report["decision"] = (
+        "cloudrun_weekly_production_smoke_ready"
+        if report["ok"]
+        else "cloudrun_weekly_production_smoke_blocked"
+    )
+    return report
 
 
 def build_report(
@@ -495,6 +637,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         server["base_url"] = args.base_url.rstrip("/")
     endpoint_specs = [
         ("healthz", "/healthz"),
+        ("readyz", "/readyz"),
         ("manifest", "/api/v1/weekly/manifest"),
         ("cities", "/api/v1/weekly/cities"),
         ("dates", "/api/v1/weekly/dates"),
@@ -564,6 +707,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         expected_min_ready_items=args.expected_min_ready_items,
         expected_min_current_items=args.expected_min_current_items,
     )
+    report = bind_report_to_deploy(
+        report,
+        args.deploy_report,
+        expected_env_id=args.env_id,
+        expected_service_name=args.service_name,
+    )
     args.out_dir.mkdir(parents=True, exist_ok=True)
     write_json(args.out_dir / "cloudrun_weekly_production_smoke.json", report)
     write_markdown(args.out_dir / "cloudrun_weekly_production_smoke.md", report)
@@ -575,6 +724,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--env-id", default=ENV_ID)
     parser.add_argument("--service-name", default=SERVICE_NAME)
     parser.add_argument("--base-url", default="")
+    parser.add_argument(
+        "--deploy-report",
+        type=Path,
+        required=True,
+        help="The exact named direct-deploy report this remote smoke must bind to.",
+    )
     parser.add_argument(
         "--tcb-cwd",
         type=Path,
@@ -590,7 +745,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: list[str] | None = None) -> int:
-    report = run(parse_args(argv))
+    global ENV_ID, SERVICE_NAME  # noqa: PLW0603
+    args = parse_args(argv)
+    ENV_ID = args.env_id
+    SERVICE_NAME = args.service_name
+    report = run(args)
     print(json.dumps({"ok": report["ok"], "decision": report["decision"], "blockers": report["blockers"], "warnings": report["warnings"]}, ensure_ascii=False, indent=2))
     return 0 if report["ok"] else 2
 

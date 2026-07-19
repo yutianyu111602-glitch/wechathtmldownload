@@ -1,4 +1,6 @@
 const assert = require("node:assert/strict");
+const path = require("node:path");
+const { execFileSync } = require("node:child_process");
 const test = require("node:test");
 
 const {
@@ -13,6 +15,25 @@ const now = new Date(2026, 4, 28);
 test("preview range bounds cover upcoming week and month", () => {
   assert.deepEqual(previewRangeBounds("week", now), { start: "2026-05-28", end: "2026-05-31" });
   assert.deepEqual(previewRangeBounds("month", now), { start: "2026-05-28", end: "2026-05-31" });
+});
+
+test("preview ranges use the same Shanghai calendar date on every device timezone", () => {
+  const modulePath = path.resolve(__dirname, "../utils/datePreview.js");
+  const script = [
+    `const preview = require(${JSON.stringify(modulePath)});`,
+    "const now = new Date('2026-07-19T16:30:00.000Z');",
+    "process.stdout.write(JSON.stringify({ week: preview.previewRangeBounds('week', now), month: preview.previewRangeBounds('month', now) }));",
+  ].join("\n");
+  for (const timezone of ["UTC", "America/Los_Angeles", "Asia/Shanghai"]) {
+    const result = JSON.parse(execFileSync(process.execPath, ["-e", script], {
+      encoding: "utf8",
+      env: { ...process.env, TZ: timezone },
+    }));
+    assert.deepEqual(result, {
+      week: { start: "2026-07-20", end: "2026-07-26" },
+      month: { start: "2026-07-20", end: "2026-07-31" },
+    }, timezone);
+  }
 });
 
 test("preview filters keep this week and this month distinct at month boundary", () => {

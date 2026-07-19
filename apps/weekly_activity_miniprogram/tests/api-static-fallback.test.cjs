@@ -42,11 +42,21 @@ function loadApiModule() {
     if (id === "./electronicRelevance") {
       return require("../utils/electronicRelevance");
     }
+    if (id === "./businessDate") {
+      return require("../utils/businessDate");
+    }
+    if (id === "./dateVisibility") {
+      return require("../utils/dateVisibility");
+    }
+    if (id === "../services/generationContract") {
+      return require("../services/generationContract");
+    }
     throw new Error("unexpected require in api.js test: " + id);
   };
   vm.runInNewContext(code, sandbox, { filename });
   return {
     __setTodayForTests: sandbox.module.exports.__setTodayForTests,
+    fetchAllCurrentResponse: sandbox.module.exports.fetchAllCurrentResponse,
     requestApi: sandbox.module.exports.requestApi,
     sandbox,
   };
@@ -383,6 +393,23 @@ test("falls back to static current data when cloud container fails", async () =>
   assert.equal(result.page.total, 1);
 });
 
+test("static current fallback satisfies the full paginator scope contract", async () => {
+  const { __setTodayForTests, fetchAllCurrentResponse, requestApi, sandbox } = loadApiModule();
+  __setTodayForTests("2026-05-09");
+  installWechatMock(sandbox);
+
+  const result = await fetchAllCurrentResponse({
+    scope: "current",
+    cityKey: "shanghai",
+    date: "2026-05-09",
+    limit: 1,
+  }, requestApi);
+
+  assert.equal(result.scope, "current");
+  assert.equal(result.total, result.items.length);
+  assert.ok(result.items.length > 0);
+});
+
 test("static current fallback filters by city_keys when city_key is absent", async () => {
   const { requestApi, sandbox } = loadApiModule();
   installWechatMock(sandbox);
@@ -452,7 +479,8 @@ test("static current fallback excludes clearly non-electronic activities", async
 });
 
 test("falls back when cloud container resolves with an error payload", async () => {
-  const { requestApi, sandbox } = loadApiModule();
+  const { __setTodayForTests, requestApi, sandbox } = loadApiModule();
+  __setTodayForTests("2026-05-09");
   installWechatMock(sandbox);
   sandbox.wx.cloud.callContainer = () => Promise.resolve({
     statusCode: 403,
@@ -461,7 +489,11 @@ test("falls back when cloud container resolves with an error payload", async () 
 
   const result = await requestApi("/api/v1/weekly/cities");
 
-  assert.deepEqual(result.cities, [{ city_key: "shanghai", count: 1 }]);
+  assert.deepEqual(
+    Object.fromEntries(Array.from(result.cities, (item) => [item.city_key, item.item_count])),
+    { shanghai: 3, shenzhen: 2, beijing: 1, hangzhou: 1 },
+  );
+  assert.equal(result.item_count, 7);
 });
 
 test("static fallback filters multi-day events by inclusive date range", async () => {
@@ -516,8 +548,17 @@ test("static fallback date index hides past date chips", async () => {
 
   const result = await requestApi("/api/v1/weekly/dates");
 
-  assert.deepEqual(Array.from(result.dates, (item) => item.date), ["2026-05-21", "2026-05-24"]);
-  assert.equal(result.item_count, 2);
+  assert.deepEqual(
+    Array.from(result.dates, (item) => [item.date, item.item_count]),
+    [
+      ["2026-05-21", 1],
+      ["2026-05-22", 1],
+      ["2026-05-23", 1],
+      ["2026-05-24", 1],
+      ["2026-07-04", 2],
+    ],
+  );
+  assert.equal(result.item_count, 3);
 });
 
 test("offline fallback does not fill the homepage with expired bundled seed rows", async () => {
@@ -566,6 +607,109 @@ test("falls back to static item detail when cloud container fails", async () => 
   const result = await requestApi("/api/v1/weekly/items/ready-shanghai");
 
   assert.equal(result.id, "ready-shanghai");
+});
+
+test("detail cache is generation-scoped and rejects a mixed-generation response", async () => {
+  const { requestApi, sandbox } = loadApiModule();
+  const storage = new Map();
+  let activeResponseGeneration = "sha256:detail-a";
+  let online = true;
+  sandbox.getApp = () => ({
+    globalData: {
+      cloud: {
+        env: "test-env",
+        service: "weekly-api",
+        useMock: false,
+        staticBaseUrl: "",
+        publicBaseUrl: "",
+        cacheMaxAgeMs: 60_000,
+        cacheFallbackDelayMs: 0,
+        offlineSnapshotFallback: false,
+      },
+    },
+  });
+  sandbox.wx = {
+    getStorageSync: (key) => storage.get(key) || "",
+    setStorageSync: (key, value) => storage.set(key, value),
+    cloud: {
+      callContainer({ path: requestPath }) {
+        assert.match(requestPath, /generationId=sha256%3Adetail-a/);
+        if (!online) return Promise.reject({ errMsg: "offline" });
+        return Promise.resolve({
+          statusCode: 200,
+          data: {
+            id: "ready-shanghai",
+            title: "exact detail",
+            generatedAt: "2026-07-19T08:00:00Z",
+            generationId: activeResponseGeneration,
+          },
+        });
+      },
+    },
+  };
+
+  const exact = await requestApi("/api/v1/weekly/items/ready-shanghai", {
+    generationId: "sha256:detail-a",
+  });
+  assert.equal(exact.generationId, "sha256:detail-a");
+  assert.equal(storage.size, 1);
+
+  online = false;
+  const cached = await requestApi("/api/v1/weekly/items/ready-shanghai", {
+    generationId: "sha256:detail-a",
+  });
+  assert.equal(cached.__fromCache, true);
+
+  online = true;
+  activeResponseGeneration = "sha256:detail-b";
+  await assert.rejects(
+    () => requestApi("/api/v1/weekly/items/ready-shanghai", {
+      generationId: "sha256:detail-a",
+      __skipCache: true,
+    }),
+    /generation/i,
+  );
+});
+
+test("detail response is never persisted under an id-only cache key", async () => {
+  const { requestApi, sandbox } = loadApiModule();
+  const storage = new Map();
+  let online = true;
+  sandbox.getApp = () => ({
+    globalData: {
+      cloud: {
+        env: "test-env",
+        service: "weekly-api",
+        useMock: false,
+        staticBaseUrl: "",
+        publicBaseUrl: "",
+        cacheMaxAgeMs: 60_000,
+        cacheFallbackDelayMs: 0,
+        offlineSnapshotFallback: false,
+      },
+    },
+  });
+  sandbox.wx = {
+    getStorageSync: (key) => storage.get(key) || "",
+    setStorageSync: (key, value) => storage.set(key, value),
+    cloud: {
+      callContainer() {
+        if (!online) return Promise.reject({ errMsg: "offline" });
+        return Promise.resolve({
+          statusCode: 200,
+          data: { id: "ready-shanghai", generationId: "sha256:first-direct-open" },
+        });
+      },
+    },
+  };
+
+  await requestApi("/api/v1/weekly/items/ready-shanghai");
+  assert.equal(storage.size, 1, "the exact response may be cached under its response generation");
+  online = false;
+  await assert.rejects(
+    () => requestApi("/api/v1/weekly/items/ready-shanghai"),
+    (error) => error && (error.errMsg === "offline" || /CONTAINER/i.test(String(error.error && error.error.code))),
+  );
 });
 
 test("uses release storage slug for static item ids with punctuation", async () => {
@@ -800,6 +944,7 @@ test("uses CloudBase hot database function for first-screen current and dates", 
   assert.deepEqual(Array.from(dates.dates, (item) => item.date), ["2026-06-02"]);
   assert.deepEqual(Array.from(calls, (item) => item.path), ["/api/v1/weekly/current", "/api/v1/weekly/dates"]);
   assert.equal(calls[0].source, "miniprogram-hot-db");
+  assert.equal(Object.prototype.hasOwnProperty.call(calls[0].query, "skipFreshness"), false);
   assert.equal(containerCallCount, 0);
 });
 
@@ -1020,7 +1165,7 @@ test("cacheMaxAgeMs zero disables cached fallback during first-load probes", asy
   );
 });
 
-test("live-only current request bypasses stored cache and bundled snapshot", async () => {
+test("live-only and live-refresh current requests bypass stored cache and bundled snapshot", async () => {
   const { requestApi, sandbox } = loadApiModule();
   sandbox.getApp = () => ({
     globalData: {
@@ -1055,10 +1200,12 @@ test("live-only current request bypasses stored cache and bundled snapshot", asy
     setStorageSync() {},
   };
 
-  await assert.rejects(
-    () => requestApi("/api/v1/weekly/current", { limit: 1, __skipCache: true, __liveOnly: true }),
-    (error) => error?.error?.code === "NETWORK_DOWN",
-  );
+  for (const control of ["__liveOnly", "__liveRefresh"]) {
+    await assert.rejects(
+      () => requestApi("/api/v1/weekly/current", { limit: 1, [control]: true }),
+      (error) => error?.error?.code === "NETWORK_DOWN",
+    );
+  }
 });
 
 test("request control flags are not sent to the public API query", async () => {
@@ -1101,10 +1248,16 @@ test("request control flags are not sent to the public API query", async () => {
     },
   };
 
-  const result = await requestApi("/api/v1/weekly/current", { limit: 1, __skipCache: true, __liveOnly: true });
+  const result = await requestApi("/api/v1/weekly/current", {
+    limit: 1,
+    __skipCache: true,
+    __liveOnly: true,
+    __liveRefresh: true,
+  });
   assert.equal(result.items[0].id, "ready-shanghai");
   assert.equal(requestedUrl.includes("__skipCache"), false);
   assert.equal(requestedUrl.includes("__liveOnly"), false);
+  assert.equal(requestedUrl.includes("__liveRefresh"), false);
 });
 
 test("uses bundled snapshot when VPN-like routes hang before any cache exists", async () => {
@@ -1320,6 +1473,351 @@ test("does not let a configured snapshot delay beat a healthy public API without
   assert.equal(publicRequestCount, 1);
   assert.equal(result.__fromSnapshot, undefined);
   assert.equal(result.items[0].id, "public-latest");
+});
+
+test("cloud database hot reads preserve -1 as disabled offline snapshot racing", async () => {
+  const { requestApi, sandbox } = loadApiModule();
+  let databaseCalls = 0;
+  sandbox.getApp = () => ({
+    globalData: {
+      cloud: {
+        env: "test-env",
+        service: "weekly-api",
+        useMock: false,
+        useCloudDatabaseFirst: true,
+        databaseFunctionName: "weeklyDataSync",
+        databaseFunctionTimeoutMs: 100,
+        databaseBackupDelayMs: 80,
+        cloudInitTimeoutMs: 100,
+        cloudCallTimeoutMs: 100,
+        publicBaseUrl: "",
+        staticBaseUrl: "",
+        offlineSnapshotFallbackDelayMs: -1,
+        offlineSnapshotFallback: true,
+      },
+    },
+  });
+
+  sandbox.wx = {
+    cloud: {
+      callFunction(options) {
+        databaseCalls += 1;
+        assert.equal(options.name, "weeklyDataSync");
+        assert.equal(options.data.path, "/api/v1/weekly/cities");
+        return new Promise((resolve) => setTimeout(() => resolve({
+          result: {
+            schema_version: "weekly_activity_miniprogram_city_index.v2",
+            generationId: "sha256:db-latest",
+            cities: [{ city_key: "shanghai", city: "上海", item_count: 7, count: 7 }],
+            source: "cloudbase-database",
+          },
+        }), 25));
+      },
+      callContainer() {
+        return new Promise(() => {});
+      },
+    },
+  };
+
+  const result = await requestApi("/api/v1/weekly/cities", {
+    dateStart: "2999-07-24",
+    dateEnd: "2999-07-26",
+  });
+
+  assert.equal(databaseCalls, 1);
+  assert.equal(result.source, "cloudbase-database");
+  assert.equal(result.generationId, "sha256:db-latest");
+  assert.equal(result.__fromSnapshot, undefined);
+});
+
+test("filtered current waits for a healthy container backup when CloudBase hangs and snapshot racing is disabled", async () => {
+  const { requestApi, sandbox } = loadApiModule();
+  let containerCalls = 0;
+  sandbox.getApp = () => ({
+    globalData: {
+      cloud: {
+        env: "test-env",
+        service: "weekly-api",
+        useMock: false,
+        useCloudDatabaseFirst: true,
+        databaseFunctionName: "weeklyDataSync",
+        databaseFunctionTimeoutMs: 80,
+        databaseBackupDelayMs: 5,
+        cloudInitTimeoutMs: 100,
+        cloudCallTimeoutMs: 100,
+        publicBaseUrl: "",
+        staticBaseUrl: "",
+        offlineSnapshotFallbackDelayMs: -1,
+        offlineSnapshotFallback: true,
+      },
+    },
+  });
+  sandbox.wx = {
+    cloud: {
+      callFunction() {
+        return new Promise(() => {});
+      },
+      callContainer() {
+        containerCalls += 1;
+        return new Promise((resolve) => setTimeout(() => resolve({
+          statusCode: 200,
+          data: {
+            schemaVersion: "weekly_activity_api.current_response.v1",
+            generationId: "sha256:container-latest",
+            items: [{ id: "container-filtered", event_date_start: "2999-07-25" }],
+            page: { cursor: 0, limit: 20, nextCursor: null, total: 1 },
+          },
+        }), 20));
+      },
+    },
+  };
+
+  const result = await requestApi("/api/v1/weekly/current", {
+    cityKey: "shanghai",
+    dateStart: "2999-07-24",
+    dateEnd: "2999-07-26",
+  });
+
+  assert.equal(containerCalls, 1);
+  assert.equal(result.items[0].id, "container-filtered");
+  assert.equal(result.__fromSnapshot, undefined);
+});
+
+test("database-first mode routes item detail to CloudRun until rich detail generations exist in CloudBase", async () => {
+  const { requestApi, sandbox } = loadApiModule();
+  let databaseCalls = 0;
+  let containerCalls = 0;
+  sandbox.getApp = () => ({
+    globalData: {
+      cloud: {
+        env: "test-env",
+        service: "weekly-api",
+        useMock: false,
+        useCloudDatabaseFirst: true,
+        databaseFunctionName: "weeklyDataSync",
+        databaseFunctionTimeoutMs: 100,
+        databaseBackupDelayMs: 0,
+        cloudInitTimeoutMs: 100,
+        cloudCallTimeoutMs: 100,
+        publicBaseUrl: "",
+        staticBaseUrl: "",
+        offlineSnapshotFallbackDelayMs: -1,
+        offlineSnapshotFallback: true,
+      },
+    },
+  });
+  sandbox.wx = {
+    cloud: {
+      callFunction() {
+        databaseCalls += 1;
+        return Promise.resolve({
+          result: {
+            id: "rich-detail",
+            title: "compressed list row",
+            generationId: "sha256:rich-detail",
+            source: "cloudbase-database",
+          },
+        });
+      },
+      callContainer(options) {
+        containerCalls += 1;
+        assert.match(options.path, /^\/api\/v1\/weekly\/items\/rich-detail\?/);
+        return Promise.resolve({
+          statusCode: 200,
+          data: {
+            id: "rich-detail",
+            title: "full detail row",
+            source_text_lines: ["long source evidence"],
+            generationId: "sha256:rich-detail",
+          },
+        });
+      },
+    },
+  };
+
+  const result = await requestApi("/api/v1/weekly/items/rich-detail", {
+    generationId: "sha256:rich-detail",
+  });
+
+  assert.equal(databaseCalls, 0);
+  assert.equal(containerCalls, 1);
+  assert.equal(result.title, "full detail row");
+  assert.deepEqual(Array.from(result.source_text_lines), ["long source evidence"]);
+});
+
+test("batch detail rejects more than 100 ids before any CloudBase or CloudRun call", async () => {
+  const { requestApi, sandbox } = loadApiModule();
+  let networkCalls = 0;
+  sandbox.getApp = () => ({
+    globalData: {
+      cloud: {
+        env: "test-env",
+        service: "weekly-api",
+        useMock: false,
+        useCloudDatabaseFirst: true,
+        databaseFunctionName: "weeklyDataSync",
+        publicBaseUrl: "",
+        staticBaseUrl: "",
+        offlineSnapshotFallbackDelayMs: -1,
+      },
+    },
+  });
+  sandbox.wx = {
+    cloud: {
+      callFunction() {
+        networkCalls += 1;
+        return Promise.resolve({ result: { items: [] } });
+      },
+      callContainer() {
+        networkCalls += 1;
+        return Promise.resolve({ statusCode: 200, data: { items: [] } });
+      },
+    },
+  };
+
+  await assert.rejects(
+    requestApi("/api/v1/weekly/items/batch", {
+      ids: Array.from({ length: 101 }, (_, index) => `event-${index}`).join(","),
+      generationId: "sha256:batch-limit",
+    }),
+    (error) => error && error.code === "WEEKLY_BATCH_ID_LIMIT",
+  );
+  assert.equal(networkCalls, 0);
+});
+
+test("batch detail enforces the request budget in UTF-8 bytes", async () => {
+  const { requestApi, sandbox } = loadApiModule();
+  let networkCalls = 0;
+  sandbox.getApp = () => ({
+    globalData: {
+      cloud: {
+        useMock: false,
+        useCloudDatabaseFirst: true,
+        databaseFunctionName: "weeklyDataSync",
+        publicBaseUrl: "",
+        staticBaseUrl: "",
+        offlineSnapshotFallbackDelayMs: -1,
+      },
+    },
+  });
+  sandbox.wx = {
+    cloud: {
+      callFunction() { networkCalls += 1; },
+      callContainer() { networkCalls += 1; },
+    },
+  };
+  const ids = Array.from(
+    { length: 100 },
+    (_, index) => `活动-${index}-${"界".repeat(100)}`,
+  ).join(",");
+
+  await assert.rejects(
+    requestApi("/api/v1/weekly/items/batch", { ids, generationId: "sha256:utf8-budget" }),
+    (error) => error && error.code === "WEEKLY_BATCH_REQUEST_TOO_LARGE"
+      && error.requestBytes > error.maxRequestBytes,
+  );
+  assert.equal(networkCalls, 0);
+});
+
+test("database-first batch detail uses one bounded CloudRun call and no CloudBase N+1", async () => {
+  const { requestApi, sandbox } = loadApiModule();
+  let databaseCalls = 0;
+  let containerCalls = 0;
+  sandbox.getApp = () => ({
+    globalData: {
+      cloud: {
+        env: "test-env",
+        service: "weekly-api",
+        useMock: false,
+        useCloudDatabaseFirst: true,
+        databaseFunctionName: "weeklyDataSync",
+        cloudInitTimeoutMs: 100,
+        cloudCallTimeoutMs: 100,
+        publicBaseUrl: "",
+        staticBaseUrl: "",
+        offlineSnapshotFallbackDelayMs: -1,
+      },
+    },
+  });
+  sandbox.wx = {
+    cloud: {
+      callFunction() {
+        databaseCalls += 1;
+        throw new Error("batch must not fan out through CloudBase");
+      },
+      callContainer(options) {
+        containerCalls += 1;
+        assert.match(options.path, /ids=event-1%2Cevent-2%2Cevent-3/);
+        return Promise.resolve({
+          statusCode: 200,
+          data: {
+            generationId: "sha256:batch-one-call",
+            items: [1, 2, 3].map((number) => ({
+              id: `event-${number}`,
+              source_text_lines: [`rich-${number}`],
+              generationId: "sha256:batch-one-call",
+            })),
+          },
+        });
+      },
+    },
+  };
+
+  const result = await requestApi("/api/v1/weekly/items/batch", {
+    ids: "event-1,event-2,event-3",
+    generationId: "sha256:batch-one-call",
+  });
+
+  assert.equal(databaseCalls, 0);
+  assert.equal(containerCalls, 1);
+  assert.deepEqual(Array.from(result.items, (item) => item.id), ["event-1", "event-2", "event-3"]);
+});
+
+test("batch detail rejects an oversized UTF-8 response instead of caching it", async () => {
+  const { requestApi, sandbox } = loadApiModule();
+  let containerCalls = 0;
+  sandbox.getApp = () => ({
+    globalData: {
+      cloud: {
+        env: "test-env",
+        service: "weekly-api",
+        useMock: false,
+        useCloudDatabaseFirst: true,
+        databaseFunctionName: "weeklyDataSync",
+        cloudInitTimeoutMs: 100,
+        cloudCallTimeoutMs: 100,
+        publicBaseUrl: "",
+        staticBaseUrl: "",
+        offlineSnapshotFallbackDelayMs: -1,
+      },
+    },
+  });
+  sandbox.wx = {
+    cloud: {
+      callFunction() {
+        throw new Error("batch must not use CloudBase compact rows");
+      },
+      callContainer() {
+        containerCalls += 1;
+        return Promise.resolve({
+          statusCode: 200,
+          data: {
+            generationId: "sha256:batch-bytes",
+            items: [{ id: "event-1", source_text: "界".repeat(700000) }],
+          },
+        });
+      },
+    },
+  };
+
+  await assert.rejects(
+    requestApi("/api/v1/weekly/items/batch", {
+      ids: "event-1",
+      generationId: "sha256:batch-bytes",
+    }),
+    (error) => error && error.code === "WEEKLY_BATCH_RESPONSE_TOO_LARGE",
+  );
+  assert.equal(containerCalls, 1);
 });
 
 test("prefers bundled snapshot before devtools mock after public fallback fails", async () => {

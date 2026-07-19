@@ -4,7 +4,9 @@ const path = require("node:path");
 const WebSocket = require("ws");
 
 const wsEndpoint = String(process.env.MINIPROGRAM_AUTOMATOR_WS || "").trim();
-const artifactRoot = path.resolve(__dirname, "../test-artifacts");
+const artifactRoot = process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT
+  ? path.resolve(process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT)
+  : path.resolve(__dirname, "../test-artifacts");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const artifactDir = path.join(artifactRoot, `artist-relation-trajectory-rendered-${stamp}`);
 const screenshotEnabled = process.env.MINIPROGRAM_SCREENSHOTS === "1";

@@ -1,0 +1,5 @@
+{
+  "timeout": 15,
+  "runtime": "Nodejs16.13",
+  "memorySize": 128
+}

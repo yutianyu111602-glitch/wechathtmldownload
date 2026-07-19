@@ -22,7 +22,7 @@ from typing import Any
 
 
 SCHEMA_VERSION = "club_overviews.v1"
-REPORT_SCHEMA_VERSION = "cloudrun_club_overviews_reconciliation.v1"
+REPORT_SCHEMA_VERSION = "cloudrun_club_overviews_reconciliation.v2"
 ENDPOINT_PATH = "/api/v1/weekly/club-overviews"
 ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
@@ -197,6 +197,55 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     temporary.replace(path)
 
 
+def load_smoke_binding(smoke_report_path: Path) -> dict[str, Any]:
+    try:
+        smoke = json.loads(Path(smoke_report_path).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"Smoke evidence is missing or invalid: {smoke_report_path}") from exc
+    if smoke.get("schema_version") != "stage7_cloudrun_weekly_production_smoke.v2":
+        raise ValueError("Smoke evidence schema is not transaction-bound v2")
+    if smoke.get("ok") is not True or smoke.get("decision") != "cloudrun_weekly_production_smoke_ready":
+        raise ValueError("Smoke evidence is not successful")
+    binding = smoke.get("evidence_binding")
+    if not isinstance(binding, dict):
+        raise ValueError("Smoke evidence binding is missing")
+    required = (
+        "transaction_id",
+        "env_id",
+        "service_name",
+        "deploy_context_fingerprint",
+        "deploy_zip_sha256",
+        "publish_lease_token_sha256",
+        "expected_generation_id",
+        "remote_generation_id",
+        "active_version",
+        "base_url",
+    )
+    missing = [name for name in required if not str(binding.get(name) or "")]
+    if missing:
+        raise ValueError("Smoke evidence binding is incomplete: " + ", ".join(missing))
+    if binding.get("expected_generation_id") != binding.get("remote_generation_id"):
+        raise ValueError("Smoke evidence generation binding does not match")
+    for field in (
+        "deploy_context_fingerprint",
+        "deploy_zip_sha256",
+        "publish_lease_token_sha256",
+    ):
+        value = str(binding.get(field) or "")
+        if len(value) != 64 or not set(value.lower()) <= set("0123456789abcdef"):
+            raise ValueError(f"Smoke evidence {field} is invalid")
+    return dict(binding)
+
+
+def assert_base_url_binding(base_url: str, evidence_binding: dict[str, Any]) -> None:
+    actual = str(base_url or "").rstrip("/")
+    expected = str(evidence_binding.get("base_url") or "").rstrip("/")
+    if not actual or not expected or actual != expected:
+        raise ValueError(
+            f"Club-overviews base URL is not bound to smoke evidence: expected={expected!r} actual={actual!r}"
+        )
+
+
 def reconcile(
     *,
     base_url: str,
@@ -206,7 +255,9 @@ def reconcile(
     timeout_seconds: float,
     poll_interval_seconds: float,
     request_timeout_seconds: float,
+    evidence_binding: dict[str, Any],
 ) -> dict[str, Any]:
+    assert_base_url_binding(base_url, evidence_binding)
     candidate_path, _candidate_payload, candidate_snapshot = load_candidate(candidate_api_dir)
     endpoint = base_url.rstrip("/") + ENDPOINT_PATH
     deadline = time.monotonic() + max(timeout_seconds, 0.0)
@@ -241,6 +292,7 @@ def reconcile(
                 "content_type": content_type,
                 "candidate": candidate_snapshot,
                 "remote": remote_snapshot,
+                "evidence_binding": evidence_binding,
             }
             write_json(report_path, report)
             return report
@@ -260,6 +312,7 @@ def reconcile(
                 "candidate": candidate_snapshot,
                 "remote": last_remote_snapshot,
                 "failure_reason": last_error,
+                "evidence_binding": evidence_binding,
             }
             write_json(report_path, report)
             raise ValueError(last_error)
@@ -272,11 +325,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--candidate-api-dir", type=Path, required=True)
     parser.add_argument("--proxy-url", default="")
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--smoke-report", type=Path, required=True)
     parser.add_argument("--timeout-seconds", type=float, default=180.0)
     parser.add_argument("--poll-interval-seconds", type=float, default=5.0)
     parser.add_argument("--request-timeout-seconds", type=float, default=30.0)
     args = parser.parse_args(argv)
     try:
+        evidence_binding = load_smoke_binding(args.smoke_report.expanduser().resolve())
         report = reconcile(
             base_url=args.base_url,
             candidate_api_dir=args.candidate_api_dir.expanduser().resolve(),
@@ -285,6 +340,7 @@ def main(argv: list[str] | None = None) -> int:
             timeout_seconds=args.timeout_seconds,
             poll_interval_seconds=args.poll_interval_seconds,
             request_timeout_seconds=args.request_timeout_seconds,
+            evidence_binding=evidence_binding,
         )
     except (OSError, ValueError) as exc:
         print(f"ERROR: {exc}")

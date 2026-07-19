@@ -1,114 +1,45 @@
 // services/homeFilters.js
 // Extracted from pages/index/index.js: city/date filter primitives.
 // Pure functions — no wx, no side effects.
-// Tries require("../utils/datePreview") first; falls back to inline copies
-// when WeChat's sandboxed module system cannot resolve cross-directory requires.
-
-var _dp;
-try {
-  _dp = require("../utils/datePreview");
-} catch (_e) {
-  _dp = null;
-}
-
-function _isoDate(value) {
-  var text = String(value || "").trim();
-  return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : "";
-}
-
-function _itemDateKeys(item) {
-  if (!item || typeof item !== "object") return [];
-  var directCandidates = [
-    item.dateLabel, item.event_date_start, item.eventDateStart,
-    item.event_date_iso_guess, item.eventDateIso, item.event_date,
-    item.date, item.event_date_end, item.eventDateEnd,
-  ];
-  var directDates = directCandidates.map(_isoDate).filter(Boolean);
-  var candidates = directDates.length
-    ? directCandidates
-    : directCandidates.concat(Array.isArray(item.event_date_iso_guesses) ? item.event_date_iso_guesses : []);
-  var out = [];
-  var seen = {};
-  for (var i = 0; i < candidates.length; i++) {
-    var t = _isoDate(candidates[i]);
-    if (t && !seen[t]) { seen[t] = true; out.push(t); }
-  }
-  return out;
-}
-
-function _itemDateBounds(item) {
-  var keys = _itemDateKeys(item).sort();
-  if (!keys.length) return null;
-  var explicitEnd = _isoDate((item || {}).event_date_end || (item || {}).eventDateEnd);
-  var start = _isoDate((item || {}).event_date_start || (item || {}).eventDateStart || (item || {}).dateLabel) || keys[0];
-  var end = explicitEnd || keys[keys.length - 1] || start;
-  var flags = Array.isArray((item || {}).quality_flags) ? item.quality_flags : [];
-  var isRange = Boolean(explicitEnd || (item || {}).isCalendarPreview || (item || {}).is_calendar_preview || flags.indexOf("calendar_preview") !== -1);
-  return { start: start, end: end >= start ? end : start, keys: keys, isRange: isRange };
-}
-
-function _itemMatchesDateKey(item, dateKey) {
-  var key = _isoDate(dateKey);
-  if (!key) return false;
-  var bounds = _itemDateBounds(item);
-  if (!bounds) return false;
-  return bounds.keys.indexOf(key) !== -1 || (bounds.isRange && bounds.start <= key && bounds.end >= key);
-}
-
-var itemDateBounds = _dp ? _dp.itemDateBounds : _itemDateBounds;
-var itemMatchesDateKey = _dp ? _dp.itemMatchesDateKey : _itemMatchesDateKey;
+// Date membership is owned by the portable dateVisibility contract used by
+// CloudRun, CloudBase sync, static fallback and home filtering.
+var _dateVisibility = require("../utils/dateVisibility");
+var _businessDate = require("../utils/businessDate");
+var itemMatchesDateKey = _dateVisibility.itemMatchesDateKey;
+var itemMatchesDateWindow = _dateVisibility.itemMatchesDateWindow;
 
 function normalizeIsoDate(value) {
-  var match = String(value || "").trim().match(/\d{4}-\d{2}-\d{2}/);
-  return match ? match[0] : "";
-}
-
-function dateFromKey(key) {
-  var match = String(key || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!match) return null;
-  var date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
-function keyFromDate(date) {
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, "0"),
-    String(date.getDate()).padStart(2, "0"),
-  ].join("-");
-}
-
-function addDateRangeKeys(keys, startKey, endKey) {
-  var start = dateFromKey(startKey);
-  var end = dateFromKey(endKey);
-  if (!start || !end || end < start) return;
-  for (var date = new Date(start); date <= end && keys.size < 64; date.setDate(date.getDate() + 1)) {
-    keys.add(keyFromDate(date));
-  }
+  return _dateVisibility.isoDate(value);
 }
 
 function dateKeysForFilter(item) {
-  var bounds = itemDateBounds(item);
-  if (!bounds) return [];
-  var keys = new Set((bounds.keys || []).map(normalizeIsoDate).filter(Boolean));
-  if (bounds.isRange) {
-    addDateRangeKeys(keys, bounds.start, bounds.end);
+  return _dateVisibility.itemDateKeys(item);
+}
+
+function normalizeCityKey(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function cityKeysForItem(item) {
+  var source = item || {};
+  var values = [source.city_key, source.cityKey]
+    .concat(Array.isArray(source.city_keys) ? source.city_keys : [])
+    .concat(Array.isArray(source.cityKeys) ? source.cityKeys : []);
+  var output = [];
+  var seen = {};
+  for (var i = 0; i < values.length; i++) {
+    var key = normalizeCityKey(values[i]);
+    if (!key || seen[key]) continue;
+    seen[key] = true;
+    output.push(key);
   }
-  return Array.from(keys).sort();
+  return output;
 }
 
 function itemMatchesCityKey(item, cityKey) {
-  var key = String(cityKey || "").trim();
+  var key = normalizeCityKey(cityKey);
   if (!key) return true;
-  var direct = String((item || {}).city_key || (item || {}).cityKey || "").trim();
-  if (direct === key) return true;
-  var keys = Array.isArray((item || {}).city_keys)
-    ? item.city_keys
-    : (Array.isArray((item || {}).cityKeys) ? item.cityKeys : []);
-  for (var i = 0; i < keys.length; i++) {
-    if (String(keys[i] || "").trim() === key) return true;
-  }
-  return false;
+  return cityKeysForItem(item).indexOf(key) !== -1;
 }
 
 function filterItemsByCityKey(items, cityKey) {
@@ -133,11 +64,7 @@ function filterItemsByDateWindow(items, startKey, endKey) {
   var min = start || end;
   var max = end || start;
   if (max < min) return [];
-  return source.filter(function (item) {
-    return dateKeysForFilter(item).some(function (key) {
-      return key >= min && key <= max;
-    });
-  });
+  return source.filter(function (item) { return itemMatchesDateWindow(item, min, max); });
 }
 
 function allCurrentDateSelection() {
@@ -152,16 +79,13 @@ function exactDateSelection(dateKey) {
 }
 
 function weekendDateSelection(offsetWeeks, now) {
-  var base = now instanceof Date ? new Date(now.getTime()) : new Date();
   var weeks = Math.max(0, Number.parseInt(offsetWeeks || 0, 10) || 0);
-  var daysUntilFriday = (5 - base.getDay() + 7) % 7;
-  var friday = new Date(base.getFullYear(), base.getMonth(), base.getDate() + daysUntilFriday + weeks * 7);
-  var sunday = new Date(friday.getFullYear(), friday.getMonth(), friday.getDate() + 2);
+  var range = _businessDate.currentShanghaiWeekendDateRange(now, weeks);
   return {
     mode: weeks === 0 ? "this_weekend" : "next_weekend",
     exactDate: "",
-    startKey: keyFromDate(friday),
-    endKey: keyFromDate(sunday),
+    startKey: range.dateFrom,
+    endKey: range.dateTo,
   };
 }
 
@@ -207,10 +131,9 @@ function filterItemsByActiveFilters(items, cityKey, dateKey) {
 }
 
 module.exports = {
-  addDateRangeKeys: addDateRangeKeys,
   allCurrentDateSelection: allCurrentDateSelection,
+  cityKeysForItem: cityKeysForItem,
   dateSelectionQuery: dateSelectionQuery,
-  dateFromKey: dateFromKey,
   dateKeysForFilter: dateKeysForFilter,
   exactDateSelection: exactDateSelection,
   filterItemsByActiveFilters: filterItemsByActiveFilters,
@@ -219,7 +142,6 @@ module.exports = {
   filterItemsByDateSelection: filterItemsByDateSelection,
   filterItemsByDateWindow: filterItemsByDateWindow,
   itemMatchesCityKey: itemMatchesCityKey,
-  keyFromDate: keyFromDate,
   normalizeDateSelection: normalizeDateSelection,
   normalizeIsoDate: normalizeIsoDate,
   weekendDateSelection: weekendDateSelection,

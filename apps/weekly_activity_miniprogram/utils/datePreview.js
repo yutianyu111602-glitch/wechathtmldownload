@@ -1,19 +1,25 @@
 const RANGE_ALL = "all";
 const RANGE_WEEK = "week";
 const RANGE_MONTH = "month";
+const dateVisibility = require("./dateVisibility");
+const {
+  itemDateKeys,
+  itemDateProfile,
+  itemMatchesDateKey,
+} = dateVisibility;
+const {
+  addDaysToDateKey,
+  currentShanghaiBusinessDateKey,
+} = require("./businessDate");
 
 function normalizeRange(value) {
   return [RANGE_ALL, RANGE_WEEK, RANGE_MONTH].includes(value) ? value : RANGE_ALL;
 }
 
 function localDateKey(date) {
-  const value = date instanceof Date ? date : new Date(date);
-  if (Number.isNaN(value.getTime())) return "";
-  return [
-    value.getFullYear(),
-    String(value.getMonth() + 1).padStart(2, "0"),
-    String(value.getDate()).padStart(2, "0"),
-  ].join("-");
+  // Historical export name retained for compatibility. Product previews are
+  // anchored to Shanghai calendar time, never the device's local timezone.
+  return currentShanghaiBusinessDateKey(date, 0);
 }
 
 function itemDateKey(item) {
@@ -21,72 +27,31 @@ function itemDateKey(item) {
   return itemDateKeys(item)[0] || "";
 }
 
-function isoDate(value) {
-  const text = String(value || "").trim();
-  return /^\d{4}-\d{2}-\d{2}$/.test(text) ? text : "";
-}
-
-function itemDateKeys(item) {
-  if (!item || typeof item !== "object") return [];
-  const directCandidates = [
-    item.dateLabel,
-    item.event_date_start,
-    item.eventDateStart,
-    item.event_date_iso_guess,
-    item.eventDateIso,
-    item.event_date,
-    item.date,
-    item.event_date_end,
-    item.eventDateEnd,
-  ];
-  const directDates = directCandidates.map(isoDate).filter(Boolean);
-  const candidates = directDates.length
-    ? directCandidates
-    : [
-        ...directCandidates,
-        ...(Array.isArray(item.event_date_iso_guesses) ? item.event_date_iso_guesses : []),
-      ];
-  const out = [];
-  const seen = new Set();
-  for (const value of candidates) {
-    const text = isoDate(value);
-    if (text && !seen.has(text)) {
-      seen.add(text);
-      out.push(text);
-    }
-  }
-  return out;
-}
-
 function itemDateBounds(item) {
-  const keys = itemDateKeys(item).sort();
-  if (!keys.length) return null;
-  const explicitEnd = isoDate(item?.event_date_end || item?.eventDateEnd);
-  const start = isoDate(item?.event_date_start || item?.eventDateStart || item?.dateLabel) || keys[0];
-  const end = explicitEnd || keys[keys.length - 1] || start;
-  const flags = Array.isArray(item?.quality_flags) ? item.quality_flags : [];
-  const isRange = Boolean(
-    explicitEnd ||
-    item?.isCalendarPreview ||
-    item?.is_calendar_preview ||
-    flags.includes("calendar_preview")
-  );
-  return { start, end: end >= start ? end : start, keys, isRange };
+  const profile = itemDateProfile(item);
+  return profile.hasDate
+    ? { start: profile.start, end: profile.end, keys: profile.keys, isRange: profile.isRange }
+    : null;
 }
 
 function previewRangeBounds(range, now = new Date()) {
   const key = normalizeRange(range);
   if (key === RANGE_ALL) return null;
-  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const end = new Date(start);
+  const start = currentShanghaiBusinessDateKey(now, 0);
+  if (!start) return null;
+  let end = start;
   if (key === RANGE_WEEK) {
-    const day = start.getDay();
+    const day = new Date(`${start}T00:00:00Z`).getUTCDay();
     const daysToSunday = day === 0 ? 0 : 7 - day;
-    end.setDate(start.getDate() + daysToSunday);
+    end = addDaysToDateKey(start, daysToSunday);
   } else if (key === RANGE_MONTH) {
-    end.setMonth(start.getMonth() + 1, 0);
+    const match = start.match(/^(\d{4})-(\d{2})-/);
+    const monthEnd = match
+      ? new Date(Date.UTC(Number(match[1]), Number(match[2]), 0))
+      : null;
+    end = monthEnd ? monthEnd.toISOString().slice(0, 10) : start;
   }
-  return { start: localDateKey(start), end: localDateKey(end) };
+  return { start, end };
 }
 
 function itemMatchesPreviewRange(item, range, now = new Date()) {
@@ -96,14 +61,6 @@ function itemMatchesPreviewRange(item, range, now = new Date()) {
   if (!itemBounds) return false;
   if (itemBounds.keys.some((key) => key >= bounds.start && key <= bounds.end)) return true;
   return itemBounds.isRange && itemBounds.start <= bounds.end && itemBounds.end >= bounds.start;
-}
-
-function itemMatchesDateKey(item, dateKey) {
-  const key = isoDate(dateKey);
-  if (!key) return false;
-  const itemBounds = itemDateBounds(item);
-  if (!itemBounds) return false;
-  return itemBounds.keys.includes(key) || (itemBounds.isRange && itemBounds.start <= key && itemBounds.end >= key);
 }
 
 function filterItemsByPreviewRange(items, range, now = new Date()) {

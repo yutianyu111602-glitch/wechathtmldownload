@@ -87,6 +87,247 @@ def set_city(item: dict, city_name: str, city_key: str) -> dict:
 
 
 class RepairWeeklyReleaseConflictsTests(unittest.TestCase):
+    def test_repairs_city_name_misread_from_street_without_collapsing_true_multi_city_events(self):
+        street_alias = event(
+            "system:street-alias",
+            "上海地下派对",
+            "streetalias",
+            address="上海市静安区乌鲁木齐北路505号",
+        )
+        street_alias["city"] = ["上海", "乌鲁木齐"]
+        street_alias["city_keys"] = ["shanghai", "urumqi"]
+
+        nanjing_street_alias = event(
+            "system:nanjing-street-alias",
+            "上海南京西路派对",
+            "nanjingstreetalias",
+            address="上海市静安区南京西路100号",
+        )
+        nanjing_street_alias["city"] = ["上海", "南京"]
+        nanjing_street_alias["city_keys"] = ["shanghai", "nanjing"]
+
+        beijing_street_alias = event(
+            "system:beijing-street-alias",
+            "广州北京路派对",
+            "beijingstreetalias",
+            address="北京路123号",
+        )
+        beijing_street_alias["city"] = ["广州", "北京"]
+        beijing_street_alias["city_key"] = "guangzhou"
+        beijing_street_alias["city_name"] = "广州"
+        beijing_street_alias["city_keys"] = ["guangzhou", "beijing"]
+
+        true_multi_city = event(
+            "tour:true-multi-city",
+            "上海郑州双城巡演",
+            "truemulticity",
+            address="上海站 / 郑州站",
+        )
+        true_multi_city["city"] = ["上海", "郑州"]
+        true_multi_city["city_keys"] = ["shanghai", "zhengzhou"]
+
+        real_urumqi = event(
+            "urumqi:real-city",
+            "乌鲁木齐 Techno Night",
+            "realurumqi",
+            address="乌鲁木齐市沙依巴克区测试街1号",
+        )
+        set_city(real_urumqi, "乌鲁木齐", "urumqi")
+
+        real_beijing = event(
+            "beijing:real-city",
+            "北京 Techno Night",
+            "realbeijing",
+            address="北京市朝阳区测试街1号",
+        )
+        set_city(real_beijing, "北京", "beijing")
+
+        real_nanjing = event(
+            "nanjing:real-city",
+            "南京 Techno Night",
+            "realnanjing",
+            address="南京市鼓楼区测试街1号",
+        )
+        set_city(real_nanjing, "南京", "nanjing")
+
+        repaired, report = repair.repair_items(
+            [
+                street_alias,
+                nanjing_street_alias,
+                beijing_street_alias,
+                true_multi_city,
+                real_beijing,
+                real_nanjing,
+                real_urumqi,
+            ],
+            quarantine_conflicts=False,
+        )
+        by_id = {item["id"]: item for item in repaired}
+
+        self.assertEqual(by_id["system:street-alias"]["city_key"], "shanghai")
+        self.assertEqual(by_id["system:street-alias"]["city_name"], "上海")
+        self.assertEqual(by_id["system:street-alias"]["city_keys"], ["shanghai"])
+        self.assertEqual(by_id["system:street-alias"]["city"], ["上海"])
+        self.assertEqual(by_id["system:nanjing-street-alias"]["city_keys"], ["shanghai"])
+        self.assertEqual(by_id["system:nanjing-street-alias"]["city"], ["上海"])
+        self.assertEqual(by_id["system:beijing-street-alias"]["city_keys"], ["guangzhou"])
+        self.assertEqual(by_id["system:beijing-street-alias"]["city"], ["广州"])
+        self.assertEqual(by_id["tour:true-multi-city"]["city_keys"], ["shanghai", "zhengzhou"])
+        self.assertEqual(by_id["tour:true-multi-city"]["city"], ["上海", "郑州"])
+        self.assertEqual(by_id["beijing:real-city"]["city_keys"], ["beijing"])
+        self.assertEqual(by_id["nanjing:real-city"]["city_keys"], ["nanjing"])
+        self.assertEqual(by_id["urumqi:real-city"]["city_keys"], ["urumqi"])
+        self.assertEqual(report["address_city_alias_normalized_count"], 3)
+        self.assertEqual(
+            report["address_city_alias_normalized_items"][0]["removed_city_keys"],
+            ["urumqi"],
+        )
+        self.assertEqual(
+            report["address_city_alias_normalized_items"][1]["removed_city_keys"],
+            ["nanjing"],
+        )
+        self.assertEqual(
+            report["address_city_alias_normalized_items"][2]["removed_city_keys"],
+            ["beijing"],
+        )
+
+    def test_single_road_alias_city_is_left_for_quality_gate_instead_of_guessed(self):
+        ambiguous = event(
+            "single:beijing-road",
+            "广州北京路派对",
+            "singlebeijingroad",
+            address="北京路123号",
+        )
+        set_city(ambiguous, "北京", "beijing")
+
+        repaired, issues = repair.normalize_address_city_road_aliases([ambiguous])
+
+        self.assertEqual(repaired[0]["city_keys"], ["beijing"])
+        self.assertEqual(issues, [])
+        issue = repair.address_city_road_alias_issue(repaired[0])
+        self.assertIsNotNone(issue)
+        self.assertFalse(issue["repairable"])
+        self.assertEqual(issue["ambiguous_city_keys"], ["beijing"])
+
+    def test_rebuild_defaults_address_city_alias_count_for_legal_non_alias_reports(self):
+        with tempfile.TemporaryDirectory() as td:
+            api_dir = Path(td) / "api"
+            item = event("exit:plain-rebuild", "Plain rebuild", "plainhash")
+            current = {
+                "schema_version": "weekly_activity_miniprogram_current.v1",
+                "item_count": 1,
+                "items": [item],
+            }
+            report = {
+                "schema_version": "weekly_incremental_merge.v1.rebuild",
+                "repaired_at": "2026-07-19T12:00:00+08:00",
+                "raw_item_count": 1,
+                "repaired_item_count": 1,
+                "removed_duplicate_count": 0,
+                "quarantined_conflict_item_count": 0,
+            }
+
+            repair.rebuild_release_files(api_dir, current, [item], report)
+
+            written_current = json.loads((api_dir / "current.json").read_text(encoding="utf-8"))
+            written_manifest = json.loads((api_dir / "manifest.json").read_text(encoding="utf-8"))
+            written_report = json.loads((api_dir / "repair_report.json").read_text(encoding="utf-8"))
+            self.assertEqual(written_current["repair_report"]["address_city_alias_normalized_count"], 0)
+            self.assertEqual(written_manifest["repair_report"]["address_city_alias_normalized_count"], 0)
+            self.assertEqual(written_report["address_city_alias_normalized_count"], 0)
+
+    def test_rebuild_derives_address_city_alias_count_from_operation_items(self):
+        with tempfile.TemporaryDirectory() as td:
+            api_dir = Path(td) / "api"
+            item = event("exit:alias-rebuild", "Alias rebuild", "aliashash")
+            current = {
+                "schema_version": "weekly_activity_miniprogram_current.v1",
+                "item_count": 1,
+                "items": [item],
+            }
+            normalized_items = [
+                {"id": item["id"], "removed_city_keys": ["urumqi"]},
+                {"id": "exit:alias-rebuild-2", "removed_city_keys": ["nanjing"]},
+            ]
+            report = {
+                "schema_version": "weekly_activity_release_repair.v1",
+                "repaired_at": "2026-07-19T12:00:00+08:00",
+                "raw_item_count": 1,
+                "repaired_item_count": 1,
+                "removed_duplicate_count": 0,
+                "quarantined_conflict_item_count": 0,
+                "address_city_alias_normalized_items": normalized_items,
+            }
+
+            repair.rebuild_release_files(api_dir, current, [item], report)
+
+            written_report = json.loads((api_dir / "repair_report.json").read_text(encoding="utf-8"))
+            self.assertEqual(written_report["address_city_alias_normalized_count"], len(normalized_items))
+
+    def test_rebuild_recomputes_routes_and_cannot_escape_public_route_directories(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            api_dir = root / "api"
+            item = event("exit:route-escape", "Route escape", "routeescapehash")
+            item["detail_path"] = "by-id/../../outside.json"
+            item["detail_url"] = "by-id/../../outside.json"
+            item["city_key"] = "../../outside-city"
+            item["city_keys"] = ["../../outside-city"]
+            item["event_date_iso_guesses"] = ["../../outside-date", "2026-05-14"]
+            outside = root / "outside.json"
+            outside.write_text("sentinel", encoding="utf-8")
+            current = {
+                "schema_version": "weekly_activity_miniprogram_current.v1",
+                "item_count": 1,
+                "items": [item],
+            }
+            report = {
+                "schema_version": "weekly_incremental_merge.v1.rebuild",
+                "repaired_at": "2026-07-19T12:00:00+08:00",
+                "raw_item_count": 1,
+                "repaired_item_count": 1,
+                "removed_duplicate_count": 0,
+                "quarantined_conflict_item_count": 0,
+            }
+
+            repair.rebuild_release_files(api_dir, current, [item], report)
+
+            safe_detail = api_dir / "by-id" / f"{repair.slugify(item['id'], fallback='item')}.json"
+            written_current = json.loads((api_dir / "current.json").read_text(encoding="utf-8"))
+            self.assertTrue(safe_detail.is_file())
+            self.assertEqual(outside.read_text(encoding="utf-8"), "sentinel")
+            self.assertNotIn("..", written_current["items"][0]["detail_path"])
+            self.assertNotIn("..", written_current["items"][0]["city_key"])
+            self.assertEqual(written_current["items"][0]["event_date_iso_guesses"], ["2026-05-14"])
+            self.assertFalse((api_dir / "by-date" / "outside-date.json").exists())
+            with self.assertRaisesRegex(ValueError, "escapes by-id"):
+                repair.safe_route_target(api_dir, "by-id/../../must-not-write.json", "by-id")
+
+    def test_rebuild_rejects_inconsistent_address_city_alias_count(self):
+        with tempfile.TemporaryDirectory() as td:
+            api_dir = Path(td) / "api"
+            item = event("exit:alias-count-mismatch", "Alias mismatch", "aliasmismatchhash")
+            current = {
+                "schema_version": "weekly_activity_miniprogram_current.v1",
+                "item_count": 1,
+                "items": [item],
+            }
+            report = {
+                "schema_version": "weekly_activity_release_repair.v1",
+                "repaired_at": "2026-07-19T12:00:00+08:00",
+                "raw_item_count": 1,
+                "repaired_item_count": 1,
+                "removed_duplicate_count": 0,
+                "quarantined_conflict_item_count": 0,
+                "address_city_alias_normalized_count": 2,
+                "address_city_alias_normalized_items": [
+                    {"id": item["id"], "removed_city_keys": ["urumqi"]},
+                ],
+            }
+
+            with self.assertRaisesRegex(ValueError, "address_city_alias_normalized_count"):
+                repair.rebuild_release_files(api_dir, current, [item], report)
+
     def test_repairs_raw_duplicates_and_rewrites_materialized_indexes(self):
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
@@ -383,6 +624,50 @@ class RepairWeeklyReleaseConflictsTests(unittest.TestCase):
         self.assertEqual(repaired_child.get("poster_source"), "")
         self.assertFalse(report["aggregate_child_source_suppressed_items"][0]["kept_internal_activity_poster"])
         self.assertIn("cover_image_url", report["aggregate_child_source_suppressed_items"][0]["cleared_poster_fields"])
+
+    def test_disables_parent_source_but_keeps_exact_qwen_child_poster_until_migration(self):
+        child = event(
+            "agg-child-exact-qwen",
+            "Exact Child Event",
+            "overviewhash",
+            venue="REACTOR Shanghai",
+            address="上海市测试路1号",
+            published_at="2026-07-18",
+            event_date="2026-07-19",
+        )
+        selected_url = "https://mmbiz.qpic.cn/mmbiz_jpg/exact-child/640?wx_fmt=jpeg"
+        child["aggregation_child"] = True
+        child["evidence"] = ["2026-07-19 Exact Child Event REACTOR Shanghai"]
+        child["cover_image_url"] = selected_url
+        child["cover_url"] = selected_url
+        child["poster_source"] = "sanji_article_body_vl_aggregate_child_exact"
+        child["poster_selection_evidence"] = {
+            "selection_scope": "aggregate_child_exact_event",
+            "selected_by": "qwen_vl_direct_sanji_article_assets",
+            "provider": "qwen3_vl",
+            "model": "qwen3.6-plus",
+            "main_poster_image_index": 2,
+            "selected_sha": "exact-child-sha",
+        }
+
+        repaired, report = repair.repair_items(
+            [child],
+            quarantine_conflicts=True,
+            window_start="2026-07-18",
+            window_end="2026-07-19",
+        )
+
+        self.assertEqual(len(repaired), 1)
+        repaired_child = repaired[0]
+        self.assertFalse(repaired_child["source_action"]["available"])
+        self.assertEqual(repaired_child["source_action"]["url_hash"], "")
+        self.assertEqual(repaired_child["cover_image_url"], selected_url)
+        self.assertEqual(repaired_child["cover_url"], selected_url)
+        self.assertEqual(repaired_child["poster_source"], "sanji_article_body_vl_aggregate_child_exact")
+        change = report["aggregate_child_source_suppressed_items"][0]
+        self.assertFalse(change["kept_internal_activity_poster"])
+        self.assertTrue(change["kept_exact_qwen_public_activity_poster"])
+        self.assertEqual(change["cleared_poster_fields"], [])
 
     def test_quarantines_weak_aggregate_child_date_evidence(self):
         weak = event(

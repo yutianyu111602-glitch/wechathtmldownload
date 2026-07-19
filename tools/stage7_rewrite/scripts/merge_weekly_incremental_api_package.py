@@ -24,6 +24,13 @@ from repair_weekly_release_conflicts import (
     sort_items,
     write_json,
 )
+from weekly_public_projection import (
+    assert_public_payload,
+    project_public_items,
+    project_public_source_map_payload,
+    scrub_public_package_payload,
+    scrub_public_value,
+)
 
 
 SCHEMA_VERSION = "weekly_incremental_api_merge.v1"
@@ -136,7 +143,15 @@ def copy_usage_sidecars(incremental_dir: Path, out_dir: Path) -> dict[str, str]:
         if not src.is_file():
             continue
         dst = out_dir / name
-        shutil.copy2(src, dst)
+        payload = read_json(src)
+        if not isinstance(payload, dict):
+            raise ValueError(f"incremental public provenance sidecar must be an object: {src}")
+        source_pack_dir = str(payload.get("source_pack_dir") or "").strip()
+        if source_pack_dir and not payload.get("source_pack_name"):
+            payload["source_pack_name"] = Path(source_pack_dir).name
+        payload = scrub_public_package_payload(payload)
+        assert_public_payload(payload, label=f"incremental merged {name}")
+        write_json(dst, payload)
         copied[name] = str(dst)
     return copied
 
@@ -374,6 +389,10 @@ def load_items(api_dir: Path) -> tuple[dict[str, Any], list[dict[str, Any]], dic
 
 
 def merge_items(base_items: list[dict[str, Any]], incremental_items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    # Project both inputs before identity matching so a retained base row cannot
+    # carry old local evidence paths into the next public generation.
+    base_items = project_public_items(base_items)
+    incremental_items = project_public_items(incremental_items)
     merged = [deepcopy(item) for item in base_items]
     index: dict[str, int] = {}
     alias_index: dict[str, set[int]] = {}
@@ -479,6 +498,9 @@ def merge_items(base_items: list[dict[str, Any]], incremental_items: list[dict[s
             alias for alias, positions in alias_index.items() if len(positions) > 1
         ),
     }
+    merged = project_public_items(merged)
+    for item in merged:
+        assert_public_payload(item, label=f"incremental merged item {item_id(item)}")
     return sort_items(merged), report
 
 
@@ -528,7 +550,7 @@ def merge_source_maps(
     payload["generated_at"] = generated_at
     payload["source_count"] = len(merged_sources)
     payload["sources"] = merged_sources
-    payload["incremental_merge"] = {
+    public_merge = {
         "schema_version": SCHEMA_VERSION + ".source_map",
         "base_source_count": len(base_sources),
         "incremental_source_count": len(incremental_sources),
@@ -537,11 +559,17 @@ def merge_source_maps(
         "replaced_source_keys": replaced_keys,
         "remapped_event_id_field_count": len(remapped_event_id_fields),
         "remapped_event_id_fields": remapped_event_id_fields,
+        "base_release_name": base_dir.name,
+        "incremental_release_name": incremental_dir.name,
+    }
+    payload["incremental_merge"] = public_merge
+    payload = project_public_source_map_payload(payload)
+    write_json(out_path, payload)
+    return {
+        **public_merge,
         "base_source_map": str(base_path),
         "incremental_source_map": str(incremental_path),
     }
-    write_json(out_path, payload)
-    return payload["incremental_merge"]
 
 
 def safe_relative_path(value: Any) -> Path | None:
@@ -660,7 +688,7 @@ def merge_llm_enrichment_index(
     payload["generatedAt"] = generated_at
     payload["itemCount"] = len(merged_ids)
     payload["enrichments"] = [by_id[eid] for eid in merged_ids if eid in by_id]
-    payload["incremental_merge"] = {
+    public_merge = {
         "schema_version": SCHEMA_VERSION + ".llm_enrichment_index",
         "base_enrichment_count": len(base_entries),
         "incremental_enrichment_count": len(incremental_entries),
@@ -671,11 +699,20 @@ def merge_llm_enrichment_index(
         "skipped_stale_incremental_ids": skipped_stale_ids,
         "remapped_enrichment_id_count": len(remapped_enrichment_ids),
         "remapped_enrichment_ids": remapped_enrichment_ids,
+        "base_release_name": base_dir.name,
+        "incremental_release_name": incremental_dir.name,
+    }
+    payload["incremental_merge"] = public_merge
+    payload = scrub_public_value(payload, key_path="$.llm.enrichment_index")
+    if not isinstance(payload, dict):
+        raise ValueError("incremental LLM enrichment index public projection must remain an object")
+    assert_public_payload(payload, label="incremental merged llm/enrichment_index.json")
+    write_json(out_path, payload)
+    return {
+        **public_merge,
         "base_enrichment_index": str(base_path),
         "incremental_enrichment_index": str(incremental_path),
     }
-    write_json(out_path, payload)
-    return payload["incremental_merge"]
 
 
 def merge_package(base_dir: Path, incremental_dir: Path, out_dir: Path, report_path: Path | None, overwrite: bool) -> dict[str, Any]:
@@ -699,6 +736,14 @@ def merge_package(base_dir: Path, incremental_dir: Path, out_dir: Path, report_p
     club_overviews["destination"] = str(copied_club_overviews_path)
 
     generated_at = now_iso()
+    base_pack_name = str(
+        base_manifest.get("source_pack_name")
+        or Path(str(base_manifest.get("source_pack_dir") or base_dir.name)).name
+    )
+    incremental_pack_name = str(
+        incremental_manifest.get("source_pack_name")
+        or Path(str(incremental_manifest.get("source_pack_dir") or incremental_dir.name)).name
+    )
     merged_items, item_merge = merge_items(base_items, incremental_items)
 
     merged_current = deepcopy(base_current)
@@ -709,8 +754,15 @@ def merge_package(base_dir: Path, incremental_dir: Path, out_dir: Path, report_p
         "incremental_api_dir": str(incremental_dir),
         "base_generated_at": base_current.get("generated_at") or base_manifest.get("generated_at"),
         "incremental_generated_at": incremental_current.get("generated_at") or incremental_manifest.get("generated_at"),
+        "base_release_name": base_dir.name,
+        "incremental_release_name": incremental_dir.name,
+        "base_pack_name": base_pack_name,
+        "incremental_pack_name": incremental_pack_name,
         **item_merge,
     }
+    merged_current["source_pack_name"] = incremental_pack_name
+    merged_current = scrub_public_package_payload(merged_current)
+    assert_public_payload(merged_current, label="incremental merged current.json")
     usage_sidecars = copy_usage_sidecars(incremental_dir, out_dir)
     provenance_sidecars = copy_incremental_provenance_sidecars(incremental_dir, out_dir)
 
@@ -754,6 +806,15 @@ def merge_package(base_dir: Path, incremental_dir: Path, out_dir: Path, report_p
     if provenance_sidecars:
         manifest["build_filter_dispositions_path"] = "build_filter_dispositions.json"
         manifest["build_filter_disposition_count"] = incremental_manifest.get("build_filter_disposition_count")
+    manifest["source_pack_name"] = incremental_pack_name
+    manifest["source_base_pack_name"] = base_pack_name
+    manifest["source_incremental_pack_name"] = incremental_pack_name
+    manifest["source_base_release_name"] = base_dir.name
+    manifest["source_incremental_release_name"] = incremental_dir.name
+    manifest = scrub_public_package_payload(manifest)
+    if usage_sidecars:
+        manifest["usage_sidecars"] = {name: name for name in sorted(usage_sidecars)}
+    assert_public_payload(manifest, label="incremental merged manifest.json")
     write_json(manifest_path, manifest)
 
     repair_report = {

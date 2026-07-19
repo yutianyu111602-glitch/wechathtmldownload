@@ -1,9 +1,9 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
-const http = require("node:http");
 const path = require("node:path");
 const { effectiveFeedCount, effectiveFeedItems } = require("./effective-feed-items.cjs");
 const { readPageDataWithFallback } = require("./devtools-page-data.cjs");
+const { startStaticPackageServer } = require("./devtools-static-package.cjs");
 const {
   filterItemsByCityKey,
   filterItemsByDateSelection,
@@ -27,8 +27,9 @@ const projectPath = process.env.MINIPROGRAM_PROJECT_PATH || path.resolve(__dirna
 const cliPath = process.env.MINIPROGRAM_DEVTOOLS_CLI || "C:/Program Files (x86)/Tencent/微信web开发者工具/cli.bat";
 const launchPort = Number(process.env.MINIPROGRAM_AUTOMATOR_PORT || "9430");
 const idePort = Number(process.env.MINIPROGRAM_DEVTOOLS_IDE_PORT || "9430");
-const cliArgs = Number.isFinite(idePort) && idePort > 0 ? ["--port", String(idePort)] : [];
-const artifactRoot = path.resolve(__dirname, "../test-artifacts");
+const artifactRoot = process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT
+  ? path.resolve(process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT)
+  : path.resolve(__dirname, "../test-artifacts");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const artifactDir = path.join(artifactRoot, `devtools-current-package-rendered-${stamp}`);
 const staticPackageDir = String(process.env.MINIPROGRAM_STATIC_PACKAGE_DIR || "").trim();
@@ -63,21 +64,20 @@ function withTimeout(promise, timeoutMs, label) {
 }
 
 async function openHome(miniProgram) {
-  await withTimeout(
-    miniProgram.evaluate(() => new Promise((resolve) => {
-      wx.switchTab({
-        url: "/pages/index/index",
-        complete: () => {
-          const pages = getCurrentPages();
-          const page = pages[pages.length - 1];
-          resolve({ route: page && page.route });
-        },
-      });
-    })),
-    25000,
-    "switchTab home",
-  );
-  const page = await withTimeout(miniProgram.currentPage(), 12000, "currentPage home");
+  let page = await withTimeout(miniProgram.currentPage(), 12000, "currentPage before home");
+  if (page.path === "pages/index/index") return page;
+  try {
+    await withTimeout(miniProgram.reLaunch("/pages/index/index"), 20000, "reLaunch home");
+  } catch {
+    await withTimeout(
+      miniProgram.evaluate(() => new Promise((resolve) => {
+        wx.reLaunch({ url: "/pages/index/index", complete: resolve });
+      })),
+      20000,
+      "wx.reLaunch home",
+    );
+  }
+  page = await withTimeout(miniProgram.currentPage(), 12000, "currentPage home");
   assert.equal(page.path, "pages/index/index");
   return page;
 }
@@ -138,56 +138,6 @@ function dateSetFromItems(items) {
   return [...keys].sort();
 }
 
-function contentTypeFor(filePath) {
-  const ext = path.extname(filePath).toLowerCase();
-  if (ext === ".json") return "application/json; charset=utf-8";
-  if (ext === ".gz") return "application/gzip";
-  if (ext === ".txt") return "text/plain; charset=utf-8";
-  return "application/octet-stream";
-}
-
-function safeStaticPath(root, urlPath) {
-  const decoded = decodeURIComponent(String(urlPath || "/").split("?")[0]);
-  const relative = path.normalize(decoded).replace(/^[/\\]+/, "");
-  const fullPath = path.resolve(root, relative || "current.json");
-  const rootWithSep = root.endsWith(path.sep) ? root : `${root}${path.sep}`;
-  if (fullPath !== root && !fullPath.startsWith(rootWithSep)) return null;
-  return fullPath;
-}
-
-async function startStaticPackageServer(packageDir) {
-  const root = path.resolve(packageDir);
-  const currentPath = path.join(root, "current.json");
-  if (!fs.existsSync(currentPath)) {
-    throw new Error(`MINIPROGRAM_STATIC_PACKAGE_DIR must contain current.json: ${root}`);
-  }
-
-  const server = http.createServer((req, res) => {
-    const filePath = safeStaticPath(root, req.url || "/");
-    if (!filePath || !fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
-      res.writeHead(404, { "Content-Type": "application/json; charset=utf-8" });
-      res.end(JSON.stringify({ error: "not_found", path: req.url || "" }));
-      return;
-    }
-    res.writeHead(200, {
-      "Content-Type": contentTypeFor(filePath),
-      "Cache-Control": "no-store",
-    });
-    fs.createReadStream(filePath).pipe(res);
-  });
-
-  await new Promise((resolve, reject) => {
-    server.once("error", reject);
-    server.listen(0, "127.0.0.1", resolve);
-  });
-  const address = server.address();
-  const baseUrl = `http://127.0.0.1:${address.port}`;
-  return {
-    baseUrl,
-    close: () => new Promise((resolve) => server.close(resolve)),
-  };
-}
-
 async function waitForPosterImageState(miniProgram, page, minLoadCount, timeoutMs) {
   const started = Date.now();
   let data = await readPageDataWithFallback(miniProgram, page, { label: "poster image state" });
@@ -237,7 +187,6 @@ async function run() {
         projectPath,
         cliPath,
         port: launchPort,
-        args: cliArgs,
         idePort,
         trustProject: true,
         timeout: 90000,
@@ -523,13 +472,14 @@ async function run() {
           }
           delete app.globalData.__currentPackageRenderedProbe;
         }), 10000, "restore current-package probe");
-        if (noCloseDevTools) {
-          miniProgram.disconnect();
-        } else {
+        if (!noCloseDevTools) {
           await withTimeout(miniProgram.close(), 15000, "miniProgram.close");
         }
       } catch (error) {
-        miniProgram.disconnect();
+        // The close promise is not cancellable. Disconnecting the protocol
+        // releases its socket so a timed-out close cannot keep Node alive.
+      } finally {
+        await Promise.resolve(miniProgram.disconnect()).catch(() => {});
       }
     }
     if (staticServer) {
@@ -538,7 +488,12 @@ async function run() {
   }
 }
 
-run().catch((error) => {
+run().then(() => {
+  // miniprogram-automator may retain an internal child-process listener after
+  // an otherwise successful close. All owned resources are closed above, so
+  // terminate this standalone evidence process deterministically.
+  process.exit(0);
+}).catch((error) => {
   const failure = {
     wsEndpoint,
     launchMode,

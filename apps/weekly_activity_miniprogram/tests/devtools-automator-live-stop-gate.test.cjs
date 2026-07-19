@@ -119,6 +119,13 @@ test("live stop gate skips IDE HTTP service ports and selects an automator WebSo
       "HTTP service endpoint should be skipped as a non-automator",
     );
     assert.ok(report.smokeResults.some((item) => item.endpoint === `ws://127.0.0.1:${wsPort}` && item.ok));
+    for (const smoke of report.smokeResults.filter((item) => item.report)) {
+      assert.ok(smoke.report.artifactDir, "nested protocol smoke must report its artifact directory");
+      assert.ok(
+        path.resolve(smoke.report.artifactDir).startsWith(path.resolve(fixtureArtifactRoot)),
+        `nested protocol smoke artifact escaped the configured root: ${smoke.report.artifactDir}`,
+      );
+    }
   } finally {
     await Promise.all([close(wsServer), close(httpServer)]);
   }

@@ -9,18 +9,224 @@ publish run.
 from __future__ import annotations
 
 import argparse
+import contextlib
+import copy
 import hashlib
+import importlib
 import json
 import os
+import shutil
 import sys
+import tempfile
+import uuid
+from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable, Iterator
 
 
 REPO = Path(__file__).resolve().parents[3]
 DEFAULT_HERMES_HOME = Path(r"F:\DevData\Hermes")
 DEFAULT_HERMES_AGENT = DEFAULT_HERMES_HOME / "hermes-agent"
 DEFAULT_REPORT_ROOT = Path(r"F:\DevData\HuaidjRuntime\state\reports")
+DEFAULT_BACKUP_ROOT = DEFAULT_REPORT_ROOT / "hermes_job_installer_backups"
+
+
+def _normalized_path(path: Path) -> str:
+    return os.path.normcase(os.path.normpath(str(path.expanduser().resolve(strict=False))))
+
+
+def _same_path(left: Path, right: Path) -> bool:
+    return _normalized_path(left) == _normalized_path(right)
+
+
+@contextlib.contextmanager
+def _forced_hermes_home(hermes_home: Path) -> Iterator[Path]:
+    """Bind one Hermes call to an explicit home and restore its caller env."""
+
+    requested = hermes_home.expanduser().resolve(strict=False)
+    previous = os.environ.get("HERMES_HOME")
+    had_previous = "HERMES_HOME" in os.environ
+    os.environ["HERMES_HOME"] = str(requested)
+    try:
+        yield requested
+    finally:
+        if had_previous:
+            os.environ["HERMES_HOME"] = previous or ""
+        else:
+            os.environ.pop("HERMES_HOME", None)
+
+
+class HermesCronApi:
+    """Fail-closed adapter around the Hermes cron store.
+
+    Every operation re-binds ``HERMES_HOME`` and ``use_cron_store`` so an old
+    Desktop/terminal environment cannot silently redirect this installer to a
+    different profile.  ``reconcile`` owns one locked load/plan/save cycle and
+    writes jobs.json at most once.
+    """
+
+    def __init__(self, hermes_home: Path, hermes_agent: Path):
+        self.hermes_home = hermes_home.expanduser().resolve(strict=False)
+        self.hermes_agent = hermes_agent.expanduser().resolve(strict=False)
+        self.jobs_file = self.hermes_home / "cron" / "jobs.json"
+        self._transaction_lock_depth = 0
+        inserted = str(self.hermes_agent)
+        sys.path.insert(0, inserted)
+        try:
+            with _forced_hermes_home(self.hermes_home):
+                self.module = importlib.import_module("cron.jobs")
+        finally:
+            if sys.path and sys.path[0] == inserted:
+                sys.path.pop(0)
+
+        module_file = Path(str(getattr(self.module, "__file__", ""))).resolve(strict=False)
+        try:
+            module_file.relative_to(self.hermes_agent)
+        except (OSError, ValueError) as exc:
+            raise RuntimeError(
+                f"Hermes cron API came from the wrong runtime: {module_file}; "
+                f"expected under {self.hermes_agent}"
+            ) from exc
+        with self.bound_store():
+            pass
+
+    def __iter__(self):
+        # Compatibility for older callers/tests that unpacked load_api().
+        yield self.create_job
+        yield self.load_jobs
+        yield self.update_job
+
+    def _assert_store(self) -> None:
+        current_store = getattr(self.module, "_current_cron_store", None)
+        if not callable(current_store):
+            raise RuntimeError("Hermes cron API does not expose _current_cron_store; refusing an unverified store")
+        store = current_store()
+        actual = Path(str(getattr(store, "jobs_file", "")))
+        if not _same_path(actual, self.jobs_file):
+            raise RuntimeError(
+                f"Hermes cron store mismatch: actual={actual.resolve(strict=False)} "
+                f"expected={self.jobs_file.resolve(strict=False)}"
+            )
+
+    @contextlib.contextmanager
+    def bound_store(self) -> Iterator[None]:
+        use_cron_store = getattr(self.module, "use_cron_store", None)
+        if not callable(use_cron_store):
+            raise RuntimeError("Hermes cron API does not support use_cron_store; refusing implicit storage")
+        with _forced_hermes_home(self.hermes_home):
+            with use_cron_store(self.hermes_home):
+                self._assert_store()
+                yield
+
+    def create_job(self, **kwargs):
+        with self.bound_store():
+            return self.module.create_job(**kwargs)
+
+    def load_jobs(self):
+        with self.bound_store():
+            return self.module.load_jobs()
+
+    def update_job(self, job_id: str, changes: dict[str, Any]):
+        with self.bound_store():
+            return self.module.update_job(job_id, changes)
+
+    @contextlib.contextmanager
+    def transaction_lock(self) -> Iterator[None]:
+        """Hold Hermes' own jobs lock across snapshot, scripts, jobs, and rollback."""
+
+        if self._transaction_lock_depth:
+            self._transaction_lock_depth += 1
+            try:
+                yield
+            finally:
+                self._transaction_lock_depth -= 1
+            return
+
+        with self.bound_store():
+            jobs_lock = getattr(self.module, "_jobs_lock", None)
+            if not callable(jobs_lock):
+                raise RuntimeError("Hermes cron API lacks the cross-process jobs transaction lock")
+            with jobs_lock():
+                self._assert_store()
+                self._transaction_lock_depth = 1
+                try:
+                    yield
+                finally:
+                    self._transaction_lock_depth = 0
+
+    def reconcile(
+        self,
+        planner: Callable[[list[dict[str, Any]], Any], tuple[list[dict[str, Any]], list[dict[str, Any]], bool]],
+        *,
+        apply: bool,
+        already_locked: bool = False,
+    ) -> list[dict[str, Any]]:
+        def plan_and_maybe_save() -> list[dict[str, Any]]:
+            desired, actions, changed = planner(
+                copy.deepcopy(list(self.module.load_jobs())), self.module
+            )
+            self._assert_store()
+            if apply and changed:
+                save_unlocked(desired)
+            return actions
+
+        save_unlocked = getattr(self.module, "_save_jobs_unlocked", None)
+        if apply and not callable(save_unlocked):
+            raise RuntimeError("Hermes cron API lacks the locked single-write transaction primitives")
+        if already_locked:
+            if self._transaction_lock_depth <= 0:
+                raise RuntimeError("Hermes reconcile already_locked requires the installer transaction lock")
+            return plan_and_maybe_save()
+
+        with self.bound_store():
+            if not apply:
+                return plan_and_maybe_save()
+            jobs_lock = getattr(self.module, "_jobs_lock", None)
+            if not callable(jobs_lock):
+                raise RuntimeError("Hermes cron API lacks the locked single-write transaction primitives")
+            with jobs_lock():
+                return plan_and_maybe_save()
+
+
+def _atomic_write_text(path: Path, text: str) -> None:
+    """Write one launcher/report beside its target, fsync, then replace."""
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=str(path.parent))
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(text)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    except BaseException:
+        try:
+            os.unlink(temporary)
+        except OSError:
+            pass
+        raise
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+class InstallerTransactionError(RuntimeError):
+    """An apply write failed after its rollback snapshot was created."""
+
+    def __init__(self, cause: BaseException, *, backup: dict[str, Any], rollback: dict[str, Any]):
+        self.cause = cause
+        self.backup = backup
+        self.rollback = rollback
+        super().__init__(
+            f"Hermes installation transaction failed; "
+            f"baseline_restored={rollback.get('baseline_restored')}: "
+            f"{type(cause).__name__}: {cause}"
+        )
 
 RUNTIME_SSOT_MARKER = "# __HUAIDJ_RUNTIME_SSOT__"
 RUNTIME_SSOT_BLOCK = r'''
@@ -1233,11 +1439,192 @@ LEGACY_JOB_NAMES = {
 
 
 def load_api(hermes_home: Path, hermes_agent: Path):
-    sys.path.insert(0, str(hermes_agent))
-    os.environ.setdefault("HERMES_HOME", str(hermes_home))
-    from cron.jobs import create_job, load_jobs, update_job  # type: ignore
+    return HermesCronApi(hermes_home, hermes_agent)
 
-    return create_job, load_jobs, update_job
+
+def _schedule_expr(job: dict[str, Any]) -> str:
+    schedule = job.get("schedule")
+    if isinstance(schedule, dict):
+        return str(schedule.get("expr") or schedule.get("display") or "")
+    return str(schedule or "")
+
+
+def _new_canonical_job(name: str, spec: dict[str, Any], cron_module: Any) -> dict[str, Any]:
+    parsed_schedule = cron_module.parse_schedule(spec["schedule"])
+    now_fn = getattr(cron_module, "_hermes_now", None)
+    now = now_fn().isoformat() if callable(now_fn) else datetime.now().astimezone().isoformat()
+    return {
+        "id": uuid.uuid4().hex[:12],
+        "name": name,
+        "prompt": None,
+        "skills": [],
+        "skill": None,
+        "model": None,
+        "provider": None,
+        "provider_snapshot": None,
+        "model_snapshot": None,
+        "base_url": None,
+        "script": spec["script"],
+        "no_agent": True,
+        "context_from": None,
+        "schedule": parsed_schedule,
+        "schedule_display": parsed_schedule.get("display", spec["schedule"]),
+        "repeat": {"times": None, "completed": 0},
+        "enabled": True,
+        "state": "scheduled",
+        "paused_at": None,
+        "paused_reason": None,
+        "created_at": now,
+        "next_run_at": cron_module.compute_next_run(parsed_schedule),
+        "last_run_at": None,
+        "last_status": None,
+        "last_error": None,
+        "last_delivery_error": None,
+        "deliver": spec.get("deliver", "weixin"),
+        "origin": None,
+        "enabled_toolsets": None,
+        "workdir": str(REPO.resolve(strict=False)),
+        "wrap_response": False,
+    }
+
+
+def _assign_if_different(job: dict[str, Any], key: str, value: Any, changed_fields: list[str]) -> None:
+    current = job.get(key)
+    equal = _same_path(Path(str(current)), Path(str(value))) if key == "workdir" and current and value else current == value
+    if not equal:
+        job[key] = value
+        changed_fields.append(key)
+
+
+def _plan_jobs(
+    jobs: list[dict[str, Any]], cron_module: Any
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], bool]:
+    """Return the full desired list while preserving IDs and runtime history."""
+
+    actions: list[dict[str, Any]] = []
+    changed = False
+    by_name: dict[str, list[dict[str, Any]]] = {}
+    for job in jobs:
+        by_name.setdefault(str(job.get("name") or ""), []).append(job)
+
+    for name, spec in JOBS.items():
+        expected_deliver = spec.get("deliver", "weixin")
+        matches = by_name.get(name, [])
+        if not matches:
+            created = _new_canonical_job(name, spec, cron_module)
+            jobs.append(created)
+            by_name.setdefault(name, []).append(created)
+            actions.append(
+                {
+                    "type": "job",
+                    "name": name,
+                    "existing_count": 0,
+                    "schedule": spec["schedule"],
+                    "script": spec["script"],
+                    "deliver": expected_deliver,
+                    "action": "create",
+                    "job_id": created["id"],
+                    "changed_fields": sorted(created.keys()),
+                }
+            )
+            changed = True
+            continue
+
+        ordered_matches = sorted(
+            matches,
+            key=lambda row: (
+                not bool(row.get("enabled")),
+                str(row.get("created_at") or ""),
+                str(row.get("id") or ""),
+            ),
+        )
+        job = ordered_matches[0]
+        duplicates = ordered_matches[1:]
+        changed_fields: list[str] = []
+        owned = {
+            "deliver": expected_deliver,
+            "script": spec["script"],
+            "no_agent": True,
+            "wrap_response": False,
+            "state": "scheduled",
+            "enabled": True,
+            "workdir": str(REPO.resolve(strict=False)),
+            "paused_at": None,
+            "paused_reason": None,
+        }
+        for key, value in owned.items():
+            _assign_if_different(job, key, value, changed_fields)
+        if _schedule_expr(job) != spec["schedule"]:
+            parsed_schedule = cron_module.parse_schedule(spec["schedule"])
+            job["schedule"] = parsed_schedule
+            job["schedule_display"] = parsed_schedule.get("display", spec["schedule"])
+            job["next_run_at"] = cron_module.compute_next_run(parsed_schedule)
+            changed_fields.extend(["schedule", "schedule_display", "next_run_at"])
+
+        duplicate_actions: list[dict[str, Any]] = []
+        for duplicate in duplicates:
+            duplicate_reason = f"Duplicate of canonical Hermes job {job.get('id')}"
+            duplicate_fields: list[str] = []
+            for key, value in {
+                "state": "paused",
+                "enabled": False,
+                "paused_reason": duplicate_reason,
+            }.items():
+                _assign_if_different(duplicate, key, value, duplicate_fields)
+            duplicate_actions.append(
+                {
+                    "job_id": duplicate.get("id"),
+                    "action": "pause" if duplicate_fields else "noop",
+                    "changed_fields": duplicate_fields,
+                }
+            )
+            if duplicate_fields:
+                changed = True
+
+        action_name = "update" if changed_fields else "noop"
+        if changed_fields:
+            changed = True
+        actions.append(
+            {
+                "type": "job",
+                "name": name,
+                "existing_count": len(matches),
+                "schedule": spec["schedule"],
+                "script": spec["script"],
+                "deliver": expected_deliver,
+                "action": action_name,
+                "job_id": job.get("id"),
+                "changed_fields": changed_fields,
+                "duplicate_job_ids": [row.get("id") for row in duplicates],
+                "duplicate_actions": duplicate_actions,
+                "paused_duplicate_job_ids": [
+                    row["job_id"] for row in duplicate_actions if row["action"] == "pause"
+                ],
+            }
+        )
+
+    legacy_reason = "Superseded by HUAIDJ Sanji Wed 21:10 / Fri 20:10 off-peak weekly schedule"
+    for name in sorted(LEGACY_JOB_NAMES):
+        for job in by_name.get(name, []):
+            changed_fields: list[str] = []
+            for key, value in {
+                "state": "paused",
+                "enabled": False,
+                "paused_reason": legacy_reason,
+            }.items():
+                _assign_if_different(job, key, value, changed_fields)
+            if changed_fields:
+                changed = True
+            actions.append(
+                {
+                    "type": "legacy_job",
+                    "name": name,
+                    "job_id": job.get("id"),
+                    "action": "pause" if changed_fields else "noop",
+                    "changed_fields": changed_fields,
+                }
+            )
+    return jobs, actions, changed
 
 
 def write_scripts(hermes_home: Path, apply: bool) -> list[dict[str, Any]]:
@@ -1268,13 +1655,243 @@ def write_scripts(hermes_home: Path, apply: bool) -> list[dict[str, Any]]:
             }
         )
         if apply and changed:
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(desired, encoding="utf-8", newline="\n")
+            _atomic_write_text(path, desired)
     return actions
 
 
-def ensure_jobs(hermes_home: Path, hermes_agent: Path, apply: bool) -> list[dict[str, Any]]:
-    create_job, load_jobs, update_job = load_api(hermes_home, hermes_agent)
+def _managed_target_paths(hermes_home: Path) -> list[Path]:
+    scripts_root = hermes_home / "scripts"
+    return [hermes_home / "cron" / "jobs.json"] + [
+        scripts_root / rel.replace("/", os.sep) for rel in sorted(SCRIPT_TEMPLATES)
+    ]
+
+
+def backup_plan(hermes_home: Path) -> list[dict[str, Any]]:
+    entries: list[dict[str, Any]] = []
+    for target in _managed_target_paths(hermes_home):
+        exists = target.is_file()
+        entries.append(
+            {
+                "target": str(target.resolve(strict=False)),
+                "existed": exists,
+                "sha256_before": _sha256_file(target) if exists else None,
+                "restore_action": "copy_backup_to_target" if exists else "remove_target_if_created",
+            }
+        )
+    return entries
+
+
+def create_backup_snapshot(hermes_home: Path, backup_root: Path) -> dict[str, Any]:
+    """Snapshot every managed target before the first apply write."""
+
+    resolved_home = hermes_home.expanduser().resolve(strict=False)
+    resolved_backup_root = backup_root.expanduser().resolve(strict=False)
+    try:
+        resolved_backup_root.relative_to(resolved_home)
+    except ValueError:
+        pass
+    else:
+        raise RuntimeError(f"Backup root must stay outside Hermes home: {resolved_backup_root}")
+
+    stamp = datetime.now().astimezone().strftime("%Y%m%d-%H%M%S")
+    snapshot = resolved_backup_root / f"huaidj-hermes-{stamp}-{uuid.uuid4().hex[:8]}"
+    snapshot.mkdir(parents=True, exist_ok=False)
+    entries = backup_plan(resolved_home)
+    for entry in entries:
+        target = Path(entry["target"])
+        relative = target.relative_to(resolved_home)
+        backup_path = snapshot / "files" / relative
+        entry["backup"] = str(backup_path) if entry["existed"] else None
+        if not entry["existed"]:
+            continue
+        backup_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(target, backup_path)
+        copied_hash = _sha256_file(backup_path)
+        if copied_hash != entry["sha256_before"]:
+            raise RuntimeError(f"Backup hash mismatch for {target}")
+        entry["backup_sha256"] = copied_hash
+
+    manifest = {
+        "schema_version": "huaidj_hermes_installer_restore_manifest.v1",
+        "created_at": datetime.now().astimezone().isoformat(),
+        "hermes_home": str(resolved_home),
+        "snapshot": str(snapshot),
+        "requires_gateway_stopped_for_restore": True,
+        "entries": entries,
+    }
+    manifest_path = snapshot / "restore_manifest.json"
+    _atomic_write_text(manifest_path, json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
+    manifest["manifest"] = str(manifest_path)
+    manifest["manifest_sha256"] = _sha256_file(manifest_path)
+    return manifest
+
+
+def _atomic_restore_file(source: Path, target: Path, expected_sha256: str) -> None:
+    """Restore one verified backup without exposing a partially copied target."""
+
+    if not source.is_file():
+        raise FileNotFoundError(f"Hermes restore backup is missing: {source}")
+    if _sha256_file(source) != expected_sha256:
+        raise RuntimeError(f"Hermes restore backup hash mismatch: {source}")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix=f".{target.name}.", suffix=".restore", dir=str(target.parent))
+    os.close(fd)
+    temporary_path = Path(temporary)
+    try:
+        shutil.copy2(source, temporary_path)
+        if _sha256_file(temporary_path) != expected_sha256:
+            raise RuntimeError(f"Hermes restore temporary hash mismatch: {target}")
+        with temporary_path.open("r+b") as handle:
+            os.fsync(handle.fileno())
+        os.replace(temporary_path, target)
+        if _sha256_file(target) != expected_sha256:
+            raise RuntimeError(f"Hermes restored target hash mismatch: {target}")
+    except BaseException:
+        try:
+            temporary_path.unlink()
+        except OSError:
+            pass
+        raise
+
+
+def restore_backup_snapshot(backup: dict[str, Any]) -> dict[str, Any]:
+    """Restore and verify every target named by a trusted installer snapshot."""
+
+    report: dict[str, Any] = {
+        "schema_version": "huaidj_hermes_installer_rollback.v1",
+        "ok": False,
+        "baseline_restored": False,
+        "manifest_sha256_verified": False,
+        "restored_targets": [],
+        "removed_targets": [],
+        "errors": [],
+    }
+    try:
+        manifest_path = Path(str(backup.get("manifest") or "")).resolve(strict=False)
+        expected_manifest_sha = str(backup.get("manifest_sha256") or "")
+        if not manifest_path.is_file() or len(expected_manifest_sha) != 64:
+            raise RuntimeError("Hermes restore manifest identity is incomplete")
+        actual_manifest_sha = _sha256_file(manifest_path)
+        if actual_manifest_sha != expected_manifest_sha:
+            raise RuntimeError("Hermes restore manifest hash mismatch")
+        report["manifest_sha256_verified"] = True
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if manifest.get("schema_version") != "huaidj_hermes_installer_restore_manifest.v1":
+            raise RuntimeError("Hermes restore manifest schema is unsupported")
+        hermes_home = Path(str(manifest.get("hermes_home") or "")).resolve(strict=False)
+        snapshot = Path(str(manifest.get("snapshot") or "")).resolve(strict=False)
+        if not _same_path(hermes_home, Path(str(backup.get("hermes_home") or ""))):
+            raise RuntimeError("Hermes restore manifest home does not match the transaction")
+        if not _same_path(snapshot, manifest_path.parent):
+            raise RuntimeError("Hermes restore manifest snapshot path is inconsistent")
+
+        entries = manifest.get("entries")
+        if not isinstance(entries, list) or not entries:
+            raise RuntimeError("Hermes restore manifest has no managed targets")
+        expected_targets = {
+            _normalized_path(path) for path in _managed_target_paths(hermes_home)
+        }
+        manifest_targets = {
+            _normalized_path(Path(str(entry.get("target") or "")))
+            for entry in entries
+            if isinstance(entry, dict)
+        }
+        if manifest_targets != expected_targets:
+            raise RuntimeError("Hermes restore manifest target set does not match the installer")
+
+        for entry in entries:
+            target = Path(str(entry.get("target") or "")).resolve(strict=False)
+            try:
+                target.relative_to(hermes_home)
+                if bool(entry.get("existed")):
+                    expected_sha = str(entry.get("sha256_before") or "")
+                    backup_sha = str(entry.get("backup_sha256") or "")
+                    source = Path(str(entry.get("backup") or "")).resolve(strict=False)
+                    source.relative_to(snapshot / "files")
+                    if len(expected_sha) != 64 or backup_sha != expected_sha:
+                        raise RuntimeError(f"Hermes restore hash contract is invalid: {target}")
+                    _atomic_restore_file(source, target, expected_sha)
+                    report["restored_targets"].append(str(target))
+                else:
+                    if target.is_dir():
+                        raise RuntimeError(f"Hermes restore target unexpectedly became a directory: {target}")
+                    if target.exists() or target.is_symlink():
+                        target.unlink()
+                    report["removed_targets"].append(str(target))
+            except (OSError, RuntimeError, ValueError) as exc:
+                report["errors"].append(f"{target}: {type(exc).__name__}: {exc}")
+
+        verification_errors: list[str] = []
+        for entry in entries:
+            target = Path(str(entry.get("target") or "")).resolve(strict=False)
+            if bool(entry.get("existed")):
+                expected_sha = str(entry.get("sha256_before") or "")
+                if not target.is_file() or _sha256_file(target) != expected_sha:
+                    verification_errors.append(f"restored hash mismatch: {target}")
+            elif target.exists() or target.is_symlink():
+                verification_errors.append(f"created target still exists: {target}")
+        report["errors"].extend(verification_errors)
+        report["baseline_restored"] = not report["errors"]
+        report["ok"] = report["baseline_restored"]
+    except (OSError, RuntimeError, ValueError, json.JSONDecodeError) as exc:
+        report["errors"].append(f"{type(exc).__name__}: {exc}")
+    return report
+
+
+def apply_installation_transaction(
+    *,
+    hermes_home: Path,
+    hermes_agent: Path,
+    backup_root: Path,
+) -> dict[str, Any]:
+    """Apply launchers and jobs as one rollback-protected transaction."""
+
+    api = load_api(hermes_home, hermes_agent)
+    if not isinstance(api, HermesCronApi):
+        raise RuntimeError("Hermes installer transaction requires the cross-process cron API")
+    actions: list[dict[str, Any]] = []
+    with api.transaction_lock():
+        backup = create_backup_snapshot(hermes_home, backup_root)
+        try:
+            actions.extend(write_scripts(hermes_home, True))
+            actions.extend(
+                ensure_jobs(
+                    hermes_home,
+                    hermes_agent,
+                    True,
+                    already_locked=True,
+                    api=api,
+                )
+            )
+        except BaseException as exc:
+            rollback = restore_backup_snapshot(backup)
+            raise InstallerTransactionError(exc, backup=backup, rollback=rollback) from exc
+    return {
+        "backup": backup,
+        "actions": actions,
+        "rollback": None,
+        "baseline_restored": None,
+    }
+
+
+def ensure_jobs(
+    hermes_home: Path,
+    hermes_agent: Path,
+    apply: bool,
+    *,
+    already_locked: bool = False,
+    api: HermesCronApi | None = None,
+) -> list[dict[str, Any]]:
+    api = api or load_api(hermes_home, hermes_agent)
+    if isinstance(api, HermesCronApi):
+        return api.reconcile(_plan_jobs, apply=apply, already_locked=already_locked)
+
+    if already_locked:
+        raise RuntimeError("Legacy Hermes cron adapters cannot prove the installer transaction lock")
+
+    # Compatibility path for tests/older embedders that replace load_api with
+    # the former three-function tuple. Production always uses HermesCronApi.
+    create_job, load_jobs, update_job = api
     actions: list[dict[str, Any]] = []
     jobs = load_jobs()
     by_name: dict[str, list[dict[str, Any]]] = {}
@@ -1405,14 +2022,20 @@ def main() -> int:
         default=os.environ.get("HERMES_AGENT_ROOT", str(resolve_hermes_runtime_root())),
         help="Immutable Hermes source/runtime root used to access the cron API.",
     )
+    parser.add_argument(
+        "--backup-root",
+        default=str(DEFAULT_BACKUP_ROOT),
+        help="External directory for the pre-apply restore snapshot.",
+    )
     parser.add_argument("--json-out", default="")
     args = parser.parse_args()
 
     hermes_home = Path(args.hermes_home)
     hermes_agent = Path(args.hermes_agent)
+    backup_root = Path(args.backup_root)
     runtime_defaults = installer_runtime_defaults()
     report: dict[str, Any] = {
-        "schema_version": "huaidj_sanji_hermes_job_installer.v2",
+        "schema_version": "huaidj_sanji_hermes_job_installer.v3",
         "applied": bool(args.apply),
         "repo": str(REPO),
         "hermes_home": str(hermes_home),
@@ -1420,19 +2043,50 @@ def main() -> int:
         "hermes_runtime": str(hermes_agent),
         "runtime_defaults": {name: str(value) for name, value in runtime_defaults.items()},
         "actions": [],
+        "backup_plan": backup_plan(hermes_home),
     }
     try:
-        report["actions"].extend(write_scripts(hermes_home, args.apply))
-        report["actions"].extend(ensure_jobs(hermes_home, hermes_agent, args.apply))
+        script_plan = write_scripts(hermes_home, False)
+        job_plan = ensure_jobs(hermes_home, hermes_agent, False)
+        would_change = any(bool(action.get("changed")) for action in script_plan) or any(
+            action.get("action") in {"create", "update", "pause"}
+            or any(
+                duplicate.get("action") == "pause"
+                for duplicate in action.get("duplicate_actions", [])
+            )
+            for action in job_plan
+        )
+        report["would_change"] = would_change
+        if args.apply and would_change:
+            transaction = apply_installation_transaction(
+                hermes_home=hermes_home,
+                hermes_agent=hermes_agent,
+                backup_root=backup_root,
+            )
+            report["backup"] = transaction["backup"]
+            report["actions"].extend(transaction["actions"])
+            report["rollback"] = transaction["rollback"]
+            report["baseline_restored"] = transaction["baseline_restored"]
+            report["changed"] = True
+        else:
+            report["actions"].extend(script_plan)
+            report["actions"].extend(job_plan)
+            report["changed"] = False
+            report["backup"] = None
         report["ok"] = True
+    except InstallerTransactionError as exc:
+        report["ok"] = False
+        report["error"] = str(exc)
+        report["backup"] = exc.backup
+        report["rollback"] = exc.rollback
+        report["baseline_restored"] = bool(exc.rollback.get("baseline_restored"))
     except Exception as exc:
         report["ok"] = False
         report["error"] = str(exc)
 
     if args.json_out:
         out = Path(args.json_out)
-        out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+        _atomic_write_text(out, json.dumps(report, ensure_ascii=False, indent=2) + "\n")
 
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0 if report.get("ok") else 2

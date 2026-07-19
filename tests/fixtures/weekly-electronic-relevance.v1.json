@@ -1,0 +1,191 @@
+{
+  "schema_version": "weekly_electronic_relevance_contract.v1",
+  "cases": [
+    {
+      "id": "unknown-poster-only",
+      "item": {
+        "title": "海报活动（无风格信号）"
+      },
+      "expected": {
+        "classification": "unknown",
+        "keep": true,
+        "reason": ""
+      }
+    },
+    {
+      "id": "weak-dj-party",
+      "item": {
+        "title": "Friday DJ Party",
+        "venue": ["Community Club"]
+      },
+      "expected": {
+        "classification": "electronic",
+        "keep": true,
+        "reason": ""
+      }
+    },
+    {
+      "id": "reggae-dub-band-current-release",
+      "item": {
+        "title": "REGGAE DUB 音乐派对 | Polar Joint 北极票乐队原创作品专场",
+        "genres": ["reggae", "dub"],
+        "promoter": "陀地音乐TOTE MUSIC",
+        "venue": ["陀地士多 Tote Store"],
+        "lineup": ["Polar Joint 北极票乐队", "Thomas", "Trick 林勤汉", "Mark"]
+      },
+      "expected": {
+        "classification": "non_electronic",
+        "keep": false,
+        "reason": "band"
+      }
+    },
+    {
+      "id": "jazz-rebirth-current-release",
+      "item": {
+        "title": "Nightingale Quartet | Jazz Rebirth 传统爵士与现代爵士的碰撞",
+        "genres": ["swing", "funk", "bebop", "jazz"],
+        "promoter": "陀地音乐TOTE MUSIC"
+      },
+      "expected": {
+        "classification": "non_electronic",
+        "keep": false,
+        "reason": "jazz"
+      }
+    },
+    {
+      "id": "tote-jazz-current-release",
+      "item": {
+        "title": "陀地音乐TOTE MUSIC",
+        "genres": ["jazz"],
+        "promoter": "陀地音乐TOTE MUSIC",
+        "lineup": ["Kz", "黄俊翔", "段易", "蓝岚"]
+      },
+      "expected": {
+        "classification": "non_electronic",
+        "keep": false,
+        "reason": "jazz"
+      }
+    },
+    {
+      "id": "free-jazz-current-release",
+      "item": {
+        "title": "佛山 鼠窝MiceSpot",
+        "genres": ["Free Jazz", "Improvisation", "Avant-garde"],
+        "promoter": "离岛唱片"
+      },
+      "expected": {
+        "classification": "non_electronic",
+        "keep": false,
+        "reason": "jazz"
+      }
+    },
+    {
+      "id": "naked-dub-does-not-override-jazz",
+      "item": {
+        "title": "Jazz Dub Club Party",
+        "genres": ["jazz", "dub"]
+      },
+      "expected": {
+        "classification": "non_electronic",
+        "keep": false,
+        "reason": "jazz"
+      }
+    },
+    {
+      "id": "negated-electronic-is-not-strong-evidence",
+      "item": {
+        "title": "Non-electronic Jazz Club Session",
+        "genres": ["jazz"]
+      },
+      "expected": {
+        "classification": "non_electronic",
+        "keep": false,
+        "reason": "jazz"
+      }
+    },
+    {
+      "id": "weak-club-does-not-override-funk",
+      "item": {
+        "title": "Funk night at the club"
+      },
+      "expected": {
+        "classification": "non_electronic",
+        "keep": false,
+        "reason": "funk"
+      }
+    },
+    {
+      "id": "weak-party-does-not-override-swing",
+      "item": {
+        "title": "Swing 跳舞派对"
+      },
+      "expected": {
+        "classification": "non_electronic",
+        "keep": false,
+        "reason": "swing"
+      }
+    },
+    {
+      "id": "house-overrides-jazz-mixed-bill",
+      "item": {
+        "title": "Jazz House Session",
+        "genres": ["jazz", "house"]
+      },
+      "expected": {
+        "classification": "electronic",
+        "keep": true,
+        "reason": ""
+      }
+    },
+    {
+      "id": "house-in-venue-is-not-genre-evidence",
+      "item": {
+        "title": "Live Jazz Quartet",
+        "genres": ["jazz"],
+        "venue": ["House of Music Club"]
+      },
+      "expected": {
+        "classification": "non_electronic",
+        "keep": false,
+        "reason": "jazz"
+      }
+    },
+    {
+      "id": "techno-overrides-funk-swing-mixed-bill",
+      "item": {
+        "title": "Funk 铸其体，Jazz 赋其神",
+        "genres": ["techno", "house", "funk", "swing"]
+      },
+      "expected": {
+        "classification": "electronic",
+        "keep": true,
+        "reason": ""
+      }
+    },
+    {
+      "id": "dub-techno-is-strong",
+      "item": {
+        "title": "Dub Techno with a Jazz texture",
+        "genres": ["Dub Techno", "jazz"]
+      },
+      "expected": {
+        "classification": "electronic",
+        "keep": true,
+        "reason": ""
+      }
+    },
+    {
+      "id": "acid-preserves-existing-cocktail-dj-case",
+      "item": {
+        "title": "Cocktail room with DJ Acid",
+        "lineup": ["DJ Acid"],
+        "venue": ["Club Room"]
+      },
+      "expected": {
+        "classification": "electronic",
+        "keep": true,
+        "reason": ""
+      }
+    }
+  ]
+}

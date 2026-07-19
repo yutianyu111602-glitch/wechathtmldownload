@@ -11,16 +11,22 @@ def test_openclaw_weekly_publish_defaults_to_online_qwen_vl() -> None:
     assert '[string]$PosterExtractionMode = "vl_direct_qwen"' in source
 
 
-def test_atlas_bio_promotion_is_explicit_and_baked_before_deploy() -> None:
+def test_atlas_bio_promotion_is_explicit_transaction_bound_and_marked_after_promotion() -> None:
     source = (ROOT / "run_openclaw_weekly_daily_publish.ps1").read_text(encoding="utf-8-sig")
 
     assert "[switch]$PromoteDjBioAtoms" in source
     assert "if ($PromoteDjBioAtoms -and -not $DeployBackend)" in source
     assert "atlas_miniapp_bio_write_executed" in source
-    assert source.index('Invoke-RunStep "Promote DJ bio atoms before baking deploy context"') < source.index(
-        'Invoke-RunStep "Bake CloudRun deploy context"'
+    prepare_at = source.index('Invoke-RunStep "Bake CloudRun deploy context"')
+    deploy_at = source.index("direct_cloudbase_deploy.py", prepare_at)
+    promote_at = source.index("--promote-transaction", deploy_at)
+    executed_at = source.index(
+        "$script:AtlasMiniappBioPromotionExecuted = [bool]$bioPromotion.authoritative_changed",
+        promote_at,
     )
-    assert "Promote DJ bio atoms to atlas profiles" not in source
+    assert prepare_at < deploy_at < promote_at < executed_at
+    assert '$bakeArgs += "--promote-dj-bio-atoms"' in source
+    assert "python $BioPromotionScript --write" not in source
 
 
 def test_weekly_wrapper_does_not_launch_separate_atlas_nightly_state_machine() -> None:
@@ -58,4 +64,6 @@ def test_candidate_scripts_resolve_paths_from_their_own_repo() -> None:
     assert r"C:\code\githubstar\wechathtmldownload" not in bake
     assert 'MINIPROGRAM_DIR = _REPO_ROOT / "apps" / "weekly_activity_miniprogram"' in bake
     assert r"C:\code\githubstar\wechathtmldownload" not in promotion
-    assert "REPO = Path(__file__).resolve().parents[3]" in promotion
+    assert 'parser.add_argument(\n        "--data-root"' in promotion
+    assert "required=True" in promotion
+    assert "services\" / \"weekly_activity_cloudrun\" / \"data" not in promotion

@@ -1,8 +1,66 @@
 # Configuration Reference
 
-Updated: 2026-05-26
+Updated: 2026-07-19
 
 This repo uses package scripts, JSON profiles, prompt files, CLI flags, and status/manifest files rather than one single config file.
+
+## 2026-07-19 HUAIDJ runtime configuration
+
+The integration checkout is not a runtime root. Only set `HUAIDJ_REPO` to a
+clean detached release whose path prefix matches its Git SHA. Runtime state,
+reports, locks, caches, hydrated test data, candidates, backups, and deploy
+workdirs must remain outside every Git checkout.
+
+Current non-secret path/config surface:
+
+| Name | Meaning / current rule |
+| --- | --- |
+| `HUAIDJ_REPO` | Immutable HUAIDJ release root selected during Hermes cutover; never the dirty discovery/integration tree |
+| `HUAIDJ_PYTHON` | Existing verified Python 3.11 runtime used by launchers and child processes |
+| `HUAIDJ_REPORT_ROOT` | External reports/logs/locks root; current authority is `F:\DevData\HuaidjRuntime\state\reports` |
+| `HUAIDJ_CURRENT_RELEASE_DIR` | External accepted weekly static package directory, not a source-tree data folder |
+| `HUAIDJ_CLOUDRUN_DATA_ROOT` | External CloudRun data root containing the promoted local release pointer |
+| `HUAIDJ_CLOUDRUN_WORK_ROOT` | External prepare/deploy work directory |
+| `HUAIDJ_PUBLISHED_API_DIR` | Explicit accepted/published API directory used for merge/readback |
+| `HUAIDJ_CI_STAGING_ROOT` | External clean mini-program upload staging root |
+| `HUAIDJ_PROXY_URL` | Temporary process-scoped `http://127.0.0.1:7890`; do not rewrite the older network SSOT |
+| `WECHAT_DEVTOOLS_CLI` | Official logged-in WeChat DevTools `cli.bat`; current managed default is under `F:\DevApps\WeChatDevTools` |
+| `WECHAT_DEVTOOLS_PROFILE_ROOT` | Managed external DevTools profile root; current default is `F:\DevData\WeChatDevTools\Profile` |
+
+Do not print or copy model keys, CloudBase credentials, Sanji cookies/account
+tables, GitHub credentials, or WeChat login material into reports. Scripts may
+read existing managed environment/config values but diagnostics record only
+safe names, hashes, counts, and statuses.
+
+Weekly/model defaults for the full-recovery candidate:
+
+- `SanjiRefreshCutoffHours=744` and `SanjiSummaryMaxAgeHours=12`;
+- source mode `sanji_desktop_rss`, using Sanji Desktop/CDP `19333` and a frozen
+  export snapshot;
+- poster route `vl_direct_qwen`, provider `qwen3_vl`, model
+  `qwen3.6-plus`, fallback `mimo`;
+- `PosterVlMaxImages=0` and `PosterVlLimit=0` mean every usable image and all
+  candidate rows, not “disabled”;
+- Qwen-VL and DeepSeek concurrency default to `4` in the maintained daily
+  wrapper;
+- Qwen-VL handles image evidence; DeepSeek receives text/OCR evidence and must
+  not be configured as an image reader.
+
+Public weekly responses and package artifacts share generation metadata. The
+minimum identity surface is `revision`, `generatedAt`, `scope`, and
+`generation_id`/`sync_id` (wire aliases may be normalized internally). Client,
+CloudRun, CloudBase and static fallback must reject incompatible identities
+rather than mix rows/facets from different generations.
+
+Business-date semantics are fixed to `Asia/Shanghai`: the operational cutoff is
+07:00 for the activity business day, `今晚` is that one business date, and
+`本周末` is the Friday-through-Sunday closed interval. Do not configure this
+from the device locale or host timezone.
+
+Atlas triplet output requires a new absolute external `--out-dir`. Its public
+`datasetId` is derived from the frozen SQLite snapshot; `--dataset-id` is an
+expected-value guard, not a rename. Multi-role `--v2/--serving` builds require
+one common embedded generation or explicit `--frozen-release-id`.
 
 2026-05-26 T6 broader source-context recovery uses only file path CLI defaults and existing report artifacts. `build_atlas_social_broader_source_context_recovery_packet.py` adds no secret, provider, network, or runtime service config; it reads current T5 work-order JSONL files and writes report-only review slices.
 

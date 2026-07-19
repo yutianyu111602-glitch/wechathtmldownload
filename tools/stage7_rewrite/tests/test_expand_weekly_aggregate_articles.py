@@ -631,6 +631,33 @@ class ExpandWeeklyAggregateArticlesTests(unittest.TestCase):
         )
 
         self.assertEqual(child["city"], ["上海"])
+        self.assertEqual(child["cover_url"], "")
+        self.assertEqual(child["cover_source"], "")
+        self.assertEqual(child["poster_selection_required"], "qwen_vl_aggregate_child_exact_event")
+
+    def test_child_rejects_parent_overview_cover_before_qwen_exact_selection(self):
+        child = aggregate.child_candidate_from_event(
+            parent={
+                "article_id": "parent-with-cover",
+                "title": "July overview",
+                "city": ["上海"],
+                "cover_url": "https://mmbiz.qpic.cn/parent-overview.png",
+            },
+            queue_row=None,
+            cache_row={"source_url": "https://mp.weixin.qq.com/s/parent-with-cover"},
+            event={
+                "is_event": True,
+                "title": "Exact Child",
+                "event_date_text": ["2026-07-18"],
+                "venue": "DOME",
+            },
+            model="deepseek-v4-pro",
+        )
+
+        self.assertEqual(child["cover_url"], "")
+        self.assertEqual(child["cover_source"], "")
+        self.assertTrue(child["aggregate_parent_cover_rejected"])
+        self.assertEqual(child["poster_selection_required"], "qwen_vl_aggregate_child_exact_event")
 
     def test_parent_body_child_opens_aggregate_parent_source_url(self):
         child = aggregate.child_candidate_from_event(

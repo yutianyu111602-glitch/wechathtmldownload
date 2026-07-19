@@ -22,7 +22,7 @@
           <image lazy-load src="{{item}}" mode="aspectFill" class="image-thumb" ></image>
           <view class="image-remove" data-index="{{index}}" catchtap="removeImage">×</view>
         </view>
-        <view wx:if="{{form.images.length < 9}}" class="image-cell image-add" bindtap="chooseImages" hover-class="option-hover">
+        <view wx:if="{{form.images.length < 4}}" class="image-cell image-add" bindtap="chooseImages" hover-class="option-hover">
           <text class="add-icon">+</text>
           <text class="add-label">{{t.addImage}}</text>
         </view>
@@ -57,6 +57,11 @@
           <view class="history-remove" data-index="{{index}}" catchtap="removeSubmission">{{t.remove}}</view>
         </view>
         <view wx:if="{{item.imageCount}}" class="history-meta">{{item.imageCount}} {{t.imagesSubmitted}} · {{item.paymentImageCount || 0}} {{t.paymentImagesSubmitted}}</view>
+        <view wx:if="{{item.syncStatus === 'pending'}}" class="history-meta history-status">{{t.syncPending}}</view>
+        <view wx:elif="{{item.syncStatus === 'cleanup_pending'}}" class="history-meta history-status history-status-warning">{{t.syncCleanupPending}}</view>
+        <view wx:elif="{{item.syncStatus === 'needs_resubmit'}}" class="history-meta history-status history-status-warning">{{t.syncNeedsResubmit}}</view>
+        <view wx:elif="{{item.syncStatus === 'synced'}}" class="history-meta history-status">{{t.syncSynced}}</view>
+        <view wx:else class="history-meta history-status">{{t.syncUnknown}}</view>
       </view>
     </view>
   </scroll-view>

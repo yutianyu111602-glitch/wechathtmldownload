@@ -47,6 +47,35 @@ function preferredSourceHash(item) {
   return "";
 }
 
+function buildDisplayItem(raw, weeklyAtlas, itemId, lang) {
+  let compact;
+  try {
+    compact = compactItem({ ...raw, weeklyAtlas });
+  } catch (compactError) {
+    console.error("[detail] compactItem failed", compactError);
+    compact = { ...raw, weeklyAtlas, id: raw.id || itemId };
+  }
+  const item = localizeItem(compact, lang);
+  item.sourceArticles = localizedSourceArticles(buildDetailSourceArticles(compact), lang);
+  return item;
+}
+
+function mergePosterFields(currentItem, resolvedItem) {
+  if (!currentItem || !resolvedItem) return currentItem;
+  const next = { ...currentItem };
+  for (const key of [
+    "coverUrl",
+    "posterFileId",
+    "posterTempUrl",
+    "posterLoadFailed",
+    "posterDownloadFallbackTried",
+    "posterFileIdFallbackTried",
+  ]) {
+    if (Object.prototype.hasOwnProperty.call(resolvedItem, key)) next[key] = resolvedItem[key];
+  }
+  return next;
+}
+
 Page({
   data: {
     lang: "zh",
@@ -82,6 +111,8 @@ Page({
   },
 
   async loadDetail() {
+    const loadToken = Number(this.detailLoadToken || 0) + 1;
+    this.detailLoadToken = loadToken;
     this.setData({
       loading: true,
       loadingProgress: 12,
@@ -91,23 +122,8 @@ Page({
     try {
       this.setData({ loadingProgress: 42, loadingStep: this.data.t.loading });
       const raw = await requestApi(`/api/v1/weekly/items/${this.itemId}`);
-      this.setData({ loadingProgress: 76, loadingStep: this.data.t.sourcePreparing });
-      let weeklyAtlas = null;
-      try {
-        weeklyAtlas = await requestApi(`/api/v1/weekly/atlas-events/${this.itemId}`);
-      } catch (atlasError) {
-        console.warn("[detail] atlas snapshot unavailable", atlasError && (atlasError.errMsg || atlasError.message || atlasError));
-      }
-      let compact;
-      try {
-        compact = compactItem({ ...raw, weeklyAtlas });
-      } catch (compactError) {
-        console.error("[detail] compactItem failed", compactError);
-        // 回退：跳过 compact 处理，直接使用 raw + weeklyAtlas 原始字段
-        compact = { ...raw, weeklyAtlas, id: raw.id || this.itemId };
-      }
-      const item = await resolvePosterUrlForItem(localizeItem(compact, this.data.lang));
-      item.sourceArticles = localizedSourceArticles(buildDetailSourceArticles(compact), this.data.lang);
+      if (this.detailLoadToken !== loadToken) return;
+      const item = buildDisplayItem(raw, null, this.itemId, this.data.lang);
       const savedIds = wx.getStorageSync("savedActivityIds") || [];
       this.setData({
         item,
@@ -118,12 +134,46 @@ Page({
         loading: false,
       });
       this.prefetchSource(preferredSourceHash(item));
+      // Atlas and cloud poster resolution are independent enhancements. They
+      // update the rendered core item when ready and degrade locally on error.
+      this.enrichDetailWithAtlas(raw, loadToken);
+      this.resolveDetailPoster(item, loadToken);
     } catch (error) {
+      if (this.detailLoadToken !== loadToken) return;
       console.error("[detail] loadDetail failed", error);
       this.setData({
         loading: false,
         error: this.data.t.loadFailed,
       });
+    }
+  },
+
+  async enrichDetailWithAtlas(raw, loadToken) {
+    try {
+      const weeklyAtlas = await requestApi(`/api/v1/weekly/atlas-events/${this.itemId}`);
+      if (this.detailLoadToken !== loadToken) return;
+      let item = buildDisplayItem(raw, weeklyAtlas, this.itemId, this.data.lang);
+      const currentItem = this.data.item;
+      if (currentItem && currentItem.posterTempUrl) item = mergePosterFields(item, currentItem);
+      this.setData({ item, priceLabel: joinList(item.price) });
+      const hash = preferredSourceHash(item);
+      if (hash && hash !== preferredSourceHash(currentItem)) this.prefetchSource(hash);
+    } catch (atlasError) {
+      console.warn("[detail] optional Atlas snapshot unavailable", atlasError && (atlasError.errMsg || atlasError.message || atlasError));
+    }
+  },
+
+  async resolveDetailPoster(coreItem, loadToken) {
+    try {
+      const resolvedItem = await resolvePosterUrlForItem(coreItem);
+      if (this.detailLoadToken !== loadToken) return;
+      if (String(this.data.item?.id || "") !== String(coreItem?.id || "")) return;
+      this.setData({
+        item: mergePosterFields(this.data.item, resolvedItem),
+        posterLoadFailed: false,
+      });
+    } catch (posterError) {
+      console.warn("[detail] optional poster URL unavailable", posterError && (posterError.errMsg || posterError.message || posterError));
     }
   },
 
@@ -133,9 +183,15 @@ Page({
       return;
     }
     this.setData({ sourceUrl: "", sourceLoading: true });
-    const url = await fetchSourceByHash(hash);
-    if (this.data.item?.sourceHash !== hash) return;
-    this.setData({ sourceUrl: url, sourceLoading: false });
+    try {
+      const url = await fetchSourceByHash(hash);
+      if (preferredSourceHash(this.data.item) !== hash) return;
+      this.setData({ sourceUrl: url, sourceLoading: false });
+    } catch (sourceError) {
+      if (preferredSourceHash(this.data.item) !== hash) return;
+      console.warn("[detail] optional source URL unavailable", sourceError && (sourceError.errMsg || sourceError.message || sourceError));
+      this.setData({ sourceUrl: "", sourceLoading: false });
+    }
   },
 
   toggleLang() {
@@ -292,16 +348,20 @@ Page({
 
   async onPosterImageError() {
     const item = this.data.item || {};
-    const fallback = await posterImageErrorFallback(item, item.coverUrl || "");
-    if (fallback) {
-      this.setData({
-        item: {
-          ...item,
-          ...posterFallbackState(item, fallback),
-        },
-        posterLoadFailed: false,
-      });
-      return;
+    try {
+      const fallback = await posterImageErrorFallback(item, item.coverUrl || "");
+      if (fallback) {
+        this.setData({
+          item: {
+            ...item,
+            ...posterFallbackState(item, fallback),
+          },
+          posterLoadFailed: false,
+        });
+        return;
+      }
+    } catch (posterError) {
+      console.warn("[detail] poster fallback unavailable", posterError && (posterError.errMsg || posterError.message || posterError));
     }
     this.setData({ posterLoadFailed: true });
   },

@@ -3,6 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { effectiveFeedCount, effectiveFeedItems } = require("./effective-feed-items.cjs");
 const { readPageDataWithFallback } = require("./devtools-page-data.cjs");
+const { activateStaticPackage, startStaticPackageServer } = require("./devtools-static-package.cjs");
 
 let automator;
 try {
@@ -25,15 +26,17 @@ const projectPath = process.env.MINIPROGRAM_PROJECT_PATH || path.resolve(__dirna
 const cliPath = process.env.MINIPROGRAM_DEVTOOLS_CLI || "C:/Program Files (x86)/Tencent/微信web开发者工具/cli.bat";
 const launchPort = Number(process.env.MINIPROGRAM_AUTOMATOR_PORT || "9430");
 const idePort = Number(process.env.MINIPROGRAM_DEVTOOLS_IDE_PORT || "9430");
-const cliArgs = Number.isFinite(idePort) && idePort > 0 ? ["--port", String(idePort)] : [];
 const automationHint = [
   "Default mode uses miniprogram-automator launch so the tool can parse the dynamic DevTools socket.",
   `Launch directly with: MINIPROGRAM_AUTOMATOR_LAUNCH=1 MINIPROGRAM_AUTOMATOR_PORT=${launchPort} node tests/devtools-extreme.cjs`,
   "Only set MINIPROGRAM_AUTOMATOR_WS when a compatible bridge has produced a verified dynamic websocket endpoint.",
 ].join("\n");
-const artifactRoot = path.resolve(__dirname, "../test-artifacts");
+const artifactRoot = process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT
+  ? path.resolve(process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT)
+  : path.resolve(__dirname, "../test-artifacts");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const artifactDir = path.join(artifactRoot, `devtools-extreme-${stamp}`);
+const staticPackageDir = String(process.env.MINIPROGRAM_STATIC_PACKAGE_DIR || "").trim();
 fs.mkdirSync(artifactDir, { recursive: true });
 const traceFile = path.join(artifactDir, "trace.log");
 
@@ -242,7 +245,7 @@ async function tapSelectorCurrent(miniProgram, page, selector, index, label, exp
   throw lastError;
 }
 
-async function openFilterModalByPill(miniProgram, page, index, stateFlag, label) {
+async function openFilterModalByPill(miniProgram, page, selector, stateFlag, label) {
   let current = page;
   let state;
   try {
@@ -252,7 +255,7 @@ async function openFilterModalByPill(miniProgram, page, index, stateFlag, label)
     trace(`WARN ${label}: scroll top failed before tap: ${error.message}`);
   }
   for (let attempt = 0; attempt < 4; attempt += 1) {
-    current = await tapSelectorCurrent(miniProgram, current, ".filter-pill", index, `${label} tap attempt ${attempt + 1}`, "pages/index/index");
+    current = await tapSelectorCurrent(miniProgram, current, selector, 0, `${label} tap attempt ${attempt + 1}`, "pages/index/index");
     await current.waitFor(700);
     state = await readPageData(miniProgram, current, `${label} modal data`, "pages/index/index");
     current = state.page;
@@ -422,11 +425,14 @@ async function openDetailById(miniProgram, id) {
 }
 
 async function run() {
+  const staticServer = staticPackageDir ? await startStaticPackageServer(staticPackageDir) : null;
   trace(launchMode ? `launch ${projectPath} port=${launchPort}` : `connect ${wsEndpoint}`);
   const report = {
     wsEndpoint,
     launchMode,
     artifactDir,
+    staticPackageDir,
+    staticBaseUrl: staticServer ? staticServer.baseUrl : "",
     steps: [],
     consoleCount: 0,
     exceptions: [],
@@ -436,7 +442,7 @@ async function run() {
       projectPath,
       cliPath,
       port: launchPort,
-      args: cliArgs,
+      idePort,
       trustProject: true,
       timeout: 90000,
     }), 110000, "automator launch")
@@ -466,6 +472,9 @@ async function run() {
       trace("home open start");
       homePage = await openHome(miniProgram);
       trace("home open pass");
+      if (staticServer) {
+        await activateStaticPackage(miniProgram, staticServer.baseUrl);
+      }
       homeData = await waitForIdle(miniProgram, homePage, "home");
       const homeItems = effectiveFeedItems(homeData);
       trace(`home data items=${homeItems.length} total=${effectiveFeedCount(homeData)}`);
@@ -493,7 +502,7 @@ async function run() {
       const dateKey = (filterHomeData.dateFilters || []).find((item) => item.key)?.key || "";
       trace(`date step dateKey=${dateKey}`);
       assert.ok(dateKey, "date modal has no selectable date");
-      let state = await openFilterModalByPill(miniProgram, homePage, 0, "showDateModal", "date filter pill");
+      let state = await openFilterModalByPill(miniProgram, homePage, ".filter-control-date", "showDateModal", "date filter control");
       homePage = state.page;
       assert.equal(state.data.showDateModal, true, "date modal did not open");
       trace("date step showDateModal assertion pass");
@@ -522,7 +531,7 @@ async function run() {
       const cityFilter = (filterHomeData.cityFilters || []).find((item) => item.key === cityKey);
       trace(`city step cityKey=${cityKey} label=${cityFilter?.label || ""}`);
       assert.ok(cityKey, "city modal has no selectable city");
-      let state = await openFilterModalByPill(miniProgram, homePage, 1, "showLocationModal", "city filter pill");
+      let state = await openFilterModalByPill(miniProgram, homePage, ".filter-control-city", "showLocationModal", "city filter control");
       homePage = state.page;
       assert.equal(state.data.showLocationModal, true, "city modal did not open");
       homePage = await callMethodCurrent(miniProgram, homePage, "chooseDraftCity", event({ key: cityKey }), "chooseDraftCity", "pages/index/index");
@@ -577,34 +586,42 @@ async function run() {
       assert.equal(langData.lang, "zh", "language did not switch back to zh");
     });
 
-    await step("impossible filters reset to default, not broken", async () => {
+    await step("unknown city resets while an impossible exact date stays explicit and empty", async () => {
       homePage = await openHome(miniProgram);
       await waitForIdle(miniProgram, homePage, "home before impossible filters");
-      trace("impossible filters set/load start");
+      trace("unknown city set/load start");
       await withTimeout(miniProgram.evaluate(() => {
         const pages = getCurrentPages();
         const page = pages[pages.length - 1];
-        page.setData({ selectedCity: "__missing_city__", selectedDate: "2099-12-31" });
+        page.setData({ selectedCity: "__missing_city__" });
         return page.loadData();
-      }), 30000, "evaluate loadData impossible filters");
-      trace("impossible filters set/load complete");
-      let state = await waitForIdleCurrent(miniProgram, homePage, "impossible filters", "pages/index/index");
+      }), 30000, "evaluate loadData unknown city");
+      trace("unknown city set/load complete");
+      let state = await waitForIdleCurrent(miniProgram, homePage, "unknown city", "pages/index/index");
       homePage = state.page;
       const fallback = state.data;
-      assert.equal(fallback.selectedCity, "", "impossible city should reset to all cities");
-      assert.equal(fallback.selectedDate, "", "impossible date should reset to all dates");
-      assert.ok(effectiveFeedItems(fallback).length > 0, "impossible filters should fall back to default items");
-      trace("impossible filters reset start");
-      await withTimeout(miniProgram.evaluate(() => {
-        const pages = getCurrentPages();
-        const page = pages[pages.length - 1];
-        page.setData({ selectedCity: "", selectedDate: "" });
-        return page.loadData();
-      }), 30000, "evaluate loadData home reset");
-      trace("impossible filters reset complete");
+      assert.equal(fallback.selectedCity, "", "unknown city should reset to all cities");
+      assert.ok(effectiveFeedItems(fallback).length > 0, "unknown city should fall back to default items");
+
+      homePage = await callMethodCurrent(
+        miniProgram,
+        homePage,
+        "chooseDraftDate",
+        event({ key: "2099-12-31" }),
+        "choose impossible exact date",
+        "pages/index/index",
+      );
+      state = await waitForIdleCurrent(miniProgram, homePage, "impossible exact date", "pages/index/index");
+      homePage = state.page;
+      assert.equal(state.data.dateMode, "exact", "impossible date must exercise exact-date mode");
+      assert.equal(state.data.selectedDate, "2099-12-31", "explicit no-result date must remain selected");
+      assert.equal(effectiveFeedItems(state.data).length, 0, "explicit no-result date must render an honest empty feed");
+
+      homePage = await callMethodCurrent(miniProgram, homePage, "resetDate", undefined, "reset impossible date", "pages/index/index");
       state = await waitForIdleCurrent(miniProgram, homePage, "home after impossible filters", "pages/index/index");
       homePage = state.page;
       homeData = state.data;
+      assert.ok(effectiveFeedItems(homeData).length > 0, "resetting the impossible date should restore default items");
     });
 
     await step("tapping a list row enters detail instead of clipboard behavior", async () => {
@@ -771,6 +788,7 @@ async function run() {
       trace(`WARN close: ${error.message}`);
       miniProgram.disconnect();
     }
+    if (staticServer) await staticServer.close();
   }
 }
 

@@ -12,8 +12,10 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@cloudbase/manager-node": "^5.5.3",
+    "@cloudbase/js-sdk": "^3.6.3",
+    "@cloudbase/signature-nodejs": "2.2.0",
     "better-sqlite3": "12.9.0",
-    "tencentcloud-sdk-nodejs-tcb": "^4.1.245"
+    "jsonwebtoken": "^9.0.3",
+    "ws": "^8.21.1"
   }
 }

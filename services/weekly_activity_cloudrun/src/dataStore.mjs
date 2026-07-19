@@ -1,12 +1,22 @@
+import { createHash } from "node:crypto";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { isElectronicMusicRelevantItem } from "./electronicRelevance.mjs";
+import dateVisibility from "./dateVisibility.cjs";
+
+const {
+  isoDate,
+  itemDateKeys,
+  itemIsCurrentOrFuture,
+  itemMatchesDateKey,
+  itemMatchesDateWindow,
+  normalizeDateWindow,
+} = dateVisibility;
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_API_DIR = path.resolve(moduleDir, "../data/current_release");
 const SOURCE_HASH_RE = /^[a-f0-9]{16,64}$/i;
-const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const TRUSTED_TIME_SOURCES = new Set([
   "source_text",
   "article_text",
@@ -93,6 +103,84 @@ function stringOrNull(value) {
   return text || null;
 }
 
+export function generationIdOf(value) {
+  return stringOrNull(value?.generationId || value?.generation_id);
+}
+
+function generationHandshakeError(currentId, manifestId) {
+  return Object.assign(
+    new Error(`weekly package generation mismatch: current=${currentId || "<missing>"} manifest=${manifestId || "<missing>"}`),
+    {
+      code: "WEEKLY_GENERATION_HANDSHAKE_FAILED",
+      currentGenerationId: currentId,
+      manifestGenerationId: manifestId,
+    },
+  );
+}
+
+function assertPackageGeneration(current, manifest) {
+  const currentId = generationIdOf(current);
+  const manifestId = generationIdOf(manifest);
+  if (!currentId && !manifestId) {
+    if (current && manifest) {
+      const currentAt = stringOrNull(current.generated_at || current.generatedAt);
+      const manifestAt = stringOrNull(manifest.generated_at || manifest.generatedAt);
+      if (!currentAt || !manifestAt || currentAt !== manifestAt) {
+        throw generationHandshakeError(currentAt, manifestAt);
+      }
+    }
+    return null;
+  }
+  if (!currentId || !manifestId || currentId !== manifestId) {
+    throw generationHandshakeError(currentId, manifestId);
+  }
+  return currentId;
+}
+
+function generatedAtOf(value) {
+  return stringOrNull(value?.generatedAt || value?.generated_at);
+}
+
+function canonicalJson(value) {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function requestedGenerationError(requested, active) {
+  return Object.assign(
+    new Error(`weekly requested generation mismatch: requested=${requested || "<missing>"} active=${active || "<legacy>"}`),
+    {
+      code: "WEEKLY_REQUEST_GENERATION_MISMATCH",
+      requestedGenerationId: requested,
+      activeGenerationId: active,
+    },
+  );
+}
+
+function detailMatchesPackage(detail, packageState, currentItem) {
+  const detailId = generationIdOf(detail);
+  if (packageState.generationId) {
+    if (detailId !== packageState.generationId) return false;
+  } else if (detailId || generatedAtOf(detail) !== packageState.generatedAt) {
+    return false;
+  }
+  const detailItem = detail?.item || detail;
+  return Boolean(currentItem && canonicalJson(detailItem) === canonicalJson(currentItem));
+}
+
+function withPackageIdentity(item, packageState) {
+  if (!item) return null;
+  return {
+    ...withPublicDetailItem(item),
+    generatedAt: packageState.generatedAt,
+    generation_id: packageState.generationId,
+    generationId: packageState.generationId,
+  };
+}
+
 function safeSanjiSourceContract(raw) {
   const contract = raw && typeof raw.sanji_source_contract === "object" && raw.sanji_source_contract
     ? raw.sanji_source_contract
@@ -119,59 +207,46 @@ function safeSanjiSourceContract(raw) {
   };
 }
 
-function isoDate(value) {
-  const text = String(value || "").trim();
-  return ISO_DATE_RE.test(text) ? text : "";
+const itemMatchesDate = itemMatchesDateKey;
+
+function itemCityKeys(item = {}) {
+  const values = [item.city_key, item.cityKey]
+    .concat(Array.isArray(item.city_keys) ? item.city_keys : [])
+    .concat(Array.isArray(item.cityKeys) ? item.cityKeys : []);
+  return [...new Set(values.map((value) => String(value || "").trim().toLowerCase()).filter(Boolean))];
 }
 
-function addDateRange(dates, start, end) {
-  if (!start || !end || start > end) return;
-  const startMs = Date.parse(`${start}T00:00:00Z`);
-  const endMs = Date.parse(`${end}T00:00:00Z`);
-  const dayMs = 24 * 60 * 60 * 1000;
-  const days = Math.round((endMs - startMs) / dayMs);
-  if (!Number.isFinite(days) || days < 1 || days > 31) return;
-  for (let offset = 1; offset < days; offset += 1) {
-    dates.add(new Date(startMs + offset * dayMs).toISOString().slice(0, 10));
+function itemCityLabel(item, key, index) {
+  const labels = Array.isArray(item.city) ? item.city : [item.city];
+  return String(labels[index] || (index === 0 ? (item.city_name || item.cityName) : "") || key);
+}
+
+function mergeDuplicateCityFields(fallbackItem, preferredItem, mergedItem) {
+  const preferredKeys = itemCityKeys(preferredItem);
+  const fallbackKeys = itemCityKeys(fallbackItem);
+  const keys = [...new Set(preferredKeys.concat(fallbackKeys))];
+  if (!keys.length) return mergedItem;
+  const labelsByKey = new Map();
+  for (const source of [fallbackItem, preferredItem]) {
+    const sourceKeys = itemCityKeys(source);
+    sourceKeys.forEach((key, index) => {
+      const label = itemCityLabel(source, key, index).trim();
+      if (label) labelsByKey.set(key, label);
+    });
   }
-}
-
-function directItemDateValues(item) {
-  return [
-    item.event_date_start,
-    item.event_date_end,
-    item.event_date_iso_guess,
-  ].map(isoDate).filter(Boolean);
-}
-
-function itemDateKeys(item) {
-  const dates = new Set();
-  for (const key of ["event_date_start", "event_date_end", "event_date_iso_guess"]) {
-    const value = isoDate(item[key]);
-    if (value) dates.add(value);
-  }
-  if (directItemDateValues(item).length === 0) {
-    for (const key of ["event_date_iso_guesses", "event_date_text"]) {
-      const raw = item[key];
-      const values = Array.isArray(raw) ? raw : [raw];
-      for (const value of values) {
-        const date = isoDate(value);
-        if (date) dates.add(date);
-      }
-    }
-  }
-  addDateRange(dates, isoDate(item.event_date_start), isoDate(item.event_date_end));
-  return [...dates].sort();
-}
-
-function itemMatchesDate(item, date) {
-  const target = isoDate(date);
-  if (!target) return true;
-  const dates = itemDateKeys(item);
-  if (dates.includes(target)) return true;
-  const start = isoDate(item.event_date_start) || dates[0] || "";
-  const end = isoDate(item.event_date_end) || dates[dates.length - 1] || start;
-  return Boolean(start && end && start <= target && target <= end);
+  const primaryKey = String(preferredItem?.city_key || preferredItem?.cityKey || keys[0]).trim().toLowerCase();
+  const orderedKeys = primaryKey && keys.includes(primaryKey)
+    ? [primaryKey, ...keys.filter((key) => key !== primaryKey)]
+    : keys;
+  return {
+    ...mergedItem,
+    city_key: primaryKey || orderedKeys[0],
+    city_keys: orderedKeys,
+    city: orderedKeys.map((key) => labelsByKey.get(key) || key),
+    ...(Object.hasOwn(fallbackItem || {}, "cityKeys") || Object.hasOwn(preferredItem || {}, "cityKeys")
+      ? { cityKeys: orderedKeys }
+      : {}),
+  };
 }
 
 function normalizeVisibilityScope(value) {
@@ -179,26 +254,6 @@ function normalizeVisibilityScope(value) {
   return scope === "package" || scope === "package_window" || scope === "all" ? "package" : "current";
 }
 
-function normalizeDateWindow(dateStart, dateEnd) {
-  const left = isoDate(dateStart);
-  const right = isoDate(dateEnd);
-  if (!left && !right) return { dateStart: "", dateEnd: "" };
-  const start = left || right;
-  const end = right || left;
-  return start <= end
-    ? { dateStart: start, dateEnd: end }
-    : { dateStart: end, dateEnd: start };
-}
-
-function itemMatchesDateWindow(item, dateStart, dateEnd) {
-  const window = normalizeDateWindow(dateStart, dateEnd);
-  if (!window.dateStart) return true;
-  const dates = itemDateKeys(item);
-  const start = isoDate(item.event_date_start) || dates[0] || "";
-  const end = isoDate(item.event_date_end) || dates[dates.length - 1] || start;
-  if (!start && !end) return false;
-  return (start || end) <= window.dateEnd && (end || start) >= window.dateStart;
-}
 
 function currentShanghaiDateParts(now = new Date()) {
   const parts = new Intl.DateTimeFormat("en-US", {
@@ -252,16 +307,6 @@ function nowFromOverride(value) {
   if (!value) return new Date();
   const date = value instanceof Date ? new Date(value.getTime()) : new Date(value);
   return Number.isNaN(date.getTime()) ? new Date() : date;
-}
-
-function itemIsCurrentOrFuture(item, today) {
-  const target = isoDate(today);
-  if (!target) return true;
-  const dates = itemDateKeys(item);
-  const start = isoDate(item.event_date_start) || dates[0] || "";
-  const end = isoDate(item.event_date_end) || dates[dates.length - 1] || start;
-  if (!start && !end) return true;
-  return (end || start) >= target;
 }
 
 function hasValue(value) {
@@ -442,8 +487,86 @@ function withClubProfile(item) {
 
 function compactText(value, maxChars = 220) {
   const text = String(value || "").trim();
-  if (!text) return "";
+  if (!text || localPathReason(text)) return "";
   return text.length > maxChars ? `${text.slice(0, maxChars).trim()}...` : text;
+}
+
+const INTERNAL_ONLY_PUBLIC_KEYS = new Set([
+  "_source_url",
+  "_source_aliases",
+  "_score_confidence",
+  "source_url",
+  "raw_source_url",
+  "sourceUrl",
+  "confidence",
+  "llm_confidence",
+  "recommendation_reason",
+  "article_dir",
+  "source_evidence_path",
+  "poster_vl_images",
+  "emergency_qwen36_lineup_patch",
+  "llm_input_path",
+  "meta_path",
+  "poster_ocr_path",
+  "raw_html_path",
+  "assets_json_path",
+  "cache_article_dir",
+  "local_path",
+]);
+const PUBLIC_URL_RE = /^(?:https?:\/\/|cloud:\/\/)\S+$/i;
+const PUBLIC_ROUTE_RE = /^\/(?:api|assets?|static|images?|media|atlas|weekly|by-(?:id|city|date)|events?|artists?|venues?)(?:\/\S*)?$/i;
+const FILE_URL_RE = /^file:(?:\/\/)?/i;
+const WINDOWS_ABSOLUTE_PATH_RE = /(?:^|[\s"'=([{])(?:[a-z]:[\\/]|\\\\[^\\/\s]+[\\/][^\\/\s]+)/i;
+const KNOWN_LOCAL_POSIX_ROOT_RE = /(?:^|[\s"'=([{])\/(?:home|mnt|srv|opt|tmp|var|root|Users|Volumes|workspace)(?:\/|$)/i;
+const POSIX_ABSOLUTE_PATH_RE = /(?:^|[\s"'=([{])\/(?!\/)[^\s"'=()\[\]{}/]+(?:\/[^\s"'=()\[\]{}/]+)+/;
+
+function isPublicRoute(text) {
+  return !text.includes("\\") && PUBLIC_ROUTE_RE.test(text) && text.split("/").every((segment) => ![".", ".."].includes(segment));
+}
+
+function localPathReason(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  if (FILE_URL_RE.test(text)) return "file_url";
+  if (WINDOWS_ABSOLUTE_PATH_RE.test(text)) return "windows_absolute_path";
+  if (KNOWN_LOCAL_POSIX_ROOT_RE.test(text)) return "posix_absolute_path";
+  if (isPublicRoute(text)) return "";
+  if (POSIX_ABSOLUTE_PATH_RE.test(text)) return "posix_absolute_path";
+  if (PUBLIC_URL_RE.test(text)) return "";
+  return "";
+}
+
+function publicHttpUrl(value) {
+  const text = String(value || "").trim();
+  if (!text || localPathReason(text) || text.includes("\\")) return "";
+  try {
+    const parsed = new URL(text);
+    if (!['http:', 'https:'].includes(parsed.protocol) || !parsed.hostname) return "";
+    if (parsed.username || parsed.password) return "";
+    const hostname = parsed.hostname.toLowerCase().replace(/\.$/, "");
+    if (hostname === "localhost" || hostname === "localhost.localdomain" || hostname.endsWith(".localhost")) return "";
+    return text;
+  } catch {
+    return "";
+  }
+}
+
+function scrubPublicValue(value) {
+  if (typeof value === "string") return localPathReason(value) ? undefined : value;
+  if (Array.isArray(value)) {
+    return value.map(scrubPublicValue).filter((child) => child !== undefined);
+  }
+  if (value && typeof value === "object") {
+    const output = {};
+    for (const [key, child] of Object.entries(value)) {
+      if (localPathReason(key)) continue;
+      if (INTERNAL_ONLY_PUBLIC_KEYS.has(key)) continue;
+      const cleaned = scrubPublicValue(child);
+      if (cleaned !== undefined) output[key] = cleaned;
+    }
+    return output;
+  }
+  return value;
 }
 
 function compactTextList(value, { limit = 6, maxChars = 220 } = {}) {
@@ -459,7 +582,8 @@ function pickObjectFields(value, fields) {
   const output = {};
   for (const field of fields) {
     if (value[field] !== undefined && value[field] !== null && value[field] !== "") {
-      output[field] = value[field];
+      const cleaned = scrubPublicValue(value[field]);
+      if (cleaned !== undefined) output[field] = cleaned;
     }
   }
   return Object.keys(output).length > 0 ? output : undefined;
@@ -558,7 +682,8 @@ function withListCompatItem(rawItem) {
   const output = {};
   for (const key of LIST_COMPAT_FIELDS) {
     if (item[key] !== undefined && item[key] !== null && item[key] !== "") {
-      output[key] = item[key];
+      const cleaned = scrubPublicValue(item[key]);
+      if (cleaned !== undefined) output[key] = cleaned;
     }
   }
   output.organizer_key = item.organizer_key;
@@ -581,6 +706,116 @@ function withListCompatItem(rawItem) {
   for (const key of ["description", "digest", "summary", "summary_digest", "source_evidence_text"]) {
     if (typeof item[key] === "string") output[key] = compactText(item[key], 260);
   }
+  return output;
+}
+
+const DETAIL_COMPAT_FIELDS = [
+  ...LIST_COMPAT_FIELDS,
+  "schema_version",
+  "content_type",
+  "is_calendar_preview",
+  "aggregation_child",
+  "event_id",
+  "article_id",
+  "queue_id",
+  "organizer_key",
+  "club_profile",
+  "posterUrl",
+  "posterFileId",
+  "cover_file_id",
+  "coverFileId",
+  "cloudFileId",
+  "poster_storage",
+  "posterStorage",
+  "poster_cloud_path",
+  "poster",
+  "raw_cover_url",
+  "poster_migrated_at",
+  "poster_public_source_hash",
+  "poster_suppressed",
+  "poster_suppressed_reason",
+  "main_poster_suppressed",
+  "mainPosterSuppressed",
+  "poster_selection_evidence",
+  "posterSelectionEvidence",
+  "poster_vl_lineup",
+  "posterVlLineup",
+  "poster_vl_lineup_evidence",
+  "posterVlLineupEvidence",
+  "event_date_range_explicit",
+  "date_range_explicit",
+  "is_date_range",
+  "time_verification",
+  "address_verification",
+  "venue_verification",
+  "geo_source",
+  "geo_provider",
+  "geo_reliability",
+  "geo_level",
+  "geo_provider_title",
+  "geo_provider_address",
+  "geo_reverse_address",
+  "geo_verified_at",
+  "geo_candidate_id",
+  "geo_locked",
+  "geo_override_reason",
+  "map_search_aliases",
+  "geo_search_aliases",
+  "poi_aliases",
+  "map_poi_name",
+  "poi_id",
+  "place_fields_locked",
+  "lineup_display_hint",
+  "lineup_quality",
+  "evidence",
+  "source_evidence",
+  "source_evidence_text",
+  "sound_system_evidence",
+  "description",
+  "digest",
+  "summary",
+  "summary_digest",
+  "dj_bio_lines",
+  "artist_profiles",
+  "atlas_artists",
+  "dj_discovery_sections",
+  "dj_external_links",
+  "sound_system",
+  "sound_systems",
+  "sound_system_text",
+  "merge_provenance",
+  "field_evidence_refs",
+  "aggregation_source_kind",
+  "dedupe_key",
+  "discovery_source",
+  "extraction_model",
+  "metadata_enriched_at",
+  "detail_path",
+  "detail_url",
+];
+
+function withPublicDetailItem(rawItem) {
+  const item = withClubProfile(rawItem);
+  if (!item || typeof item !== "object") return item;
+  const output = {};
+  for (const key of DETAIL_COMPAT_FIELDS) {
+    if (INTERNAL_ONLY_PUBLIC_KEYS.has(key)) continue;
+    if (item[key] === undefined || item[key] === null || item[key] === "") continue;
+    const cleaned = scrubPublicValue(item[key]);
+    if (cleaned !== undefined) output[key] = cleaned;
+  }
+  const sourceAction = pickObjectFields(item.source_action, [
+    "type", "label", "available", "url_hash", "disabled_reason",
+  ]) || {};
+  const sourceActionUrl = publicHttpUrl(item.source_action?.url);
+  if (sourceActionUrl) sourceAction.url = sourceActionUrl;
+  if (Object.keys(sourceAction).length > 0) output.source_action = sourceAction;
+  const sourceArticle = pickObjectFields(item.source_article, [
+    "url_hash", "title", "account_name", "published_at",
+  ]) || {};
+  const sourceArticleUrl = publicHttpUrl(item.source_article?.url);
+  if (sourceArticleUrl) sourceArticle.url = sourceArticleUrl;
+  if (Object.keys(sourceArticle).length > 0) output.source_article = sourceArticle;
   return output;
 }
 
@@ -853,9 +1088,15 @@ function dedupeItems(items) {
       continue;
     }
     if (itemQualityScore(item) > itemQualityScore(seen.get(duplicateKey))) {
-      seen.set(duplicateKey, mergeNonEmpty(seen.get(duplicateKey), item));
+      seen.set(
+        duplicateKey,
+        mergeDuplicateCityFields(seen.get(duplicateKey), item, mergeNonEmpty(seen.get(duplicateKey), item)),
+      );
     } else {
-      seen.set(duplicateKey, mergeNonEmpty(item, seen.get(duplicateKey)));
+      seen.set(
+        duplicateKey,
+        mergeDuplicateCityFields(item, seen.get(duplicateKey), mergeNonEmpty(item, seen.get(duplicateKey))),
+      );
     }
   }
   return Array.from(seen.values());
@@ -916,6 +1157,13 @@ export class WeeklyActivityDataStore {
   async getManifest() {
     try {
       const raw = await readJson(this.baseDir, "manifest.json");
+      let current = null;
+      try {
+        current = await readJson(this.baseDir, "current.json");
+      } catch {
+        current = null;
+      }
+      const generationId = assertPackageGeneration(current, raw);
       const expectedSchema = "weekly_activity_miniprogram_api.v1";
       if (raw.schema_version && raw.schema_version !== expectedSchema) {
         console.warn(
@@ -926,6 +1174,8 @@ export class WeeklyActivityDataStore {
       return {
         schema_version: raw.schema_version || expectedSchema,
         generated_at: raw.generated_at || raw.generatedAt || null,
+        generation_id: generationId,
+        generationId,
         item_count: raw.item_count ?? raw.items_total ?? 0,
         window_start: raw.window_start || raw.windowStart || null,
         window_end: raw.window_end || raw.windowEnd || null,
@@ -940,12 +1190,12 @@ export class WeeklyActivityDataStore {
         id_consistency_repair: raw.id_consistency_repair || null,
       };
     } catch (err) {
+      if (err?.code === "WEEKLY_GENERATION_HANDSHAKE_FAILED") throw err;
       console.error("[dataStore] getManifest failed:", err.message);
-      return {
-        schema_version: "weekly_activity_miniprogram_api.v1",
-        generated_at: null,
-        item_count: 0,
-      };
+      throw Object.assign(new Error("weekly manifest is unavailable"), {
+        code: "WEEKLY_MANIFEST_UNAVAILABLE",
+        cause: err,
+      });
     }
   }
 
@@ -991,6 +1241,13 @@ export class WeeklyActivityDataStore {
 
   async getVisibleProjection({ cityKey, date, dateStart, dateEnd, lookbackDays, scope } = {}) {
     const current = await readJson(this.baseDir, "current.json");
+    let manifest = null;
+    try {
+      manifest = await readJson(this.baseDir, "manifest.json");
+    } catch {
+      manifest = null;
+    }
+    const generationId = assertPackageGeneration(current, manifest);
     const expectedCurrentSchema = "weekly_activity_miniprogram_current.v1";
     if (current.schema_version && current.schema_version !== expectedCurrentSchema) {
       console.warn(
@@ -1003,6 +1260,7 @@ export class WeeklyActivityDataStore {
       );
     }
     const visibilityScope = normalizeVisibilityScope(scope);
+    const normalizedCityKey = String(cityKey || "").trim().toLowerCase();
     const exactDate = isoDate(date);
     const window = exactDate
       ? { dateStart: exactDate, dateEnd: exactDate }
@@ -1011,7 +1269,7 @@ export class WeeklyActivityDataStore {
     const lookback = normalizeLookbackDays(lookbackDays, DEFAULT_CURRENT_LOOKBACK_DAYS);
     const currentThreshold = !exactDate && !window.dateStart && lookback > 0 ? addDays(today, -lookback) : today;
     const filtered = (Array.isArray(current.items) ? current.items : []).filter((item) => {
-      if (cityKey && item.city_key !== cityKey && !(item.city_keys || []).includes(cityKey)) return false;
+      if (normalizedCityKey && normalizedCityKey !== "all" && !itemCityKeys(item).includes(normalizedCityKey)) return false;
       if (exactDate && !itemMatchesDate(item, exactDate)) return false;
       if (!exactDate && window.dateStart && !itemMatchesDateWindow(item, window.dateStart, window.dateEnd)) return false;
       if (visibilityScope === "current" && !exactDate && !window.dateStart && !itemIsCurrentOrFuture(item, currentThreshold)) {
@@ -1027,10 +1285,11 @@ export class WeeklyActivityDataStore {
     });
     return {
       current,
+      generationId,
       items,
       filters: {
         scope: visibilityScope,
-        cityKey: cityKey || null,
+        cityKey: normalizedCityKey || null,
         date: exactDate || null,
         dateStart: window.dateStart || null,
         dateEnd: window.dateEnd || null,
@@ -1047,21 +1306,12 @@ export class WeeklyActivityDataStore {
       projection = await this.getVisibleProjection({ cityKey, date, dateStart, dateEnd, lookbackDays, scope });
       current = projection.current;
     } catch (err) {
+      if (err?.code === "WEEKLY_GENERATION_HANDSHAKE_FAILED") throw err;
       console.error("[dataStore] getCurrent failed to read current.json:", err.message);
-      return {
-        schemaVersion: "weekly_activity_api.current_response.v1",
-        generatedAt: null,
-        filters: {
-          scope: normalizeVisibilityScope(scope),
-          cityKey: cityKey || null,
-          date: isoDate(date) || null,
-          dateStart: isoDate(dateStart) || null,
-          dateEnd: isoDate(dateEnd) || null,
-          lookbackDays: lookbackDays || null,
-        },
-        page: { limit: normalizeLimit(limit), cursor: "0", nextCursor: null, total: 0 },
-        items: [],
-      };
+      throw Object.assign(new Error("weekly current package is unavailable"), {
+        code: "WEEKLY_CURRENT_UNAVAILABLE",
+        cause: err,
+      });
     }
     const pageLimit = normalizeLimit(limit);
     const pageCursor = normalizeCursor(cursor);
@@ -1072,6 +1322,7 @@ export class WeeklyActivityDataStore {
     return {
       schemaVersion: "weekly_activity_api.current_response.v1",
       generatedAt: current.generated_at,
+      generationId: projection.generationId,
       filters: projection.filters,
       page: {
         limit: pageLimit,
@@ -1087,21 +1338,24 @@ export class WeeklyActivityDataStore {
     const projection = await this.getVisibleProjection({ date, dateStart, dateEnd, lookbackDays, scope });
     const cities = new Map();
     for (const item of projection.items) {
-      const key = item.city_key || (item.city_keys || [])[0] || "unknown";
-      const rawCity = Array.isArray(item.city) ? item.city[0] : item.city;
-      const label = rawCity || key;
-      const itemCount = (cities.get(key)?.item_count || 0) + 1;
-      cities.set(key, {
-        city_key: key,
-        city: label,
-        count: itemCount,
-        item_count: itemCount,
-        path: `by-city/${key}.json`,
-      });
+      const cityKeys = itemCityKeys(item);
+      for (let index = 0; index < cityKeys.length; index += 1) {
+        const key = cityKeys[index];
+        const itemCount = (cities.get(key)?.item_count || 0) + 1;
+        cities.set(key, {
+          city_key: key,
+          city: itemCityLabel(item, key, index),
+          count: itemCount,
+          item_count: itemCount,
+          path: `by-city/${key}.json`,
+        });
+      }
     }
     return {
       schema_version: "weekly_activity_miniprogram_city_index.v2",
       generated_at: projection.current.generated_at || null,
+      generation_id: projection.generationId,
+      generationId: projection.generationId,
       scope: projection.filters.scope,
       filters: projection.filters,
       city_count: cities.size,
@@ -1135,6 +1389,8 @@ export class WeeklyActivityDataStore {
     return {
       schema_version: "weekly_activity_miniprogram_date_index.v2",
       generated_at: projection.current.generated_at || null,
+      generation_id: projection.generationId,
+      generationId: projection.generationId,
       scope: projection.filters.scope,
       filters: projection.filters,
       date_count: entries.length,
@@ -1143,61 +1399,145 @@ export class WeeklyActivityDataStore {
     };
   }
 
-  async getItem(id) {
+  async getPackageState({
+    generationId,
+    generation_id: generationIdSnake,
+    generatedAt: requestedGeneratedAt,
+    generated_at: requestedGeneratedAtSnake,
+  } = {}) {
+    const current = await readJson(this.baseDir, "current.json");
+    let manifest = null;
+    try {
+      manifest = await readJson(this.baseDir, "manifest.json");
+    } catch {
+      manifest = null;
+    }
+    const activeGenerationId = assertPackageGeneration(current, manifest);
+    const generatedAt = generatedAtOf(current) || generatedAtOf(manifest);
+    if (!activeGenerationId && !generatedAt) {
+      throw generationHandshakeError(null, null);
+    }
+    const requested = stringOrNull(generationId || generationIdSnake);
+    if (requested && requested !== activeGenerationId) {
+      throw requestedGenerationError(requested, activeGenerationId);
+    }
+    const requestedAt = stringOrNull(requestedGeneratedAt || requestedGeneratedAtSnake);
+    if (requestedAt && (activeGenerationId || requestedAt !== generatedAt)) {
+      throw requestedGenerationError(requestedAt, activeGenerationId || generatedAt);
+    }
+    return {
+      current,
+      manifest,
+      generationId: activeGenerationId,
+      generatedAt,
+    };
+  }
+
+  async getReadiness() {
+    const packageState = await this.getPackageState();
+    if (!packageState.generationId) {
+      throw Object.assign(new Error("weekly package has no deterministic generation"), {
+        code: "WEEKLY_GENERATION_REQUIRED",
+      });
+    }
+    const items = Array.isArray(packageState.current?.items) ? packageState.current.items : [];
+    if (items.length === 0) {
+      throw Object.assign(new Error("weekly package is empty"), { code: "WEEKLY_PACKAGE_EMPTY" });
+    }
+    const currentCount = Number(packageState.current?.item_count);
+    const manifestCount = Number(packageState.manifest?.item_count ?? packageState.manifest?.items_total);
+    if (!Number.isFinite(currentCount) || currentCount !== items.length || !Number.isFinite(manifestCount) || manifestCount !== items.length) {
+      throw Object.assign(new Error("weekly package item count mismatch"), {
+        code: "WEEKLY_PACKAGE_COUNT_MISMATCH",
+      });
+    }
+    const ids = items.map((item) => String(item?.id || "").trim());
+    const uniqueIds = new Set(ids);
+    if (ids.some((id) => !id) || uniqueIds.size !== ids.length) {
+      throw Object.assign(new Error("weekly package IDs are missing or duplicated"), {
+        code: "WEEKLY_PACKAGE_ID_CLOSURE_FAILED",
+      });
+    }
+
+    let derivedDetailCount = 0;
+    for (const item of items) {
+      const detail = await readJson(this.baseDir, `by-id/${storageSlug(item.id)}.json`);
+      if (!detailMatchesPackage(detail, packageState, item)) {
+        throw Object.assign(new Error(`weekly detail closure mismatch for ${item.id}`), {
+          code: "WEEKLY_DETAIL_CLOSURE_FAILED",
+        });
+      }
+      derivedDetailCount += 1;
+    }
+
+    const itemIdDigest = createHash("sha256")
+      .update([...uniqueIds].sort().join("\n"), "utf8")
+      .digest("hex");
+    return {
+      ok: true,
+      service: "weekly-api",
+      generationId: packageState.generationId,
+      generatedAt: packageState.generatedAt,
+      packageItemCount: items.length,
+      derivedDetailCount,
+      itemIdDigest,
+    };
+  }
+
+  async getItem(id, options = {}) {
     const rawId = String(id || "").trim();
     const safeId = storageSlug(rawId);
     if (!safeId) return null;
-
+    const packageState = await this.getPackageState(options);
+    const currentItems = Array.isArray(packageState.current.items) ? packageState.current.items : [];
+    const currentItem = currentItems.find(
+      (entry) => entry.id === rawId || storageSlug(entry.id) === safeId,
+    ) || null;
     try {
       const detail = await readJson(this.baseDir, `by-id/${safeId}.json`);
-      return withClubProfile(detail.item || detail);
+      if (detailMatchesPackage(detail, packageState, currentItem)) {
+        return withPackageIdentity(detail.item || detail, packageState);
+      }
     } catch {
-      const current = await readJson(this.baseDir, "current.json");
-      const item = current.items.find((entry) => entry.id === rawId || storageSlug(entry.id) === safeId) || null;
-      return item ? withClubProfile(item) : null;
+      // A missing/corrupt detail route is safe to recover from current.json;
+      // package handshake errors occur before this block and are never hidden.
     }
+    return withPackageIdentity(currentItem, packageState);
   }
 
-  async getItemsByIds(ids) {
-    if (!Array.isArray(ids) || ids.length === 0) return [];
-    const wanted = ids
-      .map((id) => ({ raw: String(id || "").trim(), safe: storageSlug(id) }))
-      .filter((entry) => entry.raw && entry.safe);
-    if (wanted.length === 0) return [];
-
-    const results = await Promise.allSettled(
-      wanted.map((entry) =>
-        readJson(this.baseDir, `by-id/${entry.safe}.json`).then(
-          (detail) => ({ ok: true, entry, detail }),
-        ),
-      ),
-    );
-    const found = [];
-    const remaining = [];
-    for (const result of results) {
-      if (result.status === "fulfilled" && result.value?.ok) {
-        found.push(withClubProfile(result.value.detail.item || result.value.detail));
-      } else {
-        remaining.push(result.status === "fulfilled" ? result.value.entry : result.reason?.entry || wanted[results.indexOf(result)]);
+  async getItemsByIds(ids, options = {}) {
+    const packageState = await this.getPackageState(options);
+    const wanted = Array.isArray(ids)
+      ? ids
+        .map((id) => ({ raw: String(id || "").trim(), safe: storageSlug(id) }))
+        .filter((entry) => entry.raw && entry.safe)
+      : [];
+    const currentItems = Array.isArray(packageState.current.items) ? packageState.current.items : [];
+    const currentByRaw = new Map(currentItems.map((item) => [String(item.id || ""), item]));
+    const currentBySafe = new Map(currentItems.map((item) => [storageSlug(item.id), item]));
+    const found = await Promise.all(wanted.map(async (entry) => {
+      const currentItem = currentByRaw.get(entry.raw) || currentBySafe.get(entry.safe) || null;
+      try {
+        const detail = await readJson(this.baseDir, `by-id/${entry.safe}.json`);
+        if (detailMatchesPackage(detail, packageState, currentItem)) {
+          return withPackageIdentity(detail.item || detail, packageState);
+        }
+      } catch {
+        // Fall through to the validated current generation.
       }
-    }
-
-    if (remaining.length > 0) {
-      const current = await readJson(this.baseDir, "current.json");
-      const rawIds = new Set(remaining.map((entry) => entry.raw));
-      const safeIds = new Set(remaining.map((entry) => entry.safe));
-      found.push(
-        ...current.items
-          .filter((item) => rawIds.has(item.id) || safeIds.has(storageSlug(item.id)))
-          .map(withClubProfile),
-      );
-    }
-    return found;
+      return withPackageIdentity(currentItem, packageState);
+    }));
+    return {
+      items: found.filter(Boolean),
+      generatedAt: packageState.generatedAt,
+      generation_id: packageState.generationId,
+      generationId: packageState.generationId,
+    };
   }
 
   async getLlmSummary() {
     try {
-      return await readJson(this.baseDir, "llm/weekly_summary.json");
+      return scrubPublicValue(await readJson(this.baseDir, "llm/weekly_summary.json")) || null;
     } catch {
       return null;
     }
@@ -1205,7 +1545,7 @@ export class WeeklyActivityDataStore {
 
   async getLlmEnrichmentIndex() {
     try {
-      return await readJson(this.baseDir, "llm/enrichment_index.json");
+      return scrubPublicValue(await readJson(this.baseDir, "llm/enrichment_index.json")) || null;
     } catch {
       return null;
     }
@@ -1216,7 +1556,7 @@ export class WeeklyActivityDataStore {
     if (!safeId) return null;
 
     try {
-      return await readJson(this.baseDir, `llm/enrichments/${safeId}.json`);
+      return scrubPublicValue(await readJson(this.baseDir, `llm/enrichments/${safeId}.json`)) || null;
     } catch {
       return null;
     }
@@ -1305,12 +1645,13 @@ export class WeeklyActivityDataStore {
       return null;
     }
     const source = payload.sources?.[safeHash] || null;
-    if (!source?.url) return null;
+    const publicUrl = publicHttpUrl(source?.url);
+    if (!publicUrl) return null;
     return {
       schemaVersion: "weekly_activity_api.source_action.v1",
       type: source.type || "wechat_article",
       mode: "webview",
-      url: source.url,
+      url: publicUrl,
       accountName: source.account_name || "",
       publishedAt: source.published_at || "",
       eventId: source.event_id || "",

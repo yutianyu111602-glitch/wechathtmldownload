@@ -44,6 +44,16 @@ from audit_weekly_cross_source_conflicts import (  # noqa: E402
     trusted_time_of,
     venue_of,
 )
+from build_weekly_activity_miniprogram_api import (  # noqa: E402
+    city_occurs_only_as_road_name,
+    filter_address_city_matches,
+)
+from weekly_public_projection import (  # noqa: E402
+    assert_public_payload,
+    project_public_items,
+    project_public_source_map_payload,
+    scrub_public_package_payload,
+)
 
 
 DEFAULT_API_DIR = Path("services/weekly_activity_cloudrun/data/current_release")
@@ -192,6 +202,93 @@ def city_label_for_key(item: dict[str, Any], city_key: str) -> str:
     return CITY_LABEL_BY_KEY.get(key) or city_label_of(item)
 
 
+def item_city_entries(item: dict[str, Any]) -> list[dict[str, str]]:
+    city_keys = item.get("city_keys") if isinstance(item.get("city_keys"), list) else []
+    city_labels = item.get("city") if isinstance(item.get("city"), list) else []
+    primary_key = city_key_of(item)
+    ordered_keys: list[str] = []
+    if primary_key:
+        ordered_keys.append(primary_key)
+    for value in city_keys:
+        key = first(value)
+        if key and key not in ordered_keys:
+            ordered_keys.append(key)
+    entries: list[dict[str, str]] = []
+    for key in ordered_keys:
+        label = ""
+        for index, candidate_key in enumerate(city_keys):
+            if first(candidate_key) == key and index < len(city_labels):
+                label = first(city_labels[index])
+                break
+        if not label and key == primary_key:
+            label = first(item.get("city_name"))
+        entries.append({"key": key, "label": label or CITY_LABEL_BY_KEY.get(key) or key})
+    return entries
+
+
+def address_city_road_alias_issue(item: dict[str, Any]) -> dict[str, Any] | None:
+    address = first(item.get("address_full") or item.get("address"))
+    entries = item_city_entries(item)
+    if not address or not entries:
+        return None
+    road_only_entries = [
+        entry
+        for entry in entries
+        if city_occurs_only_as_road_name(address, entry)
+    ]
+    if not road_only_entries:
+        return None
+    road_only_key_set = {entry["key"] for entry in road_only_entries}
+    has_non_road_anchor = any(entry["key"] not in road_only_key_set for entry in entries)
+    retained = (
+        filter_address_city_matches(address, entries)
+        if len(entries) > 1 and has_non_road_anchor
+        else []
+    )
+    retained_keys = [entry["key"] for entry in retained]
+    original_keys = [entry["key"] for entry in entries]
+    road_only_keys = [entry["key"] for entry in road_only_entries]
+    removed_keys = [key for key in road_only_keys if key not in retained_keys]
+    if not removed_keys:
+        return None
+    return {
+        "id": item_id(item),
+        "title": title_of(item),
+        "address": address[:300],
+        "original_city_keys": original_keys,
+        "retained_city_keys": retained_keys,
+        "retained_city_labels": [entry["label"] for entry in retained],
+        "ambiguous_city_keys": removed_keys,
+        "removed_city_keys": removed_keys,
+        "repairable": bool(retained_keys),
+        "reason": (
+            "city_label_occurs_only_as_road_name_with_another_address_city_anchor"
+            if retained_keys
+            else "only_city_label_occurs_as_road_name_without_address_city_anchor"
+        ),
+    }
+
+
+def normalize_address_city_road_aliases(
+    items: list[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    repaired: list[dict[str, Any]] = []
+    changed: list[dict[str, Any]] = []
+    for item in items:
+        next_item = deepcopy(item)
+        issue = address_city_road_alias_issue(next_item)
+        if issue and issue["repairable"]:
+            retained_keys = issue["retained_city_keys"]
+            retained_labels = issue["retained_city_labels"]
+            next_item["city_keys"] = retained_keys
+            next_item["city"] = retained_labels
+            next_item["city_key"] = retained_keys[0] if retained_keys else ""
+            next_item["city_name"] = retained_labels[0] if retained_labels else ""
+            changed.append(issue)
+        repaired.append(next_item)
+    return repaired, changed
+
+
 def date_keys_of(item: dict[str, Any]) -> list[str]:
     direct_dates = []
     for key in ("event_date_start", "event_date_end", "event_date_iso_guess"):
@@ -205,13 +302,13 @@ def date_keys_of(item: dict[str, Any]) -> list[str]:
 
     raw = item.get("event_date_iso_guesses")
     if isinstance(raw, list):
-        dates = [first(value) for value in raw if first(value)]
+        dates = [first(value) for value in raw if ISO_DATE_RE.fullmatch(first(value))]
     else:
         dates = []
     primary = date_of(item)
-    if primary and primary not in dates:
+    if ISO_DATE_RE.fullmatch(primary) and primary not in dates:
         dates.insert(0, primary)
-    return dates
+    return sorted(set(dates))
 
 
 def window_start_of(item: dict[str, Any]) -> str:
@@ -909,6 +1006,28 @@ def has_internal_activity_poster_file_id(item: dict[str, Any]) -> bool:
     return any(is_internal_weekly_poster_file_id(item.get(key)) for key in (*POSTER_FILE_ID_FIELDS, *POSTER_URL_FIELDS))
 
 
+def has_exact_aggregate_child_qwen_public_poster(item: dict[str, Any]) -> bool:
+    evidence = item.get("poster_selection_evidence")
+    if not isinstance(evidence, dict):
+        evidence = item.get("posterSelectionEvidence")
+    if not isinstance(evidence, dict):
+        return False
+    risk_flags_value = evidence.get("risk_flags")
+    risk_flags = {
+        str(value).strip().lower()
+        for value in (risk_flags_value if isinstance(risk_flags_value, list) else [risk_flags_value])
+        if str(value or "").strip()
+    }
+    return bool(
+        evidence.get("selection_scope") == "aggregate_child_exact_event"
+        and evidence.get("selected_by") == "qwen_vl_direct_sanji_article_assets"
+        and evidence.get("main_poster_image_index") not in (None, "")
+        and "no_exact_aggregate_child_poster_visible" not in risk_flags
+        and first(item.get("poster_source")) == "sanji_article_body_vl_aggregate_child_exact"
+        and any(public_or_temp_poster_value(item.get(key)) for key in POSTER_URL_FIELDS)
+    )
+
+
 def quarantine_operational_notices(items: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     kept: list[dict[str, Any]] = []
     removed: list[dict[str, Any]] = []
@@ -945,6 +1064,10 @@ def suppress_aggregate_child_source_and_poster(items: list[dict[str, Any]]) -> t
                 if first(next_item.get(key))
             }
             has_internal_activity_poster = has_internal_activity_poster_file_id(next_item)
+            has_exact_qwen_public_poster = (
+                not has_internal_activity_poster
+                and has_exact_aggregate_child_qwen_public_poster(next_item)
+            )
             source_action = deepcopy(next_item.get("source_action") if isinstance(next_item.get("source_action"), dict) else {})
             source_article = deepcopy(next_item.get("source_article") if isinstance(next_item.get("source_article"), dict) else {})
             source_action["type"] = first(source_action.get("type") or "wechat_article")
@@ -961,7 +1084,7 @@ def suppress_aggregate_child_source_and_poster(items: list[dict[str, Any]]) -> t
             next_item["aggregation_child"] = True
             next_item["poster_suppressed"] = False
             next_item["poster_suppressed_reason"] = ""
-            if not has_internal_activity_poster:
+            if not has_internal_activity_poster and not has_exact_qwen_public_poster:
                 next_item["poster_source"] = ""
                 for field in (*POSTER_FILE_ID_FIELDS, *POSTER_URL_FIELDS, *POSTER_STORAGE_FIELDS, "poster_cloud_path"):
                     next_item[field] = ""
@@ -978,8 +1101,13 @@ def suppress_aggregate_child_source_and_poster(items: list[dict[str, Any]]) -> t
                         "date": date_of(next_item),
                         "city": city_of(next_item),
                         "source_hash": before_hash,
-                        "cleared_poster_fields": [] if has_internal_activity_poster else sorted(before_poster_fields),
+                        "cleared_poster_fields": (
+                            []
+                            if (has_internal_activity_poster or has_exact_qwen_public_poster)
+                            else sorted(before_poster_fields)
+                        ),
                         "kept_internal_activity_poster": has_internal_activity_poster,
+                        "kept_exact_qwen_public_activity_poster": has_exact_qwen_public_poster,
                         "reason": "aggregate_child_parent_article_source_disabled",
                     }
                 )
@@ -1162,6 +1290,7 @@ def repair_items(
     repaired, aggregate_source_suppressed = suppress_aggregate_child_source_and_poster(repaired)
     repaired, aggregate_merge_pruned = prune_aggregate_child_merge_provenance(repaired)
     repaired, cloudbase_poster_normalized = normalize_cloudbase_poster_fields(repaired)
+    repaired, address_city_alias_normalized = normalize_address_city_road_aliases(repaired)
     after = audit(repaired)
     report = {
         "schema_version": "weekly_activity_release_repair.v1",
@@ -1180,6 +1309,7 @@ def repair_items(
         "pruned_aggregate_child_merge_source_group_count": len(aggregate_merge_pruned),
         "pruned_aggregate_child_merge_source_count": sum(row.get("removed_source_count", 0) for row in aggregate_merge_pruned),
         "cloudbase_poster_normalized_count": len(cloudbase_poster_normalized),
+        "address_city_alias_normalized_count": len(address_city_alias_normalized),
         "quarantined_conflict_item_count": len(conflict_removed),
         "duplicate_cluster_count": len(duplicate_groups),
         "raw_duplicate_fallback_cluster_count": len(fallback_groups),
@@ -1198,6 +1328,7 @@ def repair_items(
         "aggregate_child_source_suppressed_items": aggregate_source_suppressed,
         "aggregate_child_merge_sources_pruned": aggregate_merge_pruned,
         "cloudbase_poster_normalized_items": cloudbase_poster_normalized,
+        "address_city_alias_normalized_items": address_city_alias_normalized,
         "removed_items": [
             *duplicate_removed,
             *fallback_removed,
@@ -1220,22 +1351,122 @@ def clean_json_dir(path: Path) -> None:
 
 
 def detail_path_for(item: dict[str, Any]) -> str:
-    existing = first(item.get("detail_path") or item.get("detail_url"))
-    if existing.startswith("by-id/") and existing.endswith(".json"):
-        return existing
-    return f"by-id/{slugify(item_id(item), fallback='item')}.json"
+    event_id = item_id(item)
+    if not event_id:
+        raise ValueError("weekly item ID is required before rebuilding detail routes")
+    return f"by-id/{slugify(event_id, fallback='item')}.json"
+
+
+def safe_route_target(api_dir: Path, route: str, expected_dir: str) -> Path:
+    """Resolve one flat JSON route and prove it remains inside its route directory."""
+
+    api_root = api_dir.resolve(strict=False)
+    root = (api_dir / expected_dir).resolve(strict=False)
+    if root.parent != api_root:
+        raise ValueError(f"weekly route directory escapes API root: {expected_dir}")
+    target = (api_dir / route).resolve(strict=False)
+    try:
+        target.relative_to(root)
+    except ValueError as error:
+        raise ValueError(f"weekly route escapes {expected_dir}: {route}") from error
+    if target.parent != root or target.suffix.casefold() != ".json":
+        raise ValueError(f"weekly route must be one flat JSON file in {expected_dir}: {route}")
+    return target
+
+
+def normalize_public_city_keys(item: dict[str, Any]) -> None:
+    entries = item_city_entries(item)
+    normalized: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for entry in entries:
+        safe_key = slugify(entry.get("key") or "", fallback="")
+        if not safe_key or safe_key in seen:
+            continue
+        seen.add(safe_key)
+        normalized.append(
+            {
+                "key": safe_key,
+                "label": first(entry.get("label")) or CITY_LABEL_BY_KEY.get(safe_key) or safe_key,
+            }
+        )
+    if not normalized:
+        item["city_key"] = ""
+        item["city_keys"] = []
+        return
+    item["city_key"] = normalized[0]["key"]
+    item["city_name"] = normalized[0]["label"]
+    item["city_keys"] = [entry["key"] for entry in normalized]
+    item["city"] = [entry["label"] for entry in normalized]
+
+
+def normalize_rebuild_report(report: dict[str, Any]) -> dict[str, Any]:
+    """Return a rebuild report with deterministic operation-local counters.
+
+    ``rebuild_release_files`` is shared by the conflict repair, incremental
+    merge, field repair, and lineup repair paths.  Only the conflict repair
+    path performs address/city road-alias normalization, so reports from the
+    other legal callers have a zero count.  When the repair path provides its
+    item ledger, the ledger is the count authority.  An explicit count must be
+    a non-negative integer and agree with that ledger; silently accepting a
+    disagreement would make the published manifest unauditable.
+    """
+
+    normalized = deepcopy(report)
+    count_key = "address_city_alias_normalized_count"
+    items_key = "address_city_alias_normalized_items"
+    item_rows = normalized.get(items_key)
+    if item_rows is not None and not isinstance(item_rows, list):
+        raise ValueError(f"{items_key} must be a list when present")
+
+    if count_key in normalized:
+        count = normalized[count_key]
+        if isinstance(count, bool) or not isinstance(count, int) or count < 0:
+            raise ValueError(f"{count_key} must be a non-negative integer")
+        if item_rows is not None and count != len(item_rows):
+            raise ValueError(
+                f"{count_key}={count} does not match {items_key} length={len(item_rows)}"
+            )
+    else:
+        count = len(item_rows) if item_rows is not None else 0
+
+    normalized[count_key] = count
+    return normalized
 
 
 def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[dict[str, Any]], report: dict[str, Any]) -> None:
+    report = normalize_rebuild_report(report)
     generated_at = now_iso()
+    items = project_public_items(items)
+    for item in items:
+        assert_public_payload(item, label=f"rebuilt weekly item {item_id(item)}")
+
+    source_map_file = api_dir / "source_actions" / "source_url_map.json"
+    if source_map_file.is_file():
+        write_json(
+            source_map_file,
+            project_public_source_map_payload(read_json(source_map_file)),
+        )
+    filter_dispositions_file = api_dir / "build_filter_dispositions.json"
+    if filter_dispositions_file.is_file():
+        filter_payload = read_json(filter_dispositions_file)
+        if not isinstance(filter_payload, dict):
+            raise ValueError("build_filter_dispositions.json must be an object")
+        source_pack_dir = first(filter_payload.get("source_pack_dir"))
+        if source_pack_dir and not filter_payload.get("source_pack_name"):
+            filter_payload["source_pack_name"] = Path(source_pack_dir).name
+        filter_payload = scrub_public_package_payload(filter_payload)
+        assert_public_payload(filter_payload, label="rebuilt build_filter_dispositions.json")
+        write_json(filter_dispositions_file, filter_payload)
 
     for item in items:
+        normalize_public_city_keys(item)
+        valid_dates = date_keys_of(item)
+        item["event_date_iso_guesses"] = valid_dates
+        if not ISO_DATE_RE.fullmatch(first(item.get("event_date_iso_guess"))):
+            item["event_date_iso_guess"] = valid_dates[0] if valid_dates else ""
         path = detail_path_for(item)
         item["detail_path"] = path
         item["detail_url"] = path
-
-    for dirname in ("by-city", "by-date", "by-id"):
-        clean_json_dir(api_dir / dirname)
 
     cities: dict[str, list[dict[str, Any]]] = defaultdict(list)
     city_labels: dict[str, str] = {}
@@ -1253,10 +1484,32 @@ def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[di
         for date_key in date_keys_of(item):
             dates[date_key].append(item)
 
+    detail_targets: dict[str, Path] = {}
+    for item in items:
+        route = detail_path_for(item)
+        if route in detail_targets:
+            raise ValueError(f"duplicate weekly detail storage route: {route}")
+        detail_targets[route] = safe_route_target(api_dir, route, "by-id")
+    city_targets = {
+        city_key: safe_route_target(api_dir, f"by-city/{city_key}.json", "by-city")
+        for city_key in cities
+    }
+    date_targets = {
+        date_key: safe_route_target(api_dir, f"by-date/{date_key}.json", "by-date")
+        for date_key in dates
+    }
+    city_index_target = safe_route_target(api_dir, "by-city/index.json", "by-city")
+    date_index_target = safe_route_target(api_dir, "by-date/index.json", "by-date")
+    for dirname in ("by-city", "by-date", "by-id"):
+        safe_route_target(api_dir, f"{dirname}/.route-safety.json", dirname)
+
+    for dirname in ("by-city", "by-date", "by-id"):
+        clean_json_dir(api_dir / dirname)
+
     for city_key, city_items in sorted(cities.items()):
         route = f"by-city/{city_key}.json"
         write_json(
-            api_dir / route,
+            city_targets[city_key],
             {
                 "schema_version": "weekly_activity_miniprogram_city.v1",
                 "generated_at": generated_at,
@@ -1279,7 +1532,7 @@ def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[di
         for city_key, city_items in sorted(cities.items())
     ]
     write_json(
-        api_dir / "by-city" / "index.json",
+        city_index_target,
         {
             "schema_version": "weekly_activity_miniprogram_city_index.v1",
             "generated_at": generated_at,
@@ -1293,7 +1546,7 @@ def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[di
     for date_key, date_items in sorted(dates.items()):
         route = f"by-date/{date_key}.json"
         write_json(
-            api_dir / route,
+            date_targets[date_key],
             {
                 "schema_version": "weekly_activity_miniprogram_date.v1",
                 "generated_at": generated_at,
@@ -1314,7 +1567,7 @@ def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[di
         for date_key, date_items in sorted(dates.items())
     ]
     write_json(
-        api_dir / "by-date" / "index.json",
+        date_index_target,
         {
             "schema_version": "weekly_activity_miniprogram_date_index.v1",
             "generated_at": generated_at,
@@ -1326,8 +1579,9 @@ def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[di
     )
 
     for item in items:
+        route = detail_path_for(item)
         write_json(
-            api_dir / detail_path_for(item),
+            detail_targets[route],
             {
                 "schema_version": "weekly_activity_miniprogram_detail.v1",
                 "generated_at": generated_at,
@@ -1335,7 +1589,7 @@ def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[di
             },
         )
 
-    current = deepcopy(current)
+    current = scrub_public_package_payload(deepcopy(current))
     current["generated_at"] = generated_at
     current["item_count"] = len(items)
     current["items"] = items
@@ -1346,7 +1600,9 @@ def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[di
         "repaired_item_count": report["repaired_item_count"],
         "removed_duplicate_count": report["removed_duplicate_count"],
         "quarantined_conflict_item_count": report["quarantined_conflict_item_count"],
+        "address_city_alias_normalized_count": report["address_city_alias_normalized_count"],
     }
+    assert_public_payload(current, label="rebuilt weekly current.json")
     write_json(api_dir / "current.json", current)
 
     manifest_path = api_dir / "manifest.json"
@@ -1362,6 +1618,8 @@ def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[di
     manifest["default_api_scope"] = "current"
     manifest["repair_report"] = current["repair_report"]
     manifest["repair_report_path"] = "repair_report.json"
+    manifest = scrub_public_package_payload(manifest)
+    assert_public_payload(manifest, label="rebuilt weekly manifest.json")
     write_json(manifest_path, manifest)
     write_json(api_dir / "repair_report.json", report)
 

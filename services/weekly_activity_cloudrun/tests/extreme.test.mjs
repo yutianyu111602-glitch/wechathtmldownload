@@ -243,7 +243,7 @@ test("大响应: gzip 压缩正常 (500 items)", async () => {
 // 极端测试：错误恢复
 // ════════════════════════════════════════════════════════════
 
-test("错误恢复: 缺少 current.json 时返回空数组不崩溃", async () => {
+test("错误恢复: 缺少 current.json 时失败关闭而不是伪造空活动集", async () => {
   const brokenDir = await mkdtemp(path.join(os.tmpdir(), "broken-"));
   await mkdir(path.join(brokenDir, "by-city"), { recursive: true });
   await mkdir(path.join(brokenDir, "by-date"), { recursive: true });
@@ -252,9 +252,10 @@ test("错误恢复: 缺少 current.json 时返回空数组不崩溃", async () =
   });
   // Deliberately DO NOT create current.json
   const brokenStore = new WeeklyActivityDataStore({ baseDir: brokenDir });
-  const result = await brokenStore.getCurrent({});
-  assert.equal(result.items.length, 0, `Expected 0 items, got ${result.items.length}`);
-  assert.equal(result.page.total, 0);
+  await assert.rejects(
+    () => brokenStore.getCurrent({}),
+    (error) => error && error.code === "WEEKLY_CURRENT_UNAVAILABLE",
+  );
 });
 
 test("错误恢复: 损坏的 JSON 不崩溃", async () => {

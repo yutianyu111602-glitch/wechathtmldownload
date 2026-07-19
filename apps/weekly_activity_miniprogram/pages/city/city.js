@@ -1,33 +1,13 @@
-const { requestApi } = require("../../utils/api");
+const { fetchAllCurrentItems, requestApi } = require("../../utils/api");
+const { currentShanghaiBusinessDateKey } = require("../../utils/businessDate");
 const { buildCityGuide } = require("../../utils/cityGuide");
 const { compactItem, dedupeItems } = require("../../utils/format");
 const { applyLanguageChrome, localizeItems, normalizeLang, text, translateCity } = require("../../utils/i18n");
 const { buildSimpleShare, buildSimpleTimeline, enableShareMenu } = require("../../utils/share");
+const { cityKeysForItem } = require("../../services/homeFilters");
 
 function safeVibrate(type = "light") {
   if (typeof wx !== "undefined" && typeof wx.vibrateShort === "function") wx.vibrateShort({ type });
-}
-
-async function fetchAllCurrentItems() {
-  const allItems = [];
-  let cursor = 0;
-  for (let pageIndex = 0; pageIndex < 20; pageIndex += 1) {
-    const current = await requestApi("/api/v1/weekly/current", {
-      scope: "current",
-      cityKey: "",
-      date: "",
-      lookbackDays: 0,
-      limit: 500,
-      cursor,
-    });
-    allItems.push(...(current.items || []));
-    const nextCursor = current.page && current.page.nextCursor;
-    if (nextCursor === null || nextCursor === undefined || nextCursor === "") break;
-    const parsedNext = Number(nextCursor);
-    if (!Number.isFinite(parsedNext) || parsedNext <= Number(cursor)) break;
-    cursor = parsedNext;
-  }
-  return allItems;
 }
 
 function currentCityFacets(items, upstreamCities, lang) {
@@ -37,16 +17,19 @@ function currentCityFacets(items, upstreamCities, lang) {
   ]));
   const bucket = new Map();
   for (const item of Array.isArray(items) ? items : []) {
-    const key = String(item.city_key || (item.city_keys || [])[0] || "").trim();
-    if (!key) continue;
-    const rawCity = labels.get(key) || (Array.isArray(item.city) ? item.city[0] : item.city) || key;
-    const current = bucket.get(key) || {
-      city_key: key,
-      city: rawCity,
-      item_count: 0,
-    };
-    current.item_count += 1;
-    bucket.set(key, current);
+    const cityKeys = cityKeysForItem(item);
+    const cityLabels = Array.isArray(item.city) ? item.city : [item.city];
+    for (let index = 0; index < cityKeys.length; index += 1) {
+      const key = cityKeys[index];
+      const rawCity = labels.get(key) || cityLabels[index] || (index === 0 ? item.cityLabel : "") || key;
+      const current = bucket.get(key) || {
+        city_key: key,
+        city: rawCity,
+        item_count: 0,
+      };
+      current.item_count += 1;
+      bucket.set(key, current);
+    }
   }
   return Array.from(bucket.values())
     .map((city) => ({ ...city, displayCity: translateCity(city.city, lang, city.city_key) }))
@@ -101,9 +84,16 @@ Page({
   async loadGuide(selectedCityKey) {
     this.setData({ loading: true, error: "" });
     try {
+      const businessDateKey = currentShanghaiBusinessDateKey();
       const [citiesResult, rawItems] = await Promise.all([
-        requestApi("/api/v1/weekly/cities", { scope: "current", lookbackDays: 0 }),
-        fetchAllCurrentItems(),
+        requestApi("/api/v1/weekly/cities", { scope: "current", date: businessDateKey, lookbackDays: 0 })
+          .catch((error) => {
+            // Facets only provide display labels here. The exact current item
+            // set below remains sufficient to build both labels and counts.
+            console.warn("[city] optional city labels unavailable", error);
+            return { cities: [] };
+          }),
+        fetchAllCurrentItems({ scope: "current", cityKey: "", date: businessDateKey, lookbackDays: 0, limit: 100 }),
       ]);
       const items = localizeItems(dedupeItems(rawItems.map(compactItem)), this.data.lang);
       // Counts come from the exact current item set shown after navigation. The
@@ -116,8 +106,10 @@ Page({
         cities,
         items,
         selectedCityKey,
+        businessDateKey,
         lang: this.data.lang,
       });
+      this.cityGuideBusinessDateKey = businessDateKey;
       this.setData({
         cities: guide.cities,
         guide,
@@ -135,6 +127,7 @@ Page({
       cities: this.cityGuideCities || [],
       items: this.cityGuideItems || [],
       selectedCityKey,
+      businessDateKey: this.cityGuideBusinessDateKey || currentShanghaiBusinessDateKey(),
       lang: this.data.lang,
     });
     this.setData({

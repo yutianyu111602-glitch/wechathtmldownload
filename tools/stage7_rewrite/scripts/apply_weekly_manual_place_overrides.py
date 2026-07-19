@@ -11,12 +11,20 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[3]
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+from weekly_city_routes import group_items_by_city
+
+
 DEFAULT_REPORT_ROOT = ROOT / "tools" / "stage7_rewrite" / "reports"
 
 CITY_KEYS = {
@@ -244,13 +252,7 @@ def rebuild_city_routes(api_dir: Path, current_payload: dict[str, Any]) -> None:
     city_dir = api_dir / "by-city"
     city_dir.mkdir(parents=True, exist_ok=True)
     generated_at = current_payload.get("generated_at") or now_cst()
-    grouped: dict[str, dict[str, Any]] = {}
-    for item in current_payload.get("items") or []:
-        if not isinstance(item, dict):
-            continue
-        city = first(item.get("city") or item.get("city_name")) or "未知"
-        city_key = first(item.get("city_key") or item.get("city_keys")) or CITY_KEYS.get(city, city)
-        grouped.setdefault(city_key, {"city": city, "items": []})["items"].append(item)
+    grouped = group_items_by_city(current_payload.get("items") or [], fallback_city_keys=CITY_KEYS)
 
     for path in city_dir.glob("*.json"):
         if path.name != "index.json":

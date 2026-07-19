@@ -1,6 +1,67 @@
 # Current Runtime Entry
 
-## 2026-07-18 HUAIDJ Pipeline Recovery Candidate
+Updated: 2026-07-19 CST
+
+## 2026-07-19 HUAIDJ weekly visibility recovery in progress
+
+Current local integration candidate:
+
+- path: `F:\DevData\HuaidjRuntime\build\weekly-visibility-20260719`;
+- branch: `codex/weekly-visibility-20260719`;
+- base commit at audit start: `0b97884db33c84428b88ae9612900b4efe4be92a`;
+- state: dirty/uncommitted local candidate, not an immutable release and not a
+  production runtime.
+
+The prior accepted scheduler rollback remains
+`F:\DevData\HuaidjRuntime\releases\0cf5794-pipeline-20260718`. No 2026-07-19
+Hermes cutover has occurred. Before any cutover, re-read the live jobs,
+launchers, Gateway child command, `HUAIDJ_REPO`, Python, proxy, and report-root
+tuple; directory names and `last_status=ok` are not sufficient proof.
+
+Read-only public reproduction on 2026-07-19 proved that the deployed backend
+still mixes universes: package manifest `626`, current `64`, Shanghai current
+`13`, Shanghai exact `2026-07-24` `3`, while the cities endpoint reports
+Shanghai `131` and ignores both exact-date and weekend-range filters. The old
+current endpoint also ignores `dateStart/dateEnd`. Full evidence and the fixed
+contract are in `HUAIDJ_MINIPROGRAM_LOADING_ROOT_CAUSE_20260719.md`.
+
+The integration candidate now contains cross-layer contracts for:
+
+- Asia/Shanghai business date and Friday-through-Sunday weekend ranges;
+- complete current pagination with duplicate/cursor/total/generation gates;
+- list/total/poster/city/date facets projected from one visible set;
+- transactional last-good client cache and CloudBase hot-generation switching;
+- generation-stamped package routes and fail-closed public projection;
+- Sound ingress/evidence redaction and release gates;
+- Atlas static/index/neighborhood `datasetId` handshake and an external,
+  non-deployed triplet builder;
+- transactional deploy/package helpers, Hermes launcher installation, and a
+  process lease for the twice-daily wrapper.
+
+These are candidate code facts, not release claims. Intermediate automated
+test runs exist, but the final post-merge full Node/Python/PowerShell suite,
+public-path/secret scan, and fresh eight-scenario DevTools run must still pass
+from the final commit. The DevTools profile is logged in; login alone is not a
+render or upload proof.
+
+Still not completed as of this entry:
+
+- final commit/push and detached immutable release;
+- Hermes installer apply/idempotence audit and real child cutover;
+- a new 744-hour Sanji Desktop refresh plus fresh missing-HTML zero ledger;
+- the new Qwen-VL/DeepSeek full candidate and explicit backend deployment;
+- CloudBase hot-generation readback;
+- mini-program development upload, review submission, or public release;
+- AtlasV2 source-candidate import from this run or any serving-pointer change.
+
+Current operator entrypoints are
+`HUAIDJ_DISASTER_RECOVERY_MASTER_PROMPT_20260719.md`,
+`HUAIDJ_FULL_RECOVERY_EXECUTION_PLAN_20260719.md`, and
+`HUAIDJ_PIPELINE_SSOT_20260717.md`. Runtime outputs must remain under external
+`F:\DevData\HuaidjRuntime\state` roots. The temporary proxy is process-scoped
+`HUAIDJ_PROXY_URL=http://127.0.0.1:7890`; do not change the older network SSOT.
+
+## Historical 2026-07-18 HUAIDJ Pipeline Recovery Candidate
 
 Candidate root:
 `F:\DevData\HuaidjRuntime\releases\c8196bdc-pipeline-20260718`.

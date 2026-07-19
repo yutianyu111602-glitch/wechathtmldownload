@@ -1,4 +1,4 @@
-#!/usr/bin/env pwsh
+﻿#!/usr/bin/env pwsh
 # weekly_activity_next_week_pipeline.ps1
 # 每周五执行一次，生成下一周的活动数据。
 # 当前 CloudRun 小程序发布链路使用 /home/pc/scripts/huaidj-weekly-pipeline.sh；
@@ -976,6 +976,53 @@ Invoke-Step "Step 3.6: Aggregate Article Expansion Gate → $PACK_AGGREGATE_DIR"
 
 if (-not $DryRun -and (Test-Path "$PACK_AGGREGATE_DIR\weekly_activity_recommendation_candidates.jsonl")) {
     $PACK_ENTITY_DIR = $PACK_AGGREGATE_DIR
+}
+
+# ─── Step 3.62: 聚合子活动逐项 Qwen 主海报选择 ────────────────────────────────
+# DeepSeek 在 Step 3.6 才生成 agg-child，因此父文章级 Step 3 无法为这些新行
+# 选择海报。正式 VL 路线在发布窗口/API/CloudBase 之前，用同一 Sanji 原图和
+# qwen3.6-plus 路由为每个有效子活动做精确匹配；父封面不得直接继承。
+if ($PosterExtractionMode -eq "vl_direct_qwen") {
+    $PACK_AGGREGATE_CHILD_VL_DIR = "$LONGRUN\WEEKLY_ACTIVITY_RECOMMENDATION_PACK_AGGREGATE_CHILD_VL_$WEEK_TAG"
+    Reset-OutputDir $PACK_AGGREGATE_CHILD_VL_DIR
+    Invoke-Step "Step 3.62: Aggregate Child Qwen Exact Poster Gate → $PACK_AGGREGATE_CHILD_VL_DIR" {
+        $aggregateChildVlArgs = @(
+            "$POSTER_VL_SCRIPT",
+            "--pack-dir", "$PACK_ENTITY_DIR",
+            "--weekly-queue", "$QUEUE_FILE",
+            "--out-dir", "$PACK_AGGREGATE_CHILD_VL_DIR",
+            "--window-start", "$WeekStart",
+            "--window-days", "$WindowDays",
+            "--max-images", "$PosterVlMaxImages",
+            "--limit", "$PosterVlLimit",
+            "--provider", "$PosterVlProvider",
+            "--model", "$PosterVlModel",
+            "--fallback-provider", "$PosterVlFallback",
+            "--timeout-sec", "$PosterVlTimeoutSec",
+            "--concurrency", "$PosterVlConcurrency",
+            "--progress-every", "10",
+            "--only-aggregate-children",
+            "--require-selected-poster"
+        )
+        if (-not [string]::IsNullOrWhiteSpace($resumeVlEvidenceDirResolved)) {
+            $aggregateChildVlArgs += @("--resume-from-evidence-dir", "$resumeVlEvidenceDirResolved")
+        }
+        $aggregateChildVlArgs += "--execute"
+        & $PythonExecutable @aggregateChildVlArgs
+    }
+    if (-not $DryRun) {
+        $aggregateChildCandidatePath = Join-Path $PACK_AGGREGATE_CHILD_VL_DIR "weekly_activity_recommendation_candidates.jsonl"
+        $aggregateChildSummaryPath = Join-Path $PACK_AGGREGATE_CHILD_VL_DIR "summary.json"
+        if (-not (Test-Path -LiteralPath $aggregateChildCandidatePath -PathType Leaf)) {
+            throw "Aggregate-child Qwen output missing: $aggregateChildCandidatePath"
+        }
+        if (-not (Test-Path -LiteralPath $aggregateChildSummaryPath -PathType Leaf)) {
+            throw "Aggregate-child Qwen strict-gate summary missing: $aggregateChildSummaryPath"
+        }
+        $PACK_ENTITY_DIR = $PACK_AGGREGATE_CHILD_VL_DIR
+    }
+} else {
+    Write-Host "  Aggregate-child Qwen exact-poster gate is unavailable in legacy_ocr diagnostic mode; downstream strict poster quality remains fail-closed." -ForegroundColor Yellow
 }
 
 # ─── Step 3.65: 发布窗口候选池收敛 ──────────────────────────────────────────

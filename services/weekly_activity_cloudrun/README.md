@@ -138,6 +138,96 @@ Freshness rule:
 - Mini-program calls should use `wx.cloud.callContainer` with `X-WX-SERVICE: weekly-api`.
 - The default CloudBase domain currently has no HTTP route configured. Public `curl https://<domain>/healthz` is not authoritative unless a CBR route is added; the mini-program path is `callContainer`.
 
+### Private sound submission persistence
+
+The public `GET /api/v1/weekly/sounds` endpoint exposes readiness only; it never
+returns the private review queue or payment file IDs. Production `POST` writes
+are fail-closed unless all of the following are configured:
+
+- `SOUND_SUBMISSIONS_BACKEND=cloudbase`
+- `CLOUDBASE_ENV_ID=<the deployed CloudBase environment>`
+- `SOUND_SUBMISSIONS_COLLECTION=weekly_sound_submissions` (or another valid,
+  pre-created collection name)
+- `SOUND_SUBMISSIONS_MAX_PER_DAY=5` (required integer from 1 to 50)
+- `WECHAT_APP_ID=<the production mini-program AppID>`
+- `SOUND_SUBMISSIONS_INGRESS_MODE=hmac_gateway`
+- `SOUND_SUBMISSIONS_INGRESS_HMAC_SECRET=<at least 32 random bytes>`; the same
+  secret is configured only on CloudRun and the `soundSubmissionGateway` Cloud
+  Function
+- the CloudRun service identity has read/write permission on that collection
+- the CloudRun storage client can resolve every submitted CloudBase file ID
+
+The mini-program creates the stable `submissionKey` before upload and uses only
+the following object layout:
+
+`cloud://<CLOUDBASE_ENV_ID>[.<bucket>]/atlas/sound-submissions/<submissionKey>/<sound|payment>/<filename>`
+
+It then calls the mini-program-only `soundSubmissionGateway` Cloud Function.
+That function initializes current `@cloudbase/js-sdk` v3 with the invocation context,
+derives `openId`/`appId` from CloudBase authentication (never from event data),
+HMAC-signs the fixed body and identity, and calls the fixed CloudRun route with
+`app.callContainer`. CloudRun ignores forgeable `X-WX-*` headers and requires a
+fresh valid signature. The public route may remain reachable for the existing
+service, but a direct POST cannot create a submission.
+
+Before persistence, the backend rejects control characters, URLs, foreign
+CloudBase environments, mismatched submission keys/types, and non-canonical
+paths. It also resolves every exact object through CloudBase storage. Failure at
+any validation or lookup step disables that write; no placeholder row is
+created.
+
+Each submission is stored as an independent CloudBase document, so concurrent
+CloudRun instances do not perform a shared read-modify-write on one queue file.
+The mini-program supplies a stable idempotency key. The backend derives the
+document ID from that key plus a one-way submitter hash, and atomically claims
+one of a bounded set of per-user, per-Shanghai-day quota documents before
+creating the submission. This makes retries idempotent and enforces the daily
+limit across service instances without storing raw OpenIDs. File-backend local
+development also uses the stable key and conflict detection; it is not a
+production backend.
+
+The installed CloudBase SDK exposes a transaction API, but this disaster-
+recovery release has no authorized production canary proving the exact
+quota-claim plus submission-create semantics, and it exposes no
+compare-and-delete primitive for the existing compensation path. Until that
+transaction path is separately implemented and proven, an unverified
+submission failure after a quota claim therefore never deletes the slot as
+automatic compensation: a concurrent instance may already have created the
+submission. The backend retains the slot fail-closed and creates a
+`quota_reconciliation` document with schema
+`weekly_sound_quota_reconciliation.v1`. The private store method
+`listQuotaReconciliationInternal()` exposes those markers to an authorized
+operator workflow. Capacity remains reserved until that workflow proves the
+submission state and performs a separately controlled reconciliation; a random
+new submission must not reuse the slot merely because the first response was a
+503.
+
+If the backend is missing or unavailable, `GET` reports
+`acceptingSubmissions: false` when configuration is missing and `POST` returns a
+503 error rather than claiming persistence. `SOUND_SUBMISSIONS_DIR` remains a
+single-process local-development option and is not accepted as a production
+backend.
+
+The private `GET /api/v1/weekly/sounds/review-queue` and
+`POST /api/v1/weekly/sounds/enrich?id=...` routes require
+`X-Weekly-Review-Token`. Enrichment first resolves and downloads at most four
+sound-system images (1 MiB each; JPEG/PNG/WebP MIME and magic checked), sends
+the actual image bytes to QwenVL, and sends only QwenVL's structured visual
+evidence plus the club name to DeepSeek. Cloud file IDs and payment evidence
+are never sent to either model. `SOUND_REVIEW_ENRICH_ENABLED=true`, QwenVL and
+DeepSeek credentials are all required; otherwise it fails closed.
+
+Production acceptance requires the machine gate from the mini-program project:
+
+`WEEKLY_SOUND_GATE_BASE_URL=https://<public-service-domain> npm run gate:sound-release`
+
+The gate proves both halves without writing: a direct public POST with forged
+`X-WX-*` headers is rejected, while a DevTools mini-program invocation of the
+signed gateway probe succeeds with `writeExecuted=false`. A separate authorized
+functional canary must also prove first write, stable-key replay, quota claim,
+object readback and private queue visibility. A green container health check is
+not release proof.
+
 ## Browser Preview
 
 Open `http://127.0.0.1:8787/preview` for a lightweight browser preview of the same weekly activity data used by the mini-program.

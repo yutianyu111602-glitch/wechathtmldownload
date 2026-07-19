@@ -3,6 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { effectiveFeedItems } = require("./effective-feed-items.cjs");
 const { readPageDataWithFallback } = require("./devtools-page-data.cjs");
+const { startStaticPackageServer } = require("./devtools-static-package.cjs");
 
 let automator;
 try {
@@ -22,15 +23,17 @@ const projectPath = process.env.MINIPROGRAM_PROJECT_PATH || path.resolve(__dirna
 const cliPath = process.env.MINIPROGRAM_DEVTOOLS_CLI || "C:/Program Files (x86)/Tencent/微信web开发者工具/cli.bat";
 const launchPort = Number(process.env.MINIPROGRAM_AUTOMATOR_PORT || "9430");
 const idePort = Number(process.env.MINIPROGRAM_DEVTOOLS_IDE_PORT || "9430");
-const cliArgs = Number.isFinite(idePort) && idePort > 0 ? ["--port", String(idePort)] : [];
 const automationHint = [
   "Default mode uses miniprogram-automator launch so the tool can parse the dynamic DevTools socket.",
   `Launch directly with: MINIPROGRAM_AUTOMATOR_LAUNCH=1 MINIPROGRAM_AUTOMATOR_PORT=${launchPort} MINIPROGRAM_DEVTOOLS_IDE_PORT=${idePort} node tests/devtools-loading-fallback.cjs`,
   "Only set MINIPROGRAM_AUTOMATOR_WS when a compatible bridge has produced a verified dynamic websocket endpoint.",
 ].join("\n");
-const artifactRoot = path.resolve(__dirname, "../test-artifacts");
+const artifactRoot = process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT
+  ? path.resolve(process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT)
+  : path.resolve(__dirname, "../test-artifacts");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const artifactDir = path.join(artifactRoot, `devtools-loading-fallback-${stamp}`);
+const staticPackageDir = String(process.env.MINIPROGRAM_STATIC_PACKAGE_DIR || "").trim();
 const MAX_PAGE_FALLBACK_MS = Number(process.env.MINIPROGRAM_MAX_PAGE_FALLBACK_MS || "4500");
 // App.evaluate/currentPage protocol round-trips are DevTools-host latency, not
 // first-screen product latency. Keep a generous harness bound and gate the UI
@@ -47,21 +50,20 @@ function withTimeout(promise, timeoutMs, label) {
 }
 
 async function openHome(miniProgram) {
-  await withTimeout(
-    miniProgram.evaluate(() => new Promise((resolve) => {
-      wx.switchTab({
-        url: "/pages/index/index",
-        complete: () => {
-          const pages = getCurrentPages();
-          const page = pages[pages.length - 1];
-          resolve({ route: page && page.route });
-        },
-      });
-    })),
-    25000,
-    "switchTab home"
-  );
-  const page = await withTimeout(miniProgram.currentPage(), 12000, "currentPage home");
+  let page = await withTimeout(miniProgram.currentPage(), 12000, "currentPage before home");
+  if (page.path === "pages/index/index") return page;
+  try {
+    await withTimeout(miniProgram.reLaunch("/pages/index/index"), 20000, "reLaunch home");
+  } catch {
+    await withTimeout(
+      miniProgram.evaluate(() => new Promise((resolve) => {
+        wx.reLaunch({ url: "/pages/index/index", complete: resolve });
+      })),
+      20000,
+      "wx.reLaunch home"
+    );
+  }
+  page = await withTimeout(miniProgram.currentPage(), 12000, "currentPage home");
   assert.equal(page.path, "pages/index/index");
   return page;
 }
@@ -79,12 +81,16 @@ async function waitForIdle(miniProgram, page, label, timeoutMs) {
 }
 
 async function run() {
+  const staticServer = staticPackageDir ? await startStaticPackageServer(staticPackageDir) : null;
+  const staticBaseUrl = staticServer ? staticServer.baseUrl : "";
   const report = {
     wsEndpoint,
     launchMode,
     launchPort,
     idePort,
     artifactDir,
+    staticPackageDir,
+    staticBaseUrl,
     steps: [],
     exceptions: [],
     consoleCount: 0,
@@ -94,7 +100,6 @@ async function run() {
       projectPath,
       cliPath,
       port: launchPort,
-      args: cliArgs,
       idePort,
       trustProject: true,
       timeout: 90000,
@@ -108,13 +113,54 @@ async function run() {
 
   try {
     const page = await openHome(miniProgram);
+    if (staticBaseUrl) {
+      await withTimeout(miniProgram.evaluate((injectedStaticBaseUrl) => {
+        wx.clearStorageSync();
+        const app = getApp();
+        const cloud = app.globalData.cloud;
+        const staticOnlyClient = {
+          callContainer() {
+            return Promise.reject({ error: { code: "DEVTOOLS_STATIC_PACKAGE_ONLY" } });
+          },
+          callFunction() {
+            return Promise.reject({ error: { code: "DEVTOOLS_STATIC_PACKAGE_ONLY" } });
+          },
+        };
+        cloud.useMock = false;
+        cloud.devtoolsMockFallback = false;
+        cloud.useCloudDatabaseFirst = false;
+        cloud.publicBaseUrl = "";
+        cloud.staticBaseUrl = injectedStaticBaseUrl;
+        cloud.offlineSnapshotFallback = false;
+        cloud.fastOfflineSnapshotFallback = false;
+        cloud.publicFallbackDelayMs = 0;
+        cloud.cloudClient = staticOnlyClient;
+        cloud.cloudInitPromise = null;
+        cloud.cloudReady = true;
+        const pages = getCurrentPages();
+        const current = pages[pages.length - 1];
+        current.isLoadingRequest = false;
+        current.pendingLoadOptions = null;
+        // The static-only client already guarantees the exact candidate input.
+        // Do not set skipCache here: that flag intentionally forbids writing
+        // the last-good generation that the outage phase is meant to prove.
+        return current.loadData();
+      }, staticBaseUrl), 30000, "warm candidate package cache");
+    }
     await waitForIdle(miniProgram, page, "warm home", 16000);
     await page.waitFor(1200);
 
     await withTimeout(miniProgram.evaluate(() => {
       function apiCacheKeys() {
         const keys = wx.getStorageInfoSync().keys || [];
-        return keys.filter((key) => String(key).indexOf("weeklyActivityApiCache:") === 0);
+        return keys.filter((key) => {
+          const text = String(key || "");
+          return text.indexOf("weeklyActivityApiCache:") === 0
+            || text.indexOf("weeklyActivityCurrentActive:v2:") === 0
+            || text.indexOf("weeklyActivityCurrentPage:v2:") === 0
+            || text === "weeklyActivityCurrentActiveIndex:v2"
+            || text === "weeklyActivityCurrentGeneration:v1";
+        });
       }
       const preservedApiCache = apiCacheKeys().map((key) => [key, wx.getStorageSync(key)]);
       wx.clearStorageSync();
@@ -151,7 +197,10 @@ async function run() {
       cloud.publicFallbackDelayMs = 5;
       cloud.publicRequestTimeoutMs = 5;
       cloud.cacheFallbackDelayMs = 5;
-      cloud.cacheMaxAgeMs = 0;
+      // This scenario proves persisted last-good recovery. A zero max age is
+      // the explicit product switch that disables cache fallback, so keep the
+      // freshly warmed generation eligible for this outage probe.
+      cloud.cacheMaxAgeMs = 60 * 60 * 1000;
       cloud.requestTimeoutMs = 50;
       cloud.offlineSnapshotFallback = true;
       cloud.fastOfflineSnapshotFallback = false;
@@ -180,7 +229,14 @@ async function run() {
         requestCount: app.globalData.__loadingFallbackProbe.requestCount,
         abortCount: app.globalData.__loadingFallbackProbe.abortCount,
         preservedCacheKeys: app.globalData.__loadingFallbackProbe.preservedCacheKeys,
-        apiCacheKeys: keys.filter((key) => String(key).indexOf("weeklyActivityApiCache:") === 0),
+        apiCacheKeys: keys.filter((key) => {
+          const text = String(key || "");
+          return text.indexOf("weeklyActivityApiCache:") === 0
+            || text.indexOf("weeklyActivityCurrentActive:v2:") === 0
+            || text.indexOf("weeklyActivityCurrentPage:v2:") === 0
+            || text === "weeklyActivityCurrentActiveIndex:v2"
+            || text === "weeklyActivityCurrentGeneration:v1";
+        }),
       });
     }));
 
@@ -240,10 +296,13 @@ async function run() {
     } catch (error) {
       miniProgram.disconnect();
     }
+    if (staticServer) await staticServer.close();
   }
 }
 
-run().catch((error) => {
+run().then(() => {
+  process.exit(0);
+}).catch((error) => {
   const failure = {
     wsEndpoint,
     launchMode,

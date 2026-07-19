@@ -121,6 +121,8 @@ def test_monitor_and_prefect_default_to_runtime_ssot() -> None:
         assert "HUAIDJ_CLOUDRUN_DATA_ROOT" in source
         assert "F:\\DevData\\HuaidjRuntime\\state\\weekly_activity_cloudrun\\data" in source
     assert "--current-release-dir" in prefect
+    assert 'f"{cloudrun_base}/readyz"' in monitor
+    assert 'endpoint_result("readyz"' in monitor
 
 
 def test_scheduled_runtime_reports_and_locks_stay_outside_checkout() -> None:
@@ -485,3 +487,43 @@ def test_bake_rejects_candidate_smaller_than_authoritative_base(tmp_path: Path) 
     ok, failures = bake.validate_production_bake_input(candidate)
     assert ok is False
     assert failures == ["release_item_count_below_authoritative_base"]
+
+
+def test_bake_rejects_candidate_with_mixed_generation_derived_routes(tmp_path: Path) -> None:
+    bake = load_bake_module()
+    data_root = tmp_path / "state" / "data"
+    current = data_root / "current_release"
+    candidate = tmp_path / "candidate"
+    bake.configure_runtime_paths(
+        data_root=str(data_root),
+        current_release_dir=str(current),
+        work_root=str(tmp_path / "state" / "work"),
+        production_write=True,
+    )
+    current.mkdir(parents=True)
+    candidate.mkdir(parents=True)
+    item = {
+        "id": "event-a",
+        "title": "new title",
+        "city_key": "shanghai",
+        "city_keys": ["shanghai"],
+        "city": ["上海"],
+        "event_date_start": "2026-07-24",
+        "event_date_end": "2026-07-24",
+        "detail_path": "by-id/event-a.json",
+    }
+    for directory in (current, candidate):
+        (directory / "current.json").write_text(json.dumps({"items": [item]}), encoding="utf-8")
+        (directory / "manifest.json").write_text(json.dumps({"item_count": 1}), encoding="utf-8")
+    (candidate / "by-id").mkdir()
+    (candidate / "by-id" / "event-a.json").write_text(
+        json.dumps({"item": {**item, "title": "old title"}}),
+        encoding="utf-8",
+    )
+    (candidate / "by-city").mkdir()
+    (candidate / "by-date").mkdir()
+
+    ok, failures = bake.validate_production_bake_input(candidate)
+
+    assert ok is False
+    assert "release_derived_route_closure_failed" in failures

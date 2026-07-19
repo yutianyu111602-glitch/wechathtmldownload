@@ -134,11 +134,11 @@ flowchart TD
 - primary provider 必须成功，fallback 占比不得超过 20%，`failures>0` 即不通过。
 - summary 必须记录调用数、tokens、人民币成本和 provider 分布。
 
-最新日志证据：
+2026-07-10～11 历史日志证据（当前成功水位见第 13 节）：
 
 - 2026-07-10：355/355 成功，Qwen 调用 355，失败 0，无 fallback，约 958 万 tokens，¥21.311698。
 - 2026-07-11：250/250 成功，162 条从 evidence 恢复，88 次新 API 调用，失败 0，¥4.726026。
-- 最后一次完整 Qwen 后端成功发布是 `openclaw_weekly_daily_20260702_141534`。
+- 截至 2026-07-11，当时最后一次完整 Qwen 后端成功发布是 `openclaw_weekly_daily_20260702_141534`；该历史结论已被 2026-07-18 的 `openclaw_weekly_daily_20260718_195817` 成功发布取代。
 - `openclaw_weekly_daily_20260711_230659` 的 Qwen 阶段成功；最终被 1 条 `non_target_activity_hiphop` 质量门拦下，并非 Qwen 失败。
 
 ## 6. DeepSeek 富化
@@ -238,11 +238,11 @@ flowchart TD
 - `latest_cumulative_candidate.json` 指向本次 candidate DB
 - candidate SQLite `PRAGMA quick_check=ok`，canonical/raw 映射和 dangling checks 全过
 
-2026-07-17 新 delta 导出已看到 271 篇、5,230 个资产；由于运行时 RapidOCR 依赖缺失，第一次视觉路由未完成，checkpoint 仍保持 138,692，没有误推进。依赖已补，但在用户要求重新确认管线后主动停止，必须在新理解和修复完成后从干净状态重跑。
+历史失败证据：2026-07-17 新 delta 导出曾看到 271 篇、5,230 个资产；由于运行时 RapidOCR 依赖缺失，第一次视觉路由未完成，checkpoint 保持 138,692，没有误推进。该恢复中间态已由第 12、13 节记录的后续干净重跑与成功 promotion 取代，不得再把它当成当前待执行状态。
 
 ## 10. Hermes Desktop、Gateway 与定时计划
 
-2026-07-15 的统一暂停已在 2026-07-18 全量验收后解除。当前有九个 canonical jobs active，两个旧 Friday jobs paused；不得从历史暂停记录推断当前状态，也不得手工再造第二套 Windows/Codex 执行器。
+2026-07-15 的统一暂停已在 2026-07-18 全量验收后解除。当前有九个 HUAIDJ canonical jobs active、两个旧 Friday HUAIDJ jobs paused，另有两个与本管线无关的天气任务 disabled；不得从历史暂停记录推断当前状态，也不得手工再造第二套 Windows/Codex 执行器。
 
 Windows 运行边界：
 
@@ -339,8 +339,8 @@ AtlasV2：
 Hermes：
 
 1. `Hermes_Gateway` task Running，`gateway status --deep --full` 6/6，Telegram connected，cron heartbeat 新鲜。
-2. 九个 canonical jobs active、两个旧 Friday jobs paused；workdir 统一指向不可变 release，contract audit 208/208。Fast Watch、health、package monitor 直接 canary 均 exit 0，20:30 Fast Watch 又由 cron 自动执行成功。
-3. 旧启动时约 110 秒的 PID/lock/state 假阴性来自慢初始化前未认领生命周期，不是持续 HOME 漂移。现役已稳定；最新 GitHub main 候选必须先保留本地 supervisor 并修复 early `starting`/失败清理，再经隔离 canary，不能直接覆盖重装。
+2. 九个 canonical jobs active、两个旧 Friday jobs paused；workdir 统一指向不可变 release，contract audit 208/208。Fast Watch、health、package monitor 直接 canary 均 exit 0。20:30 Fast Watch 曾由与最终代码相同的 `818ba0c` runtime 自动执行成功；`0cf5794` 安装器和契约审计完成后，Package/API Monitor 又于 20:45:47 由 Gateway 自动触发并写回 `last_status=ok`，这是最终 `0cf5794` runtime 的明确自动计划证明。Atlas job 仍显示 7 月 17 日的历史失败状态；本轮只证明同一 launcher 的手工全链 canary 成功，下一次自动成功需在 23:40 运行后另行读回。
+3. 旧启动时约 110 秒的 PID/lock/state 假阴性来自慢初始化前未认领生命周期，不是持续 HOME 漂移。现役已稳定。GitHub main `7fd419e5` 已在独立目录与本地 supervisor 合并为候选 `6fa21c6a`；early identity claim、统一失败清理、外层 lifecycle 唯一 claim 所有权和 Windows/VBS 状态门禁经独立复审无 blocker，Python gate 为 163/163。但 Electron 依赖下载受 TLS 握手中断，JS/typecheck/pack 和独立 Desktop UAT 尚未完成。候选没有 push、stage 或切换，现役仍是 `c48d53413-official-recovery`；不得把“Python 候选通过”写成“最新版 Desktop 已安装”。
 
 外部恢复证据与日常 runbook：
 
@@ -355,3 +355,45 @@ Hermes：
 - 不把活动包 CloudBase Storage 写入、CloudRun 部署、小程序代码上传、审核、公开发布、Atlas candidate promotion 混成一个状态。
 - 任何 checkpoint/pointer 只在完整门禁通过后推进；失败 run 必须保持旧水位可重放。
 - 生产代码、只读 fixture/历史证据和运行期状态必须分离：不要批量改写历史报告引用，但任何 active/default output 都不得落回 Git checkout。
+
+## 15. 2026-07-19 小程序可见性与灾后恢复覆盖层
+
+本节是当前恢复工作的状态覆盖层；第 12、13 节保留为此前已验收水位和回滚证据，不能据此推断 2026-07-19 候选已经发布。
+
+当前权威：
+
+- 灾后发现源 `F:\code\githubstar\wechathtmldownload` 保持脏树保护，不是部署源。
+- 集成候选为 `F:\DevData\HuaidjRuntime\build\weekly-visibility-20260719`，分支 `codex/weekly-visibility-20260719`，起点 `0b97884db33c`；当前未提交，不是不可变 release。
+- 上一个接受的调度回滚仍是 `F:\DevData\HuaidjRuntime\releases\0cf5794-pipeline-20260718`。本轮尚未执行 Hermes 切换。
+- 总入口为 `HUAIDJ_DISASTER_RECOVERY_MASTER_PROMPT_20260719.md`，依赖计划为 `HUAIDJ_FULL_RECOVERY_EXECUTION_PLAN_20260719.md`，Git 边界见 `WORKTREE_CONSOLIDATION_PLAN_20260719.md`。
+
+2026-07-19 公网只读复现已经确认：旧线上 package 为 626 条，current 为 64 条，上海 current 13 条、上海 2026-07-24 精确日 3 条，但 cities 对精确日和 2026-07-24～26 范围都返回上海 131 条；旧 current 忽略 `dateStart/dateEnd`。根因不是一个组件，而是旧前端把周末折叠为周五、旧 current 无范围查询、旧 cities 使用 package-wide 索引，加上旧分页/缓存可能只保留首屏。完整证据见 `HUAIDJ_MINIPROGRAM_LOADING_ROOT_CAUSE_20260719.md`。
+
+当前候选合同：
+
+1. Asia/Shanghai 07:00 业务日统一用于客户端、CloudBase、CloudRun 和静态包；`本周末` 保存周五至周日闭区间，切换城市不清空日期模式。
+2. current 必须先完成全分页，并验证唯一 ID、游标单调/无环、total、页数上限和 generation；验证完成前不得替换 last-good 缓存。
+3. 列表、total、海报池、城市与日期 facet 全部从同一 visible set 投影。远端 facet 只有 scope、generation、item count 和各 bucket 与本地投影全等时才可采信。
+4. CloudBase 热同步先写完整新代、读回校验，最后才切 active config；失败代不可污染现役。
+5. 包生成统一走公共投影、generation stamp 和受控城市路由；任何本机绝对路径、`file://`、私有 source map/source action、密钥或支付证据都阻断发布。
+6. 活动包更新仍然 online-first；常态数据增量不改写 `offlineSnapshot.js`，也不要求上传新小程序代码。
+7. Atlas 静态图、index、neighborhood 和在线 artist/path/neighborhood 以同一 snapshot-derived `datasetId` 握手；当前三件套只是外部 candidate，不代表 serving pointer 更新。
+8. Hermes 每日 wrapper 使用 OS 进程 lease；过期文本元数据不能覆盖仍活跃的 owner。最终 installer 必须以新不可变 release、现有 Python 和外部 report root 一次性渲染 7 个 canonical launchers / 9 个 active jobs，再用二次 dry-run、contract audit 和真实 child command 验证。
+
+状态矩阵（2026-07-19 本节写入时）：
+
+| 状态 | 结论 |
+| --- | --- |
+| `local_candidate` | 已建立，仍有未提交并发修复；最终全套复测待完成 |
+| `immutable_release` | 未建立 |
+| `cloudrun_deployed` | 本轮未部署 |
+| `cloudbase_synced` | 本轮未热同步 |
+| `miniprogram_uploaded` | 本轮未上传；DevTools 已登录不等于上传 |
+| `wechat_review_submitted` | 未提交 |
+| `wechat_public_released` | 未发布 |
+| `atlas_source_namespace_updated` | 本轮 744h/Atlas 导入尚未执行；现有 triplet 仅为外部单源 candidate |
+| `atlas_serving_promoted` | 未推进 |
+| `hermes_scheduler_aligned` | 尚未切到 2026-07-19 新 release |
+| 744 小时 Sanji/Qwen-VL/DeepSeek | 尚未执行；此前 96 小时水位不能代替本轮 744 小时全量 |
+
+最终顺序必须保持：完成并发代码审查与全量测试 -> secret/public-path scan -> 真实 DevTools 八场景 -> commit/push -> 新不可变 release -> Hermes 幂等切换与无付费 canary -> 744 小时 Sanji + missing HTML `unresolved=0` -> 同 snapshot 的 Qwen-VL/DeepSeek candidate -> 显式 CloudRun/CloudBase 发布和读回 -> 独立小程序上传/审核/公开验证 -> AtlasV2 派生 candidate 与独立 serving 门。任何中间成功都不能提前改写后续状态。

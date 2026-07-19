@@ -370,6 +370,27 @@ def collect_status(
     if not health_ok:
         errors.append(f"/healthz {status_code}: {detail}")
 
+    status_code, payload, error, ms = http_get_json(f"{cloudrun_base}/readyz", timeout_sec)
+    ready_package_count = int_or_zero(payload.get("packageItemCount")) if isinstance(payload, dict) else 0
+    ready_detail_count = int_or_zero(payload.get("derivedDetailCount")) if isinstance(payload, dict) else 0
+    ready_generation = str(payload.get("generationId") or "") if isinstance(payload, dict) else ""
+    ready_ok = (
+        status_code == 200
+        and isinstance(payload, dict)
+        and payload.get("ok") is True
+        and bool(ready_generation)
+        and ready_package_count > 0
+        and ready_detail_count == ready_package_count
+    )
+    detail = (
+        f"generation={ready_generation[:24]}, package={ready_package_count}, detail={ready_detail_count}"
+        if isinstance(payload, dict)
+        else error or f"HTTP {status_code}"
+    )
+    endpoints.append(endpoint_result("readyz", ready_ok, status_code, ms, str(detail)))
+    if not ready_ok:
+        errors.append(f"/readyz {status_code}: {detail}")
+
     remote_items = 0
     manifest_generated_at = ""
     window_start = ""

@@ -10,7 +10,8 @@ import argparse, json, sqlite3, math
 from pathlib import Path
 import numpy as np
 
-from audit_atlas_semantic_gate import is_placeholder_subject
+from atlas_dataset_identity import resolve_dataset_id
+from atlas_subject_filters import is_placeholder_subject
 
 TYPE_COLOR = {"dj": "#7fd4ff", "venue": "#ffcf6b", "org": "#b794f6", "series": "#2dd4bf"}
 REL_PRIORITY = {"b2b": 6, "resident_at": 5, "held_at": 4, "signed_to": 3, "presented_by": 3, "collab": 2}
@@ -165,7 +166,8 @@ def write_bundle_outputs(out_path, bundle, out_js_path=None):
     return out, js_out
 
 
-def build(v2_path, out_path, max_nodes=240, max_edges=640, out_js_path=None):
+def build(v2_path, out_path, max_nodes=240, max_edges=640, out_js_path=None, dataset_id=None):
+    resolved_dataset_id = resolve_dataset_id(Path(v2_path), dataset_id)
     db = sqlite3.connect(f"file:{v2_path}?mode=ro", uri=True)
     db.row_factory = sqlite3.Row
     meta = {r["subject_id"]: r for r in db.execute(
@@ -240,6 +242,7 @@ def build(v2_path, out_path, max_nodes=240, max_edges=640, out_js_path=None):
 
     bundle = {
         "schemaVersion": "atlas.mp.starmap.v2",
+        "datasetId": resolved_dataset_id,
         "lens": "entity",
         "generation": "g1_g7_city_geo",
         "nodes": nodes,
@@ -283,9 +286,13 @@ def _selftest():
     s.commit(); s.close()
     outp = p + ".json"
     js_out = p + ".js"
-    build(p, outp, max_nodes=10, max_edges=20, out_js_path=js_out)
+    test_dataset_id = "atlas-selftest-shared-generation-0001"
+    build(p, outp, max_nodes=10, max_edges=20, out_js_path=js_out, dataset_id=test_dataset_id)
     b = json.loads(Path(outp).read_text(encoding="utf-8"))
     assert b["schemaVersion"] == "atlas.mp.starmap.v2"
+    assert b["datasetId"] == test_dataset_id
+    assert resolve_dataset_id(Path(p)).startswith("atlas-sha256-")
+    assert str(Path(p).parent) not in json.dumps(b, ensure_ascii=False)
     assert b["counts"] == {"nodes": 6, "edges": 5}, b["counts"]
     assert not {"dj:b2b", "dj:compound", "venue:tba"} & {n["u"] for n in b["nodes"]}
     assert all("x" in n and "y" in n for n in b["nodes"])
@@ -308,11 +315,12 @@ def main():
     ap.add_argument("--out-js")
     ap.add_argument("--max-nodes", type=int, default=240)
     ap.add_argument("--max-edges", type=int, default=640)
+    ap.add_argument("--dataset-id", help="Shared public ATLAS generation id; defaults to the v2 DB SHA256")
     ap.add_argument("--selftest", action="store_true")
     a = ap.parse_args()
     if a.selftest:
         _selftest(); return
-    build(a.v2, a.out, a.max_nodes, a.max_edges, a.out_js)
+    build(a.v2, a.out, a.max_nodes, a.max_edges, a.out_js, a.dataset_id)
 
 
 if __name__ == "__main__":

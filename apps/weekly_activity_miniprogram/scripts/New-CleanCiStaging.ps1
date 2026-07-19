@@ -6,6 +6,11 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$ReleaseBindingModule = Join-Path $PSScriptRoot "MiniProgramReleaseBinding.psm1"
+if (-not (Test-Path -LiteralPath $ReleaseBindingModule -PathType Leaf)) {
+  throw "Mini-program release binding module is missing: $ReleaseBindingModule"
+}
+Import-Module $ReleaseBindingModule -Force
 
 if ([string]::IsNullOrWhiteSpace($SourceDir)) {
   $SourceDir = Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")
@@ -35,18 +40,7 @@ if (Test-Path -LiteralPath $StagingDir) {
 }
 New-Item -ItemType Directory -Path $StagingDir -Force | Out-Null
 
-$RuntimeEntries = @(
-  "app.js",
-  "app.json",
-  "app.wxss",
-  "project.config.json",
-  "sitemap.json",
-  "assets",
-  "data",
-  "pages",
-  "services",
-  "utils"
-)
+$RuntimeEntries = @(Get-HuaidjMiniProgramRuntimeEntries)
 
 foreach ($entry in $RuntimeEntries) {
   $from = Join-Path $SourceDir $entry
@@ -70,6 +64,8 @@ if (-not [string]::IsNullOrWhiteSpace($CloudfunctionRoot)) {
 
 $fileCount = (Get-ChildItem -LiteralPath $StagingDir -Recurse -File | Measure-Object).Count
 $byteCount = (Get-ChildItem -LiteralPath $StagingDir -Recurse -File | Measure-Object -Property Length -Sum).Sum
+$runtimeMatch = Assert-HuaidjRuntimeStagingMatchesSource -SourceRoot $SourceDir -StagingRoot $StagingDir
+$stagingBinding = Get-HuaidjTreeBinding -Root $StagingDir
 
 [pscustomobject]@{
   sourceDir = [string]$SourceDir
@@ -78,4 +74,8 @@ $byteCount = (Get-ChildItem -LiteralPath $StagingDir -Recurse -File | Measure-Ob
   byteCount = [int64]$byteCount
   runtimeEntries = $RuntimeEntries
   cloudfunctionRoot = $CloudfunctionRoot
+  sourceRuntimeFingerprint = [string]$runtimeMatch.sourceRuntime.fingerprint
+  stagingRuntimeFingerprint = [string]$runtimeMatch.stagingRuntime.fingerprint
+  stagingFingerprint = [string]$stagingBinding.fingerprint
+  fingerprintAlgorithm = [string]$stagingBinding.algorithm
 } | ConvertTo-Json -Compress

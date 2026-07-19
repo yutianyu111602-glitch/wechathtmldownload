@@ -1,5 +1,7 @@
 const { filterItemsByElectronic } = require("./genreFilter");
 const { buildNightDecisionTags } = require("./nightDecisionTags");
+const { itemMatchesDateKey } = require("./datePreview");
+const { cityKeysForItem } = require("../services/homeFilters");
 
 function safeText(value) {
   return String(value || "").replace(/\s+/g, " ").trim();
@@ -16,16 +18,10 @@ function numberValue(value) {
   return Number.isFinite(n) ? n : 0;
 }
 
-function cityKeyOf(item) {
-  return safeText(item && (item.city_key || item.cityKey || item.cityKeyLabel)).toLowerCase();
-}
-
 function cityMatches(item, cityKey) {
   var key = safeText(cityKey).toLowerCase();
   if (!key) return false;
-  if (cityKeyOf(item) === key) return true;
-  var keys = Array.isArray(item && item.city_keys) ? item.city_keys : [];
-  return keys.map(function (value) { return safeText(value).toLowerCase(); }).indexOf(key) !== -1;
+  return cityKeysForItem(item).indexOf(key) !== -1;
 }
 
 function isoDate(value) {
@@ -241,6 +237,10 @@ function buildCityGuide(options) {
   var cityRows = normalizeCityRows(options.cities || [], lang);
   var selectedCity = cityRows.filter(function (city) { return city.key === selectedCityKey; })[0] || null;
   var allItems = filterItemsByElectronic(Array.isArray(options.items) ? options.items : []);
+  var businessDateKey = isoDate(options.businessDateKey);
+  if (businessDateKey) {
+    allItems = allItems.filter(function (item) { return itemMatchesDateKey(item, businessDateKey); });
+  }
   var cityItems = selectedCityKey
     ? allItems.filter(function (item) { return cityMatches(item, selectedCityKey); })
     : [];

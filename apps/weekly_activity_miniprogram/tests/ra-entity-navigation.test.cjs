@@ -26,7 +26,15 @@ function pageHarness(filename, requestApi, options = {}) {
       pageConfig = config;
     },
     require(request) {
-      if (request.endsWith("/api")) return { requestApi };
+      if (request.endsWith("/api")) {
+        return {
+          requestApi,
+          fetchAllCurrentItems: options.fetchAllCurrentItems || (async (query = {}) => {
+            const response = await requestApi("/api/v1/weekly/current", { ...query, limit: 100, cursor: 0 });
+            return Array.isArray(response && response.items) ? response.items : [];
+          }),
+        };
+      }
       if (request.endsWith("/clubOverviews")) {
         return {
           getClubOverviewsForVenue: () => [],
@@ -142,6 +150,39 @@ test("venue profile still resolves by club name when the carried organizer key i
   assert.equal(resolved[0].id, "evt-1");
 });
 
+test("venue profile keeps its rendered first page when background hydration fails", async () => {
+  const filename = path.join(root, "pages", "venue", "venue.js");
+  const pageConfig = pageHarness(filename, async (apiPath) => {
+    if (apiPath.includes("/atlas/venue")) return { found: false };
+    return {
+      items: [
+        {
+          id: "evt-first",
+          venueLabel: "OIL",
+          cardLocationLabel: "OIL",
+          displayTitle: "First page techno",
+          dateLabel: "2099-07-24",
+          lineupLabel: "DJ A",
+          sourceArticles: [],
+        },
+      ],
+      page: { nextCursor: null, total: 1 },
+    };
+  }, {
+    fetchAllCurrentItems: async () => { throw new Error("background pagination failed"); },
+  });
+  const page = bindPage(pageConfig);
+  page.name = "OIL";
+  page.key = "";
+  page.lang = "zh";
+
+  await pageConfig.loadVenue.call(page);
+
+  assert.equal(page.data.loading, false);
+  assert.equal(page.data.error, "");
+  assert.equal([...page.data.events, ...page.data.pastEvents].some((event) => event.id === "evt-first"), true);
+});
+
 test("artist profile loads recent performance history instead of current-only events", async () => {
   const filename = path.join(root, "pages", "artist", "artist.js");
   const calls = [];
@@ -168,6 +209,7 @@ test("artist profile loads recent performance history instead of current-only ev
   page.lang = "zh";
 
   await pageConfig.loadArtist.call(page);
+  await page.artistHistoryPromise;
 
   const currentCalls = calls.filter((call) => call.path === "/api/v1/weekly/current");
   assert.equal(currentCalls.length, 1);

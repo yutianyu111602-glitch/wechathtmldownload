@@ -1,4 +1,4 @@
-const { requestApi } = require("../../utils/api");
+const { requestApi, fetchAllCurrentItems } = require("../../utils/api");
 const { getClubOverviewsForVenue } = require("../../utils/clubOverviews");
 const { atlasEventToWeeklyItem, compactItem } = require("../../utils/format");
 const { partitionEventsByDate, mergeResidentDjs } = require("../../utils/atlasContract");
@@ -93,23 +93,6 @@ function copyLinkFallback(url, title) {
   });
 }
 
-async function fetchAllCurrentItems(options = {}) {
-  const allItems = [];
-  let cursor = 0;
-  for (let pageIndex = 0; pageIndex < 20; pageIndex += 1) {
-    const params = { limit: 500, cursor };
-    if (options.lookbackDays) params.lookbackDays = options.lookbackDays;
-    const current = await requestApi("/api/v1/weekly/current", params);
-    allItems.push(...(current.items || []));
-    const nextCursor = current.page?.nextCursor;
-    if (nextCursor === null || nextCursor === undefined || nextCursor === "") break;
-    const parsedNext = Number(nextCursor);
-    if (!Number.isFinite(parsedNext) || parsedNext <= cursor) break;
-    cursor = parsedNext;
-  }
-  return allItems;
-}
-
 Page({
   data: {
     lang: "zh",
@@ -164,6 +147,7 @@ Page({
   },
 
   async loadVenue() {
+    let firstPageRendered = false;
     try {
       // Phase 1: Load first page immediately for fast render
       const firstPage = await requestApi("/api/v1/weekly/current", { limit: 200, cursor: 0 });
@@ -192,12 +176,22 @@ Page({
         atlasLoading: true,
         atlasLabel: this.data.t.atlasLoading || "加载历史演出...",
       });
+      firstPageRendered = true;
 
       // Phase 2: Background load full dataset + Atlas
-      const [sourceScopeItems, atlasResult] = await Promise.all([
-        fetchAllCurrentItems({ lookbackDays: 31 }),
+      const [sourceScopeResult, atlasResult] = await Promise.all([
+        fetchAllCurrentItems({ lookbackDays: 31 }).then(
+          (items) => ({ items, error: null }),
+          (error) => ({ items: firstPageItems, error }),
+        ),
         this.fetchAtlasVenue(),
       ]);
+      if (sourceScopeResult.error) {
+        // Background expansion is optional after the first page is visible.
+        // Keep the rendered data and still apply any Atlas enrichment.
+        console.warn("[venue] background current hydration unavailable", sourceScopeResult.error);
+      }
+      const sourceScopeItems = sourceScopeResult.items;
       const compactEvents = dedupeEvents(sourceScopeItems.map(compactItem).filter((item) => venueMatches(item, this.name, this.key)));
       const compactSourceEvents = compactEvents;
       const events = localizeItems(compactEvents, this.lang);
@@ -247,11 +241,16 @@ Page({
         atlasResidentDJs: mergeResidentDjs(atlasResult?.residentDJs || []),
         venueSummary: buildVenueSummary(atlasResult?.profile, this.lang),
         loading: false,
+        atlasLoading: false,
+        atlasLabel: "",
+        error: "",
       });
       safeHideLoading();
     } catch (error) {
       console.error("[venue] loadVenue failed", error);
-      this.setData({ loading: false, error: this.data.t.loadFailed });
+      this.setData(firstPageRendered
+        ? { loading: false, atlasLoading: false, atlasLabel: "" }
+        : { loading: false, error: this.data.t.loadFailed });
       safeHideLoading();
     }
   },

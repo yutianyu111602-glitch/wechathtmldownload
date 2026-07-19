@@ -3,6 +3,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { effectiveFeedItems } = require("./effective-feed-items.cjs");
 const { readPageDataWithFallback } = require("./devtools-page-data.cjs");
+const { activateStaticPackage, startStaticPackageServer } = require("./devtools-static-package.cjs");
 
 let automator;
 try {
@@ -25,15 +26,17 @@ const projectPath = process.env.MINIPROGRAM_PROJECT_PATH || path.resolve(__dirna
 const cliPath = process.env.MINIPROGRAM_DEVTOOLS_CLI || "C:/Program Files (x86)/Tencent/微信web开发者工具/cli.bat";
 const launchPort = Number(process.env.MINIPROGRAM_AUTOMATOR_PORT || "9430");
 const idePort = Number(process.env.MINIPROGRAM_DEVTOOLS_IDE_PORT || "9430");
-const cliArgs = Number.isFinite(idePort) && idePort > 0 ? ["--port", String(idePort)] : [];
 const automationHint = [
   "Default mode uses miniprogram-automator launch so the tool can parse the dynamic DevTools socket.",
   `Launch directly with: MINIPROGRAM_AUTOMATOR_LAUNCH=1 MINIPROGRAM_AUTOMATOR_PORT=${launchPort} node tests/devtools-haptics.cjs`,
   "Only set MINIPROGRAM_AUTOMATOR_WS when a compatible bridge has produced a verified dynamic websocket endpoint.",
 ].join("\n");
-const artifactRoot = path.resolve(__dirname, "../test-artifacts");
+const artifactRoot = process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT
+  ? path.resolve(process.env.MINIPROGRAM_AUTOMATOR_ARTIFACT_ROOT)
+  : path.resolve(__dirname, "../test-artifacts");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const artifactDir = path.join(artifactRoot, `devtools-haptics-${stamp}`);
+const staticPackageDir = String(process.env.MINIPROGRAM_STATIC_PACKAGE_DIR || "").trim();
 const reportFile = path.join(artifactDir, "report.json");
 fs.mkdirSync(artifactDir, { recursive: true });
 
@@ -56,7 +59,7 @@ async function connectMiniProgram() {
         projectPath,
         cliPath,
         port: launchPort,
-        args: cliArgs,
+        idePort,
         trustProject: true,
         timeout: 90000,
       }), 110000, "automator launch");
@@ -168,11 +171,14 @@ async function countAfter(label, miniProgram, action) {
 }
 
 async function run() {
+  const staticServer = staticPackageDir ? await startStaticPackageServer(staticPackageDir) : null;
   const report = {
     artifactDir,
     projectPath,
     wsEndpoint,
     launch: launchMode,
+    staticPackageDir,
+    staticBaseUrl: staticServer ? staticServer.baseUrl : "",
     checks: {},
     selectedProfile: {
       feed: "145-280ms interval, 64-140px cumulative travel",
@@ -191,6 +197,9 @@ async function run() {
   try {
     await installHapticProbe(miniProgram);
     const home = await openHome(miniProgram);
+    if (staticServer) {
+      await withTimeout(activateStaticPackage(miniProgram, staticServer.baseUrl), 30000, "activate static package");
+    }
     const data = await waitForIdle(miniProgram, home, "home");
     report.itemCount = effectiveFeedItems(data).length;
     report.posterCount = data.popularItems.length;
@@ -264,14 +273,14 @@ async function run() {
 
     report.checks.bottomTabSwitchApi = await countAfter("bottomTabSwitchApi", miniProgram, async () => {
       await resetPageHaptics(miniProgram);
-      await withTimeout(miniProgram.switchTab("/pages/saved/saved"), 30000, "switchTab saved");
+      await withTimeout(miniProgram.switchTab("/pages/about/about"), 30000, "switchTab about");
       await sleep(800);
     });
 
     report.checks.bottomTabHook = await countAfter("bottomTabHook", miniProgram, async () => {
-      const saved = await miniProgram.currentPage();
-      assert.equal(saved.path, "pages/saved/saved", `expected saved page, got ${saved.path}`);
-      await saved.callMethod("onTabItemTap");
+      const about = await miniProgram.currentPage();
+      assert.equal(about.path, "pages/about/about", `expected about page, got ${about.path}`);
+      await about.callMethod("onTabItemTap");
     });
 
     report.checks.actualPageScroll.automationNote = "automator pageScrollTo may not emit Page.onPageScroll";
@@ -313,11 +322,12 @@ async function run() {
       if (noCloseDevTools) {
         miniProgram.disconnect();
       } else {
-        await miniProgram.close();
+        await withTimeout(miniProgram.close(), 15000, "miniProgram.close");
       }
     } catch {
       miniProgram.disconnect();
     }
+    if (staticServer) await staticServer.close();
   }
 }
 

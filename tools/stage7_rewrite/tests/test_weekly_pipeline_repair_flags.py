@@ -638,6 +638,33 @@ def test_sanji_twice_daily_publish_defaults_to_online_qwen_vl_route():
     assert '"-PosterExtractionMode", $PosterExtractionMode' in daily
 
 
+def test_weekly_pipeline_runs_strict_aggregate_child_qwen_gate_after_expansion_before_api_build():
+    weekly = (ROOT / "weekly_activity_next_week_pipeline.ps1").read_text(encoding="utf-8")
+
+    aggregate_label = "Step 3.6: Aggregate Article Expansion Gate"
+    child_qwen_label = "Step 3.62: Aggregate Child Qwen Exact Poster Gate"
+    publish_window_label = "Step 3.65: Publish-window Candidate Filter"
+    api_label = "Step 4: Build Mini-Program API JSON"
+    assert aggregate_label in weekly
+    assert child_qwen_label in weekly
+    assert "WEEKLY_ACTIVITY_RECOMMENDATION_PACK_AGGREGATE_CHILD_VL_$WEEK_TAG" in weekly
+    assert '"--only-aggregate-children"' in weekly
+    assert '"--require-selected-poster"' in weekly
+    assert '"--max-images", "$PosterVlMaxImages"' in weekly
+    assert '"--limit", "$PosterVlLimit"' in weekly
+    assert '"--provider", "$PosterVlProvider"' in weekly
+    assert '"--model", "$PosterVlModel"' in weekly
+    assert weekly.index(aggregate_label) < weekly.index(child_qwen_label)
+    assert weekly.index(child_qwen_label) < weekly.index(publish_window_label)
+    assert weekly.index(child_qwen_label) < weekly.index(api_label)
+
+
+def test_weekly_pipeline_keeps_utf8_bom_for_windows_powershell_51():
+    script_path = ROOT / "weekly_activity_next_week_pipeline.ps1"
+
+    assert script_path.read_bytes().startswith(b"\xef\xbb\xbf")
+
+
 def test_openclaw_publish_repairs_final_merged_source_policy_before_external_writes():
     runner = (ROOT / "run_openclaw_weekly_daily_publish.ps1").read_text(encoding="utf-8")
 
@@ -690,12 +717,17 @@ def test_sanji_twice_daily_publish_requires_local_snapshot_refresh_contract():
     assert "Sanji export did not prove Sanji Desktop renderer refresh before snapshot" in daily
 
 
-def test_sanji_twice_daily_publish_reclaims_stale_pid_lock():
+def test_sanji_twice_daily_publish_uses_os_lease_without_age_based_lock_stealing():
     daily = (ROOT / "run_huaidj_sanji_daily_twice.ps1").read_text(encoding="utf-8")
 
-    assert "function Get-LockPid" in daily
-    assert "Get-Process -Id $lockPid" in daily
-    assert "$lockExpired -or ($lockPid -gt 0 -and -not $pidAlive)" in daily
+    assert "huaidj_sanji_daily_publish_lease.v2" in daily
+    assert "$stream.Lock(0, 1)" in daily
+    assert "$stream.Unlock(0, 1)" in daily
+    assert 'authority = "os_byte_range_lock"' in daily
+    assert "owner_process_start_utc" in daily
+    assert "Never delete by path after unlock" in daily
+    assert "$lockExpired -or" not in daily
+    assert "Remove-Item -LiteralPath $LockPath" not in daily
 
 
 def test_sanji_desktop_export_wrapper_enforces_process_timeout_for_cdp_calls():
@@ -1274,8 +1306,10 @@ def test_openclaw_publish_wrapper_reports_actual_deploy_and_upload_execution_fla
     script = (ROOT / "run_openclaw_weekly_daily_publish.ps1").read_text(encoding="utf-8")
 
     assert "$script:CloudRunDeployExecuted = $false" in script
+    assert "$script:CloudRunDeployMutationUnknown = $false" in script
     assert "$script:MiniProgramUploadExecuted = $false" in script
     assert "cloudrun_deploy_executed = [bool]$script:CloudRunDeployExecuted" in script
+    assert "cloudrun_deploy_mutation_unknown = [bool]$script:CloudRunDeployMutationUnknown" in script
     assert "miniprogram_upload_executed = [bool]$script:MiniProgramUploadExecuted" in script
     assert "cloudrun_deploy_executed = [bool]$DeployBackend" not in script
     assert "miniprogram_upload_executed = [bool]$UploadFrontend" not in script
@@ -1283,11 +1317,24 @@ def test_openclaw_publish_wrapper_reports_actual_deploy_and_upload_execution_fla
         script.index('Invoke-RunStep "Deploy CloudRun by direct CloudBase API"') :
         script.index('Invoke-RunStep "Smoke remote CloudRun and reconcile pagination"')
     ]
-    assert "$script:CloudRunDeployExecuted = $true" in deploy_step
+    assert "Update-CloudRunDeployMutationState" in deploy_step
+    assert "$script:CloudRunDeployExecuted = $true" not in deploy_step
+    state_helper = script[
+        script.index("function Update-CloudRunDeployMutationState") :
+        script.index("function Write-RemoteRollbackPacket")
+    ]
+    assert 'PSObject.Properties.Name -contains "cloud_deploy_executed"' in state_helper
+    assert 'PSObject.Properties.Name -contains "update_attempted"' in state_helper
+    assert "$script:CloudRunDeployMutationUnknown = $true" in state_helper
+    assert "$script:CloudRunDeployExecuted = [bool]$deployEvidence.safety.cloud_deploy_executed -or" in state_helper
     upload_step = script[script.index('Invoke-RunStep "Upload miniprogram developer version"') :]
     assert "pwsh -NoProfile -ExecutionPolicy Bypass" in upload_step
     assert "upload_devtools_cli_windows.ps1" in upload_step
     assert "upload_native_windows.ps1" not in upload_step
+    assert "UploadFrontend requires -DevToolsSuiteSummaryPath" in script
+    assert "-SuiteSummaryPath $DevToolsSuiteSummaryPath" in upload_step
+    assert "-StaticPackageDir $CurrentReleasePackageDir" in upload_step
+    assert "$CurrentReleasePackageDir = [System.IO.Path]::GetFullPath($IncrementalBaseApiDir)" in script
     assert "-ConfirmUpload" in upload_step
     assert 'Assert-NativeSuccess "Miniprogram developer upload"' in upload_step
     assert "$script:MiniProgramUploadExecuted = $true" in upload_step

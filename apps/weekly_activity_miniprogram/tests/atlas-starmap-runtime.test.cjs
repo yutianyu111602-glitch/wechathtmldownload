@@ -6,7 +6,7 @@ const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
 
-function loadSavedPage(requestApi) {
+function loadSavedPage(requestApi, fetchAllCurrentItems) {
   const calls = {
     navigations: [],
     toasts: [],
@@ -39,7 +39,15 @@ function loadSavedPage(requestApi) {
       },
     },
     require(request) {
-      if (request === "../../utils/api") return { requestApi };
+      if (request === "../../utils/api") {
+        return {
+          requestApi,
+          fetchAllCurrentItems: fetchAllCurrentItems || (async (query) => {
+            const response = await requestApi("/api/v1/weekly/current", query || {});
+            return response.items || [];
+          }),
+        };
+      }
       if (request === "../../utils/format") return { compactItem: (item) => item };
       if (request === "../../utils/i18n") {
         return {
@@ -126,6 +134,20 @@ function djProfile(displayName) {
   };
 }
 
+function familyProfile(displayName) {
+  return {
+    found: true,
+    canonical: {
+      id: `dj:${displayName.toLowerCase().replace(/\s+/g, "-")}`,
+      name: displayName,
+      primaryType: "dj",
+      city: "上海",
+    },
+    stats: { events: 1, relationships: 0, venues: 0 },
+    sections: { relatedDjs: { items: [] }, clubs: { items: [] }, events: { items: [] } },
+  };
+}
+
 test("ATLAS starmap skips non-profile seeds and opens the first reachable profile", async () => {
   const requests = [];
   async function requestApi(apiPath) {
@@ -180,4 +202,63 @@ test("ATLAS starmap treats missing profiles as empty records, not connection fai
   assert.equal(ok, false);
   assert.equal(page.data.error, page.data.t.empty);
   assert.notEqual(page.data.error, page.data.t.error);
+});
+
+test("ATLAS seed discovery scans the complete paginated current feed", async () => {
+  const fetchQueries = [];
+  async function requestApi(apiPath) {
+    if (apiPath === "/api/v1/weekly/current") throw new Error("single-page current must not be used");
+    throw new Error(`unexpected api path: ${apiPath}`);
+  }
+  const fetchAllCurrentItems = async (query) => {
+    fetchQueries.push(query);
+    return [{ id: "event:tail", lineup_artists: ["Tail Page DJ"] }];
+  };
+
+  const { pageConfig } = loadSavedPage(requestApi, fetchAllCurrentItems);
+  const page = bindPage(pageConfig);
+  page.data.center = { label: "Existing Center" };
+  await page.loadSeeds();
+
+  assert.equal(fetchQueries.length, 1);
+  assert.equal(fetchQueries[0].scope, "current");
+  assert.equal(page.data.seedList.some((seed) => seed.name === "Tail Page DJ"), true);
+});
+
+test("ATLAS graph keeps the newest navigation when an older request resolves last", async () => {
+  const pending = new Map();
+  const requestApi = (_apiPath, query) => new Promise((resolve) => pending.set(query.q, resolve));
+  const { pageConfig } = loadSavedPage(requestApi);
+  const page = bindPage(pageConfig);
+
+  const first = page.loadGraph("First DJ");
+  const second = page.loadGraph("Second DJ");
+  pending.get("Second DJ")(familyProfile("Second DJ"));
+  await second;
+  pending.get("First DJ")(familyProfile("First DJ"));
+  await first;
+
+  assert.equal(page.data.center.label, "Second DJ");
+});
+
+test("ATLAS seed cold start coalesces onLoad and onShow discovery", async () => {
+  let fetchCount = 0;
+  let releaseSeeds;
+  const seedGate = new Promise((resolve) => { releaseSeeds = resolve; });
+  const fetchAllCurrentItems = async () => {
+    fetchCount += 1;
+    await seedGate;
+    return [{ id: "event:one", lineup_artists: ["Seed DJ"] }];
+  };
+  const { pageConfig } = loadSavedPage(async () => ({ found: false }), fetchAllCurrentItems);
+  const page = bindPage(pageConfig);
+  page.data.center = { label: "Existing Center" };
+
+  const first = page.loadSeeds();
+  const second = page.loadSeeds();
+  releaseSeeds();
+  await Promise.all([first, second]);
+
+  assert.equal(fetchCount, 1);
+  assert.equal(page.data.seedList[0].name, "Seed DJ");
 });

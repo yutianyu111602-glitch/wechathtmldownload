@@ -5,6 +5,8 @@ import path from "node:path";
 import test from "node:test";
 import { gzipSync } from "node:zlib";
 
+const TEST_DATASET_ID = "atlas-sha256-dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd";
+
 async function listen(serverInstance) {
   await new Promise((resolve) => serverInstance.listen(0, "127.0.0.1", resolve));
   const address = serverInstance.address();
@@ -22,6 +24,7 @@ test("atlas neighborhood: subjectId lookup returns center, neighbors, and edges"
   try {
     const index = {
       v: 4,
+      datasetId: TEST_DATASET_ID,
       subjects: [
         { i: "dj:alpha", t: "dj", n: "Alpha", nn: "alpha", a: ["A"], c: "上海", ec: 10 },
         { i: "dj:beta", t: "dj", n: "Beta", nn: "beta", a: [], c: "北京", ec: 4 },
@@ -31,6 +34,7 @@ test("atlas neighborhood: subjectId lookup returns center, neighbors, and edges"
     };
     const neighborhood = {
       schemaVersion: "atlas.miniapp.neighborhood_bundle.v1",
+      datasetId: TEST_DATASET_ID,
       generation: { nodeCount: 3, relationCount: 2, subjectCount: 1, edgeCount: 2, perSubjectLimit: 60 },
       byNode: {
         "dj:alpha": [
@@ -88,6 +92,7 @@ test("similar DJs: artist DTO surfaces DJ-typed neighbors only, ranked, self/ven
   try {
     const index = {
       v: 4,
+      datasetId: TEST_DATASET_ID,
       subjects: [
         { i: "dj:alpha", t: "dj", n: "Alpha", nn: "alpha", a: ["A"], c: "上海", ec: 10 },
         { i: "dj:beta", t: "dj", n: "Beta", nn: "beta", a: [], c: "北京", ec: 4 },
@@ -98,6 +103,7 @@ test("similar DJs: artist DTO surfaces DJ-typed neighbors only, ranked, self/ven
     };
     const neighborhood = {
       schemaVersion: "atlas.miniapp.neighborhood_bundle.v1",
+      datasetId: TEST_DATASET_ID,
       generation: { nodeCount: 4, relationCount: 4, subjectCount: 1, edgeCount: 4, perSubjectLimit: 60 },
       byNode: {
         // rank-sorted: venue (drop, not dj), dj:beta, self (drop), dj:gamma
@@ -156,6 +162,7 @@ test("atlas neighborhood HTTP route exposes the same DTO contract", async () => 
   try {
     await writeFile(indexPath, gzipSync(Buffer.from(JSON.stringify({
       v: 4,
+      datasetId: TEST_DATASET_ID,
       subjects: [
         { i: "dj:alpha", t: "dj", n: "Alpha", nn: "alpha", a: ["A"], c: "上海", ec: 10 },
         { i: "venue:room", t: "venue", n: "Room", nn: "room", a: [], c: "上海", ec: 8 },
@@ -164,6 +171,7 @@ test("atlas neighborhood HTTP route exposes the same DTO contract", async () => 
     }), "utf8")));
     await writeFile(neighborhoodPath, gzipSync(Buffer.from(JSON.stringify({
       schemaVersion: "atlas.miniapp.neighborhood_bundle.v1",
+      datasetId: TEST_DATASET_ID,
       generation: { nodeCount: 2, relationCount: 1, subjectCount: 1, edgeCount: 1, perSubjectLimit: 60 },
       byNode: {
         "dj:alpha": [{ u: "venue:room", rt: "resident_at", w: 20, rs: 5 }],

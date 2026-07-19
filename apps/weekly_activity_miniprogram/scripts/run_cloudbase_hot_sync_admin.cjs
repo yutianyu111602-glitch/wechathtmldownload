@@ -137,6 +137,10 @@ function generatedAtOf(value) {
   return value && (value.generatedAt || value.generated_at) || null;
 }
 
+function generationIdOf(value) {
+  return value && (value.generationId || value.generation_id) || null;
+}
+
 function validateGenerationReadback(sync, readback) {
   if (!sync || sync.ok !== true || !sync.syncId || !generatedAtOf(sync)) {
     throw new Error("weeklyDataSync sync did not commit an active generation");
@@ -145,13 +149,18 @@ function validateGenerationReadback(sync, readback) {
     throw new Error("weeklyDataSync active generation committed but old-generation cleanup is incomplete");
   }
   const names = ["config", "current", "cities", "dates"];
+  const expectedGenerationId = generationIdOf(sync);
   for (const name of names) {
     const value = readback && readback[name];
     if (!value || value.error) throw new Error(`weeklyDataSync ${name} readback failed`);
     if (value.syncId !== sync.syncId) {
       throw new Error(`weeklyDataSync ${name} syncId mismatch: ${value.syncId || "<missing>"} != ${sync.syncId}`);
     }
-    if (generatedAtOf(value) !== sync.generatedAt) {
+    if (expectedGenerationId || generationIdOf(value)) {
+      if (!expectedGenerationId || generationIdOf(value) !== expectedGenerationId) {
+        throw new Error(`weeklyDataSync ${name} generationId mismatch`);
+      }
+    } else if (generatedAtOf(value) !== sync.generatedAt) {
       throw new Error(`weeklyDataSync ${name} generatedAt mismatch`);
     }
   }
@@ -173,6 +182,7 @@ function validateGenerationReadback(sync, readback) {
     ok: true,
     syncId: sync.syncId,
     generatedAt: sync.generatedAt,
+    generationId: expectedGenerationId,
     currentTotal,
     cityCount: Array.isArray(readback.cities.cities) ? readback.cities.cities.length : 0,
     dateCount: Array.isArray(readback.dates.dates) ? readback.dates.dates.length : 0,

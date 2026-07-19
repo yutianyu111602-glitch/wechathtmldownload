@@ -58,6 +58,7 @@ param(
     [string]$ReportRoot = "",
     [string]$Version = "",
     [string]$Desc = "",
+    [string]$DevToolsSuiteSummaryPath = "",
     [switch]$EnablePosterCloudBaseMigration,
     [string]$PosterCloudBaseEnvId = "huaidjweekly-d8g1go7-d0a07863e3e",
     [string]$PosterCloudPrefix = "cloud://huaidjweekly-d8g1go7-d0a07863e3e.6875-huaidjweekly-d8g1go7-d0a07863e3e-1371956557/",
@@ -72,6 +73,8 @@ param(
     [int]$SanjiGapMinCandidateEventLike = 25,
     [double]$SanjiGapMaxQueueStalenessHours = 36.0,
     [string]$PublicApiBase = "https://weekly-api-255880-4-1371956557.sh.run.tcloudbase.com",
+    [string]$CloudRunEnvId = "huaidjweekly-d8g1go7-d0a07863e3e",
+    [string]$CloudRunServiceName = "weekly-api",
     [string]$ProxyUrl = "",
     [string]$ReleaseGuardPath = ""
 )
@@ -234,6 +237,7 @@ if ([string]::IsNullOrWhiteSpace($SkillGuard)) {
 $MergeIncrementalScript = Join-Path $Scripts "merge_weekly_incremental_api_package.py"
 $SourcePolicyRepairScript = Join-Path $Scripts "repair_weekly_api_package_for_source_policy.py"
 $PosterMigrationScript = Join-Path $Scripts "migrate_weekly_public_posters_to_cloudbase.py"
+$GenerationStampScript = Join-Path $Scripts "stamp_weekly_api_generation.py"
 $PosterMigrationGateScript = Join-Path $Scripts "validate_weekly_poster_cloudbase_migration_gate.py"
 $MissingPosterRecoveryScript = Join-Path $Scripts "build_weekly_missing_internal_poster_recovery_work_orders.py"
 $PosterRecoverySplitControllerPacketScript = Join-Path $Scripts "build_weekly_poster_recovery_split_controller_packet.py"
@@ -298,14 +302,17 @@ $MiniProgramTestScope = if ($SkipMiniProgramTests) {
 }
 $script:PosterCloudBaseMigrationExecuted = $false
 $script:CloudRunDeployExecuted = $false
+$script:CloudRunDeployMutationUnknown = $false
 $script:MiniProgramUploadExecuted = $false
 $script:AtlasMiniappBioPromotionExecuted = $false
+$script:AtlasMiniappBioPromotionEvidence = $null
 
 if ($PromoteDjBioAtoms -and -not $DeployBackend) {
-    throw "-PromoteDjBioAtoms writes the Atlas miniapp DB/index and is only valid with -DeployBackend so the same deploy context contains those writes."
+    throw "-PromoteDjBioAtoms is transaction-bound and requires -DeployBackend so staged evidence, remote proof, and local atomic promotion share one publish transaction."
 }
 
-$RunId = "openclaw_weekly_daily_${WeekTag}_" + (Get-Date -Format "HHmmss")
+$RunNonce = [Guid]::NewGuid().ToString("N").Substring(0, 12)
+$RunId = "openclaw_weekly_daily_${WeekTag}_$(Get-Date -Format 'HHmmss')_p${PID}_$RunNonce"
 $RunReportDir = Join-Path $Reports $RunId
 $DeployReportDir = Join-Path $Reports "cloudrun_direct_deploy_$RunId"
 $CloudRunPublishTransactionDir = Join-Path $CloudRunPublishTransactionsRoot $RunId
@@ -316,7 +323,16 @@ $CloudRunSmokeReportDir = Join-Path $RunReportDir "cloudrun_weekly_production_sm
 $CloudRunSmokeReportPath = Join-Path $CloudRunSmokeReportDir "cloudrun_weekly_production_smoke.json"
 $CloudRunPaginationReportPath = Join-Path $RunReportDir "cloudrun_remote_pagination.json"
 $CloudRunClubOverviewsReportPath = Join-Path $RunReportDir "cloudrun_club_overviews_reconciliation.json"
+$CloudRunAutomaticRollbackReportPath = Join-Path $RunReportDir "cloudrun_automatic_rollback.json"
 $CloudRunRemoteRollbackPacketPath = Join-Path $RunReportDir "cloudrun_remote_rollback_packet.json"
+$CloudRunLeaseEnvScope = ([regex]::Replace($CloudRunEnvId.Trim(), '[^A-Za-z0-9._-]+', '_')).Trim('._-').ToLowerInvariant()
+$CloudRunLeaseServiceScope = ([regex]::Replace($CloudRunServiceName.Trim(), '[^A-Za-z0-9._-]+', '_')).Trim('._-').ToLowerInvariant()
+if ([string]::IsNullOrWhiteSpace($CloudRunLeaseEnvScope) -or [string]::IsNullOrWhiteSpace($CloudRunLeaseServiceScope)) {
+    throw "CloudRun env/service names cannot produce an empty publish lease scope."
+}
+$CloudRunPublishLeasePath = Join-Path $CloudRunDataRoot ".locks\cloudrun_publish_${CloudRunLeaseEnvScope}_${CloudRunLeaseServiceScope}.lease"
+$CloudRunPublishLeaseMetadataPath = "$CloudRunPublishLeasePath.json"
+$CloudRunPublishLeaseToken = [Guid]::NewGuid().ToString("N")
 $exporterSessionDiagnosticGeneratedReportPath = Join-Path $RunReportDir "exporter_session_no_secret.json"
 $exporterQrStatusGeneratedReportPath = Join-Path $RunReportDir "weekly_exporter_qr_status.json"
 $exporterQrImageGeneratedPath = Join-Path $RunReportDir "weekly_exporter_login_qr.png"
@@ -943,10 +959,61 @@ function Get-StableItemIdDigest {
     }
 }
 
+function Test-CloudRunDeployMayHaveChangedRemote {
+    $deployMayHaveChangedRemote = [bool]$script:CloudRunDeployExecuted -or [bool]$script:CloudRunDeployMutationUnknown
+    if (-not (Test-Path -LiteralPath $CloudRunDeployReportPath -PathType Leaf)) {
+        return $deployMayHaveChangedRemote
+    }
+    try {
+        $deployEvidence = Get-Content -Raw -LiteralPath $CloudRunDeployReportPath | ConvertFrom-Json
+        if ($null -ne $deployEvidence.safety) {
+            $deployMayHaveChangedRemote = $deployMayHaveChangedRemote -or [bool]$deployEvidence.safety.cloud_deploy_executed
+        }
+        if ($null -ne $deployEvidence.remote_mutation -and
+            ($deployEvidence.remote_mutation.PSObject.Properties.Name -contains "update_attempted")) {
+            # Mutation intent is journaled before UpdateCloudRunServer.  A lost
+            # response therefore remains rollback-required.
+            $deployMayHaveChangedRemote = $deployMayHaveChangedRemote -or [bool]$deployEvidence.remote_mutation.update_attempted
+        }
+    } catch {
+        # The in-process flag remains the conservative fallback when the child
+        # report is unreadable.
+    }
+    return $deployMayHaveChangedRemote
+}
+
+function Update-CloudRunDeployMutationState {
+    # direct_cloudbase_deploy.py journals update_attempted before calling the
+    # provider.  Preserve the distinction between an explicit pre-mutation
+    # failure and an unreadable/missing report after the child was invoked.
+    $script:CloudRunDeployExecuted = $false
+    $script:CloudRunDeployMutationUnknown = $false
+    if (-not (Test-Path -LiteralPath $CloudRunDeployReportPath -PathType Leaf)) {
+        $script:CloudRunDeployMutationUnknown = $true
+        return
+    }
+    try {
+        $deployEvidence = Get-Content -Raw -LiteralPath $CloudRunDeployReportPath | ConvertFrom-Json
+        $hasExecutedEvidence = $null -ne $deployEvidence.safety -and
+            ($deployEvidence.safety.PSObject.Properties.Name -contains "cloud_deploy_executed")
+        $hasAttemptedEvidence = $null -ne $deployEvidence.remote_mutation -and
+            ($deployEvidence.remote_mutation.PSObject.Properties.Name -contains "update_attempted")
+        if (-not $hasExecutedEvidence -or -not $hasAttemptedEvidence) {
+            $script:CloudRunDeployMutationUnknown = $true
+            return
+        }
+        $script:CloudRunDeployExecuted = [bool]$deployEvidence.safety.cloud_deploy_executed -or
+            [bool]$deployEvidence.remote_mutation.update_attempted
+    } catch {
+        $script:CloudRunDeployMutationUnknown = $true
+    }
+}
+
 function Write-RemoteRollbackPacket {
     param([string]$FailureReason)
     $deployEvidence = $null
     $transactionEvidence = $null
+    $automaticRollbackEvidence = $null
     if (Test-Path -LiteralPath $CloudRunDeployReportPath -PathType Leaf) {
         try {
             $deployEvidence = Get-Content -Raw -LiteralPath $CloudRunDeployReportPath | ConvertFrom-Json
@@ -961,17 +1028,37 @@ function Write-RemoteRollbackPacket {
             $transactionEvidence = $null
         }
     }
-    $deployMayHaveChangedRemote = [bool]$script:CloudRunDeployExecuted
-    if ($null -ne $deployEvidence -and $null -ne $deployEvidence.safety) {
-        $deployMayHaveChangedRemote = $deployMayHaveChangedRemote -or [bool]$deployEvidence.safety.cloud_deploy_executed
+    if (Test-Path -LiteralPath $CloudRunAutomaticRollbackReportPath -PathType Leaf) {
+        try {
+            $automaticRollbackEvidence = Get-Content -Raw -LiteralPath $CloudRunAutomaticRollbackReportPath | ConvertFrom-Json
+        } catch {
+            $automaticRollbackEvidence = $null
+        }
     }
+    $deployMayHaveChangedRemote = Test-CloudRunDeployMayHaveChangedRemote
+    $remoteMutation = $null
+    if ($null -ne $deployEvidence -and ($deployEvidence.PSObject.Properties.Name -contains "remote_mutation")) {
+        $remoteMutation = $deployEvidence.remote_mutation
+    }
+    $automaticRollbackExecuted = ($null -ne $automaticRollbackEvidence -and [bool]$automaticRollbackEvidence.automatic_rollback_executed)
+    $automaticRollbackVerified = ($null -ne $automaticRollbackEvidence -and
+        [bool]$automaticRollbackEvidence.ok -and
+        [bool]$automaticRollbackEvidence.automatic_rollback_verified)
+    $remoteRollbackRequired = $deployMayHaveChangedRemote -and -not $automaticRollbackVerified
     $packet = [ordered]@{
         schema_version = "cloudrun_remote_rollback_packet.v1"
         generated_at = [DateTimeOffset]::Now.ToString("o")
-        decision = if ($deployMayHaveChangedRemote) { "remote_rollback_required" } else { "remote_deploy_not_proven" }
-        remote_rollback_required = $deployMayHaveChangedRemote
-        automatic_rollback_executed = $false
-        automatic_rollback_verified = $false
+        decision = if ($automaticRollbackVerified) {
+            "remote_rollback_verified"
+        } elseif ($deployMayHaveChangedRemote) {
+            "remote_rollback_failed"
+        } else {
+            "remote_deploy_not_proven"
+        }
+        remote_rollback_required = $remoteRollbackRequired
+        automatic_rollback_executed = $automaticRollbackExecuted
+        automatic_rollback_verified = $automaticRollbackVerified
+        automatic_rollback_report = $CloudRunAutomaticRollbackReportPath
         local_authoritative_promotion_completed = $false
         local_transaction_status = if ($null -ne $transactionEvidence) { $transactionEvidence.status } else { "unknown" }
         local_baseline_restored = if ($null -ne $transactionEvidence) { $transactionEvidence.baseline_restored } else { $null }
@@ -984,19 +1071,36 @@ function Write-RemoteRollbackPacket {
         failure_reason = $FailureReason
         previous_server_identity = if ($null -ne $deployEvidence) { $deployEvidence.previous_server_identity } else { $null }
         post_update_server_identity = if ($null -ne $deployEvidence) { $deployEvidence.post_update_server_identity } else { $null }
+        remote_mutation = $remoteMutation
         rollback_target = [ordered]@{
             env_id = if ($null -ne $deployEvidence) { $deployEvidence.env_id } else { $null }
             service_name = if ($null -ne $deployEvidence) { $deployEvidence.service_name } else { $null }
             previous_active_version = if ($null -ne $deployEvidence) { $deployEvidence.previous_server_identity.active_version } else { $null }
             previous_active_flow_ratio = if ($null -ne $deployEvidence) { $deployEvidence.previous_server_identity.active_flow_ratio } else { $null }
         }
-        automatic_rollback_blocker = "The direct deploy report captures previous version identity but not a verified reusable package artifact; version identity alone is insufficient for a safe unattended rollback."
-        operator_steps = @(
-            "Freeze further weekly-api deploy attempts for this transaction.",
-            "In CloudBase version history, restore rollback_target.previous_active_version for rollback_target.service_name to 100 percent traffic; verify the target against previous_server_identity before confirming.",
-            "Run smoke_cloudrun_weekly_production.py, the scope=package full item-ID reconciliation, and the exact club-overviews reconciliation against the restored endpoint.",
-            "Keep local current_release unchanged; only close this packet after the restored remote identity and smoke reports are attached."
-        )
+        automatic_rollback_blocker = if ($automaticRollbackVerified) {
+            $null
+        } elseif ($null -ne $automaticRollbackEvidence -and $null -ne $automaticRollbackEvidence.failure) {
+            [string]$automaticRollbackEvidence.failure.code
+        } elseif ($deployMayHaveChangedRemote) {
+            "automatic_rollback_evidence_missing"
+        } else {
+            $null
+        }
+        operator_steps = if ($automaticRollbackVerified) {
+            @(
+                "Keep the failed candidate transaction closed; the previous 100-percent version and authoritative local package were automatically reverified.",
+                "Inspect the original smoke, pagination, or club-overviews failure before preparing a new transaction."
+            )
+        } elseif ($deployMayHaveChangedRemote) {
+            @(
+                "Freeze further weekly-api deploy attempts and inspect automatic_rollback_report.",
+                "Do not release traffic manually unless the live active version is still exactly the recorded candidate or previous version.",
+                "Restore the recorded previous version to 100 percent, then reverify health, generation, the complete scope=package item-ID set, and club-overviews against authoritative current_release."
+            )
+        } else {
+            @("Inspect the deploy report; no remote mutation was proven for this transaction.")
+        }
     }
     $packetJson = $packet | ConvertTo-Json -Depth 12
     [System.IO.File]::WriteAllText($CloudRunRemoteRollbackPacketPath, $packetJson + [Environment]::NewLine, (New-Object System.Text.UTF8Encoding($false)))
@@ -1008,9 +1112,55 @@ function Assert-RemotePagination {
         [string]$BaseUrl,
         [int]$ExpectedCount,
         [string]$CandidateApiDir,
-        [string]$ReportPath
+        [string]$ReportPath,
+        [string]$DeployReportPath,
+        [string]$SmokeReportPath,
+        [ValidateRange(1, 10000)]
+        [int]$MaxPages = 1000
     )
     $base = $BaseUrl.TrimEnd('/')
+    try {
+        $deployEvidence = Get-Content -Raw -LiteralPath $DeployReportPath | ConvertFrom-Json
+        $smokeEvidence = Get-Content -Raw -LiteralPath $SmokeReportPath | ConvertFrom-Json
+    } catch {
+        throw "Remote pagination evidence binding is unreadable: $($_.Exception.Message)"
+    }
+    if ([string]$deployEvidence.schema_version -ne "cloudrun_direct_api_deploy.v2" -or -not [bool]$deployEvidence.ok) {
+        throw "Remote pagination requires a successful transaction-bound deploy v2 report."
+    }
+    if ([string]$smokeEvidence.schema_version -ne "stage7_cloudrun_weekly_production_smoke.v2" -or -not [bool]$smokeEvidence.ok) {
+        throw "Remote pagination requires a successful transaction-bound smoke v2 report."
+    }
+    $deployBinding = $deployEvidence.evidence_binding
+    $smokeBinding = $smokeEvidence.evidence_binding
+    if ($null -eq $deployBinding -or $null -eq $smokeBinding) {
+        throw "Remote pagination deploy/smoke evidence binding is missing."
+    }
+    $bindingCoreFields = @(
+        "transaction_id",
+        "env_id",
+        "service_name",
+        "deploy_context_fingerprint",
+        "deploy_zip_sha256",
+        "expected_generation_id",
+        "publish_lease_token_sha256"
+    )
+    foreach ($field in $bindingCoreFields) {
+        $deployValue = [string]$deployBinding.$field
+        $smokeValue = [string]$smokeBinding.$field
+        if ([string]::IsNullOrWhiteSpace($deployValue) -or $deployValue -cne $smokeValue) {
+            throw "Remote pagination deploy/smoke evidence binding mismatch: $field"
+        }
+    }
+    if ([string]::IsNullOrWhiteSpace([string]$smokeBinding.active_version)) {
+        throw "Remote pagination smoke evidence has no active_version binding."
+    }
+    if ([string]$smokeBinding.expected_generation_id -cne [string]$smokeBinding.remote_generation_id) {
+        throw "Remote pagination smoke generation binding does not match."
+    }
+    if ($base -cne ([string]$smokeBinding.base_url).TrimEnd('/')) {
+        throw "Remote pagination base URL is not bound to the smoke report."
+    }
     $manifest = Invoke-RestMethod -Uri "$base/api/v1/weekly/manifest" -Proxy $ProxyUrl -TimeoutSec 30
     $remoteManifestCount = [int]$manifest.item_count
     if ($ExpectedCount -gt 0 -and $remoteManifestCount -ne $ExpectedCount) {
@@ -1019,13 +1169,42 @@ function Assert-RemotePagination {
 
     $all = @()
     $cursor = "0"
+    $pageCount = 0
+    $seenCursors = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
     do {
-        $response = Invoke-RestMethod -Uri "$base/api/v1/weekly/current?scope=package&limit=100&cursor=$cursor" -Proxy $ProxyUrl -TimeoutSec 30
+        if ($pageCount -ge $MaxPages) {
+            throw "Remote pagination exceeded maximum page count: $MaxPages"
+        }
+        if (-not $seenCursors.Add([string]$cursor)) {
+            throw "Remote pagination cursor repeated: $cursor"
+        }
+        $pageCount += 1
+        $encodedCursor = [Uri]::EscapeDataString([string]$cursor)
+        $response = Invoke-RestMethod -Uri "$base/api/v1/weekly/current?scope=package&limit=100&cursor=$encodedCursor" -Proxy $ProxyUrl -TimeoutSec 30
         if (-not $response.filters -or [string]$response.filters.scope -ne "package") {
             throw "Remote full-package pagination did not echo filters.scope=package; refusing mixed current/package evidence."
         }
-        $all += $response.items
-        $cursor = if ($response.page) { $response.page.nextCursor } else { $null }
+        if ($null -eq $response.items) {
+            throw "Remote full-package pagination page has no items array: page=$pageCount cursor=$cursor"
+        }
+        $all += @($response.items)
+        $page = Get-JsonPropertyValue -Object $response -Name "page" -DefaultValue $null
+        if ($null -eq $page) {
+            throw "Remote full-package pagination page metadata is missing: page=$pageCount cursor=$cursor"
+        }
+        $nextCursorValue = Get-JsonPropertyValue -Object $page -Name "nextCursor" -DefaultValue $null
+        $nextCursor = if ($null -eq $nextCursorValue -or [string]::IsNullOrWhiteSpace([string]$nextCursorValue)) {
+            $null
+        } else {
+            [string]$nextCursorValue
+        }
+        if ($null -ne $nextCursor -and $nextCursor -ceq [string]$cursor) {
+            throw "Remote pagination cursor did not advance: $cursor"
+        }
+        if ($null -ne $nextCursor -and $seenCursors.Contains($nextCursor)) {
+            throw "Remote pagination cursor repeated: $nextCursor"
+        }
+        $cursor = $nextCursor
     } while ($cursor)
     if ($all.Count -le 0) {
         throw "Remote package feed is empty after deploy; refusing to continue."
@@ -1083,6 +1262,8 @@ function Assert-RemotePagination {
         extra_remote_item_id_count = 0
         missing_enrichment_count = 0
         extra_enrichment_count = $extra.Count
+        page_count = $pageCount
+        evidence_binding = $smokeBinding
     }
     $reportParent = Split-Path -Parent $ReportPath
     New-Item -ItemType Directory -Force -Path $reportParent | Out-Null
@@ -1185,6 +1366,7 @@ function Write-PublishSummary {
         write_actions_allowed_now = $WriteActionsAllowedNow
         deploy_backend = [bool]$DeployBackend
         promote_dj_bio_atoms = [bool]$PromoteDjBioAtoms
+        dj_bio_promotion_evidence = $script:AtlasMiniappBioPromotionEvidence
         upload_frontend = [bool]$UploadFrontend
         miniprogram_test_scope = $MiniProgramTestScope
         miniprogram_version = if ($UploadFrontend) { $Version } else { "" }
@@ -1196,6 +1378,7 @@ function Write-PublishSummary {
             db3_write_executed = $false
             atlas_miniapp_bio_write_executed = [bool]$script:AtlasMiniappBioPromotionExecuted
             cloudrun_deploy_executed = [bool]$script:CloudRunDeployExecuted
+            cloudrun_deploy_mutation_unknown = [bool]$script:CloudRunDeployMutationUnknown
             miniprogram_upload_executed = [bool]$script:MiniProgramUploadExecuted
             review_submitted = $false
             public_release_executed = $false
@@ -1990,6 +2173,99 @@ if (-not $SkipInternalPosterGate) {
     }
 }
 
+function Enter-CloudRunServicePublishLease {
+    param(
+        [string]$LeasePath,
+        [string]$MetadataPath,
+        [string]$LeaseToken,
+        [string]$TransactionId,
+        [string]$EnvId,
+        [string]$ServiceName
+    )
+    $leaseParent = Split-Path -Parent $LeasePath
+    New-Item -ItemType Directory -Force -Path $leaseParent | Out-Null
+    $stream = $null
+    $locked = $false
+    try {
+        $stream = [System.IO.FileStream]::new(
+            $LeasePath,
+            [System.IO.FileMode]::OpenOrCreate,
+            [System.IO.FileAccess]::ReadWrite,
+            [System.IO.FileShare]::ReadWrite
+        )
+        if ($stream.Length -eq 0) {
+            $stream.WriteByte(0)
+            $stream.Flush($true)
+        }
+        $stream.Position = 0
+        $stream.Lock(0, 1)
+        $locked = $true
+        $metadata = [ordered]@{
+            schema_version = "weekly_cloudrun_service_publish_lease.v1"
+            lease_token = $LeaseToken
+            transaction_id = $TransactionId
+            env_id = $EnvId
+            service_name = $ServiceName
+            owner_pid = $PID
+            acquired_at = [DateTimeOffset]::Now.ToString("o")
+        }
+        $metadataJson = $metadata | ConvertTo-Json -Depth 4
+        [System.IO.File]::WriteAllText(
+            $MetadataPath,
+            $metadataJson + [Environment]::NewLine,
+            (New-Object System.Text.UTF8Encoding($false))
+        )
+        return [pscustomobject]@{
+            Stream = $stream
+            LeasePath = $LeasePath
+            MetadataPath = $MetadataPath
+            LeaseToken = $LeaseToken
+            TransactionId = $TransactionId
+        }
+    } catch {
+        if ($locked -and $null -ne $stream) {
+            try { $stream.Unlock(0, 1) } catch { }
+        }
+        if ($null -ne $stream) {
+            $stream.Dispose()
+        }
+        throw "Another CloudRun publish owns the service-scoped lease or the lease could not be initialized: env=$EnvId service=$ServiceName path=$LeasePath ($($_.Exception.Message))"
+    }
+}
+
+function Exit-CloudRunServicePublishLease {
+    param([object]$Lease)
+    if ($null -eq $Lease) {
+        return
+    }
+    try {
+        if (Test-Path -LiteralPath $Lease.MetadataPath -PathType Leaf) {
+            try {
+                $metadata = Get-Content -Raw -LiteralPath $Lease.MetadataPath | ConvertFrom-Json
+                if ([string]$metadata.lease_token -ceq [string]$Lease.LeaseToken -and
+                    [string]$metadata.transaction_id -ceq [string]$Lease.TransactionId) {
+                    Remove-Item -LiteralPath $Lease.MetadataPath -Force
+                }
+            } catch {
+                Write-Warning "Could not remove owned CloudRun publish lease metadata: $($_.Exception.Message)"
+            }
+        }
+    } finally {
+        try { $Lease.Stream.Unlock(0, 1) } catch { }
+        $Lease.Stream.Dispose()
+    }
+}
+
+Invoke-RunStep "Stamp deterministic weekly API generation" {
+    if (-not (Test-Path -LiteralPath $GenerationStampScript)) {
+        throw "Weekly API generation stamp script not found: $GenerationStampScript"
+    }
+    python $GenerationStampScript `
+        --api-dir $ApiDir `
+        --report (Join-Path $RunReportDir "weekly_api_generation_stamp.json")
+    Assert-NativeSuccess "Weekly API deterministic generation stamp"
+}
+
 $qualityReportPath = Join-Path $RunReportDir "release_package_quality_gate.json"
 $posterMigrationReportPath = Join-Path $RunReportDir "poster_cloudbase_migration.json"
 $posterMigrationWriteGatePath = Join-Path $RunReportDir "poster_cloudbase_migration_write_gate.json"
@@ -2559,29 +2835,32 @@ if (-not $DryRun) {
     }
 }
 
-$BioPromotionScript = Join-Path $Scripts "promote_dj_bio_atoms.py"
-if ($PromoteDjBioAtoms) {
-    if (-not (Test-Path -LiteralPath $BioPromotionScript -PathType Leaf)) {
-        throw "DJ bio promotion script not found: $BioPromotionScript"
-    }
-    Invoke-RunStep "Promote DJ bio atoms before baking deploy context" {
-        python $BioPromotionScript --write
-        $script:AtlasMiniappBioPromotionExecuted = $true
-    }
-}
-
 if ($DeployBackend) {
     Invoke-RunStep "Bake CloudRun deploy context" {
-        python (Join-Path $CloudRun "scripts\bake_and_deploy.py") `
-            --release-dir $ApiDir `
-            --source-url-map (Join-Path $ApiDir "source_actions\source_url_map.json") `
-             --data-root $CloudRunDataRoot `
-             --current-release-dir $IncrementalBaseApiDir `
-             --work-root $CloudRunWorkRoot `
-             --transaction-id $RunId `
-             --prepare-only `
-            --no-qr `
-            --desc $Desc
+        $bakeArgs = @(
+            (Join-Path $CloudRun "scripts\bake_and_deploy.py")
+            "--release-dir"
+            $ApiDir
+            "--source-url-map"
+            (Join-Path $ApiDir "source_actions\source_url_map.json")
+            "--data-root"
+            $CloudRunDataRoot
+            "--current-release-dir"
+            $IncrementalBaseApiDir
+            "--work-root"
+            $CloudRunWorkRoot
+            "--transaction-id"
+            $RunId
+            "--prepare-only"
+            "--no-qr"
+            "--desc"
+            $Desc
+        )
+        if ($PromoteDjBioAtoms) {
+            $bakeArgs += "--promote-dj-bio-atoms"
+        }
+        python @bakeArgs
+        Assert-NativeSuccess "CloudRun publish transaction prepare"
     }
     Invoke-RunStep "Run CloudRun service tests" {
         Push-Location $CloudRun
@@ -2592,30 +2871,49 @@ if ($DeployBackend) {
             Pop-Location
         }
     }
+    $CloudRunServicePublishLease = Enter-CloudRunServicePublishLease `
+        -LeasePath $CloudRunPublishLeasePath `
+        -MetadataPath $CloudRunPublishLeaseMetadataPath `
+        -LeaseToken $CloudRunPublishLeaseToken `
+        -TransactionId $RunId `
+        -EnvId $CloudRunEnvId `
+        -ServiceName $CloudRunServiceName
     try {
         Invoke-RunStep "Deploy CloudRun by direct CloudBase API" {
             python (Join-Path $CloudRun "scripts\direct_cloudbase_deploy.py") `
                 --context-dir $CloudRunDeployContextDir `
                 --out-dir $DeployReportDir `
+                --data-root $CloudRunDataRoot `
+                --env-id $CloudRunEnvId `
+                --service-name $CloudRunServiceName `
+                --transaction-id $RunId `
+                --publish-lease-path $CloudRunPublishLeasePath `
+                --publish-lease-token $CloudRunPublishLeaseToken `
                 --max-wait-seconds 900 `
                 --allow-unverified-task-poll
-            $script:CloudRunDeployExecuted = $true
+            Update-CloudRunDeployMutationState
         }
         Invoke-RunStep "Smoke remote CloudRun and reconcile pagination" {
             python (Join-Path $Scripts "smoke_cloudrun_weekly_production.py") `
                 --base-url $PublicApiBase `
+                --env-id $CloudRunEnvId `
+                --service-name $CloudRunServiceName `
+                --deploy-report $CloudRunDeployReportPath `
                 --timeout-seconds 30 `
                 --out-dir $CloudRunSmokeReportDir
             Assert-NativeSuccess "CloudRun production smoke"
             Assert-RemotePagination -BaseUrl $PublicApiBase -ExpectedCount $itemCount `
                 -CandidateApiDir $ApiDir `
-                -ReportPath $CloudRunPaginationReportPath
+                -ReportPath $CloudRunPaginationReportPath `
+                -DeployReportPath $CloudRunDeployReportPath `
+                -SmokeReportPath $CloudRunSmokeReportPath
         }
         Invoke-RunStep "Reconcile remote CloudRun club overviews" {
             python (Join-Path $Scripts "verify_weekly_club_overviews_remote.py") `
                 --base-url $PublicApiBase `
                 --candidate-api-dir $ApiDir `
                 --proxy-url $ProxyUrl `
+                --smoke-report $CloudRunSmokeReportPath `
                 --report $CloudRunClubOverviewsReportPath
             Assert-NativeSuccess "CloudRun club-overviews reconciliation"
         }
@@ -2626,20 +2924,96 @@ if ($DeployBackend) {
                 --data-root $CloudRunDataRoot `
                 --current-release-dir $IncrementalBaseApiDir `
                 --work-root $CloudRunWorkRoot `
+                --env-id $CloudRunEnvId `
+                --service-name $CloudRunServiceName `
+                --publish-lease-path $CloudRunPublishLeasePath `
+                --publish-lease-token $CloudRunPublishLeaseToken `
+                --promotion-proxy-url $ProxyUrl `
+                --promotion-timeout-seconds 30 `
                 --deploy-report $CloudRunDeployReportPath `
                 --smoke-report $CloudRunSmokeReportPath `
                 --pagination-report $CloudRunPaginationReportPath `
                 --club-overviews-report $CloudRunClubOverviewsReportPath
             Assert-NativeSuccess "CloudRun publish transaction promotion"
+            if ($PromoteDjBioAtoms) {
+                $transactionReport = Get-Content -Raw -LiteralPath $CloudRunPublishTransactionReportPath | ConvertFrom-Json
+                $bioPromotion = $transactionReport.promotion.dj_bio_promotion
+                if ([string]$transactionReport.status -cne "promoted" -or $null -eq $bioPromotion) {
+                    throw "DJ bio promotion lacks a successful transaction-bound promotion record: $CloudRunPublishTransactionReportPath"
+                }
+                $script:AtlasMiniappBioPromotionEvidence = $bioPromotion
+                $script:AtlasMiniappBioPromotionExecuted = [bool]$bioPromotion.authoritative_changed
+            }
         }
     } catch {
         $failureReason = $_.Exception.Message
-        $rollbackPacket = Write-RemoteRollbackPacket -FailureReason $failureReason
-        throw "CloudRun publish transaction did not complete; inspect transaction status and baseline_restored. Remote rollback may be required. Packet: $rollbackPacket. Cause: $failureReason"
+        $deployMayHaveChangedRemote = Test-CloudRunDeployMayHaveChangedRemote
+        $automaticRollbackExitCode = $null
+        if ($deployMayHaveChangedRemote) {
+            # Keep the service publish lease held across rollback and restored
+            # package verification.  The helper refuses unknown/third-party
+            # active versions and persists only fixed safe failure codes.
+            try {
+                python (Join-Path $CloudRun "scripts\automatic_cloudbase_rollback.py") `
+                    --transaction-id $RunId `
+                    --env-id $CloudRunEnvId `
+                    --service-name $CloudRunServiceName `
+                    --deploy-report $CloudRunDeployReportPath `
+                    --transaction-report $CloudRunPublishTransactionReportPath `
+                    --authoritative-release-dir $IncrementalBaseApiDir `
+                    --publish-lease-path $CloudRunPublishLeasePath `
+                    --publish-lease-token $CloudRunPublishLeaseToken `
+                    --data-root $CloudRunDataRoot `
+                    --report $CloudRunAutomaticRollbackReportPath `
+                    --proxy-url $ProxyUrl `
+                    --max-wait-seconds 900 `
+                    --verification-timeout-seconds 180 `
+                    --verification-poll-interval-seconds 5 `
+                    --request-timeout-seconds 30 `
+                    --max-pages 1000
+                $automaticRollbackExitCode = $LASTEXITCODE
+            } catch {
+                $automaticRollbackExitCode = 2
+            }
+        }
+        # Persist a secret-safe failure label.  The original exception remains
+        # console-visible below but is not copied into rollback evidence.
+        $rollbackPacket = Write-RemoteRollbackPacket -FailureReason "cloudrun_publish_transaction_failed"
+        $rollbackVerified = $false
+        if (Test-Path -LiteralPath $CloudRunAutomaticRollbackReportPath -PathType Leaf) {
+            try {
+                $rollbackEvidence = Get-Content -Raw -LiteralPath $CloudRunAutomaticRollbackReportPath | ConvertFrom-Json
+                $rollbackVerified = [bool]$rollbackEvidence.ok -and [bool]$rollbackEvidence.automatic_rollback_verified
+            } catch {
+                $rollbackVerified = $false
+            }
+        }
+        if ($deployMayHaveChangedRemote -and (-not $rollbackVerified -or $automaticRollbackExitCode -ne 0)) {
+            throw "CloudRun publish transaction failed and automatic rollback is not verified; further publication remains blocked while the service lease is released. Packet: $rollbackPacket. Cause: $failureReason"
+        }
+        if ($rollbackVerified) {
+            throw "CloudRun candidate publication failed; the previous remote version and authoritative package were automatically restored and fully verified. Packet: $rollbackPacket. Cause: $failureReason"
+        }
+        throw "CloudRun publish transaction did not complete and no remote mutation was proven. Packet: $rollbackPacket. Cause: $failureReason"
+    } finally {
+        Exit-CloudRunServicePublishLease -Lease $CloudRunServicePublishLease
     }
 }
 
 if ($UploadFrontend) {
+    if ([string]::IsNullOrWhiteSpace($DevToolsSuiteSummaryPath)) {
+        throw "UploadFrontend requires -DevToolsSuiteSummaryPath from the current eight-scenario rendered release suite."
+    }
+    if (-not (Test-Path -LiteralPath $DevToolsSuiteSummaryPath -PathType Leaf)) {
+        throw "DevTools suite summary not found: $DevToolsSuiteSummaryPath"
+    }
+    $CurrentReleasePackageDir = [System.IO.Path]::GetFullPath($IncrementalBaseApiDir)
+    foreach ($requiredReleaseFile in @("manifest.json", "current.json")) {
+        $requiredReleasePath = Join-Path $CurrentReleasePackageDir $requiredReleaseFile
+        if (-not (Test-Path -LiteralPath $requiredReleasePath -PathType Leaf)) {
+            throw "Authoritative current-release package is incomplete for frontend evidence binding: $requiredReleasePath"
+        }
+    }
     Invoke-RunStep "Run final guard before miniprogram upload" {
         Invoke-GuardJson -GuardArgs @("-File", $SkillGuard, "-RepoPath", $Repo, "-GateMode", "current-package", "-ExpectedMinItems", "$EffectiveMinExpectedItems", "-PublicApiBase", $PublicApiBase)
     }
@@ -2647,6 +3021,8 @@ if ($UploadFrontend) {
         pwsh -NoProfile -ExecutionPolicy Bypass -File (Join-Path $MiniProgram "scripts\upload_devtools_cli_windows.ps1") `
             -Version $Version `
             -Desc $Desc `
+            -SuiteSummaryPath $DevToolsSuiteSummaryPath `
+            -StaticPackageDir $CurrentReleasePackageDir `
             -ConfirmUpload
         Assert-NativeSuccess "Miniprogram developer upload"
         $script:MiniProgramUploadExecuted = $true

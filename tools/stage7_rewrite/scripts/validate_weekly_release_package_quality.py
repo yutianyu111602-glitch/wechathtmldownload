@@ -15,7 +15,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from repair_weekly_release_conflicts import CITY_LABEL_BY_KEY, read_json, write_json
+from repair_weekly_release_conflicts import (
+    CITY_LABEL_BY_KEY,
+    address_city_road_alias_issue,
+    read_json,
+    write_json,
+)
 
 
 SCHEMA_VERSION = "weekly_release_package_quality.v1"
@@ -795,15 +800,28 @@ def manifest_provenance_issues(api_dir: Path, manifest: dict[str, Any]) -> list[
         except OSError:
             issues.append({"field": "out_dir", "value": manifest_out, "expected": str(api_dir)})
 
-    source_pack = str(manifest.get("source_pack_dir") or "").strip()
-    base_pack = str(manifest.get("source_base_pack_dir") or "").strip()
-    incremental_pack = str(manifest.get("source_incremental_pack_dir") or "").strip()
-    if source_pack and base_pack and incremental_pack and source_pack == base_pack and source_pack != incremental_pack:
+    source_pack = str(manifest.get("source_pack_name") or manifest.get("source_pack_dir") or "").strip()
+    base_pack = str(manifest.get("source_base_pack_name") or manifest.get("source_base_pack_dir") or "").strip()
+    incremental_pack = str(
+        manifest.get("source_incremental_pack_name")
+        or manifest.get("source_incremental_pack_dir")
+        or ""
+    ).strip()
+    source_identity = source_pack.casefold()
+    base_identity = base_pack.casefold()
+    incremental_identity = incremental_pack.casefold()
+    if (
+        source_identity
+        and base_identity
+        and incremental_identity
+        and source_identity == base_identity
+        and source_identity != incremental_identity
+    ):
         issues.append({
-            "field": "source_pack_dir",
+            "field": "source_pack_name",
             "value": source_pack,
             "expected": incremental_pack,
-            "reason": "source_pack_dir still points at the base package after incremental merge",
+            "reason": "source pack identity still points at the base package after incremental merge",
         })
     return issues
 
@@ -940,6 +958,11 @@ def validate(api_dir: Path, *, require_internal_posters: bool, enforce_window_st
     ) if enforce_window_start else []
     missing_event_dates = missing_event_date_start_items(items) if enforce_window_start else []
     route_mismatches = city_route_mismatches(api_dir)
+    address_city_road_alias_items = [
+        issue
+        for item in items
+        if (issue := address_city_road_alias_issue(item)) is not None
+    ]
     provenance_issues = manifest_provenance_issues(api_dir, manifest)
     route_index_issues = static_route_index_issues(api_dir)
 
@@ -958,6 +981,8 @@ def validate(api_dir: Path, *, require_internal_posters: bool, enforce_window_st
         hard_failures.append("event_date_start_outside_manifest_window")
     if route_mismatches:
         hard_failures.append("city_route_label_mismatch")
+    if address_city_road_alias_items:
+        hard_failures.append("address_city_road_alias")
     if provenance_issues:
         hard_failures.append("manifest_provenance_stale")
     if route_index_issues:
@@ -1042,6 +1067,8 @@ def validate(api_dir: Path, *, require_internal_posters: bool, enforce_window_st
         "outside_window_start_items": outside_window[:50],
         "city_route_mismatch_count": len(route_mismatches),
         "city_route_mismatches": route_mismatches[:50],
+        "address_city_road_alias_count": len(address_city_road_alias_items),
+        "address_city_road_alias_items": address_city_road_alias_items[:50],
         "manifest_provenance_issue_count": len(provenance_issues),
         "manifest_provenance_issues": provenance_issues,
         "static_route_index_issue_count": len(route_index_issues),

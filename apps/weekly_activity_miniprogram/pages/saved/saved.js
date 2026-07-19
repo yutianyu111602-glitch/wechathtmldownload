@@ -1,4 +1,4 @@
-const { requestApi } = require("../../utils/api");
+const { fetchAllCurrentItems, requestApi } = require("../../utils/api");
 const { compactItem } = require("../../utils/format");
 const { normalizeLang, applyLanguageChrome } = require("../../utils/i18n");
 const { vibrateLight } = require("../../utils/haptics");
@@ -331,6 +331,9 @@ Page({
     applyLanguageChrome("saved", lang);
     this.seedDetailMap = {};
     this.visited = new Set(this.loadVisited());
+    this._graphLoadSeq = 0;
+    this._seedColdStartSeq = 0;
+    this._seedLoadPromise = null;
     this.setData({ lang, t: LABELS[lang] || LABELS.zh, visitedCount: this.visited.size });
     this.loadSeeds();
   },
@@ -355,6 +358,7 @@ Page({
   },
 
   onPullDownRefresh() {
+    this._graphLoadSeq = (this._graphLoadSeq || 0) + 1;
     this.setData({ history: [], trail: [], center: null, error: "" });
     this.loadSeeds().then(
       () => wx.stopPullDownRefresh(),
@@ -427,7 +431,7 @@ Page({
     return true;
   },
 
-  async loadFirstAvailableGraph(seedList) {
+  async loadFirstAvailableGraph(seedList, coldStartSeq) {
     const names = [];
     const seen = {};
     for (const seed of seedList || []) {
@@ -440,56 +444,98 @@ Page({
     if (!seen[DEFAULT_ATLAS_ENTRY]) names.push(DEFAULT_ATLAS_ENTRY);
     let best = null; // 见过最稠密的入口 {name, count}，全稀疏时兜底用
     for (const name of names) {
-      const ok = await this.loadGraph(name, { reset: true, silentNotFound: true });
+      if (coldStartSeq !== this._seedColdStartSeq) return false;
+      const ok = await this.loadGraph(name, {
+        reset: true,
+        silentNotFound: true,
+        coldStartSeq,
+      });
+      if (coldStartSeq !== this._seedColdStartSeq) return false;
       if (!ok) continue;
       const count = (this.data.nodes || []).length;
       if (count >= MIN_SEED_NEIGHBORS) return true; // 够热闹，从稠密处进入
       if (!best || count > best.count) best = { name, count };
     }
     // 所有种子都偏稀疏：退回目前最稠密那颗（ponytail: 仅当全稀疏时多一次 load）。
-    if (best) return this.loadGraph(best.name, { reset: true });
+    if (best && coldStartSeq === this._seedColdStartSeq) {
+      return this.loadGraph(best.name, { reset: true, coldStartSeq });
+    }
+    if (coldStartSeq !== this._seedColdStartSeq) return false;
     this.setData({ loading: false, error: this.data.t.empty });
     return false;
   },
 
   // 用本周活动包里的 DJ 名字作为图谱探索入口。
-  async loadSeeds() {
-    try {
-      const current = await requestApi("/api/v1/weekly/current", { limit: 60 });
-      const seen = {};
-      const seedList = [];
-      for (const item of (current.items || []).map(compactItem)) {
-        const detailId = String(item.id || "");
-        const atlasArtists = item.atlasArtistItems || item.atlas_artists || [];
-        const lineup = item.lineupItems || item.lineup_artists || [];
-        const candidates = []
-          .concat(Array.isArray(atlasArtists) ? atlasArtists : atlasArtists ? [atlasArtists] : [])
-          .concat(Array.isArray(lineup) ? lineup : lineup ? [lineup] : []);
-        for (const candidate of candidates) {
-          addSeed(seedList, seen, candidate, detailId, this.visited);
+  loadSeeds() {
+    if (this._seedLoadPromise) return this._seedLoadPromise;
+    const shouldColdStart = !this.data.center;
+    const coldStartSeq = shouldColdStart
+      ? (this._seedColdStartSeq || 0) + 1
+      : this._seedColdStartSeq;
+    if (shouldColdStart) this._seedColdStartSeq = coldStartSeq;
+    const request = (async () => {
+      try {
+        const currentItems = await fetchAllCurrentItems({ scope: "current", limit: 100 });
+        const seen = {};
+        const seedList = [];
+        for (const item of currentItems.map(compactItem)) {
+          const detailId = String(item.id || "");
+          const atlasArtists = item.atlasArtistItems || item.atlas_artists || [];
+          const lineup = item.lineupItems || item.lineup_artists || [];
+          const candidates = []
+            .concat(Array.isArray(atlasArtists) ? atlasArtists : atlasArtists ? [atlasArtists] : [])
+            .concat(Array.isArray(lineup) ? lineup : lineup ? [lineup] : []);
+          for (const candidate of candidates) {
+            addSeed(seedList, seen, candidate, detailId, this.visited);
+            if (seedList.length >= 12) break;
+          }
           if (seedList.length >= 12) break;
         }
-        if (seedList.length >= 12) break;
+        this.seedDetailMap = {};
+        for (const seed of seedList) this.seedDetailMap[seed.name] = seed.detailId;
+        this.setData({ seedList });
+        if (shouldColdStart && !this.data.center && coldStartSeq === this._seedColdStartSeq) {
+          await this.loadFirstAvailableGraph(seedList, coldStartSeq);
+        }
+      } catch (error) {
+        console.error("[atlas] loadSeeds failed", error);
+        if (shouldColdStart && !this.data.center && coldStartSeq === this._seedColdStartSeq) {
+          await this.loadGraph(DEFAULT_ATLAS_ENTRY, { reset: true, coldStartSeq });
+        }
       }
-      this.seedDetailMap = {};
-      for (const seed of seedList) this.seedDetailMap[seed.name] = seed.detailId;
-      this.setData({ seedList });
-      if (!this.data.center) {
-        await this.loadFirstAvailableGraph(seedList);
-      }
-    } catch (error) {
-      console.error("[atlas] loadSeeds failed", error);
-      if (!this.data.center) await this.loadGraph(DEFAULT_ATLAS_ENTRY, { reset: true });
-    }
+    })();
+    this._seedLoadPromise = request;
+    return request.finally(() => {
+      if (this._seedLoadPromise === request) this._seedLoadPromise = null;
+    });
   },
 
   async loadGraph(query, options = {}) {
     const name = String(query || "").trim();
     if (!name) return false;
-    const { push = false, reset = false, setHistory = null, silentNotFound = false, id = "" } = options;
+    const {
+      push = false,
+      reset = false,
+      setHistory = null,
+      silentNotFound = false,
+      id = "",
+      coldStartSeq = null,
+    } = options;
+    if (coldStartSeq === null) {
+      // An explicit navigation owns the screen and cancels any seed-probing
+      // cold start that is still walking fallback candidates.
+      this._seedColdStartSeq = (this._seedColdStartSeq || 0) + 1;
+    } else if (coldStartSeq !== this._seedColdStartSeq) {
+      return false;
+    }
+    this._graphLoadSeq = (this._graphLoadSeq || 0) + 1;
+    const graphLoadSeq = this._graphLoadSeq;
+    const isCurrentLoad = () => graphLoadSeq === this._graphLoadSeq
+      && (coldStartSeq === null || coldStartSeq === this._seedColdStartSeq);
     this.setData({ loading: true, error: "" });
     try {
       const profile = await fetchAtlasProfile(name, id);
+      if (!isCurrentLoad()) return false;
       if (!profile || profile.found === false || !profile.canonical) {
         // 已有星图时不要清空，只提示；冷启动（无 center）才落整屏空态。
         if (this.data.center && !silentNotFound) {
@@ -550,6 +596,7 @@ Page({
       vibrateLight();
       return true;
     } catch (error) {
+      if (!isCurrentLoad()) return false;
       console.error("[atlas] loadGraph failed", error);
       if (this.data.center) {
         this.setData({ loading: false });

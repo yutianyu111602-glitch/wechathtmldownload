@@ -3,7 +3,9 @@
 // Cooler + explorable: glowing nodes, deep-space backdrop, edges colored by relation type,
 // smooth fly-to animation, type-legend filtering, random hop. Loads the bundled overview
 // (data/atlas_starmap.js, from reconciled atlas v2). ES5-conservative for the WeChat sandbox.
-var requestApi = require("../../utils/api").requestApi;
+var weeklyApi = require("../../utils/api");
+var requestApi = weeklyApi.requestApi;
+var fetchAllCurrentItems = weeklyApi.fetchAllCurrentItems;
 var cityFootprint = require("../../utils/cityFootprint.js").cityFootprint;
 var bundle = require("../../data/atlas_starmap.js");
 var neighborBundle = null;
@@ -255,6 +257,42 @@ Page({
     return lens === "city" || lens === "time" ? lens : "structure";
   },
 
+  _onlinePayloadMatchesDataset: function (payload) {
+    var localDatasetId = compactText(this._localDatasetId);
+    var onlineDatasetId = compactText(payload && payload.generation && payload.generation.datasetId);
+    return !!localDatasetId && !!onlineDatasetId && localDatasetId === onlineDatasetId;
+  },
+
+  _neighborBundleMatchesDataset: function (candidate) {
+    var localDatasetId = compactText(this._localDatasetId);
+    var neighborDatasetId = compactText(candidate && candidate.datasetId);
+    return !!localDatasetId && !!neighborDatasetId && localDatasetId === neighborDatasetId;
+  },
+
+  _localNeighborRows: function (nodeId) {
+    var candidate = getNeighborBundle();
+    if (!this._neighborBundleMatchesDataset(candidate)) return [];
+    var id = String(nodeId || "");
+    return (((candidate || {}).byNode || {})[id] || []);
+  },
+
+  _requestAtlasDatasetBound: function (path, data) {
+    var that = this;
+    var requestData = Object.assign({}, data || {});
+    return requestApi(path, requestData).then(function (payload) {
+      if (that._onlinePayloadMatchesDataset(payload)) return payload;
+      return requestApi(path, Object.assign({}, requestData, {
+        __skipCache: true,
+        __liveOnly: true,
+      })).then(function (livePayload) {
+        if (that._onlinePayloadMatchesDataset(livePayload)) return livePayload;
+        var error = new Error("ATLAS dataset generation mismatch after live retry");
+        error.code = "ATLAS_DATASET_GENERATION_MISMATCH";
+        throw error;
+      });
+    });
+  },
+
   setViewLens: function (event) {
     var value = typeof event === "string"
       ? event
@@ -330,6 +368,7 @@ Page({
     this._initialQuery = query && query.q ? decodeURIComponent(query.q) : "";
     this._initialFocusId = query && query.focusId ? decodeURIComponent(query.focusId) : "";
     this._initialViewLens = this._normalizeViewLens(query && query.lens);
+    this._localDatasetId = compactText(bundle && bundle.datasetId);
     this._nodes = ((bundle && bundle.nodes) || []).map(function (n) {
       var copy = {};
       for (var k in n) copy[k] = n[k];
@@ -348,7 +387,6 @@ Page({
     this._remoteError = {};
     this._inspectorCache = {};
     this._inspectorLoading = {};
-    this._inspectorSeq = 0;
     this._trail = [];
     this._nodeIndexById = {};
     this._edgeKeySet = {};
@@ -411,11 +449,11 @@ Page({
 
   _loadSeeds: function () {
     var that = this;
-    requestApi("/api/v1/weekly/current", { limit: 60 }).then(function (r) {
+    fetchAllCurrentItems({ scope: "current", limit: 100 }).then(function (items) {
       var seen = {};
       var list = [];
       var visited = that._visited || {};
-      (r && r.items || []).forEach(function (item) {
+      (items || []).forEach(function (item) {
         var candidates = [].concat(item.atlasArtistItems || item.atlas_artists || [])
                            .concat(item.lineupItems || item.lineup_artists || []);
         candidates.forEach(function (c) {
@@ -517,14 +555,14 @@ Page({
 
   _neighborRows: function (nodeId) {
     var id = String(nodeId || "");
-    var localRows = (((getNeighborBundle() || {}).byNode || {})[id] || []);
+    var localRows = this._localNeighborRows(id);
     if (localRows.length) return localRows;
     return this._remoteRows[id] || [];
   },
 
   _neighborhoodStatus: function (nodeId) {
     var id = String(nodeId || "");
-    var localRows = (((getNeighborBundle() || {}).byNode || {})[id] || []);
+    var localRows = this._localNeighborRows(id);
     if (localRows.length) return "概览邻域 " + localRows.length + " 条";
     if (this._remoteLoading[id]) return "全库邻域加载中";
     if (this._remoteError[id]) return "全库邻域暂不可用";
@@ -782,7 +820,7 @@ Page({
     var that = this;
     this._remoteLoading[id] = true;
     this._remoteError[id] = false;
-    requestApi("/api/v1/weekly/atlas/neighborhood", { subjectId: id, limit: 18 })
+    this._requestAtlasDatasetBound("/api/v1/weekly/atlas/neighborhood", { subjectId: id, limit: 18 })
       .then(function (payload) {
         var rows = ((payload && payload.neighbors) || []).map(function (row) {
           return that._remoteNeighborRow(row);
@@ -936,10 +974,9 @@ Page({
     }
     if (this._inspectorLoading[id]) return;
     var that = this;
-    var seq = ++this._inspectorSeq;
     this._inspectorLoading[id] = true;
     this._setSelectedInspector(id, { status: "loading", summary: "读取 ATLAS 速览…" });
-    requestApi("/api/v1/weekly/atlas/artist", {
+    this._requestAtlasDatasetBound("/api/v1/weekly/atlas/artist", {
       subjectId: id, eventLimit: 40, collaboratorLimit: 20, venueLimit: 12,
       cacheBust: "starmap-inspector-20260624b",
     }).then(function (payload) {
@@ -948,13 +985,16 @@ Page({
         : { status: "empty", summary: "暂无轨迹摘要" };
       that._inspectorCache[id] = inspector;
       that._inspectorLoading[id] = false;
-      if (seq === that._inspectorSeq) that._setSelectedInspector(id, inspector);
+      // Selection identity, not request order, is the authority. This lets an
+      // A -> B -> A return reuse A's in-flight request without leaving the
+      // inspector stuck in its loading state.
+      that._setSelectedInspector(id, inspector);
     }).catch(function (error) {
       console.warn("[atlas-starmap] artist inspector fetch failed", error);
       var inspector = { status: "error", summary: "ATLAS 速览暂不可用" };
       that._inspectorCache[id] = inspector;
       that._inspectorLoading[id] = false;
-      if (seq === that._inspectorSeq) that._setSelectedInspector(id, inspector);
+      that._setSelectedInspector(id, inspector);
     });
   },
 
@@ -1370,7 +1410,7 @@ Page({
   _fetchPath: function (from, fromName, to, toName) {
     var that = this;
     this.setData({ pathResult: { status: "loading", summary: "查找关系路径…" } });
-    requestApi("/api/v1/weekly/atlas/path", { from: from, to: to }).then(function (r) {
+    this._requestAtlasDatasetBound("/api/v1/weekly/atlas/path", { from: from, to: to }).then(function (r) {
       if (!r || !r.found) {
         that.setData({ pathResult: { status: "empty", summary: fromName + " 与 " + toName + " 暂无可见关系路径" } });
         if (that.data.selected) that.setSheetState("peek");

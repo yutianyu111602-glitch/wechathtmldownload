@@ -7,6 +7,9 @@ import { URL } from "node:url";
 import { gzipSync } from "node:zlib";
 import { createDeepSeekClient } from "./deepSeekClient.mjs";
 import { createDjInterviewStore } from "./interviewStore.mjs";
+import { createQwenVlClient } from "./qwenVlClient.mjs";
+import { createCloudbaseSoundEvidence } from "./soundEvidence.mjs";
+import { verifySoundIngress } from "./soundIngress.mjs";
 import { createSoundStore } from "./soundStore.mjs";
 import { renderAtlasDetailPage } from "./atlasDetailPage.mjs";
 import { renderAtlasGraphPage } from "./atlasGraphPage.mjs";
@@ -243,6 +246,85 @@ function sendError(res, statusCode, code, message, details = {}, extraHeaders = 
       details,
     },
   }, extraHeaders);
+}
+
+function safeVendorFailure(error, fallbackCode = "VENDOR_REQUEST_FAILED") {
+  const candidateCode = String(error?.code || "").trim();
+  const code = /^(?:QWEN_VL|DEEPSEEK)_[A-Z0-9_]+$/.test(candidateCode)
+    ? candidateCode
+    : fallbackCode;
+  const providerStatus = Number(error?.providerStatus);
+  const requestIdCandidate = String(error?.requestId || "").trim();
+  return {
+    code,
+    ...(Number.isInteger(providerStatus) && providerStatus > 0 && providerStatus <= 599
+      ? { status: providerStatus }
+      : {}),
+    ...(requestIdCandidate.length <= 160 && /^[A-Za-z0-9._:-]+$/.test(requestIdCandidate)
+      ? { requestId: requestIdCandidate }
+      : {}),
+  };
+}
+
+const DEFAULT_ATLAS_ARTIST_RESPONSE_MAX_BYTES = 512 * 1024;
+const MIN_ATLAS_ARTIST_RESPONSE_MAX_BYTES = 16 * 1024;
+
+function atlasArtistResponseMaxBytes(env) {
+  const configured = Number(String(env?.ATLAS_ARTIST_RESPONSE_MAX_BYTES ?? "").trim());
+  if (!Number.isFinite(configured) || configured <= 0) return DEFAULT_ATLAS_ARTIST_RESPONSE_MAX_BYTES;
+  return Math.max(
+    MIN_ATLAS_ARTIST_RESPONSE_MAX_BYTES,
+    Math.min(Math.floor(configured), DEFAULT_ATLAS_ARTIST_RESPONSE_MAX_BYTES),
+  );
+}
+
+function jsonUtf8Bytes(payload) {
+  return Buffer.byteLength(JSON.stringify(payload), "utf8");
+}
+
+function sendAtlasArtistJson(req, res, payload, env) {
+  const maxBytes = atlasArtistResponseMaxBytes(env);
+  const responseBytes = jsonUtf8Bytes(payload);
+  const sizeHeaders = {
+    "X-Atlas-Response-Bytes": String(responseBytes),
+    "X-Atlas-Response-Max-Bytes": String(maxBytes),
+  };
+  if (responseBytes <= maxBytes) {
+    sendJson(res, 200, payload, sizeHeaders, { req, cacheMaxAge: 300 });
+    return;
+  }
+
+  const corePayload = {
+    ...payload,
+    events: [],
+    venues: [],
+    collaborators: [],
+  };
+  const coreProfileBytes = jsonUtf8Bytes(corePayload);
+  const coreProfileExceeded = coreProfileBytes > maxBytes;
+  sendError(
+    res,
+    507,
+    coreProfileExceeded ? "ATLAS_ARTIST_PROFILE_TOO_LARGE" : "ATLAS_ARTIST_PAGE_TOO_LARGE",
+    coreProfileExceeded
+      ? "Atlas artist core profile exceeds the UTF-8 response budget and was not truncated."
+      : "Atlas artist list page exceeds the UTF-8 response budget; request smaller list pages.",
+    { maxBytes, responseBytes, coreProfileBytes },
+    sizeHeaders,
+  );
+}
+
+function verifyWeeklyReviewAdmin(req, env) {
+  const expected = String(env.WEEKLY_REVIEW_ADMIN_TOKEN || "").trim();
+  if (!expected) return { ok: false, configured: false };
+  const provided = String(req.headers["x-weekly-review-token"] || "").trim();
+  if (!provided) return { ok: false, configured: true };
+  const expectedBuffer = Buffer.from(expected);
+  const providedBuffer = Buffer.from(provided);
+  return {
+    ok: expectedBuffer.length === providedBuffer.length && crypto.timingSafeEqual(expectedBuffer, providedBuffer),
+    configured: true,
+  };
 }
 
 function sendHtml(res, statusCode, body) {
@@ -755,9 +837,12 @@ export function createServer(options = {}) {
   const stage7Store = createStage7Store(options, env);
   const atlasSecurity = createAtlasSecurity(env);
   const llmClient = options.llmClient || createDeepSeekClient(env);
-  const soundStore = options.soundStore || createSoundStore({ env });
+  const soundEvidence = options.soundEvidence || createCloudbaseSoundEvidence({ env });
+  const soundVisionClient = options.soundVisionClient || createQwenVlClient(env);
+  const soundStore = options.soundStore || createSoundStore({ env, soundEvidenceVerifier: soundEvidence });
   const interviewStore = options.interviewStore || createDjInterviewStore({ env });
   const isLlmEnrichEnabled = () => String(env.DEEPSEEK_ENRICH_ENABLED || "false").toLowerCase() === "true";
+  const isSoundReviewEnrichEnabled = () => String(env.SOUND_REVIEW_ENRICH_ENABLED || "false").toLowerCase() === "true";
   const llmStatus = () =>
     typeof llmClient.publicStatus === "function"
       ? llmClient.publicStatus()
@@ -773,7 +858,7 @@ export function createServer(options = {}) {
           ...securityHeaders(),
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type, X-WX-SERVICE",
+          "Access-Control-Allow-Headers": "Content-Type, X-WX-SERVICE, X-Weekly-Review-Token, X-Huaidj-Sound-Timestamp, X-Huaidj-Sound-Nonce, X-Huaidj-Sound-AppId, X-Huaidj-Sound-OpenId, X-Huaidj-Sound-Env, X-Huaidj-Sound-Signature",
         });
         res.end();
         return;
@@ -787,6 +872,8 @@ export function createServer(options = {}) {
           pathname === "/api/v1/stage7/local/geocode-review" ||
           pathname === "/api/v1/atlas/dj-interviews" ||
           pathname === "/api/v1/weekly/sounds" ||
+          pathname === "/api/v1/weekly/sounds/ingress-probe" ||
+          pathname === "/api/v1/weekly/llm/enrich" ||
           pathname === "/api/v1/weekly/sounds/enrich");
       if (req.method !== "GET" && !isAllowedPost) {
         sendError(res, 405, "METHOD_NOT_ALLOWED", "Only GET is enabled for the public MVP.");
@@ -800,6 +887,18 @@ export function createServer(options = {}) {
 
       if (pathname === "/healthz") {
         sendJson(res, 200, { ok: true, service: "weekly-api", llm: llmStatus() });
+        return;
+      }
+
+      if (pathname === "/readyz") {
+        try {
+          const readiness = await store.getReadiness();
+          sendJson(res, 200, { ...readiness, llm: llmStatus() });
+        } catch (error) {
+          sendError(res, 503, "WEEKLY_NOT_READY", "Weekly activity package is not ready.", {
+            reason: String(error?.code || "WEEKLY_READINESS_FAILED"),
+          });
+        }
         return;
       }
 
@@ -1431,6 +1530,19 @@ export function createServer(options = {}) {
       }
 
       if (pathname === "/api/v1/weekly/llm/enrich") {
+        if (req.method !== "POST") {
+          sendError(res, 405, "METHOD_NOT_ALLOWED", "Live LLM enrichment requires private POST review.");
+          return;
+        }
+        const reviewAdmin = verifyWeeklyReviewAdmin(req, env);
+        if (!reviewAdmin.configured) {
+          sendError(res, 503, "ADMIN_TOKEN_NOT_CONFIGURED", "Private LLM review is not configured.");
+          return;
+        }
+        if (!reviewAdmin.ok) {
+          sendError(res, 403, "ADMIN_AUTH_REQUIRED", "Private LLM review authorization is required.");
+          return;
+        }
         if (!isLlmEnrichEnabled()) {
           sendError(res, 403, "LLM_DISABLED", "LLM enrichment is not enabled. Set DEEPSEEK_ENRICH_ENABLED=true.");
           return;
@@ -1449,43 +1561,28 @@ export function createServer(options = {}) {
           const enriched = await llmClient.enrichEvent(item);
           sendJson(res, 200, { schemaVersion: "weekly_activity_api.llm_enrich.v1", enriched });
         } catch (err) {
-          console.error("[llm] enrich failed", err);
-          sendError(res, 500, "LLM_ENRICH_FAILED", "LLM enrichment failed.", {
-            message: err instanceof Error ? err.message : String(err),
-          });
+          const failure = safeVendorFailure(err, "DEEPSEEK_REQUEST_FAILED");
+          console.error("[llm] enrich failed", failure);
+          sendError(res, 500, "LLM_ENRICH_FAILED", "LLM enrichment failed.", failure);
         }
         return;
       }
 
       if (pathname === "/api/v1/weekly/llm/weekly-summary") {
-        if (!isLlmEnrichEnabled()) {
-          sendError(res, 403, "LLM_DISABLED", "LLM enrichment is not enabled.");
+        const materializedSummary = await store.getLlmSummary();
+        if (!materializedSummary?.summary) {
+          sendError(res, 404, "LLM_SUMMARY_NOT_FOUND", "Materialized LLM summary was not found.");
           return;
         }
-        try {
-          const current = await store.getCurrent({ limit: 30 });
-          const summary = await llmClient.generateWeeklySummary(current.items);
-          sendJson(res, 200, { schemaVersion: "weekly_activity_api.llm_summary.v1", summary });
-        } catch (err) {
-          console.error("[llm] weekly-summary failed", err);
-          const fallbackSummary = await store.getLlmSummary();
-          if (fallbackSummary?.summary) {
-            sendJson(res, 200, {
-              schemaVersion: "weekly_activity_api.llm_summary.v1",
-              summary: fallbackSummary.summary,
-              generatedAt: fallbackSummary.generatedAt || fallbackSummary.generated_at || null,
-              provider: fallbackSummary.provider || null,
-              model: fallbackSummary.model || null,
-              source: "materialized-summary-fallback",
-              fallbackUsed: true,
-              fallbackReason: err instanceof Error ? err.message : String(err),
-            });
-            return;
-          }
-          sendError(res, 500, "LLM_SUMMARY_FAILED", "Weekly summary generation failed.", {
-            message: err instanceof Error ? err.message : String(err),
-          });
-        }
+        sendJson(res, 200, {
+          schemaVersion: "weekly_activity_api.llm_summary.v1",
+          summary: materializedSummary.summary,
+          generatedAt: materializedSummary.generatedAt || materializedSummary.generated_at || null,
+          provider: materializedSummary.provider || null,
+          model: materializedSummary.model || null,
+          source: "materialized-summary",
+          liveGenerationExecuted: false,
+        });
         return;
       }
 
@@ -1572,13 +1669,19 @@ export function createServer(options = {}) {
           sendError(res, 400, "INVALID_IDS", "Provide 1-100 comma-separated ids.");
           return;
         }
-        sendJson(res, 200, { items: await store.getItemsByIds(ids) });
+        sendJson(res, 200, await store.getItemsByIds(ids, {
+          generationId: url.searchParams.get("generationId") || url.searchParams.get("generation_id") || "",
+          generatedAt: url.searchParams.get("generatedAt") || url.searchParams.get("generated_at") || "",
+        }));
         return;
       }
 
       const itemMatch = pathname.match(/^\/api\/v1\/weekly\/items\/([^/]+)$/);
       if (itemMatch) {
-        const item = await store.getItem(decodeURIComponent(itemMatch[1]));
+        const item = await store.getItem(decodeURIComponent(itemMatch[1]), {
+          generationId: url.searchParams.get("generationId") || url.searchParams.get("generation_id") || "",
+          generatedAt: url.searchParams.get("generatedAt") || url.searchParams.get("generated_at") || "",
+        });
         if (!item) {
           sendError(res, 404, "ITEM_NOT_FOUND", "Weekly activity item was not found.");
           return;
@@ -1598,23 +1701,100 @@ export function createServer(options = {}) {
         return;
       }
 
-      if (pathname === "/api/v1/weekly/sounds") {
-        if (req.method === "POST") {
-          const body = await readJsonBody(req);
-          const result = await soundStore.submit(body);
-          sendJson(res, 201, result);
+      if (pathname === "/api/v1/weekly/sounds/ingress-probe") {
+        const body = await readJsonBody(req);
+        const ingress = verifySoundIngress({ headers: req.headers, body, env, path: pathname });
+        if (!ingress.configured) {
+          sendError(res, 503, "SOUND_SUBMISSION_INGRESS_NOT_CONFIGURED", "Signed sound submission ingress is not configured.");
           return;
         }
-        const list = await soundStore.list({
-          limit: url.searchParams.get("limit") || undefined,
+        if (!ingress.ok) {
+          const signatureMissing = ingress.reason === "signature_required";
+          sendError(
+            res,
+            signatureMissing ? 401 : 403,
+            signatureMissing ? "SOUND_SUBMISSION_SIGNATURE_REQUIRED" : "SOUND_SUBMISSION_INVALID_SIGNATURE",
+            "A valid signed sound submission gateway request is required.",
+          );
+          return;
+        }
+        sendJson(res, 200, {
+          schemaVersion: "weekly_sound_ingress_probe.v1",
+          ok: true,
+          verifiedIngress: true,
+          writeExecuted: false,
         });
-        sendJson(res, 200, list);
+        return;
+      }
+
+      if (pathname === "/api/v1/weekly/sounds/review-queue") {
+        const reviewAdmin = verifyWeeklyReviewAdmin(req, env);
+        if (!reviewAdmin.configured) {
+          sendError(res, 503, "ADMIN_TOKEN_NOT_CONFIGURED", "Private sound review is not configured.");
+          return;
+        }
+        if (!reviewAdmin.ok) {
+          sendError(res, 403, "ADMIN_AUTH_REQUIRED", "Private sound review authorization is required.");
+          return;
+        }
+        sendJson(res, 200, await soundStore.listInternal({
+          limit: url.searchParams.get("limit") || undefined,
+          status: url.searchParams.get("status") || undefined,
+        }));
+        return;
+      }
+
+      if (pathname === "/api/v1/weekly/sounds") {
+        if (req.method === "POST") {
+          const soundStatus = await soundStore.publicStatus();
+          if (!soundStatus?.acceptingSubmissions) {
+            sendError(res, 503, "SOUND_SUBMISSIONS_NOT_CONFIGURED", "Durable sound submission persistence is not configured.");
+            return;
+          }
+          const body = await readJsonBody(req);
+          const ingress = verifySoundIngress({ headers: req.headers, body, env, path: pathname });
+          if (!ingress.configured) {
+            sendError(res, 503, "SOUND_SUBMISSION_INGRESS_NOT_CONFIGURED", "Signed sound submission ingress is not configured.");
+            return;
+          }
+          if (ingress.reason === "signature_required") {
+            sendError(res, 401, "SOUND_SUBMISSION_SIGNATURE_REQUIRED", "A signed mini-program gateway request is required for sound submissions.");
+            return;
+          }
+          if (!ingress.ok) {
+            sendError(res, 403, "SOUND_SUBMISSION_INVALID_SIGNATURE", "The sound submission gateway signature is invalid or expired.");
+            return;
+          }
+          const result = await soundStore.submit(body, { ownerKey: ingress.ownerKey });
+          sendJson(res, result.duplicate ? 200 : 201, {
+            schemaVersion: "weekly_sound_submission_result.v1",
+            ok: true,
+            id: result.id,
+            status: "accepted_for_private_review",
+            duplicate: Boolean(result.duplicate),
+          });
+          return;
+        }
+        sendJson(res, 200, await soundStore.publicStatus());
         return;
       }
 
       if (pathname === "/api/v1/weekly/sounds/enrich") {
-        if (!isLlmEnrichEnabled()) {
-          sendError(res, 403, "LLM_DISABLED", "LLM enrichment is not enabled. Set DEEPSEEK_ENRICH_ENABLED=true.");
+        if (req.method !== "POST") {
+          sendError(res, 405, "METHOD_NOT_ALLOWED", "Sound enrichment requires POST.");
+          return;
+        }
+        const reviewAdmin = verifyWeeklyReviewAdmin(req, env);
+        if (!reviewAdmin.configured) {
+          sendError(res, 503, "ADMIN_TOKEN_NOT_CONFIGURED", "Private sound review is not configured.");
+          return;
+        }
+        if (!reviewAdmin.ok) {
+          sendError(res, 403, "ADMIN_AUTH_REQUIRED", "Private sound review authorization is required.");
+          return;
+        }
+        if (!isSoundReviewEnrichEnabled()) {
+          sendError(res, 403, "SOUND_REVIEW_ENRICH_DISABLED", "Private sound review enrichment is not enabled.");
           return;
         }
         const submissionId = url.searchParams.get("id") || "";
@@ -1622,31 +1802,52 @@ export function createServer(options = {}) {
           sendError(res, 400, "MISSING_ID", "Provide ?id= for the submission to enrich.");
           return;
         }
-        const list = await soundStore.list({ limit: 200 });
-        const submission = list.items.find((s) => s.id === submissionId);
+        const submission = await soundStore.getInternalById(submissionId);
         if (!submission) {
           sendError(res, 404, "SUBMISSION_NOT_FOUND", "Sound submission was not found.");
           return;
         }
         try {
-          const prompt = [
-            "Analyze this club sound system submission for Atlas:",
-            `Club: ${submission.clubName}`,
-            `Sound equipment photos (cloud file IDs): ${submission.soundFileIds.join(", ")}`,
-            `Payment screenshots (cloud file IDs): ${submission.paymentFileIds.join(", ")}`,
-            "Identify equipment models, assess completeness, and summarize findings in JSON.",
-          ].join("\n");
-          const enriched = await llmClient.enrichEvent({ title: submission.clubName, description: prompt });
+          if (typeof soundEvidence?.loadSoundImages !== "function"
+            || typeof soundVisionClient?.analyzeSoundEvidence !== "function"
+            || typeof llmClient?.enrichSoundReview !== "function") {
+            sendError(res, 503, "SOUND_REVIEW_ENRICH_NOT_CONFIGURED", "Sound review image and model clients are not configured.");
+            return;
+          }
+          const images = await soundEvidence.loadSoundImages((submission.soundFileIds || []).slice(0, 4));
+          const vision = await soundVisionClient.analyzeSoundEvidence({
+            clubName: submission.clubName,
+            images,
+          });
+          const enriched = await llmClient.enrichSoundReview({
+            clubName: submission.clubName,
+            visionEvidence: vision.vision,
+          });
           sendJson(res, 200, {
             submissionId,
+            vision: {
+              provider: vision.provider,
+              model: vision.model || null,
+              analyzedImageCount: images.length,
+            },
             enriched,
-            safety: { graphWriteExecuted: false, productionWriteExecuted: false },
+            safety: {
+              paymentEvidenceSentToModels: false,
+              storageFileIdsSentToModels: false,
+              graphWriteExecuted: false,
+              productionWriteExecuted: false,
+            },
           });
         } catch (err) {
-          console.error("[sounds] enrich failed", err);
-          sendError(res, 500, "LLM_ENRICH_FAILED", "Sound submission LLM enrichment failed.", {
-            message: err instanceof Error ? err.message : String(err),
-          });
+          const failure = safeVendorFailure(err, "SOUND_REVIEW_VENDOR_REQUEST_FAILED");
+          console.error("[sounds] enrich failed", failure);
+          sendError(
+            res,
+            Number(err?.statusCode) || 502,
+            "SOUND_REVIEW_ENRICH_FAILED",
+            "Sound submission review enrichment failed closed.",
+            failure,
+          );
         }
         return;
       }
@@ -1680,8 +1881,11 @@ export function createServer(options = {}) {
       if (pathname === "/api/v1/weekly/atlas/artist") {
         const artistOptions = {
           eventLimit: url.searchParams.get("eventLimit") || undefined,
+          eventOffset: url.searchParams.get("eventOffset") || undefined,
           collaboratorLimit: url.searchParams.get("collaboratorLimit") || undefined,
+          collaboratorOffset: url.searchParams.get("collaboratorOffset") || undefined,
           venueLimit: url.searchParams.get("venueLimit") || undefined,
+          venueOffset: url.searchParams.get("venueOffset") || undefined,
         };
         const subjectId = url.searchParams.get("subjectId") || "";
         const payload = subjectId
@@ -1690,7 +1894,7 @@ export function createServer(options = {}) {
             name: url.searchParams.get("name") || "",
             ...artistOptions,
           });
-        sendJson(res, 200, payload, {}, { req, cacheMaxAge: 300 });
+        sendAtlasArtistJson(req, res, payload, env);
         return;
       }
 
@@ -1809,7 +2013,7 @@ export function createServer(options = {}) {
           }
         }
 
-        sendJson(res, 200, {
+        const djIdProfilePayload = {
           schemaVersion: "atlas_miniapp.dj_id_profile_response.v1",
           query: rawId,
           found: artistResult.found,
@@ -1817,6 +2021,7 @@ export function createServer(options = {}) {
           events: artistResult.found ? artistResult.events : [],
           collaborators: artistResult.found ? artistResult.collaborators : [],
           venues: artistResult.found ? artistResult.venues : [],
+          pagination: artistResult.found ? artistResult.pagination : undefined,
           alternatives: artistResult.found ? artistResult.alternatives : [],
           crossDb: mergeResult?.resolved ? {
             resolved: true,
@@ -1831,7 +2036,8 @@ export function createServer(options = {}) {
             profiles: enrichment.profiles || [],
           },
           relatedEvents: enrichment.items || [],
-        }, {}, { req, cacheMaxAge: 300 });
+        };
+        sendAtlasArtistJson(req, res, djIdProfilePayload, env);
         return;
       }
 
@@ -1893,7 +2099,7 @@ export function createServer(options = {}) {
           }
         }
 
-        sendJson(res, 200, {
+        const djProfilePayload = {
           schemaVersion: "atlas_miniapp.dj_profile_response.v1",
           query: rawId,
           found: artistResult.found,
@@ -1901,6 +2107,7 @@ export function createServer(options = {}) {
           events: artistResult.found ? artistResult.events : [],
           collaborators: artistResult.found ? artistResult.collaborators : [],
           venues: artistResult.found ? artistResult.venues : [],
+          pagination: artistResult.found ? artistResult.pagination : undefined,
           alternatives: artistResult.found ? artistResult.alternatives : [],
           crossDb: mergeResult?.resolved ? {
             resolved: true,
@@ -1915,15 +2122,22 @@ export function createServer(options = {}) {
             profiles: enrichment.profiles || [],
           },
           relatedEvents: enrichment.items || [],
-        }, {}, { req, cacheMaxAge: 300 });
+        };
+        sendAtlasArtistJson(req, res, djProfilePayload, env);
         return;
       }
 
       sendError(res, 404, "ROUTE_NOT_FOUND", "Route was not found.");
     } catch (error) {
       const statusCode = Number.isInteger(error?.statusCode) ? error.statusCode : 500;
-      sendError(res, statusCode, statusCode === 500 ? "INTERNAL_ERROR" : "REQUEST_FAILED", "Weekly API failed to handle the request.", {
-        message: error instanceof Error ? error.message : String(error),
+      const safeStoreCode = typeof error?.code === "string" && /^SOUND_SUBMISSIONS?_[A-Z0-9_]+$/.test(error.code)
+        ? error.code
+        : null;
+      const vendorFailure = /^(?:QWEN_VL|DEEPSEEK)_[A-Z0-9_]+$/.test(String(error?.code || ""))
+        ? safeVendorFailure(error)
+        : null;
+      sendError(res, statusCode, safeStoreCode || (statusCode === 500 ? "INTERNAL_ERROR" : "REQUEST_FAILED"), "Weekly API failed to handle the request.", {
+        ...(vendorFailure || { message: error instanceof Error ? error.message : String(error) }),
       });
     }
   });

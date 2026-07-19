@@ -1,6 +1,6 @@
 # Documentation Index
 
-Updated: 2026-06-07 CST
+Updated: 2026-07-19 CST
 
 ## Status Legend
 
@@ -13,6 +13,47 @@ This index mixes current entrypoints, active evidence, generated references, and
 | `VERIFY_BEFORE_USE` | Generated reference or dated map; use only after checking current code/runtime. |
 | `HISTORICAL_EVIDENCE` | Past handoff/report/log; useful for context, not current authority. |
 | `DEPRECATED_OR_ARCHIVED` | Old plan, old UI/PCUI route, old watchdog route, or archived script lane; do not resume without a current SSOT promoting it. |
+
+## 2026-07-19 HUAIDJ recovery authority set
+
+Read this group before the older weekly/miniprogram/Hermes entries below. A
+document marked current here can define a contract or plan without claiming
+that its deployment/write phases have happened.
+
+- `docs/HUAIDJ_DISASTER_RECOVERY_MASTER_PROMPT_20260719.md` —
+  `CURRENT_AUTHORITY`; full-system role, named state boundaries, business
+  invariants, Git/runtime rules, execution order, and completion definition.
+- `docs/HUAIDJ_FULL_RECOVERY_EXECUTION_PLAN_20260719.md` —
+  `CURRENT_AUTHORITY`; dependency-ordered recovery plan. It remains in progress:
+  final tests, commit/push, immutable release, Hermes cutover, 744-hour run,
+  deploy/hot sync/upload/review/public release, and Atlas import are not implied.
+- `docs/HUAIDJ_MINIPROGRAM_LOADING_ROOT_CAUSE_20260719.md` —
+  `CURRENT_AUTHORITY`; public reproduction of the Friday/weekend and
+  package-wide city-count mismatch, plus the unified projection/release gate.
+- `docs/HUAIDJ_PIPELINE_SSOT_20260717.md` — `CURRENT_AUTHORITY`; complete
+  Sanji/Qwen-VL/DeepSeek/package/CloudRun/CloudBase/AtlasV2/Hermes map. Its
+  2026-07-19 overlay supersedes older status language while retaining prior
+  successful runs as rollback/history evidence.
+- `docs/current-runtime.md` — `CURRENT_AUTHORITY`; current candidate/runtime/
+  public-status split and the exact uncompleted write/release states.
+- `docs/ATLAS_DATASET_GENERATION_HANDSHAKE_20260719.md` —
+  `CURRENT_AUTHORITY`; snapshot-derived `datasetId`, static/online compatibility
+  and fail-closed release rules. It is a code/data contract, not a deploy record.
+- `docs/ATLAS_TRIPLET_INPUT_PREFLIGHT_20260719.md` — `ACTIVE_EVIDENCE`;
+  verified repository-external single-source Atlas candidate and the blocked
+  incompatible historical V2 mix. No serving pointer changed.
+- `docs/WORKTREE_CONSOLIDATION_PLAN_20260719.md` — `CURRENT_AUTHORITY` for
+  Git/worktree protection and exact-removal gates; status is planned, not
+  executed, and no wildcard/force cleanup is authorized.
+- `README.md`, `AGENTS.md`, `docs/CURRENT_CODE_MAP.md`,
+  `docs/CLI_REFERENCE.md`, `docs/CONFIGURATION.md`, and `docs/CODE_AUDIT.md` —
+  `CURRENT_AUTHORITY` for newcomer entry, agent boundaries, code paths,
+  commands, non-secret configuration, and open release risks.
+
+Older reports that claim a prior package, CloudRun revision, developer upload,
+or Hermes state remain `ACTIVE_EVIDENCE` or `HISTORICAL_EVIDENCE` unless the
+2026-07-19 authority set explicitly promotes them. Verify live code, process,
+data identity, and public readback before reusing any time-sensitive claim.
 
 ## Current Entry And Useful Evidence
 

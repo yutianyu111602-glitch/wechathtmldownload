@@ -176,6 +176,51 @@ def test_remote_verifier_candidate_report_carries_raw_file_digest(tmp_path: Path
     assert len(snapshot["file_sha256"]) == 64
 
 
+def test_remote_verifier_requires_bound_successful_smoke(tmp_path: Path) -> None:
+    verifier = load_module("weekly_club_overviews_smoke_binding_test", VERIFY_SCRIPT)
+    binding = {
+        "transaction_id": "weekly-run-003",
+        "env_id": "env-test",
+        "service_name": "weekly-api",
+        "deploy_context_fingerprint": "a" * 64,
+        "deploy_zip_sha256": "b" * 64,
+        "publish_lease_token_sha256": "d" * 64,
+        "expected_generation_id": "sha256:" + "c" * 64,
+        "remote_generation_id": "sha256:" + "c" * 64,
+        "active_version": "weekly-api-126",
+        "base_url": "https://weekly.example.invalid",
+    }
+    smoke_path = tmp_path / "smoke.json"
+    write_json(
+        smoke_path,
+        {
+            "schema_version": "stage7_cloudrun_weekly_production_smoke.v2",
+            "ok": True,
+            "decision": "cloudrun_weekly_production_smoke_ready",
+            "evidence_binding": binding,
+        },
+    )
+
+    assert verifier.load_smoke_binding(smoke_path) == binding
+    verifier.assert_base_url_binding("https://weekly.example.invalid/", binding)
+    with pytest.raises(ValueError, match="base URL"):
+        verifier.assert_base_url_binding("https://wrong.example.invalid", binding)
+
+    broken = dict(binding)
+    broken["remote_generation_id"] = "sha256:" + "d" * 64
+    write_json(
+        smoke_path,
+        {
+            "schema_version": "stage7_cloudrun_weekly_production_smoke.v2",
+            "ok": True,
+            "decision": "cloudrun_weekly_production_smoke_ready",
+            "evidence_binding": broken,
+        },
+    )
+    with pytest.raises(ValueError, match="generation"):
+        verifier.load_smoke_binding(smoke_path)
+
+
 def test_remote_verifier_rejects_same_count_with_different_overview_summary() -> None:
     verifier = load_module("weekly_club_overviews_remote_mismatch_test", VERIFY_SCRIPT)
     candidate = overview_payload("Fresh Club", "fresh", generated_at="2026-07-18T00:00:00+08:00")

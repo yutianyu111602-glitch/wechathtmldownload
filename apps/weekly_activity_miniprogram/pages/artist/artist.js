@@ -1,4 +1,4 @@
-const { requestApi } = require("../../utils/api");
+const { requestApi, fetchAllCurrentItems } = require("../../utils/api");
 const { compactItem } = require("../../utils/format");
 const { applyLanguageChrome, localizeItems, normalizeLang, text } = require("../../utils/i18n");
 const { mergeVenues, mergeCollaborators } = require("../../utils/atlasContract");
@@ -48,23 +48,6 @@ function eventDedupeKey(item = {}) {
   if (title && date && venue) return `${date}|${venue}|${title}`;
   if (sourceHash) return `source|${sourceHash}`;
   return String(item.id || item.eventId || [title, date, venue].join("|"));
-}
-
-async function fetchAllCurrentItems(options = {}) {
-  const all = [];
-  let cursor = 0;
-  for (let i = 0; i < 20; i++) {
-    const params = { limit: 500, cursor };
-    if (options.lookbackDays) params.lookbackDays = options.lookbackDays;
-    const r = await requestApi("/api/v1/weekly/current", params);
-    all.push(...(r.items || []));
-    const nc = r.page?.nextCursor;
-    if (nc === null || nc === undefined || nc === "") break;
-    const pn = Number(nc);
-    if (!Number.isFinite(pn) || pn <= cursor) break;
-    cursor = pn;
-  }
-  return all;
 }
 
 function dedupeEvents(items) {
@@ -217,6 +200,12 @@ function countLabel(value, suffix) {
   return Number.isFinite(n) && n > 0 ? `${n}${suffix}` : "";
 }
 
+function exactPaginationTotal(payload, key) {
+  const value = payload && payload.pagination && payload.pagination[key] && payload.pagination[key].total;
+  const total = Number(value);
+  return Number.isInteger(total) && total >= 0 ? total : null;
+}
+
 function normalizeRelationTrajectory(value) {
   if (!value || typeof value !== "object") return null;
   const cities = (Array.isArray(value.cities) ? value.cities : []).map((row) => {
@@ -323,16 +312,14 @@ Page({
   },
 
   async loadArtist() {
+    const loadToken = Number(this.artistLoadToken || 0) + 1;
+    this.artistLoadToken = loadToken;
+    this.setData({ loading: true, error: "" });
     try {
-      const [profileResult, historyItems] = await Promise.all([
-        this.fetchDjProfile(),
-        fetchAllCurrentItems({ lookbackDays: 45 }),
-      ]);
+      const profileResult = await this.fetchDjProfile();
+      if (this.artistLoadToken !== loadToken) return;
 
       // Process full DJ profile response
-      const events = [];
-      const bioLines = [];
-
       if (profileResult) {
         // Atlas events from the profile. Keep sourceRefId (the `src:` atlas ref)
         // so a tap routes to the atlas-evidence page; preferring the bare hash
@@ -351,8 +338,15 @@ Page({
         const mergedCollaborators = mergeCollaborators(profileResult.collaborators || []);
         const profile = profileResult.profile ? { ...profileResult.profile } : null;
         if (profile) {
-          if (mergedVenues.length) profile.venueCount = mergedVenues.length;
-          if (mergedCollaborators.length) profile.collaboratorCount = mergedCollaborators.length;
+          const eventTotal = exactPaginationTotal(profileResult, "events");
+          const venueTotal = exactPaginationTotal(profileResult, "venues");
+          const collaboratorTotal = exactPaginationTotal(profileResult, "collaborators");
+          if (eventTotal !== null) profile.eventCount = eventTotal;
+          else if (!Number.isFinite(Number(profile.eventCount)) && atlasEvts.length) profile.eventCount = atlasEvts.length;
+          if (venueTotal !== null) profile.venueCount = venueTotal;
+          else if (!Number.isFinite(Number(profile.venueCount)) && mergedVenues.length) profile.venueCount = mergedVenues.length;
+          if (collaboratorTotal !== null) profile.collaboratorCount = collaboratorTotal;
+          else if (!Number.isFinite(Number(profile.collaboratorCount)) && mergedCollaborators.length) profile.collaboratorCount = mergedCollaborators.length;
         }
 
         // Rich card: external media (RA/SoundCloud/Mixcloud/Instagram/…) + verbatim
@@ -423,6 +417,24 @@ Page({
         });
       }
 
+      // The Atlas profile is the core page. Historical weekly events are a
+      // separate enhancement and must never hold the profile skeleton open.
+      this.setData({ loading: false });
+      // Keep the optional task observable for deterministic lifecycle/tests,
+      // while deliberately not awaiting it on the first-render path.
+      this.artistHistoryPromise = this.loadArtistHistory(loadToken);
+    } catch (error) {
+      if (this.artistLoadToken !== loadToken) return;
+      console.error("[artist] loadArtist failed", error);
+      this.setData({ loading: false, error: this.data.t.loadFailed });
+    }
+  },
+
+  async loadArtistHistory(loadToken) {
+    try {
+      const historyItems = await fetchAllCurrentItems({ lookbackDays: 45 });
+      if (this.artistLoadToken !== loadToken) return;
+
       // Legacy: filter history items by artist name
       const atlasEventKeys = new Set((this.data.atlasEvents || []).map(eventDedupeKey));
       const compactEvents = dedupeEvents((historyItems || []).map(compactItem))
@@ -431,6 +443,7 @@ Page({
       const localizedEvents = localizeItems(compactEvents, this.lang);
 
       // Merge yuanbao bios from compact events
+      const bioLines = [];
       for (const e of localizedEvents) {
         if (e.bioLines?.length) {
           for (const b of e.bioLines) {
@@ -442,20 +455,20 @@ Page({
       this.setData({
         events: localizedEvents,
         bioLines,
-        loading: false,
       });
     } catch (error) {
-      console.error("[artist] loadArtist failed", error);
-      this.setData({ loading: false, error: this.data.t.loadFailed });
+      // History is optional enrichment. Keep the already rendered profile and
+      // its last usable event state when pagination or cache validation fails.
+      console.warn("[artist] optional history unavailable", error);
     }
   },
 
   async fetchDjProfile() {
-    // /atlas/artist honours query limits; the /dj-profile route hard-caps venues
-    // at 15 / collaborators at 20, which makes a deduped count impossible. Pull
-    // the full lists here, fall back to dj-profile by name only if this fails.
+    // The server exposes exact totals separately from bounded list pages. Keep
+    // the first page within the public response budget and never infer totals
+    // from the returned array length.
     const atlasQuery = {
-      eventLimit: 100, collaboratorLimit: 1500, venueLimit: 500,
+      eventLimit: 100, collaboratorLimit: 200, venueLimit: 100,
     };
     if (this.subjectId) atlasQuery.subjectId = this.subjectId;
     else atlasQuery.name = this.name;

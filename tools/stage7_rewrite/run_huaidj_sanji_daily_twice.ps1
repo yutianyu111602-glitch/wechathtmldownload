@@ -310,47 +310,103 @@ function Sync-VlSummaryStatus {
     return $summary
 }
 
-function Get-LockPid {
-    if (-not (Test-Path -LiteralPath $LockPath)) {
-        return 0
-    }
-    foreach ($line in (Get-Content -LiteralPath $LockPath -ErrorAction SilentlyContinue)) {
-        if ($line -match "^pid=(\d+)$") {
-            return [int]$Matches[1]
-        }
-    }
-    return 0
-}
-
 function Acquire-Lock {
     New-Item -ItemType Directory -Force -Path $LockDir | Out-Null
-    if (Test-Path -LiteralPath $LockPath) {
-        $lock = Get-Item -LiteralPath $LockPath
-        $lockPid = Get-LockPid
-        $lockExpired = $lock.LastWriteTime -lt (Get-Date).AddMinutes(-1 * $LockTimeoutMinutes)
-        $pidAlive = $lockPid -gt 0 -and $null -ne (Get-Process -Id $lockPid -ErrorAction SilentlyContinue)
-        if ($lockExpired -or ($lockPid -gt 0 -and -not $pidAlive)) {
-            Remove-Item -LiteralPath $LockPath -Force
-        }
+    $stream = $null
+    try {
+        # The file is a persistent lease record. The byte-range lock, not file
+        # age, is the authority: Windows releases it automatically if the owner
+        # exits or crashes, and a healthy 744-hour/full run can never be stolen.
+        $stream = [System.IO.FileStream]::new(
+            $LockPath,
+            [System.IO.FileMode]::OpenOrCreate,
+            [System.IO.FileAccess]::ReadWrite,
+            [System.IO.FileShare]::ReadWrite
+        )
+    } catch {
+        throw "Failed to open the Sanji daily publish lease record: $LockPath"
     }
     try {
-        $stream = [System.IO.File]::Open($LockPath, [System.IO.FileMode]::CreateNew, [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
-        $writer = New-Object System.IO.StreamWriter($stream)
-        $writer.WriteLine("pid=$PID")
-        $writer.WriteLine("started_at=$((Get-Date).ToString('o'))")
-        $writer.Flush()
-        return @{ stream = $stream; writer = $writer }
+        # Locking beyond the current end of file is supported on Windows. Do
+        # not resize or write before taking the lock: a losing contender must
+        # never be able to truncate the active owner's metadata.
+        $stream.Lock(0, 1)
     } catch {
-        throw "Another Sanji daily publish run is active or lock exists: $LockPath"
+        if ($null -ne $stream) {
+            $stream.Dispose()
+        }
+        throw "Another Sanji daily publish run holds the operating-system lease: $LockPath"
+    }
+
+    $leaseToken = [Guid]::NewGuid().ToString("N")
+    $processStartUtc = ""
+    try {
+        $processStartUtc = (Get-Process -Id $PID -ErrorAction Stop).StartTime.ToUniversalTime().ToString("o")
+    } catch {
+        $processStartUtc = "unavailable"
+    }
+    $metadata = [ordered]@{
+        schema_version = "huaidj_sanji_daily_publish_lease.v2"
+        active = $true
+        lease_token = $leaseToken
+        owner_pid = $PID
+        owner_process_start_utc = $processStartUtc
+        owner_host = [Environment]::MachineName
+        started_at = (Get-Date).ToUniversalTime().ToString("o")
+        stale_metadata_after_minutes = $LockTimeoutMinutes
+        authority = "os_byte_range_lock"
+    }
+    try {
+        $json = $metadata | ConvertTo-Json -Compress
+        $bytes = (New-Object System.Text.UTF8Encoding($false)).GetBytes($json)
+        $stream.SetLength([Math]::Max(1, $bytes.Length))
+        $stream.Position = 0
+        $stream.Write($bytes, 0, $bytes.Length)
+        $stream.Flush($true)
+        return @{ stream = $stream; lease_token = $leaseToken; metadata = $metadata }
+    } catch {
+        try { $stream.Unlock(0, 1) } catch { }
+        $stream.Dispose()
+        throw "Failed to persist the Sanji daily publish lease metadata."
     }
 }
 
 function Release-Lock {
     param($Lock)
-    if ($null -ne $Lock.writer) { $Lock.writer.Dispose() }
-    if ($null -ne $Lock.stream) { $Lock.stream.Dispose() }
-    if (Test-Path -LiteralPath $LockPath) {
-        Remove-Item -LiteralPath $LockPath -Force
+    if ($null -eq $Lock -or $null -eq $Lock.stream) { return }
+    $stream = $Lock.stream
+    $metadataPersisted = $true
+    try {
+        # Mark the persistent record inactive while this owner still holds the
+        # byte-range lock. Never delete by path after unlock: that can erase a
+        # successor's lock in the release/acquire race window.
+        $released = [ordered]@{
+            schema_version = "huaidj_sanji_daily_publish_lease.v2"
+            active = $false
+            lease_token = [string]$Lock.lease_token
+            owner_pid = $PID
+            released_at = (Get-Date).ToUniversalTime().ToString("o")
+            authority = "os_byte_range_lock"
+        }
+        $json = $released | ConvertTo-Json -Compress
+        $bytes = (New-Object System.Text.UTF8Encoding($false)).GetBytes($json)
+        $stream.SetLength([Math]::Max(1, $bytes.Length))
+        $stream.Position = 0
+        $stream.Write($bytes, 0, $bytes.Length)
+        $stream.Flush($true)
+    } catch {
+        # The OS lease is the authority. A best-effort metadata failure must
+        # neither retain the lock nor replace the pipeline's original result.
+        $metadataPersisted = $false
+    } finally {
+        try { $stream.Unlock(0, 1) } catch { }
+        try { $stream.Dispose() } catch { }
+        $Lock.stream = $null
+    }
+    if (-not $metadataPersisted) {
+        try {
+            Write-Warning "Sanji daily publish lease released, but inactive metadata could not be persisted."
+        } catch { }
     }
 }
 
