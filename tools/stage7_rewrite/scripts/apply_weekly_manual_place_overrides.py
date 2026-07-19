@@ -266,6 +266,7 @@ def rebuild_city_routes(api_dir: Path, current_payload: dict[str, Any]) -> None:
             {
                 "schema_version": "weekly_activity_miniprogram_city.v1",
                 "generated_at": generated_at,
+                "scope": "package",
                 "city_key": city_key,
                 "city": row["city"],
                 "item_count": len(items),
@@ -287,6 +288,8 @@ def rebuild_city_routes(api_dir: Path, current_payload: dict[str, Any]) -> None:
         {
             "schema_version": "weekly_activity_miniprogram_city_index.v1",
             "generated_at": generated_at,
+            "scope": "package",
+            "item_count": len(current_payload.get("items") or []),
             "city_count": len(cities),
             "cities": cities,
         },
@@ -331,6 +334,8 @@ def apply_package(
     manifest_path = api_dir / "manifest.json"
     if manifest_path.exists():
         manifest = load_json(manifest_path)
+        manifest["static_index_scope"] = "package"
+        manifest["default_api_scope"] = "current"
         manifest["manual_place_overrides"] = {
             "schema_version": "weekly_manual_place_overrides.v1",
             "applied_at": now_cst(),

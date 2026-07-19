@@ -1,0 +1,78 @@
+.card {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16rpx;
+  background-color: #0a0a0a;
+}
+
+.row {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.cell {
+  display: inline-block;
+  width: 240rpx;
+  margin-right: 16rpx;
+  vertical-align: top;
+}
+
+.poster {
+  width: 240rpx;
+  height: 240rpx;
+  border-radius: 12rpx;
+  background-color: #1a1a1a;
+}
+
+.poster-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.poster-empty-text {
+  color: #5a5a5a;
+  font-size: 22rpx;
+}
+
+.title {
+  display: block;
+  margin-top: 12rpx;
+  color: #f2f2f2;
+  font-size: 26rpx;
+  font-weight: bold;
+  -wx-line-clamp: 1;
+  text-overflow: ellipsis;
+  word-break: break-all;
+}
+
+.meta {
+  display: block;
+  margin-top: 6rpx;
+  color: #A7FF26;
+  font-size: 22rpx;
+  -wx-line-clamp: 1;
+  text-overflow: ellipsis;
+}
+
+.lineup {
+  display: block;
+  margin-top: 4rpx;
+  color: #9a9a9a;
+  font-size: 22rpx;
+  -wx-line-clamp: 1;
+  text-overflow: ellipsis;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 200rpx;
+}
+
+.empty-text {
+  color: #7e7e7e;
+  font-size: 24rpx;
+}

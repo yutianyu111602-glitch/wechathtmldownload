@@ -810,6 +810,8 @@ def manifest_provenance_issues(api_dir: Path, manifest: dict[str, Any]) -> list[
 
 def static_route_index_issues(api_dir: Path) -> list[dict[str, Any]]:
     issues: list[dict[str, Any]] = []
+    current = read_json(api_dir / "current.json") if (api_dir / "current.json").exists() else {}
+    expected_item_count = len(current.get("items") or []) if isinstance(current, dict) else 0
     required_indexes = [
         ("by-city/index.json", "cities"),
         ("by-date/index.json", "dates"),
@@ -822,6 +824,15 @@ def static_route_index_issues(api_dir: Path) -> list[dict[str, Any]]:
         payload = read_json(path)
         if not isinstance(payload.get(list_field), list):
             issues.append({"path": rel_path, "reason": f"{list_field}_must_be_list"})
+        if payload.get("scope") != "package":
+            issues.append({"path": rel_path, "reason": "scope_must_be_package", "actual": payload.get("scope")})
+        if payload.get("item_count") != expected_item_count:
+            issues.append({
+                "path": rel_path,
+                "reason": "item_count_must_match_current_package",
+                "actual": payload.get("item_count"),
+                "expected": expected_item_count,
+            })
     return issues
 
 

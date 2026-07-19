@@ -51,7 +51,7 @@ const TITLE_STOP_TOKENS = new Set([
 const CHINESE_TITLE_STOP_TOKENS = new Set(["活动", "派对", "预告", "阵容", "周末", "本周", "今晚", "今夜"]);
 
 export function storageSlug(value) {
-  const raw = String(value || "").trim().toLowerCase();
+  const raw = String(value || "").trim().toLowerCase().replace(/\s+/g, "-");
   if (!raw) return "";
   let out = "";
   for (const char of raw) {
@@ -172,6 +172,32 @@ function itemMatchesDate(item, date) {
   const start = isoDate(item.event_date_start) || dates[0] || "";
   const end = isoDate(item.event_date_end) || dates[dates.length - 1] || start;
   return Boolean(start && end && start <= target && target <= end);
+}
+
+function normalizeVisibilityScope(value) {
+  const scope = String(value || "").trim().toLowerCase();
+  return scope === "package" || scope === "package_window" || scope === "all" ? "package" : "current";
+}
+
+function normalizeDateWindow(dateStart, dateEnd) {
+  const left = isoDate(dateStart);
+  const right = isoDate(dateEnd);
+  if (!left && !right) return { dateStart: "", dateEnd: "" };
+  const start = left || right;
+  const end = right || left;
+  return start <= end
+    ? { dateStart: start, dateEnd: end }
+    : { dateStart: end, dateEnd: start };
+}
+
+function itemMatchesDateWindow(item, dateStart, dateEnd) {
+  const window = normalizeDateWindow(dateStart, dateEnd);
+  if (!window.dateStart) return true;
+  const dates = itemDateKeys(item);
+  const start = isoDate(item.event_date_start) || dates[0] || "";
+  const end = isoDate(item.event_date_end) || dates[dates.length - 1] || start;
+  if (!start && !end) return false;
+  return (start || end) <= window.dateEnd && (end || start) >= window.dateStart;
 }
 
 function currentShanghaiDateParts(now = new Date()) {
@@ -963,65 +989,90 @@ export class WeeklyActivityDataStore {
     }
   }
 
-  async getCurrent({ cityKey, date, limit, cursor, lookbackDays } = {}) {
+  async getVisibleProjection({ cityKey, date, dateStart, dateEnd, lookbackDays, scope } = {}) {
+    const current = await readJson(this.baseDir, "current.json");
+    const expectedCurrentSchema = "weekly_activity_miniprogram_current.v1";
+    if (current.schema_version && current.schema_version !== expectedCurrentSchema) {
+      console.warn(
+        `[dataStore] current.json schema drift: got "${current.schema_version}", expected "${expectedCurrentSchema}"`,
+      );
+    }
+    if (Array.isArray(current.items) && Number.isFinite(current.item_count) && current.item_count !== current.items.length) {
+      console.warn(
+        `[dataStore] current.json count mismatch: item_count=${current.item_count} but items.length=${current.items.length}`,
+      );
+    }
+    const visibilityScope = normalizeVisibilityScope(scope);
+    const exactDate = isoDate(date);
+    const window = exactDate
+      ? { dateStart: exactDate, dateEnd: exactDate }
+      : normalizeDateWindow(dateStart, dateEnd);
+    const today = this.todayDateKey();
+    const lookback = normalizeLookbackDays(lookbackDays, DEFAULT_CURRENT_LOOKBACK_DAYS);
+    const currentThreshold = !exactDate && !window.dateStart && lookback > 0 ? addDays(today, -lookback) : today;
+    const filtered = (Array.isArray(current.items) ? current.items : []).filter((item) => {
+      if (cityKey && item.city_key !== cityKey && !(item.city_keys || []).includes(cityKey)) return false;
+      if (exactDate && !itemMatchesDate(item, exactDate)) return false;
+      if (!exactDate && window.dateStart && !itemMatchesDateWindow(item, window.dateStart, window.dateEnd)) return false;
+      if (visibilityScope === "current" && !exactDate && !window.dateStart && !itemIsCurrentOrFuture(item, currentThreshold)) {
+        return false;
+      }
+      return item.quality_status === "READY" && isElectronicMusicRelevantItem(item);
+    });
+    const items = dedupeItems(filtered);
+    items.sort((a, b) => {
+      const aKey = isoDate(a.event_date_start) || itemDateKeys(a)[0] || "9999-12-31";
+      const bKey = isoDate(b.event_date_start) || itemDateKeys(b)[0] || "9999-12-31";
+      return aKey < bKey ? -1 : aKey > bKey ? 1 : 0;
+    });
+    return {
+      current,
+      items,
+      filters: {
+        scope: visibilityScope,
+        cityKey: cityKey || null,
+        date: exactDate || null,
+        dateStart: window.dateStart || null,
+        dateEnd: window.dateEnd || null,
+        lookbackDays: visibilityScope === "current" && !exactDate && !window.dateStart ? (lookback || null) : null,
+        today: today || null,
+      },
+    };
+  }
+
+  async getCurrent({ cityKey, date, dateStart, dateEnd, limit, cursor, lookbackDays, scope } = {}) {
     let current;
+    let projection;
     try {
-      current = await readJson(this.baseDir, "current.json");
-      const expectedCurrentSchema = "weekly_activity_miniprogram_current.v1";
-      if (current.schema_version && current.schema_version !== expectedCurrentSchema) {
-        console.warn(
-          `[dataStore] current.json schema drift: got "${current.schema_version}", expected "${expectedCurrentSchema}"`,
-        );
-      }
-      if (Array.isArray(current.items) && Number.isFinite(current.item_count) && current.item_count !== current.items.length) {
-        console.warn(
-          `[dataStore] current.json count mismatch: item_count=${current.item_count} but items.length=${current.items.length}`,
-        );
-      }
+      projection = await this.getVisibleProjection({ cityKey, date, dateStart, dateEnd, lookbackDays, scope });
+      current = projection.current;
     } catch (err) {
       console.error("[dataStore] getCurrent failed to read current.json:", err.message);
       return {
         schemaVersion: "weekly_activity_api.current_response.v1",
         generatedAt: null,
-        filters: { cityKey: cityKey || null, date: date || null, lookbackDays: lookbackDays || null },
+        filters: {
+          scope: normalizeVisibilityScope(scope),
+          cityKey: cityKey || null,
+          date: isoDate(date) || null,
+          dateStart: isoDate(dateStart) || null,
+          dateEnd: isoDate(dateEnd) || null,
+          lookbackDays: lookbackDays || null,
+        },
         page: { limit: normalizeLimit(limit), cursor: "0", nextCursor: null, total: 0 },
         items: [],
       };
     }
     const pageLimit = normalizeLimit(limit);
     const pageCursor = normalizeCursor(cursor);
-    const today = this.todayDateKey();
-    const lookback = normalizeLookbackDays(lookbackDays, DEFAULT_CURRENT_LOOKBACK_DAYS);
-    const currentThreshold = !date && lookback > 0 ? addDays(today, -lookback) : today;
-    const filtered = current.items.filter((item) => {
-      if (cityKey && item.city_key !== cityKey && !(item.city_keys || []).includes(cityKey)) {
-        return false;
-      }
-      if (date && !itemMatchesDate(item, date)) {
-        return false;
-      }
-      if (!date && !itemIsCurrentOrFuture(item, currentThreshold)) {
-        return false;
-      }
-      return item.quality_status === "READY" && isElectronicMusicRelevantItem(item);
-    });
-    const deduped = dedupeItems(filtered);
-    deduped.sort((a, b) => {
-      const aKey = isoDate(a.event_date_start) || itemDateKeys(a)[0] || "9999-12-31";
-      const bKey = isoDate(b.event_date_start) || itemDateKeys(b)[0] || "9999-12-31";
-      return aKey < bKey ? -1 : aKey > bKey ? 1 : 0;
-    });
+    const deduped = projection.items;
     const items = deduped.slice(pageCursor, pageCursor + pageLimit).map(withListCompatItem);
     const nextOffset = pageCursor + items.length;
 
     return {
       schemaVersion: "weekly_activity_api.current_response.v1",
       generatedAt: current.generated_at,
-      filters: {
-        cityKey: cityKey || null,
-        date: date || null,
-        lookbackDays: lookback || null,
-      },
+      filters: projection.filters,
       page: {
         limit: pageLimit,
         cursor: String(pageCursor),
@@ -1032,74 +1083,64 @@ export class WeeklyActivityDataStore {
     };
   }
 
-  async getCities() {
-    try {
-      return await readJson(this.baseDir, "by-city/index.json");
-    } catch {
-      const current = await readJson(this.baseDir, "current.json");
-      const today = this.todayDateKey();
-      const cities = new Map();
-      for (const item of current.items) {
-        if (!itemIsCurrentOrFuture(item, today)) continue;
-        if (item.quality_status !== "READY") continue;
-        if (!isElectronicMusicRelevantItem(item)) continue;
-        const key = item.city_key || "unknown";
-        const label = (item.city || [])[0] || key;
-        cities.set(key, {
-          city_key: key,
-          city: label,
-          item_count: (cities.get(key)?.item_count || 0) + 1,
-          path: `by-city/${key}.json`,
-        });
-      }
-      return {
-        schema_version: "weekly_activity_miniprogram_city_index.v1",
-        generated_at: current.generated_at,
-        item_count: cities.size,
-        cities: [...cities.values()],
-      };
+  async getCities({ date, dateStart, dateEnd, lookbackDays, scope } = {}) {
+    const projection = await this.getVisibleProjection({ date, dateStart, dateEnd, lookbackDays, scope });
+    const cities = new Map();
+    for (const item of projection.items) {
+      const key = item.city_key || (item.city_keys || [])[0] || "unknown";
+      const rawCity = Array.isArray(item.city) ? item.city[0] : item.city;
+      const label = rawCity || key;
+      const itemCount = (cities.get(key)?.item_count || 0) + 1;
+      cities.set(key, {
+        city_key: key,
+        city: label,
+        count: itemCount,
+        item_count: itemCount,
+        path: `by-city/${key}.json`,
+      });
     }
+    return {
+      schema_version: "weekly_activity_miniprogram_city_index.v2",
+      generated_at: projection.current.generated_at || null,
+      scope: projection.filters.scope,
+      filters: projection.filters,
+      city_count: cities.size,
+      item_count: projection.items.length,
+      cities: [...cities.values()].sort((a, b) => b.item_count - a.item_count || a.city_key.localeCompare(b.city_key)),
+    };
   }
 
-  async getDates() {
-    try {
-      const today = this.todayDateKey();
-      const payload = await readJson(this.baseDir, "by-date/index.json");
-      const dates = (payload.dates || []).filter((entry) => {
-        const dateValue = isoDate(entry.date);
-        return !today || !dateValue || dateValue >= today;
-      });
-      return {
-        ...payload,
-        date_count: dates.length,
-        item_count: dates.length,
-        dates,
-      };
-    } catch {
-      const current = await readJson(this.baseDir, "current.json");
-      const today = this.todayDateKey();
-      const dates = new Map();
-      for (const item of current.items) {
-        if (item.quality_status !== "READY") continue;
-        if (!isElectronicMusicRelevantItem(item)) continue;
-        const itemDates = itemDateKeys(item);
-        for (const date of itemDates.length ? itemDates : ["unknown"]) {
-          const dateValue = isoDate(date);
-          if (today && dateValue && dateValue < today) continue;
-          dates.set(date, {
-            date,
-            item_count: (dates.get(date)?.item_count || 0) + 1,
-            path: `by-date/${date}.json`,
-          });
-        }
+  async getDates({ cityKey, date, dateStart, dateEnd, lookbackDays, scope } = {}) {
+    const projection = await this.getVisibleProjection({ cityKey, date, dateStart, dateEnd, lookbackDays, scope });
+    const dates = new Map();
+    const windowStart = projection.filters.dateStart;
+    const windowEnd = projection.filters.dateEnd;
+    const currentFloor = projection.filters.scope === "current" && !windowStart
+      ? (projection.filters.lookbackDays ? addDays(projection.filters.today, -projection.filters.lookbackDays) : projection.filters.today)
+      : null;
+    for (const item of projection.items) {
+      for (const key of itemDateKeys(item)) {
+        if (windowStart && (key < windowStart || key > windowEnd)) continue;
+        if (currentFloor && key < currentFloor) continue;
+        const itemCount = (dates.get(key)?.item_count || 0) + 1;
+        dates.set(key, {
+          date: key,
+          count: itemCount,
+          item_count: itemCount,
+          path: `by-date/${key}.json`,
+        });
       }
-      return {
-        schema_version: "weekly_activity_miniprogram_date_index.v1",
-        generated_at: current.generated_at,
-        item_count: dates.size,
-        dates: [...dates.values()].sort((a, b) => a.date.localeCompare(b.date)),
-      };
     }
+    const entries = [...dates.values()].sort((a, b) => a.date.localeCompare(b.date));
+    return {
+      schema_version: "weekly_activity_miniprogram_date_index.v2",
+      generated_at: projection.current.generated_at || null,
+      scope: projection.filters.scope,
+      filters: projection.filters,
+      date_count: entries.length,
+      item_count: projection.items.length,
+      dates: entries,
+    };
   }
 
   async getItem(id) {

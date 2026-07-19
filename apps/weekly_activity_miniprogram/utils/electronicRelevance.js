@@ -21,13 +21,28 @@ function collectText(value, out) {
 function activityRelevanceText(item) {
   const out = [];
   const keys = [
-    "title", "title_display", "summary", "description", "description_text",
-    "promoter", "organizer", "organizer_name", "venue", "venue_name",
-    "lineup", "genres", "genre", "tags", "category", "evidence",
+    "title",
+    "title_display",
+    "summary",
+    "description",
+    "description_text",
+    "promoter",
+    "organizer",
+    "organizer_name",
+    "venue",
+    "venue_name",
+    "lineup",
+    "genres",
+    "genre",
+    "tags",
+    "category",
+    "evidence",
     "description_original_lines",
   ];
   for (const key of keys) {
-    if (Object.prototype.hasOwnProperty.call(item || {}, key)) collectText(item[key], out);
+    if (Object.prototype.hasOwnProperty.call(item || {}, key)) {
+      collectText(item[key], out);
+    }
   }
   return out.join(" ");
 }
@@ -46,4 +61,7 @@ function isElectronicMusicRelevantItem(item) {
   return !nonElectronicExclusionReason(item);
 }
 
-module.exports = { isElectronicMusicRelevantItem, nonElectronicExclusionReason };
+module.exports = {
+  isElectronicMusicRelevantItem,
+  nonElectronicExclusionReason,
+};

@@ -132,8 +132,7 @@ Page({
     safeVibrate("light");
     const name = encodeURIComponent(item.name);
     if (item.isDj) {
-      const subjectId = encodeURIComponent(item.id || "");
-      wx.navigateTo({ url: `/pages/artist/artist?name=${name}${subjectId ? `&subjectId=${subjectId}` : ""}` });
+      wx.navigateTo({ url: `/pages/artist/artist?name=${name}` });
       return;
     }
     if (item.isVenue) {

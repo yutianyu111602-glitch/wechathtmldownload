@@ -154,6 +154,58 @@ async function main() {
   const { createServer } = await import("../../../services/weekly_activity_cloudrun/src/server.mjs");
   let server;
   let ws;
+  let originalCloudConfig = null;
+
+  async function snapshotDevtoolsBackend() {
+    return withTimeout(callAppFunction(ws, function readDevtoolsBackend() {
+      const c = getApp().globalData.cloud;
+      return {
+        useMock: c.useMock === true,
+        publicBaseUrl: c.publicBaseUrl || "",
+        staticBaseUrl: c.staticBaseUrl || "",
+        useCloudDatabaseFirst: c.useCloudDatabaseFirst === true,
+        offlineSnapshotFallback: c.offlineSnapshotFallback !== false,
+        fastOfflineSnapshotFallback: c.fastOfflineSnapshotFallback === true,
+        devtoolsMockFallback: c.devtoolsMockFallback !== false,
+        publicFallbackDelayMs: Number(c.publicFallbackDelayMs || 0),
+        cacheMaxAgeMs: Number(c.cacheMaxAgeMs || 0),
+        cacheFallbackDelayMs: Number(c.cacheFallbackDelayMs || 0),
+        publicRequestTimeoutMs: Number(c.publicRequestTimeoutMs || 0),
+        requestTimeoutMs: Number(c.requestTimeoutMs || 0),
+        cloudReady: c.cloudReady === true,
+        hadCloudClient: Boolean(c.cloudClient),
+        devtoolsApiOverrideApplied: c.devtoolsApiOverrideApplied === true,
+      };
+    }, [], 8000), 12000, "snapshot DevTools backend");
+  }
+
+  async function restoreDevtoolsBackend() {
+    if (!ws || !originalCloudConfig) return { restored: false };
+    return withTimeout(callAppFunction(ws, function restoreDevtoolsBackendInApp(original) {
+      const c = getApp().globalData.cloud;
+      Object.keys(original).forEach((key) => {
+        if (key !== "hadCloudClient" && key !== "devtoolsApiOverrideApplied") c[key] = original[key];
+      });
+      if (original.devtoolsApiOverrideApplied) {
+        c.devtoolsApiOverrideApplied = true;
+        c.cloudClient = {
+          callContainer: () => Promise.reject({ error: { code: "DEVTOOLS_API_OVERRIDE_LOCAL_ONLY" } }),
+          callFunction: () => Promise.reject({ error: { code: "DEVTOOLS_API_OVERRIDE_LOCAL_ONLY" } }),
+        };
+      } else {
+        delete c.devtoolsApiOverrideApplied;
+        c.cloudClient = original.hadCloudClient && typeof wx !== "undefined" && wx.cloud ? wx.cloud : null;
+      }
+      c.cloudInitPromise = null;
+      c.cloudReady = original.cloudReady === true;
+      return {
+        restored: true,
+        publicBaseUrl: c.publicBaseUrl || "",
+        offlineSnapshotFallback: c.offlineSnapshotFallback !== false,
+      };
+    }, [originalCloudConfig], 8000), 12000, "restore DevTools backend");
+  }
+
   try {
     server = createServer({
       store: {},
@@ -165,6 +217,7 @@ async function main() {
     });
     const baseUrl = await listen(server);
     ws = await step("connect DevTools websocket", () => withTimeout(connectDevtools(wsEndpoint), 40000, "DevTools websocket connect"));
+    originalCloudConfig = await step("snapshot DevTools backend", snapshotDevtoolsBackend);
 
     function configureLocalBackend() {
       return withTimeout(callAppFunction(ws, function injectLocalBackend(base) {
@@ -555,8 +608,12 @@ async function main() {
     writeJson("report.json", report);
     console.log(JSON.stringify(report, null, 2));
   } finally {
-    await closeSocket(ws);
-    if (server) await new Promise((resolve) => server.close(resolve));
+    try {
+      await restoreDevtoolsBackend();
+    } finally {
+      await closeSocket(ws);
+      if (server) await new Promise((resolve) => server.close(resolve));
+    }
   }
 }
 

@@ -2,7 +2,7 @@
 param(
   [switch]$SkipSanjiRefresh,
   [int]$SanjiCdpPort = 19333,
-  [int]$SanjiRefreshCutoffHours = 96,
+  [int]$SanjiRefreshCutoffHours = 744,
   [int]$SanjiRefreshTimeoutMinutes = 30,
   [int]$SanjiSyncResumeAttempts = 1,
   [int]$SanjiFetchLimit = 300,
@@ -70,6 +70,9 @@ $RefreshLogPath = Join-Path $LogRoot "sanji_cdp_sync_$Stamp.json"
 $FetchRefsPath = Join-Path $LogRoot "sanji_recent_fetch_refs_$Stamp.json"
 $FetchRefsSummaryPath = Join-Path $LogRoot "sanji_recent_fetch_refs_summary_$Stamp.json"
 $FetchRefsLogPath = Join-Path $LogRoot "sanji_recent_fetch_refs_$Stamp.log"
+$PostFetchRefsPath = Join-Path $LogRoot "sanji_recent_fetch_refs_postfetch_$Stamp.json"
+$PostFetchRefsSummaryPath = Join-Path $LogRoot "sanji_recent_fetch_refs_postfetch_summary_$Stamp.json"
+$PostFetchRefsLogPath = Join-Path $LogRoot "sanji_recent_fetch_refs_postfetch_$Stamp.log"
 $FetchCancelLogPath = Join-Path $LogRoot "sanji_cdp_fetch_cancel_$Stamp.json"
 $FetchLogPath = Join-Path $LogRoot "sanji_cdp_fetch_$Stamp.json"
 $LockDir = Join-Path $HuaidjReportRoot '_locks'
@@ -399,6 +402,8 @@ function Invoke-SanjiRefresh {
     }
   }
   if ($pendingRefCount -lt 1) {
+    Copy-Item -LiteralPath $FetchRefsPath -Destination $PostFetchRefsPath -Force
+    Copy-Item -LiteralPath $FetchRefsSummaryPath -Destination $PostFetchRefsSummaryPath -Force
     return
   }
 
@@ -428,6 +433,28 @@ function Invoke-SanjiRefresh {
   Assert-SanjiPhase -Report $fetchReport -Path @('final', 'fetch') -StageName 'fetch'
   Assert-SanjiPhase -Report $fetchReport -Path @('final', 'resource') -StageName 'resource fetch'
   "Sanji CDP fetch log: $FetchLogPath" | Add-Content -LiteralPath $LogPath -Encoding UTF8
+
+  # Re-scan the complete formal window after fetch. The pre-fetch queue only
+  # proves work was requested; this second snapshot is the fail-closed proof
+  # that no actionable missing HTML remains.
+  $ExitCode = Invoke-NativeCommand {
+    & $PythonExecutable $FetchRefsScriptPath `
+      --sanji-root $SanjiRoot `
+      --cutoff-hours $SanjiRefreshCutoffHours `
+      --limit 0 `
+      --out $PostFetchRefsPath `
+      --summary-out $PostFetchRefsSummaryPath `
+      *> $PostFetchRefsLogPath
+  }
+  if ($ExitCode -ne 0) {
+    throw "Sanji postfetch unresolved ledger build failed with exit code $ExitCode. See $PostFetchRefsLogPath"
+  }
+  $postFetchSummary = Get-Content -LiteralPath $PostFetchRefsSummaryPath -Raw | ConvertFrom-Json
+  $unresolvedMissingHtml = [int]$postFetchSummary.pending_ref_count
+  "Sanji postfetch unresolved_missing_html=$unresolvedMissingHtml summary=$PostFetchRefsSummaryPath" | Add-Content -LiteralPath $LogPath -Encoding UTF8
+  if ($unresolvedMissingHtml -gt 0) {
+    throw "Sanji refresh remains incomplete: unresolved_missing_html=$unresolvedMissingHtml. See sanitized ledger $PostFetchRefsPath"
+  }
 }
 
 New-Item -ItemType Directory -Force -Path $LogRoot | Out-Null
@@ -458,8 +485,8 @@ try {
   $env:SANJI_CDP_PORT = [string]$SanjiCdpPort
   $env:SANJI_CDP_REFRESH_LOG = if ($SkipSanjiRefresh) { '' } else { $RefreshLogPath }
   $env:SANJI_CDP_FETCH_LOG = if ($SkipSanjiRefresh) { '' } else { $FetchLogPath }
-  $env:SANJI_CDP_FETCH_REFS = if ($SkipSanjiRefresh) { '' } else { $FetchRefsPath }
-  $env:SANJI_CDP_FETCH_REFS_SUMMARY = if ($SkipSanjiRefresh) { '' } else { $FetchRefsSummaryPath }
+  $env:SANJI_CDP_FETCH_REFS = if ($SkipSanjiRefresh) { '' } else { $PostFetchRefsPath }
+  $env:SANJI_CDP_FETCH_REFS_SUMMARY = if ($SkipSanjiRefresh) { '' } else { $PostFetchRefsSummaryPath }
   $env:SANJI_CDP_MAX_STALENESS_HOURS = [string]$SanjiMaxStalenessHours
 
 $ExitCode = Invoke-NativeCommand {

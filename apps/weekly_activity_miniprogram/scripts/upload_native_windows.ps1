@@ -84,8 +84,13 @@ if (-not $NoCleanStaging) {
   if (-not [string]::IsNullOrWhiteSpace($StagingRoot)) {
     $effectiveStagingRoot = $StagingRoot
   } else {
-    $repoRoot = Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..\..\..")
-    $effectiveStagingRoot = Join-Path $repoRoot "artifacts\miniprogram-ci-staging"
+    $effectiveStagingRoot = [Environment]::GetEnvironmentVariable("HUAIDJ_CI_STAGING_ROOT", "Process")
+    if ([string]::IsNullOrWhiteSpace($effectiveStagingRoot)) {
+      $effectiveStagingRoot = [Environment]::GetEnvironmentVariable("HUAIDJ_CI_STAGING_ROOT", "User")
+    }
+    if ([string]::IsNullOrWhiteSpace($effectiveStagingRoot)) {
+      $effectiveStagingRoot = "F:\DevData\HuaidjRuntime\state\staging\miniprogram-ci"
+    }
   }
 
   if ($WhatIfPreference) {

@@ -30,15 +30,24 @@
     >{{item.label}}</view>
   </view>
 
+  <view wx:if="{{!loading}}" class="column-usage-hint">
+    <text>先看标题和相关 DJ；点“展开正文”阅读，来源 / 外链 / 采访 / 作品在正文末尾再展开。分享到朋友圈请用右上角 ··· 菜单。</text>
+  </view>
+
   <view class="column-list">
     <view
       wx:for="{{filteredItems}}"
       wx:key="id"
       class="column-card"
       data-id="{{item.id}}"
-      bindtap="onCardTap"
     >
-      <view class="card-header">
+      <view
+        class="card-header"
+        data-id="{{item.id}}"
+        catchtap="onBodyToggle"
+        hover-class="card-header-hover"
+        hover-stay-time="120"
+      >
         <image wx:if="{{item.avatar}}" class="card-avatar" src="{{item.avatar}}" mode="aspectFill" lazy-load></image>
         <view class="card-header-text">
           <view class="card-meta">
@@ -46,47 +55,128 @@
             <text class="card-date">{{item.date}}</text>
           </view>
           <view class="card-title">{{item.title}}</view>
+          <view wx:if="{{item.relatedDj}}" class="card-dj-line">
+            <text class="card-dj-label">相关 DJ</text>
+            <text class="card-dj-name">{{item.relatedDj}}</text>
+          </view>
         </view>
         <view class="card-expand-icon">{{item.expanded ? '▾' : '▸'}}</view>
       </view>
       <view class="card-body {{item.expanded ? 'card-body-expanded' : 'card-body-collapsed'}}">
-        <view class="card-summary">{{item.summary}}</view>
-        <view wx:if="{{item.hasForeignMedia}}" class="card-foreign">
-          <text class="foreign-label">{{t.foreignMedia}}</text>
-          <text>{{item.foreignMedia}}</text>
+        <view wx:if="{{!item.expanded}}" class="card-expand-hint">
+          <button class="card-body-toggle" data-id="{{item.id}}" catchtap="onBodyToggle">{{item.bodyToggleLabel}}</button>
+          <text wx:if="{{item.evidenceCount}}" class="card-expand-meta">资料 {{item.evidenceCount}} 项</text>
         </view>
-        <view wx:if="{{item.soundcloud}}" class="card-link-row" data-url="{{item.soundcloud}}" bindtap="openSourceLink">
-          <text class="card-link-icon">🎧</text>
-          <text class="card-link-text">SoundCloud</text>
-          <text class="card-link-arrow">›</text>
-        </view>
-        <view wx:if="{{item.bandcamp}}" class="card-link-row" data-url="{{item.bandcamp}}" bindtap="openSourceLink">
-          <text class="card-link-icon">🎵</text>
-          <text class="card-link-text">Bandcamp</text>
-          <text class="card-link-arrow">›</text>
-        </view>
-        <view wx:if="{{item.eventUrl && !item.isFictionalUrl}}" class="card-link-row" data-url="{{item.eventUrl}}" bindtap="openSourceLink">
-          <text class="card-link-icon">📰</text>
-          <text class="card-link-text">{{t.eventSource}}</text>
-          <text class="card-link-arrow">›</text>
-        </view>
-        <view wx:if="{{item.eventUrl && item.isFictionalUrl}}" class="card-link-row card-link-row-disabled">
-          <text class="card-link-icon">📰</text>
-          <text class="card-link-text">{{t.sourceExternal}}</text>
-          <text class="card-link-arrow">·</text>
-        </view>
-        <view wx:if="{{item.tracks && item.tracks.length}}" class="card-tracks">
-          <view wx:for="{{item.tracks}}" wx:key="*this" wx:for-item="track" class="card-track-item">
-            <text class="track-dot">·</text>
-            <text>{{track}}</text>
+        <block wx:if="{{item.expanded}}">
+          <view class="card-summary">{{item.summary}}</view>
+        </block>
+        <view wx:if="{{item.expanded && item.deck}}" class="card-deck">{{item.deck}}</view>
+        <view wx:if="{{item.expanded && item.hasLongBody}}" class="card-long-body">
+          <view wx:if="{{item.cleanToneSource}}" class="card-reading-meta">
+            <text class="tone-source">{{item.cleanToneSource}}</text>
           </view>
+          <view
+            wx:for="{{item.paragraphs}}"
+            wx:key="*this"
+            wx:for-item="paragraph"
+            class="card-paragraph"
+          >{{paragraph}}</view>
         </view>
-        <view class="card-source">{{t.source}} {{item.sourceName}}</view>
-        <view class="card-share-row">
-          <button class="card-share-btn" open-type="share" data-id="{{item.id}}" data-title="{{item.title}}">
-            <text class="share-icon">↗</text>
-            <text class="share-text">{{t.shareItem || '分享'}}</text>
+
+        <view wx:if="{{item.expanded}}" class="body-action-row">
+          <button class="card-body-toggle card-body-toggle-muted" data-id="{{item.id}}" catchtap="onBodyToggle">{{item.bodyToggleLabel}}</button>
+          <button wx:if="{{item.hasEvidencePanel}}" class="evidence-toggle" data-id="{{item.id}}" catchtap="onEvidenceToggle">
+            {{item.evidenceToggleLabel}}
           </button>
+        </view>
+
+        <view wx:if="{{item.expanded && item.evidenceExpanded && item.hasEvidencePanel}}" class="card-evidence">
+          <view class="evidence-head">
+            <text class="evidence-title">资料入口</text>
+            <text class="evidence-rule">主入口优先，其余压成标签</text>
+          </view>
+
+          <view wx:if="{{item.hasForeignMedia}}" class="card-foreign">
+            <text class="foreign-label">{{t.foreignMedia}}</text>
+            <text>{{item.foreignMedia}}</text>
+          </view>
+
+          <view
+            wx:if="{{item.hasEventSource}}"
+            class="card-link-row card-link-row-primary"
+            data-source-hash="{{item.sourceHash}}"
+            data-detail-id="{{item.sourceDetailId}}"
+            data-url="{{item.eventUrl}}"
+            catchtap="openEventSource"
+          >
+            <text class="card-link-icon">SRC</text>
+            <text class="card-link-text">{{t.eventSource}}</text>
+            <text class="card-link-arrow">›</text>
+          </view>
+          <view wx:if="{{item.hasFictionalSource}}" class="card-link-row card-link-row-disabled">
+            <text class="card-link-icon">SRC</text>
+            <text class="card-link-text">{{t.sourceExternal}}</text>
+            <text class="card-link-arrow">·</text>
+          </view>
+
+          <block wx:for="{{item.primaryLinks}}" wx:key="key" wx:for-item="link">
+            <view class="card-link-row" data-url="{{link.url}}" catchtap="openSourceLink">
+              <text class="card-link-icon">{{link.icon}}</text>
+              <text class="card-link-text">{{link.label}}</text>
+              <text class="card-link-arrow">›</text>
+            </view>
+          </block>
+
+          <view wx:if="{{item.moreLinks.length}}" class="secondary-link-list">
+            <text
+              wx:for="{{item.moreLinks}}"
+              wx:key="key"
+              wx:for-item="link"
+              class="secondary-link-chip"
+              data-url="{{link.url}}"
+              catchtap="openSourceLink"
+            >{{link.label}} ›</text>
+          </view>
+
+          <view wx:if="{{item.trackPreview.length}}" class="card-tracks">
+            <view wx:for="{{item.trackPreview}}" wx:key="*this" wx:for-item="track" class="card-track-item">
+              <text class="track-dot">·</text>
+              <text>{{track}}</text>
+            </view>
+            <view wx:if="{{item.extraTrackCount}}" class="card-more-note">另有 {{item.extraTrackCount}} 条曲目线索，回到资料入口查看原文。</view>
+          </view>
+
+          <view wx:if="{{item.referencePreview.length}}" class="card-references">
+            <text class="references-label">{{t.references}}</text>
+            <view class="references-list">
+              <block wx:for="{{item.referencePreview}}" wx:key="label" wx:for-item="ref">
+                <text
+                  wx:if="{{ref.url}}"
+                  class="reference-chip reference-chip-link"
+                  data-url="{{ref.url}}"
+                  catchtap="openSourceLink"
+                >{{ref.label}} ›</text>
+                <text wx:else class="reference-chip">{{ref.label}}</text>
+              </block>
+              <text wx:if="{{item.extraReferenceCount}}" class="reference-chip">+{{item.extraReferenceCount}}</text>
+            </view>
+          </view>
+
+          <view wx:if="{{item.sourceName}}" class="card-source">{{t.source}} {{item.sourceName}}</view>
+        </view>
+
+        <view wx:if="{{item.expanded}}" class="card-share-row">
+          <view class="card-share-actions">
+            <button class="card-share-btn" open-type="share" data-id="{{item.id}}" data-title="{{item.title}}">
+              <text class="share-icon">↗</text>
+              <text class="share-text">发给朋友</text>
+            </button>
+            <button class="card-timeline-btn" data-id="{{item.id}}" catchtap="showTimelineShareTip">
+              <text class="share-icon">···</text>
+              <text class="share-text">朋友圈</text>
+            </button>
+          </view>
+          <view class="timeline-share-tip">朋友圈入口在右上角 ··· 菜单，不在“选择聊天”面板里。</view>
         </view>
       </view>
     </view>

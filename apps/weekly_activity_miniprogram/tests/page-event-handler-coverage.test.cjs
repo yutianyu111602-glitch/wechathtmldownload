@@ -101,27 +101,38 @@ test("home filter handlers reload with explicit selected filter state", () => {
   const script = read("pages/index/index.js");
 
   assert.match(script, /const selectedCityKey = opts\.cityKey !== undefined \? opts\.cityKey : this\.data\.selectedCity/);
-  assert.match(script, /const selectedDateKey = opts\.date !== undefined \? opts\.date : this\.data\.selectedDate/);
-  assert.match(script, /this\.fetchAllCurrentItems\(labels, \{ cityKey: "", date: "", lookbackDays: 0, loadSeq \}\)/);
-  assert.match(script, /filterItemsByActiveFilters\(filterSourceItems, resolvedCityKey, resolvedDateKey\)/);
+  assert.match(script, /const dateSelection = pageDateSelection\(this\.data, opts\)/);
+  assert.match(script, /const dateQuery = dateSelectionQuery\(dateSelection\)/);
+  assert.match(script, /const currentFetchOptions = \{\s*cityKey: "",\s*date: "",\s*lookbackDays: 0,\s*loadSeq,\s*skipCache: backgroundRefresh,\s*liveOnly: backgroundRefresh,\s*\}/);
+  assert.match(script, /this\.fetchAllCurrentItems\(labels, currentFetchOptions\)/);
+  assert.match(script, /requestApi\("\/api\/v1\/weekly\/manifest", \{ __skipCache: true, __liveOnly: true \}\)/);
+  assert.match(script, /currentFeedBehindManifest\(manifest, current\)/);
+  assert.match(script, /skipCache: true/);
+  assert.match(script, /liveOnly: true/);
+  assert.match(script, /const facetUniverse = filterItemsByDateSelection\(filterSourceItems, dateSelection\)/);
+  assert.match(script, /const displayItems = filterItemsByCityKey\(facetUniverse, resolvedCityKey\)/);
+  assert.match(script, /const posterPoolSourceItems = displayItems/);
   assert.match(script, /selectedCity: resolvedCityKey/);
   assert.match(script, /selectedDate: resolvedDateKey/);
+  assert.match(script, /dateMode: dateSelection\.mode/);
 
-  assert.match(script, /chooseDraftCity\(event\) \{[\s\S]*?selectedDate: ""[\s\S]*?this\.loadData\(\{ haptic: true, cityKey: key, date: "" \}\);/);
-  assert.match(script, /chooseDraftDate\(event\) \{[\s\S]*?this\.loadData\(\{ haptic: true, date: key \}\);/);
+  assert.match(script, /chooseDraftCity\(event\) \{[\s\S]*?this\.loadData\(\{ haptic: true, cityKey: key \}\);/);
+  assert.match(script, /chooseDraftDate\(event\) \{[\s\S]*?this\.loadData\(\{ haptic: true, dateSelection: selection \}\);/);
   assert.match(script, /resetLocation\(\) \{[\s\S]*?this\.loadData\(\{ haptic: true, cityKey: "" \}\);/);
-  assert.match(script, /resetDate\(\) \{[\s\S]*?this\.loadData\(\{ haptic: true, date: "" \}\);/);
-  assert.match(script, /applyLocation\(\) \{[\s\S]*?selectedDate: ""[\s\S]*?this\.loadData\(\{ haptic: true, cityKey: key, date: "" \}\);/);
+  assert.match(script, /resetDate\(\) \{[\s\S]*?this\.loadData\(\{ haptic: true, dateSelection: selection \}\);/);
+  assert.match(script, /applyLocation\(\) \{[\s\S]*?this\.loadData\(\{ haptic: true, cityKey: key \}\);/);
 });
 
 test("home first load does not wait on slow filter metadata before rendering events", () => {
   const script = read("pages/index/index.js");
 
   assert.match(script, /FILTER_META_TIMEOUT_MS\s*=\s*\d+/);
-  assert.match(script, /withFilterMetaTimeout\(requestApi\("\/api\/v1\/weekly\/cities"\)/);
-  assert.match(script, /withFilterMetaTimeout\(requestApi\("\/api\/v1\/weekly\/dates"\)/);
-  assert.match(script, /buildCityFiltersFallback\(cityFilterSourceItems/);
-  assert.match(script, /dateIndexKeys = datesResult\.status === "fulfilled" \? dateKeySetFromIndex\(datesResult\.value\) : null/);
+  assert.match(script, /withFilterMetaTimeout\(requestApi\("\/api\/v1\/weekly\/cities", facetMetaOptions\)/);
+  assert.match(script, /withFilterMetaTimeout\(requestApi\("\/api\/v1\/weekly\/dates", \{/);
+  assert.match(script, /cityFacetPayloadMatchesItems\(citiesResult\.value, cityFilterSourceItems\)/);
+  assert.match(script, /buildCityFiltersFromIndex\(citiesResult\.value, lang, this\.data\.t\.allCities\)/);
+  assert.match(script, /cityIndexFilters \|\| buildCityFiltersFallback\(cityFilterSourceItems/);
+  assert.match(script, /datesResult\.value\?\.scope === "current"/);
   assert.match(script, /buildDateFiltersFallback\(dateFilterSourceItems, lang, this\.data\.t\.allDates, dateIndexKeys\)/);
 });
 
@@ -133,5 +144,5 @@ test("home date filters are derived from local activity bounds clamped by API da
   assert.match(script, /function dateKeySetFromIndex\(payload\)/);
   assert.match(script, /if \(allowedKeys && !allowedKeys\.has\(key\)\) continue/);
   assert.match(script, /dateFilterSourceItems = resolvedCityKey/);
-  assert.match(script, /resolvedDateKey = selectedDate\.key \? selectedDateKey : ""/);
+  assert.match(script, /resolvedDateKey = dateSelection\.mode === "exact" \? dateSelection\.exactDate : ""/);
 });

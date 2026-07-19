@@ -1493,10 +1493,13 @@ export function createServer(options = {}) {
         await sendCachedWeeklyJson(
           req,
           res,
-          weeklyCacheKey(pathname, url.searchParams, ["cityKey", "date", "limit", "cursor", "lookbackDays"]),
+          weeklyCacheKey(pathname, url.searchParams, ["scope", "cityKey", "date", "dateStart", "dateEnd", "dateFrom", "dateTo", "limit", "cursor", "lookbackDays"]),
           () => store.getCurrent({
+            scope: url.searchParams.get("scope") || undefined,
             cityKey: url.searchParams.get("cityKey") || undefined,
             date: url.searchParams.get("date") || undefined,
+            dateStart: url.searchParams.get("dateStart") || url.searchParams.get("dateFrom") || undefined,
+            dateEnd: url.searchParams.get("dateEnd") || url.searchParams.get("dateTo") || undefined,
             limit: url.searchParams.get("limit") || undefined,
             cursor: url.searchParams.get("cursor") || undefined,
             lookbackDays: url.searchParams.get("lookbackDays") || undefined,
@@ -1509,8 +1512,14 @@ export function createServer(options = {}) {
         await sendCachedWeeklyJson(
           req,
           res,
-          weeklyCacheKey(pathname, url.searchParams, []),
-          () => store.getCities(),
+          weeklyCacheKey(pathname, url.searchParams, ["scope", "date", "dateStart", "dateEnd", "dateFrom", "dateTo", "lookbackDays"]),
+          () => store.getCities({
+            scope: url.searchParams.get("scope") || undefined,
+            date: url.searchParams.get("date") || undefined,
+            dateStart: url.searchParams.get("dateStart") || url.searchParams.get("dateFrom") || undefined,
+            dateEnd: url.searchParams.get("dateEnd") || url.searchParams.get("dateTo") || undefined,
+            lookbackDays: url.searchParams.get("lookbackDays") || undefined,
+          }),
           60_000,
         );
         return;
@@ -1520,8 +1529,15 @@ export function createServer(options = {}) {
         await sendCachedWeeklyJson(
           req,
           res,
-          weeklyCacheKey(pathname, url.searchParams, []),
-          () => store.getDates(),
+          weeklyCacheKey(pathname, url.searchParams, ["scope", "cityKey", "date", "dateStart", "dateEnd", "dateFrom", "dateTo", "lookbackDays"]),
+          () => store.getDates({
+            scope: url.searchParams.get("scope") || undefined,
+            cityKey: url.searchParams.get("cityKey") || undefined,
+            date: url.searchParams.get("date") || undefined,
+            dateStart: url.searchParams.get("dateStart") || url.searchParams.get("dateFrom") || undefined,
+            dateEnd: url.searchParams.get("dateEnd") || url.searchParams.get("dateTo") || undefined,
+            lookbackDays: url.searchParams.get("lookbackDays") || undefined,
+          }),
           60_000,
         );
         return;

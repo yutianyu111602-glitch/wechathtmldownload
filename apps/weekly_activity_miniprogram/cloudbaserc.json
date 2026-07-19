@@ -1,0 +1,28 @@
+{
+  "$schema": "https://static.cloudbase.net/cli/cloudbaserc.schema.json",
+  "envId": "huaidjweekly-d8g1go7-d0a07863e3e",
+  "functionRoot": "cloudfunctions",
+  "functions": [
+    {
+      "name": "atlasPlayerState",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 10,
+      "memorySize": 128
+    },
+    {
+      "name": "weeklyAiProxy",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 60,
+      "memorySize": 256
+    },
+    {
+      "name": "weeklyDataSync",
+      "runtime": "Nodejs16.13",
+      "handler": "index.main",
+      "timeout": 60,
+      "memorySize": 256
+    }
+  ]
+}

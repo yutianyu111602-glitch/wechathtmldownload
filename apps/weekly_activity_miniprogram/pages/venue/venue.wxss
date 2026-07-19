@@ -36,3 +36,91 @@
   font-size: 23rpx;
   line-height: 1.38;
 }
+
+.club-overview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.club-overview-card {
+  display: grid;
+  grid-template-columns: 168rpx minmax(0, 1fr) 32rpx;
+  align-items: center;
+  gap: 20rpx;
+  min-height: 186rpx;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid rgba(255,255,255,0.05);
+}
+
+.club-overview-poster {
+  width: 168rpx;
+  height: 150rpx;
+  border-radius: 8rpx;
+  background: rgba(255,255,255,0.06);
+}
+
+.club-overview-poster-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.52);
+  font-size: 22rpx;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.club-overview-body {
+  min-width: 0;
+}
+
+.club-overview-kicker {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.club-overview-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32rpx;
+  padding: 0 12rpx;
+  border: 1rpx solid rgba(126,184,218,0.28);
+  border-radius: 6rpx;
+  color: #7eb8da;
+  font-size: 20rpx;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.club-overview-tag.kind-week {
+  border-color: rgba(182,255,59,0.26);
+  color: #b6ff3b;
+}
+
+.club-overview-tag.kind-holiday {
+  border-color: rgba(255,167,112,0.28);
+  color: #ffa770;
+}
+
+.club-overview-window {
+  color: rgba(255,255,255,0.42);
+  font-size: 22rpx;
+  line-height: 1.2;
+}
+
+.club-overview-title {
+  color: rgba(255,255,255,0.9);
+  font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+  font-size: 28rpx;
+  line-height: 1.26;
+  font-weight: 760;
+}
+
+.club-overview-meta {
+  margin-top: 10rpx;
+  color: rgba(255,255,255,0.46);
+  font-size: 22rpx;
+  line-height: 1.35;
+}

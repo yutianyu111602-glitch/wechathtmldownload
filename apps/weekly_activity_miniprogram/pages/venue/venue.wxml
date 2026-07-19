@@ -10,6 +10,7 @@
         <view class="sub-title">{{name}}</view>
         <view wx:if="{{address}}" class="sub-address" bindtap="handleAddressTap">{{address}}</view>
         <view class="sub-count">{{events.length}} {{t.clubUpcoming}}</view>
+        <view wx:if="{{venueSummary}}" class="sub-count venue-scene">{{venueSummary}}</view>
       </view>
     <view class="section" wx:if="{{clubOverviews.length}}">
       <view class="sub-heading">{{t.clubOverviews}}</view>

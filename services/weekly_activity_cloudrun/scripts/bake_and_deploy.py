@@ -1003,6 +1003,7 @@ def promote_publish_transaction(
             "remote_item_id_digest"
         )
         == candidate_ids.get("item_id_digest"),
+        "pagination_scope_is_package": pagination_report.get("scope") == "package",
         "pagination_digest_algorithm_matches": pagination_report.get("digest_algorithm")
         == candidate_ids.get("digest_algorithm"),
         "club_candidate_digest_matches_prepared": club_candidate_evidence.get("summary_sha256")

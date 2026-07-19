@@ -1,0 +1,13 @@
+{
+  "name": "atlas-player-state",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "description": "ATLAS mini-program player state persistence function",
+  "engines": {
+    "node": ">=16"
+  },
+  "dependencies": {
+    "@cloudbase/node-sdk": "^3.18.1"
+  }
+}

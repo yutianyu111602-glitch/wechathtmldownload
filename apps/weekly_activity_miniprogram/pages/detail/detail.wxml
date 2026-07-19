@@ -127,6 +127,11 @@
       <view class="description-line muted-line">{{t.lineupHint}}</view>
     </view>
 
+    <view wx:if="{{item.hasPrice}}" class="detail-section ticket-section">
+      <view class="detail-heading">{{t.ticketing}}</view>
+      <view wx:for="{{item.price}}" wx:key="*this" class="ticket-line">{{item}}</view>
+    </view>
+
     <view wx:if="{{item.hasLineup}}" class="detail-section">
       <view class="detail-heading">{{t.artists}}</view>
       <view wx:for="{{item.lineupItems}}" wx:key="*this" class="artist-row" data-name="{{item}}" bindtap="openArtist">
@@ -161,6 +166,44 @@
       </view>
       <view wx:else class="description-line muted-line">
         {{item.displayTitle}}
+      </view>
+    </view>
+
+    <view wx:if="{{item.hasDjDiscovery}}" class="detail-section dj-discovery-section">
+      <view class="detail-heading">{{t.djDiscovery}}</view>
+      <view
+        wx:for="{{item.djDiscoverySections}}"
+        wx:for-item="section"
+        wx:key="nameKey"
+        class="dj-discovery-block"
+      >
+        <view class="dj-discovery-name">{{section.name}}</view>
+        <view wx:if="{{section.hasBioAtoms}}" class="dj-discovery-atoms">
+          <view
+            wx:for="{{section.bioAtoms}}"
+            wx:for-item="atom"
+            wx:key="text"
+            class="dj-discovery-atom"
+          >
+            {{atom.text}}
+          </view>
+        </view>
+        <view wx:if="{{section.hasLinks}}" class="dj-discovery-links">
+          <view
+            wx:for="{{section.links}}"
+            wx:for-item="link"
+            wx:key="itemId"
+            class="dj-discovery-link"
+            data-url="{{link.url}}"
+            bindtap="copyDiscoveryLink"
+          >
+            <view class="dj-discovery-link-main">
+              <text class="dj-discovery-link-label">{{link.displayLabel}}</text>
+              <text class="dj-discovery-link-platform">{{link.platform}}</text>
+            </view>
+            <text class="dj-discovery-copy">{{t.copyLink}}</text>
+          </view>
+        </view>
       </view>
     </view>
 

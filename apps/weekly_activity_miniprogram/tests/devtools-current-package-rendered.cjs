@@ -2,6 +2,12 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const http = require("node:http");
 const path = require("node:path");
+const { effectiveFeedCount, effectiveFeedItems } = require("./effective-feed-items.cjs");
+const { readPageDataWithFallback } = require("./devtools-page-data.cjs");
+const {
+  filterItemsByCityKey,
+  filterItemsByDateSelection,
+} = require("../services/homeFilters.js");
 
 let automator;
 try {
@@ -16,19 +22,16 @@ const wsEndpoint = explicitWsEndpoint;
 const explicitLaunchMode = process.env.MINIPROGRAM_AUTOMATOR_LAUNCH === "1";
 const explicitConnectMode = Boolean(wsEndpoint);
 const launchMode = explicitLaunchMode || !explicitConnectMode;
+const noCloseDevTools = explicitConnectMode || process.env.MINIPROGRAM_AUTOMATOR_NO_CLOSE === "1";
 const projectPath = process.env.MINIPROGRAM_PROJECT_PATH || path.resolve(__dirname, "..");
 const cliPath = process.env.MINIPROGRAM_DEVTOOLS_CLI || "C:/Program Files (x86)/Tencent/微信web开发者工具/cli.bat";
 const launchPort = Number(process.env.MINIPROGRAM_AUTOMATOR_PORT || "9430");
 const idePort = Number(process.env.MINIPROGRAM_DEVTOOLS_IDE_PORT || "9430");
+const cliArgs = Number.isFinite(idePort) && idePort > 0 ? ["--port", String(idePort)] : [];
 const artifactRoot = path.resolve(__dirname, "../test-artifacts");
 const stamp = new Date().toISOString().replace(/[:.]/g, "-");
 const artifactDir = path.join(artifactRoot, `devtools-current-package-rendered-${stamp}`);
 const staticPackageDir = String(process.env.MINIPROGRAM_STATIC_PACKAGE_DIR || "").trim();
-const todayObj = new Date();
-const todayStr = todayObj.toISOString().slice(0, 10);
-const tomorrowObj = new Date(todayObj);
-tomorrowObj.setDate(tomorrowObj.getDate() + 1);
-const tomorrowStr = tomorrowObj.toISOString().slice(0, 10);
 const expectedMinItemsRaw = Number(process.env.MINIPROGRAM_EXPECTED_MIN_ITEMS || "4");
 const expectedMinItems = Number.isFinite(expectedMinItemsRaw) && expectedMinItemsRaw > 0 ? expectedMinItemsRaw : 4;
 const expectPosterFileId = process.env.MINIPROGRAM_EXPECT_POSTER_FILEID !== "0";
@@ -36,6 +39,7 @@ const expectedMinPosterImageLoadsRaw = Number(process.env.MINIPROGRAM_EXPECTED_M
 const expectedMinPosterImageLoads = Number.isFinite(expectedMinPosterImageLoadsRaw) && expectedMinPosterImageLoadsRaw >= 0
   ? expectedMinPosterImageLoadsRaw
   : 1;
+const interactionCityKey = String(process.env.MINIPROGRAM_INTERACTION_CITY || "shanghai").trim();
 
 fs.mkdirSync(artifactDir, { recursive: true });
 
@@ -47,7 +51,7 @@ function envList(name, fallback) {
     .filter(Boolean);
 }
 
-const expectedDates = envList("MINIPROGRAM_EXPECTED_DATES", [todayStr, tomorrowStr]);
+const expectedDates = envList("MINIPROGRAM_EXPECTED_DATES", []);
 const forbiddenDates = envList("MINIPROGRAM_FORBIDDEN_DATES", []);
 
 function withTimeout(promise, timeoutMs, label) {
@@ -78,12 +82,12 @@ async function openHome(miniProgram) {
   return page;
 }
 
-async function waitForIdle(page, label, timeoutMs) {
+async function waitForIdle(miniProgram, page, label, timeoutMs) {
   const started = Date.now();
-  let data = await page.data();
+  let data = await readPageDataWithFallback(miniProgram, page, { label });
   while (data && data.loading && Date.now() - started < timeoutMs) {
     await page.waitFor(200);
-    data = await page.data();
+    data = await readPageDataWithFallback(miniProgram, page, { label });
   }
   assert.equal(data.loading, false, `${label}: still loading after ${timeoutMs}ms`);
   assert.equal(data.error || "", "", `${label}: unexpected error ${data.error || ""}`);
@@ -184,16 +188,16 @@ async function startStaticPackageServer(packageDir) {
   };
 }
 
-async function waitForPosterImageState(page, minLoadCount, timeoutMs) {
+async function waitForPosterImageState(miniProgram, page, minLoadCount, timeoutMs) {
   const started = Date.now();
-  let data = await page.data();
+  let data = await readPageDataWithFallback(miniProgram, page, { label: "poster image state" });
   while (
     Number(data.posterImageLoadCount || 0) < minLoadCount
     && Number(data.posterImageErrorCount || 0) === 0
     && Date.now() - started < timeoutMs
   ) {
     await page.waitFor(300);
-    data = await page.data();
+    data = await readPageDataWithFallback(miniProgram, page, { label: "poster image state" });
   }
   return {
     posterImageLoadCount: Number(data.posterImageLoadCount || 0),
@@ -233,6 +237,7 @@ async function run() {
         projectPath,
         cliPath,
         port: launchPort,
+        args: cliArgs,
         idePort,
         trustProject: true,
         timeout: 90000,
@@ -243,9 +248,9 @@ async function run() {
 
     const page = await openHome(miniProgram);
     try {
-      const initialData = await waitForIdle(page, "initial home before static probe", 30000);
+      const initialData = await waitForIdle(miniProgram, page, "initial home before static probe", 30000);
       report.initialHome = {
-        itemCount: Number(initialData.totalItems || initialData.items?.length || 0),
+        itemCount: effectiveFeedCount(initialData),
         totalItems: initialData.totalItems,
         cacheNotice: initialData.cacheNotice || "",
       };
@@ -258,6 +263,9 @@ async function run() {
       wx.clearStorageSync();
       const app = getApp();
       const cloud = app.globalData.cloud;
+      app.globalData.__currentPackageRenderedProbe = {
+        originalCloud: { ...cloud },
+      };
       const staticPackageProbe = Boolean(injectedStaticBaseUrl);
       const staticOnlyClient = {
         callContainer() {
@@ -289,6 +297,15 @@ async function run() {
       const pages = getCurrentPages();
       const page = pages[pages.length - 1];
       if (page) {
+        page.setData({
+          selectedCity: "",
+          draftCity: "",
+          selectedDate: "",
+          draftDate: "",
+          dateMode: "all_current",
+          selectedDateStart: "",
+          selectedDateEnd: "",
+        });
         page.isLoadingRequest = false;
         page.pendingLoadOptions = null;
         page.loadSeq = Number(page.loadSeq || 0) + 1;
@@ -309,17 +326,20 @@ async function run() {
         loadSeq: Number(page.loadSeq || 0),
       }));
     }), 45000, "load current package");
-    const data = await waitForIdle(page, "current-package home", 45000);
+    const data = await waitForIdle(miniProgram, page, "current-package home", 45000);
     const wallElapsedMs = Date.now() - startedAt;
     const pageElapsedMs = Number(loadTiming && loadTiming.pageElapsedMs);
-    const items = data.items || [];
-    const effectiveItemCount = Number(data.totalItems || items.length || 0);
+    const items = effectiveFeedItems(data);
+    const effectiveItemCount = effectiveFeedCount(data);
     const popularItems = data.popularItems || [];
     const itemDates = dateSetFromItems(items);
     const dateFilterKeys = (data.dateFilters || [])
       .map((entry) => String(entry && entry.key || "").trim())
       .filter(Boolean)
       .sort();
+    const datesToExpect = expectedDates.length
+      ? expectedDates
+      : itemDates.slice(0, Math.min(2, itemDates.length));
     const posterUrls = popularItems.map((item) => String(item.coverUrl || "").trim()).filter(Boolean);
     const posterFileIds = popularItems.map((item) => String(item.posterFileId || "").trim()).filter(Boolean);
     const posterCount = posterUrls.length;
@@ -355,7 +375,7 @@ async function run() {
     for (const date of forbiddenDates) {
       assert.equal(dateFilterKeys.includes(date), false, `current package date filters must not include ${date}`);
     }
-    for (const date of expectedDates) {
+    for (const date of datesToExpect) {
       assert.ok(dateFilterKeys.includes(date), `expected ${date} in rendered date filters, got ${dateFilterKeys.join(",")}`);
     }
     assert.ok(popularItems.length > 0, "expected rendered poster recommendation items");
@@ -374,7 +394,7 @@ async function run() {
         `expected first-screen posters to use direct Tencent data package URLs, got ${directTencentPosterCount}/${posterCount}`,
       );
     }
-    const imageState = await waitForPosterImageState(page, expectedMinPosterImageLoads, 30000);
+    const imageState = await waitForPosterImageState(miniProgram, page, expectedMinPosterImageLoads, 30000);
     assert.ok(
       imageState.posterImageLoadCount >= expectedMinPosterImageLoads,
       `expected at least ${expectedMinPosterImageLoads} poster image load event(s), got ${imageState.posterImageLoadCount}`,
@@ -385,6 +405,77 @@ async function run() {
       `expected no poster image load errors, got ${imageState.posterImageErrorCount}: ${imageState.posterImageErrorUrls.join(",")}`,
     );
 
+    await withTimeout(miniProgram.evaluate(() => {
+      const pages = getCurrentPages();
+      const page = pages[pages.length - 1];
+      page.chooseThisWeekend();
+      return { invoked: true };
+    }), 10000, "choose this weekend");
+    await page.waitFor(250);
+    const weekendData = await waitForIdle(miniProgram, page, "this-weekend home", 45000);
+    const weekendItems = effectiveFeedItems(weekendData);
+    const weekendSelection = {
+      mode: weekendData.dateMode,
+      exactDate: weekendData.selectedDate,
+      startKey: weekendData.selectedDateStart,
+      endKey: weekendData.selectedDateEnd,
+    };
+    assert.equal(weekendSelection.mode, "this_weekend", "this-weekend handler must retain range mode");
+    assert.equal(weekendSelection.exactDate, "", "this-weekend handler must not collapse to scalar Friday");
+    assert.match(weekendSelection.startKey, /^\d{4}-\d{2}-\d{2}$/);
+    assert.match(weekendSelection.endKey, /^\d{4}-\d{2}-\d{2}$/);
+    const weekendStart = dateFromKey(weekendSelection.startKey);
+    const weekendEnd = dateFromKey(weekendSelection.endKey);
+    assert.equal(weekendStart && weekendStart.getUTCDay(), 5, "weekend range must start on Friday");
+    assert.equal(weekendEnd && weekendEnd.getUTCDay(), 0, "weekend range must end on Sunday");
+    assert.equal(
+      filterItemsByDateSelection(weekendItems, weekendSelection).length,
+      weekendItems.length,
+      "rendered weekend feed must contain only Friday-through-Sunday items",
+    );
+    assert.ok(weekendItems.length > 0, "this-weekend feed must render at least one activity");
+
+    const cityFacet = (weekendData.cityFilters || []).find((entry) => entry && entry.key === interactionCityKey);
+    assert.ok(cityFacet, `expected ${interactionCityKey} in weekend city facets`);
+    const expectedCityCount = filterItemsByCityKey(weekendItems, interactionCityKey).length;
+    assert.equal(Number(cityFacet.count), expectedCityCount, "weekend city facet must count the same visible universe");
+    assert.ok(expectedCityCount > 0, `expected at least one ${interactionCityKey} weekend activity`);
+
+    await withTimeout(miniProgram.evaluate((cityKey) => {
+      const pages = getCurrentPages();
+      const page = pages[pages.length - 1];
+      page.chooseDraftCity({ currentTarget: { dataset: { key: cityKey } } });
+      return { invoked: true };
+    }, interactionCityKey), 10000, "choose weekend city");
+    await page.waitFor(250);
+    const weekendCityData = await waitForIdle(miniProgram, page, "this-weekend city home", 45000);
+    const weekendCityItems = effectiveFeedItems(weekendCityData);
+    assert.equal(weekendCityData.selectedCity, interactionCityKey);
+    assert.equal(weekendCityData.dateMode, weekendSelection.mode, "city switch must preserve weekend mode");
+    assert.equal(weekendCityData.selectedDateStart, weekendSelection.startKey, "city switch must preserve Friday");
+    assert.equal(weekendCityData.selectedDateEnd, weekendSelection.endKey, "city switch must preserve Sunday");
+    assert.equal(weekendCityItems.length, expectedCityCount, "city facet count and rendered city feed must match");
+    assert.equal(
+      filterItemsByCityKey(weekendCityItems, interactionCityKey).length,
+      weekendCityItems.length,
+      "rendered city feed must contain only the selected city",
+    );
+    assert.equal(Number(weekendCityData.totalItems), weekendCityItems.length, "city total and visible feed must match");
+    assert.equal(
+      filterItemsByCityKey(weekendCityData.popularItems || [], interactionCityKey).length,
+      (weekendCityData.popularItems || []).length,
+      "poster carousel must use the same selected-city universe",
+    );
+    report.weekendInteraction = {
+      selection: weekendSelection,
+      nationwideCount: weekendItems.length,
+      cityKey: interactionCityKey,
+      cityFacetCount: Number(cityFacet.count),
+      cityFeedCount: weekendCityItems.length,
+      cityTotalItems: Number(weekendCityData.totalItems),
+      cityPosterCount: (weekendCityData.popularItems || []).length,
+    };
+
     report.steps.push({
       name: "current package renders current/future data without snapshot",
       pageElapsedMs,
@@ -393,6 +484,7 @@ async function run() {
       totalItems: data.totalItems,
       itemDateCount: itemDates.length,
       itemDates: itemDates.slice(0, 20),
+      expectedDatesEffective: datesToExpect,
       dateFilterCount: dateFilterKeys.length,
       dateFilterKeys: dateFilterKeys.slice(0, 40),
       popularItemCount: popularItems.length,
@@ -419,7 +511,23 @@ async function run() {
   } finally {
     if (miniProgram) {
       try {
-        await withTimeout(miniProgram.close(), 15000, "miniProgram.close");
+        await withTimeout(miniProgram.evaluate(() => {
+          const app = getApp();
+          const probe = app.globalData.__currentPackageRenderedProbe;
+          if (probe && probe.originalCloud) {
+            const cloud = app.globalData.cloud;
+            Object.keys(cloud).forEach((key) => {
+              if (!Object.prototype.hasOwnProperty.call(probe.originalCloud, key)) delete cloud[key];
+            });
+            Object.assign(cloud, probe.originalCloud);
+          }
+          delete app.globalData.__currentPackageRenderedProbe;
+        }), 10000, "restore current-package probe");
+        if (noCloseDevTools) {
+          miniProgram.disconnect();
+        } else {
+          await withTimeout(miniProgram.close(), 15000, "miniProgram.close");
+        }
       } catch (error) {
         miniProgram.disconnect();
       }

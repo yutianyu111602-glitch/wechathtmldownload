@@ -1,0 +1,13 @@
+{
+  "name": "weekly-ai-proxy",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "description": "WeChat CloudBase AI proxy for HUAIDJ Weekly mini-program",
+  "engines": {
+    "node": ">=16"
+  },
+  "dependencies": {
+    "@cloudbase/node-sdk": "^3.18.1"
+  }
+}

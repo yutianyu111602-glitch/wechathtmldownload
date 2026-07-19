@@ -15,8 +15,24 @@
         "type": "folder"
       },
       {
+        "value": "test-artifacts",
+        "type": "prefix"
+      },
+      {
         "value": "node_modules",
         "type": "folder"
+      },
+      {
+        "value": ".vscode",
+        "type": "folder"
+      },
+      {
+        "value": ".vscode",
+        "type": "prefix"
+      },
+      {
+        "value": ".env",
+        "type": "prefix"
       },
       {
         "value": "handoffs-archive",
@@ -33,6 +49,14 @@
       {
         "value": "source_actions",
         "type": "folder"
+      },
+      {
+        "value": "data/atlas_starmap.json",
+        "type": "file"
+      },
+      {
+        "value": "data/atlas_starmap_neighbors.json",
+        "type": "file"
       },
       {
         "value": ".md",

@@ -1,0 +1,21 @@
+{
+  "_comment": "WeChat AI 开发模式配置 — 内测期，禁止合入正式 app.json/正式提审（官方约束: https://developers.weixin.qq.com/miniprogram/dev/ai/guide.html）。仅在微信开发者工具 Nightly Electron Build 里调试。接入步骤见 docs/assistant-handoff/24_WECHAT_AI_MODE_ISOLATION_20260613.md。SKILL 独立分包需全局 lazyCodeLoading=requiredComponents（正式 app.json 已开启，无需在此重复）。",
+  "subPackages": [
+    {
+      "root": "ai_packages/weekly",
+      "independent": true,
+      "pages": []
+    }
+  ],
+  "agent": {
+    "instruction": "ai_agent/AGENTS.md",
+    "pageMetadata": "ai_agent/page-meta.json",
+    "skills": [
+      {
+        "name": "weekly_events",
+        "description": "查询国内电子音乐俱乐部近期活动，可按城市、日期、DJ、俱乐部、场地和风格筛选。不处理购票、支付、订座或个人信息提交。",
+        "path": "ai_packages/weekly/weekly-events-skill"
+      }
+    ]
+  }
+}

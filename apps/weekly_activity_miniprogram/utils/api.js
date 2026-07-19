@@ -9,7 +9,7 @@ function buildInflightKey(path, data) {
   return `${path}${buildQuery(data || {})}`;
 }
 
-const API_CACHE_PREFIX = "weeklyActivityApiCache:v20260704:";
+const API_CACHE_PREFIX = "weeklyActivityApiCache:v20260719-visibility-v2:";
 const DEFAULT_CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 const DEFAULT_CACHE_FALLBACK_DELAY_MS = 2200;
 const DEFAULT_REQUEST_TIMEOUT_MS = 8000;
@@ -19,7 +19,6 @@ const DEFAULT_CLOUD_DATABASE_BACKUP_DELAY_MS = 250;
 let cloudDatabaseHotDisabledUntil = 0;
 
 const { OFFLINE_SNAPSHOT, OFFLINE_SOURCE_URLS = {} } = require("./offlineSnapshot");
-const BUNDLED_CLUB_OVERVIEWS = require("../data/club_overviews");
 const { isElectronicMusicRelevantItem } = require("./electronicRelevance");
 
 function stableData(value) {
@@ -79,8 +78,12 @@ function cloneOfflinePayload(payload) {
 
 function isDefaultCurrentFeedRequest(path, data) {
   if (path !== "/api/v1/weekly/current") return false;
+  const scope = String((data && data.scope) || "").trim().toLowerCase();
+  if (scope && scope !== "current") return false;
   const date = String((data && data.date) || "").trim();
   if (date && date !== "today") return false;
+  if (String((data && (data.dateStart || data.dateFrom)) || "").trim()) return false;
+  if (String((data && (data.dateEnd || data.dateTo)) || "").trim()) return false;
   const lookback = Number(data && data.lookbackDays);
   return !Number.isFinite(lookback) || lookback <= 0;
 }
@@ -101,11 +104,9 @@ function normalizeStoredCurrentPayload(path, data, payload) {
   return {
     ...payload,
     items: currentItems,
-    page: {
-      ...(payload.page || {}),
-      nextCursor: null,
-      total: currentItems.length,
-    },
+    // Preserve server pagination metadata. Rewriting nextCursor to null used to
+    // stop fetchAllCurrentItems after the first cached page when totals exceeded 100.
+    page: { ...(payload.page || {}) },
   };
 }
 
@@ -657,11 +658,6 @@ function requestStatic(path, data, cloud) {
     return requestJson(staticUrl(baseUrl, "manifest.json"));
   }
 
-  if (path === "/api/v1/weekly/club-overviews") {
-    return requestJson(staticUrl(baseUrl, "club_overviews.json"))
-      .then((payload) => assertContainerData(path, { statusCode: 200, data: payload }));
-  }
-
   if (path === "/api/v1/weekly/items/batch") {
     const ids = String(data.ids || "")
       .split(",")
@@ -791,12 +787,6 @@ function assertContainerData(path, res) {
   }
   if (path === "/api/v1/weekly/dates" && !Array.isArray(payload.dates)) {
     return Promise.reject({ error: { code: "CONTAINER_BAD_DATES", path }, data: payload });
-  }
-  if (
-    path === "/api/v1/weekly/club-overviews" &&
-    (!payload.by_club || typeof payload.by_club !== "object" || Array.isArray(payload.by_club))
-  ) {
-    return Promise.reject({ error: { code: "CONTAINER_BAD_CLUB_OVERVIEWS", path }, data: payload });
   }
 
   return payload;
@@ -1041,10 +1031,6 @@ function requestOfflineSnapshot(path, data, cloud, originalError) {
       generated_at: OFFLINE_SNAPSHOT.generatedAt,
       dates: OFFLINE_SNAPSHOT.dates,
     })));
-  }
-
-  if (path === "/api/v1/weekly/club-overviews") {
-    return Promise.resolve(cloneOfflinePayload(BUNDLED_CLUB_OVERVIEWS));
   }
 
   if (path === "/api/v1/weekly/items/batch") {
@@ -1304,10 +1290,42 @@ function requestApi(path, data = {}) {
   return requestPromise;
 }
 
+async function fetchAllCurrentItems(data = {}, requestPage = requestApi) {
+  const limit = Math.max(1, Math.min(200, Number(data.limit || 100)));
+  const maxPages = Math.max(1, Math.min(200, Number(data.__maxPages || 100)));
+  const base = { ...data, limit };
+  delete base.__maxPages;
+  let cursor = Number(base.cursor || 0);
+  const items = [];
+  const seenIds = new Set();
+  const seenCursors = new Set();
+  for (let pageIndex = 0; pageIndex < maxPages; pageIndex += 1) {
+    if (seenCursors.has(cursor)) throw new Error(`CURRENT_CURSOR_LOOP:${cursor}`);
+    seenCursors.add(cursor);
+    const page = await requestPage("/api/v1/weekly/current", { ...base, cursor });
+    for (const item of Array.isArray(page && page.items) ? page.items : []) {
+      const key = String(item && (item.id || item.event_id || item.eventId) || "").trim();
+      if (key && seenIds.has(key)) continue;
+      if (key) seenIds.add(key);
+      items.push(item);
+    }
+    const nextCursor = page && page.page && page.page.nextCursor;
+    if (nextCursor === null || nextCursor === undefined || nextCursor === "") break;
+    const parsedNext = Number(nextCursor);
+    if (!Number.isFinite(parsedNext) || parsedNext <= cursor) {
+      throw new Error(`INVALID_CURRENT_CURSOR:${nextCursor}`);
+    }
+    cursor = parsedNext;
+  }
+  return items;
+}
+
 module.exports = {
   __setTodayForTests(value) {
     todayOverride = isoDate(value);
   },
+  __normalizeStoredCurrentPayloadForTests: normalizeStoredCurrentPayload,
+  fetchAllCurrentItems,
   postApi,
   requestApi,
   requestLlmApi,

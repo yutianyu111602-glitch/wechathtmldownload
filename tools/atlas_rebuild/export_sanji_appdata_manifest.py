@@ -37,7 +37,7 @@ import shutil
 import sqlite3
 import sys
 import tempfile
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
@@ -127,6 +127,7 @@ class ExportStats:
     excluded_seen_articles: int = 0
     payload_copied_articles: int = 0
     payload_copy_errors: int = 0
+    missing_html_dispositions: list[dict] = field(default_factory=list)
 
 
 def utc_now() -> str:
@@ -321,6 +322,47 @@ def missing_html_is_ignored_old(article: dict, ignore_missing_before_date: str) 
         return False
     row_date = date_from_epoch(article.get("publish_time")) or date_from_epoch(article.get("create_time"))
     return bool(row_date and row_date < ignore_missing_before_date)
+
+
+def missing_html_fetch_status_class(article: dict) -> str:
+    """Return a bounded status class without copying raw errors into control artifacts."""
+    raw = " ".join(
+        str(article.get(name) or "").strip().lower()
+        for name in ("fetch_status", "content_error")
+    )
+    if any(marker in raw for marker in ("captcha", "verify", "verification")):
+        return "verification_required"
+    if any(marker in raw for marker in ("timeout", "connection", "network")):
+        return "transient_network_error"
+    if any(marker in raw for marker in ("not fetched", "missing", "pending", "empty")):
+        return "not_fetched"
+    if any(marker in raw for marker in ("error", "fail")):
+        return "fetch_error"
+    return "unknown"
+
+
+def missing_html_disposition(article: dict, ignore_missing_before_date: str) -> dict:
+    ignored_old = missing_html_is_ignored_old(article, ignore_missing_before_date)
+    fakeid = str(article.get("account_fakeid") or "")
+    aid = str(article.get("aid") or "")
+    retry_raw = article.get("fetch_retry_count")
+    try:
+        retry_count = max(0, int(retry_raw or 0))
+    except (TypeError, ValueError):
+        retry_count = 0
+    return {
+        # A one-way token is enough for retry correlation. Never place account
+        # ids, article ids, titles, URLs, raw errors, body text, or paths here.
+        "token": token_for(fakeid, aid),
+        "post_date": date_from_epoch(article.get("publish_time"))
+        or date_from_epoch(article.get("create_time")),
+        "disposition": (
+            "ignored_historical_before_cutoff" if ignored_old else "unresolved_retry_required"
+        ),
+        "reason": "html_not_found",
+        "fetch_status_class": missing_html_fetch_status_class(article),
+        "fetch_retry_count": retry_count,
+    }
 
 
 def normalize_account(account: dict) -> dict:
@@ -566,10 +608,17 @@ def build_rows(
         html_path, html_source, article_dir = resolve_article_html(raw_article, account, sanji_root, articles_root)
         if not html_path:
             stats.missing_html += 1
-            if missing_html_is_ignored_old(raw_article, ignore_missing_before_date):
+            disposition = missing_html_disposition(raw_article, ignore_missing_before_date)
+            stats.missing_html_dispositions.append(disposition)
+            if disposition["disposition"] == "ignored_historical_before_cutoff":
                 stats.ignored_old_missing_html += 1
             else:
                 stats.actionable_missing_html += 1
+            continue
+        # The processing limit must never hide a missing-HTML row later in the
+        # unseen set. Continue scanning after the payload limit, but only emit
+        # the requested number of complete articles.
+        if limit and stats.emitted_article_count >= limit:
             continue
         stats.html_found += 1
         normalized_article = normalize_article(raw_article, html_path, article_dir, account)
@@ -596,8 +645,6 @@ def build_rows(
             write_md_article(out_root, account, normalized_article, cache, md_html_path, article_assets,
                              md_articles_root, md_asset_mode, md_html_mode, stats)
         stats.emitted_article_count += 1
-        if limit and stats.emitted_article_count >= limit:
-            break
 
     manifest = {
         "schema": SCHEMA,
@@ -665,6 +712,35 @@ def export_manifest(
     )
     atomic_jsonl(out_root / "articles.jsonl", rows)
     atomic_jsonl(out_root / "assets.jsonl", asset_rows)
+    missing_ledger_name = "missing_html_dispositions.jsonl"
+    missing_digest_name = "missing_html_digest.json"
+    missing_ledger_path = out_root / missing_ledger_name
+    atomic_jsonl(missing_ledger_path, stats.missing_html_dispositions)
+    ledger_sha256 = hashlib.sha256(missing_ledger_path.read_bytes()).hexdigest()
+    disposition_counts: dict[str, int] = {}
+    for row in stats.missing_html_dispositions:
+        disposition = str(row["disposition"])
+        disposition_counts[disposition] = disposition_counts.get(disposition, 0) + 1
+    missing_digest = {
+        "schema": "sanji.missing_html_digest.v1",
+        "generated_at": manifest["generated_at"],
+        "total_missing_html": stats.missing_html,
+        "unresolved_missing_html": stats.actionable_missing_html,
+        "disposed_nonblocking_missing_html": stats.ignored_old_missing_html,
+        "disposition_counts": disposition_counts,
+        "ignore_missing_before_date": ignore_missing_before_date,
+        "ledger_rel_path": missing_ledger_name,
+        "ledger_sha256": ledger_sha256,
+        "privacy_contract": (
+            "token_date_disposition_only_no_account_ids_article_ids_titles_urls_errors_body_or_paths"
+        ),
+    }
+    atomic_json(out_root / missing_digest_name, missing_digest)
+    manifest["missing_html_contract"] = {
+        "digest_rel_path": missing_digest_name,
+        "ledger_rel_path": missing_ledger_name,
+        "unresolved_missing_html": stats.actionable_missing_html,
+    }
     atomic_json(out_root / "manifest.json", manifest)
     report = {
         "schema": "sanji.appdata.export_report.v1",
@@ -689,6 +765,10 @@ def export_manifest(
         "ignore_missing_before_date": ignore_missing_before_date,
         "ignored_old_missing_html": stats.ignored_old_missing_html,
         "actionable_missing_html": stats.actionable_missing_html,
+        "unresolved_missing_html": stats.actionable_missing_html,
+        "missing_html_ledger_rel_path": missing_ledger_name,
+        "missing_html_ledger_sha256": ledger_sha256,
+        "missing_html_digest_rel_path": missing_digest_name,
         "assets_count": stats.assets_count,
         "missing_assets": stats.missing_assets,
         "publish_time_fill": stats.publish_time_fill,

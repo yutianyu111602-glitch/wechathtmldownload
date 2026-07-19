@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
 
-const { buildDetailSourceArticles, buildVenueSourceArticles, sourceHashOf } = require("../utils/sourceArticles");
+const { buildDetailSourceArticles, buildVenueSourceArticles, sourceHashOf, isAggregateLike } = require("../utils/sourceArticles");
 
 test("venue home does not surface aggregate parent overview articles for child events", () => {
   const articles = buildVenueSourceArticles([
@@ -159,4 +159,34 @@ test("disabled aggregate child source action does not surface parent article lin
   assert.equal(sourceHashOf(item), "");
   assert.deepEqual(buildDetailSourceArticles(item), []);
   assert.deepEqual(buildVenueSourceArticles([item], { includeSingles: true }), []);
+});
+
+test("isAggregateLike detects agg children across snake_case, camelCase, and id-prefix on any id field", () => {
+  assert.equal(isAggregateLike({ aggregation_child: true }), true);
+  assert.equal(isAggregateLike({ aggregationChild: true }), true); // regression: ref path previously missed camelCase
+  assert.equal(isAggregateLike({ id: "agg-child-x" }), true);
+  assert.equal(isAggregateLike({ event_id: "agg-child-x" }), true);
+  assert.equal(isAggregateLike({ source_event_id: "agg-child-x" }), true);
+  assert.equal(isAggregateLike({ id: "exit:normal" }), false);
+  assert.equal(isAggregateLike(null), false);
+});
+
+test("merged source provenance skips a camelCase aggregationChild ref (regression)", () => {
+  const articles = buildDetailSourceArticles({
+    id: "loopy:retained",
+    sourceHash: "detail-hash",
+    source_article: { url_hash: "detail-hash", account_name: "loopy Club", published_at: "2026-06-02" },
+    merge_provenance: {
+      schema_version: "weekly_merge_provenance.v1",
+      retained_source_hash: "detail-hash",
+      source_count: 2,
+      sources: [
+        { aggregationChild: true, source_hash: "overview-hash", title: "本周活动一览", account_name: "loopy Club" },
+        { source_hash: "detail-hash", title: "具体活动原文", account_name: "loopy Club" },
+      ],
+    },
+  });
+
+  // With the fix the camelCase overview ref is filtered, leaving a single source -> no multi-source block.
+  assert.deepEqual(articles.map((article) => article.hash), []);
 });

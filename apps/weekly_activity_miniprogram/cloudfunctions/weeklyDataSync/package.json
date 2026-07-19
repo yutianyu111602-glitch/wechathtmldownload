@@ -1,0 +1,13 @@
+{
+  "name": "weekly-data-sync",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": true,
+  "description": "Sync HUAIDJ Weekly hot data into CloudBase Database",
+  "engines": {
+    "node": ">=16"
+  },
+  "dependencies": {
+    "@cloudbase/node-sdk": "^3.18.1"
+  }
+}

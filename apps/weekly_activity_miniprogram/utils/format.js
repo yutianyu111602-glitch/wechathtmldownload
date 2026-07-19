@@ -1,6 +1,8 @@
 const { VERIFIED_ADDRESS_BOOK } = require("./addressBook");
 const { VERIFIED_MAP_LOCATION_BOOK } = require("./mapLocationBook");
 const { STYLE_RULES, NON_ARTIST_LINEUP_NAMES, TRUSTED_TIME_SOURCES } = require("./styleRules");
+const { isAggregateLike } = require("./sourceArticles");
+const { normalizeDjDiscoverySectionsForDisplay } = require("./publicExternalLinks");
 
 function first(value, fallback = "") {
   return Array.isArray(value) ? value[0] || fallback : value || fallback;
@@ -183,10 +185,22 @@ const QR_ONLY_TICKETING_RE = /(芋圆|yuyuan|小程序码|二维码|扫码|购�
 const DRINK_SPECIAL_RE = /(金汤力|啤酒|酒水|特调|鸡尾酒|杯|shot|drink|drinks|bottle|套餐|放送)/i;
 const TICKETING_CURRENCY_RE = /¥|￥|元|\brmb\b|\bcny\b/i;
 const TITLE_STOP_TOKENS = new Set([
+  "ambient",
+  "anniversary",
+  "bass",
+  "bird",
   "club",
+  "disco",
+  "early",
+  "electro",
   "event",
   "events",
+  "hip",
+  "hiphop",
+  "hop",
+  "house",
   "lineup",
+  "official",
   "party",
   "pres",
   "presented",
@@ -194,11 +208,25 @@ const TITLE_STOP_TOKENS = new Set([
   "preview",
   "room",
   "support",
+  "techno",
+  "ticket",
+  "tickets",
+  "tonight",
+  "trance",
   "weekly",
+  "year",
+  "years",
 ]);
 const CHINESE_TITLE_STOP_TOKENS = new Set(["活动", "派对", "预告", "阵容", "周末", "本周", "今晚", "今夜"]);
 const TITLE_BODY_MARKER_RE = /(票务信息|预售票|早鸟票|全价票|双人票|单人票|现场票|点击购票|购票链接|现场周边|周边售卖|海报设计|感谢摄影师|感谢大家|短暂休整|本次巡演签售|ticketing|tickets?|click\s+for\s+tickets?)/i;
 const TITLE_STATION_RE = /\s+(上海|深圳|广州|厦门|北京|杭州|成都|重庆|南京|西安|天津|长沙|武汉|广州|佛山|大理)站[:：]/;
+const TITLE_WEEKDAY_PREFIX_RE = /^\s*(?:(?:周[一二三四五六日天]|星期[一二三四五六日天])(?:\.?(?:\s+|[｜|丨·:：,，\-–—、/&＆]+|$))|(?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)(?![A-Za-z])\.?(?:\s+|$))/i;
+const TITLE_EVIDENCE_REJECT_RE = /(地址|票价|门票|预售|早鸟|现场|免费入场|入场方式|扫码|二维码|candidate\s+date|candidate\s+city|candidate\s+address|image\s+\d+|body\s+text|not\s+necessary|weekly\s+preview|活动一览|活动预告|活动预览)/i;
+const TITLE_EVIDENCE_BOOST_RE = /(pres\.?|presents?|presented\s+by|呈现|×| x | vs\.? |对决|周年|夜游|龙舟|vol\.?\s*\d+|session|party|club|room|tour|joint\s+tour|派对|巡演|专场|邀请|厂牌|开票|回归|双厅)/i;
+const TITLE_ADDRESS_TOKEN_RE = /(省|市|区|县|路|街|道|胡同|弄|巷|号|座|栋|楼|层|B\d|F\d|地铁|中心|广场|园区|朝阳|海淀|静安|黄浦|余杭|拱墅|天河|越秀|锦江|武侯|avenue|road|street|district|floor|unit|building|shopping\s+center|book\s+shopping\s+center|no\.\s*\d+)/gi;
+const TITLE_CITY_ONLY_RE = /^(?:北京|上海|广州|深圳|杭州|成都|重庆|南京|武汉|长沙|天津|西安|厦门|大理|惠州|东莞|佛山|苏州|福州|青岛|大庆|昆明)$/i;
+const TITLE_STATUS_FRAGMENT_RE = /(?:即将开售|票档|享\s*\d?\s*折|购买\s*\d|购买.{0,12}票|早鸟优惠|限时早鸟)/i;
+const TITLE_PROMO_PREFIX_RE = /^\s*(?:转发|分享).{0,80}?(?:优惠|折|特价)[^，,]*[，,]\s*/i;
 const TITLE_MAX_CHARS = 64;
 
 function compactDate(value) {
@@ -311,7 +339,8 @@ function isSourceOverviewTitle(value) {
   if (/\b(?:weekly|monthly)\s+(?:preview|calendar|schedule|guide)\b/.test(lower)) return true;
   return (
     /(?:本周|这周|今周|本月|这个月|当月)\s*(?:活动)?\s*(?:一览|预告|预览|安排|日程|指南|汇总|合集)/.test(text) ||
-    /(?:\d{1,2}|[一二三四五六七八九十冬腊正]+)\s*月\s*(?:活动)?\s*(?:一览|预告|预览|安排|日程|指南|汇总|合集)/.test(text)
+    /(?:\d{1,2}|[一二三四五六七八九十冬腊正]+)\s*月\s*(?:活动)?\s*(?:一览|预告|预览|安排|日程|指南|汇总|合集)/.test(text) ||
+    /(?:端午|假期|节日|holiday)\s*(?:活动)?\s*(?:一览|全览|预告|预览|安排|计划|周刊|指南|汇总|合集)/i.test(text)
   );
 }
 
@@ -319,14 +348,17 @@ function isSourceOverviewItem(item = {}) {
   return sourceOverviewTitleCandidates(item).some(isSourceOverviewTitle);
 }
 
-function isAggregateChildItem(item = {}) {
-  return item.aggregation_child === true
-    || item.aggregationChild === true
-    || String(item.id || item.event_id || item.article_id || "").trim().startsWith("agg-child-");
-}
-
 function stripEmoji(value) {
   return String(value || "").replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, "").trim();
+}
+
+function normalizeTitleSpacing(value) {
+  return String(value || "")
+    .replace(/\s+/g, " ")
+    .replace(/\boff\s+-\s+duty\b/gi, "Off-duty")
+    .replace(/\b(pres\.)\s*(?=[\u4e00-\u9fff])/gi, "$1 ")
+    .replace(/\s+([，。！？；：、])/g, "$1")
+    .trim();
 }
 
 function isDisplayUrlLine(value) {
@@ -336,10 +368,56 @@ function isDisplayUrlLine(value) {
 function stripLeadingDateWords(value) {
   return String(value || "")
     .replace(/^\s*[「【\[]?\s*(今晚|今夜|本周(?:[一二三四五六日天]|末)?|周末)\s*[」】\]]?\s*/i, "")
-    .replace(/^\s*(\d{1,2})[./-](\d{1,2})(\s*\([^)]+\))?\s*(周[一二三四五六日天]|星期[一二三四五六日天]|今晚|今夜)?\s*/i, "")
-    .replace(/^\s*(\d{4})[./-](\d{1,2})[./-](\d{1,2})\s*/, "")
-    .replace(/^\s*[｜|·:：,，\-–—]+\s*/, "")
+    .replace(/^\s*(\d{1,2})[./-](\d{1,2})(?:\s*(?:[-–—~～至到/&]|＆)\s*(?:(?:\d{1,2})[./-])?\d{1,2})?(\s*\([^)]+\))?\s*(周[一二三四五六日天]|星期[一二三四五六日天]|今晚|今夜)?\s*/i, "")
+    .replace(/^\s*(\d{4})[./-](\d{1,2})[./-](\d{1,2})(?:\s*(?:[-–—~～至到/&]|＆)\s*(?:(?:\d{1,2})[./-])?\d{1,2})?\s*/, "")
+    .replace(/^\s*[｜|丨·:：,，\-–—、/&＆]+\s*/, "")
     .trim();
+}
+
+function stripTitleSegmentNoise(value) {
+  let text = stripLeadingDateWords(value)
+    .replace(/^\s*(预告|活动预告|本周预告|活动安排|活动日程)(?=\s|[｜|·:：,，\-–—]|$)\s*/i, "")
+    .replace(TITLE_WEEKDAY_PREFIX_RE, "")
+    .replace(/^\s*(?:(?:\d{1,2})[./-](?:\d{1,2})(?:\s*(?:[-–—~～至到/&]|＆)\s*(?:(?:\d{1,2})[./-])?(?:\d{1,2}))?|(?:\d{1,2})\s*月\s*(?:\d{1,2})(?:\s*[-–—~～至到]\s*(?:\d{1,2}))?\s*(?:日|号)?|(?:20\d{2})[./-](?:\d{1,2})[./-](?:\d{1,2})(?:\s*(?:[-–—~～至到/&]|＆)\s*(?:(?:\d{1,2})[./-])?(?:\d{1,2}))?)(?:\s*(?:周[一二三四五六日天]|星期[一二三四五六日天]|(?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)(?![A-Za-z])))?\.?\s*/i, "")
+    .replace(TITLE_WEEKDAY_PREFIX_RE, "")
+    .replace(/^\s*[」】\]\)）]+/, "")
+    .replace(/^\s*[｜|丨·:：,，\-–—、/&＆]+\s*/, "")
+    .replace(/^\s*\d{1,2}\s*(?:[｜|丨·,，\-–—、&＆]|\/(?![A-Za-z]))+\s*/, "")
+    .replace(/^\s*(?:[01]?\d|2[0-3])[:：][0-5]\d(?:\s*[-–—~～至到]\s*(?:late|[01]?\d[:：][0-5]\d|2[0-3][:：][0-5]\d))?\s*/i, "")
+    .replace(/^\s*[」】\]\)）]+/, "")
+    .replace(/^\s*[｜|丨·:：,，\-–—、/&＆]+\s*/, "")
+    .replace(/^\s*\d{1,2}\s*(?:[｜|丨·,，\-–—、&＆]|\/(?![A-Za-z]))+\s*/, "")
+    .trim();
+  const promo = text.replace(TITLE_PROMO_PREFIX_RE, "");
+  if (promo && normalizeName(promo).length >= 4) return normalizeTitleSpacing(promo);
+  return normalizeTitleSpacing(text);
+}
+
+function dateTimeOnlyTitle(value) {
+  let reduced = String(value || "").trim();
+  if (!reduced) return true;
+  reduced = reduced
+    .replace(TITLE_WEEKDAY_PREFIX_RE, "")
+    .replace(/^\s*(?:(?:\d{1,2})[./-](?:\d{1,2})(?:\s*(?:[-–—~～至到/&]|＆)\s*(?:(?:\d{1,2})[./-])?(?:\d{1,2}))?|(?:\d{1,2})\s*月\s*(?:\d{1,2})(?:\s*[-–—~～至到]\s*(?:\d{1,2}))?\s*(?:日|号)?|(?:20\d{2})[./-](?:\d{1,2})[./-](?:\d{1,2})(?:\s*(?:[-–—~～至到/&]|＆)\s*(?:(?:\d{1,2})[./-])?(?:\d{1,2}))?)(?:\s*(?:周[一二三四五六日天]|星期[一二三四五六日天]|(?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)(?![A-Za-z])))?\.?\s*/i, "")
+    .replace(/^\s*(?:[01]?\d|2[0-3])[:：][0-5]\d(?:\s*[-–—~～至到]\s*(?:late|[01]?\d[:：][0-5]\d|2[0-3][:：][0-5]\d))?\s*/i, "")
+    .replace(/(?:周[一二三四五六日天]|星期[一二三四五六日天]|\b(?:Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?|Sat(?:urday)?|Sun(?:day)?)(?![A-Za-z])|\d{1,2}[./-]\d{1,2}|\d{1,2}\s*月\s*\d{1,2}\s*日?|\d{1,2}[:：][0-5]\d|late|am|pm)/gi, "")
+    .replace(/[\s｜|/\\·:：,，.\-–—~～至到]+/g, "");
+  return !normalizeName(reduced);
+}
+
+function weakTitleCandidate(value) {
+  const normalized = normalizeName(value);
+  if (!normalized) return true;
+  if ([
+    "预告", "活动预告", "本周预告", "活动", "活动安排", "活动日程",
+    "sun", "sunday", "mon", "monday", "tue", "tuesday", "wed", "wednesday",
+    "thu", "thursday", "fri", "friday", "sat", "saturday",
+    "周一", "周二", "周三", "周四", "周五", "周六", "周日", "周天",
+    "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日", "星期天",
+  ].includes(normalized)) return true;
+  if (TITLE_CITY_ONLY_RE.test(String(value || "").trim())) return true;
+  if (TITLE_STATUS_FRAGMENT_RE.test(String(value || ""))) return true;
+  return dateTimeOnlyTitle(value);
 }
 
 function charLength(value) {
@@ -383,7 +461,11 @@ function isEntityOnlyTitle(title, item) {
     if (!candidate) return false;
     if (normalizedTitle === candidate) return true;
     if (normalizedTitle.length <= 6 && candidate.includes(normalizedTitle)) return true;
-    return candidate.length <= 6 && normalizedTitle.includes(candidate);
+    if (candidate.length > 6 && normalizedTitle.includes(candidate)) {
+      const remainder = normalizedTitle.replace(candidate, "");
+      return !remainder || remainder.length <= 2;
+    }
+    return false;
   });
 }
 
@@ -423,17 +505,130 @@ function cleanTitleCandidate(value, item) {
   let cleaned = stripEmoji(value)
     .replace(/\s+/g, " ")
     .trim();
-  cleaned = stripLeadingDateWords(cleaned);
+  cleaned = stripTitleSegmentNoise(cleaned);
   cleaned = removeEntityPrefix(cleaned, item);
+  cleaned = stripTitleSegmentNoise(cleaned);
   cleaned = stripEntityMentionPrefix(cleaned, item);
+  cleaned = stripTitleSegmentNoise(cleaned);
+  const pipeParts = cleaned.split(/[｜|]/).map((part) => stripTitleSegmentNoise(part).trim()).filter(Boolean);
+  if (pipeParts.length >= 2) {
+    const usableParts = pipeParts.filter((part) => !weakTitleCandidate(part) && !isEntityOnlyTitle(part, item));
+    if (usableParts.length && usableParts.length < pipeParts.length) {
+      cleaned = usableParts.join(" | ");
+    }
+  }
   cleaned = cleaned
-    .replace(/^\s*[｜|·:：,，\-–—]+\s*/, "")
+    .replace(/^\s*[｜|丨·:：,，\-–—]+\s*/, "")
     .replace(/\s*[｜|]\s*\d{1,2}\s*月\s*\d{1,2}\s*日?.*$/i, "")
     .replace(/\s+\d{1,2}[./-]\d{1,2}.*$/i, "")
     .trim();
   cleaned = compactLongTitle(cleaned);
-  if (!cleaned || isEntityOnlyTitle(cleaned, item)) return "";
+  if (!cleaned || weakTitleCandidate(cleaned) || isEntityOnlyTitle(cleaned, item)) return "";
   return cleaned;
+}
+
+function posterEvidenceTitleLines(item = {}) {
+  const evidence = item.poster_selection_evidence || item.posterSelectionEvidence || {};
+  if (!evidence || typeof evidence !== "object" || Array.isArray(evidence)) return [];
+  const lines = [];
+  ["event_title", "title", "poster_title"].forEach((key) => {
+    if (evidence[key]) lines.push(evidence[key]);
+  });
+  ["visible_text_lines", "evidence"].forEach((key) => {
+    const value = evidence[key];
+    if (Array.isArray(value)) lines.push(...value.slice(0, 24));
+  });
+  return lines.map((line) => String(line || "").trim()).filter(Boolean);
+}
+
+function titleLineLooksLineupOnly(value, item = {}) {
+  let normalized = normalizeName(value);
+  if (!normalized) return true;
+  const names = sourceLineup(item).map(normalizeName).filter(Boolean);
+  if (names.length < 2) return false;
+  let matched = 0;
+  names.forEach((name) => {
+    if (name && normalized.includes(name)) {
+      matched += 1;
+      normalized = normalized.replace(name, "");
+    }
+  });
+  candidateNames(item).map(normalizeName).filter(Boolean).forEach((name) => {
+    normalized = normalized.replace(name, "");
+  });
+  normalized = normalized.replace(/(dj|djs|live|b2b|vs|and|with|guest|guests|lineup|阵容)/gi, "");
+  normalized = normalized.replace(/\d{1,4}/g, "");
+  return matched >= 2 && !normalized;
+}
+
+function titleLineLooksAddress(value) {
+  const text = String(value || "").trim();
+  if (!text) return false;
+  if (/^\s*(?:地址|add(?:ress)?\.?)\s*[:：]/i.test(text)) return true;
+  if (/\b(?:avenue|road|street|district|floor|unit|building|shopping\s+center|book\s+shopping\s+center|no\.\s*\d+)\b/i.test(text)) return true;
+  const tokens = text.match(TITLE_ADDRESS_TOKEN_RE) || [];
+  if (tokens.length >= 3) return true;
+  return tokens.length >= 2 && /^\s*(?:北京|上海|广州|深圳|杭州|成都|重庆|南京|武汉|长沙|天津|西安|厦门|大理|beijing|shanghai|guangzhou|shenzhen|hangzhou|chengdu|chongqing|nanjing|wuhan|changsha|tianjin|xian|xiamen)/i.test(text);
+}
+
+function cleanPosterTitleCandidate(value, item = {}) {
+  let text = String(value || "").trim().replace(/^['"]|['"]$/g, "");
+  if (!text) return "";
+  text = text.replace(/^\s*(?:candidate\s+)?(?:event_)?title\s*[:：]\s*/i, "").trim().replace(/^['"]|['"]$/g, "");
+  if (/[:：]/.test(text)) {
+    const parts = text.split(/[:：]/);
+    const head = parts.shift();
+    const tail = parts.join(":").trim();
+    if (weakTitleCandidate(head) || /not\s+necessary|calendar|schedule/i.test(head)) text = tail;
+  }
+  if (TITLE_EVIDENCE_REJECT_RE.test(text)) return "";
+  if (titleLineLooksAddress(text)) return "";
+  let cleaned = stripTitleSegmentNoise(text).replace(/^['"]|['"]$/g, "").trim();
+  cleaned = cleaned
+    .replace(/^\s*[「【\[]?\s*(?:周[一二三四五六日天]|星期[一二三四五六日天])\s*[」】\]]?\s*/, "")
+    .replace(/^\s*(?:(?:\d{1,2})[./-](?:\d{1,2})|(?:\d{1,2})\s*月\s*(?:\d{1,2})\s*日?)\s*/i, "")
+    .replace(/\s+/g, " ")
+    .replace(/\s*[｜|丨·:：,，\-–—、/]+\s*$/g, "")
+    .trim();
+  if (weakTitleCandidate(cleaned) || titleLineLooksLineupOnly(cleaned, item) || titleLineLooksAddress(cleaned)) return "";
+  if (charLength(cleaned) < 3 || charLength(cleaned) > 80) return "";
+  return cleaned;
+}
+
+function posterEvidenceDisplayTitle(item = {}) {
+  const scored = [];
+  const seen = new Set();
+  posterEvidenceTitleLines(item).forEach((line, index) => {
+    const candidate = cleanPosterTitleCandidate(line, item);
+    const key = normalizeName(candidate);
+    if (!candidate || !key || seen.has(key)) return;
+    seen.add(key);
+    let score = 40;
+    if (TITLE_EVIDENCE_BOOST_RE.test(` ${candidate} `)) score = 100 + Math.min(charLength(candidate), 64);
+    if (/\d{1,2}[./-]\d{1,2}|\d{1,2}\s*月\s*\d{1,2}/.test(candidate)) score -= 15;
+    scored.push({ score, index, candidate });
+  });
+  scored.sort((a, b) => b.score - a.score || a.index - b.index);
+  if (!scored.length) return "";
+  const primary = scored[0].candidate;
+  const primaryKey = normalizeName(primary);
+  for (const row of scored.slice(1, 4)) {
+    const extra = row.candidate;
+    const extraKey = normalizeName(extra);
+    if (charLength(primary) + charLength(extra) + 3 > TITLE_MAX_CHARS) continue;
+    if (primaryKey.includes(extraKey) || extraKey.includes(primaryKey)) continue;
+    if (TITLE_EVIDENCE_BOOST_RE.test(` ${extra} `)) {
+      return `${primary} / ${extra}`;
+    }
+  }
+  return primary;
+}
+
+function lineupDisplayTitle(item = {}) {
+  const lineup = sourceLineup(item).filter(Boolean);
+  if (!lineup.length) return "";
+  if (lineup.length <= 5) return lineup.join(" / ");
+  return `${lineup.slice(0, 4).join(" / ")} 等`;
 }
 
 function displayTitle(item) {
@@ -447,6 +642,10 @@ function displayTitle(item) {
     const cleaned = cleanTitleCandidate(candidate, item);
     if (cleaned) return cleaned;
   }
+  const evidenceTitle = posterEvidenceDisplayTitle(item);
+  if (evidenceTitle) return evidenceTitle;
+  const lineupTitle = lineupDisplayTitle(item);
+  if (lineupTitle) return lineupTitle;
   return cleanTitleCandidate(stripEmoji(item.title), { ...item, venue_name: "", venue: [], account: "", promoter: "" }) ||
     stripEmoji(item.title) ||
     "Untitled";
@@ -548,7 +747,7 @@ function posterSuppressed(item = {}) {
 }
 
 function posterUrl(item) {
-  if (posterSuppressed(item) || isAggregateChildItem(item)) return "";
+  if (posterSuppressed(item) || isAggregateLike(item)) return "";
   const internalPosterFileId = posterFileId(item);
   if (isInternalPosterFileId(internalPosterFileId)) return internalPosterFileId;
   const cloud = appCloudConfig();
@@ -566,6 +765,8 @@ function posterUrl(item) {
 
 function normalizeName(value) {
   return String(value || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[\s·・|｜@＠:：,，.。()（）\[\]【】\-_/\\]/g, "");
 }
@@ -581,7 +782,7 @@ function dateKey(item) {
 }
 
 function cityKey(item) {
-  return normalizeDedupePart(item.cityLabel || first(item.city, item.city_key || first(item.city_keys, "")));
+  return normalizeDedupePart(item.city_key || first(item.city_keys, "") || item.cityLabel || first(item.city, ""));
 }
 
 function venueKey(item) {
@@ -849,14 +1050,104 @@ function areLikelyDuplicateItems(left, right) {
   return false;
 }
 
+const LINEUP_SOURCE_KEYS = [
+  "lineup_artists",
+  "lineupItems",
+  "lineup_items",
+  "artist_names",
+  "artistNames",
+  "artists",
+  "lineup",
+  "poster_lineup",
+  "posterLineup",
+  "poster_vl_lineup",
+  "posterVlLineup",
+  "poster_vl_lineup_items",
+  "posterVlLineupItems",
+  "qwen_vl_lineup",
+  "qwenVlLineup",
+  "qwen3_vl_lineup",
+  "qwen3VlLineup",
+  "vl_lineup",
+  "vlLineup",
+  "vl_lineup_items",
+  "vlLineupItems",
+  "strong_model_lineup",
+  "strongModelLineup",
+  "mimo_ocr_lineup",
+  "mimoOcrLineup",
+  "lineup_text",
+  "lineupText",
+];
+
+const LINEUP_SPLIT_RE = /\s*(?:\n|\r|\/|／|、|，|,|｜|\||;|；|\+|＆|&|×|\bx\b|\bb2b\b|\bB2B\b)\s*/;
+
+function lineupTextFromValue(value) {
+  if (!isMeaningfulValue(value)) return "";
+  if (typeof value === "string" || typeof value === "number") return String(value).trim();
+  if (isPlainObject(value)) {
+    return String(firstMeaningful(
+      value.name,
+      value.displayName,
+      value.display_name,
+      value.canonicalName,
+      value.canonical_name,
+      value.artistName,
+      value.artist_name,
+      value.djName,
+      value.dj_name,
+      value.raw,
+      value.label,
+    ) || "").trim();
+  }
+  return "";
+}
+
+function cleanLineupPart(value) {
+  return String(value || "")
+    .replace(/^\s*(?:line\s*up|lineup|阵容|dj\s*lineup|djs?)\s*[:：-]\s*/i, "")
+    .replace(/^\s*(?:\d{1,2}[:：]\d{2}|room\s*\d+|舞台\s*\d+)\s*[:：-]\s*/i, "")
+    .replace(/\s*[（(]\s*(?:live|dj\s*set|set|support|guest|resident|host|mc|vj)\s*[)）]\s*$/i, "")
+    .replace(/\s+(?:aw\s+live|live|dj\s*set|support|guest|resident|host|mc|vj)\s*$/i, "")
+    .replace(/^[·•*#\-\s]+|[·•*#\-\s]+$/g, "")
+    .trim();
+}
+
+function splitLineupText(value) {
+  const raw = lineupTextFromValue(value)
+    .replace(/\s+(?:b2b|B2B|x|X|×)\s+/g, " / ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+  if (!raw) return [];
+  if (!LINEUP_SPLIT_RE.test(raw)) return [cleanLineupPart(raw)].filter(Boolean);
+  LINEUP_SPLIT_RE.lastIndex = 0;
+  return raw
+    .split(LINEUP_SPLIT_RE)
+    .map(cleanLineupPart)
+    .filter(Boolean);
+}
+
+function lineupDedupeKey(value) {
+  return normalizeName(value)
+    .replace(/^(?:dj|vj|mc|live|guest|resident|support|artist)+/, "")
+    .replace(/(?:dj|vj|mc|live|guest|resident|support|artist)+$/, "");
+}
+
 function sourceLineup(item) {
-  return Array.isArray(item.lineup_artists) && item.lineup_artists.length > 0
-    ? item.lineup_artists
-    : item.lineup;
+  const values = [];
+  for (const key of LINEUP_SOURCE_KEYS) {
+    const source = item[key];
+    if (!isMeaningfulValue(source)) continue;
+    const rawValues = Array.isArray(source) ? source : [source];
+    for (const value of rawValues) {
+      values.push(...splitLineupText(value));
+    }
+  }
+  return values;
 }
 
 function hasRawLineup(item) {
-  return Array.isArray(sourceLineup(item)) && sourceLineup(item).some((name) => String(name || "").trim());
+  return sourceLineup(item).some((name) => String(name || "").trim());
 }
 
 function isTrustedTimeSource(item) {
@@ -963,19 +1254,21 @@ function isSameEntity(value, candidate) {
 
 function cleanLineup(item) {
   const rawLineup = sourceLineup(item);
-  if (!Array.isArray(rawLineup)) return [];
+  if (!Array.isArray(rawLineup) || rawLineup.length === 0) return [];
   const suspiciousCount = rawLineup.filter(isSuspiciousLineupName).length;
-  if (suspiciousCount >= 2 || (suspiciousCount > 0 && rawLineup.length >= 4)) return [];
+  if (suspiciousCount >= 2 && suspiciousCount / rawLineup.length >= 0.4) return [];
   const candidates = candidateNames(item);
   const seen = new Set();
   return rawLineup.filter((name) => {
     const normalized = normalizeName(name);
-    if (!normalized || seen.has(normalized)) return false;
+    const dedupeKey = lineupDedupeKey(name) || normalized;
+    if (!normalized || seen.has(normalized) || seen.has(dedupeKey)) return false;
     seen.add(normalized);
+    seen.add(dedupeKey);
     if (isSuspiciousLineupName(name)) return false;
     if (NON_ARTIST_LINEUP_NAMES.includes(normalized)) return false;
     return !candidates.some((candidate) => isSameEntity(name, candidate));
-  });
+  }).slice(0, 24);
 }
 
 function itemTextSignals(item) {
@@ -1708,7 +2001,7 @@ function compactItem(item) {
   const metaParts = [cityLabel, dateRangeLabel].filter(Boolean);
   const coverUrl = posterUrl(item);
   const internalPosterFileId = posterFileId(item);
-  const sourceActionEnabled = item.source_action?.available !== false && !isAggregateChildItem(item);
+  const sourceActionEnabled = item.source_action?.available !== false && !isAggregateLike(item);
   const sourceHashVal = sourceActionEnabled
     ? (item.source_action?.url_hash || item.source_article?.url_hash || item.sourceHash || item.source_hash || "")
     : "";
@@ -1725,6 +2018,13 @@ function compactItem(item) {
   const mapLocation = mapLocationForItem(item, { venueLabel, addressLabel, placeLabel, titleLabel });
   const soundSystemItems = soundSystemItemsForItem(item);
   const soundSystemEvidence = soundSystemEvidenceForItem(item);
+  const djDiscoverySections = isSourceOverview
+    ? []
+    : normalizeDjDiscoverySectionsForDisplay(
+      firstMeaningful(item.djDiscoverySections, item.dj_discovery_sections, item.dj_external_links, item.external_dj_links),
+      "zh",
+      { perDjLinkLimit: 5, sectionLimit: 24, bioAtomLimit: 4 },
+    );
   return {
     ...item,
     isSourceOverview,
@@ -1770,6 +2070,7 @@ function compactItem(item) {
     styleLabel: isSourceOverview ? "" : joinList(musicStyles),
     hasStyle: isSourceOverview ? false : musicStyles.length > 0,
     hasPrice: isSourceOverview ? false : priceItems.length > 0,
+    priceLabel: isSourceOverview ? "" : joinList(priceItems),
     soundSystemItems: isSourceOverview ? [] : soundSystemItems,
     soundSystemLabel: isSourceOverview ? "" : joinList(soundSystemItems),
     hasSoundSystem: isSourceOverview ? false : soundSystemItems.length > 0,
@@ -1783,6 +2084,8 @@ function compactItem(item) {
     hasBio: isSourceOverview ? false : bioLines.length > 0,
     atlasArtistItems: isSourceOverview ? [] : atlasArtists,
     hasAtlasArtistItems: isSourceOverview ? false : atlasArtists.length > 0,
+    djDiscoverySections,
+    hasDjDiscovery: isSourceOverview ? false : djDiscoverySections.length > 0,
     descriptionLines: isSourceOverview ? [] : descriptionLines,
     descriptionLead: isSourceOverview ? "" : descriptionLines[0] || "",
     hasDescription: isSourceOverview ? false : descriptionLines.length > 0,

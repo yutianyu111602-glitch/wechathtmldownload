@@ -1,0 +1,49 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "name": "活动",
+      "description": "按城市、日期、俱乐部、DJ 和风格查看近期国内电子音乐活动"
+    },
+    {
+      "path": "pages/detail/detail",
+      "name": "活动详情",
+      "description": "展示单场活动的时间、城市、场地、地址、阵容、风格、海报状态和公开来源状态",
+      "query": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "活动唯一标识，必须来自当前活动列表或 searchEvents 返回结果"
+          }
+        },
+        "required": ["id"]
+      }
+    },
+    {
+      "path": "pages/artist/artist",
+      "name": "DJ / 艺人",
+      "description": "展示 DJ 或艺人的近期活动、历史演出和公开证据上下文"
+    },
+    {
+      "path": "pages/venue/venue",
+      "name": "俱乐部 / 场地",
+      "description": "展示俱乐部或场地的近期活动、地址和历史活动上下文"
+    },
+    {
+      "path": "pages/column/column",
+      "name": "电子音乐专栏",
+      "description": "展示未来 15 天内会在国内俱乐部演出的 DJ / 艺人的长文介绍和公开音乐链接"
+    },
+    {
+      "path": "pages/saved/saved",
+      "name": "ATLAS计划",
+      "description": "ATLAS Beta，中国电子音乐图谱预览，用于核对城市、俱乐部、DJ、活动和公开来源证据"
+    },
+    {
+      "path": "pages/about/about",
+      "name": "关于",
+      "description": "说明 HUAIDJ 的数据来源、免责声明和 ATLAS Beta 边界"
+    }
+  ]
+}

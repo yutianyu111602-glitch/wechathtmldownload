@@ -14,24 +14,44 @@
     <view class="hero-copy">
       <view class="hero-kicker">{{t.brandKicker}}</view>
       <view class="hero-title">{{heroTitle}}</view>
-      <view class="hero-meta">{{datePillLabel}} / {{cityPillLabel}}</view>
+      <view class="hero-meta">{{cacheNotice || loadingStep || t.loadingReady}}</view>
     </view>
 
-    <view class="filter-pills">
-      <view class="filter-pill" hover-class="option-hover" bindtap="openDateModal"><text>{{datePillLabel}}</text><text class="pill-arrow">›</text></view>
-      <view class="filter-pill" hover-class="option-hover" bindtap="openLocationModal"><text>{{cityPillLabel}}</text><text class="pill-arrow">›</text></view>
+    <view class="filter-console">
+      <view class="filter-main-row">
+        <view class="filter-control filter-control-city" hover-class="option-hover" bindtap="openLocationModal">
+          <view class="filter-control-copy">
+            <text class="filter-label">{{t.locationTitle}}</text>
+            <text class="filter-value">{{cityPillLabel}}</text>
+          </view>
+          <text class="pill-arrow">›</text>
+        </view>
+        <view class="filter-control filter-control-date filter-control-primary" hover-class="option-hover" bindtap="openDateModal">
+          <view class="filter-control-copy">
+            <text class="filter-label">{{t.dateTitle}}</text>
+            <text class="filter-value">{{datePillLabel}}</text>
+          </view>
+          <text class="pill-arrow">›</text>
+        </view>
+      </view>
+      <view class="date-shortcuts">
+        <view class="date-shortcut {{dateMode === 'all_current' ? 'date-shortcut-active' : ''}}" hover-class="option-hover" bindtap="resetDate">{{t.resetToday}}</view>
+        <view class="date-shortcut {{dateMode === 'this_weekend' ? 'date-shortcut-active' : ''}}" hover-class="option-hover" bindtap="chooseThisWeekend">{{t.thisWeekend}}</view>
+        <view class="date-shortcut {{dateMode === 'next_weekend' ? 'date-shortcut-active' : ''}}" hover-class="option-hover" bindtap="chooseNextWeekend">{{t.nextWeekend}}</view>
+      </view>
+      <view class="filter-scope-line">
+        <view class="filter-scope-copy"><text class="filter-scope-dot"></text><text>{{cityPillLabel}}</text></view>
+        <view wx:if="{{selectedCity}}" class="filter-reset-link" hover-class="option-hover" bindtap="resetLocation">{{t.resetLocation}}</view>
+      </view>
+    </view>
+    <view wx:if="{{localCityKey && !selectedCity}}" class="loc-boost-chip" bindtap="applyLocalCityFilter" hover-class="option-hover">
+      <text class="loc-boost-dot">◉</text><text>{{localCityLabel}} 优先</text>
     </view>
 
     <view class="tabs">
       <view data-tab="all" bindtap="setTab" class="{{activeTab === 'all' ? 'tab-active' : ''}}">{{t.tabAll}}</view>
       <view data-tab="forYou" bindtap="setTab" class="{{activeTab === 'forYou' ? 'tab-active' : ''}}">{{t.tabForYou}}</view>
       <view data-tab="new" bindtap="setTab" class="{{activeTab === 'new' ? 'tab-active' : ''}}">{{t.tabNew}}</view>
-    </view>
-
-    <view class="preview-ranges">
-      <view data-range="week" bindtap="setPreviewRange" hover-class="option-hover" class="preview-range {{previewRange === 'week' ? 'preview-range-active' : ''}}">{{t.previewWeek}}</view>
-      <view data-range="month" bindtap="setPreviewRange" hover-class="option-hover" class="preview-range {{previewRange === 'month' ? 'preview-range-active' : ''}}">{{t.previewMonth}}</view>
-      <view data-range="all" bindtap="setPreviewRange" hover-class="option-hover" class="preview-range {{previewRange === 'all' ? 'preview-range-active' : ''}}">{{t.previewAll}}</view>
     </view>
   </view>
 
@@ -51,7 +71,7 @@
     <view wx:if="{{errorHint}}" class="state-hint">{{errorHint}}</view>
     <button class="retry-button" hover-class="option-hover" bindtap="retryLoadData">{{t.retry}}</button>
   </view>
-  <view wx:elif="{{totalItems === 0 && !loading}}" class="state">{{t.empty}}</view>
+  <view wx:elif="{{totalItems === 0}}" class="state">{{t.empty}}</view>
 
   <view wx:else class="home-content" bindtouchstart="onFeedTouchStart" bindtouchmove="onFeedTouchMove">
     <view wx:if="{{cacheNotice}}" class="cache-notice">{{cacheNotice}}</view>
@@ -63,33 +83,35 @@
           <image wx:if="{{item.coverUrl && !item.posterLoadFailed}}" class="event-poster" src="{{item.coverUrl}}" mode="aspectFill" data-id="{{item.id}}" data-src="{{item.coverUrl}}" bindload="onPosterImageLoad" binderror="onPosterImageError" ></image>
           <view wx:else class="poster-fallback">{{item.displayTitle}}</view>
         </view>
-        <view wx:if="{{!item.isSourceOverview}}" class="poster-date">
+        <view class="poster-date">
           <text wx:if="{{item.isCalendarPreview}}" class="calendar-preview-tag">{{item.calendarPreviewLabel}}</text>
           <text>{{item.weekdayLabel}}, {{item.dateRangeCompact || item.dateCompact}}</text>
         </view>
         <view class="poster-title">{{item.displayTitle}}</view>
-        <view wx:if="{{!item.isSourceOverview && item.cardLocationLabel}}" class="poster-meta">{{item.cardLocationLabel}}</view>
-        <view wx:if="{{!item.isSourceOverview && item.hasStyle}}" class="poster-meta">{{item.styleLabel}}</view>
+        <view class="poster-meta">{{item.cardLocationLabel}}</view>
+        <view wx:if="{{item.hasPrice}}" class="poster-price">{{item.priceLabel}}</view>
+        <view wx:if="{{item.hasStyle}}" class="poster-meta">{{item.styleLabel}}</view>
       </view>
     </scroll-view>
 
     <view class="archive-heading all-heading">{{t.allEvents}}</view>
     <view wx:for="{{groups}}" wx:key="key" class="day-group">
-      <view wx:if="{{!item.isSourceOverviewGroup}}" class="day-head">
+      <view class="day-head">
         <text>{{item.weekday}}</text>
         <text>{{item.date}}</text>
       </view>
       <view wx:for="{{item.items}}" wx:for-item="event" wx:key="id" class="event-row" data-id="{{event.id}}" bindtap="openDetail">
-        <view wx:if="{{!event.isSourceOverview}}" class="event-date">
+        <view class="event-date">
           <view class="event-weekday">{{event.weekdayLabel}}</view>
           <view class="event-day">{{event.dateRangeCompact || event.dateCompact}}</view>
         </view>
         <view class="event-main">
-          <view wx:if="{{!event.isSourceOverview && event.isCalendarPreview}}" class="event-tag">{{event.calendarPreviewLabel}}</view>
+          <view wx:if="{{event.isCalendarPreview}}" class="event-tag">{{event.calendarPreviewLabel}}</view>
           <view class="event-title">{{event.displayTitle}}</view>
-          <view wx:if="{{!event.isSourceOverview && event.listLocationLabel}}" class="event-place">{{event.listLocationLabel}}</view>
-          <view wx:if="{{!event.isSourceOverview && event.hasLineup}}" class="event-lineup">{{event.lineupLabel}}</view>
-          <view wx:elif="{{!event.isSourceOverview && event.hasLineupHint}}" class="event-lineup event-lineup-hint">{{event.lineupHint}}</view>
+          <view class="event-place">{{event.listLocationLabel}}</view>
+          <view wx:if="{{event.hasLineup}}" class="event-lineup">{{event.lineupLabel}}</view>
+          <view wx:elif="{{event.hasLineupHint}}" class="event-lineup event-lineup-hint">{{event.lineupHint}}</view>
+          <view wx:if="{{event.hasPrice}}" class="event-price">{{event.priceLabel}}</view>
         </view>
       </view>
     </view>

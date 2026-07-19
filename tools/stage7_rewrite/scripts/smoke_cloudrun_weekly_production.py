@@ -15,6 +15,7 @@ import subprocess
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -150,8 +151,10 @@ def get_json(base_url: str, path: str, timeout: int | None) -> dict[str, Any]:
         }
 
 
-def current_path(*, limit: int, lookback_days: int | None = None, cursor: str | None = None) -> str:
+def current_path(*, limit: int, lookback_days: int | None = None, cursor: str | None = None, scope: str | None = None) -> str:
     params: list[tuple[str, str]] = [("limit", str(limit))]
+    if scope:
+        params.append(("scope", scope))
     if lookback_days is not None:
         params.append(("lookbackDays", str(lookback_days)))
     if cursor is not None:
@@ -165,9 +168,10 @@ def get_paginated_current(
     *,
     limit: int = 100,
     lookback_days: int | None = None,
+    scope: str | None = None,
 ) -> dict[str, Any]:
     """Fetch a full current feed so LLM coverage is not judged from page 1 only."""
-    first_path = current_path(limit=limit, lookback_days=lookback_days)
+    first_path = current_path(limit=limit, lookback_days=lookback_days, scope=scope)
     first = get_json(base_url, first_path, timeout)
     payload = first.get("payload") if isinstance(first.get("payload"), dict) else {}
     if first.get("status_code") != 200 or not isinstance(payload.get("items"), list):
@@ -177,7 +181,7 @@ def get_paginated_current(
     page = payload.get("page") if isinstance(payload.get("page"), dict) else {}
     next_cursor = page.get("nextCursor")
     while next_cursor:
-        path = current_path(limit=limit, lookback_days=lookback_days, cursor=str(next_cursor))
+        path = current_path(limit=limit, lookback_days=lookback_days, cursor=str(next_cursor), scope=scope)
         response = get_json(base_url, path, timeout)
         next_payload = response.get("payload") if isinstance(response.get("payload"), dict) else {}
         if response.get("status_code") != 200 or not isinstance(next_payload.get("items"), list):
@@ -231,12 +235,29 @@ def endpoint_summary(name: str, response: dict[str, Any]) -> dict[str, Any]:
                 "total": page.get("total"),
                 "item_count": len(items),
                 "item_ids": [str(item.get("id")) for item in items if isinstance(item, dict) and item.get("id")],
+                "city_counts": dict(sorted(Counter(
+                    str(item.get("city_key") or ((item.get("city_keys") or [""])[0] if isinstance(item.get("city_keys"), list) and item.get("city_keys") else ""))
+                    for item in items if isinstance(item, dict) and (item.get("city_key") or item.get("city_keys"))
+                ).items())),
             }
         )
     elif name == "cities":
-        summary.update({"city_count": payload.get("city_count") or payload.get("item_count") or list_count(payload, "cities")})
+        city_rows = payload.get("cities") if isinstance(payload.get("cities"), list) else []
+        summary.update({
+            "scope": payload.get("scope"),
+            "city_count": payload.get("city_count") or list_count(payload, "cities"),
+            "item_count": payload.get("item_count"),
+            "city_counts": {
+                str(row.get("city_key") or row.get("key")): int(row.get("item_count") or row.get("count") or 0)
+                for row in city_rows if isinstance(row, dict) and (row.get("city_key") or row.get("key"))
+            },
+        })
     elif name == "dates":
-        summary.update({"date_count": payload.get("date_count") or payload.get("item_count") or list_count(payload, "dates")})
+        summary.update({
+            "scope": payload.get("scope"),
+            "date_count": payload.get("date_count") or list_count(payload, "dates"),
+            "item_count": payload.get("item_count"),
+        })
     elif name == "llm_status":
         llm = payload.get("llm") if isinstance(payload.get("llm"), dict) else {}
         summary.update(
@@ -357,6 +378,8 @@ def build_report(
     manifest = by_name(endpoint_results, "manifest")
     current = by_name(endpoint_results, "current")
     full_current = by_name(endpoint_results, "full_current")
+    cities = by_name(endpoint_results, "cities")
+    dates = by_name(endpoint_results, "dates")
     summary = by_name(endpoint_results, "materialized_summary")
     enrichments = by_name(endpoint_results, "materialized_enrichments")
     llm_reference = full_current if full_current else current
@@ -376,6 +399,13 @@ def build_report(
         warnings.append("materialized_summary_item_count_differs_from_manifest")
     if full_current and full_current_count and manifest_count and full_current_count != manifest_count:
         blockers.append("full_current_count_differs_from_manifest")
+    current_total = int(current.get("total") or 0)
+    if current_total and int(cities.get("item_count") or -1) != current_total:
+        blockers.append("current_city_facet_total_differs")
+    if current_total and int(dates.get("item_count") or -1) != current_total:
+        blockers.append("current_date_facet_total_differs")
+    if current.get("city_counts") != cities.get("city_counts"):
+        blockers.append("current_city_facet_counts_differ")
     if extra_enrichments:
         warnings.append("materialized_enrichment_index_is_superset_of_current_release")
     if enrichment_count and summary_count and enrichment_count != summary_count:
@@ -495,10 +525,10 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     summaries.insert(2, endpoint_summary("current", response))
 
     try:
-        response = get_paginated_current(server["base_url"], timeout_seconds, lookback_days=999)
+        response = get_paginated_current(server["base_url"], timeout_seconds, scope="package")
     except Exception as exc:  # noqa: BLE001
         response = {
-            "url_path": current_path(limit=100, lookback_days=999),
+            "url_path": current_path(limit=100, scope="package"),
             "status_code": None,
             "bytes_read": 0,
             "payload": {"_error": str(exc)[:240]},

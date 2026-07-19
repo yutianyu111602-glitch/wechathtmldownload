@@ -54,8 +54,25 @@ def package(api_dir: Path):
         },
     )
     write_json(api_dir / "by-id" / "posteru3a1.json", {"item": item})
-    write_json(api_dir / "by-city" / "index.json", {"city_key": "", "city": "", "cities": ["shanghai"]})
-    write_json(api_dir / "by-date" / "index.json", {"date": "", "dates": ["2026-06-05"]})
+    write_json(
+        api_dir / "by-city" / "index.json",
+        {
+            "city_key": "",
+            "city": "",
+            "scope": "package",
+            "item_count": 1,
+            "cities": ["shanghai"],
+        },
+    )
+    write_json(
+        api_dir / "by-date" / "index.json",
+        {
+            "date": "",
+            "scope": "package",
+            "item_count": 1,
+            "dates": ["2026-06-05"],
+        },
+    )
 
 
 def load_script_module():

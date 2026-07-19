@@ -1,6 +1,6 @@
 const VERSION = "0.5.15";
 const BUILD_DATE = "2026-06-11";
-const ATLAS_BETA_URL = "https://huaidj.club/";
+const ATLAS_BETA_URL = "https://huaidj.club/atlas/starmap";
 const ABOUT_TAB_INDEX = 3;
 const { HAPTIC, vibrateLight } = require("../../utils/haptics");
 const { applyLanguageChrome, normalizeLang, text } = require("../../utils/i18n");

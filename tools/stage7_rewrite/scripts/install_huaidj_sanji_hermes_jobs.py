@@ -9,6 +9,7 @@ publish run.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -20,6 +21,119 @@ REPO = Path(__file__).resolve().parents[3]
 DEFAULT_HERMES_HOME = Path(r"F:\DevData\Hermes")
 DEFAULT_HERMES_AGENT = DEFAULT_HERMES_HOME / "hermes-agent"
 DEFAULT_REPORT_ROOT = Path(r"F:\DevData\HuaidjRuntime\state\reports")
+
+RUNTIME_SSOT_MARKER = "# __HUAIDJ_RUNTIME_SSOT__"
+RUNTIME_SSOT_BLOCK = r'''
+HUAIDJ_LAUNCHER_SCHEMA = "huaidj_launcher_runtime_ssot.v1"
+INSTALLER_REPO = Path(r"__HUAIDJ_INSTALLER_REPO__")
+INSTALLER_PYTHON = Path(r"__HUAIDJ_INSTALLER_PYTHON__")
+INSTALLER_REPORT_ROOT = Path(r"__HUAIDJ_INSTALLER_REPORT_ROOT__")
+RUNTIME_INPUT_NAMES = ("HUAIDJ_REPO", "HUAIDJ_PYTHON", "HUAIDJ_REPORT_ROOT")
+
+
+def _same_path(left: Path, right: Path) -> bool:
+    try:
+        left_value = os.path.normcase(os.path.normpath(str(left.resolve(strict=False))))
+        right_value = os.path.normcase(os.path.normpath(str(right.resolve(strict=False))))
+    except OSError:
+        return False
+    return left_value == right_value
+
+
+def _valid_huaidj_repo(path: Path) -> bool:
+    return (
+        path.is_dir()
+        and (path / "tools" / "stage7_rewrite" / "scripts" / "install_huaidj_sanji_hermes_jobs.py").is_file()
+    )
+
+
+def _path_is_within(path: Path, parent: Path) -> bool:
+    try:
+        path.resolve(strict=False).relative_to(parent.resolve(strict=False))
+    except (OSError, ValueError):
+        return False
+    return True
+
+
+def _read_user_runtime_inputs() -> dict[str, str]:
+    values: dict[str, str] = {}
+    if os.name == "nt":
+        try:
+            import winreg
+
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Environment") as key:
+                for name in RUNTIME_INPUT_NAMES:
+                    try:
+                        value, _ = winreg.QueryValueEx(key, name)
+                    except FileNotFoundError:
+                        continue
+                    if str(value or "").strip():
+                        values[name] = str(value).strip()
+        except OSError:
+            pass
+    else:
+        for name in RUNTIME_INPUT_NAMES:
+            value = os.environ.get(name, "").strip()
+            if value:
+                values[name] = value
+    return values
+
+
+def _resolve_runtime_settings(*, require_repo: bool = True, require_python: bool = False) -> dict[str, object]:
+    """Resolve one coherent non-secret runtime tuple on every launcher start.
+
+    The Gateway process environment may predate an installer repair, so it is
+    deliberately not an authority.  HKCU is accepted only when its repo agrees
+    exactly with this rendered launcher.  Otherwise the validated Hermes job
+    workdir or the installer-rendered defaults win as one atomic tuple.
+    """
+
+    installer_repo = INSTALLER_REPO.resolve(strict=False)
+    workdir = Path.cwd().resolve(strict=False)
+    user_values = _read_user_runtime_inputs()
+    user_repo_raw = user_values.get("HUAIDJ_REPO", "")
+    user_repo = Path(user_repo_raw).resolve(strict=False) if user_repo_raw else Path()
+    registry_tuple_valid = (
+        bool(user_repo_raw)
+        and _valid_huaidj_repo(user_repo)
+        and _same_path(user_repo, installer_repo)
+    )
+    workdir_valid = _valid_huaidj_repo(workdir) and _same_path(workdir, installer_repo)
+
+    if require_repo and not _valid_huaidj_repo(installer_repo):
+        raise RuntimeError(f"Rendered HUAIDJ repo is missing or invalid: {installer_repo}")
+    if workdir_valid:
+        repo = workdir
+        source = "validated_job_workdir"
+    elif registry_tuple_valid:
+        repo = user_repo
+        source = "hkcu_runtime_tuple"
+    else:
+        repo = installer_repo
+        source = "installer_rendered_defaults"
+
+    if registry_tuple_valid:
+        report_root = Path(user_values.get("HUAIDJ_REPORT_ROOT") or INSTALLER_REPORT_ROOT)
+        python_exe = Path(user_values.get("HUAIDJ_PYTHON") or INSTALLER_PYTHON)
+    else:
+        report_root = INSTALLER_REPORT_ROOT
+        python_exe = INSTALLER_PYTHON
+
+    if require_repo and _path_is_within(report_root, repo):
+        raise RuntimeError(f"HUAIDJ report root must stay outside the immutable repo: {report_root}")
+    if require_python and not python_exe.is_file():
+        raise RuntimeError(f"HUAIDJ Python is missing: {python_exe}")
+
+    os.environ["HUAIDJ_REPO"] = str(repo)
+    os.environ["HUAIDJ_PYTHON"] = str(python_exe)
+    os.environ["HUAIDJ_REPORT_ROOT"] = str(report_root)
+    return {
+        "repo": repo,
+        "python": python_exe,
+        "report_root": report_root,
+        "source": source,
+    }
+'''.strip()
 
 
 def resolve_hermes_runtime_root() -> Path:
@@ -51,9 +165,11 @@ from datetime import datetime
 from pathlib import Path
 
 
+# __HUAIDJ_RUNTIME_SSOT__
+RUNTIME = _resolve_runtime_settings(require_repo=True)
 HERMES_HOME = Path(os.environ.get("HERMES_HOME", r"C:\\Users\\pc\\AppData\\Local\\hermes"))
-REPO = Path(os.environ.get("HUAIDJ_REPO", r"C:\\code\\githubstar\\wechathtmldownload"))
-REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\\DevData\\HuaidjRuntime\\state\\reports"))
+REPO = RUNTIME["repo"]
+REPORT_ROOT = RUNTIME["report_root"]
 LOG_DIR = REPORT_ROOT / "hermes_scheduled" / "sanji_publish"
 os.environ["HUAIDJ_REPORT_ROOT"] = str(REPORT_ROOT)
 os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
@@ -81,6 +197,7 @@ PUBLISH_CMD = [
     "manual",
     "-SkipSanjiExport",
     "-DeployBackend",
+    "-EnablePosterCloudBaseMigration",
     "-MinExpectedItems",
     "40",
     "-PosterExtractionMode",
@@ -156,8 +273,10 @@ import sys
 from pathlib import Path
 
 
-REPO = Path(os.environ.get("HUAIDJ_REPO", r"C:\\code\\githubstar\\wechathtmldownload"))
-REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\\DevData\\HuaidjRuntime\\state\\reports"))
+# __HUAIDJ_RUNTIME_SSOT__
+RUNTIME = _resolve_runtime_settings(require_repo=True)
+REPO = RUNTIME["repo"]
+REPORT_ROOT = RUNTIME["report_root"]
 os.environ["HUAIDJ_REPORT_ROOT"] = str(REPORT_ROOT)
 os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
 sys.dont_write_bytecode = True
@@ -218,8 +337,10 @@ import sys
 from pathlib import Path
 
 
-REPO = Path(os.environ.get("HUAIDJ_REPO", r"C:\\code\\githubstar\\wechathtmldownload"))
-REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\\DevData\\HuaidjRuntime\\state\\reports"))
+# __HUAIDJ_RUNTIME_SSOT__
+RUNTIME = _resolve_runtime_settings(require_repo=True)
+REPO = RUNTIME["repo"]
+REPORT_ROOT = RUNTIME["report_root"]
 REPORT_DIR = REPORT_ROOT / "coverage_audit"
 SANJI_DB = Path(os.environ.get("USERPROFILE", r"C:\\Users\\pc")) / "AppData" / "Roaming" / "sanji" / "sanji.db"
 DEFAULT_RUNTIME_DATA_ROOT = Path(r"F:\\DevData\\HuaidjRuntime\\state\\weekly_activity_cloudrun\\data")
@@ -412,7 +533,9 @@ import sys
 from pathlib import Path
 
 
-REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\\DevData\\HuaidjRuntime\\state\\reports"))
+# __HUAIDJ_RUNTIME_SSOT__
+RUNTIME = _resolve_runtime_settings(require_repo=False)
+REPORT_ROOT = RUNTIME["report_root"]
 os.environ["HUAIDJ_REPORT_ROOT"] = str(REPORT_ROOT)
 os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
 sys.dont_write_bytecode = True
@@ -446,18 +569,21 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
 
 
+# __HUAIDJ_RUNTIME_SSOT__
+RUNTIME = _resolve_runtime_settings(require_repo=True, require_python=True)
 HERMES_HOME = Path(os.environ.get("HERMES_HOME", r"C:\\Users\\pc\\AppData\\Local\\hermes"))
-REPO = Path(os.environ.get("HUAIDJ_REPO", r"C:\\code\\githubstar\\wechathtmldownload"))
-PYTHON_EXE = Path(os.environ.get("HUAIDJ_PYTHON") or sys.executable)
+REPO = RUNTIME["repo"]
+PYTHON_EXE = RUNTIME["python"]
 SANJI_ROOT = Path(os.environ.get("SANJI_ROOT", str(Path(os.environ.get("APPDATA", "")) / "sanji")))
 SANJI_ARTICLES_ROOT = Path(os.environ.get("SANJI_HOT_ARTICLES_ROOT", r"E:\\sanji_hot\\articles"))
-REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\\DevData\\HuaidjRuntime\\state\\reports"))
+REPORT_ROOT = RUNTIME["report_root"]
 LOG_DIR = REPORT_ROOT / "atlas_v2_import"
 LOCK_PATH = REPORT_ROOT / "_locks" / "atlas_v2_import.lock"
 os.environ["HUAIDJ_REPORT_ROOT"] = str(REPORT_ROOT)
@@ -581,6 +707,20 @@ def _tail(path: Path, limit: int = 4000) -> str:
         return ""
 
 
+def _load_run_summary_from_log(log_path: Path) -> dict:
+    text = _tail(log_path, limit=32768)
+    matches = list(re.finditer(r"summary:\\s*(.+?run_summary\\.json)\\s*$", text, flags=re.MULTILINE))
+    if not matches:
+        raise RuntimeError("AtlasV2 orchestrator did not report a run_summary.json path")
+    summary_path = Path(matches[-1].group(1).strip())
+    if not summary_path.is_file():
+        raise RuntimeError(f"AtlasV2 run summary is missing: {summary_path}")
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    if summary.get("schema_version") != "atlas_v2_sanji_import_run.v1":
+        raise RuntimeError("AtlasV2 run summary schema is invalid")
+    return summary
+
+
 def main() -> int:
     orchestrator = REPO / "tools" / "atlas_rebuild" / "run_atlas_v2_sanji_import.py"
     if not orchestrator.is_file():
@@ -655,6 +795,18 @@ def main() -> int:
         if tail:
             print(tail)
         return result_code
+    try:
+        summary = _load_run_summary_from_log(log_path)
+    except Exception as exc:
+        print(f"[BLOCKED] AtlasV2 exited zero without a valid terminal summary: {exc} log={log_path}")
+        return 2
+    status = str(summary.get("status") or "").strip()
+    if status == "noop_no_new_articles":
+        print(f"[NOOP] AtlasV2 has no new articles and no unresolved missing HTML. log={log_path}")
+        return 0
+    if status != "ok":
+        print(f"[BLOCKED] AtlasV2 returned an unexpected zero-exit status={status!r}. log={log_path}")
+        return 2
     print(
         f"[OK] AtlasV2 candidate import completed. log={log_path}. "
         "No production promotion or service restart was performed."
@@ -674,10 +826,12 @@ import sys
 from pathlib import Path
 
 
+# __HUAIDJ_RUNTIME_SSOT__
+RUNTIME = _resolve_runtime_settings(require_repo=True, require_python=True)
 HERMES_HOME = Path(os.environ.get("HERMES_HOME", r"C:\\Users\\pc\\AppData\\Local\\hermes"))
-REPO = Path(os.environ.get("HUAIDJ_REPO", r"C:\\code\\githubstar\\wechathtmldownload"))
-PYTHON_EXE = os.environ.get("HUAIDJ_PYTHON") or sys.executable
-REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\\DevData\\HuaidjRuntime\\state\\reports"))
+REPO = RUNTIME["repo"]
+PYTHON_EXE = str(RUNTIME["python"])
+REPORT_ROOT = RUNTIME["report_root"]
 os.environ["HUAIDJ_REPORT_ROOT"] = str(REPORT_ROOT)
 os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
 sys.dont_write_bytecode = True
@@ -758,10 +912,12 @@ import os
 from pathlib import Path
 
 
+# __HUAIDJ_RUNTIME_SSOT__
+RUNTIME = _resolve_runtime_settings(require_repo=True, require_python=True)
 HERMES_HOME = Path(os.environ.get("HERMES_HOME", r"C:\\Users\\pc\\AppData\\Local\\hermes"))
-REPO = Path(os.environ.get("HUAIDJ_REPO", r"C:\\code\\githubstar\\wechathtmldownload"))
-PYTHON_EXE = os.environ.get("HUAIDJ_PYTHON") or sys.executable
-REPORT_ROOT = Path(os.environ.get("HUAIDJ_REPORT_ROOT", r"F:\\DevData\\HuaidjRuntime\\state\\reports"))
+REPO = RUNTIME["repo"]
+PYTHON_EXE = str(RUNTIME["python"])
+REPORT_ROOT = RUNTIME["report_root"]
 os.environ["HUAIDJ_REPORT_ROOT"] = str(REPORT_ROOT)
 os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
 sys.dont_write_bytecode = True
@@ -828,6 +984,70 @@ if __name__ == "__main__":
 ''',
 }
 
+BASE_SCRIPT_TEMPLATES = dict(SCRIPT_TEMPLATES)
+
+
+def _safe_rendered_path(value: Path) -> str:
+    rendered = str(value.resolve(strict=False))
+    if any(char in rendered for char in ('"', "\n", "\r")):
+        raise ValueError(f"Unsupported character in rendered runtime path: {rendered!r}")
+    return rendered
+
+
+def installer_runtime_defaults() -> dict[str, Path]:
+    """Return the non-secret defaults frozen into a launcher installation."""
+
+    return {
+        "repo": REPO.resolve(strict=False),
+        "python": Path(os.environ.get("HUAIDJ_PYTHON") or sys.executable).resolve(strict=False),
+        "report_root": Path(os.environ.get("HUAIDJ_REPORT_ROOT") or DEFAULT_REPORT_ROOT).resolve(strict=False),
+    }
+
+
+def render_script_template(
+    rel: str,
+    *,
+    hermes_home: Path,
+    repo: Path | None = None,
+    python_exe: Path | None = None,
+    report_root: Path | None = None,
+) -> str:
+    """Render one self-contained launcher with immutable runtime identity."""
+
+    defaults = installer_runtime_defaults()
+    selected_repo = (repo or defaults["repo"]).resolve(strict=False)
+    selected_python = (python_exe or defaults["python"]).resolve(strict=False)
+    selected_report_root = (report_root or defaults["report_root"]).resolve(strict=False)
+    content = BASE_SCRIPT_TEMPLATES[rel].replace(RUNTIME_SSOT_MARKER, RUNTIME_SSOT_BLOCK)
+    replacements = {
+        "__HUAIDJ_INSTALLER_REPO__": _safe_rendered_path(selected_repo),
+        "__HUAIDJ_INSTALLER_PYTHON__": _safe_rendered_path(selected_python),
+        "__HUAIDJ_INSTALLER_REPORT_ROOT__": _safe_rendered_path(selected_report_root),
+    }
+    for token, value in replacements.items():
+        content = content.replace(token, value)
+    content = content.replace(r"C:\Users\pc\AppData\Local\hermes", str(hermes_home.resolve(strict=False)))
+    return content
+
+
+def render_script_templates(hermes_home: Path) -> dict[str, str]:
+    defaults = installer_runtime_defaults()
+    return {
+        rel: render_script_template(
+            rel,
+            hermes_home=hermes_home,
+            repo=defaults["repo"],
+            python_exe=defaults["python"],
+            report_root=defaults["report_root"],
+        )
+        for rel in BASE_SCRIPT_TEMPLATES
+    }
+
+
+# Keep this public mapping executable for existing offline contract tests.  The
+# installer re-renders with its requested Hermes home before writing live files.
+SCRIPT_TEMPLATES = render_script_templates(DEFAULT_HERMES_HOME)
+
 SCRIPT_CONTRACT_TOKENS = {
     "huaidj/sanji_publish_afternoon.py": (
         "run_sanji_desktop_recent_export.ps1",
@@ -835,6 +1055,7 @@ SCRIPT_CONTRACT_TOKENS = {
         "-Slot",
         "manual",
         "-SkipSanjiExport",
+        "-EnablePosterCloudBaseMigration",
         "PosterVlMaxImages",
         "vl_direct_qwen",
         '"0"',
@@ -927,8 +1148,24 @@ SCRIPT_CONTRACT_TOKENS = {
         "msvcrt.locking(",
         "atlas_v2_import_lock.v4",
         "return result_code",
+        "_load_run_summary_from_log",
+        "[NOOP] AtlasV2 has no new articles",
         "No production promotion or service restart",
     ),
+}
+
+RUNTIME_SSOT_CONTRACT_TOKENS = (
+    'HUAIDJ_LAUNCHER_SCHEMA = "huaidj_launcher_runtime_ssot.v1"',
+    "INSTALLER_REPO = Path(",
+    "INSTALLER_PYTHON = Path(",
+    "INSTALLER_REPORT_ROOT = Path(",
+    "def _read_user_runtime_inputs()",
+    "def _resolve_runtime_settings(",
+    'os.environ["HUAIDJ_REPO"] = str(repo)',
+)
+SCRIPT_CONTRACT_TOKENS = {
+    rel: tuple(tokens) + RUNTIME_SSOT_CONTRACT_TOKENS
+    for rel, tokens in SCRIPT_CONTRACT_TOKENS.items()
 }
 
 SCRIPT_FORBIDDEN_TOKENS = {
@@ -1006,23 +1243,30 @@ def load_api(hermes_home: Path, hermes_agent: Path):
 def write_scripts(hermes_home: Path, apply: bool) -> list[dict[str, Any]]:
     actions: list[dict[str, Any]] = []
     scripts_root = hermes_home / "scripts"
-    for rel, content in SCRIPT_TEMPLATES.items():
+    rendered_templates = render_script_templates(hermes_home)
+    for rel, rendered in rendered_templates.items():
         path = scripts_root / rel.replace("/", os.sep)
         old = path.read_text(encoding="utf-8") if path.exists() else ""
-        rendered = content.replace(r"C:\code\githubstar\wechathtmldownload", str(REPO))
-        rendered = rendered.replace(r"C:\Users\pc\AppData\Local\hermes", str(hermes_home))
-        migrated = old.replace(r"C:\code\githubstar\wechathtmldownload", str(REPO))
-        migrated = migrated.replace(r"C:\Users\pc\AppData\Local\hermes", str(hermes_home))
         tokens = SCRIPT_CONTRACT_TOKENS.get(rel, ())
         forbidden = SCRIPT_FORBIDDEN_TOKENS.get(rel, ())
         contract_ok = (
-            bool(migrated)
-            and all(token in migrated for token in tokens)
-            and not any(token in migrated for token in forbidden)
+            bool(old)
+            and old == rendered
+            and all(token in old for token in tokens)
+            and not any(token in old for token in forbidden)
         )
-        desired = migrated if contract_ok else rendered
-        changed = old != desired
-        actions.append({"type": "script", "path": str(path), "contract_ok": contract_ok, "changed": changed})
+        desired = rendered
+        changed = old != rendered
+        actions.append(
+            {
+                "type": "script",
+                "path": str(path),
+                "contract_ok": contract_ok,
+                "changed": changed,
+                "render_sha256": hashlib.sha256(rendered.encode("utf-8")).hexdigest(),
+                "installer_repo": str(REPO.resolve(strict=False)),
+            }
+        )
         if apply and changed:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(desired, encoding="utf-8", newline="\n")
@@ -1166,13 +1410,15 @@ def main() -> int:
 
     hermes_home = Path(args.hermes_home)
     hermes_agent = Path(args.hermes_agent)
+    runtime_defaults = installer_runtime_defaults()
     report: dict[str, Any] = {
-        "schema_version": "huaidj_sanji_hermes_job_installer.v1",
+        "schema_version": "huaidj_sanji_hermes_job_installer.v2",
         "applied": bool(args.apply),
         "repo": str(REPO),
         "hermes_home": str(hermes_home),
         "hermes_agent": str(hermes_agent),
         "hermes_runtime": str(hermes_agent),
+        "runtime_defaults": {name: str(value) for name, value in runtime_defaults.items()},
         "actions": [],
     }
     try:

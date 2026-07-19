@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -23,7 +24,7 @@ DEFAULT_SANJI_ROOT = Path(os.environ.get("APPDATA", r"C:\Users\pc\AppData\Roamin
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sanji-root", type=Path, default=DEFAULT_SANJI_ROOT)
-    parser.add_argument("--cutoff-hours", type=float, default=96)
+    parser.add_argument("--cutoff-hours", type=float, default=744)
     parser.add_argument("--limit", type=int, default=300)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--summary-out", type=Path, required=True)
@@ -176,6 +177,12 @@ def main(argv: list[str]) -> int:
 
     summary.update(
         {
+            "cutoff_hours": args.cutoff_hours,
+            "unresolved_missing_html": summary["pending_ref_count"],
+            "disposition_counts": {
+                "unresolved_retry_required": summary["pending_ref_count"],
+            },
+            "privacy_contract": "retry_identifiers_only_no_title_url_error_body_or_content_path",
             "sanji_root": str(args.sanji_root),
             "db_path": str(db_path),
             "out": str(args.out),
@@ -183,6 +190,8 @@ def main(argv: list[str]) -> int:
         }
     )
     json_dump(args.out, refs)
+    summary["ledger_row_count"] = len(refs)
+    summary["ledger_sha256"] = hashlib.sha256(args.out.read_bytes()).hexdigest()
     json_dump(args.summary_out, summary)
     # Windows PowerShell 5 redirects native stdout through the active ANSI code
     # page. Account names can contain private-use Unicode characters, so keep

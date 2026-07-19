@@ -22,7 +22,10 @@ param(
     [int]$PosterVlTimeoutSec = 90,
     [int]$PosterVlConcurrency = 4,
     [int]$DeepSeekConcurrency = 4,
+    [switch]$EnablePosterCloudBaseMigration,
     [int]$LockTimeoutMinutes = 180,
+    [int]$SanjiRefreshCutoffHours = 744,
+    [int]$SanjiSummaryMaxAgeHours = 12,
     [switch]$SkipSanjiExport,
     [switch]$SkipNotify,
     [string]$IncrementalBaseApiDir = "",
@@ -30,6 +33,8 @@ param(
     [string]$CloudRunDataRoot = "",
     [string]$CloudRunWorkRoot = "",
     [string]$ReportRoot = "",
+    [string]$Version = "",
+    [string]$Desc = "",
     [string]$SanjiExportOutRoot = "",
     [string]$SanjiRoot = "",
     [string]$SanjiHotArticlesRoot = "",
@@ -142,6 +147,8 @@ function New-RunStatus {
         dry_run = [bool]$DryRun
         deploy_backend = [bool]$DeployBackend
         upload_frontend = [bool]$UploadFrontend
+        miniprogram_version_requested = $Version
+        miniprogram_description_requested = $Desc
         poster_extraction_mode = $PosterExtractionMode
         poster_vl_provider = $PosterVlProvider
         poster_vl_model = $PosterVlModel
@@ -150,6 +157,9 @@ function New-RunStatus {
         poster_vl_limit = $PosterVlLimit
         poster_vl_concurrency = $PosterVlConcurrency
         deepseek_concurrency = $DeepSeekConcurrency
+        poster_cloudbase_migration_enabled = [bool]$EnablePosterCloudBaseMigration
+        sanji_refresh_cutoff_hours = $SanjiRefreshCutoffHours
+        sanji_summary_max_age_hours = $SanjiSummaryMaxAgeHours
         skip_sanji_export = [bool]$SkipSanjiExport
         sanji_export_out_root = $SanjiExportOutRoot
         sanji_root = $SanjiRoot
@@ -388,6 +398,7 @@ try {
                 -SanjiHotArticlesRoot $SanjiHotArticlesRoot `
                 -SanjiColdArchiveRoot $SanjiColdArchiveRoot `
                 -ReportRoot $HuaidjReportRoot `
+                -SanjiRefreshCutoffHours $SanjiRefreshCutoffHours `
                 *> $LogPath
             $exportExitCode = $LASTEXITCODE
         } finally {
@@ -417,6 +428,7 @@ try {
     $Status.sanji_manifest_path = [string]$sanjiSummary.manifest_path
     $rssContract = Get-JsonProperty -Object $sanjiSummary -Name "rss_contract"
     $sanjiRefresh = Get-JsonProperty -Object $sanjiSummary -Name "sanji_refresh"
+    $fetchRefsSummary = Get-JsonProperty -Object $sanjiRefresh -Name "fetch_refs_summary"
     $directRssFeedFetch = ConvertTo-BooleanFlag (Get-JsonProperty -Object $rssContract -Name "direct_rss_feed_fetch")
     $desktopRefreshInvoked = ConvertTo-BooleanFlag (Get-JsonProperty -Object $rssContract -Name "sanji_desktop_refresh_invoked")
     if (-not $desktopRefreshInvoked) {
@@ -437,6 +449,74 @@ try {
     $Status.sanji_desktop_refresh_invoked = $desktopRefreshInvoked
     $Status.sanji_db_snapshot_export = $snapshotExport
     $Status.sanji_snapshot_db_path = $snapshotDbPath
+    if ($null -eq $fetchRefsSummary) {
+        throw "Sanji export summary is missing the postfetch unresolved ledger digest"
+    }
+    $unresolvedValue = Get-JsonProperty -Object $fetchRefsSummary -Name "unresolved_missing_html"
+    if ($null -eq $unresolvedValue) {
+        $unresolvedValue = Get-JsonProperty -Object $fetchRefsSummary -Name "pending_ref_count"
+    }
+    if ($null -eq $unresolvedValue) {
+        throw "Sanji postfetch ledger digest is missing unresolved_missing_html/pending_ref_count"
+    }
+    $unresolvedMissingHtml = [int]$unresolvedValue
+    $Status.sanji_unresolved_missing_html = $unresolvedMissingHtml
+    $fetchRefsPath = [string](Get-JsonProperty -Object $sanjiRefresh -Name "fetch_refs_path")
+    $Status.sanji_unresolved_ledger_path = $fetchRefsPath
+    if (-not $fetchRefsPath -or -not (Test-Path -LiteralPath $fetchRefsPath -PathType Leaf)) {
+        throw "Sanji postfetch unresolved ledger is missing: $fetchRefsPath"
+    }
+    try {
+        $ledgerRows = Get-Content -LiteralPath $fetchRefsPath -Raw | ConvertFrom-Json
+    } catch {
+        throw "Sanji postfetch unresolved ledger is invalid JSON: $fetchRefsPath"
+    }
+    $ledgerRowCount = @($ledgerRows).Count
+    if ($ledgerRowCount -ne $unresolvedMissingHtml) {
+        throw "Sanji postfetch ledger/digest count mismatch: ledger_rows=$ledgerRowCount unresolved_missing_html=$unresolvedMissingHtml"
+    }
+    foreach ($ledgerRow in @($ledgerRows)) {
+        foreach ($property in @($ledgerRow.PSObject.Properties)) {
+            if ($property.Name -notin @("fakeid", "aid")) {
+                throw "Sanji postfetch unresolved ledger contains a forbidden field: $($property.Name)"
+            }
+        }
+    }
+    $expectedLedgerSha256 = [string](Get-JsonProperty -Object $fetchRefsSummary -Name "ledger_sha256")
+    $actualLedgerSha256 = (Get-FileHash -LiteralPath $fetchRefsPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    if (-not $expectedLedgerSha256 -or $actualLedgerSha256 -ne $expectedLedgerSha256.ToLowerInvariant()) {
+        throw "Sanji postfetch ledger/digest SHA256 mismatch"
+    }
+    $Status.sanji_unresolved_ledger_sha256 = $actualLedgerSha256
+    $cutoffValue = Get-JsonProperty -Object $fetchRefsSummary -Name "cutoff_ts"
+    $digestGeneratedAt = [string](Get-JsonProperty -Object $fetchRefsSummary -Name "generated_at")
+    if ($null -eq $cutoffValue -or [string]::IsNullOrWhiteSpace($digestGeneratedAt)) {
+        throw "Sanji postfetch ledger digest is missing cutoff_ts/generated_at"
+    }
+    try {
+        $digestGenerated = [DateTimeOffset]::Parse($digestGeneratedAt)
+        $digestCutoff = [DateTimeOffset]::FromUnixTimeSeconds([int64]$cutoffValue)
+        $refreshCoverageHours = ($digestGenerated - $digestCutoff).TotalHours
+    } catch {
+        throw "Sanji postfetch ledger digest has invalid cutoff/generated timestamp"
+    }
+    $Status.sanji_refresh_coverage_hours = [Math]::Round($refreshCoverageHours, 2)
+    if ($refreshCoverageHours -lt ($SanjiRefreshCutoffHours - 1)) {
+        throw "Sanji refresh window is incomplete: coverage_hours=$([Math]::Round($refreshCoverageHours, 2)) required_hours=$SanjiRefreshCutoffHours"
+    }
+    try {
+        $summaryGenerated = [DateTimeOffset]::Parse([string]$sanjiSummary.generated_at)
+        $summaryAgeHours = ([DateTimeOffset]::Now - $summaryGenerated).TotalHours
+    } catch {
+        throw "Sanji latest_summary.json has invalid generated_at"
+    }
+    $Status.sanji_summary_age_hours = [Math]::Round($summaryAgeHours, 2)
+    if ($summaryAgeHours -lt -1 -or $summaryAgeHours -gt $SanjiSummaryMaxAgeHours) {
+        throw "Sanji latest_summary.json is stale or future-dated: age_hours=$([Math]::Round($summaryAgeHours, 2)) max_age_hours=$SanjiSummaryMaxAgeHours"
+    }
+    if ($unresolvedMissingHtml -gt 0) {
+        throw "Sanji refresh is blocked: unresolved_missing_html=$unresolvedMissingHtml ledger=$fetchRefsPath"
+    }
     if ($rssContract -and (Get-JsonProperty -Object $rssContract -Name "direct_rss_feed_fetch_note")) {
         $Status.sanji_direct_rss_feed_fetch_note = [string](Get-JsonProperty -Object $rssContract -Name "direct_rss_feed_fetch_note")
     }
@@ -469,7 +549,6 @@ try {
         "-File", $PublishScript,
         "-SourceMode", "sanji_desktop_rss",
         "-PosterExtractionMode", $PosterExtractionMode,
-        "-EnablePosterCloudBaseMigration",
         "-WindowDays", $WindowDays,
         "-MinExpectedItems", $MinExpectedItems,
         "-IncrementalMinExpectedItems", $IncrementalMinExpectedItems,
@@ -487,6 +566,9 @@ try {
         "-CloudRunWorkRoot", $CloudRunWorkRoot,
         "-ReportRoot", $HuaidjReportRoot
     )
+    if ($EnablePosterCloudBaseMigration) { $publishArgs += "-EnablePosterCloudBaseMigration" }
+    if (-not [string]::IsNullOrWhiteSpace($Version)) { $publishArgs += @("-Version", $Version) }
+    if (-not [string]::IsNullOrWhiteSpace($Desc)) { $publishArgs += @("-Desc", $Desc) }
     if ($DeployBackend) { $publishArgs += "-DeployBackend" }
     if ($UploadFrontend) { $publishArgs += "-UploadFrontend" }
     if ($DryRun) { $publishArgs += "-DryRun" }

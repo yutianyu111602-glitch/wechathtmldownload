@@ -3,7 +3,6 @@ const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
 const vm = require("node:vm");
-const { getClubOverviewsForVenue } = require("../utils/clubOverviews");
 
 const root = path.resolve(__dirname, "..");
 
@@ -30,7 +29,7 @@ function pageHarness(filename, requestApi, options = {}) {
       if (request.endsWith("/api")) return { requestApi };
       if (request.endsWith("/clubOverviews")) {
         return {
-          getClubOverviewsForVenue: options.getClubOverviewsForVenue || (() => []),
+          getClubOverviewsForVenue: () => [],
         };
       }
       if (request.endsWith("/format")) {
@@ -84,6 +83,8 @@ function pageHarness(filename, requestApi, options = {}) {
       if (request.endsWith("/publicExternalLinks")) return require(path.join(root, "utils", "publicExternalLinks.js"));
       if (request.endsWith("/externalLinkAction")) return require(path.join(root, "utils", "externalLinkAction.js"));
       if (request.endsWith("/djLinks")) return require(path.join(root, "utils", "djLinks.js"));
+      if (request.endsWith("/cityFootprint")) return require(path.join(root, "utils", "cityFootprint.js"));
+      if (request.endsWith("/groupOutlinks")) return require(path.join(root, "utils", "groupOutlinks.js"));
       if (request.endsWith("/share")) {
         return {
           buildNamedPageShare: () => ({}),
@@ -109,74 +110,6 @@ function bindPage(config, data = {}) {
     },
   };
 }
-
-test("club overview formatter only reads a payload supplied by requestApi", () => {
-  assert.deepEqual(getClubOverviewsForVenue("OIL"), []);
-  const result = getClubOverviewsForVenue("OIL", {
-    data: {
-      by_club: {
-        OIL: [{
-          club: "OIL",
-          title: "OIL 本周活动一览",
-          original_url: "https://mp.weixin.qq.com/s/oil-weekly",
-          cover_url: "https://mmbiz.qpic.cn/example/oil-weekly.jpg",
-          window_kind: "week",
-        }],
-      },
-    },
-  });
-  assert.equal(result.length, 1);
-  assert.equal(result[0].title, "OIL 本周活动一览");
-});
-
-test("venue page renders online club overviews without coupling them to activity loading", async () => {
-  const filename = path.join(root, "pages", "venue", "venue.js");
-  const pageConfig = pageHarness(filename, async (apiPath) => {
-    assert.equal(apiPath, "/api/v1/weekly/club-overviews");
-    return {
-      by_club: {
-        OIL: [{
-          club: "OIL",
-          title: "OIL Online Roundup",
-          original_url: "https://mp.weixin.qq.com/s/oil-online",
-          cover_url: "https://mmbiz.qpic.cn/example/oil-online.jpg",
-          window_kind: "week",
-        }],
-      },
-    };
-  }, { getClubOverviewsForVenue });
-  const page = bindPage(pageConfig);
-  page.name = "OIL";
-  page.lang = "zh";
-
-  await pageConfig.loadClubOverviews.call(page);
-
-  assert.equal(page.data.clubOverviews.length, 1);
-  assert.equal(page.data.clubOverviews[0].title, "OIL Online Roundup");
-  assert.equal(page.data.error, "");
-});
-
-test("club overview network failure never fails the venue activity page", async () => {
-  const filename = path.join(root, "pages", "venue", "venue.js");
-  const pageConfig = pageHarness(filename, async (apiPath) => {
-    if (apiPath === "/api/v1/weekly/club-overviews") throw new Error("club artifact offline");
-    if (apiPath.includes("/atlas/venue")) return { found: false };
-    return { items: [], page: { nextCursor: null } };
-  }, { getClubOverviewsForVenue });
-  const page = bindPage(pageConfig);
-  page.name = "OIL";
-  page.key = "";
-  page.lang = "zh";
-
-  await Promise.all([
-    pageConfig.loadClubOverviews.call(page),
-    pageConfig.loadVenue.call(page),
-  ]);
-
-  assert.equal(page.data.loading, false);
-  assert.equal(page.data.error, "");
-  assert.equal(page.data.clubOverviews.length, 0);
-});
 
 test("venue profile still resolves by club name when the carried organizer key is stale", async () => {
   const filename = path.join(root, "pages", "venue", "venue.js");

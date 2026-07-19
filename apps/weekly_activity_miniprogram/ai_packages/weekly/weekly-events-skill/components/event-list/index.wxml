@@ -1,0 +1,27 @@
+<view class="card">
+  <scroll-view class="row" scroll-x="{{true}}" wx:if="{{events.length}}">
+    <view
+      class="cell"
+      wx:for="{{events}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onTapEvent"
+    >
+      <image
+        wx:if="{{item.poster}}"
+        class="poster"
+        src="{{item.poster}}"
+        mode="aspectFill"
+      />
+      <view wx:else class="poster poster-empty">
+        <text class="poster-empty-text">暂无海报</text>
+      </view>
+      <text class="title">{{item.title}}</text>
+      <text class="meta">{{item.line}}</text>
+      <text wx:if="{{item.lineup}}" class="lineup">{{item.lineup}}</text>
+    </view>
+  </scroll-view>
+  <view wx:else class="empty">
+    <text class="empty-text">{{hint}}</text>
+  </view>
+</view>

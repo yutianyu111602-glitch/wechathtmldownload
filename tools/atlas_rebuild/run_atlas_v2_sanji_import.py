@@ -234,6 +234,129 @@ def run_step(name: str, cmd: list[str], env: dict[str, str], log_dir: Path) -> d
     return {"name": name, "cmd": [str(c) for c in cmd], "returncode": result.returncode, "log": str(log_path)}
 
 
+MISSING_HTML_LEDGER_FIELDS = {
+    "token",
+    "post_date",
+    "disposition",
+    "reason",
+    "fetch_status_class",
+    "fetch_retry_count",
+}
+MISSING_HTML_DISPOSITIONS = {
+    "unresolved_retry_required",
+    "ignored_historical_before_cutoff",
+}
+
+
+def _safe_manifest_artifact(manifest_dir: Path, relative_name: Any) -> Path:
+    raw = str(relative_name or "").strip()
+    path = Path(raw)
+    if not raw or path.is_absolute() or ".." in path.parts:
+        raise ValueError("missing-HTML artifact must be a safe relative path")
+    resolved_root = manifest_dir.resolve()
+    resolved = (manifest_dir / path).resolve()
+    if os.path.commonpath([str(resolved_root), str(resolved)]) != str(resolved_root):
+        raise ValueError("missing-HTML artifact escapes manifest directory")
+    if not resolved.is_file():
+        raise ValueError(f"missing-HTML artifact not found: {path.as_posix()}")
+    return resolved
+
+
+def missing_html_gate_report(export_report: dict[str, Any], manifest_dir: Path) -> dict[str, Any]:
+    """Validate the sanitized missing-HTML contract before any paid stage."""
+    gate: dict[str, Any] = {
+        "contract_valid": False,
+        "gate_pass": False,
+        "unresolved_missing_html": 0,
+        "disposed_nonblocking_missing_html": 0,
+        "total_missing_html": 0,
+        "error": "",
+    }
+    try:
+        if "unresolved_missing_html" not in export_report:
+            raise ValueError("export report lacks unresolved_missing_html")
+        unresolved = int(export_report["unresolved_missing_html"])
+        actionable = int(export_report.get("actionable_missing_html", unresolved))
+        disposed = int(export_report.get("ignored_old_missing_html", 0))
+        total = int(export_report.get("missing_html", unresolved + disposed))
+        if min(unresolved, actionable, disposed, total) < 0:
+            raise ValueError("missing-HTML counts must be non-negative")
+        if actionable != unresolved or total != unresolved + disposed:
+            raise ValueError("export report missing-HTML counts disagree")
+
+        ledger_path = _safe_manifest_artifact(
+            manifest_dir, export_report.get("missing_html_ledger_rel_path")
+        )
+        digest_path = _safe_manifest_artifact(
+            manifest_dir, export_report.get("missing_html_digest_rel_path")
+        )
+        ledger_sha256 = hashlib.sha256(ledger_path.read_bytes()).hexdigest()
+        if ledger_sha256 != str(export_report.get("missing_html_ledger_sha256") or ""):
+            raise ValueError("missing-HTML ledger hash disagrees with export report")
+        digest = json.loads(digest_path.read_text(encoding="utf-8"))
+        if digest.get("schema") != "sanji.missing_html_digest.v1":
+            raise ValueError("unsupported missing-HTML digest schema")
+        if digest.get("ledger_rel_path") != ledger_path.name:
+            raise ValueError("missing-HTML digest ledger path mismatch")
+        if digest.get("ledger_sha256") != ledger_sha256:
+            raise ValueError("missing-HTML digest ledger hash mismatch")
+        digest_counts = (
+            int(digest.get("total_missing_html", -1)),
+            int(digest.get("unresolved_missing_html", -1)),
+            int(digest.get("disposed_nonblocking_missing_html", -1)),
+        )
+        if digest_counts != (total, unresolved, disposed):
+            raise ValueError("missing-HTML digest counts disagree with export report")
+
+        ledger_rows = [
+            json.loads(line)
+            for line in ledger_path.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        ]
+        if len(ledger_rows) != total:
+            raise ValueError("missing-HTML ledger row count disagrees with digest")
+        actual_dispositions: dict[str, int] = {}
+        for row in ledger_rows:
+            if not isinstance(row, dict) or not set(row).issubset(MISSING_HTML_LEDGER_FIELDS):
+                raise ValueError("missing-HTML ledger contains a non-sanitized field")
+            if set(row) != MISSING_HTML_LEDGER_FIELDS:
+                raise ValueError("missing-HTML ledger row is incomplete")
+            token = str(row.get("token") or "")
+            if not token.startswith("sanji_") or any(marker in token for marker in ("/", "\\", ":")):
+                raise ValueError("missing-HTML ledger token is invalid")
+            disposition = str(row.get("disposition") or "")
+            if disposition not in MISSING_HTML_DISPOSITIONS:
+                raise ValueError("missing-HTML ledger disposition is invalid")
+            actual_dispositions[disposition] = actual_dispositions.get(disposition, 0) + 1
+        expected_dispositions = {
+            str(key): int(value)
+            for key, value in (digest.get("disposition_counts") or {}).items()
+            if int(value) > 0
+        }
+        if actual_dispositions != expected_dispositions:
+            raise ValueError("missing-HTML ledger dispositions disagree with digest")
+        if actual_dispositions.get("unresolved_retry_required", 0) != unresolved:
+            raise ValueError("missing-HTML unresolved disposition count mismatch")
+        if actual_dispositions.get("ignored_historical_before_cutoff", 0) != disposed:
+            raise ValueError("missing-HTML historical disposition count mismatch")
+
+        gate.update(
+            {
+                "contract_valid": True,
+                "gate_pass": unresolved == 0,
+                "unresolved_missing_html": unresolved,
+                "disposed_nonblocking_missing_html": disposed,
+                "total_missing_html": total,
+                "ledger_rel_path": ledger_path.name,
+                "digest_rel_path": digest_path.name,
+                "ledger_sha256": ledger_sha256,
+            }
+        )
+    except (OSError, ValueError, TypeError, json.JSONDecodeError) as exc:
+        gate["error"] = f"{type(exc).__name__}: {exc}"
+    return gate
+
+
 def extraction_completion_report(clean_db: Path, extraction_db: Path) -> dict[str, Any]:
     """Prove every processable Stage1 token has a terminal valid extraction."""
     clean = sqlite3.connect(f"file:{clean_db.as_posix()}?mode=ro", uri=True)
@@ -372,8 +495,21 @@ def main() -> int:
         return finish(run_dir, steps, "export_delta_failed")
 
     export_report = json.loads((manifest_dir / "export_report.json").read_text(encoding="utf-8"))
+    missing_html_gate = missing_html_gate_report(export_report, manifest_dir)
+    if not missing_html_gate["contract_valid"] or not missing_html_gate["gate_pass"]:
+        return finish(
+            run_dir,
+            steps,
+            "blocked_unseen_missing_html",
+            extra={"export_report": export_report, "missing_html_gate": missing_html_gate},
+        )
     if export_report.get("article_count", 0) == 0:
-        return finish(run_dir, steps, "noop_no_new_articles", extra={"export_report": export_report})
+        return finish(
+            run_dir,
+            steps,
+            "noop_no_new_articles",
+            extra={"export_report": export_report, "missing_html_gate": missing_html_gate},
+        )
 
     steps.append(
         run_step(

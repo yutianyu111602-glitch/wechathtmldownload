@@ -2,7 +2,7 @@
 // Extracted from api.js: cache storage, TTL, and withCachedResponse wrapper.
 // All wx.* calls target the WeChat mini-program runtime global wx.
 
-const API_CACHE_PREFIX = "weeklyActivityApiCache:v20260704:";
+const API_CACHE_PREFIX = "weeklyActivityApiCache:v20260719-visibility-v2:";
 const DEFAULT_CACHE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
 const DEFAULT_CACHE_FALLBACK_DELAY_MS = 2200;
 

@@ -55,6 +55,14 @@ def table_count(conn: sqlite3.Connection, table: str) -> int:
     return int(conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0])
 
 
+def table_exists(conn: sqlite3.Connection, table: str) -> bool:
+    return bool(conn.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)).fetchone())
+
+
+def table_has_column(conn: sqlite3.Connection, table: str, column: str) -> bool:
+    return column in {str(row[1]) for row in conn.execute(f"PRAGMA table_info({table})")}
+
+
 def row_dict(row: sqlite3.Row | None) -> dict[str, Any]:
     return {key: row[key] for key in row.keys()} if row else {}
 
@@ -95,6 +103,17 @@ def evidence_key_cte(prefix: str, event_table: str, ref_table: str) -> str:
     """
 
 
+def candidate_evidence_key_cte(conn: sqlite3.Connection) -> str:
+    if table_has_column(conn, "atlas_activity_evidence_refs", "event_id"):
+        return """
+        SELECT r.event_id || char(31) || r.field_path || char(31) ||
+               COALESCE(r.field_value, '') || char(31) || COALESCE(r.quote, '') AS k,
+               r.event_id, r.field_path, r.field_value, r.quote
+        FROM atlas_activity_evidence_refs r
+        """
+    return evidence_key_cte("cand", "atlas_activity_events", "atlas_activity_evidence_refs")
+
+
 def diff_count_query(left_cte: str, right_cte: str) -> str:
     return f"""
     WITH left_keys AS (
@@ -113,7 +132,7 @@ def diff_count_query(left_cte: str, right_cte: str) -> str:
 
 def evidence_diff_samples(conn: sqlite3.Connection, side_only: bool, limit: int = 30) -> list[dict[str, Any]]:
     side_cte = evidence_key_cte("side", "sidecar.activity_events", "sidecar.evidence_refs")
-    cand_cte = evidence_key_cte("cand", "atlas_activity_events", "atlas_activity_evidence_refs")
+    cand_cte = candidate_evidence_key_cte(conn)
     left = side_cte if side_only else cand_cte
     right = cand_cte if side_only else side_cte
     rows = conn.execute(
@@ -212,7 +231,9 @@ def audit_drift(
         candidate_counts = {
             "events": table_count(conn, "atlas_activity_events"),
             "evidence_refs": table_count(conn, "atlas_activity_evidence_refs"),
-            "prov_activities": table_count(conn, "atlas_activity_prov_activities"),
+            "prov_activities": table_count(conn, "atlas_activity_prov_activities")
+            if table_exists(conn, "atlas_activity_prov_activities")
+            else 0,
         }
         event_id_drift = {
             "sidecar_missing_in_candidate": int(
@@ -248,7 +269,7 @@ def audit_drift(
             ).fetchone()[0]
         )
         side_cte = evidence_key_cte("side", "sidecar.activity_events", "sidecar.evidence_refs")
-        cand_cte = evidence_key_cte("cand", "atlas_activity_events", "atlas_activity_evidence_refs")
+        cand_cte = candidate_evidence_key_cte(conn)
         evidence_drift = {
             "sidecar_not_in_candidate": int(conn.execute(diff_count_query(side_cte, cand_cte)).fetchone()[0]),
             "candidate_not_in_sidecar": int(conn.execute(diff_count_query(cand_cte, side_cte)).fetchone()[0]),
@@ -259,16 +280,16 @@ def audit_drift(
     finally:
         conn.close()
 
-    drift_present = (
+    # The Atlas source namespace is cumulative.  Historical candidate rows are
+    # expected and must not make a current sidecar subset look stale.
+    current_subset_drift = (
         event_id_drift["sidecar_missing_in_candidate"] != 0
-        or event_id_drift["candidate_not_in_sidecar"] != 0
         or event_core_changed_count != 0
         or evidence_drift["sidecar_not_in_candidate"] != 0
-        or evidence_drift["candidate_not_in_sidecar"] != 0
     )
     decision = (
         "atlas_activity_sidecar_current_drift_refresh_needed_report_only"
-        if drift_present
+        if current_subset_drift
         else "atlas_activity_sidecar_current_aligned_report_only"
     )
     outputs = {
@@ -279,7 +300,7 @@ def audit_drift(
         "markdown_report": str(report_path),
     }
     report = {
-        "schema_version": "atlas_activity_sidecar_current_drift_audit.v1",
+        "schema_version": "atlas_activity_sidecar_current_drift_audit.v2",
         "generated_at": now_stamp(),
         "decision": decision,
         "sidecar_db": str(sidecar_db),
@@ -294,6 +315,7 @@ def audit_drift(
         "evidence_natural_key_drift": evidence_drift,
         "sidecar_only_evidence_samples": sidecar_only_samples,
         "candidate_only_evidence_samples": candidate_only_samples,
+        "candidate_historical_extras_expected": True,
         "safety": {
             "report_only": True,
             "sidecar_sqlite_read_only": True,

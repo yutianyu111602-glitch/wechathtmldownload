@@ -18,10 +18,10 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -35,7 +35,7 @@ EXPECTED_ENV_ID = "huaidjweekly-d8g1go7-d0a07863e3e"
 EXPECTED_SERVICE = "weekly-api"
 EXPECTED_PUBLIC_BASE_URL = DEFAULT_PUBLIC_BASE_URL
 EXPECTED_DB_FUNCTION = "weeklyDataSync"
-EXPECTED_CACHE_PREFIX = "weeklyActivityApiCache:v20260704:"
+EXPECTED_CACHE_PREFIX = "weeklyActivityApiCache:v20260719-visibility-v2:"
 EXPECTED_SOURCE_MODE = "sanji_desktop_rss"
 
 
@@ -109,7 +109,14 @@ def parse_time(value: Any) -> float:
 
 
 def today_shanghai() -> str:
-    return datetime.now(ZoneInfo("Asia/Shanghai")).date().isoformat()
+    try:
+        zone = ZoneInfo("Asia/Shanghai")
+    except ZoneInfoNotFoundError:
+        # Windows Python installations do not always bundle the IANA tzdata
+        # package. Shanghai has no DST in the supported operating window, so
+        # fixed UTC+08:00 is the correct fail-closed calendar fallback.
+        zone = timezone(timedelta(hours=8), name="Asia/Shanghai")
+    return datetime.now(zone).date().isoformat()
 
 
 def first(value: Any, fallback: str = "") -> str:
@@ -142,7 +149,7 @@ def is_current_or_future(item: dict[str, Any], today: str) -> bool:
 
 
 def storage_slug(value: Any) -> str:
-    raw = str(value or "").strip().lower()
+    raw = re.sub(r"\s+", "-", str(value or "").strip().lower())
     out = []
     for char in raw:
         if re.match(r"[a-z0-9_-]", char):
@@ -294,10 +301,12 @@ def audit_frontend(checks: list[Check], miniapp_dir: Path) -> None:
             "__skipCache: true",
             "__liveOnly: true",
             "currentFeedBehindManifest",
-            "HOME_LATE_NIGHT_CUTOFF_HOUR",
-            "currentWeekendWindow",
-            "applyDefaultHomeDateWindow",
-            "filterItemsByDateWindow",
+            'dateMode: "all_current"',
+            "dateSelectionQuery",
+            "weekendDateSelection",
+            "filterItemsByDateSelection",
+            "cityFacetPayloadMatchesItems",
+            "posterPoolSourceItems = displayItems",
             "buildCityFiltersFromIndex",
             "cityIndexFilters || buildCityFiltersFallback",
             "boostLocalItems",
@@ -369,7 +378,16 @@ def audit_backend(checks: list[Check], cloudrun_dir: Path) -> None:
             evidence=str(cloudbaserc_path),
         )
     else:
-        add_check(checks, "backend", "CloudRun cloudbaserc exists", False, f"missing file: {cloudbaserc_path}")
+        require_tokens(
+            checks,
+            "backend",
+            direct_deploy_path,
+            [
+                f'ENV_ID = "{EXPECTED_ENV_ID}"',
+                f'SERVICE_NAME = "{EXPECTED_SERVICE}"',
+            ],
+            name="direct CloudBase deploy identity matches mini-program env/service",
+        )
 
     require_tokens(
         checks,
@@ -382,7 +400,11 @@ def audit_backend(checks: list[Check], cloudrun_dir: Path) -> None:
             "itemIsCurrentOrFuture",
             "isElectronicMusicRelevantItem",
             "dedupeItems",
-            "lookbackDays: lookback || null",
+            "normalizeVisibilityScope",
+            "getVisibleProjection",
+            "dateStart",
+            "dateEnd",
+            "scope",
         ],
         name="WeeklyActivityDataStore current feed default filter",
     )
@@ -392,7 +414,7 @@ def audit_backend(checks: list[Check], cloudrun_dir: Path) -> None:
         server_path,
         [
             'pathname === "/api/v1/weekly/current"',
-            '["cityKey", "date", "limit", "cursor", "lookbackDays"]',
+            '["scope", "cityKey", "date", "dateStart", "dateEnd", "dateFrom", "dateTo", "limit", "cursor", "lookbackDays"]',
             "store.getCurrent",
             "sendCachedWeeklyJson",
         ],
@@ -447,6 +469,7 @@ def audit_cloudbase_db(checks: list[Check], miniapp_dir: Path) -> None:
     cloudbaserc_path = miniapp_dir / "cloudbaserc.json"
     function_path = miniapp_dir / "cloudfunctions" / EXPECTED_DB_FUNCTION / "index.js"
     sync_script_path = miniapp_dir / "scripts" / "sync_cloudbase_database.cjs"
+    admin_sync_script_path = miniapp_dir / "scripts" / "run_cloudbase_hot_sync_admin.cjs"
 
     if cloudbaserc_path.exists():
         cloudbaserc = read_json(cloudbaserc_path)
@@ -482,7 +505,10 @@ def audit_cloudbase_db(checks: list[Check], miniapp_dir: Path) -> None:
             "function normalizeLookbackDays(value, fallback = 0)",
             "syncLookbackDaysFromEvent",
             "buildCurrentFetchPath",
-            "lookbackDays=${lookbackDays}",
+            "scope=current&limit=${limit}&lookbackDays=0",
+            "activeCurrentGeneration",
+            "cleanupPreviousGeneration",
+            "eventDocIdForConfig",
             "getContainerFreshness",
             "db-behind-container",
             "container-readthrough",
@@ -504,6 +530,21 @@ def audit_cloudbase_db(checks: list[Check], miniapp_dir: Path) -> None:
             "readProbe",
         ],
         name="sync_cloudbase_database is explicit sync plus read probe",
+    )
+    require_tokens(
+        checks,
+        "cloudbase_db",
+        admin_sync_script_path,
+        [
+            'const CLOUDBASE_CLI_PACKAGE = "@cloudbase/cli@3.3.1"',
+            'scope: "current"',
+            "lookbackDays: 0",
+            'path: "/api/v1/weekly/config"',
+            'path: "/api/v1/weekly/current"',
+            'path: "/api/v1/weekly/cities"',
+            'path: "/api/v1/weekly/dates"',
+        ],
+        name="admin CloudBase sync pins CLI and reconciles one current generation",
     )
 
 
@@ -758,6 +799,8 @@ def audit_sanji_hermes_static(checks: list[Check], repo_root: Path) -> None:
             "sanji_db_snapshot_export",
             "direct_rss_feed_fetch must stay false",
             "huaidj_sanji_daily_publish.lock",
+            "[switch]$EnablePosterCloudBaseMigration",
+            'if ($EnablePosterCloudBaseMigration) { $publishArgs += "-EnablePosterCloudBaseMigration" }',
         ],
         name="Sanji daily wrapper snapshot/no-direct-RSS contract",
     )
@@ -786,7 +829,7 @@ def audit_sanji_hermes_static(checks: list[Check], repo_root: Path) -> None:
             "HUAIDJ Coverage Audit Fri 21:40",
             "LEGACY_ALLOWED_PAUSED_HERMES_JOBS",
             "Windows task disabled",
-            "Codex duplicate executor paused",
+            "Codex duplicate executor absent or paused",
         ],
         name="Hermes live schedule audit coverage",
     )
@@ -795,7 +838,7 @@ def audit_sanji_hermes_static(checks: list[Check], repo_root: Path) -> None:
 def audit_release_boundaries(checks: list[Check], repo_root: Path, miniapp_dir: Path) -> None:
     preflight = repo_root / "tools" / "stage7_rewrite" / "scripts" / "run_weekly_deploy_upload_preflight.py"
     clean_ci = miniapp_dir / "scripts" / "Test-CleanCiQuality.ps1"
-    upload_script = miniapp_dir / "scripts" / "upload_native_windows.ps1"
+    upload_script = miniapp_dir / "scripts" / "upload_devtools_cli_windows.ps1"
 
     require_tokens(
         checks,
@@ -805,7 +848,7 @@ def audit_release_boundaries(checks: list[Check], repo_root: Path, miniapp_dir: 
             "direct_cloudbase_deploy.py",
             "final-stage only",
             "bake_and_deploy.py must use --dry-run or --prepare-only in preflight",
-            "upload_native_windows.ps1",
+            "upload_devtools_cli_windows.ps1",
             "-whatif",
             '"deployment_executed": False',
             '"upload_executed": False',
@@ -831,7 +874,9 @@ def audit_release_boundaries(checks: list[Check], repo_root: Path, miniapp_dir: 
             "[CmdletBinding(SupportsShouldProcess = $true)]",
             "$WhatIfPreference",
             "ShouldProcess",
-            "miniprogram-ci",
+            "WeChat DevTools CLI",
+            "islogin",
+            "--info-output",
             "upload",
         ],
         name="upload script has explicit WhatIf/final upload boundary",

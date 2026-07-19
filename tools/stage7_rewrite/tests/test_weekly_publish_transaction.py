@@ -230,6 +230,7 @@ def write_success_evidence(root: Path, prepared: dict) -> tuple[Path, Path, Path
         {
             "ok": True,
             "decision": "cloudrun_remote_pagination_verified",
+            "scope": "package",
             "remote_item_id_count": ids["unique_item_id_count"],
             "remote_item_id_digest": ids["item_id_digest"],
             "digest_algorithm": ids["digest_algorithm"],
@@ -415,7 +416,13 @@ def test_openclaw_wrapper_promotes_only_after_smoke_and_full_pagination() -> Non
 
     assert prepare_at < deploy_at < smoke_at < pagination_at < club_overviews_at < promote_at
     assert "--transaction-id $RunId" in script
-    assert "lookbackDays=999" in script
+    assert "scope=package&limit=100" in script
+    assert "lookbackDays=999" not in script
+    assert 'scope = "package"' in script
+    assert "--max-wait-seconds 900" in script
+    assert "--timeout-seconds 30" in script
+    assert "--no-timeout" not in script
+    assert script.count("-TimeoutSec 30") >= 3
     assert "remote_item_id_digest" in script
     assert "cloudrun_remote_pagination.json" in script
     assert "--club-overviews-report $CloudRunClubOverviewsReportPath" in script

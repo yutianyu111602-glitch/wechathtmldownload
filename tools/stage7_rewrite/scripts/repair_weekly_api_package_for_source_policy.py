@@ -165,6 +165,7 @@ def rebuild_routes(api_dir: Path, items: list[dict[str, Any]], generated_at: str
             {
                 "schema_version": "weekly_activity_miniprogram_city.v1",
                 "generated_at": generated_at,
+                "scope": "package",
                 "city_key": city_key,
                 "city": label,
                 "item_count": len(city_items),
@@ -176,6 +177,8 @@ def rebuild_routes(api_dir: Path, items: list[dict[str, Any]], generated_at: str
         {
             "schema_version": "weekly_activity_miniprogram_city_index.v1",
             "generated_at": generated_at,
+            "scope": "package",
+            "item_count": len(items),
             "city_count": len(city_index_rows),
             "cities": city_index_rows,
         },
@@ -190,6 +193,7 @@ def rebuild_routes(api_dir: Path, items: list[dict[str, Any]], generated_at: str
             {
                 "schema_version": "weekly_activity_miniprogram_date.v1",
                 "generated_at": generated_at,
+                "scope": "package",
                 "date": date_key,
                 "item_count": len(date_items),
                 "items": mini_api.sort_items(date_items),
@@ -200,6 +204,8 @@ def rebuild_routes(api_dir: Path, items: list[dict[str, Any]], generated_at: str
         {
             "schema_version": "weekly_activity_miniprogram_date_index.v1",
             "generated_at": generated_at,
+            "scope": "package",
+            "item_count": len(items),
             "date_count": len(date_index_rows),
             "dates": date_index_rows,
         },
@@ -354,6 +360,8 @@ def repair(
             "source_policy_path": str(source_policy_path),
             "city_route_count": route_counts["city_route_count"],
             "date_route_count": route_counts["date_route_count"],
+            "static_index_scope": "package",
+            "default_api_scope": "current",
             "source_policy_title_dedupe_repair": {
                 "schema_version": report["schema_version"],
                 "mode": report["mode"],

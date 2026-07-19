@@ -17,10 +17,34 @@
     </view>
     <view class="atlas-sub">{{t.subtitle}}</view>
     <view class="atlas-intro">{{t.intro}}</view>
-    <view class="atlas-starmap-entry" bindtap="openStarmap" hover-class="chip-hover"
-      style="margin-top:18rpx;display:inline-block;padding:12rpx 26rpx;border-radius:28rpx;background:rgba(167,255,38,0.12);border:1rpx solid rgba(167,255,38,0.30);color:#A7FF26;font-size:24rpx;">🌌 全景星图 · 实体关系图鉴 ›</view>
-    <view class="atlas-starmap-entry" bindtap="openAtlasSearch" hover-class="chip-hover"
-      style="margin-top:18rpx;margin-left:12rpx;display:inline-block;padding:12rpx 26rpx;border-radius:28rpx;background:rgba(167,255,38,0.12);border:1rpx solid rgba(167,255,38,0.30);color:#A7FF26;font-size:24rpx;">搜索图鉴 ›</view>
+    <view class="atlas-entry-row">
+      <view class="atlas-starmap-entry" bindtap="openStarmap" hover-class="chip-hover">全景星图 · 实体关系图鉴 ›</view>
+      <view class="atlas-search-entry" bindtap="openAtlasSearch" hover-class="chip-hover">搜索图鉴 ›</view>
+    </view>
+  </view>
+
+  <!-- 我的足迹卡 (anonymous, on-device; aggregates the stars you've lit) plan 101 #8 -->
+  <view wx:if="{{visitedCount}}" class="footprint-block">
+    <view wx:if="{{!footprint}}" class="footprint-cta {{footprintLoading ? 'is-loading' : ''}}" bindtap="buildMyFootprint">
+      {{footprintLoading ? t.loading : t.footprintBtn}}
+    </view>
+    <view wx:else class="footprint-card">
+      <view class="footprint-head">
+        <text class="footprint-title">{{t.footprintTitle}}</text>
+        <text class="footprint-stat">{{footprint.djCount}} {{t.footprintDjUnit}} · {{footprint.cityCount}} {{t.footprintCityUnit}} · {{footprint.miniGraph.edges.length}} {{t.footprintLinks}}</text>
+      </view>
+      <view wx:if="{{footprint.topCities.length}}" class="footprint-cities">
+        <view wx:for="{{footprint.topCities}}" wx:key="city" class="footprint-city">
+          <text class="footprint-city-name">{{item.city}}</text>
+          <text class="footprint-city-count">{{item.count}}</text>
+        </view>
+      </view>
+      <view class="footprint-djs">
+        <view wx:for="{{footprint.miniGraph.nodes}}" wx:key="id" class="footprint-dj" data-name="{{item.id}}" catchtap="selectSeed">{{item.label}}</view>
+      </view>
+      <view class="footprint-hint">{{t.footprintHint}}</view>
+      <button class="footprint-share-btn" open-type="share">{{t.footprintShare}}</button>
+    </view>
   </view>
 
   <scroll-view wx:if="{{seedList.length}}" class="seed-bar" scroll-x="true">

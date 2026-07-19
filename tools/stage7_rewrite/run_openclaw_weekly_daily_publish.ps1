@@ -994,7 +994,7 @@ function Write-RemoteRollbackPacket {
         operator_steps = @(
             "Freeze further weekly-api deploy attempts for this transaction.",
             "In CloudBase version history, restore rollback_target.previous_active_version for rollback_target.service_name to 100 percent traffic; verify the target against previous_server_identity before confirming.",
-            "Run smoke_cloudrun_weekly_production.py, the lookbackDays=999 full item-ID reconciliation, and the exact club-overviews reconciliation against the restored endpoint.",
+            "Run smoke_cloudrun_weekly_production.py, the scope=package full item-ID reconciliation, and the exact club-overviews reconciliation against the restored endpoint.",
             "Keep local current_release unchanged; only close this packet after the restored remote identity and smoke reports are attached."
         )
     }
@@ -1011,7 +1011,7 @@ function Assert-RemotePagination {
         [string]$ReportPath
     )
     $base = $BaseUrl.TrimEnd('/')
-    $manifest = Invoke-RestMethod -Uri "$base/api/v1/weekly/manifest" -Proxy $ProxyUrl
+    $manifest = Invoke-RestMethod -Uri "$base/api/v1/weekly/manifest" -Proxy $ProxyUrl -TimeoutSec 30
     $remoteManifestCount = [int]$manifest.item_count
     if ($ExpectedCount -gt 0 -and $remoteManifestCount -ne $ExpectedCount) {
         throw "Remote manifest mismatch: manifest=$remoteManifestCount expected=$ExpectedCount"
@@ -1020,12 +1020,15 @@ function Assert-RemotePagination {
     $all = @()
     $cursor = "0"
     do {
-        $response = Invoke-RestMethod -Uri "$base/api/v1/weekly/current?limit=100&lookbackDays=999&cursor=$cursor" -Proxy $ProxyUrl
+        $response = Invoke-RestMethod -Uri "$base/api/v1/weekly/current?scope=package&limit=100&cursor=$cursor" -Proxy $ProxyUrl -TimeoutSec 30
+        if (-not $response.filters -or [string]$response.filters.scope -ne "package") {
+            throw "Remote full-package pagination did not echo filters.scope=package; refusing mixed current/package evidence."
+        }
         $all += $response.items
         $cursor = if ($response.page) { $response.page.nextCursor } else { $null }
     } while ($cursor)
     if ($all.Count -le 0) {
-        throw "Remote current feed is empty after deploy; refusing to continue."
+        throw "Remote package feed is empty after deploy; refusing to continue."
     }
 
     $candidatePayload = Get-Content -Raw -LiteralPath (Join-Path $CandidateApiDir "current.json") | ConvertFrom-Json
@@ -1036,11 +1039,11 @@ function Assert-RemotePagination {
         throw "Candidate current.json has missing or duplicate item IDs; remote promotion is blocked."
     }
 
-    $index = Invoke-RestMethod -Uri "$base/api/v1/weekly/llm/materialized-enrichments" -Proxy $ProxyUrl
+    $index = Invoke-RestMethod -Uri "$base/api/v1/weekly/llm/materialized-enrichments" -Proxy $ProxyUrl -TimeoutSec 30
     $ids = @($all | ForEach-Object { [string]$_.id })
     $remoteUniqueIds = @(Get-StableUniqueItemIds -Ids $ids)
     if ($ids.Count -ne $remoteUniqueIds.Count) {
-        throw "Remote full current feed has missing or duplicate item IDs; remote promotion is blocked."
+        throw "Remote full package feed has missing or duplicate item IDs; remote promotion is blocked."
     }
     $candidateMissingRemote = @($candidateUniqueIds | Where-Object { $_ -notin $remoteUniqueIds })
     $remoteExtra = @($remoteUniqueIds | Where-Object { $_ -notin $candidateUniqueIds })
@@ -1059,17 +1062,17 @@ function Assert-RemotePagination {
         throw "Remote pagination/enrichment mismatch: current=$($all.Count) manifest=$remoteManifestCount missing=$($missing.Count) extra=$($extra.Count)"
     }
     if ($all.Count -ne $remoteManifestCount) {
-        throw "Remote full current count differs from manifest: current=$($all.Count) manifest=$remoteManifestCount"
+        throw "Remote full package count differs from manifest: package=$($all.Count) manifest=$remoteManifestCount"
     }
     if ($extra.Count) {
         Write-Warning "materialized enrichment index is a superset of the current display feed: extra=$($extra.Count)"
     }
     $paginationReport = [ordered]@{
-        schema_version = "cloudrun_remote_pagination.v1"
+        schema_version = "cloudrun_remote_pagination.v2"
         generated_at = [DateTimeOffset]::Now.ToString("o")
         ok = $true
         decision = "cloudrun_remote_pagination_verified"
-        lookback_days = 999
+        scope = "package"
         remote_manifest_item_count = $remoteManifestCount
         remote_item_id_count = $remoteUniqueIds.Count
         remote_item_id_digest = $remoteDigest
@@ -1085,7 +1088,7 @@ function Assert-RemotePagination {
     New-Item -ItemType Directory -Force -Path $reportParent | Out-Null
     $reportJson = $paginationReport | ConvertTo-Json -Depth 6
     [System.IO.File]::WriteAllText($ReportPath, $reportJson + [Environment]::NewLine, (New-Object System.Text.UTF8Encoding($false)))
-    Write-Host "  remote pagination passed: manifest=$remoteManifestCount current=$($all.Count) digest=$remoteDigest enrichment=$($index.enrichments.Count) missing=0 extra=$($extra.Count)"
+    Write-Host "  remote package pagination passed: manifest=$remoteManifestCount package=$($all.Count) digest=$remoteDigest enrichment=$($index.enrichments.Count) missing=0 extra=$($extra.Count)"
 }
 
 function Write-PublishSummary {
@@ -2594,14 +2597,14 @@ if ($DeployBackend) {
             python (Join-Path $CloudRun "scripts\direct_cloudbase_deploy.py") `
                 --context-dir $CloudRunDeployContextDir `
                 --out-dir $DeployReportDir `
-                --no-timeout `
+                --max-wait-seconds 900 `
                 --allow-unverified-task-poll
             $script:CloudRunDeployExecuted = $true
         }
         Invoke-RunStep "Smoke remote CloudRun and reconcile pagination" {
             python (Join-Path $Scripts "smoke_cloudrun_weekly_production.py") `
                 --base-url $PublicApiBase `
-                --no-timeout `
+                --timeout-seconds 30 `
                 --out-dir $CloudRunSmokeReportDir
             Assert-NativeSuccess "CloudRun production smoke"
             Assert-RemotePagination -BaseUrl $PublicApiBase -ExpectedCount $itemCount `
@@ -2641,7 +2644,7 @@ if ($UploadFrontend) {
         Invoke-GuardJson -GuardArgs @("-File", $SkillGuard, "-RepoPath", $Repo, "-GateMode", "current-package", "-ExpectedMinItems", "$EffectiveMinExpectedItems", "-PublicApiBase", $PublicApiBase)
     }
     Invoke-RunStep "Upload miniprogram developer version" {
-        pwsh -NoProfile -ExecutionPolicy Bypass -File (Join-Path $MiniProgram "scripts\upload_native_windows.ps1") `
+        pwsh -NoProfile -ExecutionPolicy Bypass -File (Join-Path $MiniProgram "scripts\upload_devtools_cli_windows.ps1") `
             -Version $Version `
             -Desc $Desc `
             -ConfirmUpload

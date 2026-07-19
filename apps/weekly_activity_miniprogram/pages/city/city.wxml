@@ -1,25 +1,106 @@
 <view class="page city-page">
-  <view class="sub-nav">
-    <button bindtap="goBack">{{t.back}}</button>
+  <view class="guide-topbar">
+    <image lazy-load class="brand-logo" src="/assets/brand/huaidj-logo-nav-512x128.png" mode="aspectFit"></image>
+    <view class="guide-top-action" bindtap="goBack" hover-class="option-hover">{{t.back}}</view>
   </view>
-  <image lazy-load class="brand-logo" src="/assets/brand/huaidj-logo-nav-512x128.png" mode="aspectFit" ></image>
-  <view class="section-title">{{t.title}}</view>
-  <view class="muted intro">{{t.intro}}</view>
+
+  <view class="guide-header">
+    <view class="mono-label">{{t.guide}}</view>
+    <view class="guide-title">{{t.title}}</view>
+    <view class="guide-intro">{{t.intro}}</view>
+  </view>
 
   <view wx:if="{{loading}}" class="state">{{t.loading}}</view>
   <view wx:elif="{{error}}" class="state error">{{error}}</view>
   <view wx:elif="{{cities.length === 0}}" class="state">{{t.empty}}</view>
-  <view wx:else class="city-grid">
-    <view
-      wx:for="{{cities}}"
-      wx:key="city_key"
-      class="city-card"
-      data-key="{{item.city_key}}"
-      bindtap="openCity"
-      hover-class="option-hover"
-    >
-      <view class="city-name">{{item.displayCity}}</view>
-      <view class="city-count">{{item.item_count}} {{t.eventCount}}</view>
+  <block wx:else>
+    <view wx:if="{{!guide.hasSelection}}" class="city-select-panel">
+      <view class="section-row">
+        <view class="section-title">{{t.chooseCity}}</view>
+        <view class="section-count">{{cities.length}}</view>
+      </view>
+      <view class="city-grid">
+        <view
+          wx:for="{{cities}}"
+          wx:key="key"
+          class="city-card"
+          data-key="{{item.key}}"
+          bindtap="openCity"
+          hover-class="option-hover"
+        >
+          <view class="city-name">{{item.label}}</view>
+          <view class="city-count">{{item.itemCount}} {{t.eventCount}}</view>
+        </view>
+      </view>
     </view>
-  </view>
+
+    <view wx:else class="guide-workbench">
+      <view class="city-summary">
+        <view>
+          <view class="city-kicker">{{t.guide}}</view>
+          <view class="city-heading">{{guide.selectedCityLabel}}</view>
+          <view class="city-stats">
+            <text>{{guide.eventCount}} {{t.eventCount}}</text>
+            <text> · </text>
+            <text>{{guide.activeDateCount}} {{t.activeDates}}</text>
+          </view>
+        </view>
+        <view class="change-city" bindtap="clearSelectedCity" hover-class="option-hover">{{t.cityList}}</view>
+      </view>
+
+      <view wx:if="{{guide.decisionCards.length}}" class="decision-section">
+        <view class="section-row">
+          <view class="section-title">{{t.decisions}}</view>
+          <view class="section-count">{{guide.decisionCards.length}}</view>
+        </view>
+        <view
+          wx:for="{{guide.decisionCards}}"
+          wx:key="key"
+          class="decision-card"
+          data-id="{{item.item.id}}"
+          bindtap="openDecisionDetail"
+          hover-class="option-hover"
+        >
+          <view class="decision-label">{{item.label}}</view>
+          <view class="decision-title">{{item.item.title}}</view>
+          <view wx:if="{{item.item.meta}}" class="decision-meta">{{item.item.meta}}</view>
+          <view class="decision-reason">{{item.item.reason}}</view>
+          <view wx:if="{{item.item.tags.length}}" class="decision-tags">
+            <view wx:for="{{item.item.tags}}" wx:for-item="etag" wx:key="key" class="decision-tag">{{etag.label}}</view>
+          </view>
+          <text wx:if="{{item.item.nightType}}" class="decision-night-type">{{item.item.nightType}}</text>
+        </view>
+      </view>
+      <view wx:else class="state compact-state">{{t.noGuide}}</view>
+
+      <view wx:if="{{guide.venueLeads.length}}" class="venue-section">
+        <view class="section-row">
+          <view class="section-title">{{t.venues}}</view>
+          <view class="section-count">{{guide.venueLeads.length}}</view>
+        </view>
+        <view class="venue-list">
+          <view
+            wx:for="{{guide.venueLeads}}"
+            wx:key="key"
+            class="venue-row"
+            data-name="{{item.name}}"
+            bindtap="openVenueGuide"
+            hover-class="option-hover"
+          >
+            <view>
+              <view class="venue-name">{{item.name}}</view>
+              <view class="venue-meta">{{item.meta}}</view>
+            </view>
+            <view class="venue-arrow">›</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="guide-actions">
+        <button class="guide-action primary" bindtap="openAllEvents">{{t.allEvents}}</button>
+        <button class="guide-action" bindtap="openMap">{{t.map}}</button>
+        <button class="guide-action" bindtap="openColumn">{{t.column}}</button>
+      </view>
+    </view>
+  </block>
 </view>

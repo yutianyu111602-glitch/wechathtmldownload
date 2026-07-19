@@ -177,6 +177,10 @@ function toPosterCard(item, index) {
     isSourceOverview: Boolean(item.isSourceOverview),
     calendarPreviewLabel: item.calendarPreviewLabel || "",
     cardLocationLabel: item.cardLocationLabel || "",
+    cityKey: item.cityKey || item.city_key || "",
+    cityKeys: Array.isArray(item.cityKeys)
+      ? item.cityKeys.slice()
+      : (Array.isArray(item.city_keys) ? item.city_keys.slice() : []),
     hasStyle: Boolean(item.hasStyle),
     styleLabel: item.styleLabel || "",
   };

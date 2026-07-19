@@ -5,12 +5,19 @@ import path from "node:path";
 import { after, before, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { createServer } from "../src/server.mjs";
-import { WeeklyActivityDataStore } from "../src/dataStore.mjs";
+import { storageSlug, WeeklyActivityDataStore } from "../src/dataStore.mjs";
 
 let server;
 let baseUrl;
 let testEnv;
 let fixturePaths;
+
+test("storage slug matches the package writer for whitespace and unicode IDs", () => {
+  assert.equal(
+    storageSlug("陀地音乐TOTE MUSIC:d78318b809090dd4:schedule:20260718:21"),
+    "u9640u5730u97f3u4e50tote-musicu3ad78318b809090dd4u3ascheduleu3a20260718u3a21",
+  );
+});
 
 async function writeJson(filePath, value) {
   await writeFile(filePath, JSON.stringify(value, null, 2), "utf8");
@@ -1033,6 +1040,39 @@ test("filters multi-day events by inclusive date range", async () => {
   const body = await res.json();
   assert.equal(body.page.total, 1);
   assert.equal(body.items[0].id, "range-week");
+});
+
+test("HTTP date windows keep list, city and date facets in one cache-isolated projection", async () => {
+  const windowQuery = "scope=current&dateStart=2026-05-09&dateEnd=2026-05-10";
+  const firstRes = await fetch(`${baseUrl}/api/v1/weekly/current?${windowQuery}&limit=100&_ts=window-a`);
+  assert.equal(firstRes.status, 200);
+  assert.equal(firstRes.headers.get("x-weekly-cache"), "MISS");
+  const current = await firstRes.json();
+  assert.equal(current.page.total, 2);
+  assert.deepEqual(current.items.map((item) => item.id).sort(), ["item-a", "item-b"]);
+
+  const repeatRes = await fetch(`${baseUrl}/api/v1/weekly/current?${windowQuery}&limit=100&_ts=window-b`);
+  assert.equal(repeatRes.headers.get("x-weekly-cache"), "HIT");
+
+  const otherWindowRes = await fetch(`${baseUrl}/api/v1/weekly/current?scope=current&dateStart=2026-05-11&dateEnd=2026-05-11&limit=100&_ts=window-c`);
+  assert.equal(otherWindowRes.headers.get("x-weekly-cache"), "MISS");
+  const otherWindow = await otherWindowRes.json();
+  assert.deepEqual(otherWindow.items.map((item) => item.id), ["club:abc123"]);
+
+  const citiesRes = await fetch(`${baseUrl}/api/v1/weekly/cities?${windowQuery}&_ts=window-cities`);
+  const cities = await citiesRes.json();
+  assert.equal(cities.scope, "current");
+  assert.equal(cities.item_count, current.page.total);
+  assert.deepEqual(
+    Object.fromEntries(cities.cities.map((entry) => [entry.city_key, entry.count])),
+    { beijing: 1, shanghai: 1 },
+  );
+
+  const datesRes = await fetch(`${baseUrl}/api/v1/weekly/dates?${windowQuery}&_ts=window-dates`);
+  const dates = await datesRes.json();
+  assert.equal(dates.scope, "current");
+  assert.equal(dates.item_count, current.page.total);
+  assert.deepEqual(dates.dates.map((entry) => entry.date), ["2026-05-09", "2026-05-10"]);
 });
 
 test("explicit single-day current filters ignore extra non-primary parser guesses", async () => {

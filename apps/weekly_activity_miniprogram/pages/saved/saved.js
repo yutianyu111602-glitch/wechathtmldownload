@@ -3,6 +3,7 @@ const { compactItem } = require("../../utils/format");
 const { normalizeLang, applyLanguageChrome } = require("../../utils/i18n");
 const { vibrateLight } = require("../../utils/haptics");
 const { buildSimpleShare, buildSimpleTimeline, enableShareMenu } = require("../../utils/share");
+const { buildFootprintCard } = require("../../utils/footprintCard");
 
 // ATLAS = DJ/俱乐部关系图谱探索宇宙。数据来自后端 /api/v1/atlas/family/profile
 // （serving DB 的 dj_relation_rollup / dj_venue_rollup）。点一颗星 → 展开 ta 的
@@ -40,6 +41,14 @@ const LABELS = {
     relSet: "同台",
     orgUnit: "厂牌 / 主办",
     randomHop: "🎲 随机跳",
+    footprintTitle: "我的足迹",
+    footprintBtn: "生成我的足迹卡",
+    footprintEmpty: "先点亮几颗星再来生成",
+    footprintDjUnit: "位 DJ",
+    footprintCityUnit: "座城市",
+    footprintLinks: "条同台连线",
+    footprintHint: "基于你点亮过的星 · 匿名 · 仅本机",
+    footprintShare: "分享给朋友",
   },
   en: {
     title: "ATLAS Starmap",
@@ -65,6 +74,14 @@ const LABELS = {
     relSet: "co-bill",
     orgUnit: "label / promoter",
     randomHop: "🎲 Surprise",
+    footprintTitle: "My footprint",
+    footprintBtn: "Build my footprint",
+    footprintEmpty: "Light up a few stars first",
+    footprintDjUnit: "DJs",
+    footprintCityUnit: "cities",
+    footprintLinks: "co-bill links",
+    footprintHint: "From the stars you've lit · anonymous · on-device",
+    footprintShare: "Share with friends",
   },
 };
 
@@ -304,6 +321,8 @@ Page({
     history: [],
     trail: [],
     visitedCount: 0,
+    footprint: null,
+    footprintLoading: false,
   },
 
   onLoad() {
@@ -344,11 +363,46 @@ Page({
   },
 
   onShareAppMessage() {
-    return buildSimpleShare(this.data.lang === "en" ? "HUAIDJ Atlas" : "坏DJclub ATLAS 星图", "/pages/saved/saved", { lang: this.data.lang });
+    const fp = this.data.footprint;
+    const title = fp && fp.djCount
+      ? (this.data.lang === "en"
+          ? `My HUAIDJ footprint: ${fp.djCount} DJs across ${fp.cityCount} cities`
+          : `我的坏DJ足迹：${fp.djCount} 位 DJ · ${fp.cityCount} 座城市`)
+      : (this.data.lang === "en" ? "HUAIDJ Atlas" : "坏DJclub ATLAS 星图");
+    return buildSimpleShare(title, "/pages/saved/saved", { lang: this.data.lang });
   },
 
   onShareTimeline() {
     return buildSimpleTimeline(this.data.lang === "en" ? "HUAIDJ Atlas" : "坏DJclub ATLAS 星图", { lang: this.data.lang });
+  },
+
+  // "我的足迹" — aggregate the DJs the user has lit up into a shareable footprint
+  // card (DJ count, cities, co-bill density). Anonymous, on-device: reuses the
+  // existing /atlas/artist DTO (capped at the 24 most recent), no backend. Plan 101 #8.
+  async buildMyFootprint() {
+    const names = Array.from(this.visited || []).slice(-24);
+    if (!names.length) {
+      wx.showToast({ title: this.data.t.footprintEmpty, icon: "none" });
+      return;
+    }
+    if (this.data.footprintLoading) return;
+    this.setData({ footprintLoading: true });
+    const results = await Promise.all(names.map((name) =>
+      requestApi("/api/v1/weekly/atlas/artist", { name, eventLimit: 60, collaboratorLimit: 20 })
+        .then((r) => (r && r.found && r.profile) ? {
+          name: r.profile.displayName || name,
+          city: r.profile.city || "",
+          events: Array.isArray(r.events) ? r.events : [],
+          peers: []
+            .concat((r.collaborators || []).map((c) => c.displayName))
+            .concat((r.profile.similarDjs || []).map((s) => s.displayName))
+            .filter(Boolean),
+        } : null)
+        .catch(() => null)
+    ));
+    const footprint = buildFootprintCard(results.filter(Boolean), 6);
+    this.setData({ footprint, footprintLoading: false });
+    vibrateLight();
   },
 
   loadVisited() {

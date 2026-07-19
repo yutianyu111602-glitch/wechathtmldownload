@@ -65,6 +65,16 @@ function venueMatches(item, name, key) {
     .some((value) => fuzzyEntityMatch(value, target));
 }
 
+// Scene summary surfaced in the header: a 4308-show venue otherwise reads only its
+// few upcoming events. eventCount is the venue's true historical total (from the v2
+// subject). Active period is intentionally omitted — venue_events is capped at 200
+// (recency-biased), so any derived date span would mislead for high-volume venues.
+function buildVenueSummary(profile, lang) {
+  const total = Number((profile && profile.eventCount) || 0);
+  if (total <= 0) return "";
+  return lang === "en" ? `${total} shows total` : `共 ${total} 场演出`;
+}
+
 function safeHideLoading() {
   if (typeof wx !== "undefined" && typeof wx.hideLoading === "function") wx.hideLoading();
 }
@@ -105,6 +115,7 @@ Page({
     lang: "zh",
     t: text("sub", "zh"),
     name: "",
+    key: "",
     loading: true,
     error: "",
     events: [],
@@ -120,6 +131,7 @@ Page({
     atlasProfile: null,
     atlasEvents: [],
     atlasResidentDJs: [],
+    venueSummary: "",
   },
 
   onLoad(query) {
@@ -132,19 +144,23 @@ Page({
       lang: this.lang,
       t: text("sub", this.lang),
       name: this.name,
-      clubOverviews: [],
+      key: this.key,
+      clubOverviews: getClubOverviewsForVenue(this.name, { lang: this.lang }),
       clubOverviewImageFailedIds: [],
     });
-    this.loadClubOverviews();
     this.loadVenue();
   },
 
   onShareAppMessage() {
-    return buildNamedPageShare("/pages/venue/venue", this.data.name || this.name, this.lang, this.data.t.weeklyEvents);
+    return buildNamedPageShare("/pages/venue/venue", this.data.name || this.name, this.lang, this.data.t.weeklyEvents, {
+      key: this.data.key || this.key || "",
+    });
   },
 
   onShareTimeline() {
-    return buildNamedPageTimeline(this.data.name || this.name, this.lang, this.data.t.weeklyEvents);
+    return buildNamedPageTimeline(this.data.name || this.name, this.lang, this.data.t.weeklyEvents, {
+      key: this.data.key || this.key || "",
+    });
   },
 
   async loadVenue() {
@@ -216,6 +232,8 @@ Page({
         return true;
       });
       const parts = partitionEventsByDate(dedupeEvents([...events, ...filteredAtlas]));
+      const resolvedKey = this.key || atlasResult?.profile?.subjectId || "";
+      if (resolvedKey && !this.key) this.key = resolvedKey;
       this.setData({
         events: parts.upcoming,
         pastEvents: parts.past,
@@ -225,7 +243,9 @@ Page({
         mapLocationName: first.venueLabel || first.promoter || "",
         aboutLines: first.bioLines || [],
         atlasProfile: atlasResult?.profile || null,
+        key: resolvedKey,
         atlasResidentDJs: mergeResidentDjs(atlasResult?.residentDJs || []),
+        venueSummary: buildVenueSummary(atlasResult?.profile, this.lang),
         loading: false,
       });
       safeHideLoading();
@@ -233,23 +253,6 @@ Page({
       console.error("[venue] loadVenue failed", error);
       this.setData({ loading: false, error: this.data.t.loadFailed });
       safeHideLoading();
-    }
-  },
-
-  async loadClubOverviews() {
-    try {
-      const payload = await requestApi("/api/v1/weekly/club-overviews");
-      this.setData({
-        clubOverviews: getClubOverviewsForVenue(this.name, {
-          data: payload,
-          lang: this.lang,
-        }),
-        clubOverviewImageFailedIds: [],
-      });
-    } catch (error) {
-      // Club roundup cards are optional. Activity and Atlas content must remain
-      // usable even when this online artifact and every fallback are unavailable.
-      console.warn("[venue] club overviews unavailable", error);
     }
   },
 
@@ -301,7 +304,7 @@ Page({
     const isAtlasEvent = dataset.isAtlas === true || dataset.isAtlas === "true";
     const sourceHash = dataset.sourceHash || "";
     if (isAtlasEvent && sourceHash) {
-      openSourceByHash(sourceHash, this.lang || "zh");
+      openSourceByHash(sourceHash, this.lang || "zh", { fallbackDetailId: dataset.id || "" });
       return;
     }
     wx.navigateTo({ url: `/pages/detail/detail?id=${dataset.id}&lang=${this.lang || "zh"}` });

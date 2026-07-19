@@ -71,6 +71,233 @@ test("compact item hides venue-default time and keeps source-text time", () => {
   assert.equal(sourceTime.timeLabel, "22:00 - Late");
 });
 
+test("compact item repairs weak schedule title from VL poster evidence", () => {
+  const item = compactItem(baseItem({
+    id: "loopy-weak-title",
+    title: "loopy Club｜06.21 / 周日 / 15:30",
+    title_display: "/ 周日 / 15:30",
+    city: ["杭州"],
+    city_key: "hangzhou",
+    venue_name: "loopy Club",
+    venue: ["loopy Club"],
+    account: "loopy Club",
+    promoter: "loopy Club",
+    lineup_artists: ["Endy", "Jerry", "Golgol", "小喇叭"],
+    poster_selection_evidence: {
+      visible_text_lines: [
+        "loopy Club",
+        "06.21",
+        "周日",
+        "15:30",
+        "loopy x Open M pres. 夜游",
+        "Off-duty 唱机龙舟",
+        "Endy Jerry Golgol 小喇叭",
+      ],
+    },
+  }));
+
+  assert.equal(item.displayTitle, "loopy x Open M pres. 夜游 / Off-duty 唱机龙舟");
+});
+
+test("compact item normalizes pres and hyphen spacing in backend titles", () => {
+  const item = compactItem(baseItem({
+    id: "loopy-spacing",
+    title: "loopy Club｜6.21 周日｜loopy x Open M pres.夜游 / Off - duty 唱机龙舟",
+    title_display: "loopy x Open M pres.夜游 / Off - duty 唱机龙舟",
+    city: ["杭州"],
+    city_key: "hangzhou",
+    venue_name: "loopy Club",
+    venue: ["loopy Club"],
+    account: "loopy Club",
+    promoter: "loopy Club",
+  }));
+
+  assert.equal(item.displayTitle, "loopy x Open M pres. 夜游 / Off-duty 唱机龙舟");
+});
+
+test("compact item keeps ordinary English dash title separators", () => {
+  const item = compactItem(baseItem({
+    id: "open-decks-title",
+    title: "06.21 周日｜Open Decks - Shamone",
+    title_display: "Open Decks - Shamone",
+    city: ["成都"],
+    city_key: "chengdu",
+    venue_name: "Bar.woody",
+    venue: ["Bar.woody"],
+    account: "一同ChengDu",
+    promoter: "一同ChengDu",
+  }));
+
+  assert.equal(item.displayTitle, "Open Decks - Shamone");
+});
+
+test("compact item does not strip weekday letters inside event words", () => {
+  const item = compactItem(baseItem({
+    id: "friendsstand-title",
+    title: "06.21 FRIENDSSTAND 粘友力站点 @ wigwam",
+    title_display: "FRIENDSSTAND 粘友力站点 @ wigwam",
+    venue: ["wigwam"],
+    city: ["上海"],
+  }));
+
+  assert.equal(item.displayTitle, "FRIENDSSTAND 粘友力站点 @ wigwam");
+});
+
+test("compact item does not leave broken floor-like brand prefixes in titles", () => {
+  const item = compactItem(baseItem({
+    id: "stereo-title",
+    title: "52/F Pres.｜6.26 周五｜ 联合呈现：打破边界的地下电子声浪",
+    title_display: "52/F Pres. | 联合呈现：打破边界的地下电子声浪",
+    venue: ["52/F"],
+    city: ["上海"],
+  }));
+
+  assert.equal(item.displayTitle, "联合呈现：打破边界的地下电子声浪");
+  assert.equal(item.displayTitle.startsWith("F Pres."), false);
+});
+
+test("compact item repairs English weekday-only title from VL poster evidence", () => {
+  const item = compactItem(baseItem({
+    id: "dada-sun-title",
+    title: "Dada Bar Beijing｜6月21日 星期日 Sun.",
+    title_display: "Sun.",
+    city: ["北京"],
+    city_key: "beijing",
+    venue_name: "Dada Bar Beijing",
+    venue: ["Dada Bar Beijing"],
+    account: "Dada Bar Beijing",
+    promoter: "Dada Bar Beijing",
+    lineup_artists: ["Zean", "Sai G", "BAADAAM", "Puzzy Stack"],
+    poster_selection_evidence: {
+      visible_text_lines: [
+        "周日 6月21日 京沪对决，Gully Boys 围捕寿星 Puzzy Stack",
+        "ZEAN BAADAAM SAI G PUZZY STACK",
+        "北京朝阳区南营坊胡同日坛国际贸易中心A座北门B1",
+        "21:00-Late",
+      ],
+    },
+  }));
+
+  assert.equal(item.displayTitle, "京沪对决，Gully Boys 围捕寿星 Puzzy Stack");
+});
+
+test("compact item strips dangling bracket and time after date prefix", () => {
+  const item = compactItem(baseItem({
+    title: "陀地音乐TOTE MUSIC｜7/4 周六】22:00，小白爵士大乐队swing音乐跳舞派对",
+    title_display: "】22:00，小白爵士大乐队swing音乐跳舞派对",
+    venue_name: "陀地士多 Tote Store",
+    venue: ["陀地士多 Tote Store"],
+    account: "陀地音乐TOTE MUSIC",
+    promoter: "陀地音乐TOTE MUSIC",
+  }));
+
+  assert.equal(item.displayTitle, "小白爵士大乐队swing音乐跳舞派对");
+});
+
+test("compact item rejects city-only title and falls back to poster event title", () => {
+  const item = compactItem(baseItem({
+    title: "坚果NUTS｜6/28 惠州",
+    title_display: "惠州",
+    venue_name: "坚果NUTS",
+    venue: ["坚果NUTS"],
+    account: "坚果NUTS",
+    promoter: "坚果NUTS",
+    lineup_artists: ["莫迪戈", "超级查理"],
+    poster_selection_evidence: {
+      visible_text_lines: [
+        "2026 GOJAM JOINT TOUR",
+        "燃烧直到终老 BURN TILL THE END 联合专场",
+        "莫迪戈",
+        "超级查理",
+        "惠州 06.28 VOX LIVEHOUSE",
+      ],
+    },
+  }));
+
+  assert.equal(item.displayTitle, "燃烧直到终老 BURN TILL THE END 联合专场 / 2026 GOJAM JOINT TOUR");
+});
+
+test("compact item rejects English address line as title evidence", () => {
+  const item = compactItem(baseItem({
+    title: "光芒enlightening｜6月23日",
+    title_display: "光芒enlightening｜6月23日",
+    venue_name: "光芒喜剧脱口秀",
+    venue: ["光芒喜剧脱口秀"],
+    account: "光芒enlightening",
+    promoter: "光芒enlightening",
+    poster_selection_evidence: {
+      visible_text_lines: [
+        "Guangzhou Book Shopping Center No.123",
+        "Tian-He Avenue",
+        "Tian-he District",
+        "6月23日",
+        "贝多芬：第3号交响曲《英雄》",
+        "贝多芬：Egmont《艾格蒙特》",
+      ],
+    },
+  }));
+
+  assert.equal(item.displayTitle, "贝多芬：第3号交响曲《英雄》");
+});
+
+test("compact item strips promo prefix and leading vertical separator", () => {
+  const item = compactItem(baseItem({
+    title: "Cedar Kitchen｜6.21丨转发打七折！周日幸运转盘赢优惠，ReCharge / ReLink 充电/重连",
+    title_display: "丨转发打七折！周日幸运转盘赢优惠，ReCharge / ReLink 充电/重连",
+    venue_name: "Cedar Kitchen",
+    venue: ["Cedar Kitchen"],
+    account: "Cedar Kitchen",
+    promoter: "Cedar Kitchen",
+  }));
+
+  assert.equal(item.displayTitle, "ReCharge / ReLink 充电/重连");
+});
+
+test("compact item strips slash date ranges before event title", () => {
+  const item = compactItem(baseItem({
+    title: "莫须有工舍｜6.27/28｜「交流方式」夏日祭 + Promis3",
+    title_display: "莫须有工舍 | 28 | 「交流方式」夏日祭 + Promis3",
+    venue_name: "莫须有工厂",
+    venue: ["莫须有工厂"],
+    account: "莫须有工舍",
+    promoter: "莫须有工舍",
+  }));
+
+  assert.equal(item.displayTitle, "「交流方式」夏日祭 + Promis3");
+});
+
+test("compact item rejects sale-status venue row and falls back to tour poster title", () => {
+  const item = compactItem(baseItem({
+    title: "TOMTWO通透现场｜06/21 上海｜FENRIR（即将开售）",
+    title_display: "FENRIR（即将开售）",
+    venue_name: "TOMTWO通透现场",
+    venue: ["通透现场"],
+    account: "TOMTWO通透现场",
+    promoter: "TOMTWO通透现场",
+    poster_selection_evidence: {
+      visible_text_lines: [
+        "花溪「逃离黑夜」2026巡演",
+        "21 上海 FENRIR",
+      ],
+    },
+  }));
+
+  assert.equal(item.displayTitle, "花溪「逃离黑夜」2026巡演");
+});
+
+test("compact item strips year date ranges and drops venue-only suffix", () => {
+  const item = compactItem(baseItem({
+    title: "2026.6.27&28 大庆北野青年音乐浪潮|锈蚀俱乐部",
+    title_display: "锈蚀俱乐部",
+    venue_name: "Rust Club 锈蚀俱乐部",
+    venue: ["锈蚀俱乐部"],
+    account: "Rust Club 锈蚀俱乐部",
+    promoter: "Rust Club 锈蚀俱乐部",
+  }));
+
+  assert.equal(item.displayTitle, "大庆北野青年音乐浪潮");
+});
+
 test("compact item prefers verified venue coordinates when package carries stale address fields", () => {
   const item = compactItem(baseItem({
     id: "loopy:stale-address",
@@ -110,6 +337,7 @@ test("compact item recovers source-backed tiered ticketing before stale price", 
   }));
 
   assert.deepEqual(item.price, ["预售 70¥", "双人 128¥", "现场 100¥", "3am 后免费入场"]);
+  assert.equal(item.priceLabel, "预售 70¥ / 双人 128¥ / 现场 100¥ / 3am 后免费入场");
 });
 
 test("compact item trims article-body noise from overlong backend display titles", () => {
@@ -222,6 +450,48 @@ test("simple artist names survive conservative lineup filtering", () => {
   }));
 
   assert.deepEqual(item.lineupItems, ["Hadone", "Julian Muller", "QIUQIU"]);
+  assert.equal(item.hasLineup, true);
+  assert.equal(item.hasLineupHint, false);
+});
+
+test("compact item splits and dedupes VL lineup strings before display", () => {
+  const item = compactItem(baseItem({
+    title: "All Night Club Session",
+    venue_name: "loopy Club",
+    venue: ["loopy Club"],
+    account: "loopy Club",
+    lineup: ["DJ Huáng / Huang / NOIZOME，Zhou Ning｜NOIZOME"],
+  }));
+
+  assert.deepEqual(item.lineupItems, ["DJ Huáng", "NOIZOME", "Zhou Ning"]);
+  assert.equal(item.lineupLabel, "DJ Huáng / NOIZOME / Zhou Ning");
+  assert.equal(item.hasLineup, true);
+});
+
+test("compact item accepts Qwen VL lineup aliases and removes role suffixes", () => {
+  const item = compactItem(baseItem({
+    title: "Qwen VL Club Session",
+    venue_name: "loopy Club",
+    venue: ["loopy Club"],
+    account: "loopy Club",
+    qwen_vl_lineup: ["Lineup: Jasmin (DJ Set) / NOIZOME Live / Zhou Ning support / Jasmin"],
+  }));
+
+  assert.deepEqual(item.lineupItems, ["Jasmin", "NOIZOME", "Zhou Ning"]);
+  assert.equal(item.lineupLabel, "Jasmin / NOIZOME / Zhou Ning");
+  assert.equal(item.hasLineup, true);
+});
+
+test("compact item keeps real multi-DJ lineup when one noisy token is present", () => {
+  const item = compactItem(baseItem({
+    title: "Poster VL Night",
+    venue_name: "Dada",
+    venue: ["Dada"],
+    account: "Dada",
+    lineup_artists: ["阵容", "MIIIA", "Knopha", "Dokedo", "Dazzy"],
+  }));
+
+  assert.deepEqual(item.lineupItems, ["MIIIA", "Knopha", "Dokedo", "Dazzy"]);
   assert.equal(item.hasLineup, true);
   assert.equal(item.hasLineupHint, false);
 });
@@ -979,6 +1249,117 @@ test("visible description and bio lines never expose source image urls", () => {
   assert.deepEqual(item.descriptionLines, ["一场高速、冷酷、直接的周末夜。"]);
   assert.deepEqual(item.bioLines, ["来自本地俱乐部场景的制作人。"]);
   assert.equal(item.descriptionLead.includes("mmbiz.qpic.cn"), false);
+});
+
+test("compact item exposes safe DJ discovery sections for detail pages", () => {
+  const item = compactItem(baseItem({
+    title: "Club Night with DINA",
+    dj_discovery_sections: [
+      {
+        name: "DINA",
+        name_key: "dina",
+        bio_atoms: [
+          { text: "DINA is a DJ and producer from Berlin.", source_ref: "source:dina", verbatim_source: true },
+          { text: "来源线索: Resident Advisor profile", source_ref: "generated" },
+          { text: "No source ref should be hidden." },
+        ],
+        links: [
+          {
+            item_id: "dina-soundcloud",
+            entity_search_id: "dj:dina",
+            entity_name: "DINA",
+            entity_type: "artist",
+            platform: "soundcloud",
+            public_category: "mixtape_music",
+            display_label: "SoundCloud",
+            url: "https://soundcloud.com/dina/example-mix",
+            source_ref: "seed:dina",
+            confidence_score: 96,
+            confidence_band: "high",
+            miniapp_display_allowed_candidate: true,
+            block_reasons: [],
+          },
+          {
+            item_id: "dina-ra",
+            entity_search_id: "dj:dina",
+            entity_name: "DINA",
+            entity_type: "artist",
+            platform: "resident_advisor",
+            public_category: "public_profile",
+            display_label: "Resident Advisor",
+            url: "https://ra.co/dj/dina",
+            source_ref: "seed:dina",
+            confidence_score: 94,
+            confidence_band: "high",
+            miniapp_display_allowed_candidate: true,
+            block_reasons: [],
+          },
+          {
+            item_id: "dina-raw-mp3",
+            entity_search_id: "dj:dina",
+            entity_name: "DINA",
+            entity_type: "artist",
+            platform: "external",
+            public_category: "mixtape_music",
+            display_label: "Raw MP3",
+            url: "https://media.example.com/dina/raw-set.mp3",
+            source_ref: "search:dina",
+            confidence_score: 99,
+            confidence_band: "high",
+            miniapp_display_allowed_candidate: true,
+            block_reasons: [],
+          },
+        ],
+      },
+    ],
+  }));
+
+  assert.equal(item.hasDjDiscovery, true);
+  assert.equal(item.djDiscoverySections.length, 1);
+  assert.equal(item.djDiscoverySections[0].name, "DINA");
+  assert.equal(item.djDiscoverySections[0].bioAtoms.length, 1);
+  assert.equal(item.djDiscoverySections[0].bioAtoms[0].text, "DINA is a DJ and producer from Berlin.");
+  assert.deepEqual(
+    item.djDiscoverySections[0].links.map((link) => link.displayLabel),
+    ["SoundCloud", "Resident Advisor"],
+  );
+  assert.equal(item.djDiscoverySections[0].links.some((link) => link.url.endsWith(".mp3")), false);
+  assert.equal(item.djDiscoverySections[0].links[0].action.mode, "copy_original_link");
+  assert.equal(item.djDiscoverySections[0].links[0].action.mediaDownloaded, false);
+});
+
+test("source overview articles never expose DJ discovery sections", () => {
+  const item = compactItem(baseItem({
+    title: "loopy 六月活动一览",
+    article_title: "loopy 六月活动一览",
+    is_source_overview: true,
+    dj_discovery_sections: [
+      {
+        name: "DINA",
+        links: [
+          {
+            item_id: "dina-soundcloud",
+            entity_search_id: "dj:dina",
+            entity_name: "DINA",
+            entity_type: "artist",
+            platform: "soundcloud",
+            public_category: "mixtape_music",
+            display_label: "SoundCloud",
+            url: "https://soundcloud.com/dina/example-mix",
+            source_ref: "seed:dina",
+            confidence_score: 96,
+            confidence_band: "high",
+            miniapp_display_allowed_candidate: true,
+            block_reasons: [],
+          },
+        ],
+      },
+    ],
+  }));
+
+  assert.equal(item.isSourceOverview, true);
+  assert.equal(item.hasDjDiscovery, false);
+  assert.deepEqual(item.djDiscoverySections, []);
 });
 
 test("atlas artist items expose verified ids but only hint ambiguous candidates", () => {

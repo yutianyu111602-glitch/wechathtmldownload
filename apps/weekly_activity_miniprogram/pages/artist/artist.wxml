@@ -43,35 +43,106 @@
       <view wx:if="{{atlasProfile.bioSource}}" class="bio-source">via {{atlasProfile.bioSource}}</view>
     </view>
 
-    <!-- External media / sources (外媒 · 资料来源) -->
-    <view class="section" wx:if="{{djDiscovery.length}}">
-      <view class="sub-heading">{{t.externalMedia}}</view>
-      <block wx:for="{{djDiscovery}}" wx:key="nameKey" wx:for-item="sec">
-        <view
-          wx:for="{{sec.links}}"
-          wx:key="url"
-          wx:for-item="lnk"
-          class="event-row"
-          data-url="{{lnk.url}}"
-          bindtap="openExternalLink"
-        >
-          <view>
-            <view class="event-title">{{lnk.displayLabel}}</view>
-            <view class="event-meta">{{lnk.platform}}</view>
-          </view>
-          <text class="chevron">›</text>
-        </view>
-        <view wx:if="{{sec.bioAtoms.length}}" class="ext-sources">
-          <view wx:for="{{sec.bioAtoms}}" wx:key="text" wx:for-item="atom" class="body-line">{{atom.text}}</view>
-        </view>
-      </block>
+    <!-- Bio candidate (snippet=real text; template=draft) — only when no confirmed bio -->
+    <view class="section" wx:if="{{atlasProfile.bioCandidate && !atlasProfile.bio && !bioLines.length}}">
+      <view class="sub-heading">{{t.description}}</view>
+      <view class="body-line bio-candidate-text">{{atlasProfile.bioCandidate}}</view>
+      <view wx:if="{{atlasProfile.bioCandidateSource}}" class="bio-source">via {{atlasProfile.bioCandidateSource}}</view>
+      <view wx:else class="bio-candidate-badge">草稿 · 待确认</view>
     </view>
 
-    <!-- Atlas History -->
+    <!-- Atlas relation / trajectory lens -->
+    <view class="section relation-section" wx:if="{{relationTrajectory}}">
+      <view class="sub-heading">{{t.relationTrajectory}}</view>
+      <view wx:if="{{relationTrajectory.cities.length}}" class="trajectory-strip">
+        <view wx:for="{{relationTrajectory.cities}}" wx:key="city" class="trajectory-city">
+          <view class="trajectory-city-name">{{item.city}}</view>
+          <view class="trajectory-meta">{{item.metaLabel}}</view>
+        </view>
+      </view>
+      <view wx:if="{{relationTrajectory.venues.length}}" class="trajectory-group">
+        <view class="trajectory-label">{{t.trajectoryVenues}}</view>
+        <view class="chip-row">
+          <view wx:for="{{relationTrajectory.venues}}" wx:key="venueId" class="chip venue-chip" data-venue="{{item.venueName}}" catchtap="openVenue">
+            <text class="chip-name">{{item.venueName}}</text>
+            <text wx:if="{{item.metaLabel}}" class="chip-count">{{item.metaLabel}}</text>
+          </view>
+        </view>
+      </view>
+      <view wx:if="{{relationTrajectory.collaborators.length}}" class="trajectory-group">
+        <view class="trajectory-label">{{t.trajectoryCollaborators}}</view>
+        <view class="chip-row">
+          <view wx:for="{{relationTrajectory.collaborators}}" wx:key="djId" class="chip collab-chip relation-chip" data-name="{{item.displayName}}" catchtap="openArtist">
+            <text class="chip-name">{{item.displayName}}</text>
+            <text wx:if="{{item.metaLabel}}" class="chip-count">{{item.metaLabel}}</text>
+          </view>
+        </view>
+      </view>
+      <view wx:if="{{relationTrajectory.events.length}}" class="trajectory-group">
+        <view class="trajectory-label">{{t.trajectoryEvidence}}</view>
+        <view
+          wx:for="{{relationTrajectory.events}}"
+          wx:key="eventId"
+          class="event-row trajectory-event-row"
+          data-source-hash="{{item.sourceRefId}}"
+          bindtap="openAtlasEventSource"
+        >
+          <view>
+            <view class="event-title trajectory-event-title">{{item.title}}</view>
+            <view class="event-meta">{{item.metaLabel}}</view>
+          </view>
+          <text wx:if="{{item.sourceRefId}}" class="chevron">›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Similar DJs (DJ-typed graph neighbors — "你可能想认识", plan 101 #1) -->
+    <view class="section relation-section" wx:if="{{similarDjs.length}}">
+      <view class="sub-heading">{{t.similarDjs}}</view>
+      <view class="support-note">{{t.similarDjsHint}}</view>
+      <view class="chip-row">
+        <view wx:for="{{similarDjs}}" wx:key="djId" class="chip collab-chip relation-chip" data-name="{{item.displayName}}" catchtap="openArtist">
+          <text class="chip-name">{{item.displayName}}</text>
+          <text wx:if="{{item.city}}" class="chip-count">{{item.city}}{{item.eventCount ? ' · ' + item.eventCount + '场' : ''}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Scene cluster: same-venue-scene DJs (18 clusters, tight) -->
+    <view class="section relation-section" wx:if="{{atlasProfile.sceneCluster}}">
+      <view class="sub-heading">同场景</view>
+      <view class="support-note">{{atlasProfile.sceneCluster.label}} · 按活跃度排序</view>
+      <view class="chip-row">
+        <view wx:for="{{atlasProfile.sceneCluster.members}}" wx:key="djId" class="chip collab-chip relation-chip" data-name="{{item.displayName}}" catchtap="openArtist">
+          <text class="chip-name">{{item.displayName}}</text>
+          <text wx:if="{{item.eventCount}}" class="chip-count">{{item.eventCount}}场</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- City footprint (long-tail geographic reach, computed from events when no curated trajectory) -->
+    <view class="section relation-section" wx:if="{{cityFootprint.length}}">
+      <view class="sub-heading">{{t.cityFootprint}}</view>
+      <view class="support-note">{{t.cityFootprintHint}}</view>
+      <view class="trajectory-strip">
+        <view
+          wx:for="{{cityFootprint}}"
+          wx:key="city"
+          class="trajectory-city {{cityFilter === item.city ? 'trajectory-city-active' : ''}}"
+          data-city="{{item.city}}"
+          catchtap="onCityFilter"
+        >
+          <view class="trajectory-city-name">{{item.city}}</view>
+          <view class="trajectory-meta">{{item.metaLabel}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Atlas History (filtered to cityFilter when a footprint city is tapped) -->
     <view class="section" wx:if="{{atlasEvents.length}}">
-      <view class="sub-heading">演出历史</view>
+      <view class="sub-heading">演出历史<text wx:if="{{cityFilter}}" class="filter-tag"> · {{cityFilter}}</text></view>
       <view
-        wx:for="{{atlasEvents}}"
+        wx:for="{{visibleAtlasEvents}}"
         wx:key="eventId"
         class="event-row"
         data-source-hash="{{item.sourceRefId || item.sourceHash || item.source_ref_id || item.source_hash}}"
@@ -121,6 +192,113 @@
           <text wx:if="{{item.sameEventCount}}" class="chip-count">{{item.sameEventCount}}次同台</text>
         </view>
       </view>
+    </view>
+
+    <!-- Related columns: compact entry only, full reading stays on column page -->
+    <view class="section support-section column-section" wx:if="{{relatedColumns.length}}">
+      <view class="sub-heading">{{t.relatedColumns}}</view>
+      <view
+        wx:for="{{relatedColumns}}"
+        wx:key="columnId"
+        class="event-row column-row"
+        data-index="{{index}}"
+        bindtap="openRelatedColumn"
+      >
+        <view class="column-main">
+          <view class="event-title column-title">{{item.title}}</view>
+          <view wx:if="{{item.summary}}" class="event-meta column-summary">{{item.summary}}</view>
+          <view wx:if="{{item.metaLabel}}" class="column-meta">{{item.metaLabel}}</view>
+          <view class="column-action">{{t.openColumnArticle}}</view>
+        </view>
+        <text class="chevron">›</text>
+      </view>
+    </view>
+
+    <!-- External media / sources (外媒 · 资料来源) -->
+    <view class="section support-section" wx:if="{{djDiscovery.length}}">
+      <view class="sub-heading">{{t.externalMedia}}</view>
+      <view class="support-note">{{t.externalMediaHint}}</view>
+      <block wx:for="{{visibleDjDiscovery}}" wx:key="nameKey" wx:for-item="sec">
+        <view
+          wx:for="{{sec.links}}"
+          wx:key="url"
+          wx:for-item="lnk"
+          class="event-row"
+          data-url="{{lnk.url}}"
+          bindtap="openExternalLink"
+        >
+          <view>
+            <view class="event-title">{{lnk.displayLabel}}</view>
+            <view class="event-meta">{{lnk.platform}}</view>
+          </view>
+          <text class="chevron">›</text>
+        </view>
+        <view wx:if="{{sec.bioAtoms.length}}" class="ext-sources">
+          <view wx:for="{{sec.bioAtoms}}" wx:key="text" wx:for-item="atom" class="body-line">{{atom.text}}</view>
+        </view>
+      </block>
+      <view
+        wx:if="{{hiddenDiscoveryCount || djDiscoveryExpanded}}"
+        class="section-toggle"
+        bindtap="toggleDjDiscovery"
+        hover-class="option-hover"
+      >
+        <text>{{discoveryToggleLabel}}</text>
+        <text class="section-toggle-arrow">{{djDiscoveryExpanded ? "⌃" : "⌄"}}</text>
+      </view>
+    </view>
+
+    <!-- Radio/program leads (candidate-only, open original site) -->
+    <view class="section support-section" wx:if="{{radioPrograms.length}}">
+      <view class="sub-heading">{{t.radioPrograms}}</view>
+      <view class="support-note">{{t.radioProgramsHint}}</view>
+      <view
+        wx:for="{{visibleRadioPrograms}}"
+        wx:key="programId"
+        class="event-row radio-program-row"
+        data-index="{{index}}"
+        bindtap="openRadioProgram"
+      >
+        <view class="radio-program-main">
+          <view class="event-title radio-program-title">{{item.title}}</view>
+          <view class="event-meta radio-program-meta">{{item.metaLabel}}</view>
+          <view wx:if="{{item.description}}" class="radio-program-desc">{{item.description}}</view>
+        </view>
+        <text class="chevron">›</text>
+      </view>
+      <view
+        wx:if="{{hiddenRadioProgramCount || radioProgramsExpanded}}"
+        class="section-toggle"
+        bindtap="toggleRadioPrograms"
+        hover-class="option-hover"
+      >
+        <text>{{radioToggleLabel}}</text>
+        <text class="section-toggle-arrow">{{radioProgramsExpanded ? "⌃" : "⌄"}}</text>
+      </view>
+    </view>
+
+    <!-- DJ outlinks grouped by role → platform (accepted candidate only) -->
+    <view class="section support-section" wx:if="{{djOutlinksGrouped.length}}">
+      <view class="sub-heading">{{t.djOutlinks}}</view>
+      <view class="support-note">{{t.djOutlinksHint}}</view>
+      <block wx:for="{{djOutlinksGrouped}}" wx:key="role" wx:for-item="group">
+        <view class="outlink-role-group {{group.role === 'listen' ? 'listen-hub' : ''}}">
+          <view class="outlink-role-label">{{group.roleLabel}}</view>
+          <block wx:for="{{group.platforms}}" wx:key="platform" wx:for-item="plat">
+            <view
+              class="event-row outlink-primary-row"
+              data-url="{{plat.primary.url}}"
+              catchtap="openDjOutlink"
+            >
+              <view>
+                <view class="event-title">{{plat.platformLabel}}</view>
+                <view wx:if="{{plat.total > 1}}" class="event-meta outlink-count-note">+{{plat.moreCount}} 更多</view>
+              </view>
+              <text class="chevron">›</text>
+            </view>
+          </block>
+        </view>
+      </block>
     </view>
   </view>
 </view>

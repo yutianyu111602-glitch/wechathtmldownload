@@ -4,16 +4,23 @@
   </view>
   <view class="source-card">
     <view class="source-kicker">坏DJclub</view>
-    <view wx:if="{{loading}}" class="source-title">
-      <view>{{t.loading}}</view>
-      <view class="source-progress">
-        <view class="source-progress-fill" style="width: {{loadingProgress}}%;"></view>
+    <block wx:if="{{loading}}">
+      <view class="source-title">
+        <view>{{t.loading}}</view>
+        <view class="source-progress">
+          <view class="source-progress-fill" style="width: {{loadingProgress}}%;"></view>
+        </view>
       </view>
-    </view>
-    <view wx:elif="{{externalUrl}}" class="source-title">{{t.externalTitle}}</view>
-    <view wx:elif="{{error}}" class="source-title source-error">{{error}}</view>
+    </block>
+    <block wx:elif="{{externalUrl}}">
+      <view class="source-title">{{sourceExternalTitle || t.externalTitle}}</view>
+    </block>
+    <block wx:elif="{{error}}">
+      <view class="source-title source-error">{{error}}</view>
+      <view wx:if="{{debugHash}}" class="source-hint">来源标识：{{debugHash}}<text class="source-copy-link" bindtap="copyDebugHash"> 复制</text><text class="source-copy-link" bindtap="retrySource"> 重试</text></view>
+    </block>
     <view wx:else class="source-title">{{t.hint}}</view>
-    <view wx:if="{{externalUrl}}" class="source-hint">{{t.externalHint}}</view>
+    <view wx:if="{{externalUrl}}" class="source-hint">{{sourceExternalHint || t.externalHint}}</view>
     <view wx:if="{{externalUrl}}" class="source-url-label">{{sourceUrl}}</view>
     <view wx:if="{{evidenceTitle}}" class="source-evidence">
       <view class="source-evidence-title">{{evidenceTitle}}</view>

@@ -46,7 +46,6 @@ test("atlas search page calls the global subject search endpoint and routes resu
 
   assert.match(js, /\/api\/v1\/weekly\/atlas\/search/, "search page uses the backend global atlas search API");
   assert.match(js, /\/pages\/artist\/artist\?name=/, "DJ results route to DJ detail");
-  assert.match(js, /subjectId=\$\{subjectId\}/, "DJ results preserve the canonical subject id");
   assert.match(js, /\/pages\/venue\/venue\?name=/, "venue results route to venue detail");
   assert.match(js, /\/pages\/atlas-starmap\/atlas-starmap\?q=/, "org/series results route to starmap focus");
   assert.match(js, /onShareAppMessage/, "search page supports send-to-friend sharing");

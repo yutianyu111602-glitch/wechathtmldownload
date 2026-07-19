@@ -100,6 +100,16 @@ def sha256_text(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
+def sha256_file(path: Path | None) -> str:
+    if not path or not path.is_file():
+        return ""
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        while chunk := handle.read(1024 * 1024):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def stable_id(prefix: str, *parts: Any) -> str:
     blob = "\u241f".join(text(part) for part in parts if text(part))
     digest = hashlib.sha1(blob.encode("utf-8")).hexdigest()[:20]
@@ -224,7 +234,9 @@ def build_activity_event(
     source_hash = source_hash_from_item(item)
     row = {
         "schema_version": EVENT_SCHEMA_VERSION,
-        "activity_event_id": stable_id("activity_event", publish_package, event_id),
+        # The package is provenance, not identity.  A weekly event must keep the
+        # same Atlas source ID when it is republished in a later package.
+        "activity_event_id": stable_id("activity_event", event_id),
         "event_id": event_id,
         "source_event_id": event_id,
         "publish_package": publish_package,
@@ -506,6 +518,12 @@ def build_activity_source_sidecar(
     resolved_source_map_path = source_map_path or source_map_default_path(current_path)
     source_map = load_source_map(resolved_source_map_path)
 
+    event_ids = [item_identity(item) for item in items if item_identity(item)]
+    duplicate_event_ids = sorted(event_id for event_id, count in Counter(event_ids).items() if count > 1)
+    if duplicate_event_ids:
+        preview = ", ".join(duplicate_event_ids[:5])
+        raise ValueError(f"duplicate event_id rows are not safe to import: {preview}")
+
     events = [
         build_activity_event(item, publish_package=package, source_map=source_map, generated_at=generated_at)
         for item in items
@@ -538,6 +556,11 @@ def build_activity_source_sidecar(
         "decision": "activity_source_sidecar_built",
         "current_path": str(current_path),
         "source_map_path": str(resolved_source_map_path) if resolved_source_map_path else "",
+        "input_hashes": {
+            "current_sha256": sha256_file(current_path),
+            "manifest_sha256": sha256_file(current_path.parent / "manifest.json"),
+            "source_map_sha256": sha256_file(resolved_source_map_path),
+        },
         "publish_package": package,
         "input_items": len(items),
         "activity_events": len(events),

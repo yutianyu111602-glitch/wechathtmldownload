@@ -15,6 +15,14 @@
     "pages/interview/interview",
     "pages/atlas-starmap/atlas-starmap"
   ],
+  "permission": {
+    "scope.userFuzzyLocation": {
+      "desc": "用于优先推荐你所在城市的活动"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getFuzzyLocation"
+  ],
   "window": {
     "navigationBarTitleText": "活动查询",
     "navigationBarBackgroundColor": "#000000",
@@ -40,13 +48,13 @@
         "selectedIconPath": "assets/tabbar/tab_activity_selected_10.png"
       },
       {
-        "pagePath": "pages/column/column",
-        "text": "专栏",
+        "pagePath": "pages/city/city",
+        "text": "今晚",
         "iconPath": "assets/tabbar/tab_column.png",
         "selectedIconPath": "assets/tabbar/tab_column_selected.png"
       },
       {
-        "pagePath": "pages/saved/saved",
+        "pagePath": "pages/atlas-starmap/atlas-starmap",
         "text": "ATLAS计划",
         "iconPath": "assets/tabbar/tab_atlas.png",
         "selectedIconPath": "assets/tabbar/tab_atlas_selected.png"
@@ -59,12 +67,6 @@
       }
     ]
   },
-  "permission": {
-    "scope.userLocation": {
-      "desc": "用于在地图上查看活动场地的位置与路线"
-    }
-  },
-  "requiredPrivateInfos": ["getLocation"],
   "style": "v2",
   "lazyCodeLoading": "requiredComponents"
 }

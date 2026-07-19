@@ -568,13 +568,16 @@ def item_matches_lock(item: dict[str, Any], lock: dict[str, Any]) -> bool:
     if first(item.get("venue_id")) == lock["venue_id"]:
         return True
     ident = first(item.get("id"),)
-    for prefix in lock.get("id_prefixes") or []:
-        if ident.startswith(prefix):
-            return True
+    markers_all = [str(marker or "").strip() for marker in lock.get("text_markers_all") or [] if str(marker or "").strip()]
+    prefix_matches = any(ident.startswith(prefix) for prefix in lock.get("id_prefixes") or [])
+    # A lock with text_markers_all is intentionally narrower than its account
+    # prefix. For example, only the byyb 周六风云榜 row is confirmed at
+    # 长乐路115号; ordinary byyb events must not inherit that address.
+    if prefix_matches and not markers_all:
+        return True
     text = item_text(item)
     city = first(item.get("city_name"), first(item.get("city")))
     city_ok = not city or city == lock["city_name"] or bool(lock.get("allow_city_override"))
-    markers_all = [str(marker or "").strip() for marker in lock.get("text_markers_all") or [] if str(marker or "").strip()]
     if markers_all and all(marker in text for marker in markers_all) and city_ok:
         return True
     for marker in lock.get("text_markers") or []:
@@ -662,6 +665,7 @@ def rebuild_city_routes(api_dir: Path, current_payload: dict[str, Any]) -> None:
             {
                 "schema_version": "weekly_activity_miniprogram_city.v1",
                 "generated_at": generated_at,
+                "scope": "package",
                 "city_key": city_key,
                 "city": row["city"],
                 "item_count": len(items),
@@ -674,6 +678,8 @@ def rebuild_city_routes(api_dir: Path, current_payload: dict[str, Any]) -> None:
         {
             "schema_version": "weekly_activity_miniprogram_city_index.v1",
             "generated_at": generated_at,
+            "scope": "package",
+            "item_count": len(current_payload.get("items") or []),
             "city_count": len(cities),
             "cities": cities,
         },
@@ -737,6 +743,8 @@ def apply_locks(registry_path: Path, api_dir: Path, out_dir: Path, *, dry_run: b
         manifest_path = api_dir / "manifest.json"
         if manifest_path.exists():
             manifest = read_json(manifest_path)
+            manifest["static_index_scope"] = "package"
+            manifest["default_api_scope"] = "current"
             manifest["confirmed_venue_locks"] = {
                 "schema_version": "weekly_confirmed_venue_locks.v1",
                 "applied_at": verified_at,

@@ -1,0 +1,91 @@
+{
+  "apis": [
+    {
+      "name": "searchEvents",
+      "description": "查询 HUAIDJ 当前国内电子音乐活动。适用于用户询问今晚、本周、周五、周末、某城市、某 DJ、某俱乐部、某风格有什么活动。不处理购票、付款、订座或个人信息提交；不会编造不存在的活动、票价、原文链接或海报。",
+      "_meta": {
+        "ui": {
+          "componentPath": "components/event-list/index"
+        }
+      },
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string",
+            "description": "城市名，例如上海、北京、成都、杭州、深圳、广州。可为空。"
+          },
+          "dateFrom": {
+            "type": "string",
+            "description": "起始日期，格式 YYYY-MM-DD。可为空。"
+          },
+          "dateTo": {
+            "type": "string",
+            "description": "结束日期，格式 YYYY-MM-DD。可为空。"
+          },
+          "timeHint": {
+            "type": "string",
+            "enum": ["tonight", "weekend", "this_week", "next_15_days"],
+            "description": "时间语境。用户说今晚、周五、周末、最近时可使用。可为空。"
+          },
+          "keyword": {
+            "type": "string",
+            "description": "DJ、艺人、俱乐部、场地、主办方或活动标题关键词。可为空。"
+          },
+          "style": {
+            "type": "string",
+            "description": "风格关键词，例如 techno、house、bass、trance、ambient。可为空。"
+          },
+          "limit": {
+            "type": "number",
+            "description": "返回条数，默认 10，最大 20。"
+          }
+        },
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number",
+            "description": "匹配活动总数"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string" },
+                "title": { "type": "string" },
+                "date": { "type": "string" },
+                "city": { "type": "string" },
+                "venue": { "type": "string" },
+                "lineup": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "styles": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "posterAvailable": { "type": "boolean" },
+                "sourceAvailable": { "type": "boolean" },
+                "detailPath": { "type": "string" }
+              }
+            }
+          },
+          "query": {
+            "type": "object",
+            "description": "本次筛选条件"
+          }
+        }
+      }
+    }
+  ],
+  "components": [
+    {
+      "path": "components/event-list/index",
+      "relatedPage": "/pages/index/index"
+    }
+  ]
+}

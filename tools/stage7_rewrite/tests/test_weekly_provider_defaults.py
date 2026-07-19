@@ -31,6 +31,24 @@ def test_weekly_wrapper_does_not_launch_separate_atlas_nightly_state_machine() -
     assert "AtlasV2 is a separate Hermes nightly state machine" in source
 
 
+def test_daily_wrapper_requires_explicit_cloudbase_poster_write_authority() -> None:
+    source = (ROOT / "run_huaidj_sanji_daily_twice.ps1").read_text(encoding="utf-8-sig")
+
+    assert "[switch]$EnablePosterCloudBaseMigration" in source
+    assert 'poster_cloudbase_migration_enabled = [bool]$EnablePosterCloudBaseMigration' in source
+    assert 'if ($EnablePosterCloudBaseMigration) { $publishArgs += "-EnablePosterCloudBaseMigration" }' in source
+    assert 'if (-not [string]::IsNullOrWhiteSpace($Version)) { $publishArgs += @("-Version", $Version) }' in source
+    assert 'if (-not [string]::IsNullOrWhiteSpace($Desc)) { $publishArgs += @("-Desc", $Desc) }' in source
+    publish_args = source[source.index("$publishArgs = @(") : source.index(")", source.index("$publishArgs = @("))]
+    assert '"-EnablePosterCloudBaseMigration"' not in publish_args
+
+    installer = (ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py").read_text(encoding="utf-8")
+    publish_template = installer[installer.index('"huaidj/sanji_publish_afternoon.py"') :]
+    publish_template = publish_template[: publish_template.index("''',")]
+    assert '"-DeployBackend"' in publish_template
+    assert '"-EnablePosterCloudBaseMigration"' in publish_template
+
+
 def test_candidate_scripts_resolve_paths_from_their_own_repo() -> None:
     bake = (REPO / "services" / "weekly_activity_cloudrun" / "scripts" / "bake_and_deploy.py").read_text(
         encoding="utf-8"

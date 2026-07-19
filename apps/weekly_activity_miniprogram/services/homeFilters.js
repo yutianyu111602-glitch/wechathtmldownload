@@ -100,9 +100,11 @@ function dateKeysForFilter(item) {
 function itemMatchesCityKey(item, cityKey) {
   var key = String(cityKey || "").trim();
   if (!key) return true;
-  var direct = String((item || {}).city_key || "").trim();
+  var direct = String((item || {}).city_key || (item || {}).cityKey || "").trim();
   if (direct === key) return true;
-  var keys = Array.isArray((item || {}).city_keys) ? item.city_keys : [];
+  var keys = Array.isArray((item || {}).city_keys)
+    ? item.city_keys
+    : (Array.isArray((item || {}).cityKeys) ? item.cityKeys : []);
   for (var i = 0; i < keys.length; i++) {
     if (String(keys[i] || "").trim() === key) return true;
   }
@@ -123,18 +125,102 @@ function filterItemsByDateKey(items, dateKey) {
   return source.filter(function (item) { return itemMatchesDateKey(item, key); });
 }
 
+function filterItemsByDateWindow(items, startKey, endKey) {
+  var source = Array.isArray(items) ? items : [];
+  var start = normalizeIsoDate(startKey);
+  var end = normalizeIsoDate(endKey);
+  if (!start && !end) return source;
+  var min = start || end;
+  var max = end || start;
+  if (max < min) return [];
+  return source.filter(function (item) {
+    return dateKeysForFilter(item).some(function (key) {
+      return key >= min && key <= max;
+    });
+  });
+}
+
+function allCurrentDateSelection() {
+  return { mode: "all_current", exactDate: "", startKey: "", endKey: "" };
+}
+
+function exactDateSelection(dateKey) {
+  var key = normalizeIsoDate(dateKey);
+  return key
+    ? { mode: "exact", exactDate: key, startKey: key, endKey: key }
+    : allCurrentDateSelection();
+}
+
+function weekendDateSelection(offsetWeeks, now) {
+  var base = now instanceof Date ? new Date(now.getTime()) : new Date();
+  var weeks = Math.max(0, Number.parseInt(offsetWeeks || 0, 10) || 0);
+  var daysUntilFriday = (5 - base.getDay() + 7) % 7;
+  var friday = new Date(base.getFullYear(), base.getMonth(), base.getDate() + daysUntilFriday + weeks * 7);
+  var sunday = new Date(friday.getFullYear(), friday.getMonth(), friday.getDate() + 2);
+  return {
+    mode: weeks === 0 ? "this_weekend" : "next_weekend",
+    exactDate: "",
+    startKey: keyFromDate(friday),
+    endKey: keyFromDate(sunday),
+  };
+}
+
+function normalizeDateSelection(value) {
+  var input = value && typeof value === "object" ? value : {};
+  var mode = String(input.mode || "all_current");
+  if (mode === "exact") return exactDateSelection(input.exactDate || input.startKey);
+  if (mode === "this_weekend" || mode === "next_weekend") {
+    var start = normalizeIsoDate(input.startKey);
+    var end = normalizeIsoDate(input.endKey);
+    if (start && end) {
+      return {
+        mode: mode,
+        exactDate: "",
+        startKey: start <= end ? start : end,
+        endKey: start <= end ? end : start,
+      };
+    }
+  }
+  return allCurrentDateSelection();
+}
+
+function dateSelectionQuery(value) {
+  var selection = normalizeDateSelection(value);
+  return {
+    date: selection.mode === "exact" ? selection.exactDate : "",
+    dateStart: selection.mode === "this_weekend" || selection.mode === "next_weekend" ? selection.startKey : "",
+    dateEnd: selection.mode === "this_weekend" || selection.mode === "next_weekend" ? selection.endKey : "",
+  };
+}
+
+function filterItemsByDateSelection(items, value) {
+  var selection = normalizeDateSelection(value);
+  if (selection.mode === "exact") return filterItemsByDateKey(items, selection.exactDate);
+  if (selection.mode === "this_weekend" || selection.mode === "next_weekend") {
+    return filterItemsByDateWindow(items, selection.startKey, selection.endKey);
+  }
+  return Array.isArray(items) ? items : [];
+}
+
 function filterItemsByActiveFilters(items, cityKey, dateKey) {
   return filterItemsByDateKey(filterItemsByCityKey(items, cityKey), dateKey);
 }
 
 module.exports = {
   addDateRangeKeys: addDateRangeKeys,
+  allCurrentDateSelection: allCurrentDateSelection,
+  dateSelectionQuery: dateSelectionQuery,
   dateFromKey: dateFromKey,
   dateKeysForFilter: dateKeysForFilter,
+  exactDateSelection: exactDateSelection,
   filterItemsByActiveFilters: filterItemsByActiveFilters,
   filterItemsByCityKey: filterItemsByCityKey,
   filterItemsByDateKey: filterItemsByDateKey,
+  filterItemsByDateSelection: filterItemsByDateSelection,
+  filterItemsByDateWindow: filterItemsByDateWindow,
   itemMatchesCityKey: itemMatchesCityKey,
   keyFromDate: keyFromDate,
+  normalizeDateSelection: normalizeDateSelection,
   normalizeIsoDate: normalizeIsoDate,
+  weekendDateSelection: weekendDateSelection,
 };

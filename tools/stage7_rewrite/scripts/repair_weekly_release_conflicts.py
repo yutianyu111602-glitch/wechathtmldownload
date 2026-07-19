@@ -1260,6 +1260,7 @@ def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[di
             {
                 "schema_version": "weekly_activity_miniprogram_city.v1",
                 "generated_at": generated_at,
+                "scope": "package",
                 "city_key": city_key,
                 "city": city_labels.get(city_key) or city_key,
                 "item_count": len(city_items),
@@ -1282,6 +1283,8 @@ def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[di
         {
             "schema_version": "weekly_activity_miniprogram_city_index.v1",
             "generated_at": generated_at,
+            "scope": "package",
+            "item_count": len(items),
             "city_count": len(city_index_rows),
             "cities": city_index_rows,
         },
@@ -1294,6 +1297,7 @@ def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[di
             {
                 "schema_version": "weekly_activity_miniprogram_date.v1",
                 "generated_at": generated_at,
+                "scope": "package",
                 "date": date_key,
                 "item_count": len(date_items),
                 "items": sort_items(date_items),
@@ -1314,6 +1318,8 @@ def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[di
         {
             "schema_version": "weekly_activity_miniprogram_date_index.v1",
             "generated_at": generated_at,
+            "scope": "package",
+            "item_count": len(items),
             "date_count": len(date_index_rows),
             "dates": date_index_rows,
         },
@@ -1352,6 +1358,8 @@ def rebuild_release_files(api_dir: Path, current: dict[str, Any], items: list[di
     manifest["item_count"] = len(items)
     manifest["city_route_count"] = len(city_index_rows)
     manifest["date_route_count"] = len(date_index_rows)
+    manifest["static_index_scope"] = "package"
+    manifest["default_api_scope"] = "current"
     manifest["repair_report"] = current["repair_report"]
     manifest["repair_report_path"] = "repair_report.json"
     write_json(manifest_path, manifest)

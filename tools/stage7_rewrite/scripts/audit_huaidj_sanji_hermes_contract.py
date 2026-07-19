@@ -37,6 +37,10 @@ STALE_HERMES_HOME_PATTERN = re.compile(
     r"Hermes root defaults to\s+`C:\\Users\\pc\\AppData\\Local\\hermes\\hermes-agent`",
     re.MULTILINE,
 )
+LAUNCHER_REPO_DEFAULT_PATTERN = re.compile(
+    r'^INSTALLER_REPO = Path\(r"(?P<path>[^"]+)"\)$',
+    re.MULTILINE,
+)
 
 
 def resolve_hermes_runtime_root() -> Path:
@@ -149,6 +153,8 @@ EXPECTED_HERMES_SCRIPTS = {
         "msvcrt.locking(",
         "atlas_v2_import_lock.v4",
         "return result_code",
+        "_load_run_summary_from_log",
+        "[NOOP] AtlasV2 has no new articles",
         "No production promotion or service restart",
     ),
     "huaidj/sanji_publish_afternoon.py": (
@@ -158,6 +164,7 @@ EXPECTED_HERMES_SCRIPTS = {
         "-Slot",
         "manual",
         "-SkipSanjiExport",
+        "-EnablePosterCloudBaseMigration",
         "PosterVlMaxImages",
         '"0"',
         "HUAIDJ_REPO",
@@ -209,6 +216,19 @@ EXPECTED_HERMES_SCRIPTS = {
     ),
 }
 
+RUNTIME_SSOT_EXPECTED_TOKENS = (
+    'HUAIDJ_LAUNCHER_SCHEMA = "huaidj_launcher_runtime_ssot.v1"',
+    "INSTALLER_REPO = Path(",
+    "validated_job_workdir",
+    "hkcu_runtime_tuple",
+    "installer_rendered_defaults",
+    "def _resolve_runtime_settings(",
+)
+EXPECTED_HERMES_SCRIPTS = {
+    rel: tuple(tokens) + RUNTIME_SSOT_EXPECTED_TOKENS
+    for rel, tokens in EXPECTED_HERMES_SCRIPTS.items()
+}
+
 FORBIDDEN_HERMES_SCRIPT_TOKENS = {
     "huaidj/sanji_publish_afternoon.py": ("subprocess.Popen(", "[LAUNCHED]", "detached runner"),
     "huaidj/atlas_v2_sanji_import_nightly.py": ("subprocess.Popen(", "[LAUNCHED]", "Runs detached"),
@@ -229,6 +249,35 @@ def read_text(path: Path) -> str:
         return path.read_text(encoding="utf-8")
     except UnicodeDecodeError:
         return path.read_text(encoding="utf-8-sig")
+
+
+def normalized_path(value: str | Path) -> str:
+    return os.path.normcase(os.path.normpath(str(Path(value).resolve(strict=False))))
+
+
+def extract_launcher_repo_default(script_text: str) -> str:
+    match = LAUNCHER_REPO_DEFAULT_PATTERN.search(script_text)
+    return match.group("path") if match else ""
+
+
+def launcher_repo_alignment(
+    script_text: str,
+    *,
+    job_workdir: str | Path,
+    installer_repo: str | Path,
+) -> tuple[bool, str]:
+    """Check launcher default, Hermes workdir, and installer repo as one SSOT."""
+
+    launcher_repo = extract_launcher_repo_default(script_text)
+    expected = normalized_path(installer_repo)
+    launcher_value = normalized_path(launcher_repo) if launcher_repo else ""
+    workdir_value = normalized_path(job_workdir) if str(job_workdir) else ""
+    ok = bool(launcher_repo) and launcher_value == expected and workdir_value == expected
+    detail = (
+        f"launcher_default={launcher_repo or '<missing>'} "
+        f"job_workdir={job_workdir or '<missing>'} installer_repo={installer_repo}"
+    )
+    return ok, detail
 
 
 def add(checks: list[dict[str, Any]], name: str, ok: bool, detail: str, severity: str = "fail") -> None:
@@ -1033,6 +1082,18 @@ def audit_hermes(checks: list[dict[str, Any]], hermes_home: Path, hermes_agent: 
             str(job.get("workdir") or "") == str(REPO),
             f"workdir={job.get('workdir')} expected={REPO}",
         )
+        launcher_path = hermes_home / "scripts" / str(expected["script"]).replace("/", os.sep)
+        alignment_ok, alignment_detail = launcher_repo_alignment(
+            read_text(launcher_path) if launcher_path.is_file() else "",
+            job_workdir=str(job.get("workdir") or ""),
+            installer_repo=REPO,
+        )
+        add(
+            checks,
+            f"Hermes launcher/job/installer repo SSOT: {name}",
+            alignment_ok,
+            alignment_detail,
+        )
 
     scripts_root = hermes_home / "scripts"
     for rel, tokens in EXPECTED_HERMES_SCRIPTS.items():
@@ -1137,7 +1198,7 @@ def main() -> int:
     failures = [c for c in checks if c["status"] == "fail"]
     warnings = [c for c in checks if c["status"] == "warn"]
     report = {
-        "schema_version": "huaidj_sanji_hermes_contract_audit.v1",
+        "schema_version": "huaidj_sanji_hermes_contract_audit.v2",
         "ok": not failures,
         "failure_count": len(failures),
         "warning_count": len(warnings),

@@ -1,4 +1,5 @@
 const { requestApi } = require("../../utils/api");
+const { buildExternalLinkAction } = require("../../utils/externalLinkAction");
 const { applyLanguageChrome, normalizeLang, text } = require("../../utils/i18n");
 const { openOfficialArticle } = require("../../utils/sourceAction");
 const { buildSimpleShare, buildSimpleTimeline, enableShareMenu } = require("../../utils/share");
@@ -28,6 +29,23 @@ function allowedDirectWebUrl(value) {
   return url;
 }
 
+function safeOriginalExternalUrl(value, lang, linkType = "external") {
+  const action = buildExternalLinkAction(safeDecodeUrl(value), lang, { linkType });
+  return action.ok ? action.url : "";
+}
+
+function sourceExternalTitle(dict, linkType) {
+  return String(linkType || "").toLowerCase() === "radio"
+    ? (dict.radioExternalTitle || dict.externalTitle)
+    : dict.externalTitle;
+}
+
+function sourceExternalHint(dict, linkType) {
+  return String(linkType || "").toLowerCase() === "radio"
+    ? (dict.radioExternalHint || dict.externalHint)
+    : dict.externalHint;
+}
+
 function safeVibrate(type = "light") {
   if (typeof wx !== "undefined" && typeof wx.vibrateShort === "function") wx.vibrateShort({ type });
 }
@@ -45,9 +63,13 @@ Page({
     evidenceMeta: "",
     evidenceSnippet: "",
     sourceNotice: "",
+    sourceLinkType: "external",
+    sourceExternalTitle: "",
+    sourceExternalHint: "",
     loading: true,
     loadingProgress: 0,
     error: "",
+    debugHash: "",
   },
 
   onLoad(query) {
@@ -55,10 +77,28 @@ Page({
     const lang = normalizeLang(query.lang || wx.getStorageSync("weeklyActivityLang"));
     const sourceHash = query.hash || "";
     const sourceKind = query.kind || "";
+    const sourceLinkType = String(query.linkType || "external").trim() || "external";
     const directUrl = allowedDirectWebUrl(query.url || "");
+    const originalExternalUrl = safeOriginalExternalUrl(query.externalUrl || "", lang, sourceLinkType);
+    const evidenceTitle = safeDecodeUrl(query.title || "");
+    const evidenceMeta = safeDecodeUrl(query.meta || "");
+    const t = text("source", lang);
     applyLanguageChrome("source", lang);
-    this.setData({ lang, t: text("source", lang), sourceHash, sourceKind, sourceUrl: directUrl, externalUrl: directUrl, webViewUrl: "" });
-    if (directUrl) {
+    this.setData({
+      lang,
+      t,
+      sourceHash,
+      sourceKind,
+      sourceUrl: originalExternalUrl || directUrl,
+      externalUrl: originalExternalUrl || directUrl,
+      webViewUrl: "",
+      evidenceTitle,
+      evidenceMeta,
+      sourceLinkType,
+      sourceExternalTitle: sourceExternalTitle(t, sourceLinkType),
+      sourceExternalHint: sourceExternalHint(t, sourceLinkType),
+    });
+    if (directUrl || originalExternalUrl) {
       this.setData({ loading: false, loadingProgress: 100, error: "" });
       return;
     }
@@ -71,29 +111,42 @@ Page({
 
   onShareAppMessage() {
     const atlasUrl = allowedDirectWebUrl(this.data.externalUrl || this.data.webViewUrl);
+    const originalExternalUrl = atlasUrl ? "" : safeOriginalExternalUrl(this.data.externalUrl, this.data.lang, this.data.sourceLinkType);
     const isAtlas = Boolean(atlasUrl);
-    return buildSimpleShare(isAtlas ? "HUAIDJ Atlas" : (this.data.lang === "en" ? "HUAIDJ source article" : "坏DJclub 公众号原文"), "/pages/source/source", {
+    const title = this.data.evidenceTitle || (isAtlas ? "HUAIDJ Atlas" : (this.data.lang === "en" ? "HUAIDJ source article" : "坏DJclub 公众号原文"));
+    return buildSimpleShare(title, "/pages/source/source", {
       hash: this.data.sourceHash,
       url: atlasUrl,
+      externalUrl: originalExternalUrl,
+      linkType: originalExternalUrl ? this.data.sourceLinkType : "",
+      title: originalExternalUrl ? this.data.evidenceTitle : "",
+      meta: originalExternalUrl ? this.data.evidenceMeta : "",
       lang: this.data.lang,
     });
   },
 
   onShareTimeline() {
     const atlasUrl = allowedDirectWebUrl(this.data.externalUrl || this.data.webViewUrl);
+    const originalExternalUrl = atlasUrl ? "" : safeOriginalExternalUrl(this.data.externalUrl, this.data.lang, this.data.sourceLinkType);
     const isAtlas = Boolean(atlasUrl);
-    return buildSimpleTimeline(isAtlas ? "HUAIDJ Atlas" : (this.data.lang === "en" ? "HUAIDJ source article" : "坏DJclub 公众号原文"), {
+    const title = this.data.evidenceTitle || (isAtlas ? "HUAIDJ Atlas" : (this.data.lang === "en" ? "HUAIDJ source article" : "坏DJclub 公众号原文"));
+    return buildSimpleTimeline(title, {
       hash: this.data.sourceHash,
       url: atlasUrl,
+      externalUrl: originalExternalUrl,
+      linkType: originalExternalUrl ? this.data.sourceLinkType : "",
+      title: originalExternalUrl ? this.data.evidenceTitle : "",
+      meta: originalExternalUrl ? this.data.evidenceMeta : "",
       lang: this.data.lang,
     });
   },
 
   async loadSource(hash) {
     if (!hash) {
-      this.setData({ loading: false, loadingProgress: 100, error: this.data.t.failed });
+      this.setData({ loading: false, loadingProgress: 100, error: this.data.t.failed, debugHash: "" });
       return;
     }
+    this.setData({ debugHash: hash });
     try {
       this.setData({ loading: true, loadingProgress: 20, error: "" });
       const source = await requestApi(`/api/v1/weekly/source/${encodeURIComponent(hash)}`);
@@ -179,6 +232,23 @@ Page({
         wx.showToast({ title: this.data.t.linkCopied || "链接已复制", icon: "none" });
       },
     });
+  },
+
+  copyDebugHash() {
+    const hash = this.data.debugHash;
+    if (!hash) return;
+    wx.setClipboardData({
+      data: hash,
+      success: () => {
+        wx.showToast({ title: "来源标识已复制", icon: "none" });
+      },
+    });
+  },
+
+  retrySource() {
+    const hash = this.data.sourceHash || this.data.debugHash;
+    if (!hash) return;
+    this.loadSource(hash);
   },
 
   goBack() {

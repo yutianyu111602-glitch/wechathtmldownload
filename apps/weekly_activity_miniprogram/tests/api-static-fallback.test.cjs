@@ -5,7 +5,6 @@ const test = require("node:test");
 const vm = require("node:vm");
 
 const offlineSnapshotModule = require("../utils/offlineSnapshot");
-const bundledClubOverviews = require("../data/club_overviews");
 // Mirrors the production date-ascending sort in currentResponseFromStatic.
 const FIRST_OFFLINE_SNAPSHOT_ITEM = ([...(offlineSnapshotModule.OFFLINE_SNAPSHOT.items || [])]
   .sort((a, b) => {
@@ -42,9 +41,6 @@ function loadApiModule() {
     }
     if (id === "./electronicRelevance") {
       return require("../utils/electronicRelevance");
-    }
-    if (id === "../data/club_overviews") {
-      return bundledClubOverviews;
     }
     throw new Error("unexpected require in api.js test: " + id);
   };
@@ -188,28 +184,6 @@ const atlasSnapshotPayload = {
   ],
 };
 
-const clubOverviewsPayload = {
-  schema_version: "club_overviews.v1",
-  generated_at: "2026-07-18T15:00:00+08:00",
-  as_of_date: "2026-07-18",
-  source: "online-test-package",
-  club_count: 1,
-  overview_count: 1,
-  kind_counts: { week: 1 },
-  by_club: {
-    OIL: [{
-      club: "OIL",
-      title: "OIL 本周活动一览",
-      original_url: "https://mp.weixin.qq.com/s/oil-weekly",
-      cover_url: "https://mmbiz.qpic.cn/example/oil-weekly.jpg",
-      window_kind: "week",
-      window_label: "7.18-7.24",
-      window_start: "2026-07-18",
-      window_end: "2026-07-24",
-    }],
-  },
-};
-
 function installWechatMock(sandbox) {
   sandbox.getApp = () => ({
     globalData: {
@@ -260,8 +234,6 @@ function installWechatMock(sandbox) {
         };
       } else if (pathname.endsWith("/weekly_entity_snapshot.json")) {
         data = atlasSnapshotPayload;
-      } else if (pathname.endsWith("/club_overviews.json")) {
-        data = clubOverviewsPayload;
       } else {
         options.fail({ errMsg: `unexpected url ${options.url}` });
         return;
@@ -340,7 +312,7 @@ test("default current-feed cache filters stale rows from a broad raw payload", a
   __setTodayForTests("2026-07-05");
   const store = new Map();
   const query = { limit: 10, lookbackDays: 0 };
-  store.set(testCacheKey("weeklyActivityApiCache:v20260704:", "/api/v1/weekly/current", query), {
+  store.set(testCacheKey("weeklyActivityApiCache:v20260719-visibility-v2:", "/api/v1/weekly/current", query), {
     cachedAt: Date.now(),
     payload: {
       generated_at: "2026-07-05T12:00:00+08:00",
@@ -392,7 +364,7 @@ test("default current-feed cache filters stale rows from a broad raw payload", a
   const result = await requestApi("/api/v1/weekly/current", query);
   assert.equal(result.__fromCache, true);
   assert.equal(result.items.map((item) => item.id).join(","), "current-weekend");
-  assert.equal(result.page.total, 1);
+  assert.equal(result.page.total, 2, "client-side cache cleanup must preserve the server pagination total");
 });
 
 test("falls back to static current data when cloud container fails", async () => {
@@ -409,17 +381,6 @@ test("falls back to static current data when cloud container fails", async () =>
   assert.equal(result.items.length, 1);
   assert.equal(result.items[0].id, "ready-shanghai");
   assert.equal(result.page.total, 1);
-});
-
-test("loads club overviews from the online release artifact through requestApi", async () => {
-  const { requestApi, sandbox } = loadApiModule();
-  installWechatMock(sandbox);
-
-  const result = await requestApi("/api/v1/weekly/club-overviews");
-  assert.equal(result.schema_version, "club_overviews.v1");
-  assert.equal(result.source, "online-test-package");
-  assert.equal(result.by_club.OIL[0].title, "OIL 本周活动一览");
-  assert.notEqual(result.__fromSnapshot, true);
 });
 
 test("static current fallback filters by city_keys when city_key is absent", async () => {
@@ -1018,7 +979,7 @@ test("cached default current feed drops rows that are already in the past", asyn
   const cached = await requestApi("/api/v1/weekly/current", query);
   assert.equal(cached.__fromCache, true);
   assert.equal(cached.items.map((item) => item.id).join(","), "future-0703");
-  assert.equal(cached.page.total, 1);
+  assert.equal(cached.page.total, 2, "cached row filtering must not destroy the server pagination total");
 });
 
 test("cacheMaxAgeMs zero disables cached fallback during first-load probes", async () => {
@@ -1645,62 +1606,4 @@ test("offline fallback uses the baked seed only when nothing was ever persisted"
   // No persisted mirror -> baked OFFLINE_SNAPSHOT seed.
   assert.equal(result.__fromSnapshot, true);
   assert.ok(result.items.length > 0);
-});
-
-test("club overview offline fallback prefers last-good online data over the bundled seed", async () => {
-  const { requestApi, sandbox } = loadApiModule();
-  const store = new Map();
-  const cloud = {
-    env: "test-env",
-    service: "weekly-api",
-    useMock: false,
-    staticBaseUrl: "https://example.test/weekly/releases/club-overviews-current",
-    cacheMaxAgeMs: 0,
-  };
-  sandbox.getApp = () => ({ globalData: { cloud } });
-  sandbox.wx = {
-    cloud: { callContainer: () => Promise.reject({ errMsg: "cloud.callContainer:fail" }) },
-    getStorageSync: (key) => (store.has(key) ? store.get(key) : ""),
-    setStorageSync: (key, value) => { store.set(key, value); },
-    request(options) {
-      options.success({ statusCode: 200, data: clubOverviewsPayload });
-    },
-  };
-
-  const online = await requestApi("/api/v1/weekly/club-overviews");
-  assert.equal(online.source, "online-test-package");
-  assert.notEqual(online.__fromCache, true);
-
-  sandbox.wx.request = (options) => options.fail({ errMsg: "offline" });
-  const offline = await requestApi("/api/v1/weekly/club-overviews");
-  assert.equal(offline.source, "online-test-package");
-  assert.equal(offline.__fromCache, true);
-  assert.notEqual(offline.__fromSnapshot, true);
-});
-
-test("club overview bundled seed is only used on a first-install offline path", async () => {
-  const { requestApi, sandbox } = loadApiModule();
-  sandbox.getApp = () => ({
-    globalData: {
-      cloud: {
-        env: "test-env",
-        service: "weekly-api",
-        useMock: false,
-        staticBaseUrl: "",
-        publicBaseUrl: "",
-        cacheMaxAgeMs: 0,
-        offlineSnapshotFallback: true,
-      },
-    },
-  });
-  sandbox.wx = {
-    cloud: { callContainer: () => Promise.reject({ errMsg: "cloud.callContainer:fail" }) },
-    getStorageSync: () => "",
-    setStorageSync() {},
-  };
-
-  const result = await requestApi("/api/v1/weekly/club-overviews");
-  assert.equal(result.__fromSnapshot, true);
-  assert.equal(result.schema_version, bundledClubOverviews.schema_version);
-  assert.deepEqual(Object.keys(result.by_club), Object.keys(bundledClubOverviews.by_club));
 });

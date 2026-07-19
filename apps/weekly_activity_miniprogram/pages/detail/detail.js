@@ -203,10 +203,60 @@ Page({
       return;
     }
     if (this.data.sourceUrl) {
-      openSourceUrl(this.data.sourceUrl, this.data.lang, { fallbackHash: hash });
+      // 优先用官方接口打开公众号原文；微信不允许时 fallback 到 source 页面（提供链接复制等操作入口）
+      openSourceUrl(this.data.sourceUrl, this.data.lang, {
+        fallbackHash: hash,
+        suppressFallback: false,
+        fail: () => this.copyArticleUrl(this.data.sourceUrl),
+      });
       return;
     }
-    wx.navigateTo({ url: buildSourcePageUrl(hash, this.data.lang) });
+    // sourceUrl 尚未就绪时：尝试即时获取，而非直接跳 source 页（source 页也需调同一个 API）
+    this.setData({ sourceLoading: true });
+    fetchSourceByHash(hash).then((url) => {
+      this.setData({ sourceUrl: url, sourceLoading: false });
+      if (url) {
+        openSourceUrl(url, this.data.lang, {
+          fallbackHash: hash,
+          suppressFallback: false,
+          fail: () => this.copyArticleUrl(url),
+        });
+      } else {
+        wx.navigateTo({ url: buildSourcePageUrl(hash, this.data.lang) });
+      }
+    }).catch(() => {
+      this.setData({ sourceLoading: false });
+      wx.navigateTo({ url: buildSourcePageUrl(hash, this.data.lang) });
+    });
+  },
+
+  copyArticleUrl(url) {
+    const link = String(url || "").trim();
+    if (!link) return;
+    wx.setClipboardData({
+      data: link,
+      success: () => {
+        wx.showToast({
+          title: this.data.t.linkCopied || "原文链接已复制，可粘贴到浏览器打开",
+          icon: "none",
+        });
+      },
+    });
+  },
+
+  copyDiscoveryLink(event) {
+    safeVibrate("light");
+    const url = String(event.currentTarget.dataset.url || "").trim();
+    if (!url) return;
+    wx.setClipboardData({
+      data: url,
+      success: () => {
+        wx.showToast({
+          title: this.data.t.linkCopied || this.data.t.copyLink || "链接已复制",
+          icon: "none",
+        });
+      },
+    });
   },
 
   openSourceArticle(event) {
@@ -221,6 +271,12 @@ Page({
   },
 
   openPoster() {
+    // Product rule (2026-06-13): tapping the poster opens the source article
+    // when a trustworthy one exists; otherwise it falls back to previewing.
+    if (preferredSourceHash(this.data.item)) {
+      this.openSource();
+      return;
+    }
     safeVibrate("light");
     const coverUrl = this.data.item?.coverUrl;
     if (coverUrl) {

@@ -6,7 +6,18 @@ const { buildPosterPool } = require("../../utils/posterPool");
 const { openSourceByHash } = require("../../utils/sourceAction");
 const { withListLocationLabels } = require("../../utils/listDisplay");
 const { filterItemsByPreviewRange, itemDateBounds, itemMatchesDateKey, normalizeRange } = require("../../utils/datePreview");
-const { filterItemsByActiveFilters, filterItemsByCityKey, filterItemsByDateKey, dateKeysForFilter, itemMatchesCityKey, normalizeIsoDate, keyFromDate } = require("../../services/homeFilters");
+const {
+  allCurrentDateSelection,
+  dateKeysForFilter,
+  dateSelectionQuery,
+  exactDateSelection,
+  filterItemsByCityKey,
+  filterItemsByDateSelection,
+  itemMatchesCityKey,
+  normalizeDateSelection,
+  normalizeIsoDate,
+  weekendDateSelection,
+} = require("../../services/homeFilters");
 const { filterItemsByElectronic } = require("../../utils/genreFilter");
 const { buildIndexShare, buildIndexTimeline, enableShareMenu } = require("../../utils/share");
 const { posterFallbackState, posterImageErrorFallback, resolvePosterUrlsForItems } = require("../../utils/cloudPosterUrls");
@@ -38,6 +49,10 @@ const MIN_BACKGROUND_REFRESH_INTERVAL_MS = 120000;
 const FILTER_META_TIMEOUT_MS = 5000;
 const POSTER_WARM_LIMIT = 6;
 const POSTER_RESOLVE_TIMEOUT_MS = 300;
+const RELEASE_FRESHNESS_GRACE_MS = 60 * 1000;
+const PREFERRED_CITY_KEY = "weeklyActivityPreferredCity";
+const LOCATION_CITY_KEY = "weeklyActivityUserLocCity";
+const LOCATION_READY_WAIT_MS = 1500;
 
 function toIndexListItem(item) {
   if (!item || typeof item !== "object") return item;
@@ -89,6 +104,36 @@ function safeDecode(value) {
   }
 }
 
+function releaseGeneratedAt(payload) {
+  if (!payload || typeof payload !== "object") return "";
+  return payload.generatedAt || payload.generated_at || payload.generated_at_iso || "";
+}
+
+function parseReleaseTimeMs(value) {
+  const textValue = String(value || "").trim();
+  if (!textValue) return 0;
+  const parsed = Date.parse(textValue);
+  if (Number.isFinite(parsed)) return parsed;
+  const match = textValue.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})[ T](\d{1,2}):(\d{2})(?::(\d{2}))?/);
+  if (!match) return 0;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const hour = Number(match[4]);
+  const minute = Number(match[5]);
+  const second = Number(match[6] || 0);
+  if (![year, month, day, hour, minute, second].every(Number.isFinite)) return 0;
+  return Date.UTC(year, month - 1, day, hour - 8, minute, second);
+}
+
+function currentFeedBehindManifest(manifest, current) {
+  const manifestMs = parseReleaseTimeMs(releaseGeneratedAt(manifest));
+  if (!manifestMs) return false;
+  const currentMs = parseReleaseTimeMs(releaseGeneratedAt(current));
+  if (!currentMs) return Boolean(current && (current.fromCache || current.fromSnapshot));
+  return manifestMs - currentMs > RELEASE_FRESHNESS_GRACE_MS;
+}
+
 function isUnknownValue(value) {
   const raw = String(value || "").trim().toLowerCase();
   return raw === "unknown" || raw === "未知城市";
@@ -106,6 +151,35 @@ function pushUniqueLimited(list, value, limit = 24) {
   return next.slice(-limit);
 }
 
+function readStoredString(key) {
+  try {
+    const value = wx.getStorageSync(key);
+    return typeof value === "string" ? value : "";
+  } catch (_) {
+    return "";
+  }
+}
+
+function appGlobalData() {
+  try {
+    const app = getApp();
+    return app && app.globalData ? app.globalData : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+function readLocatedCityKey() {
+  const globalData = appGlobalData();
+  return globalData.userLocationCityKey || readStoredString(LOCATION_CITY_KEY);
+}
+
+function readLocalCityKey() {
+  const globalData = appGlobalData();
+  return readLocatedCityKey()
+    || globalData.preferredCityKey
+    || readStoredString(PREFERRED_CITY_KEY);
+}
 
 function buildCityFiltersFallback(items, lang, allCitiesLabel) {
   const bucket = new Map();
@@ -122,6 +196,32 @@ function buildCityFiltersFallback(items, lang, allCitiesLabel) {
   }
   const rows = Array.from(bucket.values()).sort((a, b) => b.count - a.count || String(a.label).localeCompare(String(b.label)));
   return [{ key: "", label: allCitiesLabel, count: "" }, ...rows.map((row) => ({ key: row.key, label: row.label, count: row.count }))];
+}
+
+function cityCountFromIndexEntry(entry) {
+  const value = Number(entry?.count ?? entry?.item_count ?? entry?.eventCount ?? 0);
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+function buildCityFiltersFromIndex(payload, lang, allCitiesLabel) {
+  const cities = Array.isArray(payload?.cities) ? payload.cities : [];
+  const rows = [];
+  for (const entry of cities) {
+    const key = String(entry?.city_key || entry?.key || "").trim();
+    if (!key || isUnknownValue(key)) continue;
+    const count = cityCountFromIndexEntry(entry);
+    if (count <= 0) continue;
+    const rawLabel = String(entry?.city || entry?.label || entry?.name || key);
+    if (isUnknownValue(rawLabel)) continue;
+    rows.push({
+      key,
+      label: translateCity(rawLabel, lang, key),
+      count,
+    });
+  }
+  if (!rows.length) return null;
+  rows.sort((a, b) => b.count - a.count || String(a.label).localeCompare(String(b.label)));
+  return [{ key: "", label: allCitiesLabel, count: "" }, ...rows];
 }
 
 function dateKeySetFromIndex(payload) {
@@ -174,17 +274,28 @@ function groupItems(items, lang, selectedDate = "") {
   return groups;
 }
 
-function pickWeekendDate(dateFilters, offsetWeeks) {
-  const now = new Date();
-  const day = now.getDay();
-  const daysToSaturday = (6 - day + 7) % 7 + offsetWeeks * 7;
-  const saturday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysToSaturday);
-  const keys = [-1, 0, 1].map((offset) => {
-    const date = new Date(saturday);
-    date.setDate(saturday.getDate() + offset);
-    return keyFromDate(date);
+function pageDateSelection(data, options = {}) {
+  if (options.dateSelection) return normalizeDateSelection(options.dateSelection);
+  if (options.date !== undefined) return exactDateSelection(options.date);
+  return normalizeDateSelection({
+    mode: options.dateMode || data.dateMode,
+    exactDate: data.selectedDate,
+    startKey: options.dateStart !== undefined ? options.dateStart : data.selectedDateStart,
+    endKey: options.dateEnd !== undefined ? options.dateEnd : data.selectedDateEnd,
   });
-  return keys.find((key) => dateFilters.find((item) => item.key === key)) || "";
+}
+
+function datePillLabel(selection, labels, lang) {
+  if (selection.mode === "this_weekend") return labels.thisWeekend;
+  if (selection.mode === "next_weekend") return labels.nextWeekend;
+  if (selection.mode === "exact") return dateDisplay(selection.exactDate, lang);
+  return labels.allDates;
+}
+
+function cityFacetPayloadMatchesItems(payload, items) {
+  if (!payload || payload.scope !== "current" || !Array.isArray(payload.cities)) return false;
+  const expected = Array.isArray(items) ? items.length : 0;
+  return Number(payload.item_count) === expected;
 }
 
 function withFilterMetaTimeout(promise, label) {
@@ -265,21 +376,39 @@ function viewItemsForTab(items, tab) {
   });
 }
 
-function viewStateForItems(items, tab, posterSourceItems, selectedCity, lang, previewRange, selectedDate = "") {
+function boostLocalItems(items, localCityKey) {
+  if (!localCityKey || !items.length) return items;
+  // date-stable: sort by event date asc, within same date local city items first
+  return items.slice().sort((a, b) => {
+    const aDate = String(a.dateLabel || a.event_date_start || "9999");
+    const bDate = String(b.dateLabel || b.event_date_start || "9999");
+    if (aDate < bDate) return -1;
+    if (aDate > bDate) return 1;
+    return (itemMatchesCityKey(a, localCityKey) ? 0 : 1) - (itemMatchesCityKey(b, localCityKey) ? 0 : 1);
+  });
+}
+
+function viewStateForItems(items, tab, posterSourceItems, selectedCity, lang, previewRange, selectedDate = "", localCityKey = "") {
   const rangedItems = filterItemsByPreviewRange(items, previewRange);
   const rangedPosterItems = filterItemsByPreviewRange(posterSourceItems, previewRange);
-  const viewItems = withListLocationLabels(viewItemsForTab(rangedItems, tab), selectedCity);
-  const broadPosterItems = posterSourceItems && posterSourceItems.length
+  const sorted = viewItemsForTab(rangedItems, tab);
+  const shouldBoost = Boolean(!selectedCity && localCityKey && tab !== "new");
+  const boosted = shouldBoost ? boostLocalItems(sorted, localCityKey) : sorted;
+  const viewItems = withListLocationLabels(boosted, selectedCity);
+  const allPosterSorted = posterSourceItems && posterSourceItems.length
     ? viewItemsForTab(rangedPosterItems, tab)
     : viewItems;
+  const primaryPosterItems = shouldBoost
+    ? allPosterSorted.filter((item) => itemMatchesCityKey(item, localCityKey))
+    : allPosterSorted;
   return {
     viewItems,
-    popularItems: buildPosterPool(viewItems, broadPosterItems, tab),
+    popularItems: buildPosterPool(primaryPosterItems, allPosterSorted, tab),
     groups: groupItems(viewItems, lang, selectedDate),
   };
 }
 
-function buildIndexViewData(items, posterSourceItems, activeTab, selectedCity, lang, previewRange, selectedDate = "") {
+function buildIndexViewData(items, posterSourceItems, activeTab, selectedCity, lang, previewRange, selectedDate = "", localCityKey = "") {
   const compactItems = Array.isArray(items) ? items : [];
   const compactPosterItems = Array.isArray(posterSourceItems) ? posterSourceItems : [];
   const projectedItems = compactItems.map(toIndexListItem);
@@ -288,7 +417,7 @@ function buildIndexViewData(items, posterSourceItems, activeTab, selectedCity, l
   return {
     items: projectedItems,
     previewRange: safeRange,
-    ...viewStateForItems(projectedItems, activeTab, projectedPosterItems, selectedCity, lang, safeRange, selectedDate),
+    ...viewStateForItems(projectedItems, activeTab, projectedPosterItems, selectedCity, lang, safeRange, selectedDate, localCityKey),
   };
 }
 
@@ -365,6 +494,9 @@ Page({
     dateFilters: [{ key: "", label: text("index", "zh").allDates }],
     selectedCity: "",
     selectedDate: "",
+    dateMode: "all_current",
+    selectedDateStart: "",
+    selectedDateEnd: "",
     draftCity: "",
     draftDate: "",
     showDateModal: false,
@@ -374,6 +506,8 @@ Page({
     posterImageLoadedIds: [],
     posterImageErrorUrls: [],
     posterImageFailedIds: [],
+    localCityKey: "",
+    localCityLabel: "",
   },
   posterSourceItems: [],
   _fullItems: [],
@@ -390,23 +524,71 @@ Page({
   backgroundRefreshAttempts: 0,
   retryToastAt: 0,
   lastBackgroundRefreshAt: 0,
+  locationReadyUnsubscribe: null,
 
   onLoad(query = {}) {
     enableShareMenu();
     const lang = normalizeLang(query.lang || wx.getStorageSync("weeklyActivityLang"));
     const selectedCity = safeDecode(query.city || "");
     const selectedDate = safeDecode(query.date || "");
+    const initialDateSelection = selectedDate ? exactDateSelection(selectedDate) : allCurrentDateSelection();
     wx.setStorageSync("weeklyActivityLang", lang);
     applyLanguageChrome("index", lang);
+
+    // Prefer the real located city; fall back to the last manually selected city.
+    const locKey = readLocalCityKey();
+    const locLabel = locKey ? translateCity("", lang, locKey) : "";
+
     this.setData({
       lang,
       t: text("index", lang),
       selectedCity,
-      selectedDate,
+      selectedDate: initialDateSelection.exactDate,
+      dateMode: initialDateSelection.mode,
+      selectedDateStart: initialDateSelection.startKey,
+      selectedDateEnd: initialDateSelection.endKey,
       draftCity: selectedCity,
-      draftDate: selectedDate,
+      draftDate: initialDateSelection.exactDate,
+      localCityKey: locKey,
+      localCityLabel: locLabel,
     });
-    this.loadData();
+
+    try {
+      const app = getApp();
+      if (app && typeof app.onLocationReady === "function") {
+        this.locationReadyUnsubscribe = app.onLocationReady((key) => this.applyLocatedCityKey(key));
+      }
+    } catch (_) {}
+
+    this.waitForLocationCityBeforeInitialLoad(selectedCity)
+      .then(() => this.loadData())
+      .catch(() => this.loadData());
+  },
+
+  waitForLocationCityBeforeInitialLoad(selectedCity) {
+    if (selectedCity || readLocatedCityKey()) return Promise.resolve("");
+    let app = null;
+    try {
+      app = getApp();
+    } catch (_) {}
+    if (!app || typeof app.requestLocationCity !== "function") return Promise.resolve("");
+
+    return new Promise((resolve) => {
+      let settled = false;
+      const finish = (cityKey) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        if (cityKey) this.applyLocatedCityKey(cityKey);
+        resolve(cityKey || "");
+      };
+      const timer = setTimeout(() => finish(""), LOCATION_READY_WAIT_MS);
+      try {
+        Promise.resolve(app.requestLocationCity()).then(finish, () => finish(""));
+      } catch (_) {
+        finish("");
+      }
+    });
   },
 
   onShow() {
@@ -417,13 +599,18 @@ Page({
     this.setData({
       selectedCity: pendingCity,
       draftCity: pendingCity,
-      selectedDate: "",
-      draftDate: "",
     });
+    this.persistPreferredCity(pendingCity);
     this.loadData({ haptic: true });
   },
 
   onUnload() {
+    if (typeof this.locationReadyUnsubscribe === "function") {
+      try {
+        this.locationReadyUnsubscribe();
+      } catch (_) {}
+      this.locationReadyUnsubscribe = null;
+    }
     this.clearLoadingHintTimers();
     this.clearBackgroundRefreshTimer();
   },
@@ -532,17 +719,24 @@ Page({
     let total = 0;
     let fromCache = false;
     let fromSnapshot = false;
+    let generatedAt = "";
     const allItems = [];
     for (let pageIndex = 0; pageIndex < 20; pageIndex += 1) {
       const current = await requestApi("/api/v1/weekly/current", {
+        scope: "current",
         cityKey: opts.cityKey !== undefined ? opts.cityKey : this.data.selectedCity,
         date: opts.date !== undefined ? opts.date : this.data.selectedDate,
+        dateStart: opts.dateStart !== undefined ? opts.dateStart : "",
+        dateEnd: opts.dateEnd !== undefined ? opts.dateEnd : "",
         lookbackDays: opts.lookbackDays !== undefined ? opts.lookbackDays : 0,
         limit,
         cursor,
+        __skipCache: opts.skipCache === true,
+        __liveOnly: opts.liveOnly === true,
       });
       if (current.__fromCache) fromCache = true;
       if (current.__fromSnapshot) fromSnapshot = true;
+      if (!generatedAt) generatedAt = releaseGeneratedAt(current);
       const pageItems = current.items || [];
       allItems.push(...pageItems);
       total = Number(current.page?.total || total || allItems.length);
@@ -557,7 +751,7 @@ Page({
       if (!Number.isFinite(parsedNext) || parsedNext <= Number(cursor)) break;
       cursor = parsedNext;
     }
-    return { items: allItems, total: total || allItems.length, fromCache, fromSnapshot };
+    return { items: allItems, total: total || allItems.length, fromCache, fromSnapshot, generatedAt };
   },
 
   async loadData(options) {
@@ -602,11 +796,51 @@ Page({
     let retryDelay = 0;
     try {
       const selectedCityKey = opts.cityKey !== undefined ? opts.cityKey : this.data.selectedCity;
-      const selectedDateKey = opts.date !== undefined ? opts.date : this.data.selectedDate;
-      const currentPromise = this.fetchAllCurrentItems(labels, { cityKey: "", date: "", lookbackDays: 0, loadSeq });
-      const citiesPromise = withFilterMetaTimeout(requestApi("/api/v1/weekly/cities"), "cities");
-      const datesPromise = withFilterMetaTimeout(requestApi("/api/v1/weekly/dates"), "dates");
-      const current = await currentPromise;
+      const dateSelection = pageDateSelection(this.data, opts);
+      const dateQuery = dateSelectionQuery(dateSelection);
+      const manifestPromise = withFilterMetaTimeout(
+        requestApi("/api/v1/weekly/manifest", { __skipCache: true, __liveOnly: true }),
+        "manifest",
+      ).catch(() => null);
+      const currentFetchOptions = {
+        cityKey: "",
+        date: "",
+        lookbackDays: 0,
+        loadSeq,
+        skipCache: backgroundRefresh,
+        liveOnly: backgroundRefresh,
+      };
+      const currentPromise = this.fetchAllCurrentItems(labels, currentFetchOptions);
+      const facetMetaOptions = {
+        scope: "current",
+        date: dateQuery.date,
+        dateStart: dateQuery.dateStart,
+        dateEnd: dateQuery.dateEnd,
+        lookbackDays: 0,
+      };
+      const citiesPromise = withFilterMetaTimeout(requestApi("/api/v1/weekly/cities", facetMetaOptions), "cities");
+      const datesPromise = withFilterMetaTimeout(requestApi("/api/v1/weekly/dates", {
+        scope: "current",
+        cityKey: selectedCityKey,
+        lookbackDays: 0,
+      }), "dates");
+      let current = await currentPromise;
+      const manifest = await manifestPromise;
+      if (loadSeq !== this.loadSeq) return null;
+      if (currentFeedBehindManifest(manifest, current)) {
+        this.setData({
+          loading: true,
+          loadingProgress: Math.max(Number(this.data.loadingProgress) || 0, 72),
+          loadingStep: labels.loadingRefreshing,
+          loadingHint: labels.loadingRefreshingHint,
+          cacheNotice: "",
+        });
+        current = await this.fetchAllCurrentItems(labels, {
+          ...currentFetchOptions,
+          skipCache: true,
+          liveOnly: true,
+        });
+      }
       this.setLoadingProgress(78, labels.loadingClean, loadSeq, labels.loadingCleanHint);
       const [citiesResult, datesResult] = await Promise.allSettled([citiesPromise, datesPromise]);
       if (loadSeq !== this.loadSeq) return null;
@@ -621,31 +855,42 @@ Page({
       const items = filterItemsByElectronic(localizeItems(dedupeItems((current.items || []).map(compactItem)), lang));
       this.posterSourceItems = items;
       const filterSourceItems = this.posterSourceItems.length ? this.posterSourceItems : items;
+      const facetUniverse = filterItemsByDateSelection(filterSourceItems, dateSelection);
       const cacheNotice = usedCache
         ? labels.loadingCachedNotice
         : usedSnapshot
           ? labels.loadingOfflineNotice
           : (filterMetadataSlow ? labels.loadingFallbackHint : "");
-      const cityFilterSourceItems = filterSourceItems;
-      const cityFilters = buildCityFiltersFallback(cityFilterSourceItems, lang, this.data.t.allCities);
-      const selectedCity = cityFilters.find((item) => item.key === selectedCityKey) || cityFilters[0];
-      const resolvedCityKey = selectedCity.key ? selectedCityKey : "";
+      const cityFilterSourceItems = facetUniverse;
+      const cityIndexFilters = citiesResult.status === "fulfilled"
+        && cityFacetPayloadMatchesItems(citiesResult.value, cityFilterSourceItems)
+        ? buildCityFiltersFromIndex(citiesResult.value, lang, this.data.t.allCities)
+        : null;
+      const cityFilters = cityIndexFilters || buildCityFiltersFallback(cityFilterSourceItems, lang, this.data.t.allCities);
+      const selectedCityExists = !selectedCityKey || filterItemsByCityKey(filterSourceItems, selectedCityKey).length > 0;
+      const resolvedCityKey = selectedCityExists ? selectedCityKey : "";
+      const selectedCity = cityFilters.find((item) => item.key === resolvedCityKey) || (resolvedCityKey
+        ? { key: resolvedCityKey, label: translateCity("", lang, resolvedCityKey), count: 0 }
+        : cityFilters[0]);
       const dateFilterSourceItems = resolvedCityKey
         ? filterItemsByCityKey(filterSourceItems, resolvedCityKey)
         : filterSourceItems;
-      const dateIndexKeys = datesResult.status === "fulfilled" ? dateKeySetFromIndex(datesResult.value) : null;
+      const dateIndexKeys = datesResult.status === "fulfilled" && datesResult.value?.scope === "current"
+        ? dateKeySetFromIndex(datesResult.value)
+        : null;
       const dateFilters = buildDateFiltersFallback(dateFilterSourceItems, lang, this.data.t.allDates, dateIndexKeys);
-      const selectedDate = dateFilters.find((item) => item.key === selectedDateKey) || dateFilters[0];
-      const resolvedDateKey = selectedDate.key ? selectedDateKey : "";
-      const displayItems = filterItemsByActiveFilters(filterSourceItems, resolvedCityKey, resolvedDateKey);
+      const resolvedDateKey = dateSelection.mode === "exact" ? dateSelection.exactDate : "";
+      const displayItems = filterItemsByCityKey(facetUniverse, resolvedCityKey);
+      const posterPoolSourceItems = displayItems;
       const nextViewData = applyPosterErrorMask(buildIndexViewData(
         displayItems,
-        filterSourceItems,
+        posterPoolSourceItems,
         this.data.activeTab,
         resolvedCityKey,
         lang,
         this.data.previewRange,
         resolvedDateKey,
+        this.data.localCityKey,
       ), []);
       this.setLoadingProgress(90, labels.loadingClean, loadSeq, labels.loadingCleanHint);
 
@@ -667,6 +912,9 @@ Page({
         ...lightViewData,
         selectedCity: resolvedCityKey,
         selectedDate: resolvedDateKey,
+        dateMode: dateSelection.mode,
+        selectedDateStart: dateSelection.startKey,
+        selectedDateEnd: dateSelection.endKey,
         draftCity: resolvedCityKey,
         draftDate: resolvedDateKey,
         totalItems: displayItems.length,
@@ -675,7 +923,7 @@ Page({
         cityTitle: selectedCity.key ? selectedCity.label : this.data.t.china,
         heroTitle: selectedCity.key ? selectedCity.label : this.data.t.heroTitle,
         cityPillLabel: cleanFilterLabel(selectedCity.label, this.data.t.allCities),
-        datePillLabel: selectedDate.label || this.data.t.allDates,
+        datePillLabel: datePillLabel(dateSelection, this.data.t, lang),
         loadingProgress: 100,
         loadingStep: labels.loadingReady,
         loadingHint: "",
@@ -805,12 +1053,13 @@ Page({
   refreshViewItems() {
     const nextViewData = applyPosterErrorMask(buildIndexViewData(
         this._fullItems,
-        this.posterSourceItems,
+        this._fullItems,
         this.data.activeTab,
         this.data.selectedCity,
         this.data.lang,
         this.data.previewRange,
         this.data.selectedDate,
+        this.data.localCityKey,
       ), this.data.posterImageFailedIds);
     resolveIndexViewPosters(nextViewData)
       .then((resolvedViewData) => this.setData(resolvedViewData))
@@ -880,6 +1129,7 @@ Page({
       this.data.lang,
       this.data.previewRange,
       this.data.selectedDate,
+      this.data.localCityKey,
     ), this.data.posterImageFailedIds);
     this.setData({ activeTab, ...nextViewData });
     resolveIndexViewPosters(nextViewData)
@@ -888,13 +1138,6 @@ Page({
       })
       .catch(() => {});
     this.retryResolvePosters(nextViewData, this.loadSeq);
-  },
-
-  setPreviewRange(event) {
-    const previewRange = normalizeRange(event.currentTarget.dataset.range);
-    if (previewRange === this.data.previewRange) return;
-    this.lightHaptic(HAPTIC.tabInterval);
-    this.setData({ previewRange }, () => this.refreshViewItems());
   },
 
   onTabItemTap() {
@@ -915,14 +1158,42 @@ Page({
 
   noop() {},
 
+  applyLocatedCityKey(key) {
+    const cityKey = typeof key === "string" ? key.trim() : "";
+    if (!cityKey || cityKey === this.data.localCityKey) return;
+    this.setData({
+      localCityKey: cityKey,
+      localCityLabel: translateCity("", this.data.lang, cityKey),
+    });
+    if (!this.data.selectedCity && this._fullItems && this._fullItems.length) {
+      this.refreshViewItems();
+    }
+  },
+
+  persistPreferredCity(key) {
+    if (!key) return;
+    try {
+      wx.setStorageSync(PREFERRED_CITY_KEY, key);
+      const app = getApp();
+      if (app && app.globalData) app.globalData.preferredCityKey = key;
+    } catch (_) {}
+    const localKey = readLocatedCityKey() || key;
+    const label = translateCity("", this.data.lang, localKey);
+    this.setData({ localCityKey: localKey, localCityLabel: label });
+  },
+
   chooseDraftDate(event) {
     const key = event.currentTarget.dataset.key || "";
+    const selection = key ? exactDateSelection(key) : allCurrentDateSelection();
     this.setData({
-      draftDate: key,
-      selectedDate: key,
+      draftDate: selection.exactDate,
+      selectedDate: selection.exactDate,
+      dateMode: selection.mode,
+      selectedDateStart: selection.startKey,
+      selectedDateEnd: selection.endKey,
       showDateModal: false,
     });
-    this.loadData({ haptic: true, date: key });
+    this.loadData({ haptic: true, dateSelection: selection });
   },
 
   chooseDraftCity(event) {
@@ -930,20 +1201,23 @@ Page({
     this.setData({
       draftCity: key,
       selectedCity: key,
-      draftDate: "",
-      selectedDate: "",
       showLocationModal: false,
     });
-    this.loadData({ haptic: true, cityKey: key, date: "" });
+    this.persistPreferredCity(key);
+    this.loadData({ haptic: true, cityKey: key });
   },
 
   resetDate() {
+    const selection = allCurrentDateSelection();
     this.setData({
       draftDate: "",
       selectedDate: "",
+      dateMode: selection.mode,
+      selectedDateStart: "",
+      selectedDateEnd: "",
       showDateModal: false,
     });
-    this.loadData({ haptic: true, date: "" });
+    this.loadData({ haptic: true, dateSelection: selection });
   },
 
   resetLocation() {
@@ -956,43 +1230,59 @@ Page({
   },
 
   chooseThisWeekend() {
-    const key = pickWeekendDate(this.data.dateFilters, 0);
+    const selection = weekendDateSelection(0);
     this.setData({
-      draftDate: key,
-      selectedDate: key,
+      draftDate: "",
+      selectedDate: "",
+      dateMode: selection.mode,
+      selectedDateStart: selection.startKey,
+      selectedDateEnd: selection.endKey,
       showDateModal: false,
     });
-    this.loadData({ haptic: true, date: key });
+    this.loadData({ haptic: true, dateSelection: selection });
   },
 
   chooseNextWeekend() {
-    const key = pickWeekendDate(this.data.dateFilters, 1);
+    const selection = weekendDateSelection(1);
     this.setData({
-      draftDate: key,
-      selectedDate: key,
+      draftDate: "",
+      selectedDate: "",
+      dateMode: selection.mode,
+      selectedDateStart: selection.startKey,
+      selectedDateEnd: selection.endKey,
       showDateModal: false,
     });
-    this.loadData({ haptic: true, date: key });
+    this.loadData({ haptic: true, dateSelection: selection });
   },
 
   applyDate() {
     const key = this.data.draftDate || "";
+    const selection = key ? exactDateSelection(key) : allCurrentDateSelection();
     this.setData({
-      selectedDate: key,
+      selectedDate: selection.exactDate,
+      dateMode: selection.mode,
+      selectedDateStart: selection.startKey,
+      selectedDateEnd: selection.endKey,
       showDateModal: false,
     });
-    this.loadData({ haptic: true, date: key });
+    this.loadData({ haptic: true, dateSelection: selection });
   },
 
   applyLocation() {
     const key = this.data.draftCity || "";
     this.setData({
       selectedCity: key,
-      draftDate: "",
-      selectedDate: "",
       showLocationModal: false,
     });
-    this.loadData({ haptic: true, cityKey: key, date: "" });
+    this.persistPreferredCity(key);
+    this.loadData({ haptic: true, cityKey: key });
+  },
+
+  applyLocalCityFilter() {
+    const key = this.data.localCityKey;
+    if (!key) return;
+    this.setData({ selectedCity: key, draftCity: key });
+    this.loadData({ haptic: true });
   },
 
   openDetail(event) {

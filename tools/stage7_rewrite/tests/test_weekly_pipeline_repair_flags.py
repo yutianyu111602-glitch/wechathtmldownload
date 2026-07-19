@@ -1,4 +1,5 @@
 import ast
+import json
 import os
 import runpy
 import subprocess
@@ -464,6 +465,24 @@ def test_miniprogram_upload_carries_but_never_regenerates_disaster_seed():
     assert "Upload staging mutated offlineSnapshot.js" in script
     assert "generate_offline_snapshot.py" not in script
 
+    devtools_script = (
+        repo_root / "apps" / "weekly_activity_miniprogram" / "scripts" / "upload_devtools_cli_windows.ps1"
+    ).read_text(encoding="utf-8")
+    assert "WeChat DevTools CLI" in devtools_script
+    assert '"upload",' in devtools_script
+    assert '"--project", $UploadProjectDir' in devtools_script
+    assert '"--version", $Version' in devtools_script
+    assert '"--info-output", $InfoOutput' in devtools_script
+    assert 'HUAIDJ_CI_STAGING_ROOT' in devtools_script
+    assert 'F:\\DevData\\HuaidjRuntime\\state\\staging\\wechat-devtools' in devtools_script
+    assert 'WECHAT_DEVTOOLS_PROFILE_ROOT' in devtools_script
+    assert '$env:USERPROFILE = $DevToolsProfileRoot' in devtools_script
+    assert 'islogin --project $UploadProjectDir' in devtools_script
+    assert '"login"\\s*:\\s*true' in devtools_script
+    assert '$SourceOfflineSeed = Join-Path $ProjectDir "utils\\offlineSnapshot.js"' in devtools_script
+    assert "Upload staging mutated offlineSnapshot.js" in devtools_script
+    assert "generate_offline_snapshot.py" not in devtools_script
+
 
 def test_openclaw_publish_wrapper_requires_small_sanji_gap_missing_rows():
     runner = (ROOT / "run_openclaw_weekly_daily_publish.ps1").read_text(encoding="utf-8")
@@ -868,6 +887,42 @@ def test_atlas_template_returns_worker_exit_and_cleans_lock(monkeypatch, tmp_pat
     launcher["_release_lock"](reacquired)
 
 
+def test_atlas_template_distinguishes_noop_from_completed(monkeypatch, tmp_path, capsys):
+    repo = tmp_path / "repo"
+    orchestrator = repo / "tools" / "atlas_rebuild" / "run_atlas_v2_sanji_import.py"
+    orchestrator.parent.mkdir(parents=True)
+    orchestrator.write_text("raise SystemExit(0)\n", encoding="utf-8")
+    report_root = tmp_path / "reports"
+    monkeypatch.setenv("HERMES_HOME", str(tmp_path / "hermes"))
+    monkeypatch.setenv("HUAIDJ_REPO", str(repo))
+    monkeypatch.setenv("HUAIDJ_PYTHON", os.sys.executable)
+    monkeypatch.setenv("HUAIDJ_REPORT_ROOT", str(report_root))
+    namespace = runpy.run_path(str(ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py"), run_name="__test__")
+    launcher = _exec_hermes_template(namespace["SCRIPT_TEMPLATES"]["huaidj/atlas_v2_sanji_import_nightly.py"])
+    summary_dir = tmp_path / "atlas-run"
+    summary_dir.mkdir()
+    summary_path = summary_dir / "run_summary.json"
+    summary_path.write_text(
+        json.dumps({"schema_version": "atlas_v2_sanji_import_run.v1", "status": "noop_no_new_articles"}),
+        encoding="utf-8",
+    )
+    call_count = 0
+
+    def fake_run(command, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        if call_count == 2:
+            kwargs["stdout"].write(f"=== run noop_no_new_articles === summary: {summary_path}\n")
+            kwargs["stdout"].flush()
+        return subprocess.CompletedProcess(command, 0)
+
+    monkeypatch.setattr(launcher["subprocess"], "run", fake_run)
+    assert launcher["main"]() == 0
+    output = capsys.readouterr().out
+    assert "[NOOP]" in output
+    assert "[OK]" not in output
+
+
 def test_installer_pauses_duplicate_active_jobs(monkeypatch, tmp_path):
     namespace = runpy.run_path(str(ROOT / "scripts" / "install_huaidj_sanji_hermes_jobs.py"), run_name="__test__")
     name, spec = next(iter(namespace["JOBS"].items()))
@@ -1231,6 +1286,8 @@ def test_openclaw_publish_wrapper_reports_actual_deploy_and_upload_execution_fla
     assert "$script:CloudRunDeployExecuted = $true" in deploy_step
     upload_step = script[script.index('Invoke-RunStep "Upload miniprogram developer version"') :]
     assert "pwsh -NoProfile -ExecutionPolicy Bypass" in upload_step
+    assert "upload_devtools_cli_windows.ps1" in upload_step
+    assert "upload_native_windows.ps1" not in upload_step
     assert "-ConfirmUpload" in upload_step
     assert 'Assert-NativeSuccess "Miniprogram developer upload"' in upload_step
     assert "$script:MiniProgramUploadExecuted = $true" in upload_step

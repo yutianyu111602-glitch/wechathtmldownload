@@ -1,4 +1,4 @@
-const { requestApi } = require("../../utils/api");
+const { fetchAllCurrentItems } = require("../../utils/api");
 const { compactItem, dedupeItems } = require("../../utils/format");
 const { applyLanguageChrome, normalizeLang, text, localizeItems } = require("../../utils/i18n");
 const { enableShareMenu, buildSimpleShare, buildSimpleTimeline } = require("../../utils/share");
@@ -47,9 +47,9 @@ Page({
   async loadMapData() {
     this.setData({ loading: true, error: "" });
     try {
-      const current = await requestApi("/api/v1/weekly/current", { limit: 100 });
+      const currentItems = await fetchAllCurrentItems({ limit: 100, scope: "current" });
       const items = localizeItems(
-        dedupeItems((current.items || []).map(compactItem)),
+        dedupeItems(currentItems.map(compactItem)),
         this.data.lang
       );
 
