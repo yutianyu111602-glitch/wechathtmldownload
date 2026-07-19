@@ -60,7 +60,9 @@ test("raw protocol release scenarios can launch DevTools when the wrapper clears
     "devtools-city-guide-rendered.cjs",
     "devtools-sound-rendered.cjs",
   ]) {
-    const source = fs.readFileSync(path.join(appRoot, "tests", script), "utf8");
+    const source = fs
+      .readFileSync(path.join(appRoot, "tests", script), "utf8")
+      .replace(/\r\n/g, "\n");
     assert.match(source, /devtools-raw-session\.cjs/);
     assert.match(source, /connectRawDevtools/);
     assert.doesNotMatch(source, /MINIPROGRAM_AUTOMATOR_WS\s*\|\|\s*["']ws:/);
@@ -73,7 +75,9 @@ test("home rendered scenarios tolerate DevTools restoring the already-selected h
     "devtools-current-package-rendered.cjs",
     "devtools-loading-fallback.cjs",
   ]) {
-    const source = fs.readFileSync(path.join(appRoot, "tests", script), "utf8");
+    const source = fs
+      .readFileSync(path.join(appRoot, "tests", script), "utf8")
+      .replace(/\r\n/g, "\n");
     const openHomeStart = source.indexOf("async function openHome");
     const openHomeEnd = source.indexOf("\n}\n", openHomeStart);
     const openHome = source.slice(openHomeStart, openHomeEnd + 3);

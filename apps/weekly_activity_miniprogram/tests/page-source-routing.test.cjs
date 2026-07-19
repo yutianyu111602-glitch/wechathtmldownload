@@ -309,7 +309,9 @@ test("guide tab replaces column tab while column page remains routable", () => {
 });
 
 test("detail page has a dedicated merged source article section", () => {
-  const detailScript = fs.readFileSync(path.join(root, "pages", "detail", "detail.js"), "utf8");
+  const detailScript = fs
+    .readFileSync(path.join(root, "pages", "detail", "detail.js"), "utf8")
+    .replace(/\r\n/g, "\n");
   const detailWxml = fs.readFileSync(path.join(root, "pages", "detail", "detail.wxml"), "utf8");
 
   assert.match(detailScript, /buildDetailSourceArticles/);
@@ -324,7 +326,9 @@ test("detail page has a dedicated merged source article section", () => {
 });
 
 test("detail poster tap opens source article when trustworthy, else previews", () => {
-  const detailScript = fs.readFileSync(path.join(root, "pages", "detail", "detail.js"), "utf8");
+  const detailScript = fs
+    .readFileSync(path.join(root, "pages", "detail", "detail.js"), "utf8")
+    .replace(/\r\n/g, "\n");
   const detailWxml = fs.readFileSync(path.join(root, "pages", "detail", "detail.wxml"), "utf8");
   const openPosterMatch = detailScript.match(/openPoster\(\) \{([\s\S]*?)\n  \},\n\n  onPosterImageLoad/);
 
