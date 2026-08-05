@@ -81,6 +81,8 @@ ARTICLE_COLUMNS = [
     "html_path",
     "html_fetched_at",
     "resource_retry_count",
+    "via_client",
+    "client_offset",
 ]
 
 ARTICLE_COLUMN_ALIASES = {
@@ -419,7 +421,10 @@ def build_prefetch_rows(
                 "cover_url": first_string(item.get("cover")),
                 "post_date": post_date,
                 "post_time": post_time,
-                "discovery_source": "sanji-desktop-rss",
+                "discovery_source": "sanji-desktop-client",
+                "legacy_discovery_source_alias": "sanji-desktop-rss",
+                "acquisition_channel": item.get("acquisition_channel"),
+                "coverage_scope": "broadcast_only",
                 "source_url_hash": item.get("source_url_hash"),
                 "sanji_aid": item.get("aid"),
                 "sanji_msgid": item.get("msgid"),
@@ -654,6 +659,11 @@ def build_manifest_rows(
 
         item = {
             "source": "sanji_desktop",
+            "source_contract_version": "sanji_wechat_client.v1",
+            "acquisition_channel": "wechat_client" if int(row.get("via_client") or 0) == 1 else "legacy_or_unknown",
+            "coverage_scope": "broadcast_only",
+            "via_client": row.get("via_client"),
+            "client_offset": row.get("client_offset"),
             "id": f"sanji:{row.get('account_fakeid') or ''}:{row.get('aid') or ''}",
             "source_url_hash": stable_hash(row.get("link")),
             "account_fakeid": row.get("account_fakeid"),
@@ -785,6 +795,34 @@ def main(argv: list[str]) -> int:
         jsonl_dump(prefetch_queue_path, prefetch_rows)
 
     sanji_refresh_summary_path = Path(os.environ["SANJI_CDP_FETCH_REFS_SUMMARY"]) if os.environ.get("SANJI_CDP_FETCH_REFS_SUMMARY") else None
+    sanji_refresh_log_path = Path(os.environ["SANJI_CDP_REFRESH_LOG"]) if os.environ.get("SANJI_CDP_REFRESH_LOG") else None
+    sanji_account_scope_path = Path(os.environ["SANJI_ACCOUNT_SCOPE_PATH"]) if os.environ.get("SANJI_ACCOUNT_SCOPE_PATH") else None
+    sanji_completion_ledger_path = Path(os.environ["SANJI_COMPLETION_LEDGER_PATH"]) if os.environ.get("SANJI_COMPLETION_LEDGER_PATH") else None
+    sanji_account_scope = read_json(sanji_account_scope_path) if sanji_account_scope_path else {}
+    account_scope_counts = sanji_account_scope.get("counts") if isinstance(sanji_account_scope.get("counts"), dict) else {}
+    account_scope_gate_passed = sanji_account_scope.get("gate_pass") is True
+    sanji_refresh_report = read_json(sanji_refresh_log_path) if sanji_refresh_log_path else {}
+    sanji_refresh_first = sanji_refresh_report.get("first") if isinstance(sanji_refresh_report.get("first"), dict) else {}
+    sanji_refresh_credentials = sanji_refresh_first.get("credentials") if isinstance(sanji_refresh_first.get("credentials"), dict) else {}
+    sequential_sync = sanji_refresh_report.get("sequential_sync") if isinstance(sanji_refresh_report.get("sequential_sync"), dict) else {}
+    completion_ledger = read_json(sanji_completion_ledger_path) if sanji_completion_ledger_path else {}
+    completion_summary = completion_ledger.get("summary") if isinstance(completion_ledger.get("summary"), dict) else {}
+    refresh_channel = first_string(sanji_refresh_first.get("channel"))
+    active_account_count = int(account_scope_counts.get("eligible_active_present") or 0)
+    completed_account_count = int(completion_summary.get("completed_count") or sequential_sync.get("completed_count") or 0)
+    full_scope_sync_completed = (
+        completion_summary.get("cycle_complete") is True
+        and completion_ledger.get("status") == "complete"
+        and active_account_count > 0
+        and completed_account_count == active_account_count
+        and first_string(completion_ledger.get("account_scope_sha256"))
+        == first_string(sanji_account_scope.get("eligible_fakeids_sha256"))
+    )
+    credential_gate_passed = (
+        refresh_channel == "client"
+        and account_scope_gate_passed
+        and full_scope_sync_completed
+    )
     sanji_refresh = {
         "enabled": os.environ.get("SANJI_CDP_REFRESH_ENABLED") == "1",
         "mode": first_string(os.environ.get("SANJI_CDP_REFRESH_MODE")),
@@ -795,14 +833,31 @@ def main(argv: list[str]) -> int:
         "fetch_refs_summary_path": str(sanji_refresh_summary_path) if sanji_refresh_summary_path else "",
         "fetch_refs_summary": read_json(sanji_refresh_summary_path) if sanji_refresh_summary_path else {},
         "max_staleness_hours": first_string(os.environ.get("SANJI_CDP_MAX_STALENESS_HOURS")),
+        "source_contract_version": first_string(os.environ.get("SANJI_SOURCE_CONTRACT")),
+        "channel": refresh_channel,
+        "coverage_scope": first_string(sanji_refresh_first.get("coverage_scope")),
+        "ready_account_count_at_run_start": int(sanji_refresh_credentials.get("ready_count") or 0),
+        "completed_account_count": completed_account_count,
+        "full_scope_sync_completed": full_scope_sync_completed,
+        "credential_gate_passed": credential_gate_passed,
+        "account_scope_path": str(sanji_account_scope_path) if sanji_account_scope_path else "",
+        "account_scope_gate_passed": account_scope_gate_passed,
+        "account_scope_counts": account_scope_counts,
+        "completion_ledger_path": str(sanji_completion_ledger_path) if sanji_completion_ledger_path else "",
+        "completion_ledger_status": first_string(completion_ledger.get("status")),
+        "completion_cycle_id": first_string(completion_ledger.get("cycle_id")),
         "secret_tables_read": False,
     }
     articles_path = sanji_root / "articles"
+    client_channel_rows = sum(1 for row in manifest if row.get("acquisition_channel") == "wechat_client")
+    legacy_or_unknown_rows = len(manifest) - client_channel_rows
 
     summary = {
         "ok": True,
         "source": "sanji_desktop",
-        "source_mode": "sanji_desktop_rss" if args.write_prefetch_queue else "sanji_desktop",
+        "source_mode": "sanji_desktop_client" if args.write_prefetch_queue else "sanji_desktop",
+        "legacy_source_mode_alias": "sanji_desktop_rss" if args.write_prefetch_queue else "",
+        "source_contract_version": "sanji_wechat_client.v1",
         "snapshot_source": "sanji_desktop_sqlite_backup",
         "sanji_db_snapshot_export": True,
         "snapshot_db_path": str(db_path),
@@ -848,7 +903,36 @@ def main(argv: list[str]) -> int:
         "prefetch_queue_path": str(prefetch_queue_path) if args.write_prefetch_queue else "",
         "prefetch_queue_rows": len(prefetch_rows),
         "prefetch_queue_summary": prefetch_summary,
+        "acquisition_contract": {
+            "schema_version": "sanji_wechat_client.v1",
+            "channel": "wechat_client",
+            "sanji_minimum_version": "1.1.0",
+            "coverage_scope": "broadcast_only",
+            "coverage_note": "The WeChat client channel lists group-broadcast articles; published but non-broadcast articles require explicit link ingestion.",
+            "default_sync_window_hours": 168,
+            "credential_scope": "per_public_account",
+            "credential_list_ttl_minutes": 30,
+            "credential_interaction_ttl_minutes": 90,
+            "active_account_count": active_account_count,
+            "completed_account_count": completed_account_count,
+            "full_scope_sync_completed": full_scope_sync_completed,
+            "client_channel_rows": client_channel_rows,
+            "legacy_or_unknown_rows": legacy_or_unknown_rows,
+            "refresh_channel": refresh_channel,
+            "credential_gate_passed": credential_gate_passed,
+            "account_scope_policy": first_string(sanji_account_scope.get("policy")),
+            "account_scope_gate_passed": account_scope_gate_passed,
+            "account_scope_counts": account_scope_counts,
+            "inactive_accounts_excluded": int(account_scope_counts.get("excluded_inactive_present") or 0),
+            "active_accounts_missing_from_sanji": int(account_scope_counts.get("active_missing_from_sanji") or 0),
+            "completion_cycle_id": first_string(completion_ledger.get("cycle_id")),
+            "completion_ledger_status": first_string(completion_ledger.get("status")),
+            "backend_channel_enabled": False,
+            "direct_rss_feed_fetch": False,
+            "secret_tables_read": False,
+        },
         "rss_contract": {
+            "deprecated_compatibility_alias": True,
             "source": "Sanji desktop local SQLite snapshot after optional bounded renderer refresh",
             "direct_rss_feed_fetch": False,
             "direct_rss_feed_fetch_note": "false means this pipeline does not directly fetch public RSS/WeChat feeds; it exports from the local Sanji SQLite snapshot.",
@@ -871,7 +955,8 @@ def main(argv: list[str]) -> int:
         f"- prefetch_queue: `{prefetch_queue_path if args.write_prefetch_queue else ''}`\n"
         f"- storage_layout: `{summary['storage_layout']['tiering']}` hot=`{args.hot_articles_root}` cold=`{args.cold_archive_root}`\n"
         "- secret policy: only article/account metadata is exported; Sanji identity, cookie, token, license, and credential tables are not read.\n"
-        "- rss contract: Sanji RSS/subscription auto-refresh is consumed through the local article snapshot, not by fetching secret RSS endpoints.\n"
+        "- source contract: Sanji 1.1.x WeChat client channel, active-only per-account completion ledger, broadcast-only list coverage, exported through a local SQLite snapshot.\n"
+        "- compatibility: rss_contract and sanji_desktop_rss remain output aliases only; no RSS or closed appmsgpublish endpoint is called.\n"
         "- old articles: pre-2014 unfetched/captcha rows are counted in summary and should not block daily automation.\n"
     )
     (out_dir / "README.md").write_text(readme, encoding="utf-8")

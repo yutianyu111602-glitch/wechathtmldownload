@@ -61,3 +61,69 @@ jobs:
           name: verify-${{ matrix.os }}-node${{ matrix.node }}
           path: |
             reports/**
+
+  huaidj-recovery-contracts:
+    name: HUAIDJ recovery contracts (clean Windows host)
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            requirements-dev.txt
+            tools/stage7_rewrite/requirements-huaidj-runtime.txt
+
+      - name: Install HUAIDJ test runtimes
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+          python -m pip install -r tools/stage7_rewrite/requirements-huaidj-runtime.txt
+
+      - name: Parse PowerShell pipeline entrypoints
+        shell: pwsh
+        run: |
+          $scripts = @(
+            'tools/stage7_rewrite/run_sanji_desktop_recent_export.ps1',
+            'tools/stage7_rewrite/run_huaidj_sanji_daily_twice.ps1',
+            'tools/stage7_rewrite/run_huaidj_sanji_rss_fast_watch.ps1',
+            'tools/stage7_rewrite/run_openclaw_weekly_daily_publish.ps1',
+            'tools/stage7_rewrite/weekly_activity_next_week_pipeline.ps1'
+          )
+          foreach ($script in $scripts) {
+            $tokens = $null
+            $errors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile(
+              (Resolve-Path -LiteralPath $script),
+              [ref]$tokens,
+              [ref]$errors
+            )
+            if ($errors.Count -gt 0) {
+              $errors | ForEach-Object { Write-Error ("{0}: {1}" -f $script, $_.Message) }
+              throw "PowerShell parse failed: $script"
+            }
+          }
+
+      - name: Sanji v1.1.x CDP control tests
+        shell: pwsh
+        run: node --test tools/stage7_rewrite/tests/sanji_desktop_cdp_control.test.cjs
+
+      - name: Stage7 weekly, Sanji, Hermes, and mini-program API tests
+        shell: pwsh
+        run: python -m pytest -q tools/stage7_rewrite/tests
+
+      - name: AtlasV2 Sanji import and serving tests
+        shell: pwsh
+        run: python -m pytest -q tools/atlas_rebuild

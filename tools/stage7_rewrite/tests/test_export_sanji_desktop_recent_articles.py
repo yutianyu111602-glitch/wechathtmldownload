@@ -267,7 +267,8 @@ def test_export_sanji_manifest_uses_only_fetched_article_files(tmp_path):
     assert queue_rows[0]["account_key"] == "acc1"
     assert queue_rows[0]["source_url"] == "https://example.com/a"
     assert queue_rows[0]["post_date"]
-    assert queue_rows[0]["discovery_source"] == "sanji-desktop-rss"
+    assert queue_rows[0]["discovery_source"] == "sanji-desktop-client"
+    assert queue_rows[0]["legacy_discovery_source_alias"] == "sanji-desktop-rss"
     assert queue_rows[0]["body_text_source"] == "sanji_desktop_html"
 
 

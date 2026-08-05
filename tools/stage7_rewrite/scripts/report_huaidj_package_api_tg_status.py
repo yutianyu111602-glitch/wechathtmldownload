@@ -239,7 +239,7 @@ def find_confirmed_publish_recovery(
             and payload.get("status") == "ok"
             and payload.get("decision") == "ok"
             and payload.get("dry_run") is False
-            and payload.get("source_mode") == "sanji_desktop_rss"
+            and payload.get("source_mode") in {"sanji_desktop_client", "sanji_desktop_rss"}
             and payload.get("release_ready") is True
             and int_or_zero(payload.get("quality_gate_exit_code")) == 0
             and boundary.get("cloudrun_deploy_executed") is True

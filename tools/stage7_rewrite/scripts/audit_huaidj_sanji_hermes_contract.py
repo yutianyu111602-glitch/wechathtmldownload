@@ -363,7 +363,7 @@ def audit_wrappers(checks: list[dict[str, Any]]) -> None:
             '[string]$PosterExtractionMode = "vl_direct_qwen"',
             '[int]$PosterVlMaxImages = 0',
             '[string]$PosterVlModel = "qwen3.6-plus"',
-            "sanji_desktop_rss",
+            "sanji_desktop_client",
             "validate_weekly_authoritative_base.py",
             "HUAIDJ_CLOUDRUN_DATA_ROOT",
             "HUAIDJ_CLOUDRUN_WORK_ROOT",
@@ -467,8 +467,8 @@ def audit_wrappers(checks: list[dict[str, Any]]) -> None:
             "$SanjiLatestSummaryPath",
             "E:\\weekly_activity_pipeline\\longrun",
             '$Longrun = "E:\\weekly_activity_pipeline\\longrun"',
-            '$sourceMaterialQueuePaths = if ($SourceMode -eq "sanji_desktop_rss")',
-            '$latestQueueSummaryPath = if ($SourceMode -eq "sanji_desktop_rss")',
+            '$sourceMaterialQueuePaths = if ((Test-SanjiClientSourceMode -Mode $SourceMode))',
+            '$latestQueueSummaryPath = if ((Test-SanjiClientSourceMode -Mode $SourceMode))',
         ],
     )
     add(checks, "Sanji publish wrapper stays on E drive", ok, detail)

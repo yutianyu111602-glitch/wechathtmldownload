@@ -24,7 +24,11 @@ param(
     [int]$DeepSeekConcurrency = 4,
     [switch]$EnablePosterCloudBaseMigration,
     [int]$LockTimeoutMinutes = 180,
-    [int]$SanjiRefreshCutoffHours = 744,
+    [int]$SanjiRefreshCutoffHours = 168,
+    [int]$SanjiBatchTimeoutMinutes = 360,
+    [int]$SanjiInterAccountDelaySeconds = 15,
+    [string]$SanjiSyncCycleId = "",
+    [string]$SanjiCompletionLedgerPath = "",
     [int]$SanjiSummaryMaxAgeHours = 12,
     [switch]$SkipSanjiExport,
     [switch]$SkipNotify,
@@ -159,6 +163,8 @@ function New-RunStatus {
         deepseek_concurrency = $DeepSeekConcurrency
         poster_cloudbase_migration_enabled = [bool]$EnablePosterCloudBaseMigration
         sanji_refresh_cutoff_hours = $SanjiRefreshCutoffHours
+        sanji_sync_cycle_id = $SanjiSyncCycleId
+        sanji_completion_ledger_path = $SanjiCompletionLedgerPath
         sanji_summary_max_age_hours = $SanjiSummaryMaxAgeHours
         skip_sanji_export = [bool]$SkipSanjiExport
         sanji_export_out_root = $SanjiExportOutRoot
@@ -429,6 +435,9 @@ Set-Location $Repo
 New-Item -ItemType Directory -Force -Path $DailyReportRoot | Out-Null
 $EffectiveSlot = Resolve-Slot
 $RunId = "sanji_twice_daily_{0}_{1}_{2}" -f (Get-Date -Format "yyyyMMdd"), $EffectiveSlot, (Get-Date -Format "HHmmss")
+if ([string]::IsNullOrWhiteSpace($SanjiSyncCycleId)) {
+    $SanjiSyncCycleId = "sanji_client_{0}_{1}_{2}h_active" -f (Get-Date -Format "yyyyMMdd"), $EffectiveSlot, $SanjiRefreshCutoffHours
+}
 $RunDir = Join-Path $DailyReportRoot $RunId
 New-Item -ItemType Directory -Force -Path $RunDir | Out-Null
 $LogPath = Join-Path $RunDir "run.log"
@@ -455,6 +464,10 @@ try {
                 -SanjiColdArchiveRoot $SanjiColdArchiveRoot `
                 -ReportRoot $HuaidjReportRoot `
                 -SanjiRefreshCutoffHours $SanjiRefreshCutoffHours `
+                -SanjiBatchTimeoutMinutes $SanjiBatchTimeoutMinutes `
+                -SanjiInterAccountDelaySeconds $SanjiInterAccountDelaySeconds `
+                -SanjiSyncCycleId $SanjiSyncCycleId `
+                -SanjiCompletionLedgerPath $SanjiCompletionLedgerPath `
                 *> $LogPath
             $exportExitCode = $LASTEXITCODE
         } finally {
@@ -483,6 +496,7 @@ try {
     $Status.sanji_exported_rows = $exportedRows
     $Status.sanji_manifest_path = [string]$sanjiSummary.manifest_path
     $rssContract = Get-JsonProperty -Object $sanjiSummary -Name "rss_contract"
+    $acquisitionContract = Get-JsonProperty -Object $sanjiSummary -Name "acquisition_contract"
     $sanjiRefresh = Get-JsonProperty -Object $sanjiSummary -Name "sanji_refresh"
     $fetchRefsSummary = Get-JsonProperty -Object $sanjiRefresh -Name "fetch_refs_summary"
     $directRssFeedFetch = ConvertTo-BooleanFlag (Get-JsonProperty -Object $rssContract -Name "direct_rss_feed_fetch")
@@ -505,6 +519,14 @@ try {
     $Status.sanji_desktop_refresh_invoked = $desktopRefreshInvoked
     $Status.sanji_db_snapshot_export = $snapshotExport
     $Status.sanji_snapshot_db_path = $snapshotDbPath
+    $Status.sanji_source_contract_version = [string](Get-JsonProperty -Object $acquisitionContract -Name "schema_version")
+    $Status.sanji_acquisition_channel = [string](Get-JsonProperty -Object $acquisitionContract -Name "channel")
+    $Status.sanji_coverage_scope = [string](Get-JsonProperty -Object $acquisitionContract -Name "coverage_scope")
+    $Status.sanji_active_account_count = [int](Get-JsonProperty -Object $acquisitionContract -Name "active_account_count")
+    $Status.sanji_completed_account_count = [int](Get-JsonProperty -Object $acquisitionContract -Name "completed_account_count")
+    $Status.sanji_full_scope_sync_completed = ConvertTo-BooleanFlag (Get-JsonProperty -Object $acquisitionContract -Name "full_scope_sync_completed")
+    $Status.sanji_credential_gate_passed = ConvertTo-BooleanFlag (Get-JsonProperty -Object $acquisitionContract -Name "credential_gate_passed")
+    $Status.sanji_backend_channel_enabled = ConvertTo-BooleanFlag (Get-JsonProperty -Object $acquisitionContract -Name "backend_channel_enabled")
     if ($null -eq $fetchRefsSummary) {
         throw "Sanji export summary is missing the postfetch unresolved ledger digest"
     }
@@ -588,6 +610,15 @@ try {
     if ($Status.sanji_direct_rss_feed_fetch -eq $true) {
         throw "Sanji export contract is invalid: rss_contract.direct_rss_feed_fetch must stay false for local DB snapshot exports"
     }
+    if ($Status.sanji_source_contract_version -ne "sanji_wechat_client.v1" -or $Status.sanji_acquisition_channel -ne "wechat_client") {
+        throw "Sanji export is not on the required 1.1.x WeChat client contract: version=$($Status.sanji_source_contract_version) channel=$($Status.sanji_acquisition_channel)"
+    }
+    if ($Status.sanji_coverage_scope -ne "broadcast_only" -or $Status.sanji_backend_channel_enabled -eq $true) {
+        throw "Sanji acquisition scope/channel is invalid: coverage_scope=$($Status.sanji_coverage_scope) backend_channel_enabled=$($Status.sanji_backend_channel_enabled)"
+    }
+    if ($Status.sanji_active_account_count -ne 128 -or $Status.sanji_completed_account_count -ne 128 -or $Status.sanji_full_scope_sync_completed -ne $true -or $Status.sanji_credential_gate_passed -ne $true) {
+        throw "Sanji active-only cycle proof is incomplete: active=$($Status.sanji_active_account_count) completed=$($Status.sanji_completed_account_count) full_scope=$($Status.sanji_full_scope_sync_completed) credential_gate=$($Status.sanji_credential_gate_passed)"
+    }
     if ($Status.sanji_db_snapshot_export -ne $true) {
         throw "Sanji export did not prove local DB snapshot export: sanji_db_snapshot_export != true"
     }
@@ -603,7 +634,7 @@ try {
     $publishArgs = @(
         "-NoProfile", "-ExecutionPolicy", "Bypass",
         "-File", $PublishScript,
-        "-SourceMode", "sanji_desktop_rss",
+        "-SourceMode", "sanji_desktop_client",
         "-PosterExtractionMode", $PosterExtractionMode,
         "-WindowDays", $WindowDays,
         "-MinExpectedItems", $MinExpectedItems,

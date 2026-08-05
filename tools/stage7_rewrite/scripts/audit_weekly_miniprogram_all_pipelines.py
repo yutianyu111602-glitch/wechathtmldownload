@@ -36,7 +36,7 @@ EXPECTED_SERVICE = "weekly-api"
 EXPECTED_PUBLIC_BASE_URL = DEFAULT_PUBLIC_BASE_URL
 EXPECTED_DB_FUNCTION = "weeklyDataSync"
 EXPECTED_CACHE_PREFIX = "weeklyActivityApiCache:v20260719-visibility-v2:"
-EXPECTED_SOURCE_MODE = "sanji_desktop_rss"
+EXPECTED_SOURCE_MODE = "sanji_desktop_client"
 
 
 Check = dict[str, Any]
@@ -776,7 +776,7 @@ def audit_sanji_hermes_static(checks: list[Check], repo_root: Path) -> None:
         "sanji_hermes",
         run_openclaw,
         [
-            '[string]$SourceMode = "sanji_desktop_rss"',
+            '[string]$SourceMode = "sanji_desktop_client"',
             "Assert-SanjiLatestExportReady",
             "$script:SanjiRunQueuePath",
             "sanji_source_contract",

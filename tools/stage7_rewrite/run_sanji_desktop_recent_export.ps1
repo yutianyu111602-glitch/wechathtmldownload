@@ -2,9 +2,16 @@
 param(
   [switch]$SkipSanjiRefresh,
   [int]$SanjiCdpPort = 19333,
-  [int]$SanjiRefreshCutoffHours = 744,
+  [int]$SanjiRefreshCutoffHours = 168,
   [int]$SanjiRefreshTimeoutMinutes = 30,
+  [int]$SanjiBatchTimeoutMinutes = 360,
   [int]$SanjiSyncResumeAttempts = 1,
+  [int]$SanjiMaxClientAccounts = 128,
+  [int]$SanjiInterAccountDelaySeconds = 15,
+  [ValidateSet('ready-only', 'require-all')]
+  [string]$SanjiCredentialPolicy = 'ready-only',
+  [string]$SanjiSyncCycleId = '',
+  [string]$SanjiCompletionLedgerPath = '',
   [int]$SanjiFetchLimit = 300,
   [int]$SanjiMaxStalenessHours = 36,
   [int]$SanjiExportLockWaitMinutes = 5,
@@ -14,6 +21,7 @@ param(
   [string]$ReportRoot = '',
   [string]$OutRoot = '',
   [string]$SanjiRoot = '',
+  [string]$SanjiAccountRegistryPath = '',
   [string]$SanjiHotArticlesRoot = '',
   [string]$SanjiColdArchiveRoot = ''
 )
@@ -52,16 +60,18 @@ $PythonExecutable = (Resolve-Path -LiteralPath $PythonExecutable).Path
 $env:HUAIDJ_PYTHON = $PythonExecutable
 $HuaidjReportRoot = Resolve-ConfiguredPath -Value $ReportRoot -EnvironmentVariableName 'HUAIDJ_REPORT_ROOT' -Default 'F:\DevData\HuaidjRuntime\state\reports'
 $env:HUAIDJ_REPORT_ROOT = $HuaidjReportRoot
-$SanjiExePath = Resolve-ConfiguredPath -Value $SanjiExePath -EnvironmentVariableName 'SANJI_EXE_PATH' -Default 'F:\DevApps\Sanji\0.4.1\sanji.exe'
+$SanjiExePath = Resolve-ConfiguredPath -Value $SanjiExePath -EnvironmentVariableName 'SANJI_EXE_PATH' -Default 'C:\Program Files\sanji\sanji.exe'
 $DefaultSanjiExportRoot = 'E:\' + (-join @([char]0x516C, [char]0x4F17, [char]0x53F7)) + '\sanji-daily-export'
 $OutRoot = Resolve-ConfiguredPath -Value $OutRoot -EnvironmentVariableName 'SANJI_EXPORT_OUT_ROOT' -Default $DefaultSanjiExportRoot
 $SanjiRoot = Resolve-ConfiguredPath -Value $SanjiRoot -EnvironmentVariableName 'SANJI_ROOT' -Default (Join-Path $env:APPDATA 'sanji')
+$SanjiAccountRegistryPath = Resolve-ConfiguredPath -Value $SanjiAccountRegistryPath -EnvironmentVariableName 'SANJI_ACCOUNT_REGISTRY_PATH' -Default (Join-Path $RepoRoot 'tools\stage7_rewrite\registries\weekly_accounts_seed.json')
 $SanjiHotArticlesRoot = Resolve-ConfiguredPath -Value $SanjiHotArticlesRoot -EnvironmentVariableName 'SANJI_HOT_ARTICLES_ROOT' -Default 'E:\sanji_hot\articles'
 $SanjiColdArchiveRoot = Resolve-ConfiguredPath -Value $SanjiColdArchiveRoot -EnvironmentVariableName 'SANJI_COLD_ARCHIVE_ROOT' -Default 'D:\sanji_cold_archive'
 $ScriptPath = Join-Path $RepoRoot 'tools\stage7_rewrite\scripts\export_sanji_desktop_recent_articles.py'
 $OverviewScriptPath = Join-Path $RepoRoot 'tools\stage7_rewrite\scripts\export_club_overviews_from_sanji.py'
 $CdpControlScriptPath = Join-Path $RepoRoot 'tools\stage7_rewrite\scripts\sanji_desktop_cdp_control.mjs'
 $FetchRefsScriptPath = Join-Path $RepoRoot 'tools\stage7_rewrite\scripts\build_sanji_recent_fetch_refs.py'
+$AccountScopeScriptPath = Join-Path $RepoRoot 'tools\stage7_rewrite\scripts\build_sanji_client_account_scope.py'
 $OverviewJsonPath = Join-Path $OutRoot 'latest_club_overviews.json'
 $Stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
 $LogRoot = Join-Path $OutRoot 'logs'
@@ -75,6 +85,16 @@ $PostFetchRefsSummaryPath = Join-Path $LogRoot "sanji_recent_fetch_refs_postfetc
 $PostFetchRefsLogPath = Join-Path $LogRoot "sanji_recent_fetch_refs_postfetch_$Stamp.log"
 $FetchCancelLogPath = Join-Path $LogRoot "sanji_cdp_fetch_cancel_$Stamp.json"
 $FetchLogPath = Join-Path $LogRoot "sanji_cdp_fetch_$Stamp.json"
+$AccountScopePath = Join-Path $LogRoot "sanji_client_account_scope_$Stamp.json"
+$AccountScopeLogPath = Join-Path $LogRoot "sanji_client_account_scope_$Stamp.log"
+$CycleStateRoot = Join-Path $OutRoot 'state'
+if ([string]::IsNullOrWhiteSpace($SanjiSyncCycleId)) {
+  $SanjiSyncCycleId = "sanji_client_{0}_{1}h_active" -f (Get-Date -Format 'yyyyMMdd'), $SanjiRefreshCutoffHours
+}
+$safeCycleName = $SanjiSyncCycleId -replace '[^A-Za-z0-9._-]', '_'
+if ([string]::IsNullOrWhiteSpace($SanjiCompletionLedgerPath)) {
+  $SanjiCompletionLedgerPath = Join-Path $CycleStateRoot "${safeCycleName}.json"
+}
 $LockDir = Join-Path $HuaidjReportRoot '_locks'
 $LockPath = Join-Path $LockDir 'sanji_desktop_recent_export.lock'
 $SanjiExportMutexName = 'Global\HUAIDJ_SANJI_DESKTOP_RECENT_EXPORT_LOCK'
@@ -169,7 +189,7 @@ function Ensure-SanjiCdpAvailable {
     throw "Sanji is already running but CDP port $SanjiCdpPort is unavailable. Close Sanji and let Hermes relaunch it with --remote-debugging-port=$SanjiCdpPort, or start it manually with that flag."
   }
   "Sanji CDP port $SanjiCdpPort unavailable; launching $SanjiExePath" | Add-Content -LiteralPath $LogPath -Encoding UTF8
-  Start-Process -FilePath $SanjiExePath -ArgumentList @("--remote-debugging-port=$SanjiCdpPort") -WindowStyle Minimized | Out-Null
+  Start-Process -FilePath $SanjiExePath -ArgumentList @("--remote-debugging-port=$SanjiCdpPort") -WindowStyle Hidden | Out-Null
   if (-not (Wait-SanjiCdpPort -Port $SanjiCdpPort -TimeoutSeconds $SanjiCdpStartupWaitSeconds)) {
     throw "Sanji CDP port $SanjiCdpPort did not open within ${SanjiCdpStartupWaitSeconds}s after launching $SanjiExePath"
   }
@@ -323,7 +343,7 @@ function Assert-SanjiPhase {
   if ($phase -eq 'running') {
     throw "Sanji $StageName is still running after wait. See $LogPath"
   }
-  if ($phase -eq 'paused_error') {
+  if ($phase -in @('paused_error', 'error', 'failed')) {
     $lastError = Get-SanjiPhaseError -Report $Report -Path $Path
     if (-not $lastError) { $lastError = 'unknown_error' }
     throw "Sanji $StageName paused_error: $lastError. See $LogPath"
@@ -337,41 +357,57 @@ function Invoke-SanjiRefresh {
   }
 
   $timeoutMs = [Math]::Max(1, $SanjiRefreshTimeoutMinutes) * 60 * 1000
+  $batchTimeoutMs = [Math]::Max(1, $SanjiBatchTimeoutMinutes) * 60 * 1000
   Ensure-SanjiCdpAvailable
-  "Sanji CDP sync start: port=$SanjiCdpPort cutoff_hours=$SanjiRefreshCutoffHours" | Add-Content -LiteralPath $LogPath -Encoding UTF8
+  $ExitCode = Invoke-NativeCommand {
+    & $PythonExecutable $AccountScopeScriptPath `
+      --registry $SanjiAccountRegistryPath `
+      --sanji-root $SanjiRoot `
+      --out $AccountScopePath `
+      *> $AccountScopeLogPath
+  }
+  if ($ExitCode -ne 0) {
+    throw "Sanji active-account scope build failed with exit code $ExitCode. See $AccountScopeLogPath"
+  }
+  $accountScope = Get-Content -LiteralPath $AccountScopePath -Raw | ConvertFrom-Json
+  $scopeCounts = $accountScope.counts
+  "Sanji client account scope: eligible=$($scopeCounts.eligible_active_present) inactive_excluded=$($scopeCounts.excluded_inactive_present) active_missing=$($scopeCounts.active_missing_from_sanji) unregistered=$($scopeCounts.sanji_unregistered) sha256=$($accountScope.eligible_fakeids_sha256)" | Add-Content -LiteralPath $LogPath -Encoding UTF8
+  if ($accountScope.gate_pass -ne $true) {
+    throw "Sanji active-account scope is incomplete: active_missing=$($scopeCounts.active_missing_from_sanji) unregistered=$($scopeCounts.sanji_unregistered). See $AccountScopePath"
+  }
+  if ([int]$scopeCounts.eligible_active_present -ne 128) {
+    throw "Sanji active-account scope must contain exactly 128 active accounts, got $($scopeCounts.eligible_active_present). See $AccountScopePath"
+  }
+  "Sanji CDP sequential sync start: port=$SanjiCdpPort channel=client cutoff_hours=$SanjiRefreshCutoffHours cycle_id=$SanjiSyncCycleId max_accounts=$SanjiMaxClientAccounts inter_account_delay_seconds=$SanjiInterAccountDelaySeconds ledger=$SanjiCompletionLedgerPath" | Add-Content -LiteralPath $LogPath -Encoding UTF8
   $ExitCode = Invoke-NativeProcessWithTimeout -FilePath "node" -ArgumentList @(
     $CdpControlScriptPath,
-    "--action", "sync",
+    "--action", "sync-sequential",
     "--port", [string]$SanjiCdpPort,
-    "--fakeids", "all",
+    "--fakeids-json", $AccountScopePath,
     "--cutoff-hours", [string]$SanjiRefreshCutoffHours,
+    "--channel", "client",
+    "--max-client-accounts", [string]$SanjiMaxClientAccounts,
+    "--credential-policy", $SanjiCredentialPolicy,
+    "--sync-resume-attempts", [string]$SanjiSyncResumeAttempts,
+    "--completion-ledger", $SanjiCompletionLedgerPath,
+    "--cycle-id", $SanjiSyncCycleId,
+    "--inter-account-delay-ms", [string]([Math]::Max(0, $SanjiInterAccountDelaySeconds) * 1000),
     "--timeout-ms", [string]$timeoutMs
-  ) -OutputPath $RefreshLogPath -TimeoutMs ($timeoutMs + 30000)
+  ) -OutputPath $RefreshLogPath -TimeoutMs $batchTimeoutMs
   if ($ExitCode -ne 0) {
-    throw "Sanji CDP sync failed with exit code $ExitCode. See $RefreshLogPath"
+    throw "Sanji CDP sequential sync failed with exit code $ExitCode. See $RefreshLogPath and $SanjiCompletionLedgerPath"
   }
   $syncReport = Get-Content -LiteralPath $RefreshLogPath -Raw | ConvertFrom-Json
-  $syncPhase = [string](Get-NestedValue -Object $syncReport -Path @('final', 'sync', 'phase'))
-  $syncError = Get-SanjiPhaseError -Report $syncReport -Path @('final', 'sync')
-  for ($resumeAttempt = 1; $resumeAttempt -le $SanjiSyncResumeAttempts; $resumeAttempt++) {
-    if ($syncPhase -ne 'paused_error' -or $syncError -notmatch '(^|,)token_expired(,|$)') {
-      break
-    }
-    "Sanji CDP sync auto-resume attempt=$resumeAttempt reason=$syncError" | Add-Content -LiteralPath $LogPath -Encoding UTF8
-    $ExitCode = Invoke-NativeProcessWithTimeout -FilePath "node" -ArgumentList @(
-      $CdpControlScriptPath,
-      "--action", "resume-sync",
-      "--port", [string]$SanjiCdpPort,
-      "--timeout-ms", [string]$timeoutMs
-    ) -OutputPath $RefreshLogPath -TimeoutMs ($timeoutMs + 30000)
-    if ($ExitCode -ne 0) {
-      throw "Sanji CDP sync auto-resume failed with exit code $ExitCode. See $RefreshLogPath"
-    }
-    $syncReport = Get-Content -LiteralPath $RefreshLogPath -Raw | ConvertFrom-Json
-    $syncPhase = [string](Get-NestedValue -Object $syncReport -Path @('final', 'sync', 'phase'))
-    $syncError = Get-SanjiPhaseError -Report $syncReport -Path @('final', 'sync')
+  $sequential = Get-NestedValue -Object $syncReport -Path @('sequential_sync')
+  $completedCount = [int](Get-NestedValue -Object $syncReport -Path @('sequential_sync', 'completed_count'))
+  $cycleComplete = [bool](Get-NestedValue -Object $syncReport -Path @('sequential_sync', 'cycle_complete'))
+  $scopeHash = [string](Get-NestedValue -Object $syncReport -Path @('sequential_sync', 'account_scope_sha256'))
+  if ($null -eq $sequential -or -not $cycleComplete -or $completedCount -ne [int]$scopeCounts.eligible_active_present) {
+    throw "Sanji active-only cycle is incomplete: completed=$completedCount required=$($scopeCounts.eligible_active_present) cycle_complete=$cycleComplete. See $SanjiCompletionLedgerPath"
   }
-  Assert-SanjiPhase -Report $syncReport -Path @('final', 'sync') -StageName 'sync'
+  if ($scopeHash -ne [string]$accountScope.eligible_fakeids_sha256) {
+    throw "Sanji completion ledger scope hash does not match the active registry scope"
+  }
   "Sanji CDP sync log: $RefreshLogPath" | Add-Content -LiteralPath $LogPath -Encoding UTF8
 
   $ExitCode = Invoke-NativeCommand {
@@ -468,6 +504,9 @@ $previousFetchLog = $env:SANJI_CDP_FETCH_LOG
 $previousFetchRefs = $env:SANJI_CDP_FETCH_REFS
 $previousFetchRefsSummary = $env:SANJI_CDP_FETCH_REFS_SUMMARY
 $previousMaxStalenessHours = $env:SANJI_CDP_MAX_STALENESS_HOURS
+$previousSourceContract = $env:SANJI_SOURCE_CONTRACT
+$previousAccountScopePath = $env:SANJI_ACCOUNT_SCOPE_PATH
+$previousCompletionLedgerPath = $env:SANJI_COMPLETION_LEDGER_PATH
 $previousExportOutRoot = $env:SANJI_EXPORT_OUT_ROOT
 $previousSanjiRoot = $env:SANJI_ROOT
 $previousHotArticlesRoot = $env:SANJI_HOT_ARTICLES_ROOT
@@ -488,6 +527,9 @@ try {
   $env:SANJI_CDP_FETCH_REFS = if ($SkipSanjiRefresh) { '' } else { $PostFetchRefsPath }
   $env:SANJI_CDP_FETCH_REFS_SUMMARY = if ($SkipSanjiRefresh) { '' } else { $PostFetchRefsSummaryPath }
   $env:SANJI_CDP_MAX_STALENESS_HOURS = [string]$SanjiMaxStalenessHours
+  $env:SANJI_SOURCE_CONTRACT = if ($SkipSanjiRefresh) { '' } else { 'sanji_wechat_client.v1' }
+  $env:SANJI_ACCOUNT_SCOPE_PATH = if ($SkipSanjiRefresh) { '' } else { $AccountScopePath }
+  $env:SANJI_COMPLETION_LEDGER_PATH = if ($SkipSanjiRefresh) { '' } else { $SanjiCompletionLedgerPath }
 
 $ExitCode = Invoke-NativeCommand {
   & $PythonExecutable $ScriptPath `
@@ -532,6 +574,9 @@ if ($ExitCode -ne 0) {
   if ($null -eq $previousFetchRefs) { Remove-Item Env:SANJI_CDP_FETCH_REFS -ErrorAction SilentlyContinue } else { $env:SANJI_CDP_FETCH_REFS = $previousFetchRefs }
   if ($null -eq $previousFetchRefsSummary) { Remove-Item Env:SANJI_CDP_FETCH_REFS_SUMMARY -ErrorAction SilentlyContinue } else { $env:SANJI_CDP_FETCH_REFS_SUMMARY = $previousFetchRefsSummary }
   if ($null -eq $previousMaxStalenessHours) { Remove-Item Env:SANJI_CDP_MAX_STALENESS_HOURS -ErrorAction SilentlyContinue } else { $env:SANJI_CDP_MAX_STALENESS_HOURS = $previousMaxStalenessHours }
+  if ($null -eq $previousSourceContract) { Remove-Item Env:SANJI_SOURCE_CONTRACT -ErrorAction SilentlyContinue } else { $env:SANJI_SOURCE_CONTRACT = $previousSourceContract }
+  if ($null -eq $previousAccountScopePath) { Remove-Item Env:SANJI_ACCOUNT_SCOPE_PATH -ErrorAction SilentlyContinue } else { $env:SANJI_ACCOUNT_SCOPE_PATH = $previousAccountScopePath }
+  if ($null -eq $previousCompletionLedgerPath) { Remove-Item Env:SANJI_COMPLETION_LEDGER_PATH -ErrorAction SilentlyContinue } else { $env:SANJI_COMPLETION_LEDGER_PATH = $previousCompletionLedgerPath }
   if ($null -eq $previousExportOutRoot) { Remove-Item Env:SANJI_EXPORT_OUT_ROOT -ErrorAction SilentlyContinue } else { $env:SANJI_EXPORT_OUT_ROOT = $previousExportOutRoot }
   if ($null -eq $previousSanjiRoot) { Remove-Item Env:SANJI_ROOT -ErrorAction SilentlyContinue } else { $env:SANJI_ROOT = $previousSanjiRoot }
   if ($null -eq $previousHotArticlesRoot) { Remove-Item Env:SANJI_HOT_ARTICLES_ROOT -ErrorAction SilentlyContinue } else { $env:SANJI_HOT_ARTICLES_ROOT = $previousHotArticlesRoot }

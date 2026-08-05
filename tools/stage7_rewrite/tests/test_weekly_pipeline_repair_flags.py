@@ -54,7 +54,7 @@ def test_weekly_pipeline_resumes_partial_vl_evidence_without_deleting_it():
     assert '[string]$ResumeVlEvidenceDir = ""' in runner
     assert (
         '$allowImplicitVlResume = ($PosterExtractionMode -eq "vl_direct_qwen" -and '
-        '$SourceMode -ne "sanji_desktop_rss")'
+        '-not (Test-SanjiClientSourceMode -Mode $SourceMode))'
     ) in build_block
     assert "$vlCompleteOutput" in build_block
     assert "elseif ($allowImplicitVlResume -and $vlCompleteOutput)" in build_block
@@ -71,7 +71,7 @@ def test_sanji_publish_never_implicitly_resumes_a_week_tag_vl_package():
     build_block = runner[runner.index('Invoke-RunStep "Build daily source package from selected source queue"') :]
     build_block = build_block.split('if (-not $DisableIncrementalMerge)', 1)[0]
 
-    assert '$SourceMode -ne "sanji_desktop_rss"' in build_block
+    assert '-not (Test-SanjiClientSourceMode -Mode $SourceMode)' in build_block
     assert "Skip implicit VL resume for Sanji source" in build_block
     assert "Sanji source snapshot must be rebuilt" in build_block
 
@@ -126,7 +126,7 @@ def test_openclaw_publish_wrapper_points_release_guard_at_sanji_queue():
 
     guard_block = script[script.index('Invoke-RunStep "Run release guard against candidate API package"') :]
     guard_block = guard_block.split('Invoke-RunStep "Bake CloudRun deploy context"', 1)[0]
-    assert '$SourceMode -eq "sanji_desktop_rss"' in guard_block
+    assert 'Test-SanjiClientSourceMode -Mode $SourceMode' in guard_block
     assert "$script:SanjiRunQueuePath" in guard_block
     assert "$SanjiLatestExportRoot" in guard_block
     assert '"-DailyQueueDir"' in guard_block
@@ -288,25 +288,24 @@ def test_weekly_pipeline_stops_stale_daily_prefetch_writer_before_step0_refresh(
     )
 
 
-def test_daily_runner_and_weekly_pipeline_support_sanji_desktop_rss_source_mode():
+def test_daily_runner_and_weekly_pipeline_use_sanji_desktop_client_source_mode():
     weekly = (ROOT / "weekly_activity_next_week_pipeline.ps1").read_text(encoding="utf-8")
     runner = (ROOT / "run_openclaw_weekly_daily_publish.ps1").read_text(encoding="utf-8")
     sanji_scheduled = (ROOT / "run_sanji_desktop_recent_export.ps1").read_text(encoding="utf-8")
 
-    assert '[ValidateSet("docker_exporter", "sanji_desktop_rss")]' in weekly
-    assert '[string]$SourceMode = "sanji_desktop_rss"' in weekly
-    assert 'if ($SourceMode -eq "sanji_desktop_rss")' in weekly
-    assert "SourceMode=sanji_desktop_rss; 17300/mptext aggregate download endpoint disabled" in weekly
-    assert "Use -SourceMode docker_exporter for fallback" in weekly
+    assert '[ValidateSet("docker_exporter", "sanji_desktop_client", "sanji_desktop_rss")]' in weekly
+    assert '[string]$SourceMode = "sanji_desktop_client"' in weekly
+    assert 'Test-SanjiClientSourceMode -Mode $SourceMode' in weekly
+    assert "SourceMode=sanji_desktop_client; Sanji 1.1.x native client snapshot selected" in weekly
     assert "export_sanji_desktop_recent_articles.py" in weekly
     assert "--write-prefetch-queue" in weekly
     assert "Refresh Sanji Desktop RSS Queue" in weekly
     assert "Build Source Queue" in weekly
-    assert '[ValidateSet("docker_exporter", "sanji_desktop_rss")]' in runner
-    assert '[string]$SourceMode = "sanji_desktop_rss"' in runner
+    assert '[ValidateSet("docker_exporter", "sanji_desktop_client", "sanji_desktop_rss")]' in runner
+    assert '[string]$SourceMode = "sanji_desktop_client"' in runner
     assert "SourceMode = $SourceMode" in runner
     assert "Skip legacy 17300 exporter auth/QR diagnostics for Sanji source mode" in runner
-    assert "use -SourceMode docker_exporter for deliberate 17300 fallback" in runner
+    assert "sanji_desktop_rss is a compatibility alias only" in runner
     assert 'E:\\公众号\\sanji-daily-export"' in runner
     assert '"latest_summary.json"' in runner
     assert '"latest_queue.jsonl"' in runner
@@ -333,6 +332,9 @@ def test_daily_runner_and_weekly_pipeline_support_sanji_desktop_rss_source_mode(
     assert "$SanjiLatestSummaryPath" in runner
     assert "Sanji refreshed queue row count mismatch" in runner
     assert "sanji_source_contract" in runner
+    assert "sanji_wechat_client.v1" in runner
+    assert "full_scope_sync_completed" in runner
+    assert "credential_gate_passed" in runner
     assert "direct_rss_feed_fetch must stay false for weekly publish" in runner
     assert "sanji_db_snapshot_export must stay true" in runner
     assert "sanji_desktop_refresh_invoked must stay true before snapshot export" in runner
@@ -344,7 +346,7 @@ def test_daily_runner_and_weekly_pipeline_support_sanji_desktop_rss_source_mode(
     assert "--source-queue" in weekly
     assert "$miniprogramApiArgs += $PrefetchQueue" in weekly
     assert '$SANJI_OVERVIEW_PREFETCH_JSON = "$SANJI_LATEST_EXPORT_ROOT\\latest_club_overviews.json"' in weekly
-    assert 'if ($SourceMode -ne "sanji_desktop_rss")' in weekly
+    assert '-not (Test-SanjiClientSourceMode -Mode $SourceMode)' in weekly
     assert "Sanji source mode keeps exporter loss-chain audit report-only" in weekly
     assert "--lookback-days 31" in sanji_scheduled
     assert "--body-text-limit 8000" in sanji_scheduled
@@ -761,10 +763,23 @@ def test_sanji_desktop_export_auto_resumes_token_expired_sync_once():
     assert "[int]$SanjiSyncResumeAttempts = 1" in wrapper
     assert "function Get-SanjiPhaseError" in wrapper
     assert "perAccount" in wrapper
-    assert "token_expired" in wrapper
-    assert '"--action", "resume-sync"' in wrapper
-    assert "Sanji CDP sync auto-resume" in wrapper
+    assert '"--sync-resume-attempts", [string]$SanjiSyncResumeAttempts' in wrapper
+    assert '"--completion-ledger", $SanjiCompletionLedgerPath' in wrapper
+    assert "token_expired" in cdp
+    assert 'expressionFor("resume-sync", accountArgs)' in cdp
     assert 'if (args.action === "resume-sync") output.final = await waitForIdle(client, "sync"' in cdp
+
+
+def test_outer_daily_wrapper_can_resume_an_existing_cross_day_sanji_cycle():
+    daily = (ROOT / "run_huaidj_sanji_daily_twice.ps1").read_text(encoding="utf-8")
+
+    assert '[string]$SanjiSyncCycleId = ""' in daily
+    assert '[string]$SanjiCompletionLedgerPath = ""' in daily
+    assert "if ([string]::IsNullOrWhiteSpace($SanjiSyncCycleId))" in daily
+    assert "-SanjiSyncCycleId $SanjiSyncCycleId" in daily
+    assert "-SanjiCompletionLedgerPath $SanjiCompletionLedgerPath" in daily
+    assert "sanji_sync_cycle_id = $SanjiSyncCycleId" in daily
+    assert "sanji_completion_ledger_path = $SanjiCompletionLedgerPath" in daily
 
 
 def test_sanji_cdp_control_treats_existing_task_as_waitable_state():

@@ -10,7 +10,7 @@
 #   .\weekly_activity_next_week_pipeline.ps1 -SkipUpload # 兼容旧参数；当前默认也不上传静态托管
 #
 # 前置条件:
-#   - 默认 SourceMode=sanji_desktop_rss，读取本机公号三刀/Sanji DB 导出的文章快照
+#   - 默认 SourceMode=sanji_desktop_client，读取 Sanji 1.1.x 微信通道的活动公众号快照
 #   - 旧 WeChat exporter API (http://127.0.0.1:17300) 仅在 -SourceMode docker_exporter 时作为 fallback 使用
 #   - CloudBase CLI 登录 (npm exec --yes --package @cloudbase/cli@3.3.1 -- tcb login)
 
@@ -23,8 +23,8 @@ param(
     [string]$ArticleUntilDate = "", # 留空时使用 WeekStart 后 ArticleCacheLookaheadDays 天
     [int]$ArticleCacheLookbackDays = 31,
     [int]$ArticleCacheLookaheadDays = 31,
-    [ValidateSet("docker_exporter", "sanji_desktop_rss")]
-    [string]$SourceMode = "sanji_desktop_rss",
+    [ValidateSet("docker_exporter", "sanji_desktop_client", "sanji_desktop_rss")]
+    [string]$SourceMode = "sanji_desktop_client",
     [string]$PrefetchQueue = "",
     [string]$HistoryQueue = "",
     [int]$PosterOcrLimit = 0,        # 0=不限制；公众发布默认全量 OCR，避免图片公众号系统性漏活动
@@ -74,6 +74,11 @@ $ErrorActionPreference = "Stop"
 $env:PYTHONUTF8 = "1"
 $env:PYTHONIOENCODING = "utf-8"
 $env:PYTHONDONTWRITEBYTECODE = "1"
+
+function Test-SanjiClientSourceMode {
+    param([Parameter(Mandatory = $true)][string]$Mode)
+    return $Mode -in @("sanji_desktop_client", "sanji_desktop_rss")
+}
 
 # ─── 常量 ────────────────────────────────────────────────────────────────────
 $REPO = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -259,8 +264,8 @@ if ($SourceMode -eq "docker_exporter") {
 if ($SourceMode -eq "docker_exporter" -and -not $MPTEXT_AUTO_AUTH_AVAILABLE) {
     $AGGREGATE_DOWNLOAD_ENDPOINT = ""
     Write-Host " Mptext auth not available; aggregate expansion will skip mptext and use Dajiala/cache fallback." -ForegroundColor Yellow
-} elseif ($SourceMode -eq "sanji_desktop_rss") {
-    Write-Host " SourceMode=sanji_desktop_rss; 17300/mptext aggregate download endpoint disabled. Use -SourceMode docker_exporter for fallback." -ForegroundColor Cyan
+} elseif ((Test-SanjiClientSourceMode -Mode $SourceMode)) {
+    Write-Host " SourceMode=sanji_desktop_client; Sanji 1.1.x native client snapshot selected and legacy 17300 exporter disabled." -ForegroundColor Cyan
 }
 
 # ─── 计算默认发布窗口：今天起未来 15 天 ───────────────────────────────────────
@@ -659,7 +664,7 @@ if ($ResumeFromVl) {
 else {
 # ─── Step 0: 刷新本地下载目录队列，避免用旧 latest_queue 生成 15 天窗口 ───────
 if ($PrefetchQueue -eq "" -and -not $SkipPrefetchRefresh) {
-    if ($SourceMode -eq "sanji_desktop_rss") {
+    if ((Test-SanjiClientSourceMode -Mode $SourceMode)) {
         if (-not (Test-Path $SANJI_EXPORT_SCRIPT)) {
             Write-Error "Sanji desktop export script not found: $SANJI_EXPORT_SCRIPT"
         }
@@ -749,7 +754,7 @@ $QUEUE_DIR = "$LONGRUN\WEEKLY_ACTIVITY_QUEUE_EXPORTER_API_$WEEK_TAG"
 Reset-OutputDir $QUEUE_DIR
 Invoke-Step "Step 1: Build Source Queue → $QUEUE_DIR" {
     $queueArgs = @("--out-dir", $QUEUE_DIR)
-    if ($PrefetchQueue -eq "" -and $SourceMode -eq "sanji_desktop_rss" -and (Test-Path $SANJI_LATEST_PREFETCH_QUEUE)) {
+    if ($PrefetchQueue -eq "" -and (Test-SanjiClientSourceMode -Mode $SourceMode) -and (Test-Path $SANJI_LATEST_PREFETCH_QUEUE)) {
         $PrefetchQueue = $SANJI_LATEST_PREFETCH_QUEUE
         Write-Host "  Using Sanji latest prefetch queue on E: $PrefetchQueue" -ForegroundColor Cyan
     } elseif ($PrefetchQueue -eq "" -and (Test-Path $DEFAULT_DAILY_PREFETCH_QUEUE)) {
@@ -1110,7 +1115,7 @@ Invoke-Step "Step 4: Build Mini-Program API JSON → $API_DIR" {
     & $PythonExecutable @miniprogramApiArgs
 }
 
-if ($SourceMode -eq "sanji_desktop_rss") {
+if ((Test-SanjiClientSourceMode -Mode $SourceMode)) {
     Invoke-Step "Step 4.1: Attach club overview online artifact" {
         if (-not (Test-Path -LiteralPath $SANJI_OVERVIEW_PREFETCH_JSON -PathType Leaf)) {
             throw "Sanji club overview online artifact missing: $SANJI_OVERVIEW_PREFETCH_JSON"
@@ -1207,12 +1212,12 @@ Invoke-Step "Step 4.5: Repair duplicate/conflicting release rows" {
         "--out-json", "$API_DIR\pipeline_loss_chain_audit.json",
         "--out-md", "$API_DIR\pipeline_loss_chain_audit.md"
     )
-    if ($SourceMode -ne "sanji_desktop_rss") {
+    if (-not (Test-SanjiClientSourceMode -Mode $SourceMode)) {
         $lossChainArgs += "--fail-on-error"
     }
     & $PythonExecutable "$LOSS_CHAIN_AUDIT_SCRIPT" @lossChainArgs
     if ($LASTEXITCODE -ne 0) {
-        if ($SourceMode -eq "sanji_desktop_rss") {
+        if ((Test-SanjiClientSourceMode -Mode $SourceMode)) {
             Write-Host "  ! Sanji source mode keeps exporter loss-chain audit report-only; Sanji gap gate remains the hard source coverage gate." -ForegroundColor Yellow
             $global:LASTEXITCODE = 0
         } else {

@@ -19,7 +19,8 @@ from typing import Any
 
 
 SCHEMA_VERSION = "openclaw_weekly_daily_readiness.v1"
-SOURCE_MODES = ("docker_exporter", "sanji_desktop_rss")
+SOURCE_MODES = ("docker_exporter", "sanji_desktop_client", "sanji_desktop_rss")
+SANJI_SOURCE_MODES = ("sanji_desktop_client", "sanji_desktop_rss")
 POSTER_OCR_CANARY_SCHEMA_VERSION = "weekly_aggregate_child_poster_ocr_recovery_worker_canary.v1"
 POSTER_OCR_CANARY_READY_DECISION = "weekly_aggregate_child_poster_ocr_recovery_worker_canary_ready_report_local_no_ocr_no_write"
 POSTER_OCR_CANARY_PROFILE = "openclaw-poster-ocr-recovery"
@@ -656,16 +657,16 @@ def resolve_input_paths(args: argparse.Namespace) -> dict[str, Path | None]:
         docker = args.docker_smoke_report or latest_docker_smoke_report(reports_root)
     else:
         if args.docker_smoke_report is not None:
-            raise ValueError("--docker-smoke-report is not applicable when --source-mode sanji_desktop_rss")
+            raise ValueError("--docker-smoke-report is not applicable in Sanji WeChat-client source mode")
         if args.vision_batch_report is not None:
-            raise ValueError("--vision-batch-report is not applicable when --source-mode sanji_desktop_rss")
+            raise ValueError("--vision-batch-report is not applicable in Sanji WeChat-client source mode")
         if args.exporter_freshness_preflight_report is not None:
             raise ValueError(
-                "--exporter-freshness-preflight-report is not applicable when --source-mode sanji_desktop_rss"
+                "--exporter-freshness-preflight-report is not applicable in Sanji WeChat-client source mode"
             )
         if args.exporter_auth_recovery_preflight_report is not None:
             raise ValueError(
-                "--exporter-auth-recovery-preflight-report is not applicable when --source-mode sanji_desktop_rss"
+                "--exporter-auth-recovery-preflight-report is not applicable in Sanji WeChat-client source mode"
             )
         docker = None
     poster_ocr_contract = publish_dir / "aggregate_child_poster_ocr_worker_contract.json" if publish_dir else None
@@ -694,7 +695,7 @@ def resolve_input_paths(args: argparse.Namespace) -> dict[str, Path | None]:
         explicit_legacy_poster_args = [name for name, value in legacy_poster_args.items() if value is not None]
         if explicit_legacy_poster_args:
             raise ValueError(
-                f"{', '.join(explicit_legacy_poster_args)} not applicable when --source-mode sanji_desktop_rss"
+                f"{', '.join(explicit_legacy_poster_args)} not applicable in Sanji WeChat-client source mode"
             )
         poster_recovery_split = None
         public_poster_upload_review = None
@@ -2110,7 +2111,7 @@ def scorecard(
     mimo_ok = int_value(as_dict(as_dict(vision_summary.get("mimo")).get("status_counts")).get("ok"))
     local_ocr_ok = int_value(as_dict(as_dict(vision_summary.get("local_ocr")).get("status_counts")).get("ok"))
     if not vision_summary["required"]:
-        vision_evidence = "not applicable for source_mode=sanji_desktop_rss"
+        vision_evidence = "not applicable for Sanji WeChat-client source mode"
     elif vision_score == 5:
         vision_evidence = f"StepFun ok={stepfun_ok}; MiMo ok={mimo_ok}; local OCR ok={local_ocr_ok}"
     elif vision_score == 4:
@@ -2123,7 +2124,7 @@ def scorecard(
             "max": 5,
             "applicable": docker_summary["required"],
             "evidence": (
-                "not applicable for source_mode=sanji_desktop_rss"
+                "not applicable for Sanji WeChat-client source mode"
                 if not docker_summary["required"]
                 else (
                     f"{docker_summary['profiles_ok_count']}/{docker_summary['profile_count']} profiles ok; "
@@ -2209,7 +2210,7 @@ def build_readiness(
     )
     vision_summary = summarize_vision(vision, required=source_mode == "docker_exporter")
     fallback_summary = summarize_fallback(fallback)
-    uses_sanji_source = source_mode == "sanji_desktop_rss"
+    uses_sanji_source = source_mode in SANJI_SOURCE_MODES
     fallback_declares_source_mode = fallback_summary.get("source") == "publish_summary"
     source_mode_matches_fallback = (
         not fallback_declares_source_mode

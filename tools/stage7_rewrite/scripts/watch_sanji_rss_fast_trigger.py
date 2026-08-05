@@ -388,7 +388,7 @@ def detect(args: argparse.Namespace) -> dict[str, Any]:
         "new_candidate_rows": new_candidates[:50],
         "deferred_boundary_path": str(deferred_path) if boundary_rows else None,
         "rule": {
-            "source": "Sanji desktop RSS snapshot latest_queue.jsonl",
+            "source": "Sanji desktop WeChat-client snapshot latest_queue.jsonl (legacy watcher name)",
             "publish_trigger": "only new current/future single-event-looking rows not already represented in current_release",
             "parent_overview": "monthly/weekly/holiday overview parents are excluded and handled by club_overviews",
             "boundary": "rows excluded only by ambiguous reasons (parent_overview, no_date, weak_signal) are deferred, never silently committed as known",

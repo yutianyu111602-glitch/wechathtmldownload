@@ -391,7 +391,7 @@ def build_queue(args: argparse.Namespace) -> dict[str, Any]:
             f"--disable-json-mode --out-dir \"{out_dir / 'mimo_batch'}\""
         ),
         "strong_model_policy": {
-            "daily_source_mode": "sanji_desktop_rss",
+            "daily_source_mode": "sanji_desktop_client",
             "trigger": "main_poster_selection_review_required_count > 0",
             "provider_order": ["qwen3_vl", "qwen_ocr", "deepseek_vision", "mimo", "stepfun", "local_ocr"],
             "release_rule": "Do not deploy backend or upload frontend until the strong-model decision summary has no rejected/manual/provider-error poster rows and validate_weekly_release_package_quality.py reports main_poster_selection_review_required_count=0.",

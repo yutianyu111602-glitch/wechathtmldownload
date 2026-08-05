@@ -15,8 +15,8 @@ param(
     [int]$WindowDays = 15,
     [int]$MinExpectedItems = 40,
     [int]$MaxItems = 10000,
-    [ValidateSet("docker_exporter", "sanji_desktop_rss")]
-    [string]$SourceMode = "sanji_desktop_rss",
+    [ValidateSet("docker_exporter", "sanji_desktop_client", "sanji_desktop_rss")]
+    [string]$SourceMode = "sanji_desktop_client",
     [string]$SanjiSourceSnapshotDir = "",
     [string[]]$SourcePolicyPriorReportPath = @(),
     [ValidateSet("legacy_ocr", "vl_direct_qwen")]
@@ -101,6 +101,11 @@ function Resolve-ConfiguredPathValue {
         }
     }
     return $Default
+}
+
+function Test-SanjiClientSourceMode {
+    param([Parameter(Mandatory = $true)][string]$Mode)
+    return $Mode -in @("sanji_desktop_client", "sanji_desktop_rss")
 }
 
 # Resolve one project-owned Python runtime for every nested helper.  The script
@@ -264,6 +269,7 @@ $GeocodePlacesScript = Join-Path $Scripts "geocode_weekly_activity_places.py"
 $ApplyGeocodesScript = Join-Path $Scripts "apply_weekly_geocodes_to_api_package.py"
 $SanjiGapAuditScript = Join-Path $Scripts "audit_weekly_sanji_queue_package_gap.py"
 $AuthoritativeBaseValidatorScript = Join-Path $Scripts "validate_weekly_authoritative_base.py"
+$AuthoritativeBaseRecoveryScript = Join-Path $Scripts "recover_weekly_authoritative_base.py"
 
 if ([string]::IsNullOrWhiteSpace($WeekStart)) {
     $WeekStart = (Get-Date).ToString("yyyy-MM-dd")
@@ -339,6 +345,7 @@ $exporterQrImageGeneratedPath = Join-Path $RunReportDir "weekly_exporter_login_q
 $exporterQrEndpointDiagnosticGeneratedReportPath = Join-Path $RunReportDir "weekly_exporter_qr_endpoint_diagnostic.json"
 $exporterAuthRecoveryPreflightReportPath = Join-Path $RunReportDir "weekly_exporter_auth_recovery_preflight.json"
 $runtimeCurrentReleaseQualityReportPath = Join-Path $RunReportDir "runtime_current_release_quality_gate.json"
+$authoritativeBasePublicIdentityReportPath = Join-Path $RunReportDir "authoritative_base_public_identity.json"
 $readinessSummaryReportPath = Join-Path $RunReportDir "openclaw_weekly_daily_readiness_summary.json"
 $openclawWeeklyNextActionPacketDir = Join-Path $RunReportDir "openclaw_weekly_next_action_packet"
 $openclawWeeklyNextActionPacketPath = Join-Path $openclawWeeklyNextActionPacketDir "openclaw_weekly_next_action_packet.json"
@@ -431,6 +438,9 @@ function Assert-AuthoritativeBasePackage {
     if (-not (Test-Path -LiteralPath $AuthoritativeBaseValidatorScript -PathType Leaf)) {
         throw "Authoritative base validator not found: $AuthoritativeBaseValidatorScript"
     }
+    if ($DeployBackend -and -not (Test-Path -LiteralPath $AuthoritativeBaseRecoveryScript -PathType Leaf)) {
+        throw "Authoritative public identity validator not found: $AuthoritativeBaseRecoveryScript"
+    }
     $validatorArgs = @(
         $AuthoritativeBaseValidatorScript,
         "--api-dir", $IncrementalBaseApiDir,
@@ -448,6 +458,18 @@ function Assert-AuthoritativeBasePackage {
         if ($script:AuthoritativeOnlineItemCount -le 0) {
             throw "Public weekly manifest did not provide a positive item_count; deployment is blocked."
         }
+        $publicIdentityArgs = @(
+            $AuthoritativeBaseRecoveryScript,
+            "--source-api-dir", $IncrementalBaseApiDir,
+            "--data-root", $CloudRunDataRoot,
+            "--public-base", $PublicApiBase,
+            "--report", $authoritativeBasePublicIdentityReportPath
+        )
+        if (-not [string]::IsNullOrWhiteSpace($ProxyUrl)) {
+            $publicIdentityArgs += @("--proxy-url", $ProxyUrl)
+        }
+        python @publicIdentityArgs
+        Assert-NativeSuccess "Authoritative current_release public activity-ID validation"
         $validatorArgs += @(
             "--require-external-runtime",
             "--expected-online-item-count", $script:AuthoritativeOnlineItemCount
@@ -597,6 +619,34 @@ function New-SanjiSourceContract {
         [object]$Summary,
         [string]$SummaryPath
     )
+    $acquisitionContract = Get-JsonPropertyValue -Object $Summary -Name "acquisition_contract"
+    if ($null -eq $acquisitionContract) {
+        throw "Sanji latest_summary.json missing acquisition_contract: $SummaryPath"
+    }
+    $acquisitionSchema = [string](Get-JsonPropertyValue -Object $acquisitionContract -Name "schema_version" -DefaultValue "")
+    $acquisitionChannel = [string](Get-JsonPropertyValue -Object $acquisitionContract -Name "channel" -DefaultValue "")
+    $coverageScope = [string](Get-JsonPropertyValue -Object $acquisitionContract -Name "coverage_scope" -DefaultValue "")
+    $activeAccountCount = Convert-JsonInt (Get-JsonPropertyValue -Object $acquisitionContract -Name "active_account_count")
+    $completedAccountCount = Convert-JsonInt (Get-JsonPropertyValue -Object $acquisitionContract -Name "completed_account_count")
+    $fullScopeSyncCompleted = Convert-JsonBool `
+        -Value (Get-JsonPropertyValue -Object $acquisitionContract -Name "full_scope_sync_completed") `
+        -FieldName "acquisition_contract.full_scope_sync_completed"
+    $credentialGatePassed = Convert-JsonBool `
+        -Value (Get-JsonPropertyValue -Object $acquisitionContract -Name "credential_gate_passed") `
+        -FieldName "acquisition_contract.credential_gate_passed"
+    $backendChannelEnabled = Convert-JsonBool `
+        -Value (Get-JsonPropertyValue -Object $acquisitionContract -Name "backend_channel_enabled") `
+        -FieldName "acquisition_contract.backend_channel_enabled"
+    if ($acquisitionSchema -ne "sanji_wechat_client.v1" -or $acquisitionChannel -ne "wechat_client") {
+        throw "Sanji source contract violation: expected sanji_wechat_client.v1/wechat_client, got $acquisitionSchema/$acquisitionChannel"
+    }
+    if ($coverageScope -ne "broadcast_only" -or $backendChannelEnabled) {
+        throw "Sanji source contract violation: expected broadcast_only with backend channel disabled."
+    }
+    if ($activeAccountCount -ne 128 -or $completedAccountCount -ne 128 -or -not $fullScopeSyncCompleted -or -not $credentialGatePassed) {
+        throw "Sanji source contract violation: active-only cycle is incomplete (active=$activeAccountCount completed=$completedAccountCount full=$fullScopeSyncCompleted credential_gate=$credentialGatePassed)."
+    }
+
     $rssContract = Get-JsonPropertyValue -Object $Summary -Name "rss_contract"
     if ($null -eq $rssContract) {
         throw "Sanji latest_summary.json missing rss_contract: $SummaryPath"
@@ -635,9 +685,17 @@ function New-SanjiSourceContract {
     }
 
     return [ordered]@{
-        schema_version = "weekly_sanji_source_contract.v1"
-        source_mode = "sanji_desktop_rss"
+        schema_version = "weekly_sanji_source_contract.v2"
+        source_mode = "sanji_desktop_client"
         source = "sanji_desktop_local_sqlite_snapshot"
+        acquisition_contract = $acquisitionSchema
+        acquisition_channel = $acquisitionChannel
+        coverage_scope = $coverageScope
+        active_account_count = $activeAccountCount
+        completed_account_count = $completedAccountCount
+        full_scope_sync_completed = $fullScopeSyncCompleted
+        credential_gate_passed = $credentialGatePassed
+        backend_channel_enabled = $backendChannelEnabled
         latest_summary_path = $SummaryPath
         generated_at = [string](Get-JsonPropertyValue -Object $Summary -Name "generated_at" -DefaultValue "")
         latest_publish = [string](Get-JsonPropertyValue -Object $Summary -Name "latest_publish" -DefaultValue "")
@@ -655,7 +713,7 @@ function Assert-SanjiLatestExportReady {
         [string]$Mode,
         [string]$ReportPath
     )
-    if ($Mode -ne "sanji_desktop_rss") {
+    if (-not (Test-SanjiClientSourceMode -Mode $Mode)) {
         return
     }
 
@@ -749,7 +807,7 @@ function Update-ApiManifestSourceContract {
 
     $sanjiSummaryPath = ""
     $sanjiContractWritten = $false
-    if ($Mode -eq "sanji_desktop_rss") {
+    if ((Test-SanjiClientSourceMode -Mode $Mode)) {
         $sanjiSummaryPath = Get-SanjiLatestSummaryPath
         if ([string]::IsNullOrWhiteSpace($sanjiSummaryPath)) {
             throw "Sanji source contract requires latest_summary.json before publish."
@@ -783,7 +841,7 @@ function Update-ApiManifestSourceContract {
         api_dir = $ReleaseApiDir
         manifest_path = $manifestPath
         sanji_latest_summary_path = $sanjiSummaryPath
-        sanji_source_queue_path = if ($Mode -eq "sanji_desktop_rss") { $manifest.source_queue_path } else { "" }
+        sanji_source_queue_path = if ((Test-SanjiClientSourceMode -Mode $Mode)) { $manifest.source_queue_path } else { "" }
         sanji_source_contract_written = $sanjiContractWritten
         boundary = [pscustomobject]@{
             manifest_write_executed = $true
@@ -1838,7 +1896,7 @@ if (-not $DryRun -and $SourceMode -eq "docker_exporter") {
 } else {
     Write-Host ""
     Write-Host "▶ Skip legacy 17300 exporter auth/QR diagnostics for Sanji source mode" -ForegroundColor Yellow
-    Write-Host "  SourceMode=sanji_desktop_rss consumes Sanji Desktop DB/RSS snapshot; use -SourceMode docker_exporter for deliberate 17300 fallback." -ForegroundColor DarkGray
+    Write-Host "  SourceMode=sanji_desktop_client consumes the Sanji 1.1.x WeChat-client snapshot; sanji_desktop_rss is a compatibility alias only." -ForegroundColor DarkGray
 }
 
 Assert-FullIncrementalPreflightGate
@@ -1855,7 +1913,7 @@ if (-not $DisableIncrementalMerge -or $DeployBackend) {
     }
 }
 
-if ($SourceMode -eq "sanji_desktop_rss") {
+if ((Test-SanjiClientSourceMode -Mode $SourceMode)) {
     Invoke-RunStep "Freeze Sanji source snapshot before build" {
         Assert-SanjiLatestExportReady `
             -Mode $SourceMode `
@@ -1904,7 +1962,7 @@ if (-not $SkipBuild) {
             (Test-Path (Join-Path $vlDir "weekly_activity_recommendation_review_candidates.jsonl")) -and
             (Test-Path (Join-Path $vlDir "summary.json"))
         )
-        $allowImplicitVlResume = ($PosterExtractionMode -eq "vl_direct_qwen" -and $SourceMode -ne "sanji_desktop_rss")
+        $allowImplicitVlResume = ($PosterExtractionMode -eq "vl_direct_qwen" -and -not (Test-SanjiClientSourceMode -Mode $SourceMode))
         if (-not [string]::IsNullOrWhiteSpace($ResumeVlDir)) {
             $pipelineArgs.ResumeVlDir = $ResumeVlDir
             Write-Host "  Resume VL from explicit complete package: $ResumeVlDir" -ForegroundColor Cyan
@@ -1917,10 +1975,10 @@ if (-not $SkipBuild) {
         } elseif ($allowImplicitVlResume -and (Test-Path $vlEvidenceDir) -and ((Get-ChildItem $vlEvidenceDir -File -ErrorAction SilentlyContinue | Measure-Object).Count -gt 0)) {
             $pipelineArgs.ResumeVlEvidenceDir = $vlEvidenceDir
             Write-Host "  Auto-resume VL enrichment from evidence $vlEvidenceDir ($((Get-ChildItem $vlEvidenceDir -File -ErrorAction SilentlyContinue | Measure-Object).Count) existing evidence files)" -ForegroundColor Cyan
-        } elseif ($SourceMode -eq "sanji_desktop_rss" -and ($vlCompleteOutput -or (Test-Path $vlEvidenceDir))) {
+        } elseif ((Test-SanjiClientSourceMode -Mode $SourceMode) -and ($vlCompleteOutput -or (Test-Path $vlEvidenceDir))) {
             Write-Host "  Skip implicit VL resume for Sanji source: Sanji source snapshot must be rebuilt for this run." -ForegroundColor Yellow
         }
-        if ($SourceMode -eq "sanji_desktop_rss") {
+        if ((Test-SanjiClientSourceMode -Mode $SourceMode)) {
             $sanjiQueueForPipeline = if (-not [string]::IsNullOrWhiteSpace($script:SanjiRunQueuePath)) {
                 $script:SanjiRunQueuePath
             } else {
@@ -2297,7 +2355,7 @@ Invoke-RunStep "Repair API manifest provenance" {
     Assert-NativeSuccess "API manifest provenance repair"
 }
 
-if ($SourceMode -eq "sanji_desktop_rss") {
+if ((Test-SanjiClientSourceMode -Mode $SourceMode)) {
     Invoke-RunStep "Use frozen Sanji source snapshot for manifest and coverage gates" {
         if ([string]::IsNullOrWhiteSpace($script:SanjiRunSummaryPath) -or -not (Test-Path -LiteralPath $script:SanjiRunSummaryPath)) {
             throw "Frozen Sanji summary snapshot is unavailable: $($script:SanjiRunSummaryPath)"
@@ -2504,7 +2562,7 @@ if ((Test-Path $aggregateChildPosterOcrRuntimeReleasePreflightReportPath) -and (
         $sourceMaterialArgs += "--source-url-map"
         $sourceMaterialArgs += $sourceUrlMapForOcr
     }
-    $sourceMaterialQueuePaths = if ($SourceMode -eq "sanji_desktop_rss") {
+    $sourceMaterialQueuePaths = if ((Test-SanjiClientSourceMode -Mode $SourceMode)) {
         $sanjiQueueForSourceMaterial = if (-not [string]::IsNullOrWhiteSpace($script:SanjiRunQueuePath)) {
             $script:SanjiRunQueuePath
         } else {
@@ -2534,7 +2592,7 @@ if ((Test-Path $aggregateChildPosterOcrRuntimeReleasePreflightReportPath) -and (
 if (Test-Path $ExporterFreshnessPreflightScript) {
     Write-Host ""
     Write-Host "▶ Build weekly exporter freshness preflight" -ForegroundColor Yellow
-    $latestQueueSummaryPath = if ($SourceMode -eq "sanji_desktop_rss") {
+    $latestQueueSummaryPath = if ((Test-SanjiClientSourceMode -Mode $SourceMode)) {
         if (-not [string]::IsNullOrWhiteSpace($script:SanjiRunSummaryPath)) {
             $script:SanjiRunSummaryPath
         } else {
@@ -2543,7 +2601,7 @@ if (Test-Path $ExporterFreshnessPreflightScript) {
     } else {
         Join-Path $Longrun "LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE\summary.json"
     }
-    if ($SourceMode -ne "sanji_desktop_rss" -and -not (Test-Path -LiteralPath $latestQueueSummaryPath)) {
+    if (-not (Test-SanjiClientSourceMode -Mode $SourceMode) -and -not (Test-Path -LiteralPath $latestQueueSummaryPath)) {
         $legacyQueueSummaryPath = Join-Path $Longrun "LATEST_HUAIDJ_DAILY_DOWNLOAD_QUEUE\summary.json"
         if (Test-Path -LiteralPath $legacyQueueSummaryPath) {
             $latestQueueSummaryPath = $legacyQueueSummaryPath
@@ -2699,7 +2757,7 @@ if ($qualityExitCode -ne 0) {
 }
 Write-Host "  ✓ Run release package quality gate" -ForegroundColor Green
 
-if ($SourceMode -eq "sanji_desktop_rss") {
+if ((Test-SanjiClientSourceMode -Mode $SourceMode)) {
     Write-Host ""
     Write-Host "▶ Run Sanji source coverage gate" -ForegroundColor Yellow
     if (-not (Test-Path $SanjiGapAuditScript)) {
@@ -2811,7 +2869,7 @@ Invoke-RunStep "Run release guard against candidate API package" {
         "-PublicApiBase", $PublicApiBase,
         "-SkipPublicApiProbe"
     )
-    if ($SourceMode -eq "sanji_desktop_rss") {
+    if ((Test-SanjiClientSourceMode -Mode $SourceMode)) {
         $guardDailyQueueDir = if (-not [string]::IsNullOrWhiteSpace($script:SanjiRunQueuePath)) {
             Split-Path -Parent $script:SanjiRunQueuePath
         } else {

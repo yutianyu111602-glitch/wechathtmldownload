@@ -66,7 +66,7 @@ def is_sanji_prefetch_summary(summary: dict[str, Any]) -> bool:
     source_mode = first_string(summary.get("source_mode"))
     source = first_string(summary.get("source"))
     rss_contract = summary.get("rss_contract") if isinstance(summary.get("rss_contract"), dict) else {}
-    return source_mode == "sanji_desktop_rss" or source == "sanji_desktop" or "Sanji desktop" in first_string(rss_contract.get("source"))
+    return source_mode in {"sanji_desktop_client", "sanji_desktop_rss"} or source == "sanji_desktop" or "Sanji desktop" in first_string(rss_contract.get("source"))
 
 
 def jsonl_account_counts(path: Path) -> Counter[str]:
@@ -530,7 +530,7 @@ def build_findings(report: dict[str, Any], min_items: int) -> list[dict[str, str
     if active and not sanji_snapshot and int(accounts_requested or 0) < active:
         findings.append({"severity": "error", "code": "PREFETCH_ACCOUNT_GAP", "message": "prefetch did not request all active accounts"})
     if sanji_snapshot:
-        findings.append({"severity": "info", "code": "SANJI_DESKTOP_SNAPSHOT_SOURCE", "message": "Sanji Desktop/RSS snapshot source has no exporter account-request contract"})
+        findings.append({"severity": "info", "code": "SANJI_DESKTOP_SNAPSHOT_SOURCE", "message": "Sanji WeChat-client snapshot source uses its own active-account acquisition contract, not the legacy exporter request contract"})
     elif prefetch.get("exporter_refresh_requested") is not True:
         findings.append({"severity": "warning", "code": "NO_EXPORTER_REFRESH", "message": "prefetch used only local _articles.json; high-volume accounts may be capped at first page"})
     coverage = report.get("account_coverage") or {}

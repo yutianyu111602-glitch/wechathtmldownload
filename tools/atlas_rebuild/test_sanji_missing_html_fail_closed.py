@@ -240,7 +240,7 @@ def test_historical_missing_html_has_explicit_nonblocking_disposition(tmp_path) 
     assert rows[0]["disposition"] == "ignored_historical_before_cutoff"
 
 
-def test_formal_refresh_defaults_to_744_hours_and_rechecks_after_fetch() -> None:
+def test_formal_client_sync_defaults_to_one_week_while_postfetch_rechecks_month_snapshot() -> None:
     repo_root = Path(__file__).resolve().parents[2]
     export_wrapper = (repo_root / "tools/stage7_rewrite/run_sanji_desktop_recent_export.ps1").read_text(
         encoding="utf-8"
@@ -252,11 +252,11 @@ def test_formal_refresh_defaults_to_744_hours_and_rechecks_after_fetch() -> None
         encoding="utf-8"
     )
 
-    assert "[int]$SanjiRefreshCutoffHours = 744" in export_wrapper
+    assert "[int]$SanjiRefreshCutoffHours = 168" in export_wrapper
     assert "sanji_recent_fetch_refs_postfetch_" in export_wrapper
     assert "postfetch" in export_wrapper.lower()
     assert "-SanjiRefreshCutoffHours" in outer_wrapper
-    assert "[int]$SanjiRefreshCutoffHours = 744" in outer_wrapper
+    assert "[int]$SanjiRefreshCutoffHours = 168" in outer_wrapper
     assert "-SanjiRefreshCutoffHours $SanjiRefreshCutoffHours" in outer_wrapper
     assert "unresolved_missing_html" in outer_wrapper
     assert "SanjiRefreshCutoffHours" in outer_wrapper
@@ -346,12 +346,22 @@ def _run_outer_skip_gate(tmp_path: Path, *, unresolved: int) -> subprocess.Compl
             "sanji_db_snapshot_export": True,
             "snapshot_db_path": str(snapshot),
         },
+        "acquisition_contract": {
+            "schema_version": "sanji_wechat_client.v1",
+            "channel": "wechat_client",
+            "coverage_scope": "broadcast_only",
+            "active_account_count": 128,
+            "completed_account_count": 128,
+            "full_scope_sync_completed": True,
+            "credential_gate_passed": True,
+            "backend_channel_enabled": False,
+        },
         "sanji_refresh": {
             "enabled": True,
             "fetch_refs_path": str(ledger),
             "fetch_refs_summary": {
                 "generated_at": generated_at,
-                "cutoff_ts": now_epoch - 744 * 3600,
+                "cutoff_ts": now_epoch - 168 * 3600,
                 "unresolved_missing_html": unresolved,
                 "pending_ref_count": unresolved,
                 "ledger_row_count": unresolved,
@@ -377,7 +387,7 @@ def _run_outer_skip_gate(tmp_path: Path, *, unresolved: int) -> subprocess.Compl
             "-SkipSanjiExport",
             "-SkipNotify",
             "-SanjiRefreshCutoffHours",
-            "744",
+            "168",
             "-SanjiSummaryMaxAgeHours",
             "1",
             "-SanjiExportOutRoot",
