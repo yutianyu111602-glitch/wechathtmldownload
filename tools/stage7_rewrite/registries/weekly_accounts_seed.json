@@ -1,8 +1,8 @@
 {
   "schema_version": "weekly_account_registry.v1",
-  "updated_at": "2026-07-09",
+  "updated_at": "2026-08-06",
   "source_export": "D:\\DDownload\\公众号 (5).json",
-  "notes": "132 accounts (128 active, 0 review, 4 inactive). Added Klub.bby as Guangzhou label/collective on 2026-07-09.",
+  "notes": "132 accounts (104 active, 0 review, 28 inactive). On 2026-08-06 the user confirmed that a source with no article updates for more than 180 days is treated as closed and excluded from authorization/sync; historical activity data remains preserved.",
   "accounts": [
     {
       "account_id": "no8pawnshop",
@@ -11,7 +11,7 @@
       "aliases": [],
       "city_key": "taipei",
       "type": "unknown",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 8,
       "last_seen_at": "2026-05-08",
       "export_completed": false,
@@ -20,7 +20,9 @@
       "avatar_url": "http://mmbiz.qpic.cn/mmbiz_png/rs5NiavrdLWuibGO4LlfibU0HLAmPkich28gqK7EyofZQPCpCxv42UBCXNkrU6ureiaEdzfPWsIj3ZBOdwKUzDFDkxA/0?wx_fmt=png",
       "source": "wechat-article-exporter",
       "city_source": "where_to_rave_map_crosscheck_20260514",
-      "city_verified_at": "2026-05-14"
+      "city_verified_at": "2026-05-14",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2024-05-16，截至 2026-08-06 连续 811 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "socialroom",
@@ -29,14 +31,16 @@
       "aliases": [],
       "city_key": "hongkong",
       "type": "unknown",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 10,
       "last_seen_at": "2026-05-08",
       "export_completed": false,
       "export_synced_count": 3,
       "export_total_count": 3,
       "avatar_url": "http://mmbiz.qpic.cn/sz_mmbiz_png/6ribcMbSxDXUQWzkAM4EdB6cb2wuGHbOiaenHnvAsUR9BtSlKGAA1Ybr6d2DrrWujVCDwT9WHt2T2uVibH6j3AwQA/0?wx_fmt=png",
-      "source": "wechat-article-exporter"
+      "source": "wechat-article-exporter",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2022-07-06，截至 2026-08-06 连续 1491 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "account_d186bcf5bc",
@@ -128,8 +132,8 @@
       "avatar_url": "http://mmbiz.qpic.cn/mmbiz_png/yjDYn1ic8XqXLKKTGficH3ythkheDv5Lw3iaeLNmiaKic9VSicykYHAPL0MIHgaCb4YDiacsdnjoiaicjyicvzs1nKb6AeIQ/0?wx_fmt=png",
       "source": "wechat-article-exporter",
       "city_scope": "online",
-      "inactive_reason": "inactive: 本地下载最新样例停留在旧音乐资讯/媒体内容，暂不作为城市活动源发布",
-      "inactive_verified_at": "2026-05-14"
+      "inactive_reason": "closed: 用户确认长期不更新即停业；本地下载最新样例停留在旧音乐资讯/媒体内容，暂不作为城市活动源发布",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "account_a503b643c6",
@@ -281,14 +285,16 @@
       "aliases": [],
       "city_key": "beijing",
       "type": "unknown",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 10,
       "last_seen_at": "2026-05-08",
       "export_completed": false,
       "export_synced_count": 2,
       "export_total_count": 2,
       "avatar_url": "http://mmbiz.qpic.cn/mmbiz_png/CQPWMY11zRVHXECHnfb3ZUzd0CdzcHz6g5VR7riaagGAsve4K79vhmQBlibKo3t7YfvTeZKgwhRjnLOt8ib7ibcC6g/0?wx_fmt=png",
-      "source": "wechat-article-exporter"
+      "source": "wechat-article-exporter",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2023-02-17，截至 2026-08-06 连续 1265 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "yuanhe",
@@ -441,7 +447,7 @@
       "aliases": [],
       "city_key": "lanzhou",
       "type": "unknown",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 8,
       "last_seen_at": "2026-05-08",
       "export_completed": false,
@@ -450,7 +456,9 @@
       "avatar_url": "http://mmbiz.qpic.cn/sz_mmbiz_png/Nwm4Wlcz8JCUicWbfOeEzFJTLg5BLDaygQnmUicAluWrynSkSyuFI99AQKp6na8FDvsXf6VxAmKtB2lN5XVXUS7Q/0?wx_fmt=png",
       "source": "wechat-article-exporter",
       "city_source": "where_to_rave_map_crosscheck_20260514",
-      "city_verified_at": "2026-05-14"
+      "city_verified_at": "2026-05-14",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2023-12-06，截至 2026-08-06 连续 973 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "ours_pres",
@@ -477,7 +485,7 @@
       "aliases": [],
       "city_key": "zhuhai",
       "type": "unknown",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 8,
       "last_seen_at": "2026-05-08",
       "export_completed": false,
@@ -486,7 +494,9 @@
       "avatar_url": "http://mmbiz.qpic.cn/mmbiz_png/jgEE5DfrAuBQCOvrtISjfFFbKW5FiaibrHUdJ4qSicVhN693NzZZCVUIg6FNicMntLtkdFUpKRz1WH7NsFABLVl4qg/0?wx_fmt=png",
       "source": "wechat-article-exporter",
       "city_source": "where_to_rave_map_crosscheck_20260514",
-      "city_verified_at": "2026-05-14"
+      "city_verified_at": "2026-05-14",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2025-07-14，截至 2026-08-06 连续 387 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "info_qingdao",
@@ -653,7 +663,7 @@
       "aliases": [],
       "city_key": "chongqing",
       "type": "club",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 8,
       "last_seen_at": "2026-05-08",
       "export_completed": false,
@@ -662,7 +672,9 @@
       "avatar_url": "http://mmbiz.qpic.cn/sz_mmbiz_png/om02VGOXxltsjnq6qt86MiaCpx8QA1DKxXxYLvXAEIjRnTMh5VlmGCTRKm0CRFFW673bABJDtAvica9NIbPyZyxg/0?wx_fmt=png",
       "source": "wechat-article-exporter",
       "city_source": "where_to_rave_map_crosscheck_20260514",
-      "city_verified_at": "2026-05-14"
+      "city_verified_at": "2026-05-14",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2025-06-13，截至 2026-08-06 连续 418 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "enlightening",
@@ -700,8 +712,8 @@
       "city_source": "crosscheck_web_local_where_to_rave_20260514",
       "city_verified_at": "2026-05-14",
       "city_evidence_note": "本地下载文章显示中国江苏苏州张家港SOSCLUB",
-      "inactive_reason": "inactive: 本地下载样例为2016年张家港SOS娱乐报道，疑似非当前活动源",
-      "inactive_verified_at": "2026-05-14"
+      "inactive_reason": "closed: 用户确认长期不更新即停业；本地下载样例为2016年张家港SOS娱乐报道，疑似非当前活动源",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "account_c32511ebe6",
@@ -726,7 +738,7 @@
       "aliases": [],
       "city_key": "guangzhou",
       "type": "unknown",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 8,
       "last_seen_at": "2026-05-08",
       "export_completed": false,
@@ -735,7 +747,9 @@
       "avatar_url": "http://mmbiz.qpic.cn/mmbiz_png/1WSHvtz7kbkg7icDo3KV9zhE7gTdhnPMBPvC93G4iaTcaP45c351HWicuj63zT9vTq1uSTdjVuaSc1xORS3PCR31g/0?wx_fmt=png",
       "source": "wechat-article-exporter",
       "city_source": "where_to_rave_map_crosscheck_20260514",
-      "city_verified_at": "2026-05-14"
+      "city_verified_at": "2026-05-14",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2024-09-27，截至 2026-08-06 连续 677 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "heim_shanghai",
@@ -760,14 +774,16 @@
       "aliases": [],
       "city_key": "guangzhou",
       "type": "club",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 10,
       "last_seen_at": "2026-05-08",
       "export_completed": false,
       "export_synced_count": 20,
       "export_total_count": 120,
       "avatar_url": "http://mmbiz.qpic.cn/sz_mmbiz_png/67RZZUUq2vOSX13XtXgsnsln5w3ibtZEJgqbTxXy1LtY00MwMpqVHVoCRf8GicuYnV4pl7gglYP5z2kceaRU86lw/0?wx_fmt=png",
-      "source": "wechat-article-exporter"
+      "source": "wechat-article-exporter",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2026-01-31，截至 2026-08-06 连续 186 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "wuhanprison",
@@ -808,7 +824,7 @@
       "aliases": [],
       "city_key": "nanning",
       "type": "media",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 8,
       "last_seen_at": "2026-05-08",
       "export_completed": false,
@@ -817,7 +833,9 @@
       "avatar_url": "http://mmbiz.qpic.cn/sz_mmbiz_png/WIvVQLVWbvd09k9PaibibALWC9BQ6DOWvowB6mx2wRibByuiawaMxvNnx5fKHZVN24Dl6UnC6IwKUNlxOClicpD66Aw/0?wx_fmt=png",
       "source": "wechat-article-exporter",
       "city_source": "where_to_rave_map_crosscheck_20260514",
-      "city_verified_at": "2026-05-14"
+      "city_verified_at": "2026-05-14",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2025-10-27，截至 2026-08-06 连续 282 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "deepcool",
@@ -844,14 +862,16 @@
       "aliases": [],
       "city_key": "guiyang",
       "type": "club",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 10,
       "last_seen_at": "2026-05-08",
       "export_completed": false,
       "export_synced_count": 20,
       "export_total_count": 31,
       "avatar_url": "http://mmbiz.qpic.cn/sz_mmbiz_png/QibliaNOOib11YQ7NBhibpicrTaL08JfqH6mLurCSt4EscoQicaicdVCucBl194mSvj077uR746NXPMc0ibyo7aYUD1uicA/0?wx_fmt=png",
-      "source": "wechat-article-exporter"
+      "source": "wechat-article-exporter",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2025-08-06，截至 2026-08-06 连续 364 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "powderblackdancefloor",
@@ -860,7 +880,7 @@
       "aliases": [],
       "city_key": "lanzhou",
       "type": "unknown",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 8,
       "last_seen_at": "2026-05-08",
       "export_completed": false,
@@ -869,7 +889,9 @@
       "avatar_url": "http://mmbiz.qpic.cn/sz_mmbiz_png/p7UKsKUmmMAqR0d0WB7nHgaHiaU0X1DicRBTnGswJTMicT7YsIrsQyg3Cn3m9lFwYMNjDKxI5B8ibPAeaSZFeR57Vg/0?wx_fmt=png",
       "source": "wechat-article-exporter",
       "city_source": "where_to_rave_map_crosscheck_20260514",
-      "city_verified_at": "2026-05-14"
+      "city_verified_at": "2026-05-14",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2026-01-22，截至 2026-08-06 连续 195 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "account_6f864352d2",
@@ -985,7 +1007,7 @@
       "aliases": [],
       "city_key": "lhasa",
       "type": "unknown",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 8,
       "last_seen_at": "2026-05-08",
       "export_completed": false,
@@ -994,7 +1016,9 @@
       "avatar_url": "http://mmbiz.qpic.cn/mmbiz_png/E2GR80ThG0miaHVEfRnza4R6mJdrnjNGctS6HBrzVyq15PhAFX5OBajZ4QHlz69eJUxbsE7trWKpAI5x1E8PXrQ/0?wx_fmt=png",
       "source": "wechat-article-exporter",
       "city_source": "where_to_rave_map_crosscheck_20260514",
-      "city_verified_at": "2026-05-14"
+      "city_verified_at": "2026-05-14",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2023-06-08，截至 2026-08-06 连续 1154 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "blip",
@@ -1136,14 +1160,16 @@
       "aliases": [],
       "city_key": "shanghai",
       "type": "club",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 5,
       "last_seen_at": "2026-04-21",
       "export_completed": false,
       "export_synced_count": 0,
       "export_total_count": 0,
       "avatar_url": "http://mmbiz.qpic.cn/mmbiz_png/YJicTlmicFlxnohTBvlAmHuJBtvSKeYHqicSEBeGB07iawet29Y6A4cYlPK3ukKFTWLnrtGfoACbjibcWfeOnysDXuA/0?wx_fmt=png",
-      "source": "wechat-article-exporter"
+      "source": "wechat-article-exporter",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2025-10-25，截至 2026-08-06 连续 284 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "dada_bar_beijing",
@@ -1250,7 +1276,7 @@
       "aliases": [],
       "city_key": "wuhan",
       "type": "unknown",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 1,
       "last_seen_at": "2026-04-21",
       "export_completed": false,
@@ -1260,7 +1286,9 @@
       "source": "wechat-article-exporter",
       "city_source": "crosscheck_web_local_where_to_rave_20260514",
       "city_verified_at": "2026-05-14",
-      "city_evidence_note": "SESH/RA 页面显示 Mininini Klub Wuhan"
+      "city_evidence_note": "SESH/RA 页面显示 Mininini Klub Wuhan",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2025-11-29，截至 2026-08-06 连续 249 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "chengdu_community_radio",
@@ -1322,14 +1350,16 @@
       "aliases": [],
       "city_key": "shanghai",
       "type": "club",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 5,
       "last_seen_at": "2026-04-21",
       "export_completed": false,
       "export_synced_count": 0,
       "export_total_count": 0,
       "avatar_url": "http://mmbiz.qpic.cn/mmbiz_png/dbjzBYsMpsCESyrRHrIqvFia6Je5Pzeiaj2a5EfXMQzlUztvXKORpBvwe3AyMDylRKpqA4trWbyhOoOOYLIA47Pg/0?wx_fmt=png",
-      "source": "wechat-article-exporter"
+      "source": "wechat-article-exporter",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2024-01-11，截至 2026-08-06 连续 937 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "roam",
@@ -1397,8 +1427,8 @@
       "city_source": "crosscheck_web_local_where_to_rave_20260514",
       "city_verified_at": "2026-05-14",
       "city_evidence_note": "本地下载文章/RA 均显示 EchoBay 重庆",
-      "inactive_reason": "inactive: 本地下载文章 ECHOBAY 暂停营业，2025-05-27",
-      "inactive_verified_at": "2026-05-14"
+      "inactive_reason": "closed: 用户确认长期不更新即停业；本地下载文章 ECHOBAY 暂停营业，2025-05-27",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "wigwam",
@@ -1439,7 +1469,7 @@
       "aliases": [],
       "city_key": "shanghai",
       "type": "club",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 1,
       "last_seen_at": "2026-04-21",
       "export_completed": false,
@@ -1448,7 +1478,9 @@
       "avatar_url": "http://mmbiz.qpic.cn/mmbiz_png/ibyagrddnRPJ42euYJaTdxQFss2wamgAULe22yxHVZbPaIbyEzPVkRTFVECOEHKZHdVEMZscCE49MiaEqu6DsX5w/0?wx_fmt=png",
       "source": "wechat-article-exporter",
       "city_source": "where_to_rave_map_crosscheck_20260514",
-      "city_verified_at": "2026-05-14"
+      "city_verified_at": "2026-05-14",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2018-11-30，截至 2026-08-06 连续 2805 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "shcr",
@@ -1457,7 +1489,7 @@
       "aliases": [],
       "city_key": "shanghai",
       "type": "media",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 1,
       "last_seen_at": "2026-04-21",
       "export_completed": false,
@@ -1467,7 +1499,9 @@
       "source": "wechat-article-exporter",
       "city_source": "crosscheck_web_local_where_to_rave_20260514",
       "city_verified_at": "2026-05-14",
-      "city_evidence_note": "Shanghai Community Radio / SHCR"
+      "city_evidence_note": "Shanghai Community Radio / SHCR",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2023-09-17，截至 2026-08-06 连续 1053 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "clubceliashanghai",
@@ -1530,7 +1564,7 @@
       "aliases": [],
       "city_key": "chengdu",
       "type": "unknown",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 1,
       "last_seen_at": "2026-04-21",
       "export_completed": false,
@@ -1540,7 +1574,9 @@
       "source": "wechat-article-exporter",
       "city_source": "crosscheck_web_local_where_to_rave_20260514",
       "city_verified_at": "2026-05-14",
-      "city_evidence_note": "Neocha 成都夜生活文章列为成都 FunkyTown方糖"
+      "city_evidence_note": "Neocha 成都夜生活文章列为成都 FunkyTown方糖",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2025-12-30，截至 2026-08-06 连续 218 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "cueclub",
@@ -1549,7 +1585,7 @@
       "aliases": [],
       "city_key": "chengdu",
       "type": "club",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 1,
       "last_seen_at": "2026-04-21",
       "export_completed": false,
@@ -1559,7 +1595,9 @@
       "source": "wechat-article-exporter",
       "city_source": "crosscheck_web_local_where_to_rave_20260514",
       "city_verified_at": "2026-05-14",
-      "city_evidence_note": "Chengdu-Expat/The World Underground: Cue Club Chengdu"
+      "city_evidence_note": "Chengdu-Expat/The World Underground: Cue Club Chengdu",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2023-04-19，截至 2026-08-06 连续 1204 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "oil",
@@ -1623,7 +1661,7 @@
       "aliases": [],
       "city_key": "shanghai",
       "type": "club",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 1,
       "last_seen_at": "2026-04-21",
       "export_completed": false,
@@ -1632,7 +1670,9 @@
       "avatar_url": "http://mmbiz.qpic.cn/sz_mmbiz_png/TR39pQT6LSiaSRfgVicqHkKUs0Y3Xib9MicicWIWP403fFlGYnjsAibTjBIjk3guYc7TdvHRWMGA9icl35UUmsNTHia66A/0?wx_fmt=png",
       "source": "wechat-article-exporter",
       "city_source": "where_to_rave_map_crosscheck_20260514",
-      "city_verified_at": "2026-05-14"
+      "city_verified_at": "2026-05-14",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2025-08-10，截至 2026-08-06 连续 360 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "illum_shanghai",
@@ -1689,7 +1729,7 @@
       "aliases": [],
       "city_key": "beijing",
       "type": "unknown",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 1,
       "last_seen_at": "2026-04-21",
       "export_completed": false,
@@ -1698,7 +1738,9 @@
       "avatar_url": "http://mmbiz.qpic.cn/sz_mmbiz_png/tMAGvBiaUv0ocictNVZk6T1JHx23xOiaQIllIRUHOtBZ9brmlhKKWvvGB0nqfKzI1pIV479WqEgYYQsMTSDsv0QZw/0?wx_fmt=png",
       "source": "wechat-article-exporter",
       "city_source": "where_to_rave_map_crosscheck_20260514",
-      "city_verified_at": "2026-05-14"
+      "city_verified_at": "2026-05-14",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2025-11-13，截至 2026-08-06 连续 265 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "account_f17a027d5d",
@@ -1806,14 +1848,16 @@
       "aliases": [],
       "city_key": "changsha",
       "type": "unknown",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 5,
       "last_seen_at": "2026-04-21",
       "export_completed": false,
       "export_synced_count": 0,
       "export_total_count": 0,
       "avatar_url": "http://mmbiz.qpic.cn/mmbiz_png/bkbvAdtAvB9ErWib3mic9en5tCzhW1KnU3U86OP40nLUqMxYibgNT0DGxSLZYUCyymfnmTS27ZpJkIWQVqIPz01Eg/0?wx_fmt=png",
-      "source": "wechat-article-exporter"
+      "source": "wechat-article-exporter",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2023-09-04，截至 2026-08-06 连续 1066 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "baihui",
@@ -1842,7 +1886,7 @@
       "aliases": [],
       "city_key": "guangzhou",
       "type": "club",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 1,
       "last_seen_at": "2026-04-21",
       "export_completed": false,
@@ -1852,7 +1896,9 @@
       "source": "wechat-article-exporter",
       "city_source": "crosscheck_web_local_where_to_rave_20260514",
       "city_verified_at": "2026-05-14",
-      "city_evidence_note": "DJ Mag China Awards: Club Between Guangzhou"
+      "city_evidence_note": "DJ Mag China Awards: Club Between Guangzhou",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2024-10-17，截至 2026-08-06 连续 657 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "dada_kunming",
@@ -1919,8 +1965,8 @@
       "export_total_count": 0,
       "avatar_url": "http://mmbiz.qpic.cn/mmbiz_png/v1LsFflPHLicDtzDMnM2YbNSxCL719MtYiaeuGqQTicxpX6FsTK043jnUmsOxamgGbgkP2K4uXyuiaWxv4a6bpGAdA/0?wx_fmt=png",
       "source": "wechat-article-exporter",
-      "inactive_reason": "inactive: 本地下载文章标题显示 2024 100%完工派对最终篇，暂不作为当前城市活动源",
-      "inactive_verified_at": "2026-05-14"
+      "inactive_reason": "closed: 用户确认长期不更新即停业；本地下载文章标题显示 2024 100%完工派对最终篇，暂不作为当前城市活动源",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "deeproll",
@@ -2046,7 +2092,7 @@
       "aliases": [],
       "city_key": "taipei",
       "type": "unknown",
-      "status": "active",
+      "status": "inactive",
       "sync_priority": 1,
       "last_seen_at": "2026-04-21",
       "export_completed": false,
@@ -2055,7 +2101,9 @@
       "avatar_url": "http://mmbiz.qpic.cn/mmbiz_png/nXBcdSycoK1gx8kT4Xia0AN7sFCia64XfNabZZTASqiaa2k4ibFYic0RtwEicYSRzkkBDYrCJffNcL94qhkfpqEx7pxA/0?wx_fmt=png",
       "source": "wechat-article-exporter",
       "city_source": "where_to_rave_map_crosscheck_20260514",
-      "city_verified_at": "2026-05-14"
+      "city_verified_at": "2026-05-14",
+      "inactive_reason": "closed: 用户确认长期不更新即停业；Sanji 最后文章 2025-11-10，截至 2026-08-06 连续 268 天无更新",
+      "inactive_verified_at": "2026-08-06"
     },
     {
       "account_id": "oonoo",
@@ -2296,7 +2344,10 @@
       "account_id": "klub_bby",
       "account_name": "Klub.bby",
       "fakeid": "MzIyMTMyMTY0OA==",
-      "aliases": ["Klub Bby", "Klubbby"],
+      "aliases": [
+        "Klub Bby",
+        "Klubbby"
+      ],
       "city_key": "guangzhou",
       "type": "label",
       "status": "active",
